@@ -4,10 +4,10 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
+  CustomMessageButton,
   Card,
 } from '../components';
-import { defaultSnapOrigin } from '../config';
+import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import {
   useMetaMask,
   useInvokeSnap,
@@ -102,25 +102,28 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const { error } = useMetaMaskContext();
-  const { isFlask, snapsDetected, installedSnap } = useMetaMask();
-  const requestSnap = useRequestSnap();
-  const invokeSnap = useInvokeSnap();
+  const { isFlask, snapsDetected, installedSnaps } = useMetaMask();
+  const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
+  const requestGatorSnap = useRequestSnap(gatorSnapOrigin);
+  const invokeKernelSnap = useInvokeSnap(kernelSnapOrigin);
 
-  const isMetaMaskReady = isLocalSnap(defaultSnapOrigin)
+  const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
     ? isFlask
     : snapsDetected;
+  const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
+  const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
 
   const handleSendHelloClick = async () => {
-    await invokeSnap({ method: 'hello' });
+    await invokeKernelSnap({ method: 'hello' });
   };
 
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        Welcome to <Span>7715 permissions snap</Span>
       </Heading>
       <Subtitle>
-        Get started by editing <code>src/index.tsx</code>
+        Get started by installing snaps and sending permissions requests.
       </Subtitle>
       <CardContainer>
         {error && (
@@ -139,15 +142,17 @@ const Index = () => {
             fullWidth
           />
         )}
-        {!installedSnap && (
+
+        {/* Show connect buttons */}
+        {!isKernelSnapReady && (
           <Card
             content={{
-              title: 'Connect',
+              title: 'Connect(kernel)',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Get started by connecting to and installing the kernel snap.',
               button: (
                 <ConnectButton
-                  onClick={requestSnap}
+                  onClick={requestKernelSnap}
                   disabled={!isMetaMaskReady}
                 />
               ),
@@ -155,39 +160,76 @@ const Index = () => {
             disabled={!isMetaMaskReady}
           />
         )}
-        {shouldDisplayReconnectButton(installedSnap) && (
+        {!isGatorSnapReady && (
           <Card
             content={{
-              title: 'Reconnect',
+              title: 'Connect(gator)',
               description:
-                'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
+                'Get started by connecting to and installing the gator snap.',
               button: (
-                <ReconnectButton
-                  onClick={requestSnap}
-                  disabled={!installedSnap}
+                <ConnectButton
+                  onClick={requestGatorSnap}
+                  disabled={!isMetaMaskReady}
                 />
               ),
             }}
-            disabled={!installedSnap}
+            disabled={!isMetaMaskReady}
           />
         )}
+
+        {/* Show reconnect buttons */}
+        {shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin]) && (
+          <Card
+            content={{
+              title: 'Reconnect(kernel)',
+              description:
+                'While connected to a local running kernel snap this button will always be displayed in order to update the snap if a change is made.',
+              button: (
+                <ReconnectButton
+                  onClick={requestKernelSnap}
+                  disabled={!isKernelSnapReady}
+                />
+              ),
+            }}
+            disabled={!isKernelSnapReady}
+          />
+        )}
+        {shouldDisplayReconnectButton(installedSnaps[gatorSnapOrigin]) && (
+          <Card
+            content={{
+              title: 'Reconnect(gator)',
+              description:
+                'While connected to a local running gator snap this button will always be displayed in order to update the snap if a change is made.',
+              button: (
+                <ReconnectButton
+                  onClick={requestGatorSnap}
+                  disabled={!isGatorSnapReady}
+                />
+              ),
+            }}
+            disabled={!isGatorSnapReady}
+          />
+        )}
+
+        {/* Send permissions request */}
         <Card
           content={{
             title: 'Send Hello message',
             description:
               'Display a custom message within a confirmation screen in MetaMask.',
             button: (
-              <SendHelloButton
+              <CustomMessageButton
+                text="Send message"
                 onClick={handleSendHelloClick}
-                disabled={!installedSnap}
+                disabled={!installedSnaps[kernelSnapOrigin]}
               />
             ),
           }}
-          disabled={!installedSnap}
+          disabled={!installedSnaps[kernelSnapOrigin]}
           fullWidth={
             isMetaMaskReady &&
-            Boolean(installedSnap) &&
-            !shouldDisplayReconnectButton(installedSnap)
+            Boolean(installedSnaps[kernelSnapOrigin]) &&
+            !shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])
           }
         />
         <Notice>

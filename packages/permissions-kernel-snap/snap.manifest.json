@@ -1,0 +1,35 @@
+{
+  "version": "0.1.0",
+  "description": "Manage onchain 7715 permissions",
+  "proposedName": "MetaMask Permissions Kernel",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MetaMask/snap-7715-permissions.git"
+  },
+  "source": {
+    "shasum": "ylIYi+pRX8cuh8pO6+D/Zwwem+1cO1R74kVg3fqe4NA=",
+    "location": {
+      "npm": {
+        "filePath": "dist/bundle.js",
+        "iconPath": "images/icon.svg",
+        "packageName": "@metamask/permissions-kernel",
+        "registry": "https://registry.npmjs.org/"
+      }
+    }
+  },
+  "initialPermissions": {
+    "snap_dialog": {},
+    "endowment:rpc": {
+      "dapps": true,
+      "snaps": true
+    },
+    "wallet_snap": {
+      "local:http://localhost:8081": {},
+      "npm:@metamask/7715-permissions-provider": {}
+    },
+    "snap_manageState": {},
+    "endowment:page-home": {}
+  },
+  "platformVersion": "6.14.0",
+  "manifestVersion": "0.1"
+}

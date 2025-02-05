@@ -1,4 +1,3 @@
-import { defaultSnapOrigin } from '../config';
 import { useRequest } from './useRequest';
 
 export type InvokeSnapParams = {
@@ -13,7 +12,7 @@ export type InvokeSnapParams = {
  * config.
  * @returns The invokeSnap wrapper method.
  */
-export const useInvokeSnap = (snapId = defaultSnapOrigin) => {
+export const useInvokeSnap = (snapId: string) => {
   const request = useRequest();
 
   /**

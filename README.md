@@ -1,44 +1,64 @@
-# @metamask/template-snap-monorepo
+# 7715 Permissions Snap Monorepo
 
-This repository demonstrates how to develop a snap with TypeScript. For detailed
-instructions, see [the MetaMask documentation](https://docs.metamask.io/guide/snaps.html#serving-a-snap-to-your-local-environment).
+This mono-repository contains the `kernel` and `gator` snaps that implement ERC-7715 and the Permissions registry. 
+dApps send request the permissions request to the exposed JSON-RPC interface.
+A user can grant granular permissions as cryptographic capabilities to allow dApps to execute transactions on their behalf.
 
-MetaMask Snaps is a system that allows anyone to safely expand the capabilities
-of MetaMask. A _snap_ is a program that we run in an isolated environment that
-can customize the wallet experience.
+## Prerequisites
 
-## Snaps is pre-release software
+- [MetaMask Flask](https://consensyssoftware.atlassian.net/wiki/x/IQCOB10)
+- Nodejs `20.0.0` (specified in `.nvmrc`)
+- yarn 3.2.1
 
-To interact with (your) Snaps, you will need to install [MetaMask Flask](https://metamask.io/flask/),
-a canary distribution for developers that provides access to upcoming features.
+## Environment variables
+
+### site
+The snap origin to use(defaults to local if not defined):
+```bash
+KERNEL_SNAP_ORIGIN=local:http://localhost:8080
+GATOR_SNAP_ORIGIN=local:http://localhost:8081
+```
+
+### permissions-kernel-snap
+- SNAP_ENV: The snap uses `SNAP_ENV` to dynamically map permission provider snapId to registered offers in the `PermissionOfferRegistry`. Please make use `SNAP_ENV=dev` before building the snap.
+
+### permissions-provider-snap
+
+- SNAP_ENV: The snap uses `SNAP_ENV` to dynamically set the kernel snap snapId
 
 ## Getting Started
 
-Clone the template-snap repository [using this template](https://github.com/MetaMask/template-snap-monorepo/generate)
-and set up the development environment:
+Clone the [snap-7715-permissions repository](https://github.com/MetaMask/snap-7715-permissions) and set up the development environment:
 
+1. Set the .env `SNAP_ENV=dev` in:
+   - `./packages/permissions-kernel-snap/.env`
+   - `./packages/permissions-provider-snap/.env`
+2. Install and start up snaps with development site
 ```shell
 yarn install && yarn start
 ```
 
-## Cloning
-
-This repository contains GitHub Actions that you may find useful, see
-`.github/workflows` and [Releasing & Publishing](https://github.com/MetaMask/template-snap-monorepo/edit/main/README.md#releasing--publishing)
-below for more information.
-
-If you clone or create this repository outside the MetaMask GitHub organization,
-you probably want to run `./scripts/cleanup.sh` to remove some files that will
-not work properly outside the MetaMask GitHub organization.
-
-If you don't wish to use any of the existing GitHub actions in this repository,
-simply delete the `.github/workflows` directory.
+The development site will start up on `http://localhost:8000/`
 
 ## Contributing
 
-### Testing and Linting
+### Testing
 
-Run `yarn test` to run the tests once.
+> **Note**: `@metamask/snaps-jest` assumes that the snap is built in the
+> directory you're running Jest from. If you're using a different directory,
+> you can specify the path to the snap using the [`root`](#options) option, or
+> by running your own HTTP server.
+>
+> Right now it's not possible to use `@metamask/snaps-jest` with a snap that
+> isn't built.
+
+1. Set the .env `SNAP_ENV=dev` in:
+   - `./packages/permissions-kernel-snap/.env`
+   - `./packages/permissions-provider-snap/.env`
+2. Run `yarn build`
+2. Run `yarn test` to run the tests once.
+
+### Linting
 
 Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and
 fix any automatically fixable issues.
@@ -51,3 +71,38 @@ script in the `lavamoat.allowScripts` section of `package.json`.
 
 See the documentation for [@lavamoat/allow-scripts](https://github.com/LavaMoat/LavaMoat/tree/main/packages/allow-scripts)
 for more information.
+
+## Snaps Preinstall e2e with MetaMask extension
+> :warning: **Tarball file will need to be generate locally as it is not pushed to remote repos. Follow steps below to create a tarball.**
+
+The tarball will allow us to test preinstall on the public [metamask-extension branch](https://github.com/V00D00-child/metamask-extension) without exposing the snaps codebase to the public.
+
+1. Update the .env `SNAP_ENV=prod` in:
+   - `./packages/permissions-kernel-snap/.env`
+   - `./packages/permissions-provider-snap/.env`
+2. From root of repo run the following: 
+```bash
+mkdir deps
+yarn build:pack
+```
+
+### Add preinstalls to mm-extension local build (mm-extension repo)
+
+Follow these steps to build a local version of MetaMask with packed preinstalled snaps:
+1. Copy the tarball files for `snap a` and `snap b` to the mm-extension branch([preinstalled-snap-e2e](https://github.com/V00D00-child/metamask-extension/tree/preinstalled-snap-e2e)) at the path `./deps`
+2. Run `yarn install` to unpack the preinstalled snaps.
+3. Run `yarn dist --build-type flask --apply-lavamoat false` to create a development build of MetaMask for Flask.
+4. Follow these instructions to verify that your local build runs correctly:
+   - [How to add custom build to Chrome](https://github.com/V00D00-child/metamask-extension/blob/main/docs/add-to-chrome.md)
+   - [How to add custom build to Firefox](https://github.com/V00D00-child/metamask-extension/blob/main/docs/add-to-firefox.md)
+5. Once the local build is runing in your browser, you can start interacting with the preinstalled snaps.
+
+### Making permissions requests using preinstalled gator and kernel snap (web wallet repo)
+
+1. Head back to the wallet repo:
+  - Update the `package/site/.env.local` `KERNEL_SNAP_ORIGIN=npm:@metamask/permissions-kernel`
+  - Run `yarn dev`
+  - Navigate to `http://localhost:8000/`
+2. Client connect button to connect dapp to kernel snap.
+3. Make a permissions request.
+4. Requests are sent to `kernel snap` -> `gator snap` preinstalls

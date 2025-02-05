@@ -1,21 +1,31 @@
 {
-  "name": "snap",
+  "name": "@metamask/permissions-kernel",
   "version": "0.1.0",
-  "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
+  "description": "Manage onchain 7715 permissions",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "license": "(MIT-0 OR Apache-2.0)",
+  "exports": {
+    "./package.json": "./package.json",
+    "./snap.manifest.json": "./snap.manifest.json",
+    "./images/icon.svg": "./images/icon.svg",
+    "./dist/bundle.js": "./dist/bundle.js",
+    "./dist/preinstalled-snap.json": "./dist/preinstalled-snap.json"
+  },
   "main": "./dist/bundle.js",
   "files": [
     "dist/",
+    "images/",
     "snap.manifest.json"
   ],
   "scripts": {
     "allow-scripts": "yarn workspace root allow-scripts",
-    "build": "mm-snap build",
+    "build": "mm-snap build && yarn build:preinstalled-snap",
     "build:clean": "yarn clean && yarn build",
+    "build:preinstalled-snap": "node scripts/build-preinstalled-snap.js",
+    "build:pack": "yarn build:clean && yarn pack --filename ../../deps/snap-a-0.1.0.tgz",
     "clean": "rimraf dist",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,ts",
@@ -27,7 +37,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@metamask/snaps-sdk": "^6.14.0"
+    "@metamask/snaps-sdk": "^6.14.0",
+    "viem": "^2.21.29"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
