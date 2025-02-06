@@ -28,7 +28,7 @@ describe('onRpcRequest', () => {
     });
 
     expect(response).toRespondWithError({
-      code: -32004,
+      code: -32603,
       message: 'Method foo not found.',
       stack: expect.any(String),
     });

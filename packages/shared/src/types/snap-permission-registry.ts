@@ -1,5 +1,6 @@
-import { z } from "zod";
-import { zPermissionsRequest, zTypeDescriptor } from "./7715-permissions";
+import { z } from 'zod';
+
+import { zPermissionsRequest, zTypeDescriptor } from './7715-permissions';
 
 // //////////////////////////// Permisions Registry //////////////////////////////
 
@@ -17,9 +18,7 @@ export const zPermissionOffer = z.object({
 /**
  * This is a local permissions offer definition by the permission's provider snaps
  */
-export type PermissionOffer = z.infer<
-  typeof zPermissionOffer
->;
+export type PermissionOffer = z.infer<typeof zPermissionOffer>;
 
 export const zRegisteredPermissionOffer = z.object({
   // An identifier for which snap this permission belongs to:
@@ -38,9 +37,14 @@ export const zRegisteredPermissionOffer = z.object({
 /**
  * This stored offer given by permission's provider snaps.
  */
-export type RegisteredPermissionOffer = z.infer<typeof zRegisteredPermissionOffer>;
+export type RegisteredPermissionOffer = z.infer<
+  typeof zRegisteredPermissionOffer
+>;
 
-export const zPermissionOfferRegistry= z.record(z.string(), z.array(zRegisteredPermissionOffer))
+export const zPermissionOfferRegistry = z.record(
+  z.string(),
+  z.array(zRegisteredPermissionOffer),
+);
 
 /**
  * This is the registry of all registered permission capabilities offered by permission's provider snaps.
@@ -50,10 +54,12 @@ export const zPermissionOfferRegistry= z.record(z.string(), z.array(zRegisteredP
 export type PermissionOfferRegistry = z.infer<typeof zPermissionOfferRegistry>;
 
 export const zGrantAttenuatedPermissionsParams = z.object({
-  permissionsRequest: zPermissionsRequest, 
+  permissionsRequest: zPermissionsRequest,
   siteOrigin: z.string(),
 });
-export type GrantAttenuatedPermissionsParams = z.infer<typeof zGrantAttenuatedPermissionsParams>;
+export type GrantAttenuatedPermissionsParams = z.infer<
+  typeof zGrantAttenuatedPermissionsParams
+>;
 
 export const zGatorPermission = z.object({
   // A type used for matching requests:
@@ -65,45 +71,45 @@ export const zGatorPermission = z.object({
 
 export type GatorPermission = z.infer<typeof zGatorPermission>;
 
-
 /**
  * The default permission offers that the Gator snap will offer to the kernel snap
  */
 export const DEFAULT_OFFERS: GatorPermission[] = [
-    {
-      type: 'native-token-transfer',
-      proposedName: 'Native Token Transfer',
-    },
-    {
-      type: 'erc20-token-transfer',
-      proposedName: 'ERC20 Token Transfer',
-    },
-]
+  {
+    type: 'native-token-transfer',
+    proposedName: 'Native Token Transfer',
+  },
+  {
+    type: 'erc20-token-transfer',
+    proposedName: 'ERC20 Token Transfer',
+  },
+];
 
 /**
- * Generates a unique ID for a permission offer
- * 
- * @param permissionToOffer - The permission to offer to the kernel snap 
- * @returns A promise that resolves to the unique ID for the permission offer
+ * Generates a unique ID for a permission offer.
+ *
+ * @param permissionToOffer - The permission to offer to the kernel snap.
+ * @returns A promise that resolves to the unique ID for the permission offer.
  */
-export const getIdFor = async (permissionToOffer: GatorPermission): Promise<string> => {
-    const permissionString = JSON.stringify(permissionToOffer);
+export const getIdFor = async (
+  permissionToOffer: GatorPermission,
+): Promise<string> => {
+  const permissionString = JSON.stringify(permissionToOffer);
 
-    // Encode the text as a UTF-8 byte array
-    const encoder = new TextEncoder();
-    const data = encoder.encode(permissionString);
+  // Encode the text as a UTF-8 byte array
+  const encoder = new TextEncoder();
+  const data = encoder.encode(permissionString);
 
-    // Hash the data with SHA-256
-    // crypto is allowed in the snap environment via polyfill(see ./snap.config.ts)
-    // eslint-disable-next-line no-restricted-globals
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  // Hash the data with SHA-256
+  // crypto is allowed in the snap environment via polyfill(see ./snap.config.ts)
+  // eslint-disable-next-line no-restricted-globals
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
 
-    // Convert the hash to a hexadecimal string
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray
-      .map((byte) => byte.toString(16).padStart(2, '0'))
-      .join('');
+  // Convert the hash to a hexadecimal string
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
 
-    return hashHex;
+  return hashHex;
 };
-

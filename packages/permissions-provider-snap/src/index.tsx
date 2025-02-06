@@ -136,7 +136,7 @@ export const onInstall: OnInstallHandler = async () => {
 };
 
 /**
- * OnInstall is called when the snap version updates and it used to update cryptographic abilities as permissions its to the kernel snap.
+ * OnUpdate is called when the snap version updates and it used to update cryptographic abilities as permissions its to the kernel snap.
  */
 export const onUpdate: OnUpdateHandler = async () => {
   //

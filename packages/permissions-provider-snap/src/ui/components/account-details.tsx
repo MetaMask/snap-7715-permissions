@@ -26,7 +26,7 @@ export const AccountDetails: SnapComponent<AccountDetails> = ({
   const genSelectorOption = accounts.map((account) => (
     <SelectorOption value={account}>
       <Card
-        title={<Address address={account as `0x${string}`} />}
+        title={<Address address={account} />}
         description="Account petname"
         value="1200 USDC"
       />

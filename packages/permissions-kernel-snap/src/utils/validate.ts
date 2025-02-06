@@ -92,9 +92,9 @@ export const extractPermissionName = (
  * Find all the relevant permissions that map to a registered permission offer.
  *
  * Currently just matches type. Here is where we would add a rich type description system.
- * Could start by recognizing some extra parameters for known permission types,
+ * Could start by recognizing some extra parameters for known permission types.
  * But eventually would be great to have some general-purpose type fields.
- * We also default to only matching on offers from the gator-snap, but eventually we would need to adjust to allow other permissions providers
+ * We also default to only matching on offers from the gator-snap, but eventually we would need to adjust to allow other permissions providers.
  *
  * @param allRegisteredOffers - All the registered permission offers.
  * @param permissionsToGrant - The permissions to grant.
@@ -113,10 +113,13 @@ export const findRelevantPermissions = (
       ) {
         return true;
       }
+      return false;
     });
 
     if (foundMatchingOffer) {
       return permissionRequest;
     }
+
+    return null;
   });
 };

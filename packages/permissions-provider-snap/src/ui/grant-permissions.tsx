@@ -50,7 +50,7 @@ export const GrantPermissionsPage: SnapComponent<GrantPermissionsPageProps> = ({
     throw new Error('no accounts found');
   }
 
-  const { permissionRequest, status } = permissionRequestIteratorItem;
+  const { permissionRequest } = permissionRequestIteratorItem;
   const { isFirst, isLast, permissionIndex } = iteratorItemMetadata;
 
   return (

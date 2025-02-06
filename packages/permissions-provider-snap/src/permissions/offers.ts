@@ -118,7 +118,7 @@ export const createPermissionOfferLibrary = (): PermissionOfferLibrary => {
 
       if (failedPermissions.length > 0) {
         throw new Error(
-          `Failed to batch of register permissions: ${JSON.stringify(
+          `Failed to batch register permissions: ${JSON.stringify(
             failedPermissions,
             undefined,
             2,

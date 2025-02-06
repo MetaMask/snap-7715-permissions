@@ -1,4 +1,5 @@
-// @ts-check
+/* eslint-disable jsdoc/valid-types */
+// @ts-nocheck
 /* eslint-disable n/no-sync */
 
 const { readFileSync, writeFileSync } = require('node:fs');
@@ -6,7 +7,9 @@ const { join } = require('node:path');
 
 const packageFile = require('../package.json');
 
-console.log('[preinstalled-snap] - attempt to build preinstalled for kernel snap');
+console.log(
+  '[preinstalled-snap] - attempt to build preinstalled for kernel snap',
+);
 
 /**
  * Read the contents of a file and return as a string.

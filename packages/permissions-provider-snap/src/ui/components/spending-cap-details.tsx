@@ -8,7 +8,7 @@ type SpendingCapDetails = {
 };
 
 export const SpendingCapDetails: SnapComponent<SpendingCapDetails> = ({
-  permission,
+  _,
 }) => {
   return (
     <Section>

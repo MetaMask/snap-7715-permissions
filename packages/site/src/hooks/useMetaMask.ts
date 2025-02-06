@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { kernelSnapOrigin } from '../config';
+import { gatorSnapOrigin, kernelSnapOrigin } from '../config';
 import type { GetSnapsResponse } from '../types';
 import { useMetaMaskContext } from './MetamaskContext';
 import { useRequest } from './useRequest';
@@ -43,11 +43,10 @@ export const useMetaMask = () => {
     if (kernelSnap) {
       handleSetInstalledSnap(kernelSnap);
     }
-    // TODO: Add Gator Snap
-    // const gatorSnap = snaps[GATOR_SNAP_ORIGIN];
-    // if (gatorSnap) {
-    //   handleSetInstalledSnap(gatorSnap);
-    // }
+    const gatorSnap = snaps[gatorSnapOrigin];
+    if (gatorSnap) {
+      handleSetInstalledSnap(gatorSnap);
+    }
   };
 
   useEffect(() => {
