@@ -97,7 +97,7 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
    - [How to add custom build to Firefox](https://github.com/V00D00-child/metamask-extension/blob/main/docs/add-to-firefox.md)
 5. Once the local build is runing in your browser, you can start interacting with the preinstalled snaps.
 
-### Making permissions requests using preinstalled gator and kernel snap (web wallet repo)
+### Making permissions requests using preinstalled gator and kernel snap (snap repo)
 
 1. Head back to the wallet repo:
   - Update the `package/site/.env.local` `KERNEL_SNAP_ORIGIN=npm:@metamask/permissions-kernel`

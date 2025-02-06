@@ -107,7 +107,7 @@ export const zPermissionRequest = z.object({
   chainId: zHexStr, // hex-encoding of uint256
 
   /**
-   * Account is part of 7715, but MetaMask Web wallet we do no require account to be passed in the request.
+   * Account is part of 7715, but MetaMask will not require account to be passed in the request.
    * - Wallet does not have a connect where we expose the accounts.
    * - Permission request is the first interaction with the wallet.
    * - Wallet permission picker will allow user to select the targeted account.

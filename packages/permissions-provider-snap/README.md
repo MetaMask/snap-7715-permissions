@@ -1,6 +1,6 @@
 # @metamask/7715-permissions-provider
 
-This snap creates Hybrid DeleGator account and allow site to request 7715 permissions from those accounts. User have the option to grant the permission from a confimation dialog render by the snap or from a confirmation screen render on the web wallet site.
+This snap creates a Hybrid DeleGator account and allows the site to request 7715 permissions from those accounts. Users can grant permissions from a custom interactive confirmation dialog rendered by the snap(i.e., permissions picker).
 
 ## Development
 
