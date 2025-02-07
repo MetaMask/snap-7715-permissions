@@ -1,27 +1,42 @@
 import { expect } from '@jest/globals';
 import { installSnap } from '@metamask/snaps-jest';
+import type { Json } from '@metamask/snaps-sdk';
 
 import { InternalMethod } from '../src/permissions';
-import {
-  TEST_CASE_DEFAULT_STATE,
-  TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
-} from './utils';
 
 describe('onRpcRequest', () => {
+  const MOCK_PERMISSIONS_PROVIDER_SNAP_ID = 'test:http://localhost:8081';
+  const MOCK_NATIVE_TOKEN_TRANSFER_PERMISSION = {
+    type: 'native-token-transfer',
+    hostId: MOCK_PERMISSIONS_PROVIDER_SNAP_ID,
+    hostPermissionId:
+      'd323523d13f344ed84977a720093e2b5c199565fa872ca9d1fbcfc4317c8ef11',
+    proposedName: 'Native Token Transfer',
+  };
+  const E2E_TEST_CASE_DEFAULT_STATE: Record<string, Json> = {
+    permissionOfferRegistry: {
+      [MOCK_PERMISSIONS_PROVIDER_SNAP_ID]: [
+        MOCK_NATIVE_TOKEN_TRANSFER_PERMISSION,
+      ],
+    },
+  };
+
   describe('wallet_getRegisteredOnchainPermissionOffers', () => {
     it('Return the default registered permission offers for a snapHost', async () => {
-      const { request } = await installSnap();
+      const { request } = await installSnap({
+        options: {
+          state: E2E_TEST_CASE_DEFAULT_STATE,
+        },
+      });
 
       const response = request({
         method: InternalMethod.WalletGetRegisteredOnchainPermissionOffers,
-        origin: TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
+        origin: MOCK_PERMISSIONS_PROVIDER_SNAP_ID,
       });
 
-      expect(await response).toRespondWith(
-        TEST_CASE_DEFAULT_STATE.permissionOfferRegistry[
-          TEST_CASE_PERMISSION_PROVIDER_SNAP_ID
-        ],
-      );
+      expect(await response).toRespondWith([
+        MOCK_NATIVE_TOKEN_TRANSFER_PERMISSION,
+      ]);
     });
   });
 
