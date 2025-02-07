@@ -23,7 +23,7 @@ GATOR_SNAP_ORIGIN=local:http://localhost:8081
 
 ### permissions-kernel-snap
 
-- SNAP_ENV: The snap uses `SNAP_ENV` to dynamically map permission provider snapId to registered offers in the `PermissionOfferRegistry`. Please make use `SNAP_ENV=dev` before building the snap.
+- SNAP_ENV: The snap uses `SNAP_ENV` to dynamically map permission provider snapId to registered offers in the `PermissionOfferRegistry`. Please make use `SNAP_ENV=local` before building the snap.
 
 ### permissions-provider-snap
 
@@ -33,7 +33,7 @@ GATOR_SNAP_ORIGIN=local:http://localhost:8081
 
 Clone the [snap-7715-permissions repository](https://github.com/MetaMask/snap-7715-permissions) and set up the development environment:
 
-1. Set the .env `SNAP_ENV=dev` in:
+1. Set the .env `SNAP_ENV=local` in:
    - `./packages/permissions-kernel-snap/.env`
    - `./packages/permissions-provider-snap/.env`
 2. Install and start up snaps with development site
@@ -56,7 +56,7 @@ The development site will start up on `http://localhost:8000/`
 > Right now it's not possible to use `@metamask/snaps-jest` with a snap that
 > isn't built.
 
-1. Set the .env `SNAP_ENV=dev` in:
+1. Set the .env `SNAP_ENV=local` in:
    - `./packages/permissions-kernel-snap/.env`
    - `./packages/permissions-provider-snap/.env`
 2. Run `yarn build`

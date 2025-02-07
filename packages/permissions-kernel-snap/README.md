@@ -34,6 +34,6 @@ yarn build
 > Right now it's not possible to use `@metamask/snaps-jest` with a snap that
 > isn't built.
 
-1. `SNAP_ENV=dev` in `packages/permissions-kernel-snap/.env`
+1. `SNAP_ENV=local` in `packages/permissions-kernel-snap/.env`
 2. `yarn build`
 3. `yarn test`

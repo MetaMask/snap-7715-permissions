@@ -33,6 +33,6 @@ yarn build
 > isn't built.
 
 1. `cd packages/permissions-provider-snap`
-2. `SNAP_ENV=dev` in `packages/permissions-provider-snap/.env`
+2. `SNAP_ENV=local` in `packages/permissions-provider-snap/.env`
 3. `yarn build`
 4. `yarn test`

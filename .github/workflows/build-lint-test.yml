@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - prepare
+    env:
+      SNAP_ENV: production
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
@@ -31,8 +33,6 @@ jobs:
           cache: 'yarn'
       - run: yarn --immutable --immutable-cache
       - run: yarn build
-        env:
-          SNAP_ENV: ${{ env.SNAP_ENV }}
       - name: Cache permissions-kernel snap build
         uses: actions/cache@v3
         with:
@@ -79,6 +79,8 @@ jobs:
     needs:
       - prepare
       - build
+    env:
+      SNAP_ENV: production
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
