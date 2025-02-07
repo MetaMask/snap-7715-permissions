@@ -8,9 +8,9 @@ jobs:
     name: Prepare
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -25,21 +25,21 @@ jobs:
     env:
       SNAP_ENV: production
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
       - run: yarn --immutable --immutable-cache
       - run: yarn build
       - name: Cache permissions-kernel snap build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./packages/permissions-kernel-snap/dist
           key: permissions-kernel-${{ runner.os }}-${{ github.sha }}
       - name: Cache 7715-permissions-provider snap build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./packages/permissions-provider-snap/dist
           key: 7715-permissions-provider-${{ runner.os }}-${{ github.sha }}
@@ -57,9 +57,9 @@ jobs:
     needs:
       - prepare
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -82,19 +82,19 @@ jobs:
     env:
       SNAP_ENV: production
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
       - name: Restore permissions-kernel snap build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./packages/permissions-kernel/dist
           key: permissions-kernel-${{ runner.os }}-${{ github.sha }}
       - name: Restore 7715-permissions-provider snap build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./packages/permissions-provider-snap/dist
           key: 7715-permissions-provider-${{ runner.os }}-${{ github.sha }}
