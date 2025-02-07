@@ -33,5 +33,10 @@ module.exports = {
     },
   ],
 
-  ignorePatterns: ['!.eslintrc.js', 'dist/'],
+  ignorePatterns: [
+    '**/snap.manifest.json',
+    '!.eslintrc.js',
+    'dist/',
+    'scripts/update-manifest-local.js',
+  ],
 };

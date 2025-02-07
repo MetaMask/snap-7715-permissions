@@ -7,7 +7,7 @@ import { createStateManager } from '../src/stateManagement';
 import type { MockSnapRequest } from './__mocks__/snap-provider.mock';
 // eslint-disable-next-line jest/no-mocks-import
 import { createMockSnapsProvider } from './__mocks__/snap-provider.mock';
-import { TEST_CASE_DEFAULT_STATE, TEST_CASE_SNAP_HOST_ID } from './utils';
+import { TEST_CASE_DEFAULT_STATE, TEST_CASE_PERMISSION_PROVIDER_SNAP_ID } from './utils';
 
 describe('KernelStateManager', () => {
   const stateManager = createStateManager();
@@ -80,21 +80,21 @@ describe('KernelStateManager', () => {
       });
       expect(state).toStrictEqual(TEST_CASE_DEFAULT_STATE);
 
-      // Store a new permission offer for the host TEST_CASE_SNAP_HOST_ID
+      // Store a new permission offer for the host TEST_CASE_PERMISSION_PROVIDER_SNAP_ID
       const hostStoredOffers =
         TEST_CASE_DEFAULT_STATE.permissionOfferRegistry[
-          TEST_CASE_SNAP_HOST_ID
+          TEST_CASE_PERMISSION_PROVIDER_SNAP_ID
         ] ?? [];
       const offerToStore: RegisteredPermissionOffer = {
         type: 'erc1155-token-transfer',
-        hostId: TEST_CASE_SNAP_HOST_ID,
+        hostId: TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
         hostPermissionId: '0x3344',
         proposedName: 'ERC1155 Token Transfer',
       };
       const updatedState: KernelState = {
         ...state,
         permissionOfferRegistry: {
-          [TEST_CASE_SNAP_HOST_ID]: [...hostStoredOffers, offerToStore],
+          [TEST_CASE_PERMISSION_PROVIDER_SNAP_ID]: [...hostStoredOffers, offerToStore],
         },
       };
       await stateManager.setState(updatedState);
@@ -117,17 +117,17 @@ describe('KernelStateManager', () => {
 
       const hostStoredOffers =
         TEST_CASE_DEFAULT_STATE.permissionOfferRegistry[
-          TEST_CASE_SNAP_HOST_ID
+          TEST_CASE_PERMISSION_PROVIDER_SNAP_ID
         ] ?? [];
       const offerToStore: RegisteredPermissionOffer = {
         type: 'erc1155-token-transfer',
-        hostId: TEST_CASE_SNAP_HOST_ID,
+        hostId: TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
         hostPermissionId: '0x3344',
         proposedName: 'ERC1155 Token Transfer',
       };
       const updatedState: KernelState = {
         permissionOfferRegistry: {
-          [TEST_CASE_SNAP_HOST_ID]: [...hostStoredOffers, offerToStore],
+          [TEST_CASE_PERMISSION_PROVIDER_SNAP_ID]: [...hostStoredOffers, offerToStore],
         },
       };
 

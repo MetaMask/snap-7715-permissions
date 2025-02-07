@@ -5,12 +5,15 @@ This snap creates a Hybrid DeleGator account and allows the site to request 7715
 ## Development
 
 1. install dependencies
+
 ```bash
 yarn
 ```
+
 2. start the dev server
+
 ```bash
-yarn dev
+yarn start
 ```
 
 ## Build

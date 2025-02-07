@@ -2,7 +2,10 @@ import { expect } from '@jest/globals';
 import { installSnap } from '@metamask/snaps-jest';
 
 import { InternalMethod } from '../src/permissions';
-import { TEST_CASE_DEFAULT_STATE, TEST_CASE_SNAP_HOST_ID } from './utils';
+import {
+  TEST_CASE_DEFAULT_STATE,
+  TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
+} from './utils';
 
 describe('onRpcRequest', () => {
   describe('wallet_getRegisteredOnchainPermissionOffers', () => {
@@ -11,11 +14,13 @@ describe('onRpcRequest', () => {
 
       const response = request({
         method: InternalMethod.WalletGetRegisteredOnchainPermissionOffers,
-        origin: TEST_CASE_SNAP_HOST_ID,
+        origin: TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
       });
 
       expect(await response).toRespondWith(
-        TEST_CASE_DEFAULT_STATE.permissionOfferRegistry[TEST_CASE_SNAP_HOST_ID],
+        TEST_CASE_DEFAULT_STATE.permissionOfferRegistry[
+          TEST_CASE_PERMISSION_PROVIDER_SNAP_ID
+        ],
       );
     });
   });

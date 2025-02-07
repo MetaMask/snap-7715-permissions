@@ -31,11 +31,18 @@ jobs:
           cache: 'yarn'
       - run: yarn --immutable --immutable-cache
       - run: yarn build
-      - name: Cache snap build
+        env:
+          INFURA_PROJECT_ID: ${{ env.SNAP_ENV }}
+      - name: Cache permissions-kernel snap build
         uses: actions/cache@v3
         with:
-          path: ./packages/snap/dist
-          key: snap-${{ runner.os }}-${{ github.sha }}
+          path: ./packages/permissions-kernel-snap/dist
+          key: permissions-kernel-${{ runner.os }}-${{ github.sha }}
+      - name: Cache 7715-permissions-provider snap build
+        uses: actions/cache@v3
+        with:
+          path: ./packages/permissions-provider-snap/dist
+          key: 7715-permissions-provider-${{ runner.os }}-${{ github.sha }}
       - name: Require clean working directory
         shell: bash
         run: |
@@ -79,14 +86,19 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
-      - name: Restore snap build cache
+      - name: Restore permissions-kernel snap build cache
         uses: actions/cache@v3
         with:
-          path: ./packages/snap/dist
-          key: snap-${{ runner.os }}-${{ github.sha }}
+          path: ./packages/permissions-kernel/dist
+          key: permissions-kernel-${{ runner.os }}-${{ github.sha }}
+      - name: Restore 7715-permissions-provider snap build cache
+        uses: actions/cache@v3
+        with:
+          path: ./packages/permissions-provider-snap/dist
+          key: 7715-permissions-provider-${{ runner.os }}-${{ github.sha }}
       - run: yarn install --immutable
       - name: Run e2e tests
-        run: yarn workspace snap run test
+        run: yarn test
       - name: Require clean working directory
         shell: bash
         run: |
