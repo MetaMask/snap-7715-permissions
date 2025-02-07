@@ -32,7 +32,7 @@ jobs:
       - run: yarn --immutable --immutable-cache
       - run: yarn build
         env:
-          INFURA_PROJECT_ID: ${{ env.SNAP_ENV }}
+          SNAP_ENV: ${{ env.SNAP_ENV }}
       - name: Cache permissions-kernel snap build
         uses: actions/cache@v3
         with:

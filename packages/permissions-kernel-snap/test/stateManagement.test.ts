@@ -7,7 +7,10 @@ import { createStateManager } from '../src/stateManagement';
 import type { MockSnapRequest } from './__mocks__/snap-provider.mock';
 // eslint-disable-next-line jest/no-mocks-import
 import { createMockSnapsProvider } from './__mocks__/snap-provider.mock';
-import { TEST_CASE_DEFAULT_STATE, TEST_CASE_PERMISSION_PROVIDER_SNAP_ID } from './utils';
+import {
+  TEST_CASE_DEFAULT_STATE,
+  TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
+} from './utils';
 
 describe('KernelStateManager', () => {
   const stateManager = createStateManager();
@@ -94,7 +97,10 @@ describe('KernelStateManager', () => {
       const updatedState: KernelState = {
         ...state,
         permissionOfferRegistry: {
-          [TEST_CASE_PERMISSION_PROVIDER_SNAP_ID]: [...hostStoredOffers, offerToStore],
+          [TEST_CASE_PERMISSION_PROVIDER_SNAP_ID]: [
+            ...hostStoredOffers,
+            offerToStore,
+          ],
         },
       };
       await stateManager.setState(updatedState);
@@ -127,7 +133,10 @@ describe('KernelStateManager', () => {
       };
       const updatedState: KernelState = {
         permissionOfferRegistry: {
-          [TEST_CASE_PERMISSION_PROVIDER_SNAP_ID]: [...hostStoredOffers, offerToStore],
+          [TEST_CASE_PERMISSION_PROVIDER_SNAP_ID]: [
+            ...hostStoredOffers,
+            offerToStore,
+          ],
         },
       };
 
