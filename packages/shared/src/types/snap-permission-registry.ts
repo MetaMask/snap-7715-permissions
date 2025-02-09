@@ -1,36 +1,49 @@
 import { z } from 'zod';
 
-import { zPermissionsRequest, zTypeDescriptor } from './7715-permissions';
-
-// //////////////////////////// Permisions Registry //////////////////////////////
+import { zPermissionsRequest } from './7715-permissions-request';
+import { zTypeDescriptor } from './7715-permissions-types';
 
 export const zPermissionOffer = z.object({
-  // Used to propose this permission in response to requests:
+  /**
+   * 7715 type descriptor for the permission.
+   */
   type: zTypeDescriptor,
 
-  // Used to represent the permission to the user:
+  /**
+   * Used to represent the permission to the user in the permissions picker UI.
+   */
   proposedName: z.string(),
 
-  // Used to call the method on the snap:
+  /**
+   * Used to call the method on the permission provider snap.
+   */
   id: z.string(),
 });
 
 /**
- * This is a local permissions offer definition by the permission's provider snaps
+ * This is a local permissions offer definition by the permission's provider snaps.
  */
 export type PermissionOffer = z.infer<typeof zPermissionOffer>;
 
 export const zRegisteredPermissionOffer = z.object({
-  // An identifier for which snap this permission belongs to:
+  /**
+   * An identifier for which snap this permission belongs to.
+   */
   hostId: z.string(),
 
-  // A type used for matching requests:
+  /**
+   * 7715 type descriptor for the permission.
+   */
   type: zTypeDescriptor,
 
-  // An identifier used for identifying the specific permission defined by the permission provider snap:
+  /**
+   * An identifier used for identifying the specific permission defined by the permission provider snap.
+   */
   hostPermissionId: z.string(),
 
-  // Used to represent the permission to the user:
+  /**
+   * Used to represent the permission to the user in the permissions picker UI.
+   */
   proposedName: z.string(),
 });
 
