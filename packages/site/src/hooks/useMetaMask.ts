@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { defaultSnapOrigin } from '../config';
+import { gatorSnapOrigin, kernelSnapOrigin } from '../config';
 import type { GetSnapsResponse } from '../types';
 import { useMetaMaskContext } from './MetamaskContext';
 import { useRequest } from './useRequest';
@@ -10,7 +10,8 @@ import { useRequest } from './useRequest';
  * @returns The informations.
  */
 export const useMetaMask = () => {
-  const { provider, setInstalledSnap, installedSnap } = useMetaMaskContext();
+  const { provider, handleSetInstalledSnap, installedSnaps } =
+    useMetaMaskContext();
   const request = useRequest();
 
   const [isFlask, setIsFlask] = useState(false);
@@ -33,24 +34,31 @@ export const useMetaMask = () => {
   /**
    * Get the Snap informations from MetaMask.
    */
-  const getSnap = async () => {
+  const getSnaps = async () => {
     const snaps = (await request({
       method: 'wallet_getSnaps',
     })) as GetSnapsResponse;
 
-    setInstalledSnap(snaps[defaultSnapOrigin] ?? null);
+    const kernelSnap = snaps[kernelSnapOrigin];
+    if (kernelSnap) {
+      handleSetInstalledSnap(kernelSnap);
+    }
+    const gatorSnap = snaps[gatorSnapOrigin];
+    if (gatorSnap) {
+      handleSetInstalledSnap(gatorSnap);
+    }
   };
 
   useEffect(() => {
     const detect = async () => {
       if (provider) {
         await detectFlask();
-        await getSnap();
+        await getSnaps();
       }
     };
 
     detect().catch(console.error);
   }, [provider]);
 
-  return { isFlask, snapsDetected, installedSnap, getSnap };
+  return { isFlask, snapsDetected, installedSnaps, getSnaps };
 };

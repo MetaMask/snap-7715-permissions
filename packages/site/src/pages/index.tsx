@@ -1,13 +1,14 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 
 import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
+  CustomMessageButton,
   Card,
 } from '../components';
-import { defaultSnapOrigin } from '../config';
+import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import {
   useMetaMask,
   useInvokeSnap,
@@ -100,28 +101,174 @@ const ErrorMessage = styled.div`
   }
 `;
 
+const LogWrapper = styled.pre`
+  background-color: ${(props) => props.theme.colors.primary?.default};
+  padding: 1rem;
+  border-radius: 0.5rem;
+  width: 50%;
+  height: 16rem;
+  overflow-x: auto;
+  overflow-y: auto;
+  word-break: break-word;
+`;
+
 const Index = () => {
   const { error } = useMetaMaskContext();
-  const { isFlask, snapsDetected, installedSnap } = useMetaMask();
-  const requestSnap = useRequestSnap();
-  const invokeSnap = useInvokeSnap();
+  const { isFlask, snapsDetected, installedSnaps } = useMetaMask();
+  const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
+  const requestGatorSnap = useRequestSnap(gatorSnapOrigin);
+  const invokeKernelSnap = useInvokeSnap(kernelSnapOrigin);
 
-  const isMetaMaskReady = isLocalSnap(defaultSnapOrigin)
+  const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
     ? isFlask
     : snapsDetected;
+  const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
+  const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
+  const mockDappSessionAccount = '0x016562aA41A8697720ce0943F003141f5dEAe006';
 
-  const handleSendHelloClick = async () => {
-    await invokeSnap({ method: 'hello' });
+  const [log, setLog] = useState<string[]>([]);
+  const appendToLog = (action: string, response: any) => {
+    const timestamp = new Date().toISOString();
+    const body = JSON.stringify(
+      response,
+      (_, value: any) =>
+        typeof value === 'bigint' || typeof value === 'number'
+          ? BigInt(value).toString()
+          : value,
+      2,
+    );
+    const logEntry = `${timestamp} - ${action}:\n${body}`;
+    setLog((prevLog) => [...prevLog, logEntry]);
+  };
+
+  const handleGrantPermissions = async () => {
+    const permissionsRequests = [
+      {
+        chainId: '0x1',
+        expiry: 1,
+        signer: {
+          type: 'account',
+          data: {
+            address: mockDappSessionAccount,
+          },
+        },
+        permission: {
+          type: 'native-token-transfer',
+          data: {
+            justification: 'shh...permission 1',
+            allowance: '0x1DCD6500',
+          },
+        },
+      },
+    ];
+    const response = await invokeKernelSnap({
+      method: 'wallet_grantPermissions',
+      params: permissionsRequests,
+    });
+    appendToLog('Request Permission(single permission)', response);
+  };
+
+  const handleGrantPermissionsMulti = async () => {
+    const permissionsRequests = [
+      {
+        chainId: '0x1',
+        expiry: 1,
+        signer: {
+          type: 'account',
+          data: {
+            address: mockDappSessionAccount,
+          },
+        },
+        permission: {
+          type: 'native-token-transfer',
+          data: {
+            justification: 'shh...permission 1',
+            allowance: '0x1DCD6500',
+          },
+        },
+      },
+      {
+        chainId: '0x1',
+        expiry: 1,
+        signer: {
+          type: 'account',
+          data: {
+            address: mockDappSessionAccount,
+          },
+        },
+        permission: {
+          type: 'erc20-token-transfer',
+          data: {
+            justification: 'shh...permission 2',
+            address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+            allowance: '0x1DCD6500',
+          },
+        },
+      },
+      {
+        chainId: '0x1',
+        expiry: 1,
+        signer: {
+          type: 'account',
+          data: {
+            address: mockDappSessionAccount,
+          },
+        },
+        permission: {
+          type: 'erc20-token-transfer',
+          data: {
+            justification: 'shh...permission 3',
+            address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
+            allowance: '0x1DCD6500',
+          },
+        },
+      },
+    ];
+    const response = await invokeKernelSnap({
+      method: 'wallet_grantPermissions',
+      params: permissionsRequests,
+    });
+    appendToLog('Request Permission(Multi permissions)', response);
+  };
+
+  const handleGrantPermissionsNoOffer = async () => {
+    const permissionsRequests = [
+      {
+        chainId: '0x1',
+        expiry: 1,
+        signer: {
+          type: 'account',
+          data: {
+            address: mockDappSessionAccount,
+          },
+        },
+        permission: {
+          type: 'erc721-token-transfer', // This permission type is not registered by gator snap
+          data: {
+            justification: 'shh',
+            allowance: '0x1DCD6500',
+          },
+        },
+      },
+    ];
+    const response = await invokeKernelSnap({
+      method: 'wallet_grantPermissions',
+      params: permissionsRequests,
+    });
+    appendToLog('Request Permission(offer not registered)', response);
   };
 
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        Welcome to <Span>7715 permissions snap</Span>
       </Heading>
       <Subtitle>
-        Get started by editing <code>src/index.tsx</code>
+        Get started by installing snaps and sending permissions requests.
       </Subtitle>
+      <LogWrapper>
+        {log.length > 0 ? log.join('\n\n') : 'No actions logged...'}
+      </LogWrapper>
       <CardContainer>
         {error && (
           <ErrorMessage>
@@ -139,15 +286,17 @@ const Index = () => {
             fullWidth
           />
         )}
-        {!installedSnap && (
+
+        {/* Show connect buttons */}
+        {!isKernelSnapReady && (
           <Card
             content={{
-              title: 'Connect',
+              title: 'Connect(kernel)',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Get started by connecting to and installing the kernel snap.',
               button: (
                 <ConnectButton
-                  onClick={requestSnap}
+                  onClick={requestKernelSnap}
                   disabled={!isMetaMaskReady}
                 />
               ),
@@ -155,39 +304,116 @@ const Index = () => {
             disabled={!isMetaMaskReady}
           />
         )}
-        {shouldDisplayReconnectButton(installedSnap) && (
+        {!isGatorSnapReady && (
           <Card
             content={{
-              title: 'Reconnect',
+              title: 'Connect(gator)',
               description:
-                'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
+                'Get started by connecting to and installing the gator snap.',
               button: (
-                <ReconnectButton
-                  onClick={requestSnap}
-                  disabled={!installedSnap}
+                <ConnectButton
+                  onClick={requestGatorSnap}
+                  disabled={!isMetaMaskReady}
                 />
               ),
             }}
-            disabled={!installedSnap}
+            disabled={!isMetaMaskReady}
           />
         )}
+
+        {/* Show reconnect buttons */}
+        {shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin]) && (
+          <Card
+            content={{
+              title: 'Reconnect(kernel)',
+              description:
+                'While connected to a local running kernel snap this button will always be displayed in order to update the snap if a change is made.',
+              button: (
+                <ReconnectButton
+                  onClick={requestKernelSnap}
+                  disabled={!isKernelSnapReady}
+                />
+              ),
+            }}
+            disabled={!isKernelSnapReady}
+          />
+        )}
+        {shouldDisplayReconnectButton(installedSnaps[gatorSnapOrigin]) && (
+          <Card
+            content={{
+              title: 'Reconnect(gator)',
+              description:
+                'While connected to a local running gator snap this button will always be displayed in order to update the snap if a change is made.',
+              button: (
+                <ReconnectButton
+                  onClick={requestGatorSnap}
+                  disabled={!isGatorSnapReady}
+                />
+              ),
+            }}
+            disabled={!isGatorSnapReady}
+          />
+        )}
+
+        {/* Send permissions request */}
         <Card
           content={{
-            title: 'Send Hello message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
+            title: 'Grant Permission',
+            description: 'Send a single 7715 permission request to MetaMask.',
             button: (
-              <SendHelloButton
-                onClick={handleSendHelloClick}
-                disabled={!installedSnap}
+              <CustomMessageButton
+                text="Grant Permission"
+                onClick={handleGrantPermissions}
+                disabled={!installedSnaps[kernelSnapOrigin]}
               />
             ),
           }}
-          disabled={!installedSnap}
+          disabled={!installedSnaps[kernelSnapOrigin]}
           fullWidth={
             isMetaMaskReady &&
-            Boolean(installedSnap) &&
-            !shouldDisplayReconnectButton(installedSnap)
+            Boolean(installedSnaps[kernelSnapOrigin]) &&
+            !shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])
+          }
+        />
+
+        <Card
+          content={{
+            title: 'Grant Permissions',
+            description: 'Send a multiple 7715 permission request to MetaMask.',
+            button: (
+              <CustomMessageButton
+                text="Grant Permissions"
+                onClick={handleGrantPermissionsMulti}
+                disabled={!installedSnaps[kernelSnapOrigin]}
+              />
+            ),
+          }}
+          disabled={!installedSnaps[kernelSnapOrigin]}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(installedSnaps[kernelSnapOrigin]) &&
+            !shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])
+          }
+        />
+
+        <Card
+          content={{
+            title: 'Grant Permission(no offer registered)',
+            description:
+              'Send a single 7715 permission request to MetaMask with a type that is not registered by gator snap.',
+            button: (
+              <CustomMessageButton
+                text="Grant Permission(no offer registered)"
+                onClick={handleGrantPermissionsNoOffer}
+                disabled={!installedSnaps[kernelSnapOrigin]}
+              />
+            ),
+          }}
+          disabled={!installedSnaps[kernelSnapOrigin]}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(installedSnaps[kernelSnapOrigin]) &&
+            !shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])
           }
         />
         <Notice>

@@ -1,0 +1,11 @@
+**/node_modules
+**/package.json
+**/yarn.lock
+**/tsconfig.json
+**/commitlint.config.js
+**/.packages-cache
+**/coverage
+**/dist
+**/public/*
+**/.cache
+**/snap.manifest.json
