@@ -32,7 +32,10 @@ export const NoOffersFoundPage = (
               )}**`}</Text>
             </Row>
             <Row label="Their justification">
-              <Text>{value.permission.data.justification}</Text>
+              <Text>
+                {value.permission.data.justification ??
+                  'No justification provided'}
+              </Text>
             </Row>
             <Text>
               <Bold>
