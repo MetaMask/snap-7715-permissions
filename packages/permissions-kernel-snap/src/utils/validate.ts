@@ -1,4 +1,4 @@
-import { SnapError } from '@metamask/snaps-sdk';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { z } from 'zod';
 
 import type {
@@ -12,40 +12,45 @@ import {
   zPermissionOffer,
   zPermissionsRequest,
 } from '../../../shared/src/types';
-import {
-  InternalMethod,
-  PERMISSIONS_PROVIDER_SNAP_ID,
-} from '../permissions/origin';
+import { PERMISSIONS_PROVIDER_SNAP_ID } from '../permissions/origin';
 
-export const validatePermissionRequestParam = (
+/**
+ * Safely parses the grant permissions request parameters, validating them using Zod schema.
+ *
+ * @param params - The permissions to parse.
+ * @returns The parsed and validated permissions as a PermissionsRequest object.
+ * @throws Throws a InvalidParamsError if validation fails or if the permissions data is empty.
+ */
+export const parsePermissionRequestParam = (
   params: any,
 ): PermissionsRequest => {
   const validatePermissionsRequest = zPermissionsRequest.safeParse(params);
   if (!validatePermissionsRequest.success) {
-    throw new Error(
-      extractZodError(
-        InternalMethod.WalletGrantPermissions,
-        validatePermissionsRequest.error.errors,
-      ),
-    );
+    throw new InvalidParamsError(
+      extractZodError(validatePermissionsRequest.error.errors),
+    ) as unknown as Error;
   }
 
   if (validatePermissionsRequest.data.length === 0) {
-    throw new SnapError('params are empty');
+    throw new InvalidParamsError('params are empty') as unknown as Error;
   }
 
   return validatePermissionsRequest.data;
 };
 
-export const validatePermissionOfferParam = (params: any): PermissionOffer => {
+/**
+ * Safely parses the permisssions offer request parameters, validating them using Zod schema.
+ *
+ * @param params - The permission offer to parse.
+ * @returns The parsed and validated permissions offer as a PermissionOffer object.
+ * @throws Throws a SnapError if validation fails.
+ */
+export const parsePermissionOfferParam = (params: any): PermissionOffer => {
   const validatePermissionOffer = zPermissionOffer.safeParse(params);
   if (!validatePermissionOffer.success) {
-    throw new Error(
-      extractZodError(
-        InternalMethod.WalletGrantPermissions,
-        validatePermissionOffer.error.errors,
-      ),
-    );
+    throw new InvalidParamsError(
+      extractZodError(validatePermissionOffer.error.errors),
+    ) as unknown as Error;
   }
 
   return validatePermissionOffer.data;

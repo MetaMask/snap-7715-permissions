@@ -2,9 +2,12 @@ import { expect } from '@jest/globals';
 import { assertIsAlertDialog, installSnap } from '@metamask/snaps-jest';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { PermissionsRequest } from '../../../shared/src/types';
 import { InternalMethod } from '../../src/permissions';
 import { EmptyRegistryPage, NoOffersFoundPage } from '../../src/ui';
+import {
+  MOCK_PERMISSIONS_REQUEST_SINGLE,
+  MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED,
+} from '../helper';
 
 describe('Kernel Snap', () => {
   describe('onRpcRequest', () => {
@@ -19,44 +22,6 @@ describe('Kernel Snap', () => {
         'd323523d13f344ed84977a720093e2b5c199565fa872ca9d1fbcfc4317c8ef11',
       proposedName: 'Native Token Transfer',
     });
-    const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
-      {
-        chainId: '0x1',
-        expiry: 1,
-        signer: {
-          type: 'account',
-          data: {
-            address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-          },
-        },
-        permission: {
-          type: 'native-token-transfer',
-          data: {
-            justification: 'shh...permission 1',
-            allowance: '0x1DCD6500',
-          },
-        },
-      },
-    ];
-    const MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED: PermissionsRequest = [
-      {
-        chainId: '0x1',
-        expiry: 1,
-        signer: {
-          type: 'account',
-          data: {
-            address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-          },
-        },
-        permission: {
-          type: 'non-supported-permission-type',
-          data: {
-            justification: 'shh...permission 1',
-            allowance: '0x1DCD6500',
-          },
-        },
-      },
-    ];
 
     describe('wallet_getRegisteredOnchainPermissionOffers', () => {
       it('Return the default registered permission offers for a snapHost', async () => {
@@ -233,8 +198,8 @@ describe('Kernel Snap', () => {
       });
 
       expect(response).toRespondWithError({
-        code: -32603,
-        message: 'Method foo not found.',
+        code: -32601,
+        message: 'The method does not exist / is not available.',
         stack: expect.any(String),
       });
     });

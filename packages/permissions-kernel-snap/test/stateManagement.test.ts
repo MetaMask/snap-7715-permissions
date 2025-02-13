@@ -10,7 +10,7 @@ import { createMockSnapsProvider } from './__mocks__/snap-provider.mock';
 import {
   TEST_CASE_DEFAULT_STATE,
   TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
-} from './utils';
+} from './helper';
 
 describe('KernelStateManager', () => {
   const stateManager = createStateManager();

@@ -1,16 +1,11 @@
-import { unknown, z } from 'zod';
+import { any, z } from 'zod';
 
 import { zAddress, zHexStr } from './common';
 
 // Rather than only define permissions by name,
 // Requestors can optionally make this an object and leave room for forward-extensibility.
 export const zTypeDescriptor = z.union([
-  z.enum([
-    'native-token-transfer',
-    'erc20-token-transfer',
-    'erc721-token-transfer',
-    'erc1155-token-transfer',
-  ]),
+  z.string(),
   z.object({
     name: z.string(),
     description: z.string().optional(),
@@ -24,7 +19,7 @@ export const zPermission = z.object({
   /**
    * Data structure varies by permission type.
    */
-  data: z.record(unknown()),
+  data: z.record(any()),
 });
 
 export const zMetaMaskPermissionData = z.object({
@@ -37,7 +32,7 @@ export const zMetaMaskPermissionData = z.object({
   /**
    * The outcome that is enfoced onchain during permission redemption(e.g. token balance increasing by 100).
    */
-  enforcedOutcomes: z.record(unknown()).optional(),
+  enforcedOutcomes: z.record(any()).optional(),
 });
 
 export const zNativeTokenTransferPermission = zPermission.extend({
