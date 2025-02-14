@@ -67,6 +67,7 @@ node_modules/
 .env
 .env.test
 .env.local
+.env.development
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
