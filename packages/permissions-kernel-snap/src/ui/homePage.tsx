@@ -2,6 +2,7 @@ import type {
   PermissionOfferRegistry,
   RegisteredPermissionOffer,
 } from '@metamask/7715-permissions-shared/types';
+import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import {
   Box,
   Text,
@@ -11,7 +12,6 @@ import {
   Bold,
 } from '@metamask/snaps-sdk/jsx';
 
-import { extractPermissionName } from '../utils';
 import { Header } from './components';
 
 export const HomePageContent = (

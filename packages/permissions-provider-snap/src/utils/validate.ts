@@ -1,8 +1,8 @@
-import type { GrantAttenuatedPermissionsParams } from '../../../shared/src/types';
 import {
-  extractZodError,
+  type GrantAttenuatedPermissionsParams,
   zGrantAttenuatedPermissionsParams,
 } from '../../../shared/src/types';
+import { extractZodError } from '../../../shared/src/utils';
 import { throwError } from './common';
 
 export const validatePermissionRequestParam = (

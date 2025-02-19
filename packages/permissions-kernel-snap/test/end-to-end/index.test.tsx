@@ -24,7 +24,7 @@ describe('Kernel Snap', () => {
     });
 
     describe('wallet_getRegisteredOnchainPermissionOffers', () => {
-      it('Return the default registered permission offers for a snapHost', async () => {
+      it('returns the default registered permission offers for a snapHost', async () => {
         const { request } = await installSnap({
           options: {
             state: {
@@ -53,7 +53,7 @@ describe('Kernel Snap', () => {
     });
 
     describe('wallet_offerOnchainPermission', () => {
-      it('Return registered permission offers given from a permission provider snap', async () => {
+      it('returns the registered permission offers given from a permission provider snap', async () => {
         const { request } = await installSnap({
           options: {
             state: {
@@ -131,7 +131,7 @@ describe('Kernel Snap', () => {
     });
 
     describe('wallet_grantPermissions', () => {
-      it('Return snap_dialog alert UI rendering the EmptyRegistryPage when the permissions registry is empty', async () => {
+      it('returns a snap_dialog alert UI rendering the EmptyRegistryPage when the permissions registry is empty', async () => {
         const { request } = await installSnap({
           options: {
             state: {
@@ -154,7 +154,7 @@ describe('Kernel Snap', () => {
         expect(await response).toRespondWith(null);
       });
 
-      it('Return snap_dialog alert UI rendering the NoOffersFoundPage when dApp request a permission type that has not been offered to the permissions registry by a permissions provider', async () => {
+      it('returns a snap_dialog alert UI rendering the NoOffersFoundPage when dApp request a permission type that has not been offered to the permissions registry by a permissions provider', async () => {
         const { request } = await installSnap({
           options: {
             state: {

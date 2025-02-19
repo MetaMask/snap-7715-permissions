@@ -1,9 +1,9 @@
 import { expect } from '@jest/globals';
+import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 
 import { PERMISSIONS_PROVIDER_SNAP_ID } from '../../src/permissions';
 import {
   checkForDuplicatePermissionOffer,
-  extractPermissionName,
   findRelevantPermissions,
   parsePermissionOfferParam,
   parsePermissionRequestParam,

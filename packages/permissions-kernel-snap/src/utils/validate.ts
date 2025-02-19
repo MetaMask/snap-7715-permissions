@@ -1,17 +1,16 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import type {
-  PermissionOffer,
-  PermissionsRequest,
-  RegisteredPermissionOffer,
-  zTypeDescriptor,
-} from '@metamask/7715-permissions-shared/types';
 import {
-  extractZodError,
+  type PermissionOffer,
+  type PermissionsRequest,
+  type RegisteredPermissionOffer,
   zPermissionOffer,
   zPermissionsRequest,
 } from '@metamask/7715-permissions-shared/types';
+import {
+  extractPermissionName,
+  extractZodError,
+} from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
-import type { z } from 'zod';
 
 import { PERMISSIONS_PROVIDER_SNAP_ID } from '../permissions/origin';
 
@@ -77,21 +76,6 @@ export const checkForDuplicatePermissionOffer = (
   );
 
   return Boolean(foundDup);
-};
-
-/**
- * Extracts the name of a permission from a permission type.
- *
- * @param type - The type of permission to extract the name from.
- * @returns The name of the permission.
- */
-export const extractPermissionName = (
-  type: z.infer<typeof zTypeDescriptor>,
-): string => {
-  if (typeof type === 'object') {
-    return type.name;
-  }
-  return type;
 };
 
 /**
