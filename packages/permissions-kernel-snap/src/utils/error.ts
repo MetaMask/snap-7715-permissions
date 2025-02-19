@@ -17,7 +17,7 @@ import {
  * @returns A boolean indicating whether the error is a Snap RPC error.
  */
 export function isSnapRpcError(error: Error): boolean {
-  const errors = [
+  const snapRpcErrorTypes = [
     SnapError,
     UserRejectedRequestError,
     MethodNotSupportedError,
@@ -28,5 +28,5 @@ export function isSnapRpcError(error: Error): boolean {
     InvalidParamsError,
     InvalidRequestError,
   ];
-  return errors.some((errType) => error instanceof errType);
+  return snapRpcErrorTypes.some((errType) => error instanceof errType);
 }

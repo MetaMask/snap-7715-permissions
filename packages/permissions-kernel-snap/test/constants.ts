@@ -1,4 +1,5 @@
-import type { PermissionsRequest } from '../../shared/src/types';
+import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
+
 import type { KernelState } from '../src/stateManagement';
 
 export const TEST_CASE_PERMISSION_PROVIDER_SNAP_ID =

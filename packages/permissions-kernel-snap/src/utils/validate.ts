@@ -1,17 +1,18 @@
-import { InvalidParamsError } from '@metamask/snaps-sdk';
-import type { z } from 'zod';
-
+/* eslint-disable @typescript-eslint/no-throw-literal */
 import type {
   PermissionOffer,
   PermissionsRequest,
   RegisteredPermissionOffer,
   zTypeDescriptor,
-} from '../../../shared/src/types';
+} from '@metamask/7715-permissions-shared/types';
 import {
   extractZodError,
   zPermissionOffer,
   zPermissionsRequest,
-} from '../../../shared/src/types';
+} from '@metamask/7715-permissions-shared/types';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
+import type { z } from 'zod';
+
 import { PERMISSIONS_PROVIDER_SNAP_ID } from '../permissions/origin';
 
 /**
@@ -28,11 +29,11 @@ export const parsePermissionRequestParam = (
   if (!validatePermissionsRequest.success) {
     throw new InvalidParamsError(
       extractZodError(validatePermissionsRequest.error.errors),
-    ) as unknown as Error;
+    );
   }
 
   if (validatePermissionsRequest.data.length === 0) {
-    throw new InvalidParamsError('params are empty') as unknown as Error;
+    throw new InvalidParamsError('params are empty');
   }
 
   return validatePermissionsRequest.data;
@@ -50,7 +51,7 @@ export const parsePermissionOfferParam = (params: any): PermissionOffer => {
   if (!validatePermissionOffer.success) {
     throw new InvalidParamsError(
       extractZodError(validatePermissionOffer.error.errors),
-    ) as unknown as Error;
+    );
   }
 
   return validatePermissionOffer.data;

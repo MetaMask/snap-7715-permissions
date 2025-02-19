@@ -12,7 +12,7 @@ import {
   MOCK_PERMISSIONS_REQUEST_MULTIPLE,
   MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED,
   MOCK_PERMISSIONS_REQUEST_SINGLE,
-} from '../helper';
+} from '../constants';
 
 describe('validate utils', () => {
   describe('parsePermissionRequestParam', () => {

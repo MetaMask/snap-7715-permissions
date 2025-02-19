@@ -1,6 +1,6 @@
 import { expect } from '@jest/globals';
+import type { RegisteredPermissionOffer } from '@metamask/7715-permissions-shared/types';
 
-import type { RegisteredPermissionOffer } from '../../shared/src/types';
 import type { KernelState } from '../src/stateManagement';
 import { createStateManager } from '../src/stateManagement';
 // eslint-disable-next-line jest/no-mocks-import
@@ -10,7 +10,7 @@ import { createMockSnapsProvider } from './__mocks__/snap-provider.mock';
 import {
   TEST_CASE_DEFAULT_STATE,
   TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
-} from './helper';
+} from './constants';
 
 describe('KernelStateManager', () => {
   const stateManager = createStateManager();

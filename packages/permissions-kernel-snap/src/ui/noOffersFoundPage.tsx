@@ -1,3 +1,4 @@
+import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
 import {
   Bold,
   Box,
@@ -7,7 +8,6 @@ import {
   Text,
 } from '@metamask/snaps-sdk/jsx';
 
-import type { PermissionsRequest } from '../../../shared/src/types';
 import { extractPermissionName } from '../utils';
 import { Header } from './components';
 
@@ -33,7 +33,7 @@ export const NoOffersFoundPage = (
             </Row>
             <Row label="Their justification">
               <Text>
-                {value.permission.data.justification ??
+                {value.permission.data.justification ||
                   'No justification provided'}
               </Text>
             </Row>

@@ -1,3 +1,7 @@
+import type {
+  PermissionOfferRegistry,
+  RegisteredPermissionOffer,
+} from '@metamask/7715-permissions-shared/types';
 import {
   Box,
   Text,
@@ -7,10 +11,6 @@ import {
   Bold,
 } from '@metamask/snaps-sdk/jsx';
 
-import type {
-  PermissionOfferRegistry,
-  RegisteredPermissionOffer,
-} from '../../../shared/src/types';
 import { extractPermissionName } from '../utils';
 import { Header } from './components';
 

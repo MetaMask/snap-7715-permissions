@@ -1,3 +1,7 @@
+import type {
+  GrantAttenuatedPermissionsParams,
+  RegisteredPermissionOffer,
+} from '@metamask/7715-permissions-shared/types';
 import type { Json, OnHomePageHandler } from '@metamask/snaps-sdk';
 import {
   MethodNotFoundError,
@@ -5,10 +9,6 @@ import {
   type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
 
-import type {
-  GrantAttenuatedPermissionsParams,
-  RegisteredPermissionOffer,
-} from '../../shared/src/types';
 import { logger } from './logger';
 import { InternalMethod, PERMISSIONS_PROVIDER_SNAP_ID } from './permissions';
 import { createStateManager } from './stateManagement';

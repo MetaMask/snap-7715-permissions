@@ -1,12 +1,14 @@
-import type { Json } from '@metamask/snaps-sdk';
-import { ManageStateOperation, SnapError } from '@metamask/snaps-sdk';
-
+import type {
+  PermissionOfferRegistry,
+  RegisteredPermissionOffer,
+} from '@metamask/7715-permissions-shared/types';
 import {
   DEFAULT_OFFERS,
   getIdFor,
-  type PermissionOfferRegistry,
-  type RegisteredPermissionOffer,
-} from '../../shared/src/types';
+} from '@metamask/7715-permissions-shared/utils';
+import type { Json } from '@metamask/snaps-sdk';
+import { ManageStateOperation, SnapError } from '@metamask/snaps-sdk';
+
 import { PERMISSIONS_PROVIDER_SNAP_ID } from './permissions';
 
 export type KernelState = {

@@ -7,13 +7,13 @@ import { EmptyRegistryPage, NoOffersFoundPage } from '../../src/ui';
 import {
   MOCK_PERMISSIONS_REQUEST_SINGLE,
   MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED,
-} from '../helper';
+} from '../constants';
 
 describe('Kernel Snap', () => {
   describe('onRpcRequest', () => {
     const MOCK_PERMISSIONS_PROVIDER_SNAP_ID = 'local:http://localhost:8083';
     const MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO = 'local:http://localhost:8084';
-    const createMockNativeTrasferRegisteredPermissionOffer = (
+    const createMockNativeTransferRegisteredPermissionOffer = (
       hostId: string,
     ) => ({
       type: 'native-token-transfer',
@@ -30,7 +30,7 @@ describe('Kernel Snap', () => {
             state: {
               permissionOfferRegistry: {
                 [MOCK_PERMISSIONS_PROVIDER_SNAP_ID]: [
-                  createMockNativeTrasferRegisteredPermissionOffer(
+                  createMockNativeTransferRegisteredPermissionOffer(
                     MOCK_PERMISSIONS_PROVIDER_SNAP_ID,
                   ),
                 ],
@@ -45,7 +45,7 @@ describe('Kernel Snap', () => {
         });
 
         expect(await response).toRespondWith([
-          createMockNativeTrasferRegisteredPermissionOffer(
+          createMockNativeTransferRegisteredPermissionOffer(
             MOCK_PERMISSIONS_PROVIDER_SNAP_ID,
           ),
         ]);
@@ -83,7 +83,7 @@ describe('Kernel Snap', () => {
         });
 
         expect(await fetchRes).toRespondWith([
-          createMockNativeTrasferRegisteredPermissionOffer(
+          createMockNativeTransferRegisteredPermissionOffer(
             MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
           ),
         ]);
@@ -95,7 +95,7 @@ describe('Kernel Snap', () => {
             state: {
               permissionOfferRegistry: {
                 [MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO]: [
-                  createMockNativeTrasferRegisteredPermissionOffer(
+                  createMockNativeTransferRegisteredPermissionOffer(
                     MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
                   ),
                 ],
@@ -123,7 +123,7 @@ describe('Kernel Snap', () => {
         });
 
         expect(await fetchRes).toRespondWith([
-          createMockNativeTrasferRegisteredPermissionOffer(
+          createMockNativeTransferRegisteredPermissionOffer(
             MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
           ),
         ]);
@@ -160,7 +160,7 @@ describe('Kernel Snap', () => {
             state: {
               permissionOfferRegistry: {
                 [MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO]: [
-                  createMockNativeTrasferRegisteredPermissionOffer(
+                  createMockNativeTransferRegisteredPermissionOffer(
                     MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
                   ),
                 ],
