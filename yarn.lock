@@ -2630,16 +2630,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metamask/7715-permissions-shared@file:../shared::locator=%40metamask%2Fpermissions-kernel%40workspace%3Apackages%2Fpermissions-kernel-snap":
-  version: 0.1.0
-  resolution: "@metamask/7715-permissions-shared@file:../shared#../shared::hash=c180c7&locator=%40metamask%2Fpermissions-kernel%40workspace%3Apackages%2Fpermissions-kernel-snap"
-  dependencies:
-    viem: ^2.21.29
-    zod: ^3.22.4
-  checksum: 5648dfc895183eccd83f731d92817796c164d6e8a04e9035bba10eef091ed251342e80da83fcff96a5911337aac9200f73e79097ee9cef310445daaa854910cf
-  languageName: node
-  linkType: hard
-
 "@metamask/7715-permissions-shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "@metamask/7715-permissions-shared@workspace:packages/shared"
@@ -3044,7 +3034,6 @@ __metadata:
   resolution: "@metamask/permissions-kernel@workspace:packages/permissions-kernel-snap"
   dependencies:
     "@jest/globals": ^29.5.0
-    "@metamask/7715-permissions-shared": "file:../shared"
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
