@@ -7,13 +7,11 @@ import {
   Tooltip,
   Icon,
 } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
 
 import type { Permission } from '../../../../shared/src/types';
 
 type RequestDetails = {
   siteOrigin: string;
-  chainId: Hex;
   permission: Permission;
 };
 
@@ -56,7 +54,9 @@ export const RequestDetails: SnapComponent<RequestDetails> = ({
       <Divider />
 
       <Text>Reason</Text>
-      <Text>{permission.data.justification}</Text>
+      <Text>
+        {permission.data.justification || 'No justification provided'}
+      </Text>
     </Section>
   );
 };

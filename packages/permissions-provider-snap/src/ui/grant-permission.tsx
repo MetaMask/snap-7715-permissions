@@ -1,0 +1,57 @@
+import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Footer,
+} from '@metamask/snaps-sdk/jsx';
+import type { Address } from 'viem';
+
+import type { PermissionRequest, Permission } from '../../../shared/src/types';
+import { Header, RequestDetails } from './components';
+import { GRANT_BUTTON, CANCEL_BUTTON } from './user-input.contant';
+
+export type GrantPermissionContext = {
+  permissionRequest: PermissionRequest;
+  siteOrigin: string;
+  accounts: Address[];
+};
+
+export type MocksPageProps = {
+  siteOrigin: string;
+  accounts: Address[];
+  permission: Permission;
+};
+
+export const GrantPermissonPage: SnapComponent<MocksPageProps> = ({
+  siteOrigin,
+  accounts,
+  permission,
+}) => {
+  if (accounts.length === 0) {
+    throw new Error('no accounts found');
+  }
+
+  return (
+    <Container>
+      <Box>
+        <Header
+          title="Permission request(mock)"
+          subtitle="Choose the account you want to use, then customize rules to be followed before a transaction is made."
+        />
+        <Divider />
+
+        <RequestDetails siteOrigin={siteOrigin} permission={permission} />
+      </Box>
+      <Footer>
+        <Button name={CANCEL_BUTTON} variant="destructive">
+          Cancel
+        </Button>
+        <Button name={GRANT_BUTTON} variant="primary">
+          Grant
+        </Button>
+      </Footer>
+    </Container>
+  );
+};

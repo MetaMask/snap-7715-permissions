@@ -1,51 +1,8 @@
-import { HDNodeWallet, Mnemonic } from 'ethers';
-import type { Address, Hex, PrivateKeyAccount } from 'viem';
+import type { Address, Hex } from 'viem';
 import { createPublicClient } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
 
 import type { PermissionRequestIteratorItem } from '../iterator';
 import { snapTansport } from './provider';
-
-/**
- * Creates a mnemonic from the entropy and derives a private key and address from the mnemonic and path.
- *
- * @param entropyFn - The entropy function to derive the mnemonic from.
- * @param path - The path to derive the private key from.
- * @returns The private key and address derived from the entropy and path.
- */
-export const getKeyPair = async (
-  entropyFn: () => Promise<string>,
-  path: string,
-): Promise<[PrivateKeyAccount, Hex]> => {
-  const entropy = await entropyFn();
-  const mnemonic = Mnemonic.fromEntropy(entropy);
-  const childWallet = HDNodeWallet.fromMnemonic(mnemonic, path);
-
-  const privateKey = childWallet.privateKey.toString() as Hex;
-  return [
-    privateKeyToAccount(childWallet.privateKey.toString() as Hex),
-    privateKey,
-  ];
-};
-
-/**
- * Determines whether the given CAIP-2 chain ID represents an EVM-based chain.
- *
- * @param chain - The CAIP-2 chain ID to check.
- * @returns Returns true if the chain is EVM-based, otherwise false.
- */
-export function isEvmChain(chain: string): boolean {
-  return chain.startsWith('eip155:');
-}
-
-/**
- * Throws an error with the specified message.
- *
- * @param message - The error message.
- */
-export function throwError(message: string): never {
-  throw new Error(message);
-}
 
 /**
  * Gets the chain ID of the current network.
@@ -74,22 +31,6 @@ export const isAccountDeployed = async (address: Hex): Promise<boolean> => {
   const code = await client.getCode({ address });
   return code !== '0x';
 };
-
-/**
- * Validates whether there are no duplicate addresses in the set of addresses.
- *
- * @param addressToCheck - The address to check.
- * @param setOfAddresses - An array of addresses to check against.
- * @returns Returns true if the address is unique, otherwise false.
- */
-export function isUniqueAddress(
-  addressToCheck: Hex,
-  setOfAddresses: Hex[],
-): boolean {
-  return !setOfAddresses.find(
-    (addressInSet) => addressInSet === addressToCheck,
-  );
-}
 
 /**
  * Moves the item at the specified index to the first index in the array.

@@ -4,7 +4,6 @@ import {
   zGrantAttenuatedPermissionsParams,
 } from '../../../shared/src/types';
 import { InternalMethod } from '../permissions/origin';
-import { throwError } from './common';
 
 export const validatePermissionRequestParam = (
   params: any | any[],
@@ -24,7 +23,7 @@ export const validatePermissionRequestParam = (
     validateGrantAttenuatedPermissionsParams.data.permissionsRequest.length ===
     0
   ) {
-    throwError('params are empty');
+    throw Error('params are empty');
   }
 
   return validateGrantAttenuatedPermissionsParams.data;
