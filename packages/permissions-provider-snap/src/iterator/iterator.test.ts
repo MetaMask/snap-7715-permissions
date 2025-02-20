@@ -1,6 +1,6 @@
 import { toHex } from 'viem';
 
-import type { PermissionRequest } from '../../../shared/src/types';
+import type { PermissionRequest } from '../../../shared/src';
 import { createPermissionsRequestIterator } from './iterator';
 
 describe('createPermissionsRequestIterator', () => {

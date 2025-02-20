@@ -1,6 +1,6 @@
 import { expect } from '@jest/globals';
 
-import type { RegisteredPermissionOffer } from '../../shared/src/types';
+import type { RegisteredPermissionOffer } from '@metamask/7715-permissions-shared/src';
 import type { KernelState } from '../src/stateManagement';
 import { createStateManager } from '../src/stateManagement';
 // eslint-disable-next-line jest/no-mocks-import

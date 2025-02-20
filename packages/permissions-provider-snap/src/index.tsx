@@ -14,8 +14,8 @@ import { getAddress } from 'viem';
 
 import type { PermissionsRequestIterator } from './iterator';
 import { createPermissionsRequestIterator } from './iterator';
-import { logger } from './logger';
-import { hasPermission, InternalMethod } from './permissions';
+import { logger } from '@metamask/7715-permissions-shared/src/logger';
+import { hasPermission, RpcMethod } from './permissions';
 import { saveInterfaceIdState, getInterfaceIdState } from './stateManagement';
 import type { GrantPermissionsContext } from './ui';
 import {
@@ -58,7 +58,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 
   switch (request.method) {
-    case InternalMethod.PermissionProviderGrantAttenuatedPermissions: {
+    case RpcMethod.PermissionProviderGrantAttenuatedPermissions: {
       const { permissionsRequest, siteOrigin } = validatePermissionRequestParam(
         request.params,
       );

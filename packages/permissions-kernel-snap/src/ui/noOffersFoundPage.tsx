@@ -7,7 +7,7 @@ import {
   Text,
 } from '@metamask/snaps-sdk/jsx';
 
-import type { PermissionsRequest } from '../../../shared/src/types';
+import type { PermissionsRequest } from '@metamask/7715-permissions-shared/src';
 import { extractPermissionName } from '../utils';
 import { Header } from './components';
 

@@ -3,5 +3,6 @@ module.exports = {
   transform: {
     '^.+\\.(t|j)sx?$': 'ts-jest',
   },
+  testMatch: ['**/test/**/*.test.ts'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
 };

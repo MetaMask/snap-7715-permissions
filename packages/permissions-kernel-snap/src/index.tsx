@@ -4,7 +4,7 @@ import { SnapError, type OnRpcRequestHandler } from '@metamask/snaps-sdk';
 import type {
   GrantAttenuatedPermissionsParams,
   RegisteredPermissionOffer,
-} from '../../shared/src/types';
+} from '@metamask/7715-permissions-shared/src';
 import { logger } from './logger';
 import { InternalMethod, PERMISSIONS_PROVIDER_SNAP_ID } from './permissions';
 import { createStateManager } from './stateManagement';

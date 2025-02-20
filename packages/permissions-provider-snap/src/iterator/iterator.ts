@@ -1,7 +1,7 @@
 import type {
   PermissionRequest,
   PermissionsRequest,
-} from '../../../shared/src/types';
+} from '../../../shared/src';
 
 export type PermissionRequestIteratorItem = {
   permissionRequest: PermissionRequest;

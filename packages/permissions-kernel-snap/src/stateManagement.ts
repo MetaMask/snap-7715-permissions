@@ -6,7 +6,7 @@ import {
   getIdFor,
   type PermissionOfferRegistry,
   type RegisteredPermissionOffer,
-} from '../../shared/src/types';
+} from '@metamask/7715-permissions-shared/src';
 import { PERMISSIONS_PROVIDER_SNAP_ID } from './permissions';
 
 export type KernelState = {

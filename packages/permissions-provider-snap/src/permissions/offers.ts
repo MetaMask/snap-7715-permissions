@@ -6,10 +6,10 @@ import {
   type GetSnapsResponse,
   type PermissionOffer,
   type RegisteredPermissionOffer,
-} from '../../../shared/src/types';
-import { logger } from '../logger';
-import { InternalMethod, KERNEL_SNAP_ID } from './origin';
-
+} from '../../../shared/src';
+import { logger } from '@metamask/7715-permissions-shared/src/logger';
+import { KERNEL_SNAP_ID } from './origin';
+import { RpcMethod } from '../rpc/rpcMethod';
 type PermissionOfferLibrary = {
   registerPermissionOffer(permissionToOffer: GatorPermission): Promise<boolean>;
   registerPermissionOfferBatch(
@@ -35,7 +35,7 @@ const makeOffer = async (offer: PermissionOffer): Promise<boolean> => {
     params: {
       snapId: KERNEL_SNAP_ID,
       request: {
-        method: InternalMethod.WalletOfferOnchainPermission,
+        method: RpcMethod.WalletOfferOnchainPermission,
         params: offer as Json,
       },
     },
@@ -135,7 +135,7 @@ export const createPermissionOfferLibrary = (): PermissionOfferLibrary => {
           params: {
             snapId: KERNEL_SNAP_ID,
             request: {
-              method: InternalMethod.WalletGetRegisteredOnchainPermissionOffers,
+              method: RpcMethod.WalletGetRegisteredOnchainPermissionOffers,
               params: [],
             },
           },

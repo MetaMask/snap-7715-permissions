@@ -9,7 +9,7 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
-import type { Permission } from '../../../../shared/src/types';
+import type { Permission } from '../../../../shared/src';
 
 type RequestDetails = {
   siteOrigin: string;

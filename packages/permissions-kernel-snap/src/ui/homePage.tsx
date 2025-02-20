@@ -10,7 +10,7 @@ import {
 import type {
   PermissionOfferRegistry,
   RegisteredPermissionOffer,
-} from '../../../shared/src/types';
+} from '@metamask/7715-permissions-shared/src';
 import { extractPermissionName } from '../utils';
 import { Header } from './components';
 

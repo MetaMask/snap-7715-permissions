@@ -6,12 +6,12 @@ import type {
   PermissionsRequest,
   RegisteredPermissionOffer,
   zTypeDescriptor,
-} from '../../../shared/src/types';
+} from '@metamask/7715-permissions-shared/src';
 import {
   extractZodError,
   zPermissionOffer,
   zPermissionsRequest,
-} from '../../../shared/src/types';
+} from '@metamask/7715-permissions-shared/src';
 import {
   InternalMethod,
   PERMISSIONS_PROVIDER_SNAP_ID,

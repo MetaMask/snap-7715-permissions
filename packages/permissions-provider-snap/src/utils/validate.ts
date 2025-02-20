@@ -1,9 +1,9 @@
-import type { GrantAttenuatedPermissionsParams } from '../../../shared/src/types';
+import type { GrantAttenuatedPermissionsParams } from '../../../shared/src';
 import {
   extractZodError,
   zGrantAttenuatedPermissionsParams,
-} from '../../../shared/src/types';
-import { InternalMethod } from '../permissions/origin';
+} from '../../../shared/src';
+import { RpcMethod } from '../permissions/origin';
 import { throwError } from './common';
 
 export const validatePermissionRequestParam = (
@@ -14,7 +14,7 @@ export const validatePermissionRequestParam = (
   if (!validateGrantAttenuatedPermissionsParams.success) {
     throw new Error(
       extractZodError(
-        InternalMethod.PermissionProviderGrantAttenuatedPermissions,
+        RpcMethod.PermissionProviderGrantAttenuatedPermissions,
         validateGrantAttenuatedPermissionsParams.error.errors,
       ),
     );
