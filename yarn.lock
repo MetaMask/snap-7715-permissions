@@ -2593,16 +2593,57 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask-private/delegation-abis@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "@metamask-private/delegation-abis@npm:0.5.1"
+  checksum: 709143e4e3cad4644a7e51013c7d94a721ba328cf5c98ecde919566db4d5d4c3579ece026c2d1133c7f7df20cb6e8127671ab193c10a42a40372e389a45d8362
+  languageName: node
+  linkType: hard
+
+"@metamask-private/delegation-deployments@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "@metamask-private/delegation-deployments@npm:0.5.1"
+  checksum: d8cedb76c386ab3776b92dc0fa494b08c91bde23201ac77f2e8980b0d81670097998246572269ebabc60c840d8c160de40d4d81e3dcb2aea4ce6d75fa25074fc
+  languageName: node
+  linkType: hard
+
+"@metamask-private/delegation-utils@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "@metamask-private/delegation-utils@npm:0.5.1"
+  dependencies:
+    "@metamask-private/delegation-abis": ^0.5.1
+    "@metamask-private/delegation-deployments": ^0.5.1
+    buffer: ^6.0.3
+  peerDependencies:
+    viem: ">=2.18.2 <3.0.0"
+  checksum: 9bb20689dbb04824d32f09deae0f07ebbfc68bcc32529667ce5aa65cbd6a0f32a26342959a1c15423112b63d8952a534fc028edacc6bd38b94b74d9941d78520
+  languageName: node
+  linkType: hard
+
+"@metamask-private/delegator-core-viem@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "@metamask-private/delegator-core-viem@npm:0.5.1"
+  dependencies:
+    "@metamask-private/delegation-utils": ^0.5.1
+    webauthn-p256: ^0.0.5
+  peerDependencies:
+    viem: ">=2.18.2 <3.0.0"
+  checksum: 962dc856a7a54f462cf50e840f13a8942cad7e6b6186212c1a646807eaf4d35287424c830d48a8e98575b17059807c736ef94c0110a2db4ad04af39b0b52232c
+  languageName: node
+  linkType: hard
+
 "@metamask/7715-permissions-provider@workspace:packages/permissions-provider-snap":
   version: 0.0.0-use.local
   resolution: "@metamask/7715-permissions-provider@workspace:packages/permissions-provider-snap"
   dependencies:
     "@jest/globals": ^29.5.0
+    "@metamask-private/delegator-core-viem": ^0.5.1
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
+    "@metamask/eth-hd-keyring": ^10.0.1
     "@metamask/snaps-cli": ^6.6.0
     "@metamask/snaps-jest": ^8.9.0
     "@metamask/snaps-sdk": ^6.14.0
@@ -2816,6 +2857,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/eth-hd-keyring@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "@metamask/eth-hd-keyring@npm:10.0.1"
+  dependencies:
+    "@ethereumjs/util": ^8.1.0
+    "@metamask/eth-sig-util": ^8.2.0
+    "@metamask/key-tree": ^10.0.2
+    "@metamask/scure-bip39": ^2.1.1
+    "@metamask/utils": ^11.1.0
+    ethereum-cryptography: ^2.1.2
+  checksum: ddde41e5d9889541cdac9dbc1a7f7bf97d40eb62851b8f695f8fe2ab7637047d2dc18e475b871a2d39e92dca787c5436d98862cd28b5c9e977b0a633b444a727
+  languageName: node
+  linkType: hard
+
 "@metamask/eth-json-rpc-middleware@npm:^15.1.2":
   version: 15.1.2
   resolution: "@metamask/eth-json-rpc-middleware@npm:15.1.2"
@@ -2871,7 +2926,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/eth-sig-util@npm:^8.1.2":
+"@metamask/eth-sig-util@npm:^8.1.2, @metamask/eth-sig-util@npm:^8.2.0":
   version: 8.2.0
   resolution: "@metamask/eth-sig-util@npm:8.2.0"
   dependencies:
@@ -3643,7 +3698,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:1.8.1, @noble/curves@npm:^1.6.0, @noble/curves@npm:~1.8.1":
+"@noble/curves@npm:1.8.1, @noble/curves@npm:^1.4.0, @noble/curves@npm:^1.6.0, @noble/curves@npm:~1.8.1":
   version: 1.8.1
   resolution: "@noble/curves@npm:1.8.1"
   dependencies:
@@ -19130,6 +19185,16 @@ __metadata:
   version: 1.2.2
   resolution: "weak-lru-cache@npm:1.2.2"
   checksum: 0fbe16839d193ed82ddb4fe331ca8cfaee2ecbd42596aa02366c708956cf41f7258f2d5411c3bc9aa099c26058dc47afbd2593d449718a18e4ef4d870c5ace18
+  languageName: node
+  linkType: hard
+
+"webauthn-p256@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "webauthn-p256@npm:0.0.5"
+  dependencies:
+    "@noble/curves": ^1.4.0
+    "@noble/hashes": ^1.4.0
+  checksum: 2837188d1e6d947c87c5728374fb6aec96387cb766f78e7a04d5903774264feb278d68a639748f09997f591e5278796c662bb5c4e8b8286b0f22254694023584
   languageName: node
   linkType: hard
 
