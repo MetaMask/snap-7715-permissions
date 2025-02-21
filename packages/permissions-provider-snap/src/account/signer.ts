@@ -52,8 +52,8 @@ export class Signer {
 
     const byteLength = size(entropy);
     const entropyBytes = new Uint8Array(byteLength);
-    entropyBytes.set(toBytes(entropy));
 
+    entropyBytes.set(toBytes(entropy));
     const mnemonic = entropyToMnemonic(entropyBytes, english);
 
     await this.#signerKeyring.deserialize({

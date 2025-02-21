@@ -1,11 +1,4 @@
-import {
-  createClient,
-  custom,
-  extractChain,
-  http,
-  type Chain,
-  type Hex,
-} from 'viem';
+import { createClient, custom, extractChain, type Chain, type Hex } from 'viem';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import {
   Implementation,

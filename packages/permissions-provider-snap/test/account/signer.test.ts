@@ -1,0 +1,116 @@
+import { describe, it, beforeEach } from '@jest/globals';
+import { SnapsProvider } from '@metamask/snaps-sdk';
+import { Signer } from '../../src/account/signer';
+import { isAddress } from 'viem';
+
+describe('Signer', () => {
+  let signer: Signer;
+  let mockSnapsProvider: jest.Mocked<SnapsProvider>;
+
+  beforeEach(() => {
+    mockSnapsProvider = {
+      request: jest.fn(),
+    } as unknown as jest.Mocked<SnapsProvider>;
+
+    signer = new Signer({
+      snapsProvider: mockSnapsProvider,
+    });
+
+    // todo: add a nice util function for random bytes
+    const entropy =
+      '0x' +
+      Buffer.from(
+        [...Array(32)].map(() => Math.floor(Math.random() * 256)),
+      ).toString('hex');
+
+    mockSnapsProvider.request.mockResolvedValue(entropy);
+  });
+
+  describe('getAddress()', () => {
+    it('should call the snap provider to get entropy', async () => {
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(0);
+
+      await signer.getAddress();
+
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
+        method: 'snap_getEntropy',
+        params: { version: 1 },
+      });
+    });
+
+    it('should not call the snap provider to get entropy if already called', async () => {
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(0);
+
+      await signer.getAddress();
+
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
+
+      await signer.getAddress();
+
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return an address', async () => {
+      const address = await signer.getAddress();
+
+      expect(isAddress(address)).toBe(true);
+    });
+
+    it('should return the same address with the same entropy', async () => {
+      const address = await signer.getAddress();
+
+      const secondAddress = await new Signer({
+        snapsProvider: mockSnapsProvider,
+      }).getAddress();
+
+      expect(address).toBe(secondAddress);
+    });
+  });
+
+  describe('toAccount()', () => {
+    it('should call the snap provider to get entropy', async () => {
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(0);
+
+      await signer.toAccount();
+
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
+        method: 'snap_getEntropy',
+        params: { version: 1 },
+      });
+    });
+
+    it('should not call the snap provider to get entropy if already called', async () => {
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(0);
+
+      await signer.toAccount();
+
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
+
+      await signer.toAccount();
+
+      expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return an account with the correct address', async () => {
+      const account = await signer.toAccount();
+
+      expect(account.address).toBe(await signer.getAddress());
+    });
+
+    it('should return an account with unsupported signing methods', async () => {
+      const account = await signer.toAccount();
+
+      expect(account.signMessage).toThrow(
+        'Unsupported sign method: signMessage',
+      );
+      expect(account.signTransaction).toThrow(
+        'Unsupported sign method: signTransaction',
+      );
+      expect(account.signTypedData).toThrow(
+        'Unsupported sign method: signTypedData',
+      );
+    });
+  });
+});
