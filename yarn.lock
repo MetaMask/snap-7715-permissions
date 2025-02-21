@@ -2647,6 +2647,7 @@ __metadata:
     "@metamask/snaps-cli": ^6.6.0
     "@metamask/snaps-jest": ^8.9.0
     "@metamask/snaps-sdk": ^6.14.0
+    "@scure/bip39": ^1.5.4
     "@types/react": 18.2.4
     "@types/react-dom": 18.2.4
     "@typescript-eslint/eslint-plugin": ^5.42.1
@@ -4510,7 +4511,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/bip39@npm:1.5.4, @scure/bip39@npm:^1.4.0":
+"@scure/bip39@npm:1.5.4, @scure/bip39@npm:^1.4.0, @scure/bip39@npm:^1.5.4":
   version: 1.5.4
   resolution: "@scure/bip39@npm:1.5.4"
   dependencies:

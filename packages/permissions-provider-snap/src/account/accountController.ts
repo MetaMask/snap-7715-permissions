@@ -1,4 +1,11 @@
-import { createClient, extractChain, http, type Chain, type Hex } from 'viem';
+import {
+  createClient,
+  custom,
+  extractChain,
+  http,
+  type Chain,
+  type Hex,
+} from 'viem';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import {
   Implementation,
@@ -61,9 +68,22 @@ export class AccountController {
         id: chainId as any,
       });
 
-      // todo: map this onto the experimental snap_experimentalProviderRequest API
+      const provider = {
+        request: async (request: { method: string; params?: unknown[] }) => {
+          const result = await this.#snapsProvider.request({
+            method: 'snap_experimentalProviderRequest',
+            params: {
+              chainId: `eip155:${chainId}`,
+              request,
+            },
+          } as any);
+
+          return result;
+        },
+      };
+
       const client = createClient({
-        transport: http(),
+        transport: custom(provider),
         chain,
       });
 

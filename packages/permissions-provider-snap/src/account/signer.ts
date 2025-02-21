@@ -1,7 +1,8 @@
 import HdKeyring from '@metamask/eth-hd-keyring';
-import { Account, Hex } from 'viem';
+import { Account, Hex, size, toBytes } from 'viem';
+import { toAccount, english } from 'viem/accounts';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { toAccount } from 'viem/accounts';
+import { entropyToMnemonic } from '@scure/bip39';
 
 export class Signer {
   #signerKeyring: HdKeyring | undefined;
@@ -42,16 +43,21 @@ export class Signer {
     if (this.#signerKeyring) {
       return this.#signerKeyring;
     }
+    this.#signerKeyring = new HdKeyring();
 
     const entropy = await this.#snapsProvider.request({
       method: 'snap_getEntropy',
       params: { version: 1 },
     });
 
-    this.#signerKeyring = new HdKeyring();
+    const byteLength = size(entropy);
+    const entropyBytes = new Uint8Array(byteLength);
+    entropyBytes.set(toBytes(entropy));
+
+    const mnemonic = entropyToMnemonic(entropyBytes, english);
 
     await this.#signerKeyring.deserialize({
-      mnemonic: entropy,
+      mnemonic,
       numberOfAccounts: 1,
     });
 
