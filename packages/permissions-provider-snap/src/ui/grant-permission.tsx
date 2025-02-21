@@ -1,3 +1,7 @@
+import type {
+  PermissionRequest,
+  Permission,
+} from '@metamask/7715-permissions-shared/types';
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
@@ -8,7 +12,6 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 import type { Address } from 'viem';
 
-import type { PermissionRequest, Permission } from '../../../shared/src/types';
 import { Header, RequestDetails } from './components';
 import { GRANT_BUTTON, CANCEL_BUTTON } from './user-input.contant';
 

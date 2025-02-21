@@ -1,3 +1,4 @@
+import type { Permission } from '@metamask/7715-permissions-shared/types';
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import {
   Text,
@@ -7,8 +8,6 @@ import {
   Tooltip,
   Icon,
 } from '@metamask/snaps-sdk/jsx';
-
-import type { Permission } from '../../../../shared/src/types';
 
 type RequestDetails = {
   siteOrigin: string;

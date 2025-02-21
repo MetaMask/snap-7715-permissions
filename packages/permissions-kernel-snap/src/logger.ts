@@ -83,17 +83,22 @@ export class Logger {
   }
 
   /**
+   * Get the logging level.
+   *
+   * @returns The set log level.
+   */
+  getLevel(): LogLevel {
+    return this.#context.threshold;
+  }
+
+  /**
    * Logs a message at the specified level.
    *
    * @param level - Log level of the message.
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
-  #log(
-    level: LogLevel = LogLevel.DEBUG,
-    message?: any,
-    ...optionalParams: any[]
-  ): void {
+  #log(level: LogLevel, message?: any, ...optionalParams: any[]): void {
     const { threshold, handlers } = this.#context;
     if (level >= threshold) {
       handlers[level](message, ...optionalParams);

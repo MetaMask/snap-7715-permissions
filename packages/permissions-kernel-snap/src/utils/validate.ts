@@ -1,50 +1,55 @@
-import { SnapError } from '@metamask/snaps-sdk';
-import type { z } from 'zod';
-
-import type {
-  PermissionOffer,
-  PermissionsRequest,
-  RegisteredPermissionOffer,
-  zTypeDescriptor,
-} from '../../../shared/src/types';
+/* eslint-disable @typescript-eslint/no-throw-literal */
 import {
-  extractZodError,
+  type PermissionOffer,
+  type PermissionsRequest,
+  type RegisteredPermissionOffer,
   zPermissionOffer,
   zPermissionsRequest,
-} from '../../../shared/src/types';
+} from '@metamask/7715-permissions-shared/types';
 import {
-  InternalMethod,
-  PERMISSIONS_PROVIDER_SNAP_ID,
-} from '../permissions/origin';
+  extractPermissionName,
+  extractZodError,
+} from '@metamask/7715-permissions-shared/utils';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
 
-export const validatePermissionRequestParam = (
+import { PERMISSIONS_PROVIDER_SNAP_ID } from '../permissions/origin';
+
+/**
+ * Safely parses the grant permissions request parameters, validating them using Zod schema.
+ *
+ * @param params - The permissions to parse.
+ * @returns The parsed and validated permissions as a PermissionsRequest object.
+ * @throws Throws a InvalidParamsError if validation fails or if the permissions data is empty.
+ */
+export const parsePermissionRequestParam = (
   params: any,
 ): PermissionsRequest => {
   const validatePermissionsRequest = zPermissionsRequest.safeParse(params);
   if (!validatePermissionsRequest.success) {
-    throw new Error(
-      extractZodError(
-        InternalMethod.WalletGrantPermissions,
-        validatePermissionsRequest.error.errors,
-      ),
+    throw new InvalidParamsError(
+      extractZodError(validatePermissionsRequest.error.errors),
     );
   }
 
   if (validatePermissionsRequest.data.length === 0) {
-    throw new SnapError('params are empty');
+    throw new InvalidParamsError('params are empty');
   }
 
   return validatePermissionsRequest.data;
 };
 
-export const validatePermissionOfferParam = (params: any): PermissionOffer => {
+/**
+ * Safely parses the permisssions offer request parameters, validating them using Zod schema.
+ *
+ * @param params - The permission offer to parse.
+ * @returns The parsed and validated permissions offer as a PermissionOffer object.
+ * @throws Throws a SnapError if validation fails.
+ */
+export const parsePermissionOfferParam = (params: any): PermissionOffer => {
   const validatePermissionOffer = zPermissionOffer.safeParse(params);
   if (!validatePermissionOffer.success) {
-    throw new Error(
-      extractZodError(
-        InternalMethod.WalletGrantPermissions,
-        validatePermissionOffer.error.errors,
-      ),
+    throw new InvalidParamsError(
+      extractZodError(validatePermissionOffer.error.errors),
     );
   }
 
@@ -71,21 +76,6 @@ export const checkForDuplicatePermissionOffer = (
   );
 
   return Boolean(foundDup);
-};
-
-/**
- * Extracts the name of a permission from a permission type.
- *
- * @param type - The type of permission to extract the name from.
- * @returns The name of the permission.
- */
-export const extractPermissionName = (
-  type: z.infer<typeof zTypeDescriptor>,
-): string => {
-  if (typeof type === 'object') {
-    return type.name;
-  }
-  return type;
 };
 
 /**

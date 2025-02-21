@@ -17,8 +17,8 @@ A user can grant granular permissions as cryptographic capabilities to allow dAp
 The snap origin to use(defaults to local if not defined):
 
 ```bash
-KERNEL_SNAP_ORIGIN=local:http://localhost:8080
-GATOR_SNAP_ORIGIN=local:http://localhost:8081
+GATSBY_KERNEL_SNAP_ORIGIN=local:http://localhost:8080
+GATSBY_GATOR_SNAP_ORIGIN=local:http://localhost:8081
 ```
 
 ### permissions-kernel-snap
@@ -120,7 +120,7 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
 
 1. Head back to the wallet repo:
 
-- Update the `package/site/.env.local` `KERNEL_SNAP_ORIGIN=npm:@metamask/permissions-kernel`
+- Update the `package/site/.env.development` `GATSBY_KERNEL_SNAP_ORIGIN=npm:@metamask/permissions-kernel`
 - Run `yarn dev`
 - Navigate to `http://localhost:8000/`
 

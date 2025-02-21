@@ -21,6 +21,10 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['html', 'json-summary', 'text'],
   moduleNameMapper: {
+    '^@metamask/7715-permissions-shared/utils$':
+      '<rootDir>/../shared/src/utils',
+    '^@metamask/7715-permissions-shared/types$':
+      '<rootDir>/../shared/src/types',
     '^.+.(svg)$': 'jest-transform-stub',
   },
 };

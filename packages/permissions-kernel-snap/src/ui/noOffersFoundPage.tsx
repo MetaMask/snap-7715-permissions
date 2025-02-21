@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
+import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import {
   Bold,
   Box,
@@ -7,8 +10,6 @@ import {
   Text,
 } from '@metamask/snaps-sdk/jsx';
 
-import type { PermissionsRequest } from '../../../shared/src/types';
-import { extractPermissionName } from '../utils';
 import { Header } from './components';
 
 export const NoOffersFoundPage = (
@@ -32,7 +33,10 @@ export const NoOffersFoundPage = (
               )}**`}</Text>
             </Row>
             <Row label="Their justification">
-              <Text>{value.permission.data.justification}</Text>
+              <Text>
+                {value.permission.data.justification ||
+                  'No justification provided'}
+              </Text>
             </Row>
             <Text>
               <Bold>
