@@ -7,7 +7,7 @@ module.exports = {
   resetMocks: true,
   setupFilesAfterEnv: ['./jest.setup.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/__mocks__/'],
-  testMatch: ['**/test/**/*.test.ts'],
+  testMatch: ['**/test/**/?(*.)+(spec|test).[tj]s?(x)'],
   collectCoverage: true,
   collectCoverageFrom: [
     './src/**/*.ts',

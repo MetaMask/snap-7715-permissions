@@ -68,7 +68,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           context: context as InterfaceContext,
           ui: (
             <GrantPermissonPage
-              accounts={context.accounts}
               siteOrigin={context.siteOrigin}
               permission={context.permissionRequest.permission}
             />

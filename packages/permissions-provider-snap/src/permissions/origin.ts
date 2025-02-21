@@ -8,9 +8,6 @@ export const KERNEL_SNAP_ID =
   Defines the permission for the Gator keyring and internal methods to restrict access to specific sites and snaps origins
 */
 export enum InternalMethod {
-  // debug
-  Hello = 'hello',
-
   /**
    * This method is used by snaps to offer its cryptographic abilities as permissions to kernel.
    */

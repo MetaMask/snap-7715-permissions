@@ -5,7 +5,7 @@ module.exports = {
   restoreMocks: true,
   resetMocks: true,
   testPathIgnorePatterns: ['/node_modules/', '/__mocks__/'],
-  testMatch: ['**/test/**/*.test.ts'],
+  testMatch: ['**/test/**/?(*.)+(spec|test).[tj]s?(x)'],
   collectCoverage: true,
   collectCoverageFrom: [
     './src/**/*.ts',
