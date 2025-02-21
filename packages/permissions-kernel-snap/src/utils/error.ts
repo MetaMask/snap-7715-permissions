@@ -3,19 +3,12 @@ import {
   MethodNotFoundError,
   MethodNotSupportedError,
   ParseError,
-  ResourceNotFoundError,
-  ResourceUnavailableError,
-  TransactionRejected,
-  DisconnectedError,
   UnauthorizedError,
-  UnsupportedMethodError,
   InternalError,
-  InvalidInputError,
   InvalidParamsError,
   InvalidRequestError,
-  LimitExceededError,
+  UserRejectedRequestError,
 } from '@metamask/snaps-sdk';
-import { UserRejectedRequestError, ChainDisconnectedError } from 'viem';
 
 /**
  * Determines if the given error is a Snap RPC error.
@@ -24,25 +17,16 @@ import { UserRejectedRequestError, ChainDisconnectedError } from 'viem';
  * @returns A boolean indicating whether the error is a Snap RPC error.
  */
 export function isSnapRpcError(error: Error): boolean {
-  const errors = [
+  const snapRpcErrorTypes = [
     SnapError,
-    MethodNotFoundError,
     UserRejectedRequestError,
     MethodNotSupportedError,
     MethodNotFoundError,
     ParseError,
-    ResourceNotFoundError,
-    ResourceUnavailableError,
-    TransactionRejected,
-    ChainDisconnectedError,
-    DisconnectedError,
     UnauthorizedError,
-    UnsupportedMethodError,
     InternalError,
-    InvalidInputError,
     InvalidParamsError,
     InvalidRequestError,
-    LimitExceededError,
   ];
-  return errors.some((errType) => error instanceof errType);
+  return snapRpcErrorTypes.some((errType) => error instanceof errType);
 }

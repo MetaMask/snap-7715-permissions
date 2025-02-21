@@ -1,18 +1,22 @@
-import type { Json, OnHomePageHandler } from '@metamask/snaps-sdk';
-import { SnapError, type OnRpcRequestHandler } from '@metamask/snaps-sdk';
-
 import type {
   GrantAttenuatedPermissionsParams,
   RegisteredPermissionOffer,
-} from '../../shared/src/types';
+} from '@metamask/7715-permissions-shared/types';
+import type { Json, OnHomePageHandler } from '@metamask/snaps-sdk';
+import {
+  MethodNotFoundError,
+  SnapError,
+  type OnRpcRequestHandler,
+} from '@metamask/snaps-sdk';
+
 import { logger } from './logger';
 import { InternalMethod, PERMISSIONS_PROVIDER_SNAP_ID } from './permissions';
 import { createStateManager } from './stateManagement';
 import { HomePageContent, EmptyRegistryPage, NoOffersFoundPage } from './ui';
 import {
   checkForDuplicatePermissionOffer,
-  validatePermissionOfferParam,
-  validatePermissionRequestParam,
+  parsePermissionOfferParam,
+  parsePermissionRequestParam,
   findRelevantPermissions,
   isSnapRpcError,
 } from './utils';
@@ -45,7 +49,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       }
 
       case InternalMethod.WalletOfferOnchainPermission: {
-        const offered = validatePermissionOfferParam(request.params);
+        const offered = parsePermissionOfferParam(request.params);
         logger.info(
           `New permission offer to register:`,
           JSON.stringify(offered, undefined, 2),
@@ -88,9 +92,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       }
 
       case InternalMethod.WalletGrantPermissions: {
-        const permissionsToGrant = validatePermissionRequestParam(
-          request.params,
-        );
+        const permissionsToGrant = parsePermissionRequestParam(request.params);
         const { permissionOfferRegistry } = await stateManager.getState();
         if (Object.keys(permissionOfferRegistry).length === 0) {
           await snap.request({
@@ -144,7 +146,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         });
       }
       default: {
-        throw new Error(`Method ${request.method} not found.`);
+        throw new MethodNotFoundError() as unknown as Error;
       }
     }
   } catch (error: any) {

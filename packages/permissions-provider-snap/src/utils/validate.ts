@@ -1,9 +1,8 @@
-import type { GrantAttenuatedPermissionsParams } from '../../../shared/src/types';
 import {
-  extractZodError,
+  type GrantAttenuatedPermissionsParams,
   zGrantAttenuatedPermissionsParams,
 } from '../../../shared/src/types';
-import { InternalMethod } from '../permissions/origin';
+import { extractZodError } from '../../../shared/src/utils';
 import { throwError } from './common';
 
 export const validatePermissionRequestParam = (
@@ -13,10 +12,7 @@ export const validatePermissionRequestParam = (
     zGrantAttenuatedPermissionsParams.safeParse(params);
   if (!validateGrantAttenuatedPermissionsParams.success) {
     throw new Error(
-      extractZodError(
-        InternalMethod.PermissionProviderGrantAttenuatedPermissions,
-        validateGrantAttenuatedPermissionsParams.error.errors,
-      ),
+      extractZodError(validateGrantAttenuatedPermissionsParams.error.errors),
     );
   }
 

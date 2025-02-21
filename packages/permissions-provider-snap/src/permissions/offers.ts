@@ -1,12 +1,12 @@
 import type { Json } from '@metamask/snaps-sdk';
 
 import {
-  getIdFor,
   type GatorPermission,
   type GetSnapsResponse,
   type PermissionOffer,
   type RegisteredPermissionOffer,
 } from '../../../shared/src/types';
+import { getIdFor } from '../../../shared/src/utils';
 import { logger } from '../logger';
 import { InternalMethod, KERNEL_SNAP_ID } from './origin';
 
