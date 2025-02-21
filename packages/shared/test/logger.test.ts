@@ -1,4 +1,4 @@
-import { Logger, LogLevel, objStringify } from '../src/logger';
+import { Logger, LogLevel, objStringify } from '../src/utils/logger';
 
 describe('Logger', () => {
   let logger: Logger;

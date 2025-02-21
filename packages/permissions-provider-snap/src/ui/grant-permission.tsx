@@ -10,7 +10,6 @@ import {
   Divider,
   Footer,
 } from '@metamask/snaps-sdk/jsx';
-import type { Address } from 'viem';
 
 import { Header, RequestDetails } from './components';
 import { GRANT_BUTTON, CANCEL_BUTTON } from './user-input.contant';
@@ -18,24 +17,17 @@ import { GRANT_BUTTON, CANCEL_BUTTON } from './user-input.contant';
 export type GrantPermissionContext = {
   permissionRequest: PermissionRequest;
   siteOrigin: string;
-  accounts: Address[];
 };
 
-export type MocksPageProps = {
+export type GrantPermissionPageProps = {
   siteOrigin: string;
-  accounts: Address[];
   permission: Permission;
 };
 
-export const GrantPermissonPage: SnapComponent<MocksPageProps> = ({
+export const GrantPermissonPage: SnapComponent<GrantPermissionPageProps> = ({
   siteOrigin,
-  accounts,
   permission,
 }) => {
-  if (accounts.length === 0) {
-    throw new Error('no accounts found');
-  }
-
   return (
     <Container>
       <Box>

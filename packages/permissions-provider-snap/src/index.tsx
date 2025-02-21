@@ -1,3 +1,4 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
   InterfaceContext,
   OnInstallHandler,
@@ -8,10 +9,7 @@ import {
   UserInputEventType,
   type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
-import type { Address } from 'viem';
-import { getAddress } from 'viem';
 
-import { logger } from './logger';
 import { hasPermission, InternalMethod } from './permissions';
 import { saveInterfaceIdState } from './stateManagement';
 import type { GrantPermissionContext } from './ui';
@@ -58,12 +56,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         throw new Error('No permission request found');
       }
 
-      const userAccounts: Address[] = [
-        getAddress('0x70997970C51812dc3A010C7d01b50e0d17dc79C8'),
-      ];
       const context: GrantPermissionContext = {
         siteOrigin,
-        accounts: userAccounts,
         permissionRequest: firstRequest,
       };
 
@@ -144,7 +138,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         context: context as InterfaceContext,
         ui: (
           <GrantPermissonPage
-            accounts={context.accounts}
             siteOrigin={context.siteOrigin}
             permission={context.permissionRequest.permission}
           />

@@ -1,7 +1,4 @@
-import type {
-  PermissionRequest,
-  PermissionsRequest,
-} from '@metamask/7715-permissions-shared/types';
+import type { PermissionRequest, PermissionsRequest } from '../types';
 
 export type PermissionRequestIteratorItem = {
   permissionRequest: PermissionRequest;

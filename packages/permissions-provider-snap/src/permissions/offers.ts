@@ -4,10 +4,9 @@ import {
   type PermissionOffer,
   type RegisteredPermissionOffer,
 } from '@metamask/7715-permissions-shared/types';
-import { getIdFor } from '@metamask/7715-permissions-shared/utils';
+import { getIdFor, logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
-import { logger } from '../logger';
 import { InternalMethod, KERNEL_SNAP_ID } from './origin';
 
 type PermissionOfferLibrary = {

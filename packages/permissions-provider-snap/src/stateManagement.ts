@@ -1,6 +1,5 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import { ManageStateOperation } from '@metamask/snaps-sdk';
-
-import { logger } from './logger';
 
 export type GatorSnapState = {
   activeInterfaceId: string;
