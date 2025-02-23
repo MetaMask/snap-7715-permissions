@@ -3,11 +3,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "jsx": "react-jsx",
-    "jsxImportSource": "@metamask/snaps-sdk",
-    "paths": {
-      "@metamask/7715-permissions-shared/types": ["../shared/src/types"],
-      "@metamask/7715-permissions-shared/utils": ["../shared/src/utils"]
-    }
+    "jsxImportSource": "@metamask/snaps-sdk"
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }
