@@ -27,10 +27,28 @@ import {
   PREVIOUS_BUTTON,
 } from './ui';
 import { updateAccountsOrder, validatePermissionRequestParam } from './utils';
+import { AccountController } from './account/accountController';
+import { Signer } from './account/signer';
+import { mainnet } from 'viem/chains';
 
 // Global iterator to keep track of the current permission request create on each request
 let permissionsRequestIterator: PermissionsRequestIterator =
   createPermissionsRequestIterator([]);
+
+const accountController = new AccountController({
+  snapsProvider: snap,
+  signer: new Signer({ snapsProvider: snap }),
+  supportedChains: [mainnet],
+  deploymentSalt: '0x1234',
+});
+
+accountController
+  .getAccountAddress({
+    chainId: mainnet.id,
+  })
+  .then((address) => {
+    console.log({ address });
+  });
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.

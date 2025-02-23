@@ -7,6 +7,7 @@ import {
   type MetaMaskSmartAccount,
 } from '@metamask-private/delegator-core-viem';
 import type { Signer } from './signer';
+import { mainnet } from 'viem/chains';
 
 // todo either narrow this or remove entirely
 type ChainId = number;
@@ -56,9 +57,9 @@ export class AccountController {
 
     if (!smartAccount) {
       // todo: figure out what happens if this doesn't match a chain, and remove chainId assertion
-      const chain = extractChain({
+      const chain = (extractChain as any)({
         chains: this.#supportedChains,
-        id: chainId as any,
+        id: chainId,
       });
 
       const provider = {

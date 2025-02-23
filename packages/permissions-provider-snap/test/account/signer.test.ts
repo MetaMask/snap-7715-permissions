@@ -16,12 +16,9 @@ describe('Signer', () => {
       snapsProvider: mockSnapsProvider,
     });
 
-    // todo: add a nice util function for random bytes
-    const entropy =
-      '0x' +
-      Buffer.from(
-        [...Array(32)].map(() => Math.floor(Math.random() * 256)),
-      ).toString('hex');
+    const randomValues = new Uint8Array(32);
+    crypto.getRandomValues(randomValues);
+    const entropy = `0x${Buffer.from(randomValues).toString('hex')}`;
 
     mockSnapsProvider.request.mockResolvedValue(entropy);
   });
@@ -108,9 +105,11 @@ describe('Signer', () => {
       expect(account.signTransaction).toThrow(
         'Unsupported sign method: signTransaction',
       );
-      expect(account.signTypedData).toThrow(
-        'Unsupported sign method: signTypedData',
-      );
+
+      expect(account.signTypedData).toBeDefined();
+      const signature = await (account.signTypedData as any)({} as any);
+
+      expect(signature).toBe('0x1234');
     });
   });
 });

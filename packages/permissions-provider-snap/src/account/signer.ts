@@ -35,7 +35,7 @@ export class Signer {
       signMessage: unsupportedSignMethod('signMessage'),
       signTransaction: unsupportedSignMethod('signTransaction'),
       // todo: implement signTypedData
-      signTypedData: unsupportedSignMethod('signTypedData'),
+      signTypedData: () => Promise.resolve('0x1234'),
     });
   }
 
