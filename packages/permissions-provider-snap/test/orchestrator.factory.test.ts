@@ -17,13 +17,11 @@ describe('PermissionOrchestratorFactory', () => {
   };
 
   const mockAccountController = {};
+  let mockSnapProvider: SnapsProvider = {} as SnapsProvider;
 
   beforeEach(() => {
-    // @ts-expect-error Mocking Snap global object
-    // eslint-disable-next-line no-restricted-globals
-    global.snap = createMockSnapsProvider();
+    mockSnapProvider = createMockSnapsProvider();
 
-    // Clear mock call history to ensure no interference between tests
     jest.clearAllMocks();
   });
 
@@ -42,7 +40,7 @@ describe('PermissionOrchestratorFactory', () => {
               },
             },
           } as PermissionRequest,
-          snap as SnapsProvider,
+          mockSnapProvider,
           mockAccountController,
         );
 
@@ -68,7 +66,7 @@ describe('PermissionOrchestratorFactory', () => {
               },
             },
           } as PermissionRequest,
-          snap as SnapsProvider,
+          mockSnapProvider,
           mockAccountController,
         );
 
@@ -94,7 +92,7 @@ describe('PermissionOrchestratorFactory', () => {
             },
           },
         } as PermissionRequest,
-        snap as SnapsProvider,
+        mockSnapProvider,
         mockAccountController,
       ),
     ).toThrow('Permission type is not supported');
