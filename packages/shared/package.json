@@ -10,7 +10,8 @@
   "license": "(MIT-0 OR Apache-2.0)",
   "exports": {
     "./utils": "./src/utils/index.ts",
-    "./types": "./src/types/index.ts"
+    "./types": "./src/types/index.ts",
+    "./test": "./test/__mocks__/index.ts"
   },
   "main": "./src",
   "types": "./src",

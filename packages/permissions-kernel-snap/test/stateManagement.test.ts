@@ -1,12 +1,10 @@
 import { expect } from '@jest/globals';
+import type { MockSnapRequest } from '@metamask/7715-permissions-shared/test';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/test';
 import type { RegisteredPermissionOffer } from '@metamask/7715-permissions-shared/types';
 
 import type { KernelState } from '../src/stateManagement';
 import { createStateManager } from '../src/stateManagement';
-// eslint-disable-next-line jest/no-mocks-import
-import type { MockSnapRequest } from './__mocks__/snap-provider.mock';
-// eslint-disable-next-line jest/no-mocks-import
-import { createMockSnapsProvider } from './__mocks__/snap-provider.mock';
 import {
   TEST_CASE_DEFAULT_STATE,
   TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
