@@ -7,7 +7,12 @@ import {
   type MetaMaskSmartAccount,
 } from '@metamask-private/delegator-core-viem';
 import type { Signer } from './signer';
-import { mainnet } from 'viem/chains';
+import type { Logger } from 'src/logger';
+
+export type FactoryArgs = {
+  factory: Hex | undefined;
+  factoryData: Hex | undefined;
+};
 
 // todo either narrow this or remove entirely
 type ChainId = number;
@@ -17,7 +22,7 @@ export type AccountOptionsBase = {
 };
 
 export type SignDelegationOptions = AccountOptionsBase & {
-  delegation: Exclude<DelegationStruct, 'signature'>;
+  delegation: Omit<DelegationStruct, 'signature'>;
 };
 
 export type AccountControllerInterface = Pick<
@@ -32,8 +37,9 @@ export class AccountController {
   #deploymentSalt: Hex;
   #metaMaskSmartAccountByChainId: Record<
     ChainId,
-    MetaMaskSmartAccount<Implementation.MultiSig>
+    Promise<MetaMaskSmartAccount<Implementation.MultiSig>>
   > = {};
+  #logger: Logger;
 
   //new Signer({ snapsProvider: this.#snapsProvider });
   constructor(config: {
@@ -41,29 +47,60 @@ export class AccountController {
     signer: Signer;
     supportedChains: Chain[];
     deploymentSalt: Hex;
+    logger: Logger;
   }) {
     this.#snapsProvider = config.snapsProvider;
     this.#signer = config.signer;
     this.#supportedChains = config.supportedChains;
     this.#deploymentSalt = config.deploymentSalt;
+    this.#logger = config.logger;
   }
 
   async #getMetaMaskSmartAccount(
     options: AccountOptionsBase,
   ): Promise<MetaMaskSmartAccount<Implementation.MultiSig>> {
+    this.#logger.debug('accountController:getMetaMaskSmartAccount()');
+
     const { chainId } = options;
 
     let smartAccount = this.#metaMaskSmartAccountByChainId[chainId];
 
+    this.#logger.debug(
+      'accountController:getMetaMaskSmartAccount() - smartAccount',
+      smartAccount,
+    );
+
     if (!smartAccount) {
-      // todo: figure out what happens if this doesn't match a chain, and remove chainId assertion
-      const chain = (extractChain as any)({
+      this.#logger.debug(
+        'accountController:getMetaMaskSmartAccount() - smartAccount not found',
+      );
+
+      // @ts-ignore -- extractChain does not work well with dynamic chains parameter
+      const chain = extractChain({
         chains: this.#supportedChains,
         id: chainId,
       });
 
+      if (!chain) {
+        this.#logger.error(
+          'accountController:getMetaMaskSmartAccount() - chain not supported',
+          { chainId },
+        );
+
+        throw new Error(`Chain not supported: ${chainId}`);
+      }
+
       const provider = {
         request: async (request: { method: string; params?: unknown[] }) => {
+          this.#logger.debug(
+            'accountController:getMetaMaskSmartAccount() - request',
+            request,
+          );
+
+          // eth_getCode returns undefined for undeployed contract
+          return '0x';
+
+          // todo: this fails
           const result = await this.#snapsProvider.request({
             method: 'snap_experimentalProviderRequest',
             params: {
@@ -81,18 +118,21 @@ export class AccountController {
         chain,
       });
 
-      const signerAddress = await this.#signer.getAddress();
-      const signatory = {
-        account: await this.#signer.toAccount(),
-      };
+      smartAccount = (async () => {
+        const account = await this.#signer.toAccount();
 
-      smartAccount = await toMetaMaskSmartAccount({
-        implementation: Implementation.MultiSig,
-        deployParams: [[signerAddress], 1n],
-        deploySalt: this.#deploymentSalt,
-        signatory: [signatory],
-        client,
-      });
+        const signatory = {
+          account,
+        };
+
+        return await toMetaMaskSmartAccount({
+          implementation: Implementation.MultiSig,
+          deployParams: [[signatory.account.address], 1n],
+          deploySalt: this.#deploymentSalt,
+          signatory: [signatory],
+          client,
+        });
+      })();
 
       this.#metaMaskSmartAccountByChainId[chainId] = smartAccount;
     }
@@ -100,8 +140,23 @@ export class AccountController {
     return smartAccount;
   }
 
-  public async getAccountAddress(options: AccountOptionsBase): Promise<Hex> {
+  public async getAccountAddress(): Promise<Hex> {
+    this.#logger.debug('accountController:getAddress()');
+
     return await this.#signer.getAddress();
+  }
+
+  public async getAccountMetadata(
+    options: AccountOptionsBase,
+  ): Promise<FactoryArgs> {
+    const smartAccount = await this.#getMetaMaskSmartAccount(options);
+
+    const factoryArgs = await smartAccount.getFactoryArgs();
+
+    return {
+      factory: factoryArgs.factory,
+      factoryData: factoryArgs.factoryData,
+    };
   }
 
   public async signDelegation(

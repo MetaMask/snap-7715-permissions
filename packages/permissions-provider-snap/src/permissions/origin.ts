@@ -33,6 +33,7 @@ export const originPermissions = new Map<string, string[]>([
     KERNEL_SNAP_ID,
     [InternalMethod.PermissionProviderGrantAttenuatedPermissions],
   ],
+  ['http://localhost:8000', ['permission_getAddress']],
 ]);
 
 /**

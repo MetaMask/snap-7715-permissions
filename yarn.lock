@@ -2644,6 +2644,7 @@ __metadata:
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/eth-hd-keyring": ^10.0.1
+    "@metamask/eth-simple-keyring": ^8.1.1
     "@metamask/snaps-cli": ^6.6.0
     "@metamask/snaps-jest": ^8.9.0
     "@metamask/snaps-sdk": ^6.17.1
@@ -2939,6 +2940,19 @@ __metadata:
     ethereum-cryptography: ^2.1.2
     tweetnacl: ^1.0.3
   checksum: 273e8bd3578a2395d888e0e7a2a8310311e320dd1d77b81035b1e5b21c432296ef144abd8f2e7ee3147ff82e660941e9671c080c0a6883017e2946523a09dcf4
+  languageName: node
+  linkType: hard
+
+"@metamask/eth-simple-keyring@npm:^8.1.1":
+  version: 8.1.1
+  resolution: "@metamask/eth-simple-keyring@npm:8.1.1"
+  dependencies:
+    "@ethereumjs/util": ^8.1.0
+    "@metamask/eth-sig-util": ^8.2.0
+    "@metamask/utils": ^11.1.0
+    ethereum-cryptography: ^2.1.2
+    randombytes: ^2.1.0
+  checksum: 7fe06220b2fac7421497291866a2e88a2fb9165d91358ee9eeca29edc6bcd2a2120c12ae0c6cc697117ff594b14e8a51fd8264ee68100350dc6ad9f79d454f63
   languageName: node
   linkType: hard
 

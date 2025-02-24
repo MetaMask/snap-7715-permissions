@@ -1,22 +1,35 @@
-import HdKeyring from '@metamask/eth-hd-keyring';
-import { Account, Hex, size, toBytes } from 'viem';
-import { toAccount, english } from 'viem/accounts';
+import SimpleKeyring from '@metamask/eth-simple-keyring';
+import { Account, Hex } from 'viem';
+import { toAccount } from 'viem/accounts';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { entropyToMnemonic } from '@scure/bip39';
+import { Logger } from 'src/logger';
+
+const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 
 export class Signer {
-  #signerKeyring: HdKeyring | undefined;
+  #signerKeyring: Promise<SimpleKeyring> | undefined;
   #snapsProvider: SnapsProvider;
+  #logger: Logger;
 
-  constructor(config: { snapsProvider: SnapsProvider }) {
+  constructor(config: { snapsProvider: SnapsProvider; logger: Logger }) {
     this.#snapsProvider = config.snapsProvider;
+    this.#logger = config.logger;
   }
 
   public async getAddress(): Promise<Hex> {
+    this.#logger.debug('signer:getAddress()');
+
     const keyring = await this.#getOrCreateSignerKeyring();
-    const accounts = keyring.getAccounts();
+    this.#logger.debug('signer:getAddress() - keyring resolved');
+
+    const accounts = await keyring.getAccounts();
+    this.#logger.debug('signer:getAddress() - accounts resolved');
 
     if (accounts.length !== 1) {
+      this.#logger.error(
+        'signer:getAddress() - expected exactly one account, got ' +
+          accounts.length,
+      );
       throw new Error('Expected exactly one account');
     }
 
@@ -40,27 +53,29 @@ export class Signer {
   }
 
   async #getOrCreateSignerKeyring() {
+    this.#logger.debug('signer:getOrCreateSignerKeyring()');
+
     if (this.#signerKeyring) {
-      return this.#signerKeyring;
+      return await this.#signerKeyring;
     }
-    this.#signerKeyring = new HdKeyring();
+    this.#logger.debug(
+      'signer:getOrCreateSignerKeyring() - keyring not resolved',
+    );
 
-    const entropy = await this.#snapsProvider.request({
-      method: 'snap_getEntropy',
-      params: { version: 1 },
-    });
+    this.#signerKeyring = (async () => {
+      const entropy = await this.#snapsProvider.request({
+        method: 'snap_getEntropy',
+        params: { version: 1, salt: GET_ENTROPY_SALT },
+      });
 
-    const byteLength = size(entropy);
-    const entropyBytes = new Uint8Array(byteLength);
+      this.#logger.debug('entropy received', entropy);
 
-    entropyBytes.set(toBytes(entropy));
-    const mnemonic = entropyToMnemonic(entropyBytes, english);
+      const keyring = new SimpleKeyring([entropy]);
+      this.#logger.debug('signer:getOrCreateSignerKeyring() - keyring created');
 
-    await this.#signerKeyring.deserialize({
-      mnemonic,
-      numberOfAccounts: 1,
-    });
+      return keyring;
+    })();
 
-    return this.#signerKeyring;
+    return await this.#signerKeyring;
   }
 }

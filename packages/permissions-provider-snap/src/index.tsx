@@ -14,7 +14,6 @@ import { getAddress } from 'viem';
 
 import type { PermissionsRequestIterator } from './iterator';
 import { createPermissionsRequestIterator } from './iterator';
-import { logger } from './logger';
 import { hasPermission, InternalMethod } from './permissions';
 import { saveInterfaceIdState, getInterfaceIdState } from './stateManagement';
 import type { GrantPermissionsContext } from './ui';
@@ -27,28 +26,44 @@ import {
   PREVIOUS_BUTTON,
 } from './ui';
 import { updateAccountsOrder, validatePermissionRequestParam } from './utils';
-import { AccountController } from './account/accountController';
+import { Logger, LogLevel } from './logger';
 import { Signer } from './account/signer';
-import { mainnet } from 'viem/chains';
-
+import { AccountController } from './account/accountController';
+import { sepolia } from 'viem/chains';
 // Global iterator to keep track of the current permission request create on each request
 let permissionsRequestIterator: PermissionsRequestIterator =
   createPermissionsRequestIterator([]);
 
+const logger = new Logger();
+logger.setLevel(LogLevel.DEBUG);
+
 const accountController = new AccountController({
   snapsProvider: snap,
-  signer: new Signer({ snapsProvider: snap }),
-  supportedChains: [mainnet],
-  deploymentSalt: '0x1234',
+  signer: new Signer({
+    snapsProvider: snap,
+    logger,
+  }),
+  supportedChains: [sepolia],
+  deploymentSalt: '0x',
+  logger,
 });
-
+/*
 accountController
   .getAccountAddress({
-    chainId: mainnet.id,
+    chainId: sepolia.id,
   })
   .then((address) => {
-    console.log({ address });
+    console.log('accountController.getAccountAddress() resolved', address);
   });
+
+
+accountController
+  .getAccountMetadata({
+    chainId: sepolia.id,
+  })
+  .then((metadata) => {
+    console.log('accountController.getAccountMetadata() resolved', metadata);
+  });*/
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -76,6 +91,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 
   switch (request.method) {
+    case 'permission_getAddress': {
+      const address = await accountController.getAccountAddress();
+
+      return address;
+    }
     case InternalMethod.PermissionProviderGrantAttenuatedPermissions: {
       const { permissionsRequest, siteOrigin } = validatePermissionRequestParam(
         request.params,

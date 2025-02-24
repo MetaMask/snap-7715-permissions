@@ -2,6 +2,7 @@ import { describe, it, beforeEach } from '@jest/globals';
 import { SnapsProvider } from '@metamask/snaps-sdk';
 import { Signer } from '../../src/account/signer';
 import { isAddress } from 'viem';
+import { Logger } from '../../src/logger';
 
 describe('Signer', () => {
   let signer: Signer;
@@ -14,6 +15,7 @@ describe('Signer', () => {
 
     signer = new Signer({
       snapsProvider: mockSnapsProvider,
+      logger: new Logger(),
     });
 
     const randomValues = new Uint8Array(32);
@@ -32,7 +34,7 @@ describe('Signer', () => {
       expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_getEntropy',
-        params: { version: 1 },
+        params: { version: 1, salt: '7715_permissions_provider_snap' },
       });
     });
 
@@ -59,6 +61,7 @@ describe('Signer', () => {
 
       const secondAddress = await new Signer({
         snapsProvider: mockSnapsProvider,
+        logger: new Logger(),
       }).getAddress();
 
       expect(address).toBe(secondAddress);
@@ -74,7 +77,7 @@ describe('Signer', () => {
       expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_getEntropy',
-        params: { version: 1 },
+        params: { version: 1, salt: '7715_permissions_provider_snap' },
       });
     });
 
@@ -111,5 +114,17 @@ describe('Signer', () => {
 
       expect(signature).toBe('0x1234');
     });
+  });
+
+  it('should only call the snap provider to get entropy once', async () => {
+    expect(mockSnapsProvider.request).toHaveBeenCalledTimes(0);
+
+    await Promise.all([
+      signer.getAddress(),
+      signer.toAccount(),
+      signer.getAddress(),
+    ]);
+
+    expect(mockSnapsProvider.request).toHaveBeenCalledTimes(1);
   });
 });
