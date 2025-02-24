@@ -27,7 +27,10 @@ export type SignDelegationOptions = AccountOptionsBase & {
 
 export type AccountControllerInterface = Pick<
   AccountController,
-  'getAccountAddress' | 'signDelegation'
+  | 'getAccountAddress'
+  | 'signDelegation'
+  | 'getAccountMetadata'
+  | 'getAccountBalance'
 >;
 
 export class AccountController {
@@ -93,21 +96,22 @@ export class AccountController {
       const provider = {
         request: async (request: { method: string; params?: unknown[] }) => {
           this.#logger.debug(
-            'accountController:getMetaMaskSmartAccount() - request',
+            'accountController:getMetaMaskSmartAccount() - provider.request()',
             request,
           );
 
-          // eth_getCode returns undefined for undeployed contract
-          return '0x';
-
-          // todo: this fails
+          // we can just pass the request to the snapsProvider, because
+          // snap_experimentalProviderRequest enforcesan allowlist of methods.
           const result = await this.#snapsProvider.request({
+            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
             method: 'snap_experimentalProviderRequest',
             params: {
+              // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
               chainId: `eip155:${chainId}`,
+              // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
               request,
             },
-          } as any);
+          });
 
           return result;
         },
@@ -157,6 +161,24 @@ export class AccountController {
       factory: factoryArgs.factory,
       factoryData: factoryArgs.factoryData,
     };
+  }
+
+  public async getAccountBalance(options: AccountOptionsBase): Promise<Hex> {
+    const smartAccount = await this.#getMetaMaskSmartAccount(options);
+
+    this.#logger.debug('accountController:getAccountBalance()');
+
+    const balance = await smartAccount.client.request({
+      method: 'eth_getBalance',
+      params: [await smartAccount.getAddress(), 'latest'],
+    });
+
+    this.#logger.debug(
+      'accountController:getAccountBalance() - balance resolved',
+      balance,
+    );
+
+    return balance;
   }
 
   public async signDelegation(

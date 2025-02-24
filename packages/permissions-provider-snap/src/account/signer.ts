@@ -1,10 +1,12 @@
 import SimpleKeyring from '@metamask/eth-simple-keyring';
-import { Account, Hex } from 'viem';
 import { toAccount } from 'viem/accounts';
+import type { Account, CustomSource, Hex } from 'viem';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { Logger } from 'src/logger';
+import type { Logger } from 'src/logger';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
+
+type SignTypedDataFunction = CustomSource['signTypedData'];
 
 export class Signer {
   #signerKeyring: Promise<SimpleKeyring> | undefined;
@@ -37,19 +39,30 @@ export class Signer {
   }
 
   public async toAccount(): Promise<Account> {
+    this.#logger.debug('signer:toAccount()');
     const address = await this.getAddress();
 
     const unsupportedSignMethod = (method: string) => () => {
       throw new Error(`Unsupported sign method: ${method}`);
     };
 
-    return toAccount({
+    const keyring = await this.#getOrCreateSignerKeyring();
+    this.#logger.debug('signer:toAccount() - created keyring');
+
+    const signTypedData = this.#createSignTypedDataAdapter(address, keyring);
+
+    this.#logger.debug('signer:toAccount() - created signTypedDataAdapter');
+
+    const account = toAccount({
       address,
       signMessage: unsupportedSignMethod('signMessage'),
       signTransaction: unsupportedSignMethod('signTransaction'),
-      // todo: implement signTypedData
-      signTypedData: () => Promise.resolve('0x1234'),
+      signTypedData,
     });
+
+    this.#logger.debug('signer:toAccount() - account created');
+
+    return account;
   }
 
   async #getOrCreateSignerKeyring() {
@@ -77,5 +90,29 @@ export class Signer {
     })();
 
     return await this.#signerKeyring;
+  }
+
+  #createSignTypedDataAdapter(
+    address: Hex,
+    keyring: SimpleKeyring,
+  ): SignTypedDataFunction {
+    // todo we should do better at aligning the types
+    // @ts-expect-error SignTypedDataFunction is a complex generic type that is derived from parameters in viem
+    return async (message: Parameters<SignTypedDataFunction>[0]) => {
+      this.#logger.debug(
+        'signer:createSignTypedDataAdapter() - signing typed data',
+        message,
+      );
+
+      const signature = await keyring.signTypedData(address, message, {
+        version: 'V4',
+      });
+
+      this.#logger.debug(
+        'signer:createSignTypedDataAdapter() - signature created',
+        signature,
+      );
+      return signature as Hex;
+    };
   }
 }

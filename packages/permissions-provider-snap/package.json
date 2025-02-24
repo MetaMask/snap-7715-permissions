@@ -37,7 +37,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@metamask-private/delegator-core-viem": "^0.5.1",
+    "@metamask-private/delegator-core-viem": "^0.6.0",
     "@metamask/eth-simple-keyring": "^8.1.1",
     "@metamask/snaps-sdk": "^6.17.1",
     "ethers": "^6.10.0",

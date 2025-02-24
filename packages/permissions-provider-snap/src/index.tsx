@@ -30,6 +30,10 @@ import { Logger, LogLevel } from './logger';
 import { Signer } from './account/signer';
 import { AccountController } from './account/accountController';
 import { sepolia } from 'viem/chains';
+import {
+  createRootDelegation,
+  UnsignedDelegationStruct,
+} from '@metamask-private/delegator-core-viem';
 // Global iterator to keep track of the current permission request create on each request
 let permissionsRequestIterator: PermissionsRequestIterator =
   createPermissionsRequestIterator([]);
@@ -92,9 +96,34 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   switch (request.method) {
     case 'permission_getAddress': {
-      const address = await accountController.getAccountAddress();
+      const addressProm = accountController.getAccountAddress();
+      const balanceProm = accountController.getAccountBalance({
+        chainId: sepolia.id,
+      });
+      const metadataProm = accountController.getAccountMetadata({
+        chainId: sepolia.id,
+      });
 
-      return address;
+      const delegation = createRootDelegation('0x1234', '0x1234', []);
+      const signedDelegation = await accountController.signDelegation({
+        chainId: sepolia.id,
+        delegation,
+      });
+
+      const [address, balance, metadata] = await Promise.all([
+        addressProm,
+        balanceProm,
+        metadataProm,
+      ]);
+
+      return {
+        address,
+        metadata,
+        balance,
+        signedDelegation: JSON.stringify(signedDelegation, (_, v) =>
+          typeof v === 'bigint' ? `0x${v.toString(16)}` : v,
+        ),
+      };
     }
     case InternalMethod.PermissionProviderGrantAttenuatedPermissions: {
       const { permissionsRequest, siteOrigin } = validatePermissionRequestParam(
