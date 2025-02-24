@@ -1,11 +1,13 @@
-import type { PermissionResponse } from './7715-permissions-response';
 import type {
-  Erc20TokenTransferPermission,
-  NativeTokenTransferPermission,
-  Permission,
-} from './7715-permissions-types';
+  Erc20TokenTransferPermissionRequest,
+  NativeTokenTransferPermissionRequest,
+  PermissionRequest,
+} from './7715-permissions-request';
+import type { PermissionResponse } from './7715-permissions-response';
 
-type ValidateFn = (basePermission: Permission) => Promise<boolean>;
+type ValidateFn = (
+  basePermissionRequest: PermissionRequest,
+) => Promise<boolean>;
 
 type OrchestrateFn<PerTyp> = (
   permission: PerTyp,
@@ -33,11 +35,11 @@ export type NativePermissionTypePermissionOrchestrator = {
   /**
    * Orchestrates the permission request for a native token transfer.
    *
-   * @param nativeTokenTransferPermission - The permission request.
+   * @param nativeTokenTransferPermissionRequest - The permission request for a native token transfer.
    * @returns The permission response.
    * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
    */
-  orchestrate: OrchestrateFn<NativeTokenTransferPermission>;
+  orchestrate: OrchestrateFn<NativeTokenTransferPermissionRequest>;
 };
 
 export type Erc20PermissionTypePermissionOrchestrator = {
@@ -58,11 +60,11 @@ export type Erc20PermissionTypePermissionOrchestrator = {
   /**
    * Orchestrates the permission request for an erc-20 token transfer.
    *
-   * @param nativeTokenTransferPermission - The permission request.
+   * @param nativeTokenTransferPermissionRequest - The permission request for an erc-20 token transfer.
    * @returns The permission response.
    * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
    */
-  orchestrate: OrchestrateFn<Erc20TokenTransferPermission>;
+  orchestrate: OrchestrateFn<Erc20TokenTransferPermissionRequest>;
 };
 
 /**
@@ -73,11 +75,11 @@ export type Erc20PermissionTypePermissionOrchestrator = {
  */
 export type PermissionOrchestratorTypeMapping = {
   ['native-token-transfer']: {
-    params: NativeTokenTransferPermission;
+    params: NativeTokenTransferPermissionRequest;
     return: NativePermissionTypePermissionOrchestrator;
   };
   ['erc-20-token-transfer']: {
-    params: Erc20TokenTransferPermission;
+    params: Erc20TokenTransferPermissionRequest;
     return: Erc20PermissionTypePermissionOrchestrator;
   };
 };
