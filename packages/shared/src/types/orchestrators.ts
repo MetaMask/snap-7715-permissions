@@ -5,7 +5,7 @@ import type {
   Permission,
 } from './7715-permissions-types';
 
-type ValidateFn = (basePermission: Permission) => boolean;
+type ValidateFn = (basePermission: Permission) => Promise<boolean>;
 
 type OrchestrateFn<PerTyp> = (
   permission: PerTyp,

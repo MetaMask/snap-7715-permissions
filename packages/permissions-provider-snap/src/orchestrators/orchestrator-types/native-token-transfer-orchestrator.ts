@@ -18,7 +18,7 @@ export const createNativePermissionTypePermissionOrchestrator = (
 ): NativePermissionTypePermissionOrchestrator => {
   return {
     permissionType: 'native-token-transfer',
-    validate: (_permission: Permission) => {
+    validate: async (_permission: Permission) => {
       // TODO: Implement Specific permission validator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/38
       return true;
     },
