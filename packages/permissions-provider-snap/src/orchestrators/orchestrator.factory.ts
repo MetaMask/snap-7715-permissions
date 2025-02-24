@@ -31,18 +31,24 @@ export const createPermissionOrchestratorFactory = <
     permissionRequest.permission.type,
   );
 
-  if (permissionType === 'erc-20-token-transfer') {
-    return createErc20PermissionTypePermissionOrchestrator(
+  const orchestrators: Record<
+    string,
+    PermissionOrchestratorTypeMapping[PermissionType]['return']
+  > = {
+    'erc-20-token-transfer': createErc20PermissionTypePermissionOrchestrator(
       snapsProvider,
       accountController,
-    );
+    ),
+    'native-token-transfer': createNativePermissionTypePermissionOrchestrator(
+      snapsProvider,
+      accountController,
+    ),
+  };
+
+  const orchestrator = orchestrators[permissionType];
+  if (!orchestrator) {
+    throw new Error('Permission type is not supported');
   }
 
-  if (permissionType === 'native-token-transfer') {
-    return createNativePermissionTypePermissionOrchestrator(
-      snapsProvider,
-      accountController,
-    );
-  }
-  throw new Error('Permission type is not supported');
+  return orchestrator;
 };
