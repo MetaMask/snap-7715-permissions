@@ -118,7 +118,6 @@ const Index = () => {
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestGatorSnap = useRequestSnap(gatorSnapOrigin);
   const invokeKernelSnap = useInvokeSnap(kernelSnapOrigin);
-  const invokeGatorSnap = useInvokeSnap(gatorSnapOrigin);
 
   const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
     ? isFlask
@@ -140,14 +139,6 @@ const Index = () => {
     );
     const logEntry = `${timestamp} - ${action}:\n${body}`;
     setLog((prevLog) => [...prevLog, logEntry]);
-  };
-
-  const handleGetAccountDetails = async () => {
-    const response = await invokeGatorSnap({
-      method: 'permission_getAddress',
-      params: [],
-    });
-    appendToLog('Get account details', response);
   };
 
   const handleGrantPermissions = async () => {
@@ -365,25 +356,6 @@ const Index = () => {
         )}
 
         {/* Send permissions request */}
-        <Card
-          content={{
-            title: 'Get account details',
-            description: 'Get the details of the embedded smart account.',
-            button: (
-              <CustomMessageButton
-                text="Get account details"
-                onClick={handleGetAccountDetails}
-                disabled={!installedSnaps[gatorSnapOrigin]}
-              />
-            ),
-          }}
-          disabled={!installedSnaps[kernelSnapOrigin]}
-          fullWidth={
-            isMetaMaskReady &&
-            Boolean(installedSnaps[kernelSnapOrigin]) &&
-            !shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])
-          }
-        />
         <Card
           content={{
             title: 'Grant Permission',
