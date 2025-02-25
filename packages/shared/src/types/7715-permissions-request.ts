@@ -1,10 +1,6 @@
 import { z } from 'zod';
 
-import {
-  zErc20TokenTransferPermission,
-  zNativeTokenTransferPermission,
-  zPermission,
-} from './7715-permissions-types';
+import { zPermission } from './7715-permissions-types';
 import { zAddress, zHexStr } from './common';
 
 export const zAccountSigner = z.object({
@@ -53,19 +49,3 @@ export const zPermissionsRequest = z.array(zPermissionRequest);
 
 export type PermissionRequest = z.infer<typeof zPermissionRequest>;
 export type PermissionsRequest = z.infer<typeof zPermissionsRequest>;
-
-export const zNativeTokenTransferPermissionRequest = zPermission.extend({
-  permission: zNativeTokenTransferPermission,
-});
-
-export type NativeTokenTransferPermissionRequest = z.infer<
-  typeof zNativeTokenTransferPermissionRequest
->;
-
-export const zErc20TokenTransferPermissionRequest = zPermission.extend({
-  permission: zErc20TokenTransferPermission,
-});
-
-export type Erc20TokenTransferPermissionRequest = z.infer<
-  typeof zErc20TokenTransferPermissionRequest
->;
