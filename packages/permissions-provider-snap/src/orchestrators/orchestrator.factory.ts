@@ -1,15 +1,15 @@
-import type {
-  PermissionRequest,
-  PermissionOrchestratorKeys,
-  PermissionOrchestratorTypeMapping,
-} from '@metamask/7715-permissions-shared/types';
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 
 import {
-  createErc20PermissionTypePermissionOrchestrator,
-  createNativePermissionTypePermissionOrchestrator,
-} from './orchestrator-types';
+  createNativeTokenStreamPermissionOrchestrator,
+  createNativeTokenTransferPermissionOrchestrator,
+} from './native-token-orchestrators';
+import type {
+  SupportedPermissionTypes,
+  PermissionOrchestratorReturnMapping,
+} from './orchestrator.types';
 
 /**
  * Factory function for creating a permission orchestrator for a given permission type.
@@ -21,34 +21,33 @@ import {
  * @throws If the permission type is not supported.
  */
 export const createPermissionOrchestratorFactory = <
-  PermissionType extends PermissionOrchestratorKeys,
+  PermissionType extends SupportedPermissionTypes,
 >(
   permissionRequest: PermissionRequest,
   snapsProvider: SnapsProvider,
   accountController: unknown,
-): PermissionOrchestratorTypeMapping[PermissionType]['return'] => {
+): PermissionOrchestratorReturnMapping[PermissionType] => {
   const permissionType = extractPermissionName(
     permissionRequest.permission.type,
   );
 
   const orchestrators: Record<
     string,
-    PermissionOrchestratorTypeMapping[PermissionType]['return']
+    PermissionOrchestratorReturnMapping[PermissionType]
   > = {
-    'erc-20-token-transfer': createErc20PermissionTypePermissionOrchestrator(
+    'native-token-transfer': createNativeTokenTransferPermissionOrchestrator(
       snapsProvider,
       accountController,
-    ),
-    'native-token-transfer': createNativePermissionTypePermissionOrchestrator(
+    ) as PermissionOrchestratorReturnMapping[PermissionType],
+    'native-token-stream': createNativeTokenStreamPermissionOrchestrator(
       snapsProvider,
       accountController,
-    ),
+    ) as PermissionOrchestratorReturnMapping[PermissionType],
   };
 
   const orchestrator = orchestrators[permissionType];
   if (!orchestrator) {
     throw new Error('Permission type is not supported');
   }
-
   return orchestrator;
 };

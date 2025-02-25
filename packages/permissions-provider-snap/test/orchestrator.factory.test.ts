@@ -26,8 +26,8 @@ describe('PermissionOrchestratorFactory', () => {
   });
 
   describe('native-token-transfer permission type', () => {
-    it('should return a Erc20PermissionTypePermissionOrchestrator when given native-token-transfer permission type', () => {
-      const erc20Orchestrator =
+    it('should return a NativeTokenStreamPermissionOrchestrator when given native-token-transfer permission type', () => {
+      const nativeTokenTransferOrchestrator =
         createPermissionOrchestratorFactory<'native-token-transfer'>(
           {
             ...mockPartialPermissionRequest,
@@ -44,21 +44,25 @@ describe('PermissionOrchestratorFactory', () => {
           mockAccountController,
         );
 
-      expect(erc20Orchestrator).toBeDefined();
-      expect(erc20Orchestrator.permissionType).toBe('native-token-transfer');
-      expect(erc20Orchestrator.validate).toBeInstanceOf(Function);
-      expect(erc20Orchestrator.orchestrate).toBeInstanceOf(Function);
+      expect(nativeTokenTransferOrchestrator).toBeDefined();
+      expect(nativeTokenTransferOrchestrator.permissionType).toBe(
+        'native-token-transfer',
+      );
+      expect(nativeTokenTransferOrchestrator.validate).toBeInstanceOf(Function);
+      expect(nativeTokenTransferOrchestrator.orchestrate).toBeInstanceOf(
+        Function,
+      );
     });
   });
 
-  describe('erc-20-token-transfer permission type', () => {
-    it('should return a Erc20PermissionTypePermissionOrchestrator when given erc-20-token-transfer permission type', () => {
-      const erc20Orchestrator =
-        createPermissionOrchestratorFactory<'erc-20-token-transfer'>(
+  describe('native-token-stream permission type', () => {
+    it('should return a NativeTokenStreamPermissionOrchestrator when given native-token-stream permission type', () => {
+      const nativeTokenStreamOrchestrator =
+        createPermissionOrchestratorFactory<'native-token-stream'>(
           {
             ...mockPartialPermissionRequest,
             permission: {
-              type: 'erc-20-token-transfer',
+              type: 'native-token-stream',
               data: {
                 justification: 'shh...permission 2',
                 address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
@@ -70,10 +74,14 @@ describe('PermissionOrchestratorFactory', () => {
           mockAccountController,
         );
 
-      expect(erc20Orchestrator).toBeDefined();
-      expect(erc20Orchestrator.permissionType).toBe('erc-20-token-transfer');
-      expect(erc20Orchestrator.validate).toBeInstanceOf(Function);
-      expect(erc20Orchestrator.orchestrate).toBeInstanceOf(Function);
+      expect(nativeTokenStreamOrchestrator).toBeDefined();
+      expect(nativeTokenStreamOrchestrator.permissionType).toBe(
+        'native-token-stream',
+      );
+      expect(nativeTokenStreamOrchestrator.validate).toBeInstanceOf(Function);
+      expect(nativeTokenStreamOrchestrator.orchestrate).toBeInstanceOf(
+        Function,
+      );
     });
   });
 
