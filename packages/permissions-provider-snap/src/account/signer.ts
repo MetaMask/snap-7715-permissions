@@ -8,16 +8,30 @@ const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 
 type SignTypedDataFunction = CustomSource['signTypedData'];
 
+/**
+ * Represents a Signer of a Multisig DeleGator Account, derives the private key from snaps entropy.
+ */
 export class Signer {
   #signerKeyring: Promise<SimpleKeyring> | undefined;
   #snapsProvider: SnapsProvider;
   #logger: Logger;
 
+  /**
+   * Creates a new Signer instance.
+   * @param config - Configuration object
+   * @param config.snapsProvider - Provider for interacting with snaps environment
+   * @param config.logger - Logger instance
+   */
   constructor(config: { snapsProvider: SnapsProvider; logger: Logger }) {
     this.#snapsProvider = config.snapsProvider;
     this.#logger = config.logger;
   }
 
+  /**
+   * Gets the Ethereum address associated with this signer.
+   * @returns Promise resolving to the hex address
+   * @throws Error if there is not exactly one account
+   */
   public async getAddress(): Promise<Hex> {
     this.#logger.debug('signer:getAddress()');
 
@@ -38,6 +52,10 @@ export class Signer {
     return accounts[0]!;
   }
 
+  /**
+   * Converts the signer to a viem Account object.
+   * @returns Promise resolving to a viem Account
+   */
   public async toAccount(): Promise<Account> {
     this.#logger.debug('signer:toAccount()');
     const address = await this.getAddress();
@@ -65,6 +83,11 @@ export class Signer {
     return account;
   }
 
+  /**
+   * Gets an existing keyring or creates a new one if none exists.
+   * @returns Promise resolving to a SimpleKeyring instance
+   * @private
+   */
   async #getOrCreateSignerKeyring() {
     this.#logger.debug('signer:getOrCreateSignerKeyring()');
 
@@ -92,6 +115,13 @@ export class Signer {
     return await this.#signerKeyring;
   }
 
+  /**
+   * Creates a function to sign typed data using the keyring.
+   * @param address - The address to sign with
+   * @param keyring - The keyring to use for signing
+   * @returns Function that signs typed data
+   * @private
+   */
   #createSignTypedDataAdapter(
     address: Hex,
     keyring: SimpleKeyring,
