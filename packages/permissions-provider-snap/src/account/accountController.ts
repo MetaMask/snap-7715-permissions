@@ -138,6 +138,10 @@ export class AccountController {
         });
       })();
 
+      // `smartAccount` is asynchronous to ensure that subsequent callers wait
+      // on the same smart account resolution. the entire function call up to
+      // adding the smartAccount to #metaMaskSmartAccountByChainId must be
+      // synchronous.
       this.#metaMaskSmartAccountByChainId[chainId] = smartAccount;
     }
 

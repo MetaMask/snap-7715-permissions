@@ -2,9 +2,9 @@ import { describe, it, beforeEach } from '@jest/globals';
 import { SnapsProvider } from '@metamask/snaps-sdk';
 import { sepolia } from 'viem/chains';
 import { Hex, isAddress, isHex } from 'viem';
-import { AccountController } from '../src/account/accountController';
-import type { Signer } from '../src/account/signer';
-import { Logger, LogLevel } from '../src/logger';
+import { AccountController } from '../../src/account/accountController';
+import type { Signer } from '../../src/account/signer';
+import { Logger, LogLevel } from '../../src/logger';
 import {
   DelegationStruct,
   getDeleGatorEnvironment,

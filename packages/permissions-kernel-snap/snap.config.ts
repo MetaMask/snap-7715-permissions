@@ -23,6 +23,21 @@ const config: SnapConfig = {
     SNAP_ENV: process.env.SNAP_ENV,
   },
   // eslint-disable-next-line @typescript-eslint/no-shadow
+  customizeWebpackConfig: (config) =>
+    merge(config, {
+      resolve: {
+        alias: {
+          '@metamask/7715-permissions-shared/types': resolve(
+            __dirname,
+            '../shared/src/types',
+          ),
+          '@metamask/7715-permissions-shared/utils': resolve(
+            __dirname,
+            '../shared/src/utils',
+          ),
+        },
+      },
+    }),
 };
 
 export default config;
