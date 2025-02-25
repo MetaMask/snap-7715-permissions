@@ -4,7 +4,7 @@ import { sepolia } from 'viem/chains';
 import { Hex, isAddress, isHex } from 'viem';
 import { AccountController } from '../src/account/accountController';
 import type { Signer } from '../src/account/signer';
-import { Logger } from '../src/logger';
+import { Logger, LogLevel } from '../src/logger';
 import {
   DelegationStruct,
   getDeleGatorEnvironment,
@@ -30,7 +30,9 @@ describe('AccountController', () => {
       signer: mockSigner,
       supportedChains: [sepolia],
       deploymentSalt: '0x1234',
-      logger: new Logger(),
+      logger: new Logger({
+        threshold: LogLevel.ERROR,
+      }),
     });
   });
 

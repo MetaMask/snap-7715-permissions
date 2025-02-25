@@ -1,8 +1,8 @@
 import { describe, it, beforeEach } from '@jest/globals';
 import { SnapsProvider } from '@metamask/snaps-sdk';
 import { Signer } from '../../src/account/signer';
-import { isAddress } from 'viem';
-import { Logger } from '../../src/logger';
+import { isAddress, isHex, size } from 'viem';
+import { Logger, LogLevel } from '../../src/logger';
 
 describe('Signer', () => {
   let signer: Signer;
@@ -15,7 +15,9 @@ describe('Signer', () => {
 
     signer = new Signer({
       snapsProvider: mockSnapsProvider,
-      logger: new Logger(),
+      logger: new Logger({
+        threshold: LogLevel.ERROR,
+      }),
     });
 
     const randomValues = new Uint8Array(32);
@@ -110,9 +112,44 @@ describe('Signer', () => {
       );
 
       expect(account.signTypedData).toBeDefined();
-      const signature = await (account.signTypedData as any)({} as any);
 
-      expect(signature).toBe('0x1234');
+      // @ts-ignore-error todo we should do better at aligning the types
+      const signature = await account.signTypedData!({
+        domain: {
+          name: 'Ether Mail',
+          version: '1',
+          chainId: 1,
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+        },
+        types: {
+          Person: [
+            { name: 'name', type: 'string' },
+            { name: 'wallet', type: 'address' },
+          ],
+          Mail: [
+            { name: 'from', type: 'Person' },
+            { name: 'to', type: 'Person' },
+            { name: 'contents', type: 'string' },
+          ],
+        },
+        primaryType: 'Mail',
+        message: {
+          from: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          },
+          to: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          },
+          contents: 'Hello, Bob!',
+        },
+      });
+
+      expect(isHex(signature)).toBe(true);
+
+      const SINGLE_EOA_SIGNATURE_BYTE_LENGTH = 65;
+      expect(size(signature)).toBe(SINGLE_EOA_SIGNATURE_BYTE_LENGTH);
     });
   });
 
