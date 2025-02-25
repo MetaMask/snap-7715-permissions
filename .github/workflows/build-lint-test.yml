@@ -14,8 +14,12 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
       - name: Install Yarn dependencies
         run: yarn --immutable
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   build:
     name: Build
@@ -31,7 +35,11 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
       - run: yarn --immutable --immutable-cache
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn build
       - name: Cache permissions-kernel snap build
         uses: actions/cache@v4
@@ -63,7 +71,11 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
       - run: yarn --immutable --immutable-cache
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn lint
       - name: Require clean working directory
         shell: bash
@@ -88,6 +100,8 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
       - name: Restore permissions-kernel snap build cache
         uses: actions/cache@v4
         with:
@@ -99,6 +113,8 @@ jobs:
           path: ./packages/permissions-provider-snap/dist
           key: 7715-permissions-provider-${{ runner.os }}-${{ github.sha }}
       - run: yarn install --immutable
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Run e2e tests
         run: yarn test
       - name: Require clean working directory
