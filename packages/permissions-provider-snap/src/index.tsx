@@ -27,8 +27,7 @@ import {
 } from './ui';
 import { updateAccountsOrder, validatePermissionRequestParam } from './utils';
 import { Logger, LogLevel } from './logger';
-import { Signer } from './account/signer';
-import { AccountController } from './account/accountController';
+import { AccountController } from './accountController';
 import { sepolia } from 'viem/chains';
 
 // Global iterator to keep track of the current permission request create on each request
@@ -41,10 +40,6 @@ const logger = new Logger({
 
 const accountController = new AccountController({
   snapsProvider: snap,
-  signer: new Signer({
-    snapsProvider: snap,
-    logger,
-  }),
   supportedChains: [sepolia],
   deploymentSalt: '0x',
   logger,

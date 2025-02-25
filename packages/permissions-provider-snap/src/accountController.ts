@@ -6,9 +6,11 @@ import {
   type DelegationStruct,
   type MetaMaskSmartAccount,
 } from '@metamask-private/delegator-core-viem';
-import type { Signer } from './signer';
 import type { Logger } from 'src/logger';
+import { privateKeyToAccount } from 'viem/accounts';
 
+const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
+const MULTISIG_THRESHOLD = 1n;
 /**
  * Factory arguments for smart account deployment.
  */
@@ -51,7 +53,6 @@ export type AccountControllerInterface = Pick<
  */
 export class AccountController {
   #snapsProvider: SnapsProvider;
-  #signer: Signer;
   #supportedChains: Chain[];
   #deploymentSalt: Hex;
   #metaMaskSmartAccountByChainId: Record<
@@ -71,13 +72,11 @@ export class AccountController {
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
-    signer: Signer;
     supportedChains: Chain[];
     deploymentSalt: Hex;
     logger: Logger;
   }) {
     this.#snapsProvider = config.snapsProvider;
-    this.#signer = config.signer;
     this.#supportedChains = config.supportedChains;
     this.#deploymentSalt = config.deploymentSalt;
     this.#logger = config.logger;
@@ -125,29 +124,7 @@ export class AccountController {
         throw new Error(`Chain not supported: ${chainId}`);
       }
 
-      const provider = {
-        request: async (request: { method: string; params?: unknown[] }) => {
-          this.#logger.debug(
-            'accountController:getMetaMaskSmartAccount() - provider.request()',
-            request,
-          );
-
-          // we can just pass the request to the snapsProvider, because
-          // snap_experimentalProviderRequest enforcesan allowlist of methods.
-          const result = await this.#snapsProvider.request({
-            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-            method: 'snap_experimentalProviderRequest',
-            params: {
-              // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-              chainId: `eip155:${chainId}`,
-              // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-              request,
-            },
-          });
-
-          return result;
-        },
-      };
+      const provider = this.#createExperimentalProviderRequestProvider(chainId);
 
       const client = createClient({
         transport: custom(provider),
@@ -155,17 +132,20 @@ export class AccountController {
       });
 
       smartAccount = (async () => {
-        const account = await this.#signer.toAccount();
+        const entropy = await this.#snapsProvider.request({
+          method: 'snap_getEntropy',
+          params: { version: 1, salt: GET_ENTROPY_SALT },
+        });
 
-        const signatory = {
-          account,
-        };
+        this.#logger.debug('entropy received', entropy);
+
+        const account = privateKeyToAccount(entropy);
 
         return await toMetaMaskSmartAccount({
           implementation: Implementation.MultiSig,
-          deployParams: [[signatory.account.address], 1n],
+          deployParams: [[account.address], MULTISIG_THRESHOLD],
           deploySalt: this.#deploymentSalt,
-          signatory: [signatory],
+          signatory: [{ account }],
           client,
         });
       })();
@@ -181,13 +161,54 @@ export class AccountController {
   }
 
   /**
-   * Gets the account address for the current signer.
+   * Creates a provider that handles experimental provider requests.
+   * @param chainId - The chain ID for the provider
+   * @returns A provider object with a request method
+   * @private
+   */
+  #createExperimentalProviderRequestProvider(chainId: ChainId) {
+    return {
+      request: async (request: { method: string; params?: unknown[] }) => {
+        this.#logger.debug(
+          'accountController:createExperimentalProviderRequestProvider() - provider.request()',
+          request,
+        );
+
+        // we can just pass the request to the snapsProvider, because
+        // snap_experimentalProviderRequest enforcesan allowlist of methods.
+        const result = await this.#snapsProvider.request({
+          // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
+          method: 'snap_experimentalProviderRequest',
+          params: {
+            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
+            chainId: `eip155:${chainId}`,
+            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
+            request,
+          },
+        });
+
+        return result;
+      },
+    };
+  }
+
+  /**
+   * Gets the account address for the current account.
    * @returns A promise that resolves to the account address as a hex string.
    */
-  public async getAccountAddress(): Promise<Hex> {
+  public async getAccountAddress(options: AccountOptionsBase): Promise<Hex> {
     this.#logger.debug('accountController:getAccountAddress()');
 
-    return await this.#signer.getAddress();
+    const smartAccount = await this.#getMetaMaskSmartAccount(options);
+
+    const address = await smartAccount.getAddress();
+
+    this.#logger.debug(
+      'accountController:getAccountAddress() - address resolved',
+      address,
+    );
+
+    return address;
   }
 
   /**
@@ -202,6 +223,11 @@ export class AccountController {
 
     const factoryArgs = await smartAccount.getFactoryArgs();
 
+    this.#logger.debug(
+      'accountController:getAccountMetadata() - factoryArgs resolved',
+      factoryArgs,
+    );
+
     return {
       factory: factoryArgs.factory,
       factoryData: factoryArgs.factoryData,
@@ -215,6 +241,9 @@ export class AccountController {
    */
   public async getAccountBalance(options: AccountOptionsBase): Promise<Hex> {
     this.#logger.debug('accountController:getAccountBalance()');
+
+    const { chainId } = options;
+
     const smartAccount = await this.#getMetaMaskSmartAccount(options);
 
     this.#logger.debug(
@@ -222,9 +251,13 @@ export class AccountController {
       smartAccount,
     );
 
-    const balance = await smartAccount.client.request({
+    const provider = this.#createExperimentalProviderRequestProvider(chainId);
+
+    const accountAddress = await smartAccount.getAddress();
+
+    const balance = await provider.request({
       method: 'eth_getBalance',
-      params: [await smartAccount.getAddress(), 'latest'],
+      params: [accountAddress, 'latest'],
     });
 
     this.#logger.debug(
@@ -232,7 +265,7 @@ export class AccountController {
       balance,
     );
 
-    return balance;
+    return balance as Hex;
   }
 
   /**
@@ -254,7 +287,10 @@ export class AccountController {
       smartAccount,
     );
 
-    const signature = await smartAccount.signDelegation({ delegation });
+    const signature = await smartAccount.signDelegation({
+      delegation,
+      chainId,
+    });
 
     this.#logger.debug(
       'accountController:signDelegation() - signature resolved',
