@@ -19,7 +19,7 @@ jobs:
       - name: Install Yarn dependencies
         run: yarn --immutable
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   build:
     name: Build
@@ -39,7 +39,7 @@ jobs:
           always-auth: true
       - run: yarn --immutable --immutable-cache
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn build
       - name: Cache permissions-kernel snap build
         uses: actions/cache@v4
