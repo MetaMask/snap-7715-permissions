@@ -5,7 +5,7 @@ import {
 } from '@metamask-private/delegator-core-viem';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { isHex, size } from 'viem';
-import { sepolia } from 'viem/chains';
+import { sepolia, oneWorld } from 'viem/chains';
 
 import { AccountController } from '../src/accountController';
 
@@ -53,6 +53,40 @@ describe('AccountController', () => {
       snapsProvider: mockSnapsProvider,
       supportedChains: [sepolia],
       deploymentSalt: '0x1234',
+    });
+  });
+
+  describe('constructor()', () => {
+    it('should throw if no supported chains are specified', () => {
+      expect(
+        () =>
+          new AccountController({
+            snapsProvider: mockSnapsProvider,
+            supportedChains: [],
+            deploymentSalt: '0x1234',
+          }),
+      ).toThrow('No supported chains specified');
+    });
+
+    it('should throw if an unsupported chain is specified', () => {
+      expect(
+        () =>
+          new AccountController({
+            snapsProvider: mockSnapsProvider,
+            supportedChains: [oneWorld] as any,
+            deploymentSalt: '0x1234',
+          }),
+      ).toThrow('Unsupported chains specified: oneworld');
+    });
+
+    it('should not throw if supported chains are not specified', () => {
+      expect(
+        () =>
+          new AccountController({
+            snapsProvider: mockSnapsProvider,
+            deploymentSalt: '0x1234',
+          }),
+      ).not.toThrow();
     });
   });
 

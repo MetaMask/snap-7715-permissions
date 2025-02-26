@@ -94,9 +94,47 @@ export class AccountController {
     supportedChains?: SupportedChains;
     deploymentSalt: Hex;
   }) {
+    // only validate if supportedChains is specified, as it will default to ALL_SUPPORTED_CHAINS
+    if (config.supportedChains) {
+      this.#validateSupportedChains(config.supportedChains);
+    }
+
     this.#snapsProvider = config.snapsProvider;
     this.#supportedChains = config.supportedChains ?? ALL_SUPPORTED_CHAINS;
     this.#deploymentSalt = config.deploymentSalt;
+  }
+
+  #validateSupportedChains(supportedChains: SupportedChains) {
+    if (supportedChains.length === 0) {
+      logger.error('No supported chains specified');
+      throw new Error('No supported chains specified');
+    }
+
+    // Get chain names from config and check if they're supported by delegator
+    const configuredChains = Object.keys(chains)
+      .filter((name) => {
+        // assert chains to any here due to the inability to infer the namespace of the global import
+        const chain = (chains as any)[name as keyof typeof chains];
+        return supportedChains.some(
+          (supportedChain) => supportedChain.id === chain.id,
+        );
+      })
+      .map((name) => name.toLowerCase());
+
+    const chainsWithDelegatorDeployed = Object.keys(
+      ChainsWithDelegatorDeployed,
+    ).map((name) => name.toLowerCase());
+
+    const unsupportedChains = configuredChains.filter(
+      (chain) => !chainsWithDelegatorDeployed.includes(chain),
+    );
+
+    if (unsupportedChains.length > 0) {
+      logger.error('Unsupported chains specified', unsupportedChains);
+      throw new Error(
+        `Unsupported chains specified: ${unsupportedChains.join(', ')}`,
+      );
+    }
   }
 
   /**
