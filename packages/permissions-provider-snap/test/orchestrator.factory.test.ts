@@ -25,36 +25,6 @@ describe('PermissionOrchestratorFactory', () => {
     jest.clearAllMocks();
   });
 
-  describe('native-token-transfer permission type', () => {
-    it('should return a NativeTokenStreamPermissionOrchestrator when given native-token-transfer permission type', () => {
-      const nativeTokenTransferOrchestrator =
-        createPermissionOrchestratorFactory<'native-token-transfer'>(
-          {
-            ...mockPartialPermissionRequest,
-            permission: {
-              type: 'native-token-transfer',
-              data: {
-                justification: 'shh...permission',
-                address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
-                allowance: '0x1DCD6500',
-              },
-            },
-          } as PermissionRequest,
-          mockSnapProvider,
-          mockAccountController,
-        );
-
-      expect(nativeTokenTransferOrchestrator).toBeDefined();
-      expect(nativeTokenTransferOrchestrator.permissionType).toBe(
-        'native-token-transfer',
-      );
-      expect(nativeTokenTransferOrchestrator.validate).toBeInstanceOf(Function);
-      expect(nativeTokenTransferOrchestrator.orchestrate).toBeInstanceOf(
-        Function,
-      );
-    });
-  });
-
   describe('native-token-stream permission type', () => {
     it('should return a NativeTokenStreamPermissionOrchestrator when given native-token-stream permission type', () => {
       const nativeTokenStreamOrchestrator =
