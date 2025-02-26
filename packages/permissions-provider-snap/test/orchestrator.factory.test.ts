@@ -2,6 +2,7 @@ import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/test'
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 
+import { createMockAccountController } from '../src/accountController';
 import { createPermissionOrchestratorFactory } from '../src/orchestrators';
 
 describe('PermissionOrchestratorFactory', () => {
@@ -16,7 +17,7 @@ describe('PermissionOrchestratorFactory', () => {
     },
   };
 
-  const mockAccountController = {};
+  const mockAccountController = createMockAccountController();
   let mockSnapProvider: SnapsProvider = {} as SnapsProvider;
 
   beforeEach(() => {

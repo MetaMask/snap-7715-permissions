@@ -2,10 +2,46 @@ import type {
   NativeTokenStreamPermission,
   NativeTokenTransferPermission,
   PermissionRequest,
+  PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
+import type { Hex } from 'viem';
+import { fromHex } from 'viem';
 
+import { type MockAccountController } from '../accountController';
+import { type PermissionConfirmationContext } from '../ui';
 import type { OrchestrateMeta, Orchestrator } from './orchestrator.types';
+import { handleConfirmationRender } from './render-handler';
+
+/**
+ * Prepare the account details for the permission picker UI.
+ * @param _accountController - An account controller instance.
+ * @param chainId - The chain ID.
+ * @returns The account address, balance and initCode.
+ */
+const prepareAccountDetails = async (
+  _accountController: MockAccountController,
+  chainId: number,
+): Promise<
+  [
+    Hex,
+    Hex,
+    {
+      factory: Hex | undefined;
+      factoryData: Hex | undefined;
+    },
+  ]
+> => {
+  return await Promise.all([
+    _accountController.getAccountAddress({
+      chainId,
+    }),
+    _accountController.getAccountBalance({
+      chainId,
+    }),
+    _accountController.getAccountMetadata(),
+  ]);
+};
 
 /**
  * Factory function for create a native token transfer permission orchestrator.
@@ -16,7 +52,7 @@ import type { OrchestrateMeta, Orchestrator } from './orchestrator.types';
  */
 export const createNativeTokenTransferPermissionOrchestrator = (
   _snapsProvider: SnapsProvider,
-  _accountController: unknown,
+  _accountController: MockAccountController,
 ): Orchestrator<'native-token-transfer'> => {
   return {
     permissionType: 'native-token-transfer',
@@ -43,7 +79,7 @@ export const createNativeTokenTransferPermissionOrchestrator = (
  */
 export const createNativeTokenStreamPermissionOrchestrator = (
   _snapsProvider: SnapsProvider,
-  _accountController: unknown,
+  _accountController: MockAccountController,
 ): Orchestrator<'native-token-stream'> => {
   return {
     permissionType: 'native-token-stream',
@@ -53,10 +89,56 @@ export const createNativeTokenStreamPermissionOrchestrator = (
     },
     orchestrate: async (
       _nativeTokenStreamPermission: NativeTokenStreamPermission,
-      _orchestrateMeta: OrchestrateMeta,
+      orchestrateMeta: OrchestrateMeta,
     ) => {
-      // TODO: Implement Specific permission orchestrator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/42
-      return null;
+      const { chainId, delegate, origin, expiry } = orchestrateMeta;
+
+      // Get the user account details
+      const [delegator, balance, accountMeta] = await prepareAccountDetails(
+        _accountController,
+        fromHex(chainId, 'number'),
+      );
+
+      // Render permission picker UI to capture user attunation and acceptance/rejection
+      const perContext: PermissionConfirmationContext = {
+        permission: _nativeTokenStreamPermission,
+        siteOrigin: origin,
+        balance,
+        expiry,
+        delegation: {
+          delegator,
+          delegate,
+          caveats: [],
+          salt: '0x1',
+          authority: '0x000000_authority',
+          signature: '0x',
+        },
+      };
+
+      // TODO: Extract the delegations from the reponse returnd by the permission picker UI
+      await handleConfirmationRender(_snapsProvider, perContext);
+      return {
+        chainId,
+        account: delegator,
+        expiry,
+        signer: {
+          type: 'account',
+          data: {
+            address: delegate,
+          },
+        },
+
+        // TODO: Update to use actual values instead of mock values
+        permission: _nativeTokenStreamPermission,
+        context: '0x000000_encoded_signed_delegation',
+        accountMeta:
+          accountMeta.factory && accountMeta.factoryData
+            ? [accountMeta]
+            : undefined,
+        signerMeta: {
+          delegationManager: '0x000000_delegation_manager',
+        },
+      } as PermissionResponse;
     },
   };
 };
