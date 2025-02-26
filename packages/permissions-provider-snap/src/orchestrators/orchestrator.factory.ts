@@ -2,11 +2,8 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 
-import { type MockAccountController } from '../accountController';
-import {
-  createNativeTokenStreamPermissionOrchestrator,
-  createNativeTokenTransferPermissionOrchestrator,
-} from './native-token-orchestrators';
+import type { MockAccountController } from '../accountController';
+import { createNativeTokenStreamPermissionOrchestrator } from './native-token-orchestrators';
 import type {
   SupportedPermissionTypes,
   PermissionOrchestratorReturnMapping,
@@ -36,10 +33,6 @@ export const createPermissionOrchestratorFactory = <
     string,
     PermissionOrchestratorReturnMapping[PermissionType]
   > = {
-    'native-token-transfer': createNativeTokenTransferPermissionOrchestrator(
-      snapsProvider,
-      accountController,
-    ) as PermissionOrchestratorReturnMapping[PermissionType],
     'native-token-stream': createNativeTokenStreamPermissionOrchestrator(
       snapsProvider,
       accountController,

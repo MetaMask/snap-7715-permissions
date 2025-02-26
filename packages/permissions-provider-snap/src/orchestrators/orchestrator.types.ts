@@ -2,16 +2,13 @@ import type {
   PermissionRequest,
   PermissionResponse,
   NativeTokenStreamPermission,
-  NativeTokenTransferPermission,
 } from '@metamask/7715-permissions-shared/types';
 import type { Address, Hex } from 'viem';
 
 /**
  * Supported permission types.
  */
-export type SupportedPermissionTypes =
-  | 'native-token-transfer'
-  | 'native-token-stream';
+export type SupportedPermissionTypes = 'native-token-stream';
 
 /**
  * Mapping of supported permission orchestrators orchestrateFn parameter types.
@@ -20,7 +17,6 @@ export type SupportedPermissionTypes =
  * and are defined as `type: { name: z.string(), description: z.string().optional()}`.
  */
 type OrchestrateFnParamsMapping = {
-  'native-token-transfer': NativeTokenTransferPermission;
   'native-token-stream': NativeTokenStreamPermission;
 };
 
@@ -31,7 +27,6 @@ type OrchestrateFnParamsMapping = {
  * and are defined as `type: { name: z.string(), description: z.string().optional()}`.
  */
 export type PermissionOrchestratorReturnMapping = {
-  'native-token-transfer': Orchestrator<'native-token-transfer'>;
   'native-token-stream': Orchestrator<'native-token-stream'>;
 };
 
