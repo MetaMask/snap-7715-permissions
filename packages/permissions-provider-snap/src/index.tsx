@@ -1,40 +1,26 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
-  Json,
+  InterfaceContext,
   OnInstallHandler,
   OnUpdateHandler,
   OnUserInputHandler,
-  UserInputEvent,
 } from '@metamask/snaps-sdk';
 import {
   UserInputEventType,
   type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
-import type { Address, Hex } from 'viem';
-import { getAddress } from 'viem';
 import { sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
-import {
-  type PermissionsRequestIterator,
-  createPermissionsRequestIterator,
-} from './iterator';
-import { logger } from './logger';
 import { hasPermission, InternalMethod } from './permissions';
-import { saveInterfaceIdState, getInterfaceIdState } from './stateManagement';
-import type { GrantPermissionsContext } from './ui';
+import { saveInterfaceIdState } from './stateManagement';
+import type { GrantPermissionContext } from './ui';
+import { GrantPermissonPage } from './ui';
 import {
-  ACCOUNT_SELECTOR,
-  GRANT_BUTTON,
-  GrantPermissionsPage,
-  CANCEL_BUTTON,
-  NEXT_BUTTON,
-  PREVIOUS_BUTTON,
-} from './ui';
-import { updateAccountsOrder, validatePermissionRequestParam } from './utils';
-
-// Global iterator to keep track of the current permission request create on each request
-let permissionsRequestIterator: PermissionsRequestIterator =
-  createPermissionsRequestIterator([]);
+  buttonClickEventHandler,
+  getActiveInterfaceContext,
+  validatePermissionRequestParam,
+} from './utils';
 
 // Initialize account controller for future use
 const controller = new AccountController({
@@ -79,45 +65,25 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         request.params,
       );
 
-      permissionsRequestIterator =
-        createPermissionsRequestIterator(permissionsRequest);
-      permissionsRequestIterator.first();
-
-      // TODO: Intepret the permissions data(by type) and reject if token data is not valid
-
-      // Request access to view users extension accounts
-      const res = await ethereum.request<Hex[]>({
-        method: 'eth_requestAccounts',
-      });
-      if (!res || res.length === 0) {
-        throw new Error('No accounts found');
+      const firstRequest = permissionsRequest[0];
+      if (!firstRequest) {
+        throw new Error('No permission request found');
       }
-      const userAccounts: Address[] = res
-        .filter((account) => account !== undefined)
-        .map(getAddress);
 
-      // Render permission picker UI
+      const context: GrantPermissionContext = {
+        siteOrigin,
+        permissionRequest: firstRequest,
+      };
+
+      // Render permission picker UI mock
       const interfaceId = await snap.request({
         method: 'snap_createInterface',
         params: {
-          context: {
-            siteOrigin,
-            accounts: userAccounts,
-          } as GrantPermissionsContext,
+          context: context as InterfaceContext,
           ui: (
-            <GrantPermissionsPage
-              permissionRequestIteratorItem={permissionsRequestIterator.currentItem()}
-              accounts={userAccounts}
-              siteOrigin={siteOrigin}
-              areAllSettled={
-                permissionsRequestIterator.areAllSettled() ||
-                permissionsRequestIterator.isLast()
-              }
-              iteratorItemMetadata={{
-                isFirst: permissionsRequestIterator.isFirst(),
-                isLast: permissionsRequestIterator.isLast(),
-                permissionIndex: permissionsRequestIterator.currentIndex(),
-              }}
+            <GrantPermissonPage
+              siteOrigin={context.siteOrigin}
+              permission={context.permissionRequest.permission}
             />
           ),
         },
@@ -159,78 +125,6 @@ export const onUpdate: OnUpdateHandler = async () => {
 };
 
 /**
- * Handle input change events to update the interface.
- *
- * @param event - The input change event.
- */
-const inputChangeEventHandler = (event: UserInputEvent) => {
-  if (event.type !== UserInputEventType.InputChangeEvent) {
-    throw new Error('Invalid event type');
-  }
-
-  if (
-    event.name ===
-      `${ACCOUNT_SELECTOR}-${permissionsRequestIterator.currentIndex()}` &&
-    event.value &&
-    typeof event.value === 'string'
-  ) {
-    permissionsRequestIterator.updateCurrentItem((item) => {
-      return {
-        ...item,
-        permissionRequest: {
-          ...item.permissionRequest,
-          account: getAddress(event.value as string),
-        },
-      };
-    });
-  }
-};
-
-/**
- * Handle button click events to update the interface.
- *
- * @param event - The button click event.
- * @param activeInterfaceId - The active interface id.
- */
-const buttonClickEventHandler = async (
-  event: UserInputEvent,
-  activeInterfaceId: string,
-) => {
-  if (event.type !== UserInputEventType.ButtonClickEvent) {
-    throw new Error('Invalid event type');
-  }
-
-  if (event.name === CANCEL_BUTTON) {
-    await snap.request({
-      method: 'snap_resolveInterface',
-      params: {
-        id: activeInterfaceId,
-        value: null,
-      },
-    });
-    return;
-  }
-
-  if (event.name === GRANT_BUTTON) {
-    const grantResponses = permissionsRequestIterator.getItems();
-    await snap.request({
-      method: 'snap_resolveInterface',
-      params: {
-        id: activeInterfaceId,
-        value: grantResponses as Json[],
-      },
-    });
-    return;
-  }
-
-  if (event.name === NEXT_BUTTON) {
-    permissionsRequestIterator.settleAndMoveNext();
-  } else if (event.name === PREVIOUS_BUTTON) {
-    permissionsRequestIterator.settleAndMovePrevious();
-  }
-};
-
-/**
  * Handle incoming user input events to update the interface.
  *
  * @param args - The user input handler args as object.
@@ -238,21 +132,9 @@ const buttonClickEventHandler = async (
  * @param args.event - The user input event.
  */
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
-  const activeInterfaceId = await getInterfaceIdState();
-  const context = await snap.request({
-    method: 'snap_getInterfaceContext',
-    params: {
-      id: activeInterfaceId,
-    },
-  });
-
+  const { activeInterfaceId, context } = await getActiveInterfaceContext();
   if (id === activeInterfaceId && context) {
     switch (event.type) {
-      case UserInputEventType.InputChangeEvent: {
-        inputChangeEventHandler(event);
-        break;
-      }
-
       case UserInputEventType.ButtonClickEvent: {
         await buttonClickEventHandler(event, activeInterfaceId);
         break;
@@ -262,31 +144,15 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
       }
     }
 
-    const { siteOrigin, accounts } = context as GrantPermissionsContext;
-    const updatedAccountsOrder: Address[] = updateAccountsOrder(
-      accounts,
-      permissionsRequestIterator.currentItem(),
-    );
-
     await snap.request({
       method: 'snap_updateInterface',
       params: {
         id,
-        context,
+        context: context as InterfaceContext,
         ui: (
-          <GrantPermissionsPage
-            permissionRequestIteratorItem={permissionsRequestIterator.currentItem()}
-            siteOrigin={siteOrigin}
-            accounts={updatedAccountsOrder}
-            areAllSettled={
-              permissionsRequestIterator.areAllSettled() ||
-              permissionsRequestIterator.isLast()
-            }
-            iteratorItemMetadata={{
-              isFirst: permissionsRequestIterator.isFirst(),
-              isLast: permissionsRequestIterator.isLast(),
-              permissionIndex: permissionsRequestIterator.currentIndex(),
-            }}
+          <GrantPermissonPage
+            siteOrigin={context.siteOrigin}
+            permission={context.permissionRequest.permission}
           />
         ),
       },

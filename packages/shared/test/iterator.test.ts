@@ -1,7 +1,7 @@
 import { toHex } from 'viem';
 
-import type { PermissionRequest } from '../../../shared/src/types';
-import { createPermissionsRequestIterator } from './iterator';
+import { createPermissionsRequestIterator } from '../src/iterator';
+import type { PermissionRequest } from '../src/types';
 
 describe('createPermissionsRequestIterator', () => {
   const mockPermissionsRequest: PermissionRequest[] = [

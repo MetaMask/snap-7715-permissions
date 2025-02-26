@@ -1,4 +1,4 @@
-import type { SnapConfig } from '@metamask/snaps-cli';
+import { type SnapConfig } from '@metamask/snaps-cli';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
 

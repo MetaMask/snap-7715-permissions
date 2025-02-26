@@ -2,6 +2,7 @@ import type {
   GrantAttenuatedPermissionsParams,
   RegisteredPermissionOffer,
 } from '@metamask/7715-permissions-shared/types';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, OnHomePageHandler } from '@metamask/snaps-sdk';
 import {
   MethodNotFoundError,
@@ -9,7 +10,6 @@ import {
   type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
 
-import { logger } from './logger';
 import { InternalMethod, PERMISSIONS_PROVIDER_SNAP_ID } from './permissions';
 import { createStateManager } from './stateManagement';
 import { HomePageContent, EmptyRegistryPage, NoOffersFoundPage } from './ui';

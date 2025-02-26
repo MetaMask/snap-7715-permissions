@@ -5,12 +5,11 @@ import {
   type DelegationStruct,
   type MetaMaskSmartAccount,
 } from '@metamask-private/delegator-core-viem';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { createClient, custom, extractChain, type Hex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import * as chains from 'viem/chains';
-
-import { logger } from './logger';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
