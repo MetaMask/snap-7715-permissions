@@ -1,16 +1,17 @@
-import { createClient, custom, extractChain, type Chain, type Hex } from 'viem';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
 import {
   Implementation,
   toMetaMaskSmartAccount,
   type DelegationStruct,
   type MetaMaskSmartAccount,
 } from '@metamask-private/delegator-core-viem';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { Logger } from 'src/logger';
+import { createClient, custom, extractChain, type Chain, type Hex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
+
 /**
  * Factory arguments for smart account deployment.
  */
@@ -48,27 +49,30 @@ export type AccountControllerInterface = Pick<
 >;
 
 /**
- * Controller class for managing smart account operations.
- * Handles account creation, delegation signing, and balance queries across supported chains.
+ * Controls smart account operations including creation, delegation signing, and balance queries.
  */
 export class AccountController {
   #snapsProvider: SnapsProvider;
+
   #supportedChains: Chain[];
+
   #deploymentSalt: Hex;
+
   #metaMaskSmartAccountByChainId: Record<
     ChainId,
     Promise<MetaMaskSmartAccount<Implementation.MultiSig>>
   > = {};
+
   #logger: Logger;
 
   /**
-   * Creates a new AccountController instance.
-   * @param config - Configuration object for the controller
-   * @param config.snapsProvider - Provider for interacting with snaps environment
-   * @param config.signer - Signer instance representing the account
-   * @param config.supportedChains - Array of supported chains
-   * @param config.deploymentSalt - Hex salt used for smart account deployment
-   * @param config.logger - Logger instance
+   * Initializes a new AccountController instance.
+   *
+   * @param config - The configuration object.
+   * @param config.snapsProvider - The provider for interacting with snaps.
+   * @param config.supportedChains - The supported blockchain chains.
+   * @param config.deploymentSalt - The hex salt for smart account deployment.
+   * @param config.logger - The logger instance.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
@@ -83,11 +87,11 @@ export class AccountController {
   }
 
   /**
-   * Gets or creates a MetaMask smart account for the specified chain. Caches
-   * the account promise, to ensure subsequent calls wait for the same account.
-   * @param options - Options containing the chain ID
-   * @returns Promise resolving to a MetaMask smart account instance
-   * @throws Error if the specified chain is not supported
+   * Retrieves or creates a MetaMaskSmartAccount for the specified chain.
+   *
+   * @param options - The account options containing chain ID.
+   * @returns A Promise resolving to a MetaMaskSmartAccount.
+   * @throws When the specified chain is not supported.
    * @private
    */
   async #getMetaMaskSmartAccount(
@@ -109,7 +113,7 @@ export class AccountController {
         'accountController:getMetaMaskSmartAccount() - smartAccount not found',
       );
 
-      // @ts-ignore -- extractChain does not work well with dynamic chains parameter
+      // @ts-expect-error -- viem extractChain does not work well with dynamic chains
       const chain = extractChain({
         chains: this.#supportedChains,
         id: chainId,
@@ -162,8 +166,9 @@ export class AccountController {
 
   /**
    * Creates a provider that handles experimental provider requests.
-   * @param chainId - The chain ID for the provider
-   * @returns A provider object with a request method
+   *
+   * @param chainId - The chain ID for the provider.
+   * @returns A provider object with a request method.
    * @private
    */
   #createExperimentalProviderRequestProvider(chainId: ChainId) {
@@ -193,8 +198,10 @@ export class AccountController {
   }
 
   /**
-   * Gets the account address for the current account.
-   * @returns A promise that resolves to the account address as a hex string.
+   * Retrieves the account address for the current account.
+   *
+   * @param options - The base account options including chainId.
+   * @returns A promise resolving to the account address as a hex string.
    */
   public async getAccountAddress(options: AccountOptionsBase): Promise<Hex> {
     this.#logger.debug('accountController:getAccountAddress()');
@@ -212,9 +219,10 @@ export class AccountController {
   }
 
   /**
-   * Gets the metadata for deploying a smart account.
+   * Retrieves the metadata for deploying a smart account.
+   *
    * @param options - The base account options including chainId.
-   * @returns A promise that resolves to the factory arguments needed for deployment.
+   * @returns A promise resolving to the factory arguments needed for deployment.
    */
   public async getAccountMetadata(
     options: AccountOptionsBase,
@@ -235,9 +243,10 @@ export class AccountController {
   }
 
   /**
-   * Gets the balance of the smart account.
+   * Retrieves the balance of the smart account.
+   *
    * @param options - The base account options including chainId.
-   * @returns A promise that resolves to the account balance as a hex string.
+   * @returns A promise resolving to the account balance as a hex string.
    */
   public async getAccountBalance(options: AccountOptionsBase): Promise<Hex> {
     this.#logger.debug('accountController:getAccountBalance()');
@@ -270,8 +279,9 @@ export class AccountController {
 
   /**
    * Signs a delegation using the smart account.
+   *
    * @param options - The options for signing including chainId and delegation data.
-   * @returns A promise that resolves to the signed delegation structure.
+   * @returns A promise resolving to the signed delegation structure.
    */
   public async signDelegation(
     options: SignDelegationOptions,

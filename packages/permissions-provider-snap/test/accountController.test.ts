@@ -1,13 +1,14 @@
 import { describe, it, beforeEach } from '@jest/globals';
-import { SnapsProvider } from '@metamask/snaps-sdk';
-import { sepolia } from 'viem/chains';
-import { isHex, size } from 'viem';
-import { AccountController } from '../src/accountController';
-import { Logger, LogLevel } from '../src/logger';
 import {
   createRootDelegation,
   getDeleGatorEnvironment,
 } from '@metamask-private/delegator-core-viem';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
+import { isHex, size } from 'viem';
+import { sepolia } from 'viem/chains';
+
+import { AccountController } from '../src/accountController';
+import { Logger, LogLevel } from '../src/logger';
 
 describe('AccountController', () => {
   const entropy =
@@ -22,13 +23,13 @@ describe('AccountController', () => {
 
   beforeEach(() => {
     mockSnapsProvider.request.mockReset();
-    mockSnapsProvider.request.mockImplementation((req) => {
+    mockSnapsProvider.request.mockImplementation(async (req) => {
       const { method, params } = req;
 
       switch (method as string) {
         case 'snap_getEntropy':
-          return Promise.resolve(entropy);
-        case 'snap_experimentalProviderRequest':
+          return entropy;
+        case 'snap_experimentalProviderRequest': {
           const {
             request: { method: internalMethod },
           } = params as {
@@ -36,13 +37,17 @@ describe('AccountController', () => {
           };
 
           if (internalMethod === 'eth_getBalance') {
-            return Promise.resolve(expectedBalance);
+            return expectedBalance;
           } else if (internalMethod === 'eth_getCode') {
-            return Promise.resolve('0x');
+            return '0x';
           }
+          break;
+        }
+        default:
+          break;
       }
 
-      return Promise.resolve(null);
+      return null;
     });
 
     accountController = new AccountController({
@@ -63,7 +68,7 @@ describe('AccountController', () => {
         chainId: sepolia.id,
       });
 
-      expect(address).toEqual(expectedAddress);
+      expect(address).toStrictEqual(expectedAddress);
     });
   });
 
@@ -75,7 +80,7 @@ describe('AccountController', () => {
         chainId: sepolia.id,
       });
 
-      expect(metadata.factory).toEqual(environment.SimpleFactory);
+      expect(metadata.factory).toStrictEqual(environment.SimpleFactory);
       expect(isHex(metadata.factoryData)).toBe(true);
     });
   });
@@ -86,7 +91,7 @@ describe('AccountController', () => {
         chainId: sepolia.id,
       });
 
-      expect(balance).toEqual(expectedBalance);
+      expect(balance).toStrictEqual(expectedBalance);
     });
   });
 
@@ -103,7 +108,7 @@ describe('AccountController', () => {
         delegation: unsignedDelegation,
       });
 
-      expect(signedDelegation).toEqual({
+      expect(signedDelegation).toStrictEqual({
         ...unsignedDelegation,
         signature: expect.any(String),
       });

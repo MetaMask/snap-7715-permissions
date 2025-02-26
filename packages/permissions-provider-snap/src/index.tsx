@@ -11,9 +11,12 @@ import {
 } from '@metamask/snaps-sdk';
 import type { Address, Hex } from 'viem';
 import { getAddress } from 'viem';
+import { sepolia } from 'viem/chains';
 
+import { AccountController } from './accountController';
 import type { PermissionsRequestIterator } from './iterator';
 import { createPermissionsRequestIterator } from './iterator';
+import { Logger, LogLevel } from './logger';
 import { hasPermission, InternalMethod } from './permissions';
 import { saveInterfaceIdState, getInterfaceIdState } from './stateManagement';
 import type { GrantPermissionsContext } from './ui';
@@ -26,9 +29,6 @@ import {
   PREVIOUS_BUTTON,
 } from './ui';
 import { updateAccountsOrder, validatePermissionRequestParam } from './utils';
-import { Logger, LogLevel } from './logger';
-import { AccountController } from './accountController';
-import { sepolia } from 'viem/chains';
 
 // Global iterator to keep track of the current permission request create on each request
 let permissionsRequestIterator: PermissionsRequestIterator =
@@ -38,12 +38,18 @@ const logger = new Logger({
   threshold: LogLevel.DEBUG,
 });
 
-const accountController = new AccountController({
+// Initialize account controller for future use
+const controller = new AccountController({
   snapsProvider: snap,
   supportedChains: [sepolia],
   deploymentSalt: '0x',
   logger,
 });
+
+// If the account controller is not used, linting error is surfaced.
+if (controller === undefined) {
+  throw new Error('Failed to initialize account controller');
+}
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
