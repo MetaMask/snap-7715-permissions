@@ -2586,11 +2586,51 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask-private/delegation-abis@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@metamask-private/delegation-abis@npm:0.6.0"
+  checksum: 4e07f2eb6b40e6daf50cd26aba8c84516e3c3838ecbd23e1e1dc2869c7790ecac830717dc04af5000b0d07e8700d803e8a9ae5b4c248b6ee5a7fffe8ddc5c015
+  languageName: node
+  linkType: hard
+
+"@metamask-private/delegation-deployments@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@metamask-private/delegation-deployments@npm:0.6.0"
+  checksum: a987a39c61a75e8ba1b54b78848fbf83147f8eb4dcc7f14ca3703e5e755368e72dea11fa604ae0935603254d29a82c1cfc19da7b85f8173935fad8f81396e8c3
+  languageName: node
+  linkType: hard
+
+"@metamask-private/delegation-utils@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@metamask-private/delegation-utils@npm:0.6.0"
+  dependencies:
+    "@metamask-private/delegation-abis": ^0.6.0
+    "@metamask-private/delegation-deployments": ^0.6.0
+    buffer: ^6.0.3
+  peerDependencies:
+    viem: ">=2.18.2 <3.0.0"
+  checksum: 903032b9a69056ef9401b04cabeef4ef905c1622de5e7bcdc8a4ef04bf73628223724e8401b3f3e7f5df503db6c90a09ca4325aac97f0adec787839d654e547f
+  languageName: node
+  linkType: hard
+
+"@metamask-private/delegator-core-viem@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@metamask-private/delegator-core-viem@npm:0.6.0"
+  dependencies:
+    "@metamask-private/delegation-utils": ^0.6.0
+    webauthn-p256: ^0.0.5
+  peerDependencies:
+    viem: ">=2.18.2 <3.0.0"
+  checksum: 0ee12a67e0d55e8c5ed039eef40a8d241e85962b668b6addef44cd9ee374d3086c58e8df291584f761bc1ffc2af91c33c80b254a9c6316b95891fd84979f207d
+  languageName: node
+  linkType: hard
+
 "@metamask/7715-permissions-provider@workspace:packages/permissions-provider-snap":
   version: 0.0.0-use.local
   resolution: "@metamask/7715-permissions-provider@workspace:packages/permissions-provider-snap"
   dependencies:
     "@jest/globals": ^29.5.0
+    "@metamask-private/delegator-core-viem": ^0.6.0
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -2599,7 +2639,7 @@ __metadata:
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/snaps-cli": ^6.6.0
     "@metamask/snaps-jest": ^8.9.0
-    "@metamask/snaps-sdk": ^6.14.0
+    "@metamask/snaps-sdk": ^6.17.1
     "@types/react": 18.2.4
     "@types/react-dom": 18.2.4
     "@typescript-eslint/eslint-plugin": ^5.42.1
@@ -2936,18 +2976,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/json-rpc-middleware-stream@npm:^8.0.5":
-  version: 8.0.5
-  resolution: "@metamask/json-rpc-middleware-stream@npm:8.0.5"
-  dependencies:
-    "@metamask/json-rpc-engine": ^10.0.1
-    "@metamask/safe-event-emitter": ^3.0.0
-    "@metamask/utils": ^10.0.0
-    readable-stream: ^3.6.2
-  checksum: 4ac3d537bad1ab039bb1b42fb35113fe9a98bd89339155a0f759a086b957e5717ea1e75bdd340defd2b25f5886e07ab130235a63a1b8e627f8cb32a3020622c9
-  languageName: node
-  linkType: hard
-
 "@metamask/json-rpc-middleware-stream@npm:^8.0.6":
   version: 8.0.6
   resolution: "@metamask/json-rpc-middleware-stream@npm:8.0.6"
@@ -2960,7 +2988,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/key-tree@npm:^10.0.1, @metamask/key-tree@npm:^10.0.2":
+"@metamask/key-tree@npm:^10.0.2":
   version: 10.0.2
   resolution: "@metamask/key-tree@npm:10.0.2"
   dependencies:
@@ -3035,7 +3063,7 @@ __metadata:
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/snaps-cli": ^6.6.0
     "@metamask/snaps-jest": ^8.9.0
-    "@metamask/snaps-sdk": ^6.14.0
+    "@metamask/snaps-sdk": ^6.17.1
     "@types/react": 18.2.4
     "@types/react-dom": 18.2.4
     "@typescript-eslint/eslint-plugin": ^5.42.1
@@ -3101,27 +3129,6 @@ __metadata:
     readable-stream: ^3.6.2
     webextension-polyfill: ^0.10.0
   checksum: 85e40140f342a38112c3d7cee436751a2be4c575cc4f815ab48a73b549abc2d756bf4a10e4b983e91dbd38076601f992531edb6d8d674aebceae32ef7e299275
-  languageName: node
-  linkType: hard
-
-"@metamask/providers@npm:^18.1.1":
-  version: 18.1.1
-  resolution: "@metamask/providers@npm:18.1.1"
-  dependencies:
-    "@metamask/json-rpc-engine": ^10.0.1
-    "@metamask/json-rpc-middleware-stream": ^8.0.5
-    "@metamask/object-multiplex": ^2.0.0
-    "@metamask/rpc-errors": ^7.0.1
-    "@metamask/safe-event-emitter": ^3.1.1
-    "@metamask/utils": ^10.0.0
-    detect-browser: ^5.2.0
-    extension-port-stream: ^4.1.0
-    fast-deep-equal: ^3.1.3
-    is-stream: ^2.0.0
-    readable-stream: ^3.6.2
-  peerDependencies:
-    webextension-polyfill: ^0.10.0 || ^0.11.0 || ^0.12.0
-  checksum: ca28bab03d7b67fd1e4fccf28045bd465a961c946b1f3e2464d6201730ec8c50970eb4a48d373bd3a7ac0bda471da604b71aaf5f22eae3c342a82e5b07134e91
   languageName: node
   linkType: hard
 
@@ -3366,19 +3373,6 @@ __metadata:
     "@noble/hashes": ^1.3.1
     luxon: ^3.5.0
   checksum: 198741c41f0b424b84095baeab3ef8e42660159d60f68b1cb891d93f0352238d876a051b55b2d8d5a6270a0d37d16f9b51677e0ae72e92670d59ec95d18ecad0
-  languageName: node
-  linkType: hard
-
-"@metamask/snaps-sdk@npm:^6.14.0":
-  version: 6.14.0
-  resolution: "@metamask/snaps-sdk@npm:6.14.0"
-  dependencies:
-    "@metamask/key-tree": ^10.0.1
-    "@metamask/providers": ^18.1.1
-    "@metamask/rpc-errors": ^7.0.1
-    "@metamask/superstruct": ^3.1.0
-    "@metamask/utils": ^10.0.0
-  checksum: b3249976538664f9bf40b5bedc307c42940fb105e2e292f38668853d581ebcedf274978dbe4af331383f743ed87ee587c0e3e5eac834765aefa199920d86b898
   languageName: node
   linkType: hard
 
@@ -3628,7 +3622,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:1.8.1, @noble/curves@npm:^1.6.0, @noble/curves@npm:~1.8.1":
+"@noble/curves@npm:1.8.1, @noble/curves@npm:^1.4.0, @noble/curves@npm:^1.6.0, @noble/curves@npm:~1.8.1":
   version: 1.8.1
   resolution: "@noble/curves@npm:1.8.1"
   dependencies:
@@ -19063,6 +19057,16 @@ __metadata:
   version: 1.2.2
   resolution: "weak-lru-cache@npm:1.2.2"
   checksum: 0fbe16839d193ed82ddb4fe331ca8cfaee2ecbd42596aa02366c708956cf41f7258f2d5411c3bc9aa099c26058dc47afbd2593d449718a18e4ef4d870c5ace18
+  languageName: node
+  linkType: hard
+
+"webauthn-p256@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "webauthn-p256@npm:0.0.5"
+  dependencies:
+    "@noble/curves": ^1.4.0
+    "@noble/hashes": ^1.4.0
+  checksum: 2837188d1e6d947c87c5728374fb6aec96387cb766f78e7a04d5903774264feb278d68a639748f09997f591e5278796c662bb5c4e8b8286b0f22254694023584
   languageName: node
   linkType: hard
 
