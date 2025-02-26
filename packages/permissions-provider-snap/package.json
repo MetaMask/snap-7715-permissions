@@ -37,8 +37,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@metamask/7715-permissions-shared": "workspace:*",
     "@metamask/snaps-sdk": "^6.14.0",
-    "ethers": "^6.10.0",
     "viem": "^2.21.29"
   },
   "devDependencies": {

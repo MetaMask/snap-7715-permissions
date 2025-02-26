@@ -1,13 +1,12 @@
-import type { Json } from '@metamask/snaps-sdk';
-
 import {
   type GatorPermission,
   type GetSnapsResponse,
   type PermissionOffer,
   type RegisteredPermissionOffer,
-} from '../../../shared/src/types';
-import { getIdFor } from '../../../shared/src/utils';
-import { logger } from '../logger';
+} from '@metamask/7715-permissions-shared/types';
+import { getIdFor, logger } from '@metamask/7715-permissions-shared/utils';
+import type { Json } from '@metamask/snaps-sdk';
+
 import { InternalMethod, KERNEL_SNAP_ID } from './origin';
 
 type PermissionOfferLibrary = {

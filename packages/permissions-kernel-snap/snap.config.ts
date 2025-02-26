@@ -1,4 +1,4 @@
-import { merge, type SnapConfig } from '@metamask/snaps-cli';
+import { type SnapConfig } from '@metamask/snaps-cli';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
 
@@ -22,22 +22,6 @@ const config: SnapConfig = {
     // eslint-disable-next-line n/no-process-env
     SNAP_ENV: process.env.SNAP_ENV,
   },
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  customizeWebpackConfig: (config) =>
-    merge(config, {
-      resolve: {
-        alias: {
-          '@metamask/7715-permissions-shared/types': resolve(
-            __dirname,
-            '../shared/src/types',
-          ),
-          '@metamask/7715-permissions-shared/utils': resolve(
-            __dirname,
-            '../shared/src/utils',
-          ),
-        },
-      },
-    }),
 };
 
 export default config;

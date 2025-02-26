@@ -1,9 +1,8 @@
 import {
   type GrantAttenuatedPermissionsParams,
   zGrantAttenuatedPermissionsParams,
-} from '../../../shared/src/types';
-import { extractZodError } from '../../../shared/src/utils';
-import { throwError } from './common';
+} from '@metamask/7715-permissions-shared/types';
+import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 
 export const validatePermissionRequestParam = (
   params: any | any[],
@@ -20,7 +19,7 @@ export const validatePermissionRequestParam = (
     validateGrantAttenuatedPermissionsParams.data.permissionsRequest.length ===
     0
   ) {
-    throwError('params are empty');
+    throw Error('params are empty');
   }
 
   return validateGrantAttenuatedPermissionsParams.data;
