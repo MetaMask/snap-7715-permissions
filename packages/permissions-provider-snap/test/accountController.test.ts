@@ -8,7 +8,6 @@ import { isHex, size } from 'viem';
 import { sepolia } from 'viem/chains';
 
 import { AccountController } from '../src/accountController';
-import { Logger, LogLevel } from '../src/logger';
 
 describe('AccountController', () => {
   const entropy =
@@ -54,9 +53,6 @@ describe('AccountController', () => {
       snapsProvider: mockSnapsProvider,
       supportedChains: [sepolia],
       deploymentSalt: '0x1234',
-      logger: new Logger({
-        threshold: LogLevel.ERROR,
-      }),
     });
   });
 
@@ -69,6 +65,16 @@ describe('AccountController', () => {
       });
 
       expect(address).toStrictEqual(expectedAddress);
+    });
+
+    it('should reject if an invalid chainId is supplied', async () => {
+      const invalidChainId = 12345;
+
+      await expect(
+        accountController.getAccountAddress({
+          chainId: invalidChainId,
+        }),
+      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
   });
 
@@ -83,6 +89,16 @@ describe('AccountController', () => {
       expect(metadata.factory).toStrictEqual(environment.SimpleFactory);
       expect(isHex(metadata.factoryData)).toBe(true);
     });
+
+    it('should reject if an invalid chainId is supplied', async () => {
+      const invalidChainId = 12345;
+
+      await expect(
+        accountController.getAccountMetadata({
+          chainId: invalidChainId,
+        }),
+      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
+    });
   });
 
   describe('getAccountBalance()', () => {
@@ -92,6 +108,16 @@ describe('AccountController', () => {
       });
 
       expect(balance).toStrictEqual(expectedBalance);
+    });
+
+    it('should reject if an invalid chainId is supplied', async () => {
+      const invalidChainId = 12345;
+
+      await expect(
+        accountController.getAccountBalance({
+          chainId: invalidChainId,
+        }),
+      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
   });
 
@@ -119,6 +145,17 @@ describe('AccountController', () => {
       expect(size(signedDelegation.signature)).toBe(
         EXPECTED_EOA_SIGNATURE_LENGTH,
       );
+    });
+
+    it('should reject if an invalid chainId is supplied', async () => {
+      const invalidChainId = 12345;
+
+      await expect(
+        accountController.signDelegation({
+          chainId: invalidChainId,
+          delegation: unsignedDelegation,
+        }),
+      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
   });
 });

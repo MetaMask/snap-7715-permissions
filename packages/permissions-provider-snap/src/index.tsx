@@ -14,9 +14,11 @@ import { getAddress } from 'viem';
 import { sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
-import type { PermissionsRequestIterator } from './iterator';
-import { createPermissionsRequestIterator } from './iterator';
-import { Logger, LogLevel } from './logger';
+import {
+  type PermissionsRequestIterator,
+  createPermissionsRequestIterator,
+} from './iterator';
+import { logger } from './logger';
 import { hasPermission, InternalMethod } from './permissions';
 import { saveInterfaceIdState, getInterfaceIdState } from './stateManagement';
 import type { GrantPermissionsContext } from './ui';
@@ -34,16 +36,11 @@ import { updateAccountsOrder, validatePermissionRequestParam } from './utils';
 let permissionsRequestIterator: PermissionsRequestIterator =
   createPermissionsRequestIterator([]);
 
-const logger = new Logger({
-  threshold: LogLevel.DEBUG,
-});
-
 // Initialize account controller for future use
 const controller = new AccountController({
   snapsProvider: snap,
   supportedChains: [sepolia],
   deploymentSalt: '0x',
-  logger,
 });
 
 // If the account controller is not used, linting error is surfaced.

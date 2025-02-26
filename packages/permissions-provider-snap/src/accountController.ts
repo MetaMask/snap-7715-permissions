@@ -1,16 +1,34 @@
 import {
+  CHAIN_ID as ChainsWithDelegatorDeployed,
   Implementation,
   toMetaMaskSmartAccount,
   type DelegationStruct,
   type MetaMaskSmartAccount,
 } from '@metamask-private/delegator-core-viem';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import type { Logger } from 'src/logger';
-import { createClient, custom, extractChain, type Chain, type Hex } from 'viem';
+import { createClient, custom, extractChain, type Hex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
+import * as chains from 'viem/chains';
+
+import { logger } from './logger';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
+
+type SupportedChains =
+  (typeof chains)[keyof typeof ChainsWithDelegatorDeployed &
+    keyof typeof chains][];
+
+// all of the chainIds that have delegator contracts deployed
+type SupportedChainId = SupportedChains[number]['id'];
+
+// default for `supportedChains` configuration option
+const ALL_SUPPORTED_CHAINS: SupportedChains = Object.keys(chains)
+  .filter((name) => Object.keys(ChainsWithDelegatorDeployed).includes(name))
+  .map(
+    // we assert to any here due to the inability to infer the namespace of the global import
+    (name) => (chains as any)[name as keyof typeof chains],
+  ) as SupportedChains;
 
 /**
  * Factory arguments for smart account deployment.
@@ -20,14 +38,12 @@ export type FactoryArgs = {
   factoryData: Hex | undefined;
 };
 
-// todo either narrow this or remove entirely
-type ChainId = number;
-
 /**
  * Base options required for account operations.
  */
 export type AccountOptionsBase = {
-  chainId: ChainId;
+  // really this needs to be of type SupportedChainId, but it makes it hard for callers to validate
+  chainId: number;
 };
 
 /**
@@ -54,16 +70,16 @@ export type AccountControllerInterface = Pick<
 export class AccountController {
   #snapsProvider: SnapsProvider;
 
-  #supportedChains: Chain[];
+  #supportedChains: SupportedChains;
 
   #deploymentSalt: Hex;
 
-  #metaMaskSmartAccountByChainId: Record<
-    ChainId,
-    Promise<MetaMaskSmartAccount<Implementation.MultiSig>>
+  #metaMaskSmartAccountByChainId: Partial<
+    Record<
+      SupportedChainId,
+      Promise<MetaMaskSmartAccount<Implementation.MultiSig>>
+    >
   > = {};
-
-  #logger: Logger;
 
   /**
    * Initializes a new AccountController instance.
@@ -72,18 +88,15 @@ export class AccountController {
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.supportedChains - The supported blockchain chains.
    * @param config.deploymentSalt - The hex salt for smart account deployment.
-   * @param config.logger - The logger instance.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
-    supportedChains: Chain[];
+    supportedChains?: SupportedChains;
     deploymentSalt: Hex;
-    logger: Logger;
   }) {
     this.#snapsProvider = config.snapsProvider;
-    this.#supportedChains = config.supportedChains;
+    this.#supportedChains = config.supportedChains ?? ALL_SUPPORTED_CHAINS;
     this.#deploymentSalt = config.deploymentSalt;
-    this.#logger = config.logger;
   }
 
   /**
@@ -97,30 +110,32 @@ export class AccountController {
   async #getMetaMaskSmartAccount(
     options: AccountOptionsBase,
   ): Promise<MetaMaskSmartAccount<Implementation.MultiSig>> {
-    this.#logger.debug('accountController:getMetaMaskSmartAccount()');
+    logger.debug('accountController:getMetaMaskSmartAccount()');
 
     const { chainId } = options;
 
+    this.#assertIsSupportedChainId(chainId);
+
     let smartAccount = this.#metaMaskSmartAccountByChainId[chainId];
 
-    this.#logger.debug(
+    logger.debug(
       'accountController:getMetaMaskSmartAccount() - smartAccount',
       smartAccount,
     );
 
     if (!smartAccount) {
-      this.#logger.debug(
+      logger.debug(
         'accountController:getMetaMaskSmartAccount() - smartAccount not found',
       );
 
-      // @ts-expect-error -- viem extractChain does not work well with dynamic chains
+      // @ts-expect-error - extractChain does not work well with dynamic `chains`
       const chain = extractChain({
         chains: this.#supportedChains,
         id: chainId,
       });
 
       if (!chain) {
-        this.#logger.error(
+        logger.error(
           'accountController:getMetaMaskSmartAccount() - chain not supported',
           { chainId },
         );
@@ -141,7 +156,7 @@ export class AccountController {
           params: { version: 1, salt: GET_ENTROPY_SALT },
         });
 
-        this.#logger.debug('entropy received', entropy);
+        logger.debug('entropy received', entropy);
 
         const account = privateKeyToAccount(entropy);
 
@@ -164,6 +179,20 @@ export class AccountController {
     return smartAccount;
   }
 
+  #assertIsSupportedChainId(
+    chainId: number,
+  ): asserts chainId is SupportedChainId {
+    if (!this.#supportedChains.some((chain) => chain.id === chainId)) {
+      logger.error(
+        'accountController:assertIsSupportedChainId() - unsupported chainId',
+        {
+          chainId,
+        },
+      );
+      throw new Error(`Unsupported ChainId: ${chainId}`);
+    }
+  }
+
   /**
    * Creates a provider that handles experimental provider requests.
    *
@@ -171,10 +200,10 @@ export class AccountController {
    * @returns A provider object with a request method.
    * @private
    */
-  #createExperimentalProviderRequestProvider(chainId: ChainId) {
+  #createExperimentalProviderRequestProvider(chainId: SupportedChainId) {
     return {
       request: async (request: { method: string; params?: unknown[] }) => {
-        this.#logger.debug(
+        logger.debug(
           'accountController:createExperimentalProviderRequestProvider() - provider.request()',
           request,
         );
@@ -204,13 +233,13 @@ export class AccountController {
    * @returns A promise resolving to the account address as a hex string.
    */
   public async getAccountAddress(options: AccountOptionsBase): Promise<Hex> {
-    this.#logger.debug('accountController:getAccountAddress()');
+    logger.debug('accountController:getAccountAddress()');
 
     const smartAccount = await this.#getMetaMaskSmartAccount(options);
 
     const address = await smartAccount.getAddress();
 
-    this.#logger.debug(
+    logger.debug(
       'accountController:getAccountAddress() - address resolved',
       address,
     );
@@ -231,7 +260,7 @@ export class AccountController {
 
     const factoryArgs = await smartAccount.getFactoryArgs();
 
-    this.#logger.debug(
+    logger.debug(
       'accountController:getAccountMetadata() - factoryArgs resolved',
       factoryArgs,
     );
@@ -249,16 +278,18 @@ export class AccountController {
    * @returns A promise resolving to the account balance as a hex string.
    */
   public async getAccountBalance(options: AccountOptionsBase): Promise<Hex> {
-    this.#logger.debug('accountController:getAccountBalance()');
+    logger.debug('accountController:getAccountBalance()');
 
     const { chainId } = options;
 
     const smartAccount = await this.#getMetaMaskSmartAccount(options);
 
-    this.#logger.debug(
+    logger.debug(
       'accountController:getAccountBalance() - smartAccount resolved',
       smartAccount,
     );
+
+    this.#assertIsSupportedChainId(chainId);
 
     const provider = this.#createExperimentalProviderRequestProvider(chainId);
 
@@ -269,7 +300,7 @@ export class AccountController {
       params: [accountAddress, 'latest'],
     });
 
-    this.#logger.debug(
+    logger.debug(
       'accountController:getAccountBalance() - balance resolved',
       balance,
     );
@@ -286,13 +317,13 @@ export class AccountController {
   public async signDelegation(
     options: SignDelegationOptions,
   ): Promise<DelegationStruct> {
-    this.#logger.debug('accountController:signDelegation()');
+    logger.debug('accountController:signDelegation()');
 
     const { chainId, delegation } = options;
 
     const smartAccount = await this.#getMetaMaskSmartAccount({ chainId });
 
-    this.#logger.debug(
+    logger.debug(
       'accountController:signDelegation() - smartAccount resolved',
       smartAccount,
     );
@@ -302,9 +333,7 @@ export class AccountController {
       chainId,
     });
 
-    this.#logger.debug(
-      'accountController:signDelegation() - signature resolved',
-    );
+    logger.debug('accountController:signDelegation() - signature resolved');
 
     return { ...delegation, signature };
   }
