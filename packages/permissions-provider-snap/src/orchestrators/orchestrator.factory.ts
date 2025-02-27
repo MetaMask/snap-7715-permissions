@@ -19,24 +19,24 @@ import type {
  * @throws If the permission type is not supported.
  */
 export const createPermissionOrchestratorFactory = <
-  PermissionType extends SupportedPermissionTypes,
+  TPermissionType extends SupportedPermissionTypes,
 >(
   permissionRequest: PermissionRequest,
   snapsProvider: SnapsProvider,
   accountController: MockAccountController,
-): PermissionOrchestratorReturnMapping[PermissionType] => {
+): PermissionOrchestratorReturnMapping[TPermissionType] => {
   const permissionType = extractPermissionName(
     permissionRequest.permission.type,
   );
 
   const orchestrators: Record<
     string,
-    PermissionOrchestratorReturnMapping[PermissionType]
+    PermissionOrchestratorReturnMapping[TPermissionType]
   > = {
     'native-token-stream': createNativeTokenStreamPermissionOrchestrator(
       snapsProvider,
       accountController,
-    ) as PermissionOrchestratorReturnMapping[PermissionType],
+    ) as PermissionOrchestratorReturnMapping[TPermissionType],
   };
 
   const orchestrator = orchestrators[permissionType];

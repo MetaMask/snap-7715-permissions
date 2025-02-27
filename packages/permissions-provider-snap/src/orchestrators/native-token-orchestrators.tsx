@@ -8,9 +8,8 @@ import type { Hex } from 'viem';
 import { fromHex } from 'viem';
 
 import { type MockAccountController } from '../accountController';
-import { type PermissionConfirmationContext } from '../ui';
+import { renderPermissionConfirmation } from '../ui';
 import type { OrchestrateMeta, Orchestrator } from './orchestrator.types';
-import { handleConfirmationRender } from './render-handler';
 
 /**
  * Prepare the account details for the permission picker UI.
@@ -71,24 +70,17 @@ export const createNativeTokenStreamPermissionOrchestrator = (
         fromHex(chainId, 'number'),
       );
 
-      // Render permission picker UI to capture user attunation and acceptance/rejection
-      const perContext: PermissionConfirmationContext = {
+      // TODO: Extract the delegations from the reponse returnd by the permission picker UI
+      await renderPermissionConfirmation(_snapsProvider, {
         permission: _nativeTokenStreamPermission,
+        delegator,
+        delegate,
         siteOrigin: origin,
         balance,
         expiry,
-        delegation: {
-          delegator,
-          delegate,
-          caveats: [],
-          salt: '0x1',
-          authority: '0x000000_authority',
-          signature: '0x',
-        },
-      };
+      });
 
-      // TODO: Extract the delegations from the reponse returnd by the permission picker UI
-      await handleConfirmationRender(_snapsProvider, perContext);
+      // TODO: Update to use actual values instead of mock values
       return {
         chainId,
         account: delegator,
@@ -99,8 +91,6 @@ export const createNativeTokenStreamPermissionOrchestrator = (
             address: delegate,
           },
         },
-
-        // TODO: Update to use actual values instead of mock values
         permission: _nativeTokenStreamPermission,
         context: '0x000000_encoded_signed_delegation',
         accountMeta:

@@ -1,3 +1,3 @@
 export * from './user-input.contant';
-export * from './grant-permission';
-export * from './permission-confirmation';
+export * from './render-handler';
+export * from './ui.factory';

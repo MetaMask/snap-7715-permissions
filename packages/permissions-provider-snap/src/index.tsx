@@ -1,19 +1,20 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
-  InterfaceContext,
+  Json,
   OnInstallHandler,
   OnUpdateHandler,
   OnUserInputHandler,
+  SnapsProvider,
 } from '@metamask/snaps-sdk';
 import {
   UserInputEventType,
   type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
 
+import { createMockAccountController } from './accountController';
+import { createPermissionOrchestratorFactory } from './orchestrators';
 import { hasPermission, InternalMethod } from './permissions';
-import { saveInterfaceIdState } from './stateManagement';
-import type { GrantPermissionContext } from './ui';
-import { GrantPermissonPage } from './ui';
+import { permissionConfirmationPageFactory } from './ui';
 import {
   buttonClickEventHandler,
   getActiveInterfaceContext,
@@ -51,44 +52,31 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         request.params,
       );
 
-      const firstRequest = permissionsRequest[0];
-      if (!firstRequest) {
-        throw new Error('No permission request found');
+      const permissionRequest = permissionsRequest[0];
+      if (!permissionRequest) {
+        throw new Error('No permissions provided');
       }
 
-      const context: GrantPermissionContext = {
-        siteOrigin,
-        permissionRequest: firstRequest,
-      };
+      const orchestrator = createPermissionOrchestratorFactory(
+        permissionRequest,
+        snap as SnapsProvider,
+        createMockAccountController(),
+      );
 
-      // Render permission picker UI mock
-      const interfaceId = await snap.request({
-        method: 'snap_createInterface',
-        params: {
-          context: context as InterfaceContext,
-          ui: (
-            <GrantPermissonPage
-              siteOrigin={context.siteOrigin}
-              permission={context.permissionRequest.permission}
-            />
-          ),
-        },
-      });
-      await saveInterfaceIdState(interfaceId);
+      if (await orchestrator.validate(permissionRequest)) {
+        const permision = permissionRequest.permission;
 
-      const permissionsRes = await snap.request({
-        method: 'snap_dialog',
-        params: {
-          id: interfaceId,
-        },
-      });
+        const res = await orchestrator.orchestrate(permision as any, {
+          chainId: permissionRequest.chainId,
+          delegate: permissionRequest.signer.data.address,
+          origin: siteOrigin,
+          expiry: permissionRequest.expiry,
+        });
 
-      if (!permissionsRes) {
-        throw new Error('User rejected the permissions request');
+        return [res] as Json[];
       }
 
-      await saveInterfaceIdState('');
-      return permissionsRes;
+      return null;
     }
     default: {
       throw new Error(request.method);
@@ -118,8 +106,9 @@ export const onUpdate: OnUpdateHandler = async () => {
  * @param args.event - The user input event.
  */
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
-  const { activeInterfaceId, context } = await getActiveInterfaceContext();
-  if (id === activeInterfaceId && context) {
+  const { activeInterfaceId, activeContext } =
+    await getActiveInterfaceContext();
+  if (id === activeInterfaceId && activeContext) {
     switch (event.type) {
       case UserInputEventType.ButtonClickEvent: {
         await buttonClickEventHandler(event, activeInterfaceId);
@@ -130,17 +119,26 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
       }
     }
 
+    // TODO: Make sure context is correct type for the permission type instead of any
+    const { permission, delegator, delegate, siteOrigin, balance, expiry } =
+      activeContext as any;
+
+    const [updatedContext, permissionConfirmationPage] =
+      permissionConfirmationPageFactory({
+        permission,
+        delegator,
+        delegate,
+        siteOrigin,
+        balance,
+        expiry,
+      });
+
     await snap.request({
       method: 'snap_updateInterface',
       params: {
         id,
-        context: context as InterfaceContext,
-        ui: (
-          <GrantPermissonPage
-            siteOrigin={context.siteOrigin}
-            permission={context.permissionRequest.permission}
-          />
-        ),
+        context: updatedContext,
+        ui: permissionConfirmationPage,
       },
     });
   }

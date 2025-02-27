@@ -1,8 +1,7 @@
-import type { UserInputEvent, Json } from '@metamask/snaps-sdk';
+import type { UserInputEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import { getInterfaceIdState } from '../stateManagement';
-import type { GrantPermissionContext } from '../ui';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../ui';
 
 /**
@@ -19,7 +18,7 @@ export const getActiveInterfaceContext = async () => {
     },
   });
 
-  return { activeInterfaceId, context: context as GrantPermissionContext };
+  return { activeInterfaceId, activeContext: context };
 };
 
 /**
@@ -45,13 +44,12 @@ export const buttonClickEventHandler = async (
       },
     });
   } else if (event.name === GRANT_BUTTON) {
-    const { context } = await getActiveInterfaceContext();
-    const grantResponses = [context.permissionRequest];
+    const { activeContext } = await getActiveInterfaceContext();
     await snap.request({
       method: 'snap_resolveInterface',
       params: {
         id: activeInterfaceId,
-        value: grantResponses as Json[],
+        value: activeContext,
       },
     });
   }

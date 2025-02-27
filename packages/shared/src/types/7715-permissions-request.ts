@@ -42,7 +42,7 @@ export const zPermissionRequest = z.object({
    * unix timestamp in seconds
    */
   expiry: z.number(),
-  signer: z.union([zAccountSigner, zWalletSigner]),
+  signer: zAccountSigner,
   permission: zPermission,
 });
 export const zPermissionsRequest = z.array(zPermissionRequest);

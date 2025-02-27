@@ -11,12 +11,12 @@ import type { Address, Hex } from 'viem';
 export type SupportedPermissionTypes = 'native-token-stream';
 
 /**
- * Mapping of supported permission orchestrators orchestrateFn parameter types.
+ * Mapping of supported permission types to their respective permission types.
  *
  * - In the future, we may want to extend the mapping key to a unique hash to account for permission types that don't have a string literal representation
  * and are defined as `type: { name: z.string(), description: z.string().optional()}`.
  */
-type OrchestrateFnParamsMapping = {
+export type PermissionTypeMapping = {
   'native-token-stream': NativeTokenStreamPermission;
 };
 
@@ -81,7 +81,7 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
    * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
    */
   orchestrate: (
-    permission: OrchestrateFnParamsMapping[TPermissionType],
+    permission: PermissionTypeMapping[TPermissionType],
     orchestrateMeta: OrchestrateMeta,
   ) => Promise<PermissionResponse | null>;
 };

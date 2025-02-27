@@ -1,5 +1,4 @@
-import type { Permission } from '@metamask/7715-permissions-shared/types';
-import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import type { JsonObject, SnapComponent } from '@metamask/snaps-sdk/jsx';
 import {
   Text,
   Divider,
@@ -9,14 +8,16 @@ import {
   Icon,
 } from '@metamask/snaps-sdk/jsx';
 
-type RequestDetails = {
+type RequestDetails = JsonObject & {
   siteOrigin: string;
-  permission: Permission;
+  justification: string | undefined;
+  chainId: number;
 };
 
 export const RequestDetails: SnapComponent<RequestDetails> = ({
   siteOrigin,
-  permission,
+  justification,
+  chainId,
 }) => {
   const items = [
     {
@@ -31,7 +32,7 @@ export const RequestDetails: SnapComponent<RequestDetails> = ({
     },
     {
       label: 'Network',
-      text: 'Linea Sepolia',
+      text: `${chainId}`,
       tooltipText: 'Tooltip text',
     },
   ].map((item) => (
@@ -53,9 +54,7 @@ export const RequestDetails: SnapComponent<RequestDetails> = ({
       <Divider />
 
       <Text>Reason</Text>
-      <Text>
-        {permission.data.justification || 'No justification provided'}
-      </Text>
+      <Text>{justification ?? 'No justification provided'}</Text>
     </Section>
   );
 };

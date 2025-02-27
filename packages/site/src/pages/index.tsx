@@ -153,7 +153,7 @@ const Index = () => {
           },
         },
         permission: {
-          type: 'native-token-transfer',
+          type: 'native-token-stream',
           data: {
             justification: 'shh...permission 1',
             allowance: '0x1DCD6500',
@@ -180,7 +180,7 @@ const Index = () => {
           },
         },
         permission: {
-          type: 'native-token-transfer',
+          type: 'native-token-stream',
           data: {
             justification: 'shh...permission 1',
             allowance: '0x1DCD6500',
@@ -197,10 +197,9 @@ const Index = () => {
           },
         },
         permission: {
-          type: 'erc20-token-transfer',
+          type: 'erc20-token-stream',
           data: {
             justification: 'shh...permission 2',
-            address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
             allowance: '0x1DCD6500',
           },
         },
@@ -215,10 +214,9 @@ const Index = () => {
           },
         },
         permission: {
-          type: 'erc20-token-transfer',
+          type: 'erc20-token-stream',
           data: {
             justification: 'shh...permission 3',
-            address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
             allowance: '0x1DCD6500',
           },
         },
