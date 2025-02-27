@@ -86,20 +86,6 @@ describe('AccountController', () => {
           }),
       ).not.toThrow();
     });
-
-    it('should accept one of accepted chains', async () => {
-      const controller = new AccountController({
-        snapsProvider: mockSnapsProvider,
-        deploymentSalt: '0x1234',
-        supportedChains: [sepolia, lineaSepolia],
-      });
-
-      await expect(
-        controller.getAccountAddress({
-          chainId: sepolia.id,
-        }),
-      ).resolves.toBeDefined();
-    });
   });
 
   describe('getAccountAddress()', () => {
@@ -121,6 +107,20 @@ describe('AccountController', () => {
           chainId: invalidChainId,
         }),
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
+    });
+
+    it('should accept one of mmultiple accepted chains', async () => {
+      const controller = new AccountController({
+        snapsProvider: mockSnapsProvider,
+        deploymentSalt: '0x1234',
+        supportedChains: [sepolia, lineaSepolia],
+      });
+
+      const address = await controller.getAccountAddress({
+        chainId: sepolia.id,
+      });
+
+      expect(address).toBeDefined();
     });
   });
 
