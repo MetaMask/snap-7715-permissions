@@ -125,6 +125,8 @@ const Index = () => {
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
   const mockDappSessionAccount = '0x016562aA41A8697720ce0943F003141f5dEAe006';
+  const chainId = '0xaa36a7'; // Sepolia
+  const expiry = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now (unix timestamp in seconds)
 
   const [log, setLog] = useState<string[]>([]);
   const appendToLog = (action: string, response: any) => {
@@ -144,8 +146,8 @@ const Index = () => {
   const handleGrantPermissions = async () => {
     const permissionsRequests = [
       {
-        chainId: '0x1',
-        expiry: 1,
+        chainId,
+        expiry,
         signer: {
           type: 'account',
           data: {
@@ -156,7 +158,6 @@ const Index = () => {
           type: 'native-token-stream',
           data: {
             justification: 'shh...permission 1',
-            allowance: '0x1DCD6500',
           },
         },
       },
@@ -171,8 +172,8 @@ const Index = () => {
   const handleGrantPermissionsMulti = async () => {
     const permissionsRequests = [
       {
-        chainId: '0x1',
-        expiry: 1,
+        chainId,
+        expiry,
         signer: {
           type: 'account',
           data: {
@@ -183,13 +184,12 @@ const Index = () => {
           type: 'native-token-stream',
           data: {
             justification: 'shh...permission 1',
-            allowance: '0x1DCD6500',
           },
         },
       },
       {
-        chainId: '0x1',
-        expiry: 1,
+        chainId,
+        expiry,
         signer: {
           type: 'account',
           data: {
@@ -200,13 +200,12 @@ const Index = () => {
           type: 'erc20-token-stream',
           data: {
             justification: 'shh...permission 2',
-            allowance: '0x1DCD6500',
           },
         },
       },
       {
-        chainId: '0x1',
-        expiry: 1,
+        chainId,
+        expiry,
         signer: {
           type: 'account',
           data: {
@@ -217,7 +216,6 @@ const Index = () => {
           type: 'erc20-token-stream',
           data: {
             justification: 'shh...permission 3',
-            allowance: '0x1DCD6500',
           },
         },
       },
@@ -232,8 +230,8 @@ const Index = () => {
   const handleGrantPermissionsNoOffer = async () => {
     const permissionsRequests = [
       {
-        chainId: '0x1',
-        expiry: 1,
+        chainId,
+        expiry,
         signer: {
           type: 'account',
           data: {

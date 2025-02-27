@@ -1,9 +1,8 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/test';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { sepolia } from 'viem/chains';
 
-import { AccountController } from '../src/accountController';
+import { createMockAccountController } from '../src/accountContoller.mock';
 import { createPermissionOrchestratorFactory } from '../src/orchestrators';
 
 describe('PermissionOrchestratorFactory', () => {
@@ -18,17 +17,11 @@ describe('PermissionOrchestratorFactory', () => {
     },
   };
 
-  let mockAccountController: AccountController;
+  const mockAccountController = createMockAccountController();
   let mockSnapsProvider: SnapsProvider = {} as SnapsProvider;
 
   beforeEach(() => {
     mockSnapsProvider = createMockSnapsProvider();
-
-    mockAccountController = new AccountController({
-      snapsProvider: mockSnapsProvider,
-      supportedChains: [sepolia],
-      deploymentSalt: '0x1234',
-    });
 
     jest.clearAllMocks();
   });

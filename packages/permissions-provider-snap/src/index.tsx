@@ -11,15 +11,17 @@ import {
 } from '@metamask/snaps-sdk';
 import { sepolia } from 'viem/chains';
 
+import { createMockAccountController } from './accountContoller.mock';
 import { AccountController } from './accountController';
+import type { PermissionTypeMapping } from './orchestrators';
 import { createPermissionOrchestratorFactory } from './orchestrators';
 import { hasPermission, InternalMethod } from './permissions';
-import { permissionConfirmationPageFactory } from './ui';
 import {
+  permissionConfirmationPageFactory,
   buttonClickEventHandler,
   getActiveInterfaceContext,
-  validatePermissionRequestParam,
-} from './utils';
+} from './ui';
+import { validatePermissionRequestParam } from './utils';
 
 // Initialize account controller for future use
 const controller = new AccountController({
@@ -64,26 +66,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         request.params,
       );
 
-      const permissionRequest = permissionsRequest[0];
-      if (!permissionRequest) {
-        throw new Error('No permissions provided');
+      const firstRequest = permissionsRequest[0];
+      if (!firstRequest) {
+        throw new Error('No permission request found');
       }
 
       // Testing orchestrator e2e
       const orchestrator = createPermissionOrchestratorFactory(
-        permissionRequest,
+        firstRequest,
         snap,
-        controller,
+        createMockAccountController(),
       );
 
-      if (await orchestrator.validate(permissionRequest)) {
-        const permision = permissionRequest.permission;
+      if (await orchestrator.validate(firstRequest)) {
+        const { permissionType } = orchestrator;
+        const permission =
+          firstRequest.permission as PermissionTypeMapping[typeof permissionType];
 
-        const res = await orchestrator.orchestrate(permision as any, {
-          chainId: permissionRequest.chainId,
-          delegate: permissionRequest.signer.data.address,
+        const res = await orchestrator.orchestrate(permission, {
+          chainId: firstRequest.chainId,
+          delegate: firstRequest.signer.data.address,
           origin: siteOrigin,
-          expiry: permissionRequest.expiry,
+          expiry: firstRequest.expiry,
         });
 
         return [res] as Json[];
@@ -133,8 +137,15 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
     }
 
     // TODO: Make sure context is correct type for the permission type instead of any
-    const { permission, delegator, delegate, siteOrigin, balance, expiry } =
-      activeContext as any;
+    const {
+      permission,
+      delegator,
+      delegate,
+      siteOrigin,
+      balance,
+      expiry,
+      chainId,
+    } = activeContext as any;
 
     const [updatedContext, permissionConfirmationPage] =
       permissionConfirmationPageFactory({
@@ -144,6 +155,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         siteOrigin,
         balance,
         expiry,
+        chainId,
       });
 
     await snap.request({

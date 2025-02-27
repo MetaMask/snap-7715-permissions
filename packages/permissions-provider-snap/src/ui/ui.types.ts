@@ -1,3 +1,4 @@
+import type { CaveatStruct } from '@metamask-private/delegator-core-viem';
 import type { InterfaceContext } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
@@ -6,6 +7,18 @@ import type {
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../orchestrators/orchestrator.types';
+
+/**
+ * The delegation in transit object with salt as a hex string to be compatible with the Snap context { [prop: string]: Json; } object.
+ */
+export type DelegationInTransit = {
+  delegate: Hex;
+  delegator: Hex;
+  authority: Hex;
+  caveats: CaveatStruct[];
+  salt: Hex;
+  signature: Hex;
+};
 
 /**
  * The custom Snap context object for the permission confirmation page that will be passed to onUserInput when the user interacts with the interface.
@@ -20,19 +33,9 @@ export type PermissionConfirmationContext<
   permission: PermissionTypeMapping[TPermissionType];
   readonly siteOrigin: string;
   readonly balance: Hex;
+  readonly chainId: number;
   expiry: number;
-
-  /**
-   * The delegation data with attached caveat specific to the permission.
-   */
-  delegation: {
-    readonly delegate: Hex; // The dapp session account(ie. account to receive the delegation).
-    readonly delegator: Hex; // The user account(ie. account to sign the delegation).
-    caveats: any[];
-    salt: Hex;
-    authority: Hex;
-    signature: Hex;
-  };
+  delegation: DelegationInTransit;
 };
 
 /**
@@ -43,7 +46,7 @@ export type PermissionConfirmationProps<
 > = JsonObject &
   Pick<
     PermissionConfirmationContext<TPermissionType>,
-    'permission' | 'siteOrigin' | 'balance' | 'expiry' | 'delegation'
+    'permission' | 'siteOrigin' | 'balance' | 'expiry' | 'chainId'
   >;
 
 /**
@@ -52,10 +55,11 @@ export type PermissionConfirmationProps<
 export type PreparePermissionConfirmationMeta<
   TPermissionType extends SupportedPermissionTypes,
 > = {
-  permission: PermissionTypeMapping[TPermissionType];
-  delegator: Hex;
-  delegate: Hex;
-  siteOrigin: string;
-  balance: Hex;
-  expiry: number;
+  readonly permission: PermissionTypeMapping[TPermissionType];
+  readonly delegator: Hex;
+  readonly delegate: Hex;
+  readonly siteOrigin: string;
+  readonly balance: Hex;
+  readonly expiry: number;
+  readonly chainId: number;
 };

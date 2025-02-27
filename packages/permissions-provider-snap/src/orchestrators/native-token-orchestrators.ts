@@ -1,3 +1,4 @@
+import { encodeDelegation } from '@metamask-private/delegator-core-viem';
 import type {
   NativeTokenStreamPermission,
   PermissionRequest,
@@ -7,8 +8,9 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { Hex } from 'viem';
 import { fromHex } from 'viem';
 
-import { type AccountController } from '../accountController';
+import { type MockAccountController } from '../accountContoller.mock';
 import { renderPermissionConfirmation } from '../ui';
+import { convertToDelegationStruct } from '../utils';
 import type { OrchestrateMeta, Orchestrator } from './orchestrator.types';
 
 /**
@@ -17,8 +19,8 @@ import type { OrchestrateMeta, Orchestrator } from './orchestrator.types';
  * @param chainId - The chain ID.
  * @returns The account address, balance and initCode.
  */
-const prepareAccountDetails = async (
-  _accountController: AccountController,
+export const prepareAccountDetails = async (
+  _accountController: MockAccountController,
   chainId: number,
 ): Promise<
   [
@@ -52,7 +54,7 @@ const prepareAccountDetails = async (
  */
 export const createNativeTokenStreamPermissionOrchestrator = (
   _snapsProvider: SnapsProvider,
-  _accountController: AccountController,
+  _accountController: MockAccountController,
 ): Orchestrator<'native-token-stream'> => {
   return {
     permissionType: 'native-token-stream',
@@ -65,6 +67,7 @@ export const createNativeTokenStreamPermissionOrchestrator = (
       orchestrateMeta: OrchestrateMeta,
     ) => {
       const { chainId, delegate, origin, expiry } = orchestrateMeta;
+      const chainIdNum = fromHex(chainId, 'number');
 
       // Get the user account details
       const [delegator, balance, accountMeta] = await prepareAccountDetails(
@@ -72,17 +75,27 @@ export const createNativeTokenStreamPermissionOrchestrator = (
         fromHex(chainId, 'number'),
       );
 
-      // TODO: Extract the delegations from the reponse returnd by the permission picker UI
-      await renderPermissionConfirmation(_snapsProvider, {
-        permission: _nativeTokenStreamPermission,
-        delegator,
-        delegate,
-        siteOrigin: origin,
-        balance,
-        expiry,
-      });
+      // Wait for the successful permission confirmation from the user
+      const attenuatedUiContext = await renderPermissionConfirmation(
+        _snapsProvider,
+        {
+          permission: _nativeTokenStreamPermission,
+          delegator,
+          delegate,
+          siteOrigin: origin,
+          balance,
+          expiry,
+          chainId: chainIdNum,
+        },
+      );
 
-      // TODO: Update to use actual values instead of mock values
+      // Sign the delegation and encode it to create the permissioncContext
+      const signedDelegation = await _accountController.signDelegation({
+        chainId: chainIdNum,
+        delegation: convertToDelegationStruct(attenuatedUiContext.delegation), // has the delegation with caveat attached specific to the permission
+      });
+      const permissionContext = encodeDelegation([signedDelegation]);
+
       return {
         chainId,
         account: delegator,
@@ -94,13 +107,13 @@ export const createNativeTokenStreamPermissionOrchestrator = (
           },
         },
         permission: _nativeTokenStreamPermission,
-        context: '0x000000_encoded_signed_delegation',
+        context: permissionContext,
         accountMeta:
           accountMeta.factory && accountMeta.factoryData
             ? [accountMeta]
             : undefined,
         signerMeta: {
-          delegationManager: '0x000000_delegation_manager',
+          delegationManager: '0x000000_delegation_manager', // TODO: Update to use actual values instead of mock values
         },
       } as PermissionResponse;
     },

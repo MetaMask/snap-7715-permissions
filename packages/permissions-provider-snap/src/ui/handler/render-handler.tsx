@@ -1,12 +1,12 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 
-import type { SupportedPermissionTypes } from '../orchestrators/orchestrator.types';
-import { saveInterfaceIdState } from '../stateManagement';
-import { permissionConfirmationPageFactory } from './ui.factory';
+import type { SupportedPermissionTypes } from '../../orchestrators/orchestrator.types';
+import { saveInterfaceIdState } from '../../stateManagement';
+import { permissionConfirmationPageFactory } from '../ui.factory';
 import type {
   PermissionConfirmationContext,
   PreparePermissionConfirmationMeta,
-} from './ui.types';
+} from '../ui.types';
 
 /**
  * Render the permission confirmation page.
@@ -43,6 +43,7 @@ export const renderPermissionConfirmation = async <
 
   await saveInterfaceIdState('');
 
+  // If user click cancel, the response will be undefined
   if (!attenuatedContext) {
     throw new Error('User rejected the permissions request');
   }

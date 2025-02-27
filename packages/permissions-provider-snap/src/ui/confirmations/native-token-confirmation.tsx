@@ -1,15 +1,8 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Button,
-  Container,
-  Divider,
-  Footer,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Container, Divider } from '@metamask/snaps-sdk/jsx';
 
-import { Header, RequestDetails } from '../components';
+import { ConfirmationFooter, Header, RequestDetails } from '../components';
 import type { PermissionConfirmationProps } from '../ui.types';
-import { CANCEL_BUTTON, GRANT_BUTTON } from '../user-input.contant';
 
 /**
  * The native-token-stream permission confirmation page.
@@ -17,11 +10,12 @@ import { CANCEL_BUTTON, GRANT_BUTTON } from '../user-input.contant';
  * @param props - The permission confirmation props.
  * @param props.siteOrigin - The site origin.
  * @param props.permission - The native-token-stream permission data.
+ * @param props.chainId - The chain ID.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
-> = ({ siteOrigin, permission }) => {
+> = ({ siteOrigin, permission, chainId }) => {
   return (
     <Container>
       <Box>
@@ -33,20 +27,11 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
 
         <RequestDetails
           siteOrigin={siteOrigin}
-          chainId={permission.data.chainId}
+          chainId={chainId}
           justification={permission.data.justification}
         />
-
-        {/* <ConfirmationFooter /> */}
-        <Footer>
-          <Button name={CANCEL_BUTTON} variant="destructive">
-            Cancel
-          </Button>
-          <Button name={GRANT_BUTTON} variant="primary">
-            Grant
-          </Button>
-        </Footer>
       </Box>
+      <ConfirmationFooter />
     </Container>
   );
 };

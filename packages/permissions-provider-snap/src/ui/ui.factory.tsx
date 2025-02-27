@@ -1,8 +1,9 @@
+import { createRootDelegation } from '@metamask-private/delegator-core-viem';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { ComponentOrElement } from '@metamask/snaps-sdk';
-// import { Box, Text } from '@metamask/snaps-sdk/jsx';
 
 import type { SupportedPermissionTypes } from '../orchestrators';
+import { convertToDelegationInTransit } from '../utils';
 import { NativeTokenStreamConfirmationPage } from './confirmations';
 import type {
   PermissionConfirmationContext,
@@ -19,8 +20,15 @@ export const permissionConfirmationPageFactory = <
 >(
   preparePermissionConfirmationMeta: PreparePermissionConfirmationMeta<TPermissionType>,
 ): [PermissionConfirmationContext<TPermissionType>, ComponentOrElement] => {
-  const { permission, delegator, delegate, siteOrigin, balance, expiry } =
-    preparePermissionConfirmationMeta;
+  const {
+    permission,
+    delegator,
+    delegate,
+    siteOrigin,
+    balance,
+    expiry,
+    chainId,
+  } = preparePermissionConfirmationMeta;
 
   const permissionType = extractPermissionName(permission.type);
   const context: PermissionConfirmationContext<TPermissionType> = {
@@ -28,14 +36,10 @@ export const permissionConfirmationPageFactory = <
     siteOrigin,
     balance,
     expiry,
-    delegation: {
-      delegator,
-      delegate,
-      caveats: [],
-      salt: '0x1',
-      authority: '0x000000_authority',
-      signature: '0x',
-    },
+    chainId,
+    delegation: convertToDelegationInTransit(
+      createRootDelegation(delegate, delegator, []),
+    ),
   };
 
   const confirmationScreens: Record<string, ComponentOrElement> = {
@@ -45,13 +49,9 @@ export const permissionConfirmationPageFactory = <
         permission={context.permission}
         balance={context.balance}
         expiry={context.expiry}
+        chainId={context.chainId}
         delegation={context.delegation}
       />
-
-      // TODO: Box renders fine, figure out why components are not rendering with error
-      // <Box>
-      //   <Text>Happy path</Text>
-      // </Box>
     ),
   };
 
