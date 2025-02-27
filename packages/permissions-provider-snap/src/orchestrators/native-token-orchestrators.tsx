@@ -7,7 +7,7 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { Hex } from 'viem';
 import { fromHex } from 'viem';
 
-import { type MockAccountController } from '../accountController';
+import { type AccountController } from '../accountController';
 import { renderPermissionConfirmation } from '../ui';
 import type { OrchestrateMeta, Orchestrator } from './orchestrator.types';
 
@@ -18,7 +18,7 @@ import type { OrchestrateMeta, Orchestrator } from './orchestrator.types';
  * @returns The account address, balance and initCode.
  */
 const prepareAccountDetails = async (
-  _accountController: MockAccountController,
+  _accountController: AccountController,
   chainId: number,
 ): Promise<
   [
@@ -37,7 +37,9 @@ const prepareAccountDetails = async (
     _accountController.getAccountBalance({
       chainId,
     }),
-    _accountController.getAccountMetadata(),
+    _accountController.getAccountMetadata({
+      chainId,
+    }),
   ]);
 };
 
@@ -50,7 +52,7 @@ const prepareAccountDetails = async (
  */
 export const createNativeTokenStreamPermissionOrchestrator = (
   _snapsProvider: SnapsProvider,
-  _accountController: MockAccountController,
+  _accountController: AccountController,
 ): Orchestrator<'native-token-stream'> => {
   return {
     permissionType: 'native-token-stream',

@@ -22,6 +22,7 @@ jobs:
   build-lint-test:
     name: Build, lint, and test
     uses: ./.github/workflows/build-lint-test.yml
+    secrets: inherit
 
   all-jobs-completed:
     name: All jobs completed

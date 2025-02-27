@@ -9,6 +9,7 @@
   },
   "license": "(MIT-0 OR Apache-2.0)",
   "exports": {
+    ".": "./src/index.ts",
     "./utils": "./src/utils/index.ts",
     "./types": "./src/types/index.ts",
     "./test": "./test/__mocks__/index.ts"

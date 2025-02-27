@@ -4,14 +4,14 @@ import type {
   OnInstallHandler,
   OnUpdateHandler,
   OnUserInputHandler,
-  SnapsProvider,
 } from '@metamask/snaps-sdk';
 import {
   UserInputEventType,
   type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
+import { sepolia } from 'viem/chains';
 
-import { createMockAccountController } from './accountController';
+import { AccountController } from './accountController';
 import { createPermissionOrchestratorFactory } from './orchestrators';
 import { hasPermission, InternalMethod } from './permissions';
 import { permissionConfirmationPageFactory } from './ui';
@@ -20,6 +20,18 @@ import {
   getActiveInterfaceContext,
   validatePermissionRequestParam,
 } from './utils';
+
+// Initialize account controller for future use
+const controller = new AccountController({
+  snapsProvider: snap,
+  supportedChains: [sepolia],
+  deploymentSalt: '0x',
+});
+
+// If the account controller is not used, linting error is surfaced.
+if (controller === undefined) {
+  throw new Error('Failed to initialize account controller');
+}
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -57,10 +69,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         throw new Error('No permissions provided');
       }
 
+      // Testing orchestrator e2e
       const orchestrator = createPermissionOrchestratorFactory(
         permissionRequest,
-        snap as SnapsProvider,
-        createMockAccountController(),
+        snap,
+        controller,
       );
 
       if (await orchestrator.validate(permissionRequest)) {
