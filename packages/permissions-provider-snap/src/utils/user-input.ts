@@ -1,4 +1,4 @@
-import type { UserInputEvent, Json } from '@metamask/snaps-sdk';
+import type { UserInputEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import { getInterfaceIdState } from '../stateManagement';
@@ -41,17 +41,15 @@ export const buttonClickEventHandler = async (
       method: 'snap_resolveInterface',
       params: {
         id: activeInterfaceId,
-        value: null,
+        value: false,
       },
     });
   } else if (event.name === GRANT_BUTTON) {
-    const { context } = await getActiveInterfaceContext();
-    const grantResponses = [context.permissionRequest];
     await snap.request({
       method: 'snap_resolveInterface',
       params: {
         id: activeInterfaceId,
-        value: grantResponses as Json[],
+        value: true,
       },
     });
   }

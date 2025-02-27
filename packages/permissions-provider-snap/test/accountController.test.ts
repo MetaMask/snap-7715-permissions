@@ -3,7 +3,7 @@ import {
   createRootDelegation,
   getDeleGatorEnvironment,
 } from '@metamask-private/delegator-core-viem';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { isHex, size } from 'viem';
 import { sepolia, oneWorld } from 'viem/chains';
 
@@ -16,9 +16,7 @@ describe('AccountController', () => {
   const expectedAddress = '0xD1feB94b097Bd806a67F16c7b549f7e894C0a546';
   const expectedBalance = '0x1000000000000000000';
   let accountController: AccountController;
-  const mockSnapsProvider = {
-    request: jest.fn(),
-  } as unknown as jest.Mocked<SnapsProvider>;
+  const mockSnapsProvider = createMockSnapsProvider();
 
   beforeEach(() => {
     mockSnapsProvider.request.mockReset();

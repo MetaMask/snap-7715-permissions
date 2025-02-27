@@ -1,0 +1,1 @@
+export { createMockSnapsProvider } from './mockSnapsProvider';

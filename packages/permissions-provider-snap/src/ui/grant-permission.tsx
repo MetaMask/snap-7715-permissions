@@ -2,7 +2,7 @@ import type {
   PermissionRequest,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
-import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import type { JSXElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
   Button,
@@ -24,10 +24,9 @@ export type GrantPermissionPageProps = {
   permission: Permission;
 };
 
-export const GrantPermissonPage: SnapComponent<GrantPermissionPageProps> = ({
-  siteOrigin,
-  permission,
-}) => {
+export const GrantPermissonPage: (
+  params: GrantPermissionPageProps,
+) => JSXElement = ({ siteOrigin, permission }) => {
   return (
     <Container>
       <Box>
