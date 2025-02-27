@@ -4,7 +4,7 @@ import {
   getDeleGatorEnvironment,
 } from '@metamask-private/delegator-core-viem';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
-import { isHex, size, toHex } from 'viem';
+import { isHex, size } from 'viem';
 import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
 import { AccountController } from '../src/accountController';
@@ -94,9 +94,11 @@ describe('AccountController', () => {
         supportedChains: [sepolia, lineaSepolia],
       });
 
-      const address = await controller.getAccountAddress({
-        chainId: sepolia.id,
-      });
+      await expect(
+        controller.getAccountAddress({
+          chainId: sepolia.id,
+        }),
+      ).resolves.toBeDefined();
     });
   });
 

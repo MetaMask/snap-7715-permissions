@@ -10,10 +10,10 @@ import {
   Divider,
   Footer,
 } from '@metamask/snaps-sdk/jsx';
+import type { Hex } from 'viem';
 
 import { Header, RequestDetails } from './components';
 import { GRANT_BUTTON, CANCEL_BUTTON } from './user-input.contant';
-import { Hex } from 'viem';
 
 export type GrantPermissionContext = {
   permissionRequest: PermissionRequest;

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import { toHex } from 'viem';
 import { sepolia } from 'viem/chains';
+
 import {
   ConnectButton,
   InstallFlaskButton,
@@ -16,7 +18,6 @@ import {
   useRequestSnap,
 } from '../hooks';
 import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
-import { toHex } from 'viem';
 
 const Container = styled.div`
   display: flex;
