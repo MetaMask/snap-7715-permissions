@@ -47,6 +47,12 @@ export class RpcHandler {
       permissionRequest: firstRequest,
     };
 
+    const chainId = Number(firstRequest.chainId);
+
+    const accountAddress = await this.#accountController.getAccountAddress({
+      chainId,
+    });
+
     const didUserGrantPermission = await this.#snapsProvider.request({
       method: 'snap_dialog',
       params: {
@@ -54,6 +60,8 @@ export class RpcHandler {
         content: GrantPermissonPage({
           siteOrigin: context.siteOrigin,
           permission: context.permissionRequest.permission,
+          accountAddress,
+          chainId,
         }),
       },
     });

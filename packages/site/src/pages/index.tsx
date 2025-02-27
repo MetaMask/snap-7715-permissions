@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-
+import { sepolia } from 'viem/chains';
 import {
   ConnectButton,
   InstallFlaskButton,
@@ -16,6 +16,7 @@ import {
   useRequestSnap,
 } from '../hooks';
 import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
+import { toHex } from 'viem';
 
 const Container = styled.div`
   display: flex;
@@ -144,7 +145,7 @@ const Index = () => {
   const handleGrantPermissions = async () => {
     const permissionsRequests = [
       {
-        chainId: '0x1',
+        chainId: toHex(sepolia.id),
         expiry: 1,
         signer: {
           type: 'account',
@@ -171,7 +172,7 @@ const Index = () => {
   const handleGrantPermissionsMulti = async () => {
     const permissionsRequests = [
       {
-        chainId: '0x1',
+        chainId: toHex(sepolia.id),
         expiry: 1,
         signer: {
           type: 'account',
@@ -188,7 +189,7 @@ const Index = () => {
         },
       },
       {
-        chainId: '0x1',
+        chainId: toHex(sepolia.id),
         expiry: 1,
         signer: {
           type: 'account',
@@ -206,7 +207,7 @@ const Index = () => {
         },
       },
       {
-        chainId: '0x1',
+        chainId: toHex(sepolia.id),
         expiry: 1,
         signer: {
           type: 'account',
@@ -234,7 +235,7 @@ const Index = () => {
   const handleGrantPermissionsNoOffer = async () => {
     const permissionsRequests = [
       {
-        chainId: '0x1',
+        chainId: toHex(sepolia.id),
         expiry: 1,
         signer: {
           type: 'account',

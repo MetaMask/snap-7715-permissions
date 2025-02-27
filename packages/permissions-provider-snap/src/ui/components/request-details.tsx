@@ -8,16 +8,28 @@ import {
   Tooltip,
   Icon,
 } from '@metamask/snaps-sdk/jsx';
+import { extractChain, type Hex, toHex } from 'viem';
+import * as ALL_CHAINS from 'viem/chains';
 
 type RequestDetails = {
   siteOrigin: string;
   permission: Permission;
+  accountAddress: Hex;
+  chainId: number;
 };
 
 export const RequestDetails: (params: RequestDetails) => JSXElement = ({
   siteOrigin,
   permission,
+  accountAddress,
+  chainId,
 }) => {
+  // @ts-expect-error - extractChain does not work well with dynamic `chains`
+  const chain = extractChain({
+    chains: Object.values(ALL_CHAINS),
+    id: chainId as any,
+  });
+
   const items = [
     {
       label: 'Requested by',
@@ -31,7 +43,12 @@ export const RequestDetails: (params: RequestDetails) => JSXElement = ({
     },
     {
       label: 'Network',
-      text: 'Linea Sepolia',
+      text: chain?.name || toHex(chainId),
+      tooltipText: 'Tooltip text',
+    },
+    {
+      label: 'Account',
+      text: accountAddress,
       tooltipText: 'Tooltip text',
     },
   ].map((item) => (

@@ -13,6 +13,7 @@ import {
 
 import { Header, RequestDetails } from './components';
 import { GRANT_BUTTON, CANCEL_BUTTON } from './user-input.contant';
+import { Hex } from 'viem';
 
 export type GrantPermissionContext = {
   permissionRequest: PermissionRequest;
@@ -22,11 +23,13 @@ export type GrantPermissionContext = {
 export type GrantPermissionPageProps = {
   siteOrigin: string;
   permission: Permission;
+  accountAddress: Hex;
+  chainId: number;
 };
 
 export const GrantPermissonPage: (
   params: GrantPermissionPageProps,
-) => JSXElement = ({ siteOrigin, permission }) => {
+) => JSXElement = ({ siteOrigin, permission, accountAddress, chainId }) => {
   return (
     <Container>
       <Box>
@@ -36,7 +39,12 @@ export const GrantPermissonPage: (
         />
         <Divider />
 
-        <RequestDetails siteOrigin={siteOrigin} permission={permission} />
+        <RequestDetails
+          siteOrigin={siteOrigin}
+          permission={permission}
+          accountAddress={accountAddress}
+          chainId={chainId}
+        />
       </Box>
       <Footer>
         <Button name={CANCEL_BUTTON} variant="destructive">

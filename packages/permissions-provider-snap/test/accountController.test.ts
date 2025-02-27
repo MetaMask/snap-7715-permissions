@@ -4,8 +4,8 @@ import {
   getDeleGatorEnvironment,
 } from '@metamask-private/delegator-core-viem';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
-import { isHex, size } from 'viem';
-import { sepolia, oneWorld } from 'viem/chains';
+import { isHex, size, toHex } from 'viem';
+import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
 import { AccountController } from '../src/accountController';
 
@@ -85,6 +85,18 @@ describe('AccountController', () => {
             deploymentSalt: '0x1234',
           }),
       ).not.toThrow();
+    });
+
+    it('should accept one of accepted chains', async () => {
+      const controller = new AccountController({
+        snapsProvider: mockSnapsProvider,
+        deploymentSalt: '0x1234',
+        supportedChains: [sepolia, lineaSepolia],
+      });
+
+      const address = await controller.getAccountAddress({
+        chainId: sepolia.id,
+      });
     });
   });
 
