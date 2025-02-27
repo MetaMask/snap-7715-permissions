@@ -9,7 +9,9 @@ import {
   UserInputEventType,
   type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
+import { sepolia } from 'viem/chains';
 
+import { AccountController } from './accountController';
 import { hasPermission, InternalMethod } from './permissions';
 import { saveInterfaceIdState } from './stateManagement';
 import type { GrantPermissionContext } from './ui';
@@ -19,6 +21,18 @@ import {
   getActiveInterfaceContext,
   validatePermissionRequestParam,
 } from './utils';
+
+// Initialize account controller for future use
+const controller = new AccountController({
+  snapsProvider: snap,
+  supportedChains: [sepolia],
+  deploymentSalt: '0x',
+});
+
+// If the account controller is not used, linting error is surfaced.
+if (controller === undefined) {
+  throw new Error('Failed to initialize account controller');
+}
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
