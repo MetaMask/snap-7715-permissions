@@ -1,4 +1,7 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  extractPermissionName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
 import type {
   Json,
   OnInstallHandler,
@@ -13,13 +16,18 @@ import { sepolia } from 'viem/chains';
 
 import { createMockAccountController } from './accountContoller.mock';
 import { AccountController } from './accountController';
-import type { PermissionTypeMapping } from './orchestrators';
-import { createPermissionOrchestratorFactory } from './orchestrators';
+import type {
+  PermissionTypeMapping,
+  SupportedPermissionTypes,
+} from './orchestrators';
+import { createPermissionOrchestrator } from './orchestrators';
 import { hasPermission, InternalMethod } from './permissions';
+import { createStateManager } from './stateManagement';
 import {
   permissionConfirmationPageFactory,
   buttonClickEventHandler,
   getActiveInterfaceContext,
+  createPermissionConfirmationRenderHandler,
 } from './ui';
 import { validatePermissionRequestParam } from './utils';
 
@@ -34,6 +42,12 @@ const controller = new AccountController({
 if (controller === undefined) {
   throw new Error('Failed to initialize account controller');
 }
+
+// Initialize orchestrator for future use
+const orchestrator = createPermissionOrchestrator(
+  createMockAccountController(),
+  createPermissionConfirmationRenderHandler(snap, createStateManager(snap)),
+);
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -71,15 +85,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         throw new Error('No permission request found');
       }
 
-      // Testing orchestrator e2e
-      const orchestrator = createPermissionOrchestratorFactory(
-        firstRequest,
-        snap,
-        createMockAccountController(),
-      );
-
+      // process the request
       if (await orchestrator.validate(firstRequest)) {
-        const { permissionType } = orchestrator;
+        const permissionType = extractPermissionName(
+          firstRequest.permission.type,
+        ) as SupportedPermissionTypes;
+
         const permission =
           firstRequest.permission as PermissionTypeMapping[typeof permissionType];
 

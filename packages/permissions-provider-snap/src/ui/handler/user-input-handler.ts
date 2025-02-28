@@ -1,7 +1,7 @@
 import type { UserInputEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
-import { getInterfaceIdState } from '../../stateManagement';
+import { createStateManager } from '../../stateManagement';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../user-input.contant';
 
 /**
@@ -10,7 +10,8 @@ import { CANCEL_BUTTON, GRANT_BUTTON } from '../user-input.contant';
  * @returns The active interface context.
  */
 export const getActiveInterfaceContext = async () => {
-  const activeInterfaceId = await getInterfaceIdState();
+  const stateManager = createStateManager(snap);
+  const { activeInterfaceId } = await stateManager.getState();
   const context = await snap.request({
     method: 'snap_getInterfaceContext',
     params: {

@@ -52,7 +52,7 @@ export type PermissionConfirmationProps<
 /**
  * The meta data required to prepare the permission confirmation page.
  */
-export type PreparePermissionConfirmationMeta<
+export type PermissionConfirmationMeta<
   TPermissionType extends SupportedPermissionTypes,
 > = {
   readonly permission: PermissionTypeMapping[TPermissionType];

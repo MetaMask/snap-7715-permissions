@@ -1,2 +1,2 @@
-export * from './orchestrator.factory';
 export * from './orchestrator.types';
+export * from './orchestrators';

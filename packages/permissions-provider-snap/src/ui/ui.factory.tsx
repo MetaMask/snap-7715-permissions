@@ -2,23 +2,26 @@ import { createRootDelegation } from '@metamask-private/delegator-core-viem';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { ComponentOrElement } from '@metamask/snaps-sdk';
 
-import type { SupportedPermissionTypes } from '../orchestrators';
+import type {
+  PermissionTypeMapping,
+  SupportedPermissionTypes,
+} from '../orchestrators';
 import { convertToDelegationInTransit } from '../utils';
 import { NativeTokenStreamConfirmationPage } from './confirmations';
 import type {
   PermissionConfirmationContext,
-  PreparePermissionConfirmationMeta,
+  PermissionConfirmationMeta,
 } from './ui.types';
 
 /**
  * Factory function for creating a permission confirmation page for a specific permission type.
- * @param preparePermissionConfirmationMeta - The meta data required to prepare the permission confirmation page.
+ * @param permissionConfirmationMeta - The meta data required to prepare the permission confirmation page.
  * @returns The permission confirmation context and the permission confirmation page component for the specific permission type.
  */
 export const permissionConfirmationPageFactory = <
   TPermissionType extends SupportedPermissionTypes,
 >(
-  preparePermissionConfirmationMeta: PreparePermissionConfirmationMeta<TPermissionType>,
+  permissionConfirmationMeta: PermissionConfirmationMeta<TPermissionType>,
 ): [PermissionConfirmationContext<TPermissionType>, ComponentOrElement] => {
   const {
     permission,
@@ -28,7 +31,7 @@ export const permissionConfirmationPageFactory = <
     balance,
     expiry,
     chainId,
-  } = preparePermissionConfirmationMeta;
+  } = permissionConfirmationMeta;
 
   const permissionType = extractPermissionName(permission.type);
   const context: PermissionConfirmationContext<TPermissionType> = {
@@ -37,6 +40,7 @@ export const permissionConfirmationPageFactory = <
     balance,
     expiry,
     chainId,
+    // TODO: Use the delegation builder to attach the correct caveats specific to the permission type: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
     delegation: convertToDelegationInTransit(
       createRootDelegation(delegate, delegator, []),
     ),
@@ -46,7 +50,9 @@ export const permissionConfirmationPageFactory = <
     'native-token-stream': (
       <NativeTokenStreamConfirmationPage
         siteOrigin={context.siteOrigin}
-        permission={context.permission}
+        permission={
+          context.permission as PermissionTypeMapping['native-token-stream']
+        }
         balance={context.balance}
         expiry={context.expiry}
         chainId={context.chainId}

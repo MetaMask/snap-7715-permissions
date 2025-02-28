@@ -1,5 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { ManageStateOperation } from '@metamask/snaps-sdk';
+import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
+import { ManageStateOperation, SnapError } from '@metamask/snaps-sdk';
 
 export type GatorSnapState = {
   activeInterfaceId: string;
@@ -12,68 +13,67 @@ const defaultState: GatorSnapState = {
   activeInterfaceId: '',
 };
 
-/**
- * Retrieves the current state of the gator snap.
- *
- * @returns The current state of the keyring.
- */
-const getState = async (): Promise<GatorSnapState> => {
-  const state = (await snap.request({
-    method: 'snap_manageState',
-    params: { operation: ManageStateOperation.GetState },
-  })) as any;
+export type StateManager = {
+  /**
+   * Retrieves the current state of the gator snap. .
+   *
+   * @returns The current state of the gator snap..
+   */
+  getState: () => Promise<GatorSnapState>;
 
-  if (!state) {
-    logger.debug(
-      '[SNAP] Initializing state:',
-      JSON.stringify(defaultState, undefined, 2),
-    );
-    return defaultState;
-  }
-
-  return state;
+  /**
+   * Persists the given state.
+   *
+   * @param newState - The new state to set.
+   */
+  setState: (newState: GatorSnapState) => Promise<void>;
 };
 
 /**
- * Retrieves the current state of the InterfaceId.
+ * Creates a state manager for the gator snap.
  *
- * @returns The current state of the InterfaceId.
+ * @param snapsProvider - The snaps provider instance.
+ * @param encrypted - Whether the state should be encrypted.
+ * @returns The state manager instance.
  */
-export const getInterfaceIdState = async (): Promise<string> => {
-  const state = await getState();
-  return state.activeInterfaceId;
-};
+export const createStateManager = (
+  snapsProvider: SnapsProvider,
+  encrypted = true,
+): StateManager => {
+  return {
+    getState: async (): Promise<GatorSnapState> => {
+      try {
+        const state = (await snapsProvider.request({
+          method: 'snap_manageState',
+          params: { operation: ManageStateOperation.GetState },
+        })) as any;
 
-/**
- * Persists the given InterfaceId state to the snap state.
- *
- * @param newActiveInterfaceId - New active InterfaceId state to persist.
- */
-export const saveInterfaceIdState = async (newActiveInterfaceId: string) => {
-  const state = await getState();
-  const newState = {
-    ...state,
-    activeInterfaceId: newActiveInterfaceId,
+        if (!state) {
+          logger.debug(
+            '[SNAP] Initializing state:',
+            JSON.stringify(defaultState, undefined, 2),
+          );
+          return defaultState;
+        }
+
+        return state;
+      } catch (error: any) {
+        throw new SnapError('Failed to get state', error);
+      }
+    },
+    setState: async (newState: GatorSnapState) => {
+      try {
+        await snapsProvider.request({
+          method: 'snap_manageState',
+          params: {
+            operation: ManageStateOperation.UpdateState,
+            newState: newState as unknown as Record<string, Json>,
+            encrypted,
+          },
+        });
+      } catch (error: any) {
+        throw new SnapError('Failed to set state', error);
+      }
+    },
   };
-
-  await snap.request({
-    method: 'snap_manageState',
-    params: {
-      operation: ManageStateOperation.UpdateState,
-      newState,
-    },
-  });
-};
-
-/**
- * Clear the given snap state.
- *
- */
-export const clearState = async () => {
-  await snap.request({
-    method: 'snap_manageState',
-    params: {
-      operation: ManageStateOperation.ClearState,
-    },
-  });
 };
