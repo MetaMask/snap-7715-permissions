@@ -2,32 +2,26 @@ import type {
   PermissionRequest,
   PermissionResponse,
   NativeTokenStreamPermission,
+  NativeTokenTransferPermission,
 } from '@metamask/7715-permissions-shared/types';
 import type { Address, Hex } from 'viem';
 
 /**
  * Supported permission types.
  */
-export type SupportedPermissionTypes = 'native-token-stream';
+export type SupportedPermissionTypes =
+  | 'native-token-stream'
+  | 'native-token-transfer';
 
 /**
- * Mapping of supported permission orchestrators orchestrateFn parameter types.
+ * Mapping of supported permission types to their respective permission types.
  *
  * - In the future, we may want to extend the mapping key to a unique hash to account for permission types that don't have a string literal representation
  * and are defined as `type: { name: z.string(), description: z.string().optional()}`.
  */
-type OrchestrateFnParamsMapping = {
+export type PermissionTypeMapping = {
   'native-token-stream': NativeTokenStreamPermission;
-};
-
-/**
- * Mapping of supported permission orchestrators return types for the permission factory to return the correct orchestrator.
- *
- * - In the future, we may want to extend the mapping key to a unique hash to account for permission types that don't have a string literal representation
- * and are defined as `type: { name: z.string(), description: z.string().optional()}`.
- */
-export type PermissionOrchestratorReturnMapping = {
-  'native-token-stream': Orchestrator<'native-token-stream'>;
+  'native-token-transfer': NativeTokenTransferPermission;
 };
 
 /**
@@ -60,15 +54,10 @@ export type OrchestrateMeta = {
 
 export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   /**
-   * The permission type.
-   */
-  permissionType: TPermissionType;
-
-  /**
    * Validates the base permission request for the permission type.
    *
-   * @param basePermission - The base permission to validate.
-   * @returns True if the base permission is valid otherwise throws an error.
+   * @param basePermissionRequest - The base permission request to validate.
+   * @returns True if the base permission for the permission type is valid otherwise throws an error.
    * @throws If the base permission request is invalid given the permission type.
    */
   validate: (basePermissionRequest: PermissionRequest) => Promise<true>;
@@ -81,7 +70,7 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
    * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
    */
   orchestrate: (
-    permission: OrchestrateFnParamsMapping[TPermissionType],
+    permission: PermissionTypeMapping[TPermissionType],
     orchestrateMeta: OrchestrateMeta,
   ) => Promise<PermissionResponse | null>;
 };

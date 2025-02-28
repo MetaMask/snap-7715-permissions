@@ -1,32 +1,43 @@
-import type {
-  NativeTokenStreamPermission,
-  PermissionRequest,
-} from '@metamask/7715-permissions-shared/types';
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 
-import type { OrchestrateMeta, Orchestrator } from './orchestrator.types';
+import type {
+  OrchestrateMeta,
+  Orchestrator,
+  PermissionTypeMapping,
+  SupportedPermissionTypes,
+} from './orchestrator.types';
 
 /**
- * Factory function for create a native token stream permission orchestrator.
+ * Factory function for create a permission orchestrator for a specific permission type.
  *
  * @param _snapsProvider - A snaps provider instance.
  * @param _accountController - An account controller instance.
  * @returns A permission orchestrator for the native-token-stream permission type.
  */
-export const createNativeTokenStreamPermissionOrchestrator = (
+export const createPermissionOrchestrator = <
+  TPermissionType extends SupportedPermissionTypes,
+>(
   _snapsProvider: SnapsProvider,
   _accountController: unknown,
-): Orchestrator<'native-token-stream'> => {
+): Orchestrator<TPermissionType> => {
+  let passedValidation = false;
   return {
-    permissionType: 'native-token-stream',
     validate: async (_basePermissionRequest: PermissionRequest) => {
       // TODO: Implement Specific permission validator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/38
+      passedValidation = true;
       return true;
     },
     orchestrate: async (
-      _nativeTokenStreamPermission: NativeTokenStreamPermission,
+      _permission: PermissionTypeMapping[TPermissionType],
       _orchestrateMeta: OrchestrateMeta,
     ) => {
+      if (!passedValidation) {
+        throw new Error(
+          'Permission has not been validated, call validate before orchestrate',
+        );
+      }
+
       // TODO: Implement Specific permission orchestrator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/42
       return null;
     },
