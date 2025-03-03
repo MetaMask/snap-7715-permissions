@@ -1,12 +1,12 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 
-import type { SupportedPermissionTypes } from '../../orchestrators/orchestrator.types';
+import type { SupportedPermissionTypes } from '../../orchestrators';
 import type { StateManager } from '../../stateManagement';
-import { permissionConfirmationPageFactory } from '../ui.factory';
+import { permissionConfirmationPageFactory } from '../confirmationFactory';
 import type {
   PermissionConfirmationContext,
   PermissionConfirmationMeta,
-} from '../ui.types';
+} from '../types';
 
 export type PermissionConfirmationRenderHandler<
   TPermissionType extends SupportedPermissionTypes,

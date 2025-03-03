@@ -6,7 +6,7 @@ import type { Hex } from 'viem';
 import type {
   PermissionTypeMapping,
   SupportedPermissionTypes,
-} from '../orchestrators/orchestrator.types';
+} from '../orchestrators';
 
 /**
  * The delegation in transit object with salt as a hex string to be compatible with the Snap context { [prop: string]: Json; } object.

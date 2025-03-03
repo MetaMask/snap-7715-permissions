@@ -1,6 +1,6 @@
 import { createRootDelegation } from '@metamask-private/delegator-core-viem';
-import type { MockSnapRequest } from '@metamask/7715-permissions-shared/test';
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/test';
+import type { MockSnapRequest } from '@metamask/7715-permissions-shared/testing';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';

@@ -1,7 +1,7 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box, Button } from '@metamask/snaps-sdk/jsx';
 
-import { NEXT_BUTTON, PREVIOUS_BUTTON } from '../user-input.contant';
+import { NEXT_BUTTON, PREVIOUS_BUTTON } from '../userInputContant';
 
 type PaginationProps = {
   isFirst: boolean;

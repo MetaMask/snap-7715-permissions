@@ -12,7 +12,7 @@
     ".": "./src/index.ts",
     "./utils": "./src/utils/index.ts",
     "./types": "./src/types/index.ts",
-    "./test": "./test/__mocks__/index.ts"
+    "./testing": "./test/__mocks__/index.ts"
   },
   "main": "./src",
   "types": "./src",

@@ -12,9 +12,8 @@ import { convertToDelegationStruct } from '../utils';
 import type {
   OrchestrateMeta,
   Orchestrator,
-  PermissionTypeMapping,
   SupportedPermissionTypes,
-} from './orchestrator.types';
+} from './types';
 
 /**
  * Prepare the account details for the permission picker UI.
@@ -61,23 +60,13 @@ export const createPermissionOrchestrator = <
   accountController: MockAccountController,
   permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler<TPermissionType>,
 ): Orchestrator<TPermissionType> => {
-  let passedValidation = false;
   return {
-    validate: async (_basePermissionRequest: PermissionRequest) => {
+    validate: async (_basePermission: PermissionRequest) => {
       // TODO: Implement Specific permission validator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/38
-      passedValidation = true;
       return true;
     },
-    orchestrate: async (
-      permission: PermissionTypeMapping[TPermissionType],
-      orchestrateMeta: OrchestrateMeta,
-    ) => {
-      if (!passedValidation) {
-        throw new Error(
-          'Permission has not been validated, call validate before orchestrate',
-        );
-      }
-      const { chainId, delegate, origin, expiry } = orchestrateMeta;
+    orchestrate: async (orchestrateMeta: OrchestrateMeta<TPermissionType>) => {
+      const { chainId, delegate, origin, expiry, permission } = orchestrateMeta;
       const chainIdNum = fromHex(chainId, 'number');
 
       // Get the user account details

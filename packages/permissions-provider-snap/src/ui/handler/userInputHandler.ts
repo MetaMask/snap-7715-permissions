@@ -2,7 +2,7 @@ import type { UserInputEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import { createStateManager } from '../../stateManagement';
-import { CANCEL_BUTTON, GRANT_BUTTON } from '../user-input.contant';
+import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputContant';
 
 /**
  * Get the active interface context.

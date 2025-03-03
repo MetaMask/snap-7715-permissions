@@ -1,1 +1,1 @@
-export * from './native-token-confirmation';
+export * from './nativeTokenConfirmation';

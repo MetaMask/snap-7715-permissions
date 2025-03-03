@@ -11,7 +11,7 @@ import { NativeTokenStreamConfirmationPage } from './confirmations';
 import type {
   PermissionConfirmationContext,
   PermissionConfirmationMeta,
-} from './ui.types';
+} from './types';
 
 /**
  * Factory function for creating a permission confirmation page for a specific permission type.

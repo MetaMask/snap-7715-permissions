@@ -2,7 +2,7 @@ import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box, Container, Divider } from '@metamask/snaps-sdk/jsx';
 
 import { ConfirmationFooter, Header, RequestDetails } from '../components';
-import type { PermissionConfirmationProps } from '../ui.types';
+import type { PermissionConfirmationProps } from '../types';
 
 /**
  * The native-token-stream permission confirmation page.

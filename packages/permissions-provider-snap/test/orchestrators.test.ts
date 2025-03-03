@@ -62,12 +62,16 @@ describe('Orchestrators', () => {
       expect(orchestrator.orchestrate).toBeInstanceOf(Function);
     });
 
-    it('should orchestrate after passing validation and return valid 7715 response', async () => {
+    it('should orchestrate', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockAccountController,
         mockPermissionConfirmationRenderHandler,
       );
-      const orchestrateMeta: OrchestrateMeta = {
+      const permissionTypeAsserted =
+        mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
+
+      const orchestrateMeta: OrchestrateMeta<typeof mockPermissionType> = {
+        permission: permissionTypeAsserted,
         chainId: mockPartialPermissionRequest.chainId,
         delegate: mockPartialPermissionRequest.signer.data.address,
         origin: 'http://localhost:3000',
@@ -80,8 +84,6 @@ describe('Orchestrators', () => {
         mockAccountController,
         chainId,
       );
-      const permissionTypeAsserted =
-        mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
 
       mockPermissionConfirmationRenderHandler.renderPermissionConfirmation.mockResolvedValueOnce(
         {
@@ -104,10 +106,7 @@ describe('Orchestrators', () => {
       await orchestrator.validate(mockPartialPermissionRequest);
 
       // then orchestrate
-      const res = await orchestrator.orchestrate(
-        permissionTypeAsserted,
-        orchestrateMeta,
-      );
+      const res = await orchestrator.orchestrate(orchestrateMeta);
 
       expect(res).toStrictEqual({
         account: '0x1234567890123456789012345678901234567890',
@@ -131,27 +130,6 @@ describe('Orchestrators', () => {
         },
         signerMeta: { delegationManager: '0x000000_delegation_manager' },
       });
-    });
-
-    it('should throw error if trying to orchestrate before passing validation', async () => {
-      const orchestrator = createPermissionOrchestrator(
-        mockAccountController,
-        mockPermissionConfirmationRenderHandler,
-      );
-
-      const permissionTypeAsserted =
-        mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
-
-      await expect(
-        orchestrator.orchestrate(permissionTypeAsserted, {
-          chainId: mockPartialPermissionRequest.chainId,
-          delegate: mockPartialPermissionRequest.signer.data.address,
-          origin: 'http://localhost:3000',
-          expiry: 1,
-        }),
-      ).rejects.toThrow(
-        'Permission has not been validated, call validate before orchestrate',
-      );
     });
   });
 });

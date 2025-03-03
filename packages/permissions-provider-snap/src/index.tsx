@@ -94,7 +94,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         const permission =
           firstRequest.permission as PermissionTypeMapping[typeof permissionType];
 
-        const res = await orchestrator.orchestrate(permission, {
+        const res = await orchestrator.orchestrate({
+          permission,
           chainId: firstRequest.chainId,
           delegate: firstRequest.signer.data.address,
           origin: siteOrigin,

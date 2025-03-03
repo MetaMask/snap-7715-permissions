@@ -1,2 +1,2 @@
-export * from './render-handler';
-export * from './user-input-handler';
+export * from './renderHandler';
+export * from './userInputHandler';

@@ -1,3 +1,3 @@
-export * from './ui.factory';
+export * from './confirmationFactory';
 export * from './handler';
-export * from './ui.types';
+export * from './types';

@@ -1,7 +1,7 @@
 import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
 import { toHex } from 'viem';
 
-import type { DelegationInTransit } from '../ui/ui.types';
+import type { DelegationInTransit } from '../ui/types';
 
 /**
  * Converts a delegation struct object to a delegation in transit object.

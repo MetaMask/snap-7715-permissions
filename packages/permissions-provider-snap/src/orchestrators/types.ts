@@ -27,30 +27,33 @@ export type PermissionTypeMapping = {
 /**
  * Metadata required for orchestrating a permission.
  */
-export type OrchestrateMeta = {
-  /**
-   * The chain id of the permission in hex format.
-   *
-   */
-  chainId: Hex;
+export type OrchestrateMeta<TPermissionType extends SupportedPermissionTypes> =
+  {
+    permission: PermissionTypeMapping[TPermissionType];
 
-  /**
-   * The address of the delegate that will be granted the permission(ie. the dapp's session account address).
-   */
-  delegate: Address;
+    /**
+     * The chain id of the permission in hex format.
+     *
+     */
+    chainId: Hex;
 
-  /**
-   * The origin of the permission request(ie. the dapp's origin).
-   */
-  origin: string;
+    /**
+     * The address of the delegate that will be granted the permission(ie. the dapp's session account address).
+     */
+    delegate: Address;
 
-  /**
-   * unix timestamp in seconds when the granted permission is set to expire.
-   *
-   * @example Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
-   */
-  expiry: number;
-};
+    /**
+     * The origin of the permission request(ie. the dapp's origin).
+     */
+    origin: string;
+
+    /**
+     * unix timestamp in seconds when the granted permission is set to expire.
+     *
+     * @example Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
+     */
+    expiry: number;
+  };
 
 export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   /**
@@ -70,7 +73,6 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
    * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
    */
   orchestrate: (
-    permission: PermissionTypeMapping[TPermissionType],
-    orchestrateMeta: OrchestrateMeta,
+    orchestrateMeta: OrchestrateMeta<TPermissionType>,
   ) => Promise<PermissionResponse | null>;
 };
