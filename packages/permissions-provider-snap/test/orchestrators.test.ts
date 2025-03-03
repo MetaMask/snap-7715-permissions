@@ -1,4 +1,4 @@
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/test';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
@@ -51,7 +51,7 @@ describe('Orchestrators', () => {
       expect(orchestrator.orchestrate).toBeInstanceOf(Function);
     });
 
-    it('should orchestrate after passing validation', async () => {
+    it('should orchestrate', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
@@ -62,7 +62,8 @@ describe('Orchestrators', () => {
       const permissionTypeAsserted =
         mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
 
-      const res = await orchestrator.orchestrate(permissionTypeAsserted, {
+      const res = await orchestrator.orchestrate({
+        permission: permissionTypeAsserted,
         chainId: mockPartialPermissionRequest.chainId,
         delegate: mockPartialPermissionRequest.signer.data.address,
         origin: 'http://localhost:3000',
@@ -70,27 +71,6 @@ describe('Orchestrators', () => {
       });
 
       expect(res).toBeNull();
-    });
-
-    it('should throw error if trying to orchestrate before passing validation', async () => {
-      const orchestrator = createPermissionOrchestrator(
-        mockSnapProvider,
-        mockAccountController,
-      );
-
-      const permissionTypeAsserted =
-        mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
-
-      await expect(
-        orchestrator.orchestrate(permissionTypeAsserted, {
-          chainId: mockPartialPermissionRequest.chainId,
-          delegate: mockPartialPermissionRequest.signer.data.address,
-          origin: 'http://localhost:3000',
-          expiry: 1,
-        }),
-      ).rejects.toThrow(
-        'Permission has not been validated, call validate before orchestrate',
-      );
     });
   });
 });

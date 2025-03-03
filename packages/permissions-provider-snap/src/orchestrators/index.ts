@@ -1,2 +1,2 @@
-export * from './orchestrator.types';
+export * from './types';
 export * from './orchestrators';

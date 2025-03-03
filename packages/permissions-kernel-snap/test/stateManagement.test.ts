@@ -1,6 +1,6 @@
 import { expect } from '@jest/globals';
-import type { MockSnapRequest } from '@metamask/7715-permissions-shared/test';
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/test';
+import type { MockSnapRequest } from '@metamask/7715-permissions-shared/testing';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { RegisteredPermissionOffer } from '@metamask/7715-permissions-shared/types';
 
 import type { KernelState } from '../src/stateManagement';
