@@ -14,7 +14,14 @@ import type {
   Orchestrator,
   PermissionTypeMapping,
   SupportedPermissionTypes,
-} from './orchestrator.types';
+} from './types';
+
+/**
+ * Maps permission types to their corresponding Zod object validators.
+ */
+const zodObjectMapper = {
+  'native-token-stream': zNativeTokenStreamPermission,
+};
 
 /**
  * Parses a permission request and returns the permission object.
@@ -27,10 +34,6 @@ import type {
 const parsePermission = <TPermissionType extends SupportedPermissionTypes>(
   basePermissionRequest: PermissionRequest,
 ): PermissionTypeMapping[TPermissionType] => {
-  const zodObjectMapper = {
-    'native-token-stream': zNativeTokenStreamPermission,
-  };
-
   const permissionType = extractPermissionName(
     basePermissionRequest.permission.type,
   ) as keyof typeof zodObjectMapper;
@@ -79,24 +82,12 @@ export const createPermissionOrchestrator = <
   _snapsProvider: SnapsProvider,
   _accountController: unknown,
 ): Orchestrator<TPermissionType> => {
-  let passedValidation = false;
   return {
     validate: async (basePermissionRequest: PermissionRequest) => {
-      passedValidation = validatePermissionData(
-        parsePermission(basePermissionRequest),
-      );
-      return passedValidation;
+      validatePermissionData(parsePermission(basePermissionRequest));
+      return true;
     },
-    orchestrate: async (
-      _permission: PermissionTypeMapping[TPermissionType],
-      _orchestrateMeta: OrchestrateMeta,
-    ) => {
-      if (!passedValidation) {
-        throw new Error(
-          'Permission has not been validated, call validate before orchestrate',
-        );
-      }
-
+    orchestrate: async (_orchestrateMeta: OrchestrateMeta<TPermissionType>) => {
       // TODO: Implement Specific permission orchestrator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/42
       return null;
     },

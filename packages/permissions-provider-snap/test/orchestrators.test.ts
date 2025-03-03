@@ -1,4 +1,4 @@
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/test';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
@@ -51,7 +51,7 @@ describe('Orchestrators', () => {
       expect(orchestrator.orchestrate).toBeInstanceOf(Function);
     });
 
-    it('should orchestrate after passing validation', async () => {
+    it('should orchestrate', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
@@ -62,7 +62,8 @@ describe('Orchestrators', () => {
       const permissionTypeAsserted =
         mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
 
-      const res = await orchestrator.orchestrate(permissionTypeAsserted, {
+      const res = await orchestrator.orchestrate({
+        permission: permissionTypeAsserted,
         chainId: mockPartialPermissionRequest.chainId,
         delegate: mockPartialPermissionRequest.signer.data.address,
         origin: 'http://localhost:3000',
@@ -72,24 +73,49 @@ describe('Orchestrators', () => {
       expect(res).toBeNull();
     });
 
-    it('should throw error if trying to orchestrate before passing validation', async () => {
+    it('should return true when validate called with valid permission that is supported', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
       );
 
-      const permissionTypeAsserted =
-        mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
+      const res = await orchestrator.validate(mockPartialPermissionRequest);
+
+      expect(res).toBe(true);
+    });
+
+    it('should throw error when validate called with permission type that is not supported', async () => {
+      const orchestrator = createPermissionOrchestrator(
+        mockSnapProvider,
+        mockAccountController,
+      );
 
       await expect(
-        orchestrator.orchestrate(permissionTypeAsserted, {
-          chainId: mockPartialPermissionRequest.chainId,
-          delegate: mockPartialPermissionRequest.signer.data.address,
-          origin: 'http://localhost:3000',
-          expiry: 1,
+        orchestrator.validate({
+          ...mockPartialPermissionRequest,
+          permission: {
+            ...mockPartialPermissionRequest.permission,
+            type: 'unsupported-permission-type',
+          },
         }),
       ).rejects.toThrow(
-        'Permission has not been validated, call validate before orchestrate',
+        `Validation for Permission type unsupported-permission-type is not supported`,
+      );
+    });
+
+    it('should throw error when validate called with permission that is not valid', async () => {
+      const orchestrator = createPermissionOrchestrator(
+        mockSnapProvider,
+        mockAccountController,
+      );
+
+      await expect(
+        orchestrator.validate({
+          ...mockPartialPermissionRequest,
+          permission: {},
+        } as any),
+      ).rejects.toThrow(
+        'Validation for Permission type undefined is not supported',
       );
     });
   });
