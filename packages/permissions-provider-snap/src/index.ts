@@ -9,7 +9,7 @@ import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
-import { RpcHandler } from './rpc/rpcHandler';
+import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 
 // set up dependencies
@@ -22,7 +22,7 @@ const accountController = new AccountController({
 // todo instantiate actual OrchestratorFactory
 const orchestratorFactory = {};
 
-const rpcHandler = new RpcHandler({
+const rpcHandler = createRpcHandler({
   accountController,
   orchestratorFactory,
   snapsProvider: snap,
@@ -32,7 +32,6 @@ const rpcHandler = new RpcHandler({
 const boundRpcHandlers: {
   [RpcMethod: string]: (params?: JsonRpcParams) => Promise<Json>;
 } = {
-  [RpcMethod.Ping]: rpcHandler.ping.bind(rpcHandler),
   [RpcMethod.PermissionProviderGrantAttenuatedPermissions]:
     rpcHandler.grantPermission.bind(rpcHandler),
 };

@@ -2,7 +2,7 @@ import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 
 import type { AccountControllerInterface } from '../../src/accountController';
-import { RpcHandler } from '../../src/rpc/rpcHandler';
+import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 
 describe('RpcHandler', () => {
   let handler: RpcHandler;
@@ -21,7 +21,7 @@ describe('RpcHandler', () => {
     mockAccountController.getAccountMetadata.mockClear();
     mockAccountController.getAccountBalance.mockClear();
 
-    handler = new RpcHandler({
+    handler = createRpcHandler({
       accountController: mockAccountController,
       orchestratorFactory: {},
       snapsProvider: mockSnapsProvider,
@@ -30,11 +30,5 @@ describe('RpcHandler', () => {
 
   it('should be defined', () => {
     expect(handler).toBeDefined();
-  });
-
-  it('should pong', async () => {
-    const result = await handler.ping();
-
-    expect(result).toBe('pong');
   });
 });

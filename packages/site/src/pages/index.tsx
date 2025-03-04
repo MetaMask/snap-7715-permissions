@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { toHex } from 'viem';
-import { sepolia } from 'viem/chains';
 
 import {
   ConnectButton,
@@ -146,7 +144,7 @@ const Index = () => {
   const handleGrantPermissions = async () => {
     const permissionsRequests = [
       {
-        chainId: toHex(sepolia.id),
+        chainId: '0x1',
         expiry: 1,
         signer: {
           type: 'account',
@@ -173,7 +171,7 @@ const Index = () => {
   const handleGrantPermissionsMulti = async () => {
     const permissionsRequests = [
       {
-        chainId: toHex(sepolia.id),
+        chainId: '0x1',
         expiry: 1,
         signer: {
           type: 'account',
@@ -190,7 +188,7 @@ const Index = () => {
         },
       },
       {
-        chainId: toHex(sepolia.id),
+        chainId: '0x1',
         expiry: 1,
         signer: {
           type: 'account',
@@ -208,7 +206,7 @@ const Index = () => {
         },
       },
       {
-        chainId: toHex(sepolia.id),
+        chainId: '0x1',
         expiry: 1,
         signer: {
           type: 'account',
@@ -236,7 +234,7 @@ const Index = () => {
   const handleGrantPermissionsNoOffer = async () => {
     const permissionsRequests = [
       {
-        chainId: toHex(sepolia.id),
+        chainId: '0x1',
         expiry: 1,
         signer: {
           type: 'account',
