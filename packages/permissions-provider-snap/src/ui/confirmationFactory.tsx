@@ -1,12 +1,12 @@
 import { createRootDelegation } from '@metamask-private/delegator-core-viem';
-import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { ComponentOrElement } from '@metamask/snaps-sdk';
 
-import type {
-  PermissionTypeMapping,
-  SupportedPermissionTypes,
+import type { PermissionCaseHandler } from '../orchestrators';
+import {
+  type PermissionTypeMapping,
+  type SupportedPermissionTypes,
 } from '../orchestrators';
-import { convertToDelegationInTransit } from '../utils';
+import { convertToDelegationInTransit, handlePermissionCase } from '../utils';
 import { NativeTokenStreamConfirmationPage } from './confirmations';
 import type {
   PermissionConfirmationContext,
@@ -33,7 +33,6 @@ export const permissionConfirmationPageFactory = <
     chainId,
   } = permissionConfirmationMeta;
 
-  const permissionType = extractPermissionName(permission.type);
   const context: PermissionConfirmationContext<TPermissionType> = {
     permission,
     siteOrigin,
@@ -46,24 +45,30 @@ export const permissionConfirmationPageFactory = <
     ),
   };
 
-  const confirmationScreens: Record<string, ComponentOrElement> = {
-    'native-token-stream': (
+  const caseHandlers: PermissionCaseHandler<
+    TPermissionType,
+    ComponentOrElement
+  > = {
+    'native-token-stream': (per) => (
       <NativeTokenStreamConfirmationPage
         siteOrigin={context.siteOrigin}
-        permission={
-          context.permission as PermissionTypeMapping['native-token-stream']
-        }
+        permission={per as PermissionTypeMapping['native-token-stream']}
         balance={context.balance}
         expiry={context.expiry}
         chainId={context.chainId}
         delegation={context.delegation}
       />
     ),
+    'native-token-transfer': (_per) => {
+      throw new Error('Permission confirmation screen not found');
+    },
   };
 
-  const confirmationScreen = confirmationScreens[permissionType];
-  if (!confirmationScreen) {
-    throw new Error('Permission confirmation screen not found');
-  }
+  const confirmationScreen = handlePermissionCase(
+    permission,
+    caseHandlers,
+    'Permission confirmation screen not found',
+  );
+
   return [context, confirmationScreen];
 };

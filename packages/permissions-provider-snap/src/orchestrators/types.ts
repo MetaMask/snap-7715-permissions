@@ -76,3 +76,15 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
     orchestrateMeta: OrchestrateMeta<TPermissionType>,
   ) => Promise<PermissionResponse | null>;
 };
+
+/**
+ * A case handler for handling permission types.
+ */
+export type PermissionCaseHandler<
+  TPermissionType extends SupportedPermissionTypes,
+  TReturnType,
+> = {
+  [K in SupportedPermissionTypes]: (
+    permission: PermissionTypeMapping[TPermissionType],
+  ) => TReturnType;
+};
