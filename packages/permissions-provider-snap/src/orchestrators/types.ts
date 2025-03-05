@@ -1,10 +1,21 @@
 import type {
-  PermissionRequest,
   PermissionResponse,
   NativeTokenStreamPermission,
   NativeTokenTransferPermission,
+  Permission,
 } from '@metamask/7715-permissions-shared/types';
-import type { Address, Hex } from 'viem';
+import type { Address, Hex, OneOf } from 'viem';
+
+export type OrchestrateResult = OneOf<
+  | {
+      success: true;
+      response: PermissionResponse;
+    }
+  | {
+      success: false;
+      reason: string;
+    }
+>;
 
 /**
  * Supported permission types.
@@ -59,12 +70,12 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   /**
    * Validates the base permission request for the permission type.
    *
-   * @param basePermissionRequest - The base permission request to validate.
+   * @param basePermission - The base permission to validate.
    * @returns The parsed and validated permission.
    * @throws If the base permission request is invalid given the permission type.
    */
   parseAndValidate: (
-    basePermissionRequest: PermissionRequest,
+    basePermission: Permission,
   ) => Promise<PermissionTypeMapping[TPermissionType]>;
 
   /**
@@ -76,7 +87,7 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
    */
   orchestrate: (
     orchestrateMeta: OrchestrateMeta<TPermissionType>,
-  ) => Promise<PermissionResponse | null>;
+  ) => Promise<OrchestrateResult>;
 };
 
 /**

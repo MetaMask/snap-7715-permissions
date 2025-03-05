@@ -1,5 +1,5 @@
 import { createRootDelegation } from '@metamask-private/delegator-core-viem';
-import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import { getAddress } from 'viem';
 
@@ -25,25 +25,16 @@ describe('Orchestrators', () => {
   });
 
   describe('native-token-stream Orchestrator', () => {
-    const mockPartialPermissionRequest: PermissionRequest = {
-      chainId: '0xaa36a7', // Sepolia
-      expiry: 1,
-      signer: {
-        type: 'account',
-        data: {
-          address: getAddress('0x016562aA41A8697720ce0943F003141f5dEAe006'),
-        },
-      },
-      permission: {
-        type: 'native-token-stream',
-        data: {
-          justification: 'shh...permission 2',
-        },
+    const mockbasePermission: Permission = {
+      type: 'native-token-stream',
+      data: {
+        justification: 'shh...permission 2',
       },
     };
     const mockPermissionType = extractPermissionName(
-      mockPartialPermissionRequest.permission.type,
+      mockbasePermission.type,
     ) as SupportedPermissionTypes;
+
     const mockPermissionConfirmationRenderHandler = {
       getConfirmedAttenuatedPermission: jest.fn(),
       getPermissionConfirmationPage: jest.fn(),
@@ -58,7 +49,7 @@ describe('Orchestrators', () => {
       typeof mockPermissionType
     > = {
       permission:
-        mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType],
+        mockbasePermission as PermissionTypeMapping[typeof mockPermissionType],
       delegator,
       delegate,
       siteOrigin: 'http://localhost:3000',
@@ -93,19 +84,19 @@ describe('Orchestrators', () => {
       expect(orchestrator.orchestrate).toBeInstanceOf(Function);
     });
 
-    it('should orchestrate and return a valide 7715 response', async () => {
+    it('should orchestrate and return a successfuly 7715 response when user confirms', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockAccountController,
         mockPermissionConfirmationRenderHandler,
         mockPermissionType,
       );
       const permissionTypeAsserted =
-        mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
+        mockbasePermission as PermissionTypeMapping[typeof mockPermissionType];
 
       const orchestrateMeta: OrchestrateMeta<typeof mockPermissionType> = {
         permission: permissionTypeAsserted,
-        chainId: mockPartialPermissionRequest.chainId,
-        delegate: mockPartialPermissionRequest.signer.data.address,
+        chainId: '0xaa36a7',
+        delegate: '0x016562aA41A8697720ce0943F003141f5dEAe006',
         origin: 'http://localhost:3000',
         expiry: 1,
       };
@@ -126,32 +117,79 @@ describe('Orchestrators', () => {
       );
 
       // first validate the permission
-      await orchestrator.parseAndValidate(mockPartialPermissionRequest);
+      await orchestrator.parseAndValidate(mockbasePermission);
 
       // then orchestrate
       const res = await orchestrator.orchestrate(orchestrateMeta);
 
       expect(res).toStrictEqual({
-        account: '0x1234567890123456789012345678901234567890',
-        accountMeta: [
-          {
-            factory: '0x1234567890123456789012345678901234567890',
-            factoryData: '0x000000000000000000000000000000_factory_data',
+        success: true,
+        response: {
+          account: '0x1234567890123456789012345678901234567890',
+          accountMeta: [
+            {
+              factory: '0x1234567890123456789012345678901234567890',
+              factoryData: '0x000000000000000000000000000000_factory_data',
+            },
+          ],
+          chainId: '0xaa36a7',
+          context:
+            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000016562aa41a8697720ce0943f003141f5deae009000000000000000000000000016562aa41a8697720ce0943f003141f5deae008ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000_SIGNED_DELEGATION00000000000000000000000000000000',
+          expiry: 1,
+          permission: {
+            data: { justification: 'shh...permission 2' },
+            type: 'native-token-stream',
           },
-        ],
+          signer: {
+            data: { address: '0x016562aA41A8697720ce0943F003141f5dEAe006' },
+            type: 'account',
+          },
+          signerMeta: { delegationManager: '0x000000_delegation_manager' },
+        },
+      });
+    });
+
+    it('should orchestrate and return a unsuccessfuly 7715 response when user rejects', async () => {
+      const orchestrator = createPermissionOrchestrator(
+        mockAccountController,
+        mockPermissionConfirmationRenderHandler,
+        mockPermissionType,
+      );
+      const permissionTypeAsserted =
+        mockbasePermission as PermissionTypeMapping[typeof mockPermissionType];
+
+      const orchestrateMeta: OrchestrateMeta<typeof mockPermissionType> = {
+        permission: permissionTypeAsserted,
         chainId: '0xaa36a7',
-        context:
-          '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000016562aa41a8697720ce0943f003141f5deae009000000000000000000000000016562aa41a8697720ce0943f003141f5deae008ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000_SIGNED_DELEGATION00000000000000000000000000000000',
+        delegate: '0x016562aA41A8697720ce0943F003141f5dEAe006',
+        origin: 'http://localhost:3000',
         expiry: 1,
-        permission: {
-          data: { justification: 'shh...permission 2' },
-          type: 'native-token-stream',
+      };
+
+      // prepare mock permission confirmation page
+      mockPermissionConfirmationRenderHandler.getPermissionConfirmationPage.mockReturnValueOnce(
+        [mockAttenuatedContext, mockPage],
+      );
+
+      // prepare mock user confirmation context
+      mockPermissionConfirmationRenderHandler.getConfirmedAttenuatedPermission.mockResolvedValueOnce(
+        {
+          isConfirmed: false,
+          attenuatedDelegation: mockAttenuatedContext.delegation,
+          attenuatedExpiry: mockAttenuatedContext.expiry,
+          attenuatedPermission: mockAttenuatedContext.permission,
         },
-        signer: {
-          data: { address: '0x016562aA41A8697720ce0943F003141f5dEAe006' },
-          type: 'account',
-        },
-        signerMeta: { delegationManager: '0x000000_delegation_manager' },
+      );
+
+      // first validate the permission
+      await orchestrator.parseAndValidate(mockbasePermission);
+
+      // then orchestrate
+      const res = await orchestrator.orchestrate(orchestrateMeta);
+
+      expect(res).toStrictEqual({
+        success: false,
+        reason: 'User rejected the permissions request',
       });
     });
   });

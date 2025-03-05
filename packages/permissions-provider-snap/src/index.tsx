@@ -89,7 +89,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           confirmationRenderHandler,
           permissionType,
         );
-        const permission = await orchestrator.parseAndValidate(firstRequest);
+        const permission = await orchestrator.parseAndValidate(
+          firstRequest.permission,
+        );
 
         const res = await orchestrator.orchestrate({
           permission,
@@ -99,7 +101,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           expiry: firstRequest.expiry,
         });
 
-        return [res] as Json[];
+        if (!res.success) {
+          throw new Error(res.reason);
+        }
+
+        return [res.response] as Json[];
       } catch (error: any) {
         let snapError = error;
 

@@ -2,10 +2,7 @@ import {
   createRootDelegation,
   encodeDelegation,
 } from '@metamask-private/delegator-core-viem';
-import type {
-  PermissionRequest,
-  PermissionResponse,
-} from '@metamask/7715-permissions-shared/types';
+import type { Permission } from '@metamask/7715-permissions-shared/types';
 import type { Hex } from 'viem';
 import { fromHex } from 'viem';
 
@@ -17,6 +14,7 @@ import {
 } from '../utils';
 import type {
   OrchestrateMeta,
+  OrchestrateResult,
   Orchestrator,
   PermissionTypeMapping,
   SupportedPermissionTypes,
@@ -58,9 +56,9 @@ export const createPermissionOrchestrator = <
   permissionType: TPermissionType,
 ): Orchestrator<TPermissionType> => {
   return {
-    parseAndValidate: async (basePermission: PermissionRequest) => {
+    parseAndValidate: async (basePermission: Permission) => {
       // TODO: Implement Specific permission validator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/38
-      return basePermission.permission as PermissionTypeMapping[typeof permissionType];
+      return basePermission as PermissionTypeMapping[typeof permissionType];
     },
     orchestrate: async (orchestrateMeta: OrchestrateMeta<TPermissionType>) => {
       const { chainId, delegate, origin, expiry, permission } = orchestrateMeta;
@@ -107,7 +105,10 @@ export const createPermissionOrchestrator = <
         );
 
       if (!isConfirmed) {
-        throw new Error('User rejected the permissions request');
+        return {
+          success: false,
+          reason: 'User rejected the permissions request',
+        };
       }
 
       // TODO: Pass this to the delegation builder to sign and build the permission context
@@ -123,25 +124,28 @@ export const createPermissionOrchestrator = <
       });
 
       return {
-        chainId,
-        account: delegator,
-        expiry: attenuatedExpiry,
-        signer: {
-          type: 'account',
-          data: {
-            address: delegate,
+        success: true,
+        response: {
+          chainId,
+          account: delegator,
+          expiry: attenuatedExpiry,
+          signer: {
+            type: 'account',
+            data: {
+              address: delegate,
+            },
+          },
+          permission: attenuatedPermission,
+          context: permissionContext,
+          accountMeta:
+            accountMeta.factory && accountMeta.factoryData
+              ? [accountMeta]
+              : undefined,
+          signerMeta: {
+            delegationManager: '0x000000_delegation_manager', // TODO: Update to use actual values instead of mock values
           },
         },
-        permission: attenuatedPermission,
-        context: permissionContext,
-        accountMeta:
-          accountMeta.factory && accountMeta.factoryData
-            ? [accountMeta]
-            : undefined,
-        signerMeta: {
-          delegationManager: '0x000000_delegation_manager', // TODO: Update to use actual values instead of mock values
-        },
-      } as PermissionResponse;
+      } as OrchestrateResult;
     },
   };
 };
