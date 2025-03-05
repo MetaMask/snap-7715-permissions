@@ -2,19 +2,59 @@ import { createRootDelegation } from '@metamask-private/delegator-core-viem';
 import type { MockSnapRequest } from '@metamask/7715-permissions-shared/testing';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
+import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
 import type {
-  PermissionConfirmationContext,
-  PermissionConfirmationMeta,
-} from '../src/ui';
+  PermissionTypeMapping,
+  SupportedPermissionTypes,
+} from '../src/orchestrators';
+import type { PermissionConfirmationContext } from '../src/ui';
 import { createPermissionConfirmationRenderHandler } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { convertToSerializableDelegation } from '../src/utils';
 
 describe('Permission Confirmation Render Handler', () => {
   let mockSnapProvider: SnapsProvider;
+  const delegator = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
+  const delegate = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe009');
+  const mockDelegation = convertToSerializableDelegation(
+    createRootDelegation(delegate, delegator, []),
+  );
+  const permission: NativeTokenStreamPermission = {
+    type: 'native-token-stream',
+    data: {
+      justification: 'shh...permission 2',
+    },
+  };
+  const mockPermissionType = extractPermissionName(
+    permission.type,
+  ) as SupportedPermissionTypes;
+  const mockContext: PermissionConfirmationContext<typeof mockPermissionType> =
+    {
+      permission,
+      delegator,
+      delegate,
+      siteOrigin: 'http://localhost:3000',
+      balance: '0x1',
+      expiry: 1,
+      chainId: 11155111,
+      delegation: mockDelegation,
+    };
+
+  const mockPage = (
+    <NativeTokenStreamConfirmationPage
+      siteOrigin={mockContext.siteOrigin}
+      permission={
+        mockContext.permission as PermissionTypeMapping['native-token-stream']
+      }
+      balance={mockContext.balance}
+      expiry={mockContext.expiry}
+      chainId={mockContext.chainId}
+      delegation={mockDelegation}
+    />
+  );
 
   beforeEach(() => {
     mockSnapProvider = createMockSnapsProvider();
@@ -22,70 +62,36 @@ describe('Permission Confirmation Render Handler', () => {
     jest.clearAllMocks();
   });
 
-  describe('renderPermissionConfirmation - native-token-stream', () => {
-    const permission: NativeTokenStreamPermission = {
-      type: 'native-token-stream',
-      data: {
-        justification: 'shh...permission 2',
-      },
-    };
-    const delegator = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
-    const delegate = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe009');
-    const mockDelegation = convertToSerializableDelegation(
-      createRootDelegation(delegate, delegator, []),
-    );
-    const mockConfirmationMeta: PermissionConfirmationMeta<'native-token-stream'> =
-      {
-        permission,
-        delegator,
-        delegate,
-        siteOrigin: 'http://localhost:3000',
-        balance: '0x1',
-        expiry: 1,
-        chainId: 11155111,
-      };
-
-    it('should render the confirmation screen and return context after user confirms', async () => {
+  describe('getConfirmedAttenuatedPermission - native-token-stream', () => {
+    it('should render the confirmation screen and return attenuated results after user confirms', async () => {
       const permissionConfirmationRenderHandler =
         createPermissionConfirmationRenderHandler(mockSnapProvider);
-
-      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
-        {
-          permission,
-          siteOrigin: 'http://localhost:3000',
-          balance: '0x1',
-          expiry: 1,
-          chainId: 11155111,
-          delegation: mockDelegation,
-        };
 
       // mock the snap dialog user interaction
       const mockInterfaceId = 'mockInterfaceId';
       (mockSnapProvider.request as MockSnapRequest)
         .mockResolvedValueOnce(mockInterfaceId) // mock snap_createInterface
-        .mockResolvedValueOnce(mockAttenuatedContext); // mock snap_dialog
+        .mockResolvedValueOnce({
+          attenuatedPermission: mockContext.permission,
+          attenuatedDelegation: mockContext.delegation,
+          attenuatedExpiry: mockContext.expiry,
+          isConfirmed: true,
+        }); // mock snap_dialog resolves with type AttenuatedResponse
 
       // render the permission confirmation page
-      const attenuatedContextRes =
-        await permissionConfirmationRenderHandler.renderPermissionConfirmation(
-          mockConfirmationMeta,
+      const attenuatedRes =
+        await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
+          mockContext,
+          mockPage,
+          mockPermissionType,
         );
 
       expect(mockSnapProvider.request).toHaveBeenCalledTimes(2);
       expect(mockSnapProvider.request).toHaveBeenNthCalledWith(1, {
         method: 'snap_createInterface',
         params: {
-          context: mockAttenuatedContext,
-          ui: (
-            <NativeTokenStreamConfirmationPage
-              siteOrigin={mockConfirmationMeta.siteOrigin}
-              permission={mockConfirmationMeta.permission}
-              balance={mockConfirmationMeta.balance}
-              expiry={mockConfirmationMeta.expiry}
-              chainId={mockConfirmationMeta.chainId}
-              delegation={mockDelegation}
-            />
-          ),
+          context: mockContext,
+          ui: mockPage,
         },
       });
       expect(
@@ -95,7 +101,12 @@ describe('Permission Confirmation Render Handler', () => {
         params: { id: mockInterfaceId },
       });
 
-      expect(attenuatedContextRes).toStrictEqual(mockAttenuatedContext);
+      expect(attenuatedRes).toStrictEqual({
+        attenuatedPermission: mockContext.permission,
+        attenuatedDelegation: mockContext.delegation,
+        attenuatedExpiry: mockContext.expiry,
+        isConfirmed: true,
+      });
     });
 
     it('should throw error when user cancels confirmation screen', async () => {
@@ -106,13 +117,71 @@ describe('Permission Confirmation Render Handler', () => {
       const mockInterfaceId = 'mockInterfaceId';
       (mockSnapProvider.request as MockSnapRequest)
         .mockResolvedValueOnce(mockInterfaceId) // mock snap_createInterface
-        .mockResolvedValueOnce(null); // mock snap_dialog - user cancels
+        .mockResolvedValueOnce({
+          attenuatedPermission: mockContext.permission,
+          attenuatedDelegation: mockContext.delegation,
+          attenuatedExpiry: mockContext.expiry,
+          isConfirmed: false,
+        }); // mock snap_dialog resolves with type AttenuatedResponse
 
-      await expect(
-        permissionConfirmationRenderHandler.renderPermissionConfirmation(
-          mockConfirmationMeta,
+      const attenuatedRes =
+        await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
+          mockContext,
+          mockPage,
+          mockPermissionType,
+        );
+
+      expect(attenuatedRes).toStrictEqual({
+        attenuatedPermission: mockContext.permission,
+        attenuatedDelegation: mockContext.delegation,
+        attenuatedExpiry: mockContext.expiry,
+        isConfirmed: false,
+      });
+    });
+  });
+
+  describe('getPermissionConfirmationPage - native-token-stream', () => {
+    it('should return the native-token-stream confirmation page and context object', async () => {
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
+
+      const [context, page] =
+        permissionConfirmationRenderHandler.getPermissionConfirmationPage(
+          mockContext,
+          mockPermissionType,
+        );
+
+      expect(context).toStrictEqual(mockContext);
+      expect(page).toStrictEqual(mockPage);
+    });
+
+    it('should throw error when given a permission type that is not supported', async () => {
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
+
+      const nonSupportedPermissionType: any = 'non-supported-permission';
+      const nonSupportedPermission = {
+        type: nonSupportedPermissionType,
+        data: {
+          justification: 'shh...permission 2',
+        },
+      };
+
+      expect(() =>
+        permissionConfirmationRenderHandler.getPermissionConfirmationPage(
+          {
+            permission: nonSupportedPermission,
+            delegator,
+            delegate,
+            siteOrigin: 'http://localhost:3000',
+            balance: '0x1',
+            expiry: 1,
+            chainId: 11155111,
+            delegation: mockDelegation,
+          } as PermissionConfirmationContext<typeof nonSupportedPermissionType>,
+          nonSupportedPermissionType,
         ),
-      ).rejects.toThrow('User rejected the permissions request');
+      ).toThrow('Permission confirmation screen not found');
     });
   });
 });

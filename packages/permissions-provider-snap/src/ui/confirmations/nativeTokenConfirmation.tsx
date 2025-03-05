@@ -21,7 +21,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       <Box>
         <Header
           title="Permission request(native-token-stream)"
-          subtitle="Choose the account you want to use, then customize rules to be followed before a transaction is made."
+          subtitle="<place holder subtitle>"
         />
         <Divider />
 

@@ -8,6 +8,8 @@ import {
   Icon,
 } from '@metamask/snaps-sdk/jsx';
 
+import { getChainName } from '../../utils';
+
 type RequestDetails = JsonObject & {
   siteOrigin: string;
   justification: string | undefined;
@@ -19,6 +21,7 @@ export const RequestDetails: SnapComponent<RequestDetails> = ({
   justification,
   chainId,
 }) => {
+  const chainName = getChainName(chainId);
   const items = [
     {
       label: 'Requested by',
@@ -32,7 +35,7 @@ export const RequestDetails: SnapComponent<RequestDetails> = ({
     },
     {
       label: 'Network',
-      text: `${chainId}`,
+      text: `${chainName}`,
       tooltipText: 'Tooltip text',
     },
   ].map((item) => (

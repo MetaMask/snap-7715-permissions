@@ -1,22 +1,20 @@
 import { createRootDelegation } from '@metamask-private/delegator-core-viem';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import { fromHex, getAddress } from 'viem';
+import { getAddress } from 'viem';
 
-import { createMockAccountController } from '../src/accountContoller.mock';
+import { createMockAccountController } from '../src/accountController.mock';
 import type {
   OrchestrateMeta,
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../src/orchestrators';
-import {
-  createPermissionOrchestrator,
-  prepareAccountDetails,
-} from '../src/orchestrators';
+import { createPermissionOrchestrator } from '../src/orchestrators';
 import type {
   PermissionConfirmationContext,
   PermissionConfirmationRenderHandler,
 } from '../src/ui';
+import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { convertToSerializableDelegation } from '../src/utils';
 
 describe('Orchestrators', () => {
@@ -47,8 +45,41 @@ describe('Orchestrators', () => {
       mockPartialPermissionRequest.permission.type,
     ) as SupportedPermissionTypes;
     const mockPermissionConfirmationRenderHandler = {
-      renderPermissionConfirmation: jest.fn(),
+      getConfirmedAttenuatedPermission: jest.fn(),
+      getPermissionConfirmationPage: jest.fn(),
     } as unknown as jest.Mocked<PermissionConfirmationRenderHandler>;
+
+    const delegator = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
+    const delegate = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe009');
+    const mockDelegation = convertToSerializableDelegation(
+      createRootDelegation(delegate, delegator, []),
+    );
+    const mockAttenuatedContext: PermissionConfirmationContext<
+      typeof mockPermissionType
+    > = {
+      permission:
+        mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType],
+      delegator,
+      delegate,
+      siteOrigin: 'http://localhost:3000',
+      balance: '0x1',
+      expiry: 1,
+      chainId: 11155111,
+      delegation: mockDelegation,
+    };
+
+    const mockPage = (
+      <NativeTokenStreamConfirmationPage
+        siteOrigin={mockAttenuatedContext.siteOrigin}
+        permission={
+          mockAttenuatedContext.permission as PermissionTypeMapping['native-token-stream']
+        }
+        balance={mockAttenuatedContext.balance}
+        expiry={mockAttenuatedContext.expiry}
+        chainId={mockAttenuatedContext.chainId}
+        delegation={mockDelegation}
+      />
+    );
 
     it('should return a PermissionOrchestrator when given native-token-stream permission type', () => {
       const orchestrator = createPermissionOrchestrator(
@@ -62,7 +93,7 @@ describe('Orchestrators', () => {
       expect(orchestrator.orchestrate).toBeInstanceOf(Function);
     });
 
-    it('should orchestrate', async () => {
+    it('should orchestrate and return a valide 7715 response', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockAccountController,
         mockPermissionConfirmationRenderHandler,
@@ -79,28 +110,19 @@ describe('Orchestrators', () => {
         expiry: 1,
       };
 
-      // prepare mock user confirmation context
-      const chainId = fromHex(orchestrateMeta.chainId, 'number');
-      const [delegator, balance] = await prepareAccountDetails(
-        mockAccountController,
-        chainId,
+      // prepare mock permission confirmation page
+      mockPermissionConfirmationRenderHandler.getPermissionConfirmationPage.mockReturnValueOnce(
+        [mockAttenuatedContext, mockPage],
       );
 
-      mockPermissionConfirmationRenderHandler.renderPermissionConfirmation.mockResolvedValueOnce(
+      // prepare mock user confirmation context
+      mockPermissionConfirmationRenderHandler.getConfirmedAttenuatedPermission.mockResolvedValueOnce(
         {
-          permission: permissionTypeAsserted,
-          siteOrigin: orchestrateMeta.origin,
-          balance,
-          chainId,
-          expiry: orchestrateMeta.expiry,
-          delegation: convertToSerializableDelegation(
-            createRootDelegation(
-              mockPartialPermissionRequest.signer.data.address,
-              delegator,
-              [],
-            ),
-          ),
-        } as PermissionConfirmationContext<typeof mockPermissionType>,
+          isConfirmed: true,
+          attenuatedDelegation: mockAttenuatedContext.delegation,
+          attenuatedExpiry: mockAttenuatedContext.expiry,
+          attenuatedPermission: mockAttenuatedContext.permission,
+        },
       );
 
       // first validate the permission
@@ -119,7 +141,7 @@ describe('Orchestrators', () => {
         ],
         chainId: '0xaa36a7',
         context:
-          '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000016562aa41a8697720ce0943f003141f5deae0060000000000000000000000001234567890123456789012345678901234567890ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000_SIGNED_DELEGATION00000000000000000000000000000000',
+          '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000016562aa41a8697720ce0943f003141f5deae009000000000000000000000000016562aa41a8697720ce0943f003141f5deae008ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000_SIGNED_DELEGATION00000000000000000000000000000000',
         expiry: 1,
         permission: {
           data: { justification: 'shh...permission 2' },

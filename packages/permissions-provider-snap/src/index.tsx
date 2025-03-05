@@ -15,13 +15,12 @@ import {
 } from '@metamask/snaps-sdk';
 import { sepolia } from 'viem/chains';
 
-import { createMockAccountController } from './accountContoller.mock';
 import { AccountController } from './accountController';
+import { createMockAccountController } from './accountController.mock';
 import type { SupportedPermissionTypes } from './orchestrators';
 import { createPermissionOrchestrator } from './orchestrators';
 import { hasPermission, InternalMethod } from './permissions';
 import {
-  permissionConfirmationPageFactory,
   buttonClickEventHandler,
   getActiveInterfaceContext,
   createPermissionConfirmationRenderHandler,
@@ -39,6 +38,10 @@ const controller = new AccountController({
 if (controller === undefined) {
   throw new Error('Failed to initialize account controller');
 }
+
+// Initialize permission confirmation render handler
+const confirmationRenderHandler =
+  createPermissionConfirmationRenderHandler(snap);
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -83,7 +86,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         // process the request
         const orchestrator = createPermissionOrchestrator(
           createMockAccountController(),
-          createPermissionConfirmationRenderHandler(snap),
+          confirmationRenderHandler,
           permissionType,
         );
         const permission = await orchestrator.parseAndValidate(firstRequest);
@@ -149,27 +152,23 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
       }
     }
 
-    // TODO: Make sure context is correct type for the permission type instead of any
-    const {
-      permission,
-      delegator,
-      delegate,
-      siteOrigin,
-      balance,
-      expiry,
-      chainId,
-    } = activeContext as any;
-
+    // Update the interface with the new context and UI specific to the permission type
     const [updatedContext, permissionConfirmationPage] =
-      permissionConfirmationPageFactory({
-        permission,
-        delegator,
-        delegate,
-        siteOrigin,
-        balance,
-        expiry,
-        chainId,
-      });
+      confirmationRenderHandler.getPermissionConfirmationPage(
+        {
+          permission: activeContext.permission,
+          delegator: activeContext.delegation.delegator,
+          delegate: activeContext.delegation.delegate,
+          siteOrigin: activeContext.siteOrigin,
+          balance: activeContext.balance,
+          expiry: activeContext.expiry,
+          chainId: activeContext.chainId,
+          delegation: activeContext.delegation,
+        },
+        extractPermissionName(
+          activeContext.permission.type,
+        ) as SupportedPermissionTypes,
+      );
 
     await snap.request({
       method: 'snap_updateInterface',

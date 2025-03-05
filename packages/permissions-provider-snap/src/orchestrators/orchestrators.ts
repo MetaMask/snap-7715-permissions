@@ -1,4 +1,7 @@
-import { encodeDelegation } from '@metamask-private/delegator-core-viem';
+import {
+  createRootDelegation,
+  encodeDelegation,
+} from '@metamask-private/delegator-core-viem';
 import type {
   PermissionRequest,
   PermissionResponse,
@@ -6,9 +9,12 @@ import type {
 import type { Hex } from 'viem';
 import { fromHex } from 'viem';
 
-import { type MockAccountController } from '../accountContoller.mock';
-import type { PermissionConfirmationRenderHandler } from '../ui';
-import { convertToDelegationStruct } from '../utils';
+import { type MockAccountController } from '../accountController.mock';
+import { type PermissionConfirmationRenderHandler } from '../ui';
+import {
+  convertToDelegationStruct,
+  convertToSerializableDelegation,
+} from '../utils';
 import type {
   OrchestrateMeta,
   Orchestrator,
@@ -20,29 +26,17 @@ import type {
  * Prepare the account details for the permission picker UI.
  * @param accountController - An account controller instance.
  * @param chainId - The chain ID.
- * @returns The account address, balance and initCode.
+ * @returns The account address, balance.
  */
 export const prepareAccountDetails = async (
   accountController: MockAccountController,
   chainId: number,
-): Promise<
-  [
-    Hex,
-    Hex,
-    {
-      factory: Hex | undefined;
-      factoryData: Hex | undefined;
-    },
-  ]
-> => {
+): Promise<[Hex, Hex]> => {
   return await Promise.all([
     accountController.getAccountAddress({
       chainId,
     }),
     accountController.getAccountBalance({
-      chainId,
-    }),
-    accountController.getAccountMetadata({
       chainId,
     }),
   ]);
@@ -64,52 +58,81 @@ export const createPermissionOrchestrator = <
   permissionType: TPermissionType,
 ): Orchestrator<TPermissionType> => {
   return {
-    parseAndValidate: async (_basePermission: PermissionRequest) => {
+    parseAndValidate: async (basePermission: PermissionRequest) => {
       // TODO: Implement Specific permission validator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/38
-      return {} as PermissionTypeMapping[TPermissionType];
+      return basePermission.permission as PermissionTypeMapping[typeof permissionType];
     },
     orchestrate: async (orchestrateMeta: OrchestrateMeta<TPermissionType>) => {
       const { chainId, delegate, origin, expiry, permission } = orchestrateMeta;
       const chainIdNum = fromHex(chainId, 'number');
 
       // Get the user account details
-      const [delegator, balance, accountMeta] = await prepareAccountDetails(
+      const [delegator, balance] = await prepareAccountDetails(
         accountController,
         fromHex(chainId, 'number'),
       );
 
-      // Wait for the successful permission confirmation from the user
-      const attenuatedUiContext =
-        await permissionConfirmationRenderHandler.renderPermissionConfirmation<
-          typeof permissionType
-        >({
-          permission,
-          delegator,
-          delegate,
-          siteOrigin: origin,
-          balance,
-          expiry,
-          chainId: chainIdNum,
-        });
+      // TODO: Use the delegation builder to attach the correct caveats specific to the permission type: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
+      const delegationToBuild = convertToSerializableDelegation(
+        createRootDelegation(delegate, delegator, []),
+      );
 
+      // Prepare specific context and UI
+      const [context, permissionConfirmationPage] =
+        permissionConfirmationRenderHandler.getPermissionConfirmationPage(
+          {
+            permission,
+            delegator,
+            delegate,
+            siteOrigin: origin,
+            balance,
+            expiry,
+            chainId: chainIdNum,
+            delegation: delegationToBuild,
+          },
+          permissionType,
+        );
+
+      // Wait for the successful permission confirmation reponse from the user
+      const {
+        attenuatedPermission,
+        attenuatedDelegation,
+        attenuatedExpiry,
+        isConfirmed,
+      } =
+        await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
+          context,
+          permissionConfirmationPage,
+          permissionType,
+        );
+
+      if (!isConfirmed) {
+        throw new Error('User rejected the permissions request');
+      }
+
+      // TODO: Pass this to the delegation builder to sign and build the permission context
       // Sign the delegation and encode it to create the permissioncContext
       const signedDelegation = await accountController.signDelegation({
         chainId: chainIdNum,
-        delegation: convertToDelegationStruct(attenuatedUiContext.delegation), // has the delegation with caveat attached specific to the permission
+        delegation: convertToDelegationStruct(attenuatedDelegation), // has the delegation with caveat attached specific to the permission
       });
       const permissionContext = encodeDelegation([signedDelegation]);
+
+      const accountMeta = await accountController.getAccountMetadata({
+        chainId: chainIdNum,
+      });
 
       return {
         chainId,
         account: delegator,
-        expiry,
+        expiry: attenuatedExpiry,
         signer: {
           type: 'account',
           data: {
             address: delegate,
           },
         },
-        permission,
+        permission: attenuatedPermission,
         context: permissionContext,
         accountMeta:
           accountMeta.factory && accountMeta.factoryData

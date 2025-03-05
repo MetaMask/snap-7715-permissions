@@ -39,12 +39,14 @@ describe('Generic dispatcher for permission cases', () => {
 
     it('should execute the correct handler based on the permission type', async () => {
       const res1 = handlePermissionCase(
+        'native-token-stream',
         nativeTokenStreamPermission,
         caseHandlers,
         'Permission not supported',
       );
 
       const res2 = handlePermissionCase(
+        'native-token-transfer',
         nativeTokenTrasnferPermission,
         caseHandlers,
         'Permission not supported',
@@ -61,6 +63,7 @@ describe('Generic dispatcher for permission cases', () => {
       };
       expect(() =>
         handlePermissionCase(
+          'non-supported-permission' as SupportedPermissionTypes,
           nonSupportedPermission as any,
           caseHandlers,
           'Permission not supported',
