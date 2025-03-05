@@ -7,7 +7,13 @@ import {
 } from '@metamask-private/delegator-core-viem';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { Address, createClient, custom, extractChain, type Hex } from 'viem';
+import {
+  createClient,
+  custom,
+  extractChain,
+  type Hex,
+  type Address,
+} from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import * as chains from 'viem/chains';
 
