@@ -2,11 +2,9 @@
 import {
   zNativeTokenStreamPermission,
   type PermissionRequest,
+  type PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import {
-  extractPermissionName,
-  extractZodError,
-} from '@metamask/7715-permissions-shared/utils';
+import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError, type SnapsProvider } from '@metamask/snaps-sdk';
 
 import type {
@@ -27,18 +25,17 @@ const zodObjectMapper = {
  * Parses a permission request and returns the permission object.
  *
  * @param basePermissionRequest - The permission request object.
+ * @param permissionType - The permission type.
  * @returns The permission object.
  * @throws An error if the permission in the request is invalid.
  * @throws An error if the permission type is not supported.
  */
 const parsePermission = <TPermissionType extends SupportedPermissionTypes>(
   basePermissionRequest: PermissionRequest,
+  permissionType: TPermissionType,
 ): PermissionTypeMapping[TPermissionType] => {
-  const permissionType = extractPermissionName(
-    basePermissionRequest.permission.type,
-  ) as keyof typeof zodObjectMapper;
-
-  const zValaidator = zodObjectMapper[permissionType];
+  const zValaidatorKey = permissionType as keyof typeof zodObjectMapper;
+  const zValaidator = zodObjectMapper[zValaidatorKey];
   if (!zValaidator) {
     throw new Error(
       `Validation for Permission type ${permissionType} is not supported`,
@@ -50,13 +47,14 @@ const parsePermission = <TPermissionType extends SupportedPermissionTypes>(
     throw new InvalidParamsError(extractZodError(validateRes.error.errors));
   }
 
-  return validateRes.data as PermissionTypeMapping[TPermissionType];
+  return validateRes.data as PermissionTypeMapping[typeof permissionType];
 };
 
 /**
  * Validates a permission object data specific to the permission type.
  *
  * @param _permission - The permission object.
+ * @param _permissionType - The permission type.
  * @returns True if the permission object data is valid.
  * @throws An error if the permission object data is invalid.
  */
@@ -64,6 +62,7 @@ const validatePermissionData = <
   TPermissionType extends SupportedPermissionTypes,
 >(
   _permission: PermissionTypeMapping[TPermissionType],
+  _permissionType: TPermissionType,
 ): true => {
   // TODO: Implement permission.data validation for the native-token-stream permission type
   return true;
@@ -74,6 +73,7 @@ const validatePermissionData = <
  *
  * @param _snapsProvider - A snaps provider instance.
  * @param _accountController - An account controller instance.
+ * @param permissionType - The permission type.
  * @returns A permission orchestrator for the native-token-stream permission type.
  */
 export const createPermissionOrchestrator = <
@@ -81,15 +81,24 @@ export const createPermissionOrchestrator = <
 >(
   _snapsProvider: SnapsProvider,
   _accountController: unknown,
+  permissionType: TPermissionType,
 ): Orchestrator<TPermissionType> => {
   return {
-    validate: async (basePermissionRequest: PermissionRequest) => {
-      validatePermissionData(parsePermission(basePermissionRequest));
-      return true;
+    parseAndValidate: async (basePermissionRequest: PermissionRequest) => {
+      const validatedPermission = parsePermission(
+        basePermissionRequest,
+        permissionType,
+      );
+      validatePermissionData(validatedPermission, permissionType);
+
+      return validatedPermission;
     },
     orchestrate: async (_orchestrateMeta: OrchestrateMeta<TPermissionType>) => {
       // TODO: Implement Specific permission orchestrator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/42
-      return null;
+      return {
+        success: true,
+        response: {} as PermissionResponse,
+      };
     },
   };
 };

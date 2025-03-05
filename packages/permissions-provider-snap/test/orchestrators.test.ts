@@ -41,13 +41,14 @@ describe('Orchestrators', () => {
     ) as SupportedPermissionTypes;
 
     it('should return a PermissionOrchestrator when given native-token-stream permission type', () => {
-      const orchestrator = createPermissionOrchestrator<'native-token-stream'>(
+      const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
+        mockPermissionType,
       );
 
       expect(orchestrator).toBeDefined();
-      expect(orchestrator.validate).toBeInstanceOf(Function);
+      expect(orchestrator.parseAndValidate).toBeInstanceOf(Function);
       expect(orchestrator.orchestrate).toBeInstanceOf(Function);
     });
 
@@ -55,9 +56,10 @@ describe('Orchestrators', () => {
       const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
+        mockPermissionType,
       );
 
-      await orchestrator.validate(mockPartialPermissionRequest);
+      await orchestrator.parseAndValidate(mockPartialPermissionRequest);
 
       const permissionTypeAsserted =
         mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
@@ -70,28 +72,35 @@ describe('Orchestrators', () => {
         expiry: 1,
       });
 
-      expect(res).toBeNull();
+      expect(res).toStrictEqual({ response: {}, success: true });
     });
 
     it('should return true when validate called with valid permission that is supported', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
+        mockPermissionType,
       );
 
-      const res = await orchestrator.validate(mockPartialPermissionRequest);
+      const res = await orchestrator.parseAndValidate(
+        mockPartialPermissionRequest,
+      );
 
-      expect(res).toBe(true);
+      expect(res).toStrictEqual({
+        data: { justification: 'shh...permission 2' },
+        type: 'native-token-stream',
+      });
     });
 
     it('should throw error when validate called with permission type that is not supported', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
+        'unsupported-permission-type' as keyof PermissionTypeMapping,
       );
 
       await expect(
-        orchestrator.validate({
+        orchestrator.parseAndValidate({
           ...mockPartialPermissionRequest,
           permission: {
             ...mockPartialPermissionRequest.permission,
@@ -107,15 +116,16 @@ describe('Orchestrators', () => {
       const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
+        mockPermissionType,
       );
 
       await expect(
-        orchestrator.validate({
+        orchestrator.parseAndValidate({
           ...mockPartialPermissionRequest,
           permission: {},
         } as any),
       ).rejects.toThrow(
-        'Validation for Permission type undefined is not supported',
+        `Failed type validation: type: Invalid literal value, expected "native-token-stream", data: Required, data: Required`,
       );
     });
   });
