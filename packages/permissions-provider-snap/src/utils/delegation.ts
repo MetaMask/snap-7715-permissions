@@ -1,7 +1,7 @@
 import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
 import { toHex } from 'viem';
 
-import type { DelegationInTransit } from '../ui/types';
+import type { SerializableDelegation } from '../ui/types';
 
 /**
  * Converts a delegation struct object to a delegation in transit object.
@@ -9,13 +9,13 @@ import type { DelegationInTransit } from '../ui/types';
  * @param delegation - The delegation struct object including salt as a BigInt ready for signing.
  * @returns The delegation in transit object with salt as a hex string to be compatible with the Snap context { [prop: string]: Json; } object.
  */
-export const convertToDelegationInTransit = (
+export const convertToSerializableDelegation = (
   delegation: DelegationStruct,
-): DelegationInTransit =>
+): SerializableDelegation =>
   ({
     ...delegation,
     salt: toHex(delegation.salt),
-  } as DelegationInTransit);
+  } as SerializableDelegation);
 
 /**
  * Converts a delegation in transit object to a delegation struct object.
@@ -24,7 +24,7 @@ export const convertToDelegationInTransit = (
  * @returns The delegation struct object.
  */
 export const convertToDelegationStruct = (
-  delegation: DelegationInTransit,
+  delegation: SerializableDelegation,
 ): DelegationStruct => ({
   ...delegation,
   salt: BigInt(delegation.salt),

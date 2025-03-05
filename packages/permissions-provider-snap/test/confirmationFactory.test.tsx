@@ -8,12 +8,12 @@ import {
 } from '../src/ui';
 import type { PermissionConfirmationContext } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
-import { convertToDelegationInTransit } from '../src/utils';
+import { convertToSerializableDelegation } from '../src/utils';
 
 describe('permissionConfirmationPageFactory', () => {
   const delegator = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
   const delegate = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe009');
-  const mockDelegation = convertToDelegationInTransit(
+  const mockDelegation = convertToSerializableDelegation(
     createRootDelegation(delegate, delegator, []),
   );
 

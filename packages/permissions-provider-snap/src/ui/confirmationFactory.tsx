@@ -6,7 +6,10 @@ import {
   type PermissionTypeMapping,
   type SupportedPermissionTypes,
 } from '../orchestrators';
-import { convertToDelegationInTransit, handlePermissionCase } from '../utils';
+import {
+  convertToSerializableDelegation,
+  handlePermissionCase,
+} from '../utils';
 import { NativeTokenStreamConfirmationPage } from './confirmations';
 import type {
   PermissionConfirmationContext,
@@ -40,7 +43,7 @@ export const permissionConfirmationPageFactory = <
     expiry,
     chainId,
     // TODO: Use the delegation builder to attach the correct caveats specific to the permission type: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
-    delegation: convertToDelegationInTransit(
+    delegation: convertToSerializableDelegation(
       createRootDelegation(delegate, delegator, []),
     ),
   };

@@ -5,27 +5,20 @@ import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-sha
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
-import type { StateManager } from '../src/stateManagement';
-import { createStateManager } from '../src/stateManagement';
 import type {
   PermissionConfirmationContext,
   PermissionConfirmationMeta,
 } from '../src/ui';
 import { createPermissionConfirmationRenderHandler } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
-import { convertToDelegationInTransit } from '../src/utils';
+import { convertToSerializableDelegation } from '../src/utils';
 
 describe('Permission Confirmation Render Handler', () => {
   let mockSnapProvider: SnapsProvider;
-  let mockSnapProviderForStateManager: SnapsProvider;
-  let mockStateManager: StateManager;
 
   beforeEach(() => {
-    // make sure the UI and state use separate mock providers to avoid conflicts
     mockSnapProvider = createMockSnapsProvider();
-    mockSnapProviderForStateManager = createMockSnapsProvider();
 
-    mockStateManager = createStateManager(mockSnapProviderForStateManager);
     jest.clearAllMocks();
   });
 
@@ -38,7 +31,7 @@ describe('Permission Confirmation Render Handler', () => {
     };
     const delegator = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
     const delegate = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe009');
-    const mockDelegation = convertToDelegationInTransit(
+    const mockDelegation = convertToSerializableDelegation(
       createRootDelegation(delegate, delegator, []),
     );
     const mockConfirmationMeta: PermissionConfirmationMeta<'native-token-stream'> =
@@ -54,10 +47,7 @@ describe('Permission Confirmation Render Handler', () => {
 
     it('should render the confirmation screen and return context after user confirms', async () => {
       const permissionConfirmationRenderHandler =
-        createPermissionConfirmationRenderHandler(
-          mockSnapProvider,
-          mockStateManager,
-        );
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
 
       const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
         {
@@ -110,10 +100,7 @@ describe('Permission Confirmation Render Handler', () => {
 
     it('should throw error when user cancels confirmation screen', async () => {
       const permissionConfirmationRenderHandler =
-        createPermissionConfirmationRenderHandler(
-          mockSnapProvider,
-          mockStateManager,
-        );
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
 
       // mock the snap dialog user interaction
       const mockInterfaceId = 'mockInterfaceId';

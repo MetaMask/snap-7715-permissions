@@ -17,7 +17,7 @@ import type {
   PermissionConfirmationContext,
   PermissionConfirmationRenderHandler,
 } from '../src/ui';
-import { convertToDelegationInTransit } from '../src/utils';
+import { convertToSerializableDelegation } from '../src/utils';
 
 describe('Orchestrators', () => {
   const mockAccountController = createMockAccountController();
@@ -48,17 +48,17 @@ describe('Orchestrators', () => {
     ) as SupportedPermissionTypes;
     const mockPermissionConfirmationRenderHandler = {
       renderPermissionConfirmation: jest.fn(),
-    } as unknown as jest.Mocked<
-      PermissionConfirmationRenderHandler<typeof mockPermissionType>
-    >;
+    } as unknown as jest.Mocked<PermissionConfirmationRenderHandler>;
 
     it('should return a PermissionOrchestrator when given native-token-stream permission type', () => {
-      const orchestrator = createPermissionOrchestrator<
-        typeof mockPermissionType
-      >(mockAccountController, mockPermissionConfirmationRenderHandler);
+      const orchestrator = createPermissionOrchestrator(
+        mockAccountController,
+        mockPermissionConfirmationRenderHandler,
+        mockPermissionType,
+      );
 
       expect(orchestrator).toBeDefined();
-      expect(orchestrator.validate).toBeInstanceOf(Function);
+      expect(orchestrator.parseAndValidate).toBeInstanceOf(Function);
       expect(orchestrator.orchestrate).toBeInstanceOf(Function);
     });
 
@@ -66,6 +66,7 @@ describe('Orchestrators', () => {
       const orchestrator = createPermissionOrchestrator(
         mockAccountController,
         mockPermissionConfirmationRenderHandler,
+        mockPermissionType,
       );
       const permissionTypeAsserted =
         mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
@@ -92,7 +93,7 @@ describe('Orchestrators', () => {
           balance,
           chainId,
           expiry: orchestrateMeta.expiry,
-          delegation: convertToDelegationInTransit(
+          delegation: convertToSerializableDelegation(
             createRootDelegation(
               mockPartialPermissionRequest.signer.data.address,
               delegator,
@@ -103,7 +104,7 @@ describe('Orchestrators', () => {
       );
 
       // first validate the permission
-      await orchestrator.validate(mockPartialPermissionRequest);
+      await orchestrator.parseAndValidate(mockPartialPermissionRequest);
 
       // then orchestrate
       const res = await orchestrator.orchestrate(orchestrateMeta);

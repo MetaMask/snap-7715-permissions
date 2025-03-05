@@ -60,10 +60,12 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
    * Validates the base permission request for the permission type.
    *
    * @param basePermissionRequest - The base permission request to validate.
-   * @returns True if the base permission for the permission type is valid otherwise throws an error.
+   * @returns The parsed and validated permission.
    * @throws If the base permission request is invalid given the permission type.
    */
-  validate: (basePermissionRequest: PermissionRequest) => Promise<true>;
+  parseAndValidate: (
+    basePermissionRequest: PermissionRequest,
+  ) => Promise<PermissionTypeMapping[TPermissionType]>;
 
   /**
    * Orchestrates the permission request for the permission type.

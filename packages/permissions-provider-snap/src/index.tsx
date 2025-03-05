@@ -9,6 +9,7 @@ import type {
   OnUserInputHandler,
 } from '@metamask/snaps-sdk';
 import {
+  SnapError,
   UserInputEventType,
   type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
@@ -16,20 +17,16 @@ import { sepolia } from 'viem/chains';
 
 import { createMockAccountController } from './accountContoller.mock';
 import { AccountController } from './accountController';
-import type {
-  PermissionTypeMapping,
-  SupportedPermissionTypes,
-} from './orchestrators';
+import type { SupportedPermissionTypes } from './orchestrators';
 import { createPermissionOrchestrator } from './orchestrators';
 import { hasPermission, InternalMethod } from './permissions';
-import { createStateManager } from './stateManagement';
 import {
   permissionConfirmationPageFactory,
   buttonClickEventHandler,
   getActiveInterfaceContext,
   createPermissionConfirmationRenderHandler,
 } from './ui';
-import { validatePermissionRequestParam } from './utils';
+import { isSnapRpcError, validatePermissionRequestParam } from './utils';
 
 // Initialize account controller for future use
 const controller = new AccountController({
@@ -42,12 +39,6 @@ const controller = new AccountController({
 if (controller === undefined) {
   throw new Error('Failed to initialize account controller');
 }
-
-// Initialize orchestrator for future use
-const orchestrator = createPermissionOrchestrator(
-  createMockAccountController(),
-  createPermissionConfirmationRenderHandler(snap, createStateManager(snap)),
-);
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -76,23 +67,26 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   switch (request.method) {
     case InternalMethod.PermissionProviderGrantAttenuatedPermissions: {
-      const { permissionsRequest, siteOrigin } = validatePermissionRequestParam(
-        request.params,
-      );
+      try {
+        const { permissionsRequest, siteOrigin } =
+          validatePermissionRequestParam(request.params);
 
-      const firstRequest = permissionsRequest[0];
-      if (!firstRequest) {
-        throw new Error('No permission request found');
-      }
+        const firstRequest = permissionsRequest[0];
+        if (!firstRequest) {
+          throw new Error('No permission request found');
+        }
 
-      // process the request
-      if (await orchestrator.validate(firstRequest)) {
         const permissionType = extractPermissionName(
           firstRequest.permission.type,
         ) as SupportedPermissionTypes;
 
-        const permission =
-          firstRequest.permission as PermissionTypeMapping[typeof permissionType];
+        // process the request
+        const orchestrator = createPermissionOrchestrator(
+          createMockAccountController(),
+          createPermissionConfirmationRenderHandler(snap),
+          permissionType,
+        );
+        const permission = await orchestrator.parseAndValidate(firstRequest);
 
         const res = await orchestrator.orchestrate({
           permission,
@@ -103,9 +97,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         });
 
         return [res] as Json[];
-      }
+      } catch (error: any) {
+        let snapError = error;
 
-      return null;
+        if (!isSnapRpcError(error)) {
+          snapError = new SnapError(error);
+        }
+        logger.error(
+          `onRpcRequest error: ${JSON.stringify(snapError.toJSON(), null, 2)}`,
+        );
+        throw snapError;
+      }
     }
     default: {
       throw new Error(request.method);
@@ -135,12 +137,11 @@ export const onUpdate: OnUpdateHandler = async () => {
  * @param args.event - The user input event.
  */
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
-  const { activeInterfaceId, activeContext } =
-    await getActiveInterfaceContext();
-  if (id === activeInterfaceId && activeContext) {
+  const activeContext = await getActiveInterfaceContext(id);
+  if (activeContext) {
     switch (event.type) {
       case UserInputEventType.ButtonClickEvent: {
-        await buttonClickEventHandler(event, activeInterfaceId);
+        await buttonClickEventHandler(event, id);
         break;
       }
       default: {

@@ -12,6 +12,7 @@ import { convertToDelegationStruct } from '../utils';
 import type {
   OrchestrateMeta,
   Orchestrator,
+  PermissionTypeMapping,
   SupportedPermissionTypes,
 } from './types';
 
@@ -52,18 +53,20 @@ export const prepareAccountDetails = async (
  *
  * @param accountController - An account controller instance.
  * @param permissionConfirmationRenderHandler - The permission confirmation render handler.
+ * @param permissionType - The permission type.
  * @returns A permission orchestrator for the specific permission type.
  */
 export const createPermissionOrchestrator = <
   TPermissionType extends SupportedPermissionTypes,
 >(
   accountController: MockAccountController,
-  permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler<TPermissionType>,
+  permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler,
+  permissionType: TPermissionType,
 ): Orchestrator<TPermissionType> => {
   return {
-    validate: async (_basePermission: PermissionRequest) => {
+    parseAndValidate: async (_basePermission: PermissionRequest) => {
       // TODO: Implement Specific permission validator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/38
-      return true;
+      return {} as PermissionTypeMapping[TPermissionType];
     },
     orchestrate: async (orchestrateMeta: OrchestrateMeta<TPermissionType>) => {
       const { chainId, delegate, origin, expiry, permission } = orchestrateMeta;
@@ -77,7 +80,9 @@ export const createPermissionOrchestrator = <
 
       // Wait for the successful permission confirmation from the user
       const attenuatedUiContext =
-        await permissionConfirmationRenderHandler.renderPermissionConfirmation({
+        await permissionConfirmationRenderHandler.renderPermissionConfirmation<
+          typeof permissionType
+        >({
           permission,
           delegator,
           delegate,

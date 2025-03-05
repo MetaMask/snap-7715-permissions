@@ -12,7 +12,7 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 import type { Address as AddressViem } from 'viem';
 
-import { ACCOUNT_SELECTOR } from '../userInputContant';
+import { ACCOUNT_SELECTOR } from '../userInputConstant';
 
 type AccountDetails = {
   accounts: AddressViem[];

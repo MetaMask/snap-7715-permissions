@@ -1,22 +1,21 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 
 import type { SupportedPermissionTypes } from '../../orchestrators';
-import type { StateManager } from '../../stateManagement';
 import { permissionConfirmationPageFactory } from '../confirmationFactory';
 import type {
   PermissionConfirmationContext,
   PermissionConfirmationMeta,
 } from '../types';
 
-export type PermissionConfirmationRenderHandler<
-  TPermissionType extends SupportedPermissionTypes,
-> = {
+export type PermissionConfirmationRenderHandler = {
   /**
    * Render the permission confirmation page.
    * @param permissionConfirmationMeta - The meta data required to prepare the permission confirmation page.
    * @returns The attenuated context data after the user confirms the permission request.
    */
-  renderPermissionConfirmation: (
+  renderPermissionConfirmation: <
+    TPermissionType extends SupportedPermissionTypes,
+  >(
     permissionConfirmationMeta: PermissionConfirmationMeta<TPermissionType>,
   ) => Promise<PermissionConfirmationContext<TPermissionType>>;
 };
@@ -25,17 +24,15 @@ export type PermissionConfirmationRenderHandler<
  * Creates a permission confirmation render handler for a specific permission type.
  *
  * @param snapsProvider - A snaps provider instance.
- * @param stateManager - A state manager instance.
  * @returns The permission confirmation render handler for the specific permission type.
  */
-export const createPermissionConfirmationRenderHandler = <
-  TPermissionType extends SupportedPermissionTypes,
->(
+export const createPermissionConfirmationRenderHandler = (
   snapsProvider: SnapsProvider,
-  stateManager: StateManager,
-): PermissionConfirmationRenderHandler<TPermissionType> => {
+): PermissionConfirmationRenderHandler => {
   return {
-    renderPermissionConfirmation: async (
+    renderPermissionConfirmation: async <
+      TPermissionType extends SupportedPermissionTypes,
+    >(
       permissionConfirmationMeta: PermissionConfirmationMeta<TPermissionType>,
     ) => {
       const [context, permissionConfirmationPage] =
@@ -51,20 +48,12 @@ export const createPermissionConfirmationRenderHandler = <
         },
       });
 
-      await stateManager.setState({
-        activeInterfaceId: interfaceId,
-      });
-
       // The snap_dialog will resolve with the context data after the user confirms
       const attenuatedContext = await snapsProvider.request({
         method: 'snap_dialog',
         params: {
           id: interfaceId,
         },
-      });
-
-      await stateManager.setState({
-        activeInterfaceId: '',
       });
 
       // If user click cancel, the response will be undefined
