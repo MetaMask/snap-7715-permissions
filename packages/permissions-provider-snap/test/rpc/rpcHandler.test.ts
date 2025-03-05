@@ -23,7 +23,6 @@ describe('RpcHandler', () => {
 
     handler = createRpcHandler({
       accountController: mockAccountController,
-      orchestratorFactory: {},
       snapsProvider: mockSnapsProvider,
     });
   });

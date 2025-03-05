@@ -19,12 +19,8 @@ const accountController = new AccountController({
   deploymentSalt: '0x',
 });
 
-// todo instantiate actual OrchestratorFactory
-const orchestratorFactory = {};
-
 const rpcHandler = createRpcHandler({
   accountController,
-  orchestratorFactory,
   snapsProvider: snap,
 });
 

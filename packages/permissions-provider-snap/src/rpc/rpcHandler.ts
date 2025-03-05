@@ -23,13 +23,11 @@ export type RpcHandler = {
  *
  * @param config - The parameters for creating the RPC handler.
  * @param config.accountController - The account controller interface.
- * @param config.orchestratorFactory - The orchestrator factory.
  * @param config.snapsProvider - The snaps provider.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
   accountController: AccountControllerInterface;
-  orchestratorFactory: Record<string, never>;
   snapsProvider: SnapsProvider;
 }): RpcHandler {
   const { accountController, snapsProvider } = config;
@@ -42,10 +40,8 @@ export function createRpcHandler(config: {
      * @returns The result of the grant permission request.
      */
     async grantPermission(params?: Json): Promise<Json> {
-      // todo: in reality the majority of this method would be something like:
-      // const responses = permissionRequest.permissionsRequest.map(async (request) =>
-      //  createPermissionOrchestrator(request.permission.type)
-      //  .orchestrate(request))
+      // todo: the vast majority of this code should be removed, and replaced
+      // with a call into the orchestrator factory.
 
       logger.debug('grantPermissions()', params);
 
