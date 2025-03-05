@@ -41,13 +41,14 @@ describe('Orchestrators', () => {
     ) as SupportedPermissionTypes;
 
     it('should return a PermissionOrchestrator when given native-token-stream permission type', () => {
-      const orchestrator = createPermissionOrchestrator<'native-token-stream'>(
+      const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
+        mockPermissionType,
       );
 
       expect(orchestrator).toBeDefined();
-      expect(orchestrator.validate).toBeInstanceOf(Function);
+      expect(orchestrator.parseAndValidate).toBeInstanceOf(Function);
       expect(orchestrator.orchestrate).toBeInstanceOf(Function);
     });
 
@@ -55,9 +56,10 @@ describe('Orchestrators', () => {
       const orchestrator = createPermissionOrchestrator(
         mockSnapProvider,
         mockAccountController,
+        mockPermissionType,
       );
 
-      await orchestrator.validate(mockPartialPermissionRequest);
+      await orchestrator.parseAndValidate(mockPartialPermissionRequest);
 
       const permissionTypeAsserted =
         mockPartialPermissionRequest.permission as PermissionTypeMapping[typeof mockPermissionType];
@@ -70,7 +72,7 @@ describe('Orchestrators', () => {
         expiry: 1,
       });
 
-      expect(res).toBeNull();
+      expect(res).toStrictEqual({ response: {}, success: true });
     });
   });
 });
