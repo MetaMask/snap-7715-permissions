@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
+import type { Permission } from '@metamask/7715-permissions-shared/types';
 import {
   zNativeTokenStreamPermission,
-  type PermissionRequest,
   type PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
@@ -24,14 +24,14 @@ const zodObjectMapper = {
 /**
  * Parses a permission request and returns the permission object.
  *
- * @param basePermissionRequest - The permission request object.
+ * @param basePermission - The base permission object.
  * @param permissionType - The permission type.
  * @returns The permission object.
  * @throws An error if the permission in the request is invalid.
  * @throws An error if the permission type is not supported.
  */
 const parsePermission = <TPermissionType extends SupportedPermissionTypes>(
-  basePermissionRequest: PermissionRequest,
+  basePermission: Permission,
   permissionType: TPermissionType,
 ): PermissionTypeMapping[TPermissionType] => {
   const zValaidatorKey = permissionType as keyof typeof zodObjectMapper;
@@ -42,7 +42,7 @@ const parsePermission = <TPermissionType extends SupportedPermissionTypes>(
     );
   }
 
-  const validateRes = zValaidator.safeParse(basePermissionRequest.permission);
+  const validateRes = zValaidator.safeParse(basePermission);
   if (!validateRes.success) {
     throw new InvalidParamsError(extractZodError(validateRes.error.errors));
   }
@@ -84,9 +84,9 @@ export const createPermissionOrchestrator = <
   permissionType: TPermissionType,
 ): Orchestrator<TPermissionType> => {
   return {
-    parseAndValidate: async (basePermissionRequest: PermissionRequest) => {
+    parseAndValidate: async (basePermission: Permission) => {
       const validatedPermission = parsePermission(
-        basePermissionRequest,
+        basePermission,
         permissionType,
       );
       validatePermissionData(validatedPermission, permissionType);
