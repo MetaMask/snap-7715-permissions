@@ -51,7 +51,7 @@ export type OrchestrateMeta<TPermissionType extends SupportedPermissionTypes> =
     /**
      * The address of the delegate that will be granted the permission(ie. the dapp's session account address).
      */
-    delegate: Address;
+    sessionAccount: Address;
 
     /**
      * The origin of the permission request(ie. the dapp's origin).
@@ -88,16 +88,4 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   orchestrate: (
     orchestrateMeta: OrchestrateMeta<TPermissionType>,
   ) => Promise<OrchestrateResult>;
-};
-
-/**
- * A case handler for handling permission types.
- */
-export type PermissionCaseHandler<
-  TPermissionType extends SupportedPermissionTypes,
-  TReturnType,
-> = {
-  [K in SupportedPermissionTypes]: (
-    permission: PermissionTypeMapping[TPermissionType],
-  ) => TReturnType;
 };

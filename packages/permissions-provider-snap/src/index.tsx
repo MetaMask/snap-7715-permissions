@@ -96,7 +96,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         const res = await orchestrator.orchestrate({
           permission,
           chainId: firstRequest.chainId,
-          delegate: firstRequest.signer.data.address,
+          sessionAccount: firstRequest.signer.data.address,
           origin: siteOrigin,
           expiry: firstRequest.expiry,
         });
@@ -163,8 +163,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
       confirmationRenderHandler.getPermissionConfirmationPage(
         {
           permission: activeContext.permission,
-          delegator: activeContext.delegation.delegator,
-          delegate: activeContext.delegation.delegate,
+          account: activeContext.account,
           siteOrigin: activeContext.siteOrigin,
           balance: activeContext.balance,
           expiry: activeContext.expiry,

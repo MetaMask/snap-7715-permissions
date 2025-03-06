@@ -1,17 +1,18 @@
 import type { ComponentOrElement, SnapsProvider } from '@metamask/snaps-sdk';
 
 import type {
-  PermissionCaseHandler,
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../../orchestrators';
-import { handlePermissionCase } from '../../utils';
 import { NativeTokenStreamConfirmationPage } from '../confirmations';
 import type {
   PermissionConfirmationContext,
   SerializableDelegation,
 } from '../types';
 
+/**
+ * The attenuated response after the user confirms the permission request.
+ */
 export type AttenuatedResponse<
   TPermissionType extends SupportedPermissionTypes,
 > = {
@@ -51,6 +52,28 @@ export type PermissionConfirmationRenderHandler = {
     context: PermissionConfirmationContext<TPermissionType>,
     permissionType: TPermissionType,
   ) => [PermissionConfirmationContext<TPermissionType>, ComponentOrElement];
+};
+
+/**
+ * Build the native token stream confirmation page.
+ *
+ * @param context - The permission confirmation context.
+ * @returns The native token stream confirmation page component.
+ */
+export const buildNativeTokenStreamConfirmationPage = (
+  context: PermissionConfirmationContext<'native-token-stream'>,
+) => {
+  return (
+    <NativeTokenStreamConfirmationPage
+      siteOrigin={context.siteOrigin}
+      account={context.account}
+      permission={context.permission}
+      balance={context.balance}
+      expiry={context.expiry}
+      chainId={context.chainId}
+      delegation={context.delegation}
+    />
+  );
 };
 
 /**
@@ -96,31 +119,16 @@ export const createPermissionConfirmationRenderHandler = (
       context: PermissionConfirmationContext<TPermissionType>,
       permissionType: TPermissionType,
     ) => {
-      const caseHandlers: PermissionCaseHandler<
-        TPermissionType,
-        ComponentOrElement
-      > = {
-        'native-token-stream': (per) => (
-          <NativeTokenStreamConfirmationPage
-            siteOrigin={context.siteOrigin}
-            permission={per as PermissionTypeMapping['native-token-stream']}
-            balance={context.balance}
-            expiry={context.expiry}
-            chainId={context.chainId}
-            delegation={context.delegation}
-          />
-        ),
-        'native-token-transfer': (_per) => {
-          throw new Error('Permission confirmation screen not found');
-        },
-      };
+      let confirmationScreen: ComponentOrElement | undefined;
+      if (permissionType === 'native-token-stream') {
+        confirmationScreen = buildNativeTokenStreamConfirmationPage(
+          context as PermissionConfirmationContext<'native-token-stream'>,
+        );
+      }
 
-      const confirmationScreen = handlePermissionCase(
-        permissionType,
-        context.permission,
-        caseHandlers,
-        'Permission confirmation screen not found',
-      );
+      if (!confirmationScreen) {
+        throw new Error('Permission confirmation screen not found');
+      }
 
       return [context, confirmationScreen];
     },

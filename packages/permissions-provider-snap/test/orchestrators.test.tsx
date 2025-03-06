@@ -40,18 +40,19 @@ describe('Orchestrators', () => {
       getPermissionConfirmationPage: jest.fn(),
     } as unknown as jest.Mocked<PermissionConfirmationRenderHandler>;
 
-    const delegator = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
-    const delegate = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe009');
+    const account = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
+    const sessionAccount = getAddress(
+      '0x016562aA41A8697720ce0943F003141f5dEAe009',
+    );
     const mockDelegation = convertToSerializableDelegation(
-      createRootDelegation(delegate, delegator, []),
+      createRootDelegation(sessionAccount, account, []),
     );
     const mockAttenuatedContext: PermissionConfirmationContext<
       typeof mockPermissionType
     > = {
       permission:
         mockbasePermission as PermissionTypeMapping[typeof mockPermissionType],
-      delegator,
-      delegate,
+      account,
       siteOrigin: 'http://localhost:3000',
       balance: '0x1',
       expiry: 1,
@@ -62,6 +63,7 @@ describe('Orchestrators', () => {
     const mockPage = (
       <NativeTokenStreamConfirmationPage
         siteOrigin={mockAttenuatedContext.siteOrigin}
+        account={mockAttenuatedContext.account}
         permission={
           mockAttenuatedContext.permission as PermissionTypeMapping['native-token-stream']
         }
@@ -96,7 +98,7 @@ describe('Orchestrators', () => {
       const orchestrateMeta: OrchestrateMeta<typeof mockPermissionType> = {
         permission: permissionTypeAsserted,
         chainId: '0xaa36a7',
-        delegate: '0x016562aA41A8697720ce0943F003141f5dEAe006',
+        sessionAccount: '0x016562aA41A8697720ce0943F003141f5dEAe006',
         origin: 'http://localhost:3000',
         expiry: 1,
       };
@@ -161,7 +163,7 @@ describe('Orchestrators', () => {
       const orchestrateMeta: OrchestrateMeta<typeof mockPermissionType> = {
         permission: permissionTypeAsserted,
         chainId: '0xaa36a7',
-        delegate: '0x016562aA41A8697720ce0943F003141f5dEAe006',
+        sessionAccount: '0x016562aA41A8697720ce0943F003141f5dEAe006',
         origin: 'http://localhost:3000',
         expiry: 1,
       };

@@ -17,10 +17,12 @@ import { convertToSerializableDelegation } from '../src/utils';
 
 describe('Permission Confirmation Render Handler', () => {
   let mockSnapProvider: SnapsProvider;
-  const delegator = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
-  const delegate = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe009');
+  const account = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
+  const sessionAccount = getAddress(
+    '0x016562aA41A8697720ce0943F003141f5dEAe009',
+  );
   const mockDelegation = convertToSerializableDelegation(
-    createRootDelegation(delegate, delegator, []),
+    createRootDelegation(sessionAccount, account, []),
   );
   const permission: NativeTokenStreamPermission = {
     type: 'native-token-stream',
@@ -34,8 +36,7 @@ describe('Permission Confirmation Render Handler', () => {
   const mockContext: PermissionConfirmationContext<typeof mockPermissionType> =
     {
       permission,
-      delegator,
-      delegate,
+      account,
       siteOrigin: 'http://localhost:3000',
       balance: '0x1',
       expiry: 1,
@@ -46,6 +47,7 @@ describe('Permission Confirmation Render Handler', () => {
   const mockPage = (
     <NativeTokenStreamConfirmationPage
       siteOrigin={mockContext.siteOrigin}
+      account={mockContext.account}
       permission={
         mockContext.permission as PermissionTypeMapping['native-token-stream']
       }
@@ -171,8 +173,7 @@ describe('Permission Confirmation Render Handler', () => {
         permissionConfirmationRenderHandler.getPermissionConfirmationPage(
           {
             permission: nonSupportedPermission,
-            delegator,
-            delegate,
+            account,
             siteOrigin: 'http://localhost:3000',
             balance: '0x1',
             expiry: 1,

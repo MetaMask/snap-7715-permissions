@@ -61,18 +61,19 @@ export const createPermissionOrchestrator = <
       return basePermission as PermissionTypeMapping[typeof permissionType];
     },
     orchestrate: async (orchestrateMeta: OrchestrateMeta<TPermissionType>) => {
-      const { chainId, delegate, origin, expiry, permission } = orchestrateMeta;
+      const { chainId, sessionAccount, origin, expiry, permission } =
+        orchestrateMeta;
       const chainIdNum = fromHex(chainId, 'number');
 
       // Get the user account details
-      const [delegator, balance] = await prepareAccountDetails(
+      const [account, balance] = await prepareAccountDetails(
         accountController,
         fromHex(chainId, 'number'),
       );
 
       // TODO: Use the delegation builder to attach the correct caveats specific to the permission type: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
       const delegationToBuild = convertToSerializableDelegation(
-        createRootDelegation(delegate, delegator, []),
+        createRootDelegation(sessionAccount, account, []),
       );
 
       // Prepare specific context and UI
@@ -80,8 +81,7 @@ export const createPermissionOrchestrator = <
         permissionConfirmationRenderHandler.getPermissionConfirmationPage(
           {
             permission,
-            delegator,
-            delegate,
+            account,
             siteOrigin: origin,
             balance,
             expiry,
@@ -127,12 +127,12 @@ export const createPermissionOrchestrator = <
         success: true,
         response: {
           chainId,
-          account: delegator,
+          account,
           expiry: attenuatedExpiry,
           signer: {
             type: 'account',
             data: {
-              address: delegate,
+              address: sessionAccount,
             },
           },
           permission: attenuatedPermission,

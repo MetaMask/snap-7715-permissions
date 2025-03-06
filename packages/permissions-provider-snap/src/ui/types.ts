@@ -12,6 +12,8 @@ import type {
  * The delegation in transit object with salt as a hex string to be compatible with the Snap context { [prop: string]: Json; } object.
  */
 export type SerializableDelegation = Omit<DelegationStruct, 'salt'> & {
+  readonly delegate: Hex;
+  readonly delegator: Hex;
   salt: Hex;
 };
 
@@ -26,6 +28,7 @@ export type PermissionConfirmationContext<
   TPermissionType extends SupportedPermissionTypes,
 > = InterfaceContext & {
   permission: PermissionTypeMapping[TPermissionType];
+  readonly account: Hex;
   readonly siteOrigin: string;
   readonly balance: Hex;
   readonly chainId: number;
@@ -41,20 +44,5 @@ export type PermissionConfirmationProps<
 > = JsonObject &
   Pick<
     PermissionConfirmationContext<TPermissionType>,
-    'permission' | 'siteOrigin' | 'balance' | 'expiry' | 'chainId'
+    'permission' | 'account' | 'siteOrigin' | 'balance' | 'expiry' | 'chainId'
   >;
-
-/**
- * The meta data required to prepare the permission confirmation page.
- */
-export type PermissionConfirmationMeta<
-  TPermissionType extends SupportedPermissionTypes,
-> = {
-  readonly permission: PermissionTypeMapping[TPermissionType];
-  readonly delegator: Hex;
-  readonly delegate: Hex;
-  readonly siteOrigin: string;
-  readonly balance: Hex;
-  readonly expiry: number;
-  readonly chainId: number;
-};
