@@ -20,6 +20,8 @@ export const zPermission = z.object({
    * Data structure varies by permission type.
    */
   data: z.record(any()),
+
+  rules: z.record(any()).optional(),
 });
 
 export const zMetaMaskPermissionData = z.object({
