@@ -54,7 +54,6 @@ export const buttonClickEventHandler = async (
   const activeContext = await getActiveInterfaceContext(activeInterfaceId);
   const attenuatedResponse: AttenuatedResponse<SupportedPermissionTypes> = {
     attenuatedPermission: activeContext.permission,
-    attenuatedDelegation: activeContext.delegation,
     attenuatedExpiry: activeContext.expiry,
     isConfirmed: false,
   };

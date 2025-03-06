@@ -1,4 +1,3 @@
-import { createRootDelegation } from '@metamask-private/delegator-core-viem';
 import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import { getAddress } from 'viem';
@@ -15,7 +14,6 @@ import type {
   PermissionConfirmationRenderHandler,
 } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
-import { convertToSerializableDelegation } from '../src/utils';
 
 describe('Orchestrators', () => {
   const mockAccountController = createMockAccountController();
@@ -41,12 +39,6 @@ describe('Orchestrators', () => {
     } as unknown as jest.Mocked<PermissionConfirmationRenderHandler>;
 
     const account = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
-    const sessionAccount = getAddress(
-      '0x016562aA41A8697720ce0943F003141f5dEAe009',
-    );
-    const mockDelegation = convertToSerializableDelegation(
-      createRootDelegation(sessionAccount, account, []),
-    );
     const mockAttenuatedContext: PermissionConfirmationContext<
       typeof mockPermissionType
     > = {
@@ -57,7 +49,6 @@ describe('Orchestrators', () => {
       balance: '0x1',
       expiry: 1,
       chainId: 11155111,
-      delegation: mockDelegation,
     };
 
     const mockPage = (
@@ -70,7 +61,6 @@ describe('Orchestrators', () => {
         balance={mockAttenuatedContext.balance}
         expiry={mockAttenuatedContext.expiry}
         chainId={mockAttenuatedContext.chainId}
-        delegation={mockDelegation}
       />
     );
 
@@ -112,7 +102,6 @@ describe('Orchestrators', () => {
       mockPermissionConfirmationRenderHandler.getConfirmedAttenuatedPermission.mockResolvedValueOnce(
         {
           isConfirmed: true,
-          attenuatedDelegation: mockAttenuatedContext.delegation,
           attenuatedExpiry: mockAttenuatedContext.expiry,
           attenuatedPermission: mockAttenuatedContext.permission,
         },
@@ -136,7 +125,7 @@ describe('Orchestrators', () => {
           ],
           chainId: '0xaa36a7',
           context:
-            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000016562aa41a8697720ce0943f003141f5deae009000000000000000000000000016562aa41a8697720ce0943f003141f5deae008ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000_SIGNED_DELEGATION00000000000000000000000000000000',
+            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000016562aa41a8697720ce0943f003141f5deae0060000000000000000000000001234567890123456789012345678901234567890ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000_SIGNED_DELEGATION00000000000000000000000000000000',
           expiry: 1,
           permission: {
             data: { justification: 'shh...permission 2' },
@@ -177,7 +166,6 @@ describe('Orchestrators', () => {
       mockPermissionConfirmationRenderHandler.getConfirmedAttenuatedPermission.mockResolvedValueOnce(
         {
           isConfirmed: false,
-          attenuatedDelegation: mockAttenuatedContext.delegation,
           attenuatedExpiry: mockAttenuatedContext.expiry,
           attenuatedPermission: mockAttenuatedContext.permission,
         },

@@ -1,4 +1,3 @@
-import { createRootDelegation } from '@metamask-private/delegator-core-viem';
 import type { MockSnapRequest } from '@metamask/7715-permissions-shared/testing';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
@@ -13,17 +12,10 @@ import type {
 import type { PermissionConfirmationContext } from '../src/ui';
 import { createPermissionConfirmationRenderHandler } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
-import { convertToSerializableDelegation } from '../src/utils';
 
 describe('Permission Confirmation Render Handler', () => {
   let mockSnapProvider: SnapsProvider;
   const account = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
-  const sessionAccount = getAddress(
-    '0x016562aA41A8697720ce0943F003141f5dEAe009',
-  );
-  const mockDelegation = convertToSerializableDelegation(
-    createRootDelegation(sessionAccount, account, []),
-  );
   const permission: NativeTokenStreamPermission = {
     type: 'native-token-stream',
     data: {
@@ -41,7 +33,6 @@ describe('Permission Confirmation Render Handler', () => {
       balance: '0x1',
       expiry: 1,
       chainId: 11155111,
-      delegation: mockDelegation,
     };
 
   const mockPage = (
@@ -54,7 +45,6 @@ describe('Permission Confirmation Render Handler', () => {
       balance={mockContext.balance}
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
-      delegation={mockDelegation}
     />
   );
 
@@ -75,7 +65,6 @@ describe('Permission Confirmation Render Handler', () => {
         .mockResolvedValueOnce(mockInterfaceId) // mock snap_createInterface
         .mockResolvedValueOnce({
           attenuatedPermission: mockContext.permission,
-          attenuatedDelegation: mockContext.delegation,
           attenuatedExpiry: mockContext.expiry,
           isConfirmed: true,
         }); // mock snap_dialog resolves with type AttenuatedResponse
@@ -105,7 +94,6 @@ describe('Permission Confirmation Render Handler', () => {
 
       expect(attenuatedRes).toStrictEqual({
         attenuatedPermission: mockContext.permission,
-        attenuatedDelegation: mockContext.delegation,
         attenuatedExpiry: mockContext.expiry,
         isConfirmed: true,
       });
@@ -121,7 +109,6 @@ describe('Permission Confirmation Render Handler', () => {
         .mockResolvedValueOnce(mockInterfaceId) // mock snap_createInterface
         .mockResolvedValueOnce({
           attenuatedPermission: mockContext.permission,
-          attenuatedDelegation: mockContext.delegation,
           attenuatedExpiry: mockContext.expiry,
           isConfirmed: false,
         }); // mock snap_dialog resolves with type AttenuatedResponse
@@ -135,7 +122,6 @@ describe('Permission Confirmation Render Handler', () => {
 
       expect(attenuatedRes).toStrictEqual({
         attenuatedPermission: mockContext.permission,
-        attenuatedDelegation: mockContext.delegation,
         attenuatedExpiry: mockContext.expiry,
         isConfirmed: false,
       });
@@ -178,7 +164,6 @@ describe('Permission Confirmation Render Handler', () => {
             balance: '0x1',
             expiry: 1,
             chainId: 11155111,
-            delegation: mockDelegation,
           } as PermissionConfirmationContext<typeof nonSupportedPermissionType>,
           nonSupportedPermissionType,
         ),

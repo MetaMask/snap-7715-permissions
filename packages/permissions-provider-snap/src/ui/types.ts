@@ -33,7 +33,6 @@ export type PermissionConfirmationContext<
   readonly balance: Hex;
   readonly chainId: number;
   expiry: number;
-  delegation: SerializableDelegation;
 };
 
 /**

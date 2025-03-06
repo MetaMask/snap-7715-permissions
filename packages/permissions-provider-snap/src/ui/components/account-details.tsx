@@ -10,25 +10,30 @@ import {
   Section,
   Card,
 } from '@metamask/snaps-sdk/jsx';
-import type { Address as AddressViem } from 'viem';
+import { type Hex } from 'viem';
 
+import { weiToEth } from '../../utils';
 import { ACCOUNT_SELECTOR } from '../userInputConstant';
 
-type AccountDetails = {
-  accounts: AddressViem[];
+export type AccountDetailsProps = {
+  accounts: {
+    address: Hex;
+    balance: Hex;
+    asset: string;
+  }[];
   permissionIndex: number;
 };
 
-export const AccountDetails: SnapComponent<AccountDetails> = ({
+export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
   accounts,
   permissionIndex,
 }) => {
   const genSelectorOption = accounts.map((account) => (
-    <SelectorOption value={account}>
+    <SelectorOption value={account.address}>
       <Card
-        title={<Address address={account} />}
-        description="Account petname"
-        value="1200 USDC"
+        title={<Address address={account.address} displayName={true} />}
+        description="Spending Account"
+        value={`${weiToEth(account.balance)} ${account.asset}`}
       />
     </SelectorOption>
   ));

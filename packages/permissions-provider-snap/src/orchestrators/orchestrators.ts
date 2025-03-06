@@ -14,10 +14,7 @@ import { fromHex } from 'viem';
 
 import { type MockAccountController } from '../accountController.mock';
 import { type PermissionConfirmationRenderHandler } from '../ui';
-import {
-  convertToDelegationStruct,
-  convertToSerializableDelegation,
-} from '../utils';
+import { convertToSerializableDelegation } from '../utils';
 import type {
   OrchestrateMeta,
   OrchestrateResult,
@@ -157,12 +154,7 @@ export const createPermissionOrchestrator = <
         );
 
       // Wait for the successful permission confirmation reponse from the user
-      const {
-        attenuatedPermission,
-        attenuatedDelegation,
-        attenuatedExpiry,
-        isConfirmed,
-      } =
+      const { attenuatedPermission, attenuatedExpiry, isConfirmed } =
         await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
           context,
           permissionConfirmationPage,
@@ -176,11 +168,16 @@ export const createPermissionOrchestrator = <
         };
       }
 
-      // TODO: Pass this to the delegation builder to sign and build the permission context
+      // TODO: Use the delegation builder to attach the correct caveats specific
+      // to the permission type, derived from the attenuatedPermission and
+      // expiry:
+      // https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
+      const delegation = createRootDelegation(sessionAccount, account, []);
+
       // Sign the delegation and encode it to create the permissioncContext
       const signedDelegation = await accountController.signDelegation({
         chainId: chainIdNum,
-        delegation: convertToDelegationStruct(attenuatedDelegation), // has the delegation with caveat attached specific to the permission
+        delegation,
       });
       const permissionContext = encodeDelegation([signedDelegation]);
 
