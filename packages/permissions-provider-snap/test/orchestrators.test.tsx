@@ -194,5 +194,52 @@ describe('Orchestrators', () => {
         reason: 'User rejected the permissions request',
       });
     });
+
+    it('should return true when validate called with valid permission that is supported', async () => {
+      const orchestrator = createPermissionOrchestrator(
+        mockAccountController,
+        mockPermissionConfirmationRenderHandler,
+        mockPermissionType,
+      );
+
+      const res = await orchestrator.parseAndValidate(mockbasePermission);
+
+      expect(res).toStrictEqual({
+        data: { justification: 'shh...permission 2' },
+        type: 'native-token-stream',
+      });
+    });
+
+    it('should throw error when validate called with permission type that is not supported', async () => {
+      const orchestrator = createPermissionOrchestrator(
+        mockAccountController,
+        mockPermissionConfirmationRenderHandler,
+        'unsupported-permission-type' as keyof PermissionTypeMapping,
+      );
+
+      await expect(
+        orchestrator.parseAndValidate({
+          ...mockbasePermission,
+          type: 'unsupported-permission-type',
+        }),
+      ).rejects.toThrow(
+        `Validation for Permission type unsupported-permission-type is not supported`,
+      );
+    });
+
+    it('should throw error when validate called with permission that is not valid', async () => {
+      const orchestrator = createPermissionOrchestrator(
+        mockAccountController,
+        mockPermissionConfirmationRenderHandler,
+        mockPermissionType,
+      );
+
+      await expect(
+        orchestrator.parseAndValidate({
+          ...mockbasePermission,
+          data: {},
+        } as unknown as Permission),
+      ).rejects.toThrow('Failed type validation: data.justification: Required');
+    });
   });
 });

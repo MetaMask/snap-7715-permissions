@@ -1,8 +1,14 @@
+/* eslint-disable @typescript-eslint/no-throw-literal */
 import {
   createRootDelegation,
   encodeDelegation,
 } from '@metamask-private/delegator-core-viem';
-import type { Permission } from '@metamask/7715-permissions-shared/types';
+import {
+  zNativeTokenStreamPermission,
+  type Permission,
+} from '@metamask/7715-permissions-shared/types';
+import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { Hex } from 'viem';
 import { fromHex } from 'viem';
 
@@ -19,6 +25,13 @@ import type {
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from './types';
+
+/**
+ * Maps permission types to their corresponding Zod object validators.
+ */
+const zodObjectMapper = {
+  'native-token-stream': zNativeTokenStreamPermission,
+};
 
 /**
  * Prepare the account details for the permission picker UI.
@@ -41,6 +54,53 @@ export const prepareAccountDetails = async (
 };
 
 /**
+ * Parses a permission request and returns the permission object.
+ *
+ * @param basePermission - The base permission object.
+ * @param permissionType - The permission type.
+ * @returns The permission object.
+ * @throws An error if the permission in the request is invalid.
+ * @throws An error if the permission type is not supported.
+ */
+const parsePermission = <TPermissionType extends SupportedPermissionTypes>(
+  basePermission: Permission,
+  permissionType: TPermissionType,
+): PermissionTypeMapping[TPermissionType] => {
+  const zValidatorKey = permissionType as keyof typeof zodObjectMapper;
+  const zValidator = zodObjectMapper[zValidatorKey];
+  if (!zValidator) {
+    throw new Error(
+      `Validation for Permission type ${permissionType} is not supported`,
+    );
+  }
+
+  const validateRes = zValidator.safeParse(basePermission);
+  if (!validateRes.success) {
+    throw new InvalidParamsError(extractZodError(validateRes.error.errors));
+  }
+
+  return validateRes.data as PermissionTypeMapping[typeof permissionType];
+};
+
+/**
+ * Validates a permission object data specific to the permission type.
+ *
+ * @param _permission - The permission object.
+ * @param _permissionType - The permission type.
+ * @returns True if the permission object data is valid.
+ * @throws An error if the permission object data is invalid.
+ */
+const validatePermissionData = <
+  TPermissionType extends SupportedPermissionTypes,
+>(
+  _permission: PermissionTypeMapping[TPermissionType],
+  _permissionType: TPermissionType,
+): true => {
+  // TODO: Implement permission.data validation for the native-token-stream permission type
+  return true;
+};
+
+/**
  * Factory function to create a permission orchestrator for a specific permission type.
  *
  * @param accountController - An account controller instance.
@@ -57,8 +117,13 @@ export const createPermissionOrchestrator = <
 ): Orchestrator<TPermissionType> => {
   return {
     parseAndValidate: async (basePermission: Permission) => {
-      // TODO: Implement Specific permission validator: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/38
-      return basePermission as PermissionTypeMapping[typeof permissionType];
+      const validatedPermission = parsePermission(
+        basePermission,
+        permissionType,
+      );
+      validatePermissionData(validatedPermission, permissionType);
+
+      return validatedPermission;
     },
     orchestrate: async (orchestrateMeta: OrchestrateMeta<TPermissionType>) => {
       const { chainId, sessionAccount, origin, expiry, permission } =

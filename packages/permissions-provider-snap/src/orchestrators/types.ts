@@ -20,9 +20,7 @@ export type OrchestrateResult = OneOf<
 /**
  * Supported permission types.
  */
-export type SupportedPermissionTypes =
-  | 'native-token-stream'
-  | 'native-token-transfer';
+export type SupportedPermissionTypes = keyof PermissionTypeMapping;
 
 /**
  * Mapping of supported permission types to their respective permission types.
