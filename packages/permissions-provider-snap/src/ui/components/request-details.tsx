@@ -1,5 +1,5 @@
 import type { Permission } from '@metamask/7715-permissions-shared/types';
-import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import type { JSXElement } from '@metamask/snaps-sdk/jsx';
 import {
   Text,
   Divider,
@@ -8,16 +8,28 @@ import {
   Tooltip,
   Icon,
 } from '@metamask/snaps-sdk/jsx';
+import { extractChain, type Hex, toHex } from 'viem';
+import * as ALL_CHAINS from 'viem/chains';
 
 type RequestDetails = {
   siteOrigin: string;
   permission: Permission;
+  accountAddress: Hex;
+  chainId: number;
 };
 
-export const RequestDetails: SnapComponent<RequestDetails> = ({
+export const RequestDetails: (params: RequestDetails) => JSXElement = ({
   siteOrigin,
   permission,
+  accountAddress,
+  chainId,
 }) => {
+  // @ts-expect-error - extractChain does not work well with dynamic `chains`
+  const chain = extractChain({
+    chains: Object.values(ALL_CHAINS),
+    id: chainId as any,
+  });
+
   const items = [
     {
       label: 'Requested by',
@@ -31,7 +43,12 @@ export const RequestDetails: SnapComponent<RequestDetails> = ({
     },
     {
       label: 'Network',
-      text: 'Linea Sepolia',
+      text: chain?.name || toHex(chainId),
+      tooltipText: 'Tooltip text',
+    },
+    {
+      label: 'Account',
+      text: accountAddress,
       tooltipText: 'Tooltip text',
     },
   ].map((item) => (

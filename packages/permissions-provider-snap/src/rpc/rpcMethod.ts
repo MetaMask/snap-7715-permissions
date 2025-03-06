@@ -1,9 +1,7 @@
-import { KERNEL_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
-
 /*
   Defines the permission for the Gator keyring and internal methods to restrict access to specific sites and snaps origins
 */
-export enum InternalMethod {
+export enum RpcMethod {
   /**
    * This method is used by snaps to offer its cryptographic abilities as permissions to kernel.
    */
@@ -19,22 +17,3 @@ export enum InternalMethod {
    */
   PermissionProviderGrantAttenuatedPermissions = 'permissionsProvider_grantAttenuatedPermissions',
 }
-
-export const originPermissions = new Map<string, string[]>([
-  // Local kernel snap
-  [
-    KERNEL_SNAP_ID,
-    [InternalMethod.PermissionProviderGrantAttenuatedPermissions],
-  ],
-]);
-
-/**
- * Verify if the caller can call the requested method.
- *
- * @param origin - Caller origin.
- * @param method - Method being called.
- * @returns True if the caller is allowed to call the method, false otherwise.
- */
-export const hasPermission = (origin: string, method: string): boolean => {
-  return originPermissions.get(origin)?.includes(method) ?? false;
-};

@@ -2,7 +2,7 @@ import type {
   PermissionRequest,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
-import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import type { JSXElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
   Button,
@@ -10,6 +10,7 @@ import {
   Divider,
   Footer,
 } from '@metamask/snaps-sdk/jsx';
+import type { Hex } from 'viem';
 
 import { Header, RequestDetails } from './components';
 import { GRANT_BUTTON, CANCEL_BUTTON } from './user-input.contant';
@@ -22,12 +23,13 @@ export type GrantPermissionContext = {
 export type GrantPermissionPageProps = {
   siteOrigin: string;
   permission: Permission;
+  accountAddress: Hex;
+  chainId: number;
 };
 
-export const GrantPermissonPage: SnapComponent<GrantPermissionPageProps> = ({
-  siteOrigin,
-  permission,
-}) => {
+export const GrantPermissonPage: (
+  params: GrantPermissionPageProps,
+) => JSXElement = ({ siteOrigin, permission, accountAddress, chainId }) => {
   return (
     <Container>
       <Box>
@@ -37,7 +39,12 @@ export const GrantPermissonPage: SnapComponent<GrantPermissionPageProps> = ({
         />
         <Divider />
 
-        <RequestDetails siteOrigin={siteOrigin} permission={permission} />
+        <RequestDetails
+          siteOrigin={siteOrigin}
+          permission={permission}
+          accountAddress={accountAddress}
+          chainId={chainId}
+        />
       </Box>
       <Footer>
         <Button name={CANCEL_BUTTON} variant="destructive">
