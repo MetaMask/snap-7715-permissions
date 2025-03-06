@@ -5,10 +5,7 @@ import type {
   SupportedPermissionTypes,
 } from '../../orchestrators';
 import { NativeTokenStreamConfirmationPage } from '../confirmations';
-import type {
-  PermissionConfirmationContext,
-  SerializableDelegation,
-} from '../types';
+import type { PermissionConfirmationContext } from '../types';
 
 /**
  * The attenuated response after the user confirms the permission request.
@@ -18,7 +15,6 @@ export type AttenuatedResponse<
 > = {
   isConfirmed: boolean;
   attenuatedPermission: PermissionTypeMapping[TPermissionType];
-  attenuatedDelegation: SerializableDelegation;
   attenuatedExpiry: number;
 };
 
@@ -71,7 +67,6 @@ export const buildNativeTokenStreamConfirmationPage = (
       balance={context.balance}
       expiry={context.expiry}
       chainId={context.chainId}
-      delegation={context.delegation}
     />
   );
 };
