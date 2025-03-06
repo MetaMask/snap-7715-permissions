@@ -11,6 +11,7 @@ describe('RpcHandler', () => {
     signDelegation: jest.fn(),
     getAccountMetadata: jest.fn(),
     getAccountBalance: jest.fn(),
+    getDelegationManager: jest.fn(),
   };
   const mockSnapsProvider = createMockSnapsProvider();
 
