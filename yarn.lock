@@ -17379,6 +17379,7 @@ __metadata:
     rimraf: ^3.0.2
     styled-components: 5.3.3
     typescript: ^4.7.4
+    viem: 2.22.21
   languageName: unknown
   linkType: soft
 
@@ -18997,7 +18998,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^2.21.29":
+"viem@npm:2.22.21, viem@npm:^2.21.29":
   version: 2.22.21
   resolution: "viem@npm:2.22.21"
   dependencies:
