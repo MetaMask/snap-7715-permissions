@@ -88,6 +88,30 @@ describe('AccountController', () => {
     });
   });
 
+  describe('getDelegationManager()', () => {
+    it('should get the delegation manager', async () => {
+      const chainId = sepolia.id;
+      const { DelegationManager: expectedDelegationManager } =
+        getDeleGatorEnvironment(chainId);
+
+      const delegationManager = await accountController.getDelegationManager({
+        chainId,
+      });
+
+      expect(delegationManager).toStrictEqual(expectedDelegationManager);
+    });
+
+    it('should reject if an invalid chainId is supplied', async () => {
+      const invalidChainId = 12345;
+
+      await expect(
+        accountController.getDelegationManager({
+          chainId: invalidChainId,
+        }),
+      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
+    });
+  });
+
   describe('getAccountAddress()', () => {
     it('should get the account address', async () => {
       mockSnapsProvider.request.mockResolvedValueOnce(entropy);
