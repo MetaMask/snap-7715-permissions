@@ -11,13 +11,13 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: [
     './src/**/*.[tj]s?(x)',
-    './src/index.ts',
     '!./src/**/*.d.ts',
     '!./src/**/index.[tj]s?(x)',
     '!./src/**/type?(s).ts',
     '!./src/**/constant?(s).ts',
     '!./test/**',
   ],
+  coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   coverageReporters: ['html', 'json-summary', 'text'],
 };

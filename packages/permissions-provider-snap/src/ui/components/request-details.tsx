@@ -10,13 +10,13 @@ import {
 import { extractChain, toHex } from 'viem';
 import * as ALL_CHAINS from 'viem/chains';
 
-type RequestDetails = JsonObject & {
+type RequestDetailsProps = JsonObject & {
   siteOrigin: string;
   justification: string | undefined;
   chainId: number;
 };
 
-export const RequestDetails: SnapComponent<RequestDetails> = ({
+export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
   siteOrigin,
   justification,
   chainId,

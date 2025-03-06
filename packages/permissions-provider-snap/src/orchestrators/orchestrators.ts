@@ -14,7 +14,6 @@ import { fromHex } from 'viem';
 
 import { type MockAccountController } from '../accountController.mock';
 import { type PermissionConfirmationRenderHandler } from '../ui';
-import { convertToSerializableDelegation } from '../utils';
 import type {
   OrchestrateMeta,
   OrchestrateResult,
@@ -108,6 +107,7 @@ const validatePermissionData = <
 export const createPermissionOrchestrator = <
   TPermissionType extends SupportedPermissionTypes,
 >(
+  // TODO: Remove mock accountController: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/54
   accountController: MockAccountController,
   permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler,
   permissionType: TPermissionType,
@@ -133,11 +133,6 @@ export const createPermissionOrchestrator = <
         fromHex(chainId, 'number'),
       );
 
-      // TODO: Use the delegation builder to attach the correct caveats specific to the permission type: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
-      const delegationToBuild = convertToSerializableDelegation(
-        createRootDelegation(sessionAccount, account, []),
-      );
-
       // Prepare specific context and UI
       const [context, permissionConfirmationPage] =
         permissionConfirmationRenderHandler.getPermissionConfirmationPage(
@@ -148,7 +143,6 @@ export const createPermissionOrchestrator = <
             balance,
             expiry,
             chainId: chainIdNum,
-            delegation: delegationToBuild,
           },
           permissionType,
         );
@@ -168,9 +162,7 @@ export const createPermissionOrchestrator = <
         };
       }
 
-      // TODO: Use the delegation builder to attach the correct caveats specific
-      // to the permission type, derived from the attenuatedPermission and
-      // expiry:
+      // TODO: Use the delegation builder to attach the correct caveats specific to the permission type
       // https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
       const delegation = createRootDelegation(sessionAccount, account, []);
 

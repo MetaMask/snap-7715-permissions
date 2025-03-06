@@ -36,7 +36,7 @@ describe('Orchestrators', () => {
     const mockPermissionConfirmationRenderHandler = {
       getConfirmedAttenuatedPermission: jest.fn(),
       getPermissionConfirmationPage: jest.fn(),
-    } as unknown as jest.Mocked<PermissionConfirmationRenderHandler>;
+    } as jest.Mocked<PermissionConfirmationRenderHandler>;
 
     const account = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
     const mockAttenuatedContext: PermissionConfirmationContext<

@@ -1,8 +1,6 @@
-import type { MockSnapRequest } from '@metamask/7715-permissions-shared/testing';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
 import type {
@@ -14,7 +12,7 @@ import { createPermissionConfirmationRenderHandler } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 
 describe('Permission Confirmation Render Handler', () => {
-  let mockSnapProvider: SnapsProvider;
+  const mockSnapProvider = createMockSnapsProvider();
   const account = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
   const permission: NativeTokenStreamPermission = {
     type: 'native-token-stream',
@@ -49,9 +47,7 @@ describe('Permission Confirmation Render Handler', () => {
   );
 
   beforeEach(() => {
-    mockSnapProvider = createMockSnapsProvider();
-
-    jest.clearAllMocks();
+    mockSnapProvider.request.mockReset();
   });
 
   describe('getConfirmedAttenuatedPermission - native-token-stream', () => {
@@ -61,7 +57,7 @@ describe('Permission Confirmation Render Handler', () => {
 
       // mock the snap dialog user interaction
       const mockInterfaceId = 'mockInterfaceId';
-      (mockSnapProvider.request as MockSnapRequest)
+      mockSnapProvider.request
         .mockResolvedValueOnce(mockInterfaceId) // mock snap_createInterface
         .mockResolvedValueOnce({
           attenuatedPermission: mockContext.permission,
@@ -85,9 +81,7 @@ describe('Permission Confirmation Render Handler', () => {
           ui: mockPage,
         },
       });
-      expect(
-        mockSnapProvider.request as MockSnapRequest,
-      ).toHaveBeenNthCalledWith(2, {
+      expect(mockSnapProvider.request).toHaveBeenNthCalledWith(2, {
         method: 'snap_dialog',
         params: { id: mockInterfaceId },
       });
@@ -105,7 +99,7 @@ describe('Permission Confirmation Render Handler', () => {
 
       // mock the snap dialog user interaction
       const mockInterfaceId = 'mockInterfaceId';
-      (mockSnapProvider.request as MockSnapRequest)
+      mockSnapProvider.request
         .mockResolvedValueOnce(mockInterfaceId) // mock snap_createInterface
         .mockResolvedValueOnce({
           attenuatedPermission: mockContext.permission,
