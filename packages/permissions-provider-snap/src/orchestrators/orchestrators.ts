@@ -34,15 +34,15 @@ const parsePermission = <TPermissionType extends SupportedPermissionTypes>(
   basePermission: Permission,
   permissionType: TPermissionType,
 ): PermissionTypeMapping[TPermissionType] => {
-  const zValaidatorKey = permissionType as keyof typeof zodObjectMapper;
-  const zValaidator = zodObjectMapper[zValaidatorKey];
-  if (!zValaidator) {
+  const zValidatorKey = permissionType as keyof typeof zodObjectMapper;
+  const zValidator = zodObjectMapper[zValidatorKey];
+  if (!zValidator) {
     throw new Error(
       `Validation for Permission type ${permissionType} is not supported`,
     );
   }
 
-  const validateRes = zValaidator.safeParse(basePermission);
+  const validateRes = zValidator.safeParse(basePermission);
   if (!validateRes.success) {
     throw new InvalidParamsError(extractZodError(validateRes.error.errors));
   }
