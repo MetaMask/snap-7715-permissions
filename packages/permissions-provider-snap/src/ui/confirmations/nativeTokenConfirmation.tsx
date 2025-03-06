@@ -1,0 +1,60 @@
+import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import { Box, Container, Divider } from '@metamask/snaps-sdk/jsx';
+
+import type { AccountDetailsProps } from '../components';
+import {
+  AccountDetails,
+  ConfirmationFooter,
+  Header,
+  RequestDetails,
+} from '../components';
+import type { PermissionConfirmationProps } from '../types';
+
+/**
+ * The native-token-stream permission confirmation page.
+ *
+ * @param props - The permission confirmation props.
+ * @param props.siteOrigin - The site origin.
+ * @param props.permission - The native-token-stream permission data.
+ * @param props.chainId - The chain ID.
+ * @param props.account - The account address.
+ * @param props.balance - The account balance.
+ * @returns The JSX element to render.
+ */
+export const NativeTokenStreamConfirmationPage: SnapComponent<
+  PermissionConfirmationProps<'native-token-stream'>
+> = ({ siteOrigin, permission, chainId, account, balance }) => {
+  const accountDetailsProps: AccountDetailsProps = {
+    accounts: [
+      {
+        address: account,
+        balance,
+        asset: 'ETH',
+      },
+    ],
+    permissionIndex: 0,
+  };
+  return (
+    <Container>
+      <Box>
+        <Header
+          title="Permission request"
+          subtitle="<place holder subtitle for native-token-stream>"
+        />
+        <Divider />
+
+        <RequestDetails
+          siteOrigin={siteOrigin}
+          chainId={chainId}
+          justification={permission.data.justification}
+        />
+
+        <AccountDetails
+          accounts={accountDetailsProps.accounts}
+          permissionIndex={accountDetailsProps.permissionIndex}
+        />
+      </Box>
+      <ConfirmationFooter />
+    </Container>
+  );
+};

@@ -27,12 +27,6 @@ export const zMetaMaskPermissionData = z.object({
    * A human-readable explanation of why the permission is being requested.
    */
   justification: z.string(),
-
-  // TODO: We need to define the structure of the enforced outcomes.
-  /**
-   * The outcome that is enfoced onchain during permission redemption(e.g. token balance increasing by 100).
-   */
-  enforcedOutcomes: z.record(any()).optional(),
 });
 
 export const zNativeTokenTransferPermission = zPermission.extend({

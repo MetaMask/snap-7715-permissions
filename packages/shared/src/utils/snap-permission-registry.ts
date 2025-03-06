@@ -5,12 +5,8 @@ import type { GatorPermission } from '../types';
  */
 export const DEFAULT_OFFERS: GatorPermission[] = [
   {
-    type: 'native-token-transfer',
-    proposedName: 'Native Token Transfer',
-  },
-  {
-    type: 'erc20-token-transfer',
-    proposedName: 'ERC20 Token Transfer',
+    type: 'native-token-stream',
+    proposedName: 'Native Token Stream',
   },
 ];
 

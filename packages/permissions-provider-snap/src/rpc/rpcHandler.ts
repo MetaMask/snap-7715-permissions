@@ -1,9 +1,17 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
+import {
+  extractPermissionName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
+import type { Json } from '@metamask/snaps-sdk';
+import type { PermissionConfirmationRenderHandler } from 'src/ui';
 
 import type { AccountControllerInterface } from '../accountController';
-import type { GrantPermissionContext } from '../ui/grant-permission';
-import { GrantPermissonPage } from '../ui/grant-permission';
+import { createMockAccountController } from '../accountController.mock';
+import {
+  createPermissionOrchestrator,
+  type SupportedPermissionTypes,
+} from '../orchestrators';
+import { validatePermissionRequestParam } from '../utils';
 
 /**
  * Type for the RPC handler methods.
@@ -23,14 +31,14 @@ export type RpcHandler = {
  *
  * @param config - The parameters for creating the RPC handler.
  * @param config.accountController - The account controller interface.
- * @param config.snapsProvider - The snaps provider.
+ * @param config.permissionConfirmationRenderHandler - The permission confirmation render handler.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
   accountController: AccountControllerInterface;
-  snapsProvider: SnapsProvider;
+  permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
 }): RpcHandler {
-  const { accountController, snapsProvider } = config;
+  const { permissionConfirmationRenderHandler } = config;
 
   return {
     /**
@@ -40,48 +48,44 @@ export function createRpcHandler(config: {
      * @returns The result of the grant permission request.
      */
     async grantPermission(params?: Json): Promise<Json> {
-      // todo: the vast majority of this code should be removed, and replaced
-      // with a call into the orchestrator factory.
-
       logger.debug('grantPermissions()', params);
 
-      const { permissionsRequest, siteOrigin } = params as unknown as any;
+      const { permissionsRequest, siteOrigin } =
+        validatePermissionRequestParam(params);
 
       const firstRequest = permissionsRequest[0];
       if (!firstRequest) {
         throw new Error('No permission request found');
       }
 
-      const context: GrantPermissionContext = {
-        siteOrigin,
-        permissionRequest: firstRequest,
-      };
+      const permissionType = extractPermissionName(
+        firstRequest.permission.type,
+      ) as SupportedPermissionTypes;
 
-      const chainId = Number(firstRequest.chainId);
+      // process the request
+      const orchestrator = createPermissionOrchestrator(
+        createMockAccountController(),
+        permissionConfirmationRenderHandler,
+        permissionType,
+      );
+      const permission = await orchestrator.parseAndValidate(
+        firstRequest.permission,
+      );
 
-      const accountAddress = await accountController.getAccountAddress({
-        chainId,
+      const orchestrateRes = await orchestrator.orchestrate({
+        permission,
+        chainId: firstRequest.chainId,
+        sessionAccount: firstRequest.signer.data.address,
+        origin: siteOrigin,
+        expiry: firstRequest.expiry,
       });
+      logger.debug('isPermissionGranted', orchestrateRes.success);
 
-      const didUserGrantPermission = await snapsProvider.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'confirmation',
-          content: GrantPermissonPage({
-            siteOrigin: context.siteOrigin,
-            permission: context.permissionRequest.permission,
-            accountAddress,
-            chainId,
-          }),
-        },
-      });
+      if (!orchestrateRes.success) {
+        throw new Error(orchestrateRes.reason);
+      }
 
-      logger.debug('isPermissionGranted', didUserGrantPermission);
-
-      // just a placeholder for now
-      return (
-        didUserGrantPermission ? context : { isPermissionGranted: false }
-      ) as Json;
+      return [orchestrateRes.response] as Json[];
     },
   };
 }

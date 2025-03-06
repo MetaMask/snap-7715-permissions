@@ -1,16 +1,26 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
-import type {
-  Json,
-  JsonRpcParams,
-  OnRpcRequestHandler,
-  OnUserInputHandler,
+import {
+  extractPermissionName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
+import {
+  UserInputEventType,
+  type Json,
+  type JsonRpcParams,
+  type OnRpcRequestHandler,
+  type OnUserInputHandler,
 } from '@metamask/snaps-sdk';
 import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
+import type { SupportedPermissionTypes } from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import {
+  buttonClickEventHandler,
+  createPermissionConfirmationRenderHandler,
+  getActiveInterfaceContext,
+} from './ui';
 
 // set up dependencies
 const accountController = new AccountController({
@@ -19,9 +29,12 @@ const accountController = new AccountController({
   deploymentSalt: '0x',
 });
 
+const permissionConfirmationRenderHandler =
+  createPermissionConfirmationRenderHandler(snap);
+
 const rpcHandler = createRpcHandler({
   accountController,
-  snapsProvider: snap,
+  permissionConfirmationRenderHandler,
 });
 
 // configure RPC methods bindings
@@ -74,6 +87,42 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  * @param args.event - The user input event.
  */
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
-  console.log('onUserInput', id, event);
-  // todo: handle user input
+  // TODO: Decouple User input handler: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/84
+  const activeContext = await getActiveInterfaceContext(id);
+  if (activeContext) {
+    switch (event.type) {
+      case UserInputEventType.ButtonClickEvent: {
+        await buttonClickEventHandler(event, id);
+        break;
+      }
+      default: {
+        return;
+      }
+    }
+
+    // Update the interface with the new context and UI specific to the permission type
+    const [updatedContext, permissionConfirmationPage] =
+      permissionConfirmationRenderHandler.getPermissionConfirmationPage(
+        {
+          permission: activeContext.permission,
+          account: activeContext.account,
+          siteOrigin: activeContext.siteOrigin,
+          balance: activeContext.balance,
+          expiry: activeContext.expiry,
+          chainId: activeContext.chainId,
+        },
+        extractPermissionName(
+          activeContext.permission.type,
+        ) as SupportedPermissionTypes,
+      );
+
+    await snap.request({
+      method: 'snap_updateInterface',
+      params: {
+        id,
+        context: updatedContext,
+        ui: permissionConfirmationPage,
+      },
+    });
+  }
 };
