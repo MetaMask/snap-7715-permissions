@@ -27,12 +27,6 @@ export const zMetaMaskPermissionData = z.object({
    * A human-readable explanation of why the permission is being requested.
    */
   justification: z.string(),
-
-  // TODO: We need to define the structure of the enforced outcomes.
-  /**
-   * The outcome that is enfoced onchain during permission redemption(e.g. token balance increasing by 100).
-   */
-  enforcedOutcomes: z.record(any()).optional(),
 });
 
 export const zNativeTokenTransferPermission = zPermission.extend({
@@ -78,8 +72,16 @@ export const zErc1155TokenTransferPermission = zPermission.extend({
   ),
 });
 
+export const zNativeTokenStreamPermission = zPermission.extend({
+  type: z.literal('native-token-stream'),
+  data: z.intersection(zMetaMaskPermissionData, z.record(any())), // TODO: Define the data structure: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/36
+});
+
 export type NativeTokenTransferPermission = z.infer<
   typeof zNativeTokenTransferPermission
+>;
+export type NativeTokenStreamPermission = z.infer<
+  typeof zNativeTokenStreamPermission
 >;
 export type Erc20TokenTransferPermission = z.infer<
   typeof zErc20TokenTransferPermission

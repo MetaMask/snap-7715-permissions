@@ -3,6 +3,7 @@ import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testi
 
 import type { AccountControllerInterface } from '../../src/accountController';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
+import type { PermissionConfirmationRenderHandler } from '../../src/ui';
 
 describe('RpcHandler', () => {
   let handler: RpcHandler;
@@ -13,6 +14,10 @@ describe('RpcHandler', () => {
     getAccountBalance: jest.fn(),
     getDelegationManager: jest.fn(),
   };
+  const mockPermissionConfirmationRenderHandler = {
+    getConfirmedAttenuatedPermission: jest.fn(),
+    getPermissionConfirmationPage: jest.fn(),
+  } as jest.Mocked<PermissionConfirmationRenderHandler>;
   const mockSnapsProvider = createMockSnapsProvider();
 
   beforeEach(() => {
@@ -24,7 +29,8 @@ describe('RpcHandler', () => {
 
     handler = createRpcHandler({
       accountController: mockAccountController,
-      snapsProvider: mockSnapsProvider,
+      permissionConfirmationRenderHandler:
+        mockPermissionConfirmationRenderHandler,
     });
   });
 

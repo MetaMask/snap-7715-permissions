@@ -10,9 +10,9 @@ module.exports = {
   testMatch: ['**/test/**/?(*.)+(spec|test).[tj]s?(x)'],
   collectCoverage: true,
   collectCoverageFrom: [
-    './src/**/*.ts',
+    './src/**/*.[tj]s?(x)',
     '!./src/**/*.d.ts',
-    '!./src/**/index.ts',
+    '!./src/**/index.[tj]s?(x)',
     '!./src/**/type?(s).ts',
     '!./src/**/constant?(s).ts',
     '!./test/**',
