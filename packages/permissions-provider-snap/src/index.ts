@@ -12,7 +12,10 @@ import {
 import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
-import type { SupportedPermissionTypes } from './orchestrators';
+import {
+  createPermissionOrchestratorFactory,
+  type SupportedPermissionTypes,
+} from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
@@ -101,26 +104,24 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
     }
 
     // Update the interface with the new context and UI specific to the permission type
-    const [updatedContext, permissionConfirmationPage] =
-      permissionConfirmationRenderHandler.getPermissionConfirmationPage(
-        {
-          permission: activeContext.permission,
-          account: activeContext.account,
-          siteOrigin: activeContext.siteOrigin,
-          balance: activeContext.balance,
-          expiry: activeContext.expiry,
-          chainId: activeContext.chainId,
-        },
-        extractPermissionName(
-          activeContext.permission.type,
-        ) as SupportedPermissionTypes,
-      );
+    const permissionType = extractPermissionName(
+      activeContext.permission.type,
+    ) as SupportedPermissionTypes;
+
+    const orchestrator = createPermissionOrchestratorFactory(
+      permissionType,
+      accountController,
+      permissionConfirmationRenderHandler,
+    );
+
+    const permissionConfirmationPage =
+      orchestrator.buildPermissionConfirmationPage(activeContext);
 
     await snap.request({
       method: 'snap_updateInterface',
       params: {
         id,
-        context: updatedContext,
+        context: activeContext,
         ui: permissionConfirmationPage,
       },
     });

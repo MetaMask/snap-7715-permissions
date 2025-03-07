@@ -1,10 +1,33 @@
-import type {
-  PermissionResponse,
-  NativeTokenStreamPermission,
-  NativeTokenTransferPermission,
-  Permission,
+import {
+  type PermissionResponse,
+  type NativeTokenStreamPermission,
+  type NativeTokenTransferPermission,
+  type Permission,
+  zNativeTokenStreamPermission,
 } from '@metamask/7715-permissions-shared/types';
+import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { Address, Hex, OneOf } from 'viem';
+
+import type { MockAccountController } from '../accountController.mock';
+import type { PermissionConfirmationContext } from '../ui';
+
+/**
+ * Maps permission types to their corresponding Zod object validators.
+ */
+export const zodObjectMapper = {
+  'native-token-stream': zNativeTokenStreamPermission,
+};
+
+/**
+ * The attenuated response after the user confirms the permission request.
+ */
+export type AttenuatedResponse<
+  TPermissionType extends SupportedPermissionTypes,
+> = {
+  isConfirmed: boolean;
+  attenuatedPermission: PermissionTypeMapping[TPermissionType];
+  attenuatedExpiry: number;
+};
 
 export type OrchestrateResult = OneOf<
   | {
@@ -77,13 +100,50 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   ) => Promise<PermissionTypeMapping[TPermissionType]>;
 
   /**
-   * Orchestrates the permission request for the permission type.
-   *
-   * @param permission - The permission to orchestrate.
-   * @returns The permission response.
-   * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
+   * Builds the delegation object for the permission type.
+   * @param account - The account address.
+   * @param sessionAccount - The session account address.
+   * @param chainId - The chain ID.
+   * @param attenuatedPermission - The attenuated permission object.
+   * @returns The 7715 permision context(ie. encoded signed delegation).
    */
-  orchestrate: (
-    orchestrateMeta: OrchestrateMeta<TPermissionType>,
-  ) => Promise<OrchestrateResult>;
+  buildPermissionContext: (
+    account: Hex,
+    sessionAccount: Hex,
+    chainId: number,
+    attenuatedPermission: PermissionTypeMapping[TPermissionType],
+  ) => Promise<Hex>;
+
+  /**
+   * Builds the permission confirmation page for the permission type.
+   * @param context - The permission confirmation context.
+   * @returns The permission confirmation page component.
+   */
+  buildPermissionConfirmationPage: (
+    context: PermissionConfirmationContext<TPermissionType>,
+  ) => ComponentOrElement;
+
+  /**
+   * Render the permission confirmation page and get the attenuated context data after the user confirms the permission request.
+   *
+   * @param context - The permission confirmation context.
+   * @returns The attenuated context data after the user confirms the permission request.
+   */
+  getConfirmedAttenuatedPermission: (
+    context: PermissionConfirmationContext<TPermissionType>,
+    ui: ComponentOrElement,
+  ) => Promise<AttenuatedResponse<TPermissionType>>;
 };
+
+/**
+ * Orchestrates the permission request for the permission type.
+ *
+ * @param permission - The permission to orchestrate.
+ * @returns The permission response.
+ * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
+ */
+export type Orchestrate = (
+  accountController: MockAccountController,
+  orchestrator: Orchestrator<SupportedPermissionTypes>,
+  orchestrateMeta: OrchestrateMeta<SupportedPermissionTypes>,
+) => Promise<OrchestrateResult>;

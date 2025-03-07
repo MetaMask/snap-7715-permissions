@@ -8,7 +8,8 @@ import type { PermissionConfirmationRenderHandler } from 'src/ui';
 import type { AccountControllerInterface } from '../accountController';
 import { createMockAccountController } from '../accountController.mock';
 import {
-  createPermissionOrchestrator,
+  createPermissionOrchestratorFactory,
+  orchestrate,
   type SupportedPermissionTypes,
 } from '../orchestrators';
 import { validatePermissionRequestParam } from '../utils';
@@ -62,23 +63,28 @@ export function createRpcHandler(config: {
         firstRequest.permission.type,
       ) as SupportedPermissionTypes;
 
-      // process the request
-      const orchestrator = createPermissionOrchestrator(
+      // create orchestrator
+      const orchestrator = createPermissionOrchestratorFactory(
+        permissionType,
         createMockAccountController(),
         permissionConfirmationRenderHandler,
-        permissionType,
       );
       const permission = await orchestrator.parseAndValidate(
         firstRequest.permission,
       );
 
-      const orchestrateRes = await orchestrator.orchestrate({
-        permission,
-        chainId: firstRequest.chainId,
-        sessionAccount: firstRequest.signer.data.address,
-        origin: siteOrigin,
-        expiry: firstRequest.expiry,
-      });
+      // process the request
+      const orchestrateRes = await orchestrate(
+        createMockAccountController(),
+        orchestrator,
+        {
+          permission,
+          chainId: firstRequest.chainId,
+          sessionAccount: firstRequest.signer.data.address,
+          origin: siteOrigin,
+          expiry: firstRequest.expiry,
+        },
+      );
       logger.debug('isPermissionGranted', orchestrateRes.success);
 
       if (!orchestrateRes.success) {
