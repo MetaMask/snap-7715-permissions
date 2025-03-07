@@ -1,22 +1,14 @@
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
-import {
-  type NativeTokenStreamPermission,
-  type NativeTokenTransferPermission,
-  type Permission,
-  zNativeTokenStreamPermission,
-} from '@metamask/7715-permissions-shared/types';
+import { type Permission } from '@metamask/7715-permissions-shared/types';
 import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { Address, Hex, OneOf } from 'viem';
 
 import type { MockAccountController } from '../accountController.mock';
 import type { PermissionConfirmationContext } from '../ui';
-
-/**
- * Maps permission types to their corresponding Zod object validators.
- */
-export const zodObjectMapper = {
-  'native-token-stream': zNativeTokenStreamPermission,
-};
+import type {
+  PermissionTypeMapping,
+  SupportedPermissionTypes,
+} from './orchestrator';
 
 /**
  * The attenuated response after the user confirms the permission request.
@@ -42,22 +34,6 @@ export type OrchestrateResult = OneOf<
       reason: string;
     }
 >;
-
-/**
- * Supported permission types.
- */
-export type SupportedPermissionTypes = keyof PermissionTypeMapping;
-
-/**
- * Mapping of supported permission types to their respective permission types.
- *
- * - In the future, we may want to extend the mapping key to a unique hash to account for permission types that don't have a string literal representation
- * and are defined as `type: { name: z.string(), description: z.string().optional()}`.
- */
-export type PermissionTypeMapping = {
-  'native-token-stream': NativeTokenStreamPermission;
-  'native-token-transfer': NativeTokenTransferPermission;
-};
 
 /**
  * Metadata required for orchestrating a permission.

@@ -5,12 +5,8 @@ import type {
   PermissionConfirmationContext,
   PermissionConfirmationRenderHandler,
 } from '../ui';
-import type {
-  OrchestrateMeta,
-  OrchestrateResult,
-  Orchestrator,
-  SupportedPermissionTypes,
-} from './types';
+import type { SupportedPermissionTypes } from './orchestrator';
+import type { OrchestrateMeta, OrchestrateResult, Orchestrator } from './types';
 
 /**
  * Prepare the account details for the permission picker UI.

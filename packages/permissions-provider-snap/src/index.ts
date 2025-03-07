@@ -12,10 +12,8 @@ import {
 import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
-import {
-  createPermissionOrchestrator,
-  type SupportedPermissionTypes,
-} from './orchestrators';
+import type { SupportedPermissionTypes } from './orchestrators';
+import { createPermissionOrchestrator } from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';

@@ -9,8 +9,8 @@ import type { Hex } from 'viem';
 import type { PermissionConfirmationContext } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
 import type { OrchestratorArgs, OrchestratorFactoryFunction } from '../types';
-import { type PermissionTypeMapping } from '../types';
 import { parsePermission } from '../validate';
+import type { PermissionTypeMapping } from './types';
 
 /**
  * Validates a permission object data specific to the permission type.

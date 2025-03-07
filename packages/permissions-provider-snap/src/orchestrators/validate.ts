@@ -3,8 +3,11 @@ import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
 
-import type { SupportedPermissionTypes, PermissionTypeMapping } from './types';
-import { zodObjectMapper } from './types';
+import type {
+  SupportedPermissionTypes,
+  PermissionTypeMapping,
+} from './orchestrator';
+import { zodObjectMapper } from './orchestrator';
 
 /**
  * Parses a permission request and returns the permission object.

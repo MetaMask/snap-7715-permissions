@@ -1,9 +1,6 @@
+import type { SupportedPermissionTypes } from './orchestrator';
 import { orchestratorModules } from './orchestrator';
-import type {
-  Orchestrator,
-  OrchestratorArgs,
-  SupportedPermissionTypes,
-} from './types';
+import type { Orchestrator, OrchestratorArgs } from './types';
 
 /**
  * Factory function for creating a permission orchestrator for a given permission type.
