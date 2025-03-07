@@ -3,12 +3,10 @@ import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { UserInputEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
-import type {
-  AttenuatedResponse,
-  SupportedPermissionTypes,
-} from '../../orchestrators';
+import type { SupportedPermissionTypes } from '../../orchestrators';
 import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
+import type { AttenuatedResponse } from './renderHandler';
 
 /**
  * Get the active interface context.

@@ -7,7 +7,7 @@ import type { Json } from '@metamask/snaps-sdk';
 import type { AccountControllerInterface } from '../accountController';
 import { createMockAccountController } from '../accountController.mock';
 import {
-  createPermissionOrchestratorFactory,
+  createPermissionOrchestrator,
   orchestrate,
   type SupportedPermissionTypes,
 } from '../orchestrators';
@@ -40,6 +40,7 @@ export function createRpcHandler(config: {
   permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
 }): RpcHandler {
   const { permissionConfirmationRenderHandler } = config;
+  const mockAccountController = createMockAccountController();
 
   return {
     /**
@@ -64,10 +65,9 @@ export function createRpcHandler(config: {
       ) as SupportedPermissionTypes;
 
       // create orchestrator
-      const orchestrator = createPermissionOrchestratorFactory(
-        permissionType,
-        createMockAccountController(),
-      );
+      const orchestrator = createPermissionOrchestrator(permissionType, {
+        accountController: mockAccountController,
+      });
       const permission = await orchestrator.parseAndValidate(
         firstRequest.permission,
       );
@@ -75,7 +75,7 @@ export function createRpcHandler(config: {
       // process the request
       const orchestrateRes = await orchestrate(
         permissionType,
-        createMockAccountController(),
+        mockAccountController,
         orchestrator,
         {
           permission,

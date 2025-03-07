@@ -1,5 +1,5 @@
+import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import {
-  type PermissionResponse,
   type NativeTokenStreamPermission,
   type NativeTokenTransferPermission,
   type Permission,
@@ -8,6 +8,7 @@ import {
 import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { Address, Hex, OneOf } from 'viem';
 
+import type { MockAccountController } from '../accountController.mock';
 import type { PermissionConfirmationContext } from '../ui';
 
 /**
@@ -28,6 +29,9 @@ export type AttenuatedResponse<
   attenuatedExpiry: number;
 };
 
+/**
+ * The result of orchestrating a permission.
+ */
 export type OrchestrateResult = OneOf<
   | {
       success: true;
@@ -122,3 +126,18 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
     context: PermissionConfirmationContext<TPermissionType>,
   ) => ComponentOrElement;
 };
+
+/**
+ * The orchestrator args.
+ */
+export type OrchestratorArgs = {
+  // TODO: Remove mock accountController: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/54
+  accountController: MockAccountController;
+};
+
+/**
+ * Factory function for creating a permission orchestrator for a given permission type.
+ */
+export type OrchestratorFactoryFunction<
+  TPermissionType extends SupportedPermissionTypes,
+> = (args: OrchestratorArgs) => Orchestrator<TPermissionType>;

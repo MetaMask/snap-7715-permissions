@@ -13,7 +13,7 @@ import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
 import {
-  createPermissionOrchestratorFactory,
+  createPermissionOrchestrator,
   type SupportedPermissionTypes,
 } from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
@@ -108,10 +108,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
       activeContext.permission.type,
     ) as SupportedPermissionTypes;
 
-    const orchestrator = createPermissionOrchestratorFactory(
-      permissionType,
+    const orchestrator = createPermissionOrchestrator(permissionType, {
       accountController,
-    );
+    });
 
     const permissionConfirmationPage =
       orchestrator.buildPermissionConfirmationPage(activeContext);

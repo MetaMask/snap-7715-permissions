@@ -1,10 +1,21 @@
 import type { ComponentOrElement, SnapsProvider } from '@metamask/snaps-sdk';
 
 import type {
-  AttenuatedResponse,
+  PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../../orchestrators';
 import type { PermissionConfirmationContext } from '../types';
+
+/**
+ * The attenuated response after the user confirms the permission request.
+ */
+export type AttenuatedResponse<
+  TPermissionType extends SupportedPermissionTypes,
+> = {
+  isConfirmed: boolean;
+  attenuatedPermission: PermissionTypeMapping[TPermissionType];
+  attenuatedExpiry: number;
+};
 
 export type PermissionConfirmationRenderHandler = {
   /**
