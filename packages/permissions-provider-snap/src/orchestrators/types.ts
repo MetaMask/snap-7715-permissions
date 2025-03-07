@@ -8,7 +8,6 @@ import {
 import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { Address, Hex, OneOf } from 'viem';
 
-import type { MockAccountController } from '../accountController.mock';
 import type { PermissionConfirmationContext } from '../ui';
 
 /**
@@ -122,28 +121,4 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   buildPermissionConfirmationPage: (
     context: PermissionConfirmationContext<TPermissionType>,
   ) => ComponentOrElement;
-
-  /**
-   * Render the permission confirmation page and get the attenuated context data after the user confirms the permission request.
-   *
-   * @param context - The permission confirmation context.
-   * @returns The attenuated context data after the user confirms the permission request.
-   */
-  getConfirmedAttenuatedPermission: (
-    context: PermissionConfirmationContext<TPermissionType>,
-    ui: ComponentOrElement,
-  ) => Promise<AttenuatedResponse<TPermissionType>>;
 };
-
-/**
- * Orchestrates the permission request for the permission type.
- *
- * @param permission - The permission to orchestrate.
- * @returns The permission response.
- * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
- */
-export type Orchestrate = (
-  accountController: MockAccountController,
-  orchestrator: Orchestrator<SupportedPermissionTypes>,
-  orchestrateMeta: OrchestrateMeta<SupportedPermissionTypes>,
-) => Promise<OrchestrateResult>;

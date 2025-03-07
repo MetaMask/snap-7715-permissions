@@ -1,9 +1,11 @@
 import { fromHex, type Hex } from 'viem';
 
 import type { MockAccountController } from '../accountController.mock';
-import type { PermissionConfirmationContext } from '../ui';
 import type {
-  Orchestrate,
+  PermissionConfirmationContext,
+  PermissionConfirmationRenderHandler,
+} from '../ui';
+import type {
   OrchestrateMeta,
   OrchestrateResult,
   Orchestrator,
@@ -30,11 +32,26 @@ const prepareAccountDetails = async (
   ]);
 };
 
-export const orchestrate: Orchestrate = async (
+/**
+ * Orchestrates the permission request for the permission type.
+ *
+ * @param permissionType - The permission type.
+ * @param accountController - An account controller instance.
+ * @param orchestrator - The permission orchestrator.
+ * @param orchestrateMeta - The permission orchestration metadata.
+ * @param permissionConfirmationRenderHandler - The permission confirmation render handler.
+ * @returns The permission response.
+ * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
+ */
+export const orchestrate = async <
+  TPermissionType extends SupportedPermissionTypes,
+>(
+  permissionType: TPermissionType,
   accountController: MockAccountController,
-  orchestrator: Orchestrator<SupportedPermissionTypes>,
-  orchestrateMeta: OrchestrateMeta<SupportedPermissionTypes>,
-) => {
+  orchestrator: Orchestrator<TPermissionType>,
+  orchestrateMeta: OrchestrateMeta<TPermissionType>,
+  permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler,
+): Promise<OrchestrateResult> => {
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
   const chainIdNum = fromHex(chainId, 'number');
@@ -46,7 +63,7 @@ export const orchestrate: Orchestrate = async (
   );
 
   // Prepare specific context object and confirmation page for the permission type
-  const uiContext: PermissionConfirmationContext<SupportedPermissionTypes> = {
+  const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permission,
     account,
     siteOrigin: origin,
@@ -60,9 +77,10 @@ export const orchestrate: Orchestrate = async (
 
   // Wait for the successful permission confirmation reponse from the user
   const { attenuatedPermission, attenuatedExpiry, isConfirmed } =
-    await orchestrator.getConfirmedAttenuatedPermission(
+    await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
       uiContext,
       confirmationPage,
+      permissionType,
     );
 
   if (!isConfirmed) {

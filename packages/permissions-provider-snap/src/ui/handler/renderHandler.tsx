@@ -15,7 +15,7 @@ export type PermissionConfirmationRenderHandler = {
    * @param permissionType - The permission type.
    * @returns The attenuated context data after the user confirms the permission request.
    */
-  handlePermissionConfirmationRender: <
+  getConfirmedAttenuatedPermission: <
     TPermissionType extends SupportedPermissionTypes,
   >(
     context: PermissionConfirmationContext<TPermissionType>,
@@ -34,7 +34,7 @@ export const createPermissionConfirmationRenderHandler = (
   snapsProvider: SnapsProvider,
 ): PermissionConfirmationRenderHandler => {
   return {
-    handlePermissionConfirmationRender: async <
+    getConfirmedAttenuatedPermission: async <
       TPermissionType extends SupportedPermissionTypes,
     >(
       context: PermissionConfirmationContext<TPermissionType>,

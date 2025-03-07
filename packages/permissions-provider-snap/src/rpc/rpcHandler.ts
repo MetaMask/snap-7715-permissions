@@ -3,7 +3,6 @@ import {
   logger,
 } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
-import type { PermissionConfirmationRenderHandler } from 'src/ui';
 
 import type { AccountControllerInterface } from '../accountController';
 import { createMockAccountController } from '../accountController.mock';
@@ -12,6 +11,7 @@ import {
   orchestrate,
   type SupportedPermissionTypes,
 } from '../orchestrators';
+import type { PermissionConfirmationRenderHandler } from '../ui';
 import { validatePermissionRequestParam } from '../utils';
 
 /**
@@ -67,7 +67,6 @@ export function createRpcHandler(config: {
       const orchestrator = createPermissionOrchestratorFactory(
         permissionType,
         createMockAccountController(),
-        permissionConfirmationRenderHandler,
       );
       const permission = await orchestrator.parseAndValidate(
         firstRequest.permission,
@@ -75,6 +74,7 @@ export function createRpcHandler(config: {
 
       // process the request
       const orchestrateRes = await orchestrate(
+        permissionType,
         createMockAccountController(),
         orchestrator,
         {
@@ -84,6 +84,7 @@ export function createRpcHandler(config: {
           origin: siteOrigin,
           expiry: firstRequest.expiry,
         },
+        permissionConfirmationRenderHandler,
       );
       logger.debug('isPermissionGranted', orchestrateRes.success);
 

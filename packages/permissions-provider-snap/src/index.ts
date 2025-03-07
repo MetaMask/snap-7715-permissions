@@ -111,7 +111,6 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
     const orchestrator = createPermissionOrchestratorFactory(
       permissionType,
       accountController,
-      permissionConfirmationRenderHandler,
     );
 
     const permissionConfirmationPage =
