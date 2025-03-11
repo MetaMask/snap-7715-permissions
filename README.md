@@ -44,17 +44,6 @@ yarn install && yarn start
 
 The development site will start up on `http://localhost:8000/`
 
-## Adding new permisssion types
-
-Follow the following steps to add new permission types to the `permissions-provider-snap`:
-
-1. Create new permission type definition with `permission.data` to `./packages/shared/src/types/7715-permissions-types.ts`
-2. Add new permission type definition to the mapping(s) in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/lookup-table.ts`
-3. Run `yarn generate:orchestrator <nameOfYourOrchestrator>` script to create your orchestrator template.
-4. Add your orchestrator to `orchestratorModules` and `zodObjectMapper` in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/lookup-table.ts`
-
-You are now all set to implement your orchestrators' interface.
-
 ## Contributing
 
 ### Testing
@@ -138,3 +127,14 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
 2. Client connect button to connect dapp to kernel snap.
 3. Make a permissions request.
 4. Requests are sent to `kernel snap` -> `gator snap` preinstalls
+
+## Adding new permisssion types
+
+Follow the following steps to add new permission types to the `permissions-provider-snap`:
+
+1. Create new permission type definition with `permission.data` to `./packages/shared/src/types/7715-permissions-types.ts`
+2. Add new permission type definition to the mapping(s) in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/types.ts`
+3. Run `yarn generate:orchestrator <nameOfYourOrchestrator>` script to create your orchestrator template.
+4. Add your orchestrator to `orchestratorModules` and `zodObjectMapper` in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/lookup-table.ts`
+
+You are now all set to implement your orchestrators' interface.
