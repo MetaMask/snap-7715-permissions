@@ -34,7 +34,8 @@
     "prepublishOnly": "mm-snap manifest",
     "serve": "mm-snap serve",
     "start": "mm-snap watch",
-    "test": "jest"
+    "test": "jest",
+    "generate:orchestrator": "node scripts/generate-orchestrator.js"
   },
   "dependencies": {
     "@metamask-private/delegator-core-viem": "^0.6.0",
