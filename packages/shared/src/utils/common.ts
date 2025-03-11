@@ -51,7 +51,7 @@ export function updateAccountsOrder(
 ): Address[] {
   const accountsUpdated = Array.from(accountsToSelect);
   if (curr) {
-    const selectedAccount = curr.permissionRequest.account;
+    const selectedAccount = curr.permissionRequest.address;
 
     if (selectedAccount) {
       const index = accountsUpdated.findIndex(

@@ -1,6 +1,6 @@
 import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import { getAddress } from 'viem';
+import { getAddress, toHex } from 'viem';
 
 import { createMockAccountController } from '../src/accountController.mock';
 import type {
@@ -27,6 +27,10 @@ describe('Orchestrators', () => {
       type: 'native-token-stream',
       data: {
         justification: 'shh...permission 2',
+        initialAmount: '0x1',
+        amountPerSecond: '0x1',
+        startTime: toHex(BigInt(1000)),
+        endTime: toHex(BigInt(1000 + 1000)),
       },
     };
     const mockPermissionType = extractPermissionName(
@@ -38,13 +42,13 @@ describe('Orchestrators', () => {
       getPermissionConfirmationPage: jest.fn(),
     } as jest.Mocked<PermissionConfirmationRenderHandler>;
 
-    const account = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
+    const address = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
     const mockAttenuatedContext: PermissionConfirmationContext<
       typeof mockPermissionType
     > = {
       permission:
         mockbasePermission as PermissionTypeMapping[typeof mockPermissionType],
-      account,
+      address,
       siteOrigin: 'http://localhost:3000',
       balance: '0x1',
       expiry: 1,
@@ -54,7 +58,7 @@ describe('Orchestrators', () => {
     const mockPage = (
       <NativeTokenStreamConfirmationPage
         siteOrigin={mockAttenuatedContext.siteOrigin}
-        account={mockAttenuatedContext.account}
+        address={mockAttenuatedContext.address}
         permission={
           mockAttenuatedContext.permission as PermissionTypeMapping['native-token-stream']
         }
@@ -116,7 +120,7 @@ describe('Orchestrators', () => {
       expect(res).toStrictEqual({
         success: true,
         response: {
-          account: '0x1234567890123456789012345678901234567890',
+          address: '0x1234567890123456789012345678901234567890',
           accountMeta: [
             {
               factory: '0x1234567890123456789012345678901234567890',
@@ -127,10 +131,18 @@ describe('Orchestrators', () => {
           context:
             '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000016562aa41a8697720ce0943f003141f5deae0060000000000000000000000001234567890123456789012345678901234567890ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000_SIGNED_DELEGATION00000000000000000000000000000000',
           expiry: 1,
-          permission: {
-            data: { justification: 'shh...permission 2' },
-            type: 'native-token-stream',
-          },
+          permissions: [
+            {
+              data: {
+                justification: 'shh...permission 2',
+                amountPerSecond: '0x1',
+                endTime: '0x7d0',
+                initialAmount: '0x1',
+                startTime: '0x3e8',
+              },
+              type: 'native-token-stream',
+            },
+          ],
           signer: {
             data: { address: '0x016562aA41A8697720ce0943F003141f5dEAe006' },
             type: 'account',
@@ -183,7 +195,7 @@ describe('Orchestrators', () => {
       });
     });
 
-    it('should return true when validate called with valid permission that is supported', async () => {
+    it('should return as parsed permission when parseAndValidate called with valid permission that is supported', async () => {
       const orchestrator = createPermissionOrchestrator(
         mockAccountController,
         mockPermissionConfirmationRenderHandler,
@@ -193,7 +205,13 @@ describe('Orchestrators', () => {
       const res = await orchestrator.parseAndValidate(mockbasePermission);
 
       expect(res).toStrictEqual({
-        data: { justification: 'shh...permission 2' },
+        data: {
+          justification: 'shh...permission 2',
+          amountPerSecond: '0x1',
+          endTime: '0x7d0',
+          initialAmount: '0x1',
+          startTime: '0x3e8',
+        },
         type: 'native-token-stream',
       });
     });

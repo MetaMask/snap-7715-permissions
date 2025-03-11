@@ -76,7 +76,15 @@ export const zErc1155TokenTransferPermission = zPermission.extend({
 
 export const zNativeTokenStreamPermission = zPermission.extend({
   type: z.literal('native-token-stream'),
-  data: z.intersection(zMetaMaskPermissionData, z.record(any())), // TODO: Define the data structure: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/36
+  data: z.intersection(
+    zMetaMaskPermissionData,
+    z.object({
+      initialAmount: zHexStr.optional(),
+      amountPerSecond: zHexStr,
+      startTime: zHexStr,
+      endTime: zHexStr,
+    }),
+  ),
 });
 
 export type NativeTokenTransferPermission = z.infer<

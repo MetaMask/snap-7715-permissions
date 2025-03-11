@@ -1,7 +1,7 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import { getAddress } from 'viem';
+import { getAddress, toHex } from 'viem';
 
 import type {
   PermissionTypeMapping,
@@ -13,11 +13,15 @@ import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 
 describe('Permission Confirmation Render Handler', () => {
   const mockSnapProvider = createMockSnapsProvider();
-  const account = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
+  const address = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
   const permission: NativeTokenStreamPermission = {
     type: 'native-token-stream',
     data: {
       justification: 'shh...permission 2',
+      initialAmount: '0x1',
+      amountPerSecond: '0x1',
+      startTime: toHex(BigInt(1000)),
+      endTime: toHex(BigInt(1000 + 1000)),
     },
   };
   const mockPermissionType = extractPermissionName(
@@ -25,8 +29,9 @@ describe('Permission Confirmation Render Handler', () => {
   ) as SupportedPermissionTypes;
   const mockContext: PermissionConfirmationContext<typeof mockPermissionType> =
     {
-      permission,
-      account,
+      permission:
+        permission as PermissionTypeMapping[typeof mockPermissionType],
+      address,
       siteOrigin: 'http://localhost:3000',
       balance: '0x1',
       expiry: 1,
@@ -36,7 +41,7 @@ describe('Permission Confirmation Render Handler', () => {
   const mockPage = (
     <NativeTokenStreamConfirmationPage
       siteOrigin={mockContext.siteOrigin}
-      account={mockContext.account}
+      address={mockContext.address}
       permission={
         mockContext.permission as PermissionTypeMapping['native-token-stream']
       }
@@ -153,7 +158,7 @@ describe('Permission Confirmation Render Handler', () => {
         permissionConfirmationRenderHandler.getPermissionConfirmationPage(
           {
             permission: nonSupportedPermission,
-            account,
+            address,
             siteOrigin: 'http://localhost:3000',
             balance: '0x1',
             expiry: 1,

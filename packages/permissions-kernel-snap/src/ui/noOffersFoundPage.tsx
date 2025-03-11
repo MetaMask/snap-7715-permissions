@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
+import type {
+  Permission,
+  PermissionsRequest,
+} from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import {
   Bold,
@@ -11,6 +14,26 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 
 import { Header } from './components';
+
+const renderPermissions = (origin: string, permissions: Permission[]) => {
+  return permissions.map((permission, _) => (
+    <Section>
+      <Row label="Origin">
+        <Text>{`The site at ${origin} requests access to **${extractPermissionName(
+          permission.type,
+        )}**`}</Text>
+      </Row>
+      <Row label="Their justification">
+        <Text>
+          {permission.data.justification || 'No justification provided'}
+        </Text>
+      </Row>
+      <Text>
+        <Bold>However, no offers found for the requested permission.</Bold>
+      </Text>
+    </Section>
+  ));
+};
 
 export const NoOffersFoundPage = (
   origin: string,
@@ -26,24 +49,7 @@ export const NoOffersFoundPage = (
 
       {requestedPermission.map((value, _) => (
         <Box direction="vertical" alignment="center">
-          <Section>
-            <Row label="Origin">
-              <Text>{`The site at ${origin} requests access to **${extractPermissionName(
-                value.permission.type,
-              )}**`}</Text>
-            </Row>
-            <Row label="Their justification">
-              <Text>
-                {value.permission.data.justification ||
-                  'No justification provided'}
-              </Text>
-            </Row>
-            <Text>
-              <Bold>
-                However, no offers found for the requested permission.
-              </Bold>
-            </Text>
-          </Section>
+          {renderPermissions(origin, value.permissions)}
         </Box>
       ))}
     </Box>

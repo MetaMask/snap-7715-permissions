@@ -128,7 +128,7 @@ export const createPermissionOrchestrator = <
       const chainIdNum = fromHex(chainId, 'number');
 
       // Get the user account details
-      const [account, balance] = await prepareAccountDetails(
+      const [address, balance] = await prepareAccountDetails(
         accountController,
         fromHex(chainId, 'number'),
       );
@@ -138,7 +138,7 @@ export const createPermissionOrchestrator = <
         permissionConfirmationRenderHandler.getPermissionConfirmationPage(
           {
             permission,
-            account,
+            address,
             siteOrigin: origin,
             balance,
             expiry,
@@ -164,7 +164,7 @@ export const createPermissionOrchestrator = <
 
       // TODO: Use the delegation builder to attach the correct caveats specific to the permission type
       // https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
-      const delegation = createRootDelegation(sessionAccount, account, []);
+      const delegation = createRootDelegation(sessionAccount, address, []);
 
       // Sign the delegation and encode it to create the permissioncContext
       const signedDelegation = await accountController.signDelegation({
@@ -181,7 +181,7 @@ export const createPermissionOrchestrator = <
         success: true,
         response: {
           chainId,
-          account,
+          address,
           expiry: attenuatedExpiry,
           signer: {
             type: 'account',
@@ -189,7 +189,7 @@ export const createPermissionOrchestrator = <
               address: sessionAccount,
             },
           },
-          permission: attenuatedPermission,
+          permissions: [attenuatedPermission],
           context: permissionContext,
           accountMeta:
             accountMeta.factory && accountMeta.factoryData

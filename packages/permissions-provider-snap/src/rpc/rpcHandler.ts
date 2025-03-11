@@ -58,8 +58,14 @@ export function createRpcHandler(config: {
         throw new Error('No permission request found');
       }
 
+      // TODO: Only supporting one permission per request for now, but this will be updated in the future
+      const firstPermission = firstRequest.permissions[0];
+      if (!firstPermission) {
+        throw new Error('No permission found');
+      }
+
       const permissionType = extractPermissionName(
-        firstRequest.permission.type,
+        firstPermission.type,
       ) as SupportedPermissionTypes;
 
       // process the request
@@ -68,9 +74,7 @@ export function createRpcHandler(config: {
         permissionConfirmationRenderHandler,
         permissionType,
       );
-      const permission = await orchestrator.parseAndValidate(
-        firstRequest.permission,
-      );
+      const permission = await orchestrator.parseAndValidate(firstPermission);
 
       const orchestrateRes = await orchestrator.orchestrate({
         permission,

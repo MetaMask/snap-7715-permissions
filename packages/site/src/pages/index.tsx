@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import { toHex } from 'viem';
 
 import {
   ConnectButton,
@@ -127,6 +128,8 @@ const Index = () => {
   const mockDappSessionAccount = '0x016562aA41A8697720ce0943F003141f5dEAe006';
   const chainId = '0xaa36a7'; // Sepolia
   const expiry = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now (unix timestamp in seconds)
+  const tenDaysFromNow = Math.floor(Date.now() / 1000) + 864000; // 10 days from now (unix timestamp in seconds)
+  const now = Math.floor(Date.now() / 1000); // now (unix timestamp in seconds)
 
   const [log, setLog] = useState<string[]>([]);
   const appendToLog = (action: string, response: any) => {
@@ -154,12 +157,18 @@ const Index = () => {
             address: mockDappSessionAccount,
           },
         },
-        permission: {
-          type: 'native-token-stream',
-          data: {
-            justification: 'shh...permission 1',
+        permissions: [
+          {
+            type: 'native-token-stream',
+            data: {
+              justification: 'shh...permission 1',
+              initialAmount: '0x1',
+              amountPerSecond: '0x1',
+              startTime: toHex(BigInt(now)),
+              endTime: toHex(BigInt(tenDaysFromNow)),
+            },
           },
-        },
+        ],
       },
     ];
     const response = await invokeKernelSnap({
@@ -180,12 +189,18 @@ const Index = () => {
             address: mockDappSessionAccount,
           },
         },
-        permission: {
-          type: 'native-token-stream',
-          data: {
-            justification: 'shh...permission 1',
+        permissions: [
+          {
+            type: 'native-token-stream',
+            data: {
+              justification: 'shh...permission 1',
+              initialAmount: '0x1',
+              amountPerSecond: '0x1',
+              startTime: toHex(BigInt(now)),
+              endTime: toHex(BigInt(tenDaysFromNow)),
+            },
           },
-        },
+        ],
       },
       {
         chainId,
@@ -196,12 +211,14 @@ const Index = () => {
             address: mockDappSessionAccount,
           },
         },
-        permission: {
-          type: 'erc20-token-stream',
-          data: {
-            justification: 'shh...permission 2',
+        permissions: [
+          {
+            type: 'erc20-token-stream',
+            data: {
+              justification: 'shh...permission 2',
+            },
           },
-        },
+        ],
       },
       {
         chainId,
@@ -212,12 +229,14 @@ const Index = () => {
             address: mockDappSessionAccount,
           },
         },
-        permission: {
-          type: 'erc20-token-stream',
-          data: {
-            justification: 'shh...permission 3',
+        permissions: [
+          {
+            type: 'erc20-token-stream',
+            data: {
+              justification: 'shh...permission 3',
+            },
           },
-        },
+        ],
       },
     ];
     const response = await invokeKernelSnap({
@@ -238,13 +257,15 @@ const Index = () => {
             address: mockDappSessionAccount,
           },
         },
-        permission: {
-          type: 'erc721-token-transfer', // This permission type is not registered by gator snap
-          data: {
-            justification: 'shh',
-            allowance: '0x1DCD6500',
+        permissions: [
+          {
+            type: 'erc721-token-transfer', // This permission type is not registered by gator snap
+            data: {
+              justification: 'shh',
+              allowance: '0x1DCD6500',
+            },
           },
-        },
+        ],
       },
     ];
     const response = await invokeKernelSnap({
