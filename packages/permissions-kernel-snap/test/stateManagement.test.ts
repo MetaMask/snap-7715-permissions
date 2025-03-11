@@ -1,12 +1,9 @@
 import { expect } from '@jest/globals';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { RegisteredPermissionOffer } from '@metamask/7715-permissions-shared/types';
 
 import type { KernelState } from '../src/stateManagement';
 import { createStateManager } from '../src/stateManagement';
-// eslint-disable-next-line jest/no-mocks-import
-import type { MockSnapRequest } from './__mocks__/snap-provider.mock';
-// eslint-disable-next-line jest/no-mocks-import
-import { createMockSnapsProvider } from './__mocks__/snap-provider.mock';
 import {
   TEST_CASE_DEFAULT_STATE,
   TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
@@ -14,22 +11,22 @@ import {
 
 describe('KernelStateManager', () => {
   const stateManager = createStateManager();
+  const mockSnapsProvider = createMockSnapsProvider();
+
+  // @ts-expect-error Mocking Snap global object
+  // eslint-disable-next-line no-restricted-globals
+  global.snap = mockSnapsProvider;
 
   beforeEach(() => {
-    // @ts-expect-error Mocking Snap global object
-    // eslint-disable-next-line no-restricted-globals
-    global.snap = createMockSnapsProvider();
-
-    // Clear mock call history to ensure no interference between tests
-    jest.clearAllMocks();
+    mockSnapsProvider.request.mockClear();
   });
 
   describe('getState', () => {
     it('should return the default state when no state is retrieved', async () => {
-      (snap.request as MockSnapRequest).mockResolvedValue(null);
+      mockSnapsProvider.request.mockResolvedValue(null);
 
       const result = await stateManager.getState();
-      expect(snap.request).toHaveBeenCalledWith({
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_manageState',
         params: {
           operation: 'get',
@@ -40,12 +37,10 @@ describe('KernelStateManager', () => {
     });
 
     it('should return stored permissions offer registry', async () => {
-      (snap.request as MockSnapRequest).mockResolvedValue(
-        TEST_CASE_DEFAULT_STATE,
-      );
+      mockSnapsProvider.request.mockResolvedValue(TEST_CASE_DEFAULT_STATE);
 
       const { permissionOfferRegistry } = await stateManager.getState();
-      expect(snap.request).toHaveBeenCalledWith({
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_manageState',
         params: {
           operation: 'get',
@@ -58,7 +53,7 @@ describe('KernelStateManager', () => {
     });
 
     it('throw Error if the operation fails when attempting to get state', async () => {
-      (snap.request as MockSnapRequest).mockRejectedValue(
+      mockSnapsProvider.request.mockRejectedValue(
         new Error('Failed to get state'),
       );
 
@@ -70,9 +65,7 @@ describe('KernelStateManager', () => {
 
   describe('setState', () => {
     it('should update offers on permissions offer registry', async () => {
-      (snap.request as MockSnapRequest).mockResolvedValue(
-        TEST_CASE_DEFAULT_STATE,
-      );
+      mockSnapsProvider.request.mockResolvedValue(TEST_CASE_DEFAULT_STATE);
       const state = await stateManager.getState();
       expect(snap.request).toHaveBeenCalledWith({
         method: 'snap_manageState',
@@ -117,7 +110,7 @@ describe('KernelStateManager', () => {
     });
 
     it('throw Error if the operation fails when attempting to update state', async () => {
-      (snap.request as MockSnapRequest).mockRejectedValue(
+      mockSnapsProvider.request.mockRejectedValue(
         new Error('Failed to update state'),
       );
 

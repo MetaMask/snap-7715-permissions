@@ -7,7 +7,13 @@ import {
 } from '@metamask-private/delegator-core-viem';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { createClient, custom, extractChain, type Hex } from 'viem';
+import {
+  createClient,
+  custom,
+  extractChain,
+  type Hex,
+  type Address,
+} from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import * as chains from 'viem/chains';
 
@@ -61,6 +67,7 @@ export type AccountControllerInterface = Pick<
   | 'signDelegation'
   | 'getAccountMetadata'
   | 'getAccountBalance'
+  | 'getDelegationManager'
 >;
 
 /**
@@ -269,7 +276,9 @@ export class AccountController {
    * @param options - The base account options including chainId.
    * @returns A promise resolving to the account address as a hex string.
    */
-  public async getAccountAddress(options: AccountOptionsBase): Promise<Hex> {
+  public async getAccountAddress(
+    options: AccountOptionsBase,
+  ): Promise<Address> {
     logger.debug('accountController:getAccountAddress()');
 
     const smartAccount = await this.#getMetaMaskSmartAccount(options);
@@ -282,6 +291,22 @@ export class AccountController {
     );
 
     return address;
+  }
+
+  /**
+   * Retrieves the delegation manager address for the current account.
+   *
+   * @param options - The base account options including chainId.
+   * @returns A promise resolving to the delegation manager address as a hex string.
+   */
+  public async getDelegationManager(
+    options: AccountOptionsBase,
+  ): Promise<Address> {
+    const smartAccount = await this.#getMetaMaskSmartAccount(options);
+
+    // once we have multiple versions of the delegation manager supported, we
+    // will need to validate and perhaps upgrade here
+    return smartAccount.environment.DelegationManager;
   }
 
   /**

@@ -3,9 +3,9 @@ import {
   createRootDelegation,
   getDeleGatorEnvironment,
 } from '@metamask-private/delegator-core-viem';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { isHex, size } from 'viem';
-import { sepolia, oneWorld } from 'viem/chains';
+import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
 import { AccountController } from '../src/accountController';
 
@@ -16,9 +16,7 @@ describe('AccountController', () => {
   const expectedAddress = '0xD1feB94b097Bd806a67F16c7b549f7e894C0a546';
   const expectedBalance = '0x1000000000000000000';
   let accountController: AccountController;
-  const mockSnapsProvider = {
-    request: jest.fn(),
-  } as unknown as jest.Mocked<SnapsProvider>;
+  const mockSnapsProvider = createMockSnapsProvider();
 
   beforeEach(() => {
     mockSnapsProvider.request.mockReset();
@@ -90,6 +88,30 @@ describe('AccountController', () => {
     });
   });
 
+  describe('getDelegationManager()', () => {
+    it('should get the delegation manager', async () => {
+      const chainId = sepolia.id;
+      const { DelegationManager: expectedDelegationManager } =
+        getDeleGatorEnvironment(chainId);
+
+      const delegationManager = await accountController.getDelegationManager({
+        chainId,
+      });
+
+      expect(delegationManager).toStrictEqual(expectedDelegationManager);
+    });
+
+    it('should reject if an invalid chainId is supplied', async () => {
+      const invalidChainId = 12345;
+
+      await expect(
+        accountController.getDelegationManager({
+          chainId: invalidChainId,
+        }),
+      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
+    });
+  });
+
   describe('getAccountAddress()', () => {
     it('should get the account address', async () => {
       mockSnapsProvider.request.mockResolvedValueOnce(entropy);
@@ -109,6 +131,20 @@ describe('AccountController', () => {
           chainId: invalidChainId,
         }),
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
+    });
+
+    it('should accept one of mmultiple accepted chains', async () => {
+      const controller = new AccountController({
+        snapsProvider: mockSnapsProvider,
+        deploymentSalt: '0x1234',
+        supportedChains: [sepolia, lineaSepolia],
+      });
+
+      const address = await controller.getAccountAddress({
+        chainId: sepolia.id,
+      });
+
+      expect(address).toBeDefined();
     });
   });
 

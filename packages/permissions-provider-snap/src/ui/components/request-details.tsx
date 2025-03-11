@@ -1,5 +1,4 @@
-import type { Permission } from '@metamask/7715-permissions-shared/types';
-import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import type { JsonObject, SnapComponent } from '@metamask/snaps-sdk/jsx';
 import {
   Text,
   Divider,
@@ -8,16 +7,25 @@ import {
   Tooltip,
   Icon,
 } from '@metamask/snaps-sdk/jsx';
+import { extractChain, toHex } from 'viem';
+import * as ALL_CHAINS from 'viem/chains';
 
-type RequestDetails = {
+type RequestDetailsProps = JsonObject & {
   siteOrigin: string;
-  permission: Permission;
+  justification: string | undefined;
+  chainId: number;
 };
 
-export const RequestDetails: SnapComponent<RequestDetails> = ({
+export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
   siteOrigin,
-  permission,
+  justification,
+  chainId,
 }) => {
+  // @ts-expect-error - extractChain does not work well with dynamic `chains`
+  const chain = extractChain({
+    chains: Object.values(ALL_CHAINS),
+    id: chainId as any,
+  });
   const items = [
     {
       label: 'Requested by',
@@ -31,7 +39,7 @@ export const RequestDetails: SnapComponent<RequestDetails> = ({
     },
     {
       label: 'Network',
-      text: 'Linea Sepolia',
+      text: chain?.name || toHex(chainId),
       tooltipText: 'Tooltip text',
     },
   ].map((item) => (
@@ -53,9 +61,7 @@ export const RequestDetails: SnapComponent<RequestDetails> = ({
       <Divider />
 
       <Text>Reason</Text>
-      <Text>
-        {permission.data.justification || 'No justification provided'}
-      </Text>
+      <Text>{justification ?? 'No justification provided'}</Text>
     </Section>
   );
 };

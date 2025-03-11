@@ -1,14 +1,7 @@
-import type { Permission } from '@metamask/7715-permissions-shared/types';
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Text, Section, Box, Icon, Tooltip } from '@metamask/snaps-sdk/jsx';
 
-type SpendingCapDetails = {
-  permission: Permission;
-};
-
-export const SpendingCapDetails: SnapComponent<SpendingCapDetails> = ({
-  _,
-}) => {
+export const SpendingCapDetails: SnapComponent = () => {
   return (
     <Section>
       <Box direction="horizontal" alignment="space-between">
