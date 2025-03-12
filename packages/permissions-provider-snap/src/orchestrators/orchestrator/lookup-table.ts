@@ -1,5 +1,3 @@
-import { zNativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
-
 import type { OrchestratorFactoryFunction } from '../types';
 import { nativeTokenStreamPermissionOrchestrator } from './nativeTokenStreamOrchestrator';
 import type { SupportedPermissionTypes } from './types';
@@ -19,11 +17,4 @@ const orchestratorModules: Record<
     >,
 };
 
-/**
- * Maps permission types to their corresponding Zod object validators.
- */
-const zodObjectMapper = {
-  'native-token-stream': zNativeTokenStreamPermission,
-};
-
-export { orchestratorModules, zodObjectMapper };
+export { orchestratorModules };

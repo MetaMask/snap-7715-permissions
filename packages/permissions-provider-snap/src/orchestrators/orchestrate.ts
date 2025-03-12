@@ -9,6 +9,18 @@ import type { SupportedPermissionTypes } from './orchestrator';
 import type { OrchestrateMeta, OrchestrateResult, Orchestrator } from './types';
 
 /**
+ * Arguments for running the orchestrate function.
+ */
+export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
+  {
+    permissionType: TPermissionType;
+    accountController: MockAccountController; // TODO: Improve to new require passing in the account controller
+    orchestrator: Orchestrator<TPermissionType>;
+    orchestrateMeta: OrchestrateMeta<TPermissionType>;
+    permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
+  };
+
+/**
  * Prepare the account details for the permission picker UI.
  * @param accountController - An account controller instance.
  * @param chainId - The chain ID.
@@ -31,29 +43,28 @@ const prepareAccountDetails = async (
 /**
  * Orchestrates the permission request for the permission type.
  *
- * @param permissionType - The permission type.
- * @param accountController - An account controller instance.
- * @param orchestrator - The permission orchestrator.
- * @param orchestrateMeta - The permission orchestration metadata.
- * @param permissionConfirmationRenderHandler - The permission confirmation render handler.
+ * @param orchestrateArgs - The orchestrate arguments.
  * @returns The permission response.
  * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
  */
 export const orchestrate = async <
   TPermissionType extends SupportedPermissionTypes,
 >(
-  permissionType: TPermissionType,
-  accountController: MockAccountController,
-  orchestrator: Orchestrator<TPermissionType>,
-  orchestrateMeta: OrchestrateMeta<TPermissionType>,
-  permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler,
+  orchestrateArgs: OrchestrateArgs<TPermissionType>,
 ): Promise<OrchestrateResult> => {
+  const {
+    permissionType,
+    accountController,
+    orchestrator,
+    orchestrateMeta,
+    permissionConfirmationRenderHandler,
+  } = orchestrateArgs;
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
   const chainIdNum = fromHex(chainId, 'number');
 
   // Get the user account details
-  const [account, balance] = await prepareAccountDetails(
+  const [address, balance] = await prepareAccountDetails(
     accountController,
     fromHex(chainId, 'number'),
   );
@@ -61,7 +72,7 @@ export const orchestrate = async <
   // Prepare specific context object and confirmation page for the permission type
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permission,
-    account,
+    address,
     siteOrigin: origin,
     balance,
     expiry,
@@ -87,7 +98,7 @@ export const orchestrate = async <
   }
 
   const permissionContext = await orchestrator.buildPermissionContext(
-    account,
+    address,
     sessionAccount,
     chainIdNum,
     attenuatedPermission,
@@ -101,7 +112,7 @@ export const orchestrate = async <
     success: true,
     response: {
       chainId,
-      account,
+      address,
       expiry: attenuatedExpiry,
       signer: {
         type: 'account',
@@ -109,7 +120,7 @@ export const orchestrate = async <
           address: sessionAccount,
         },
       },
-      permission: attenuatedPermission,
+      permissions: [attenuatedPermission],
       context: permissionContext,
       accountMeta:
         accountMeta.factory && accountMeta.factoryData

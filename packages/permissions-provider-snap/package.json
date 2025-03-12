@@ -27,7 +27,6 @@
     "build:pack": "yarn build:clean && yarn pack --filename ../../deps/snap-b-0.1.0.tgz",
     "build:preinstalled-snap": "node scripts/build-preinstalled-snap.js",
     "clean": "rimraf dist",
-    "generate:orchestrator": "node scripts/generate-orchestrator.js",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",

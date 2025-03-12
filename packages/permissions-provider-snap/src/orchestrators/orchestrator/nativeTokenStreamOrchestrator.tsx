@@ -1,16 +1,49 @@
+/* eslint-disable @typescript-eslint/no-throw-literal */
 import {
   createRootDelegation,
   encodeDelegation,
 } from '@metamask-private/delegator-core-viem';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
-import { type Permission } from '@metamask/7715-permissions-shared/types';
+import {
+  zNativeTokenStreamPermission,
+  type Permission,
+} from '@metamask/7715-permissions-shared/types';
+import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
+import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
 import type { OrchestratorArgs, OrchestratorFactoryFunction } from '../types';
-import { parsePermission } from '../validate';
-import type { PermissionTypeMapping } from './types';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { PermissionTypeMapping } from './types';
+
+declare module './types' {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface PermissionTypeMapping {
+    'native-token-stream': JsonObject & NativeTokenStreamPermission; // JsonObject & NativeTokenStreamPermission to be compatible with the Snap JSON object type
+  }
+}
+
+/**
+ * Parses a permission request and returns the permission object.
+ *
+ * @param basePermission - The base permission object.
+ * @returns The permission object.
+ * @throws An error if the permission in the request is invalid.
+ * @throws An error if the permission type is not supported.
+ */
+const parsePermission = (
+  basePermission: Permission,
+): NativeTokenStreamPermission => {
+  const validateRes = zNativeTokenStreamPermission.safeParse(basePermission);
+  if (!validateRes.success) {
+    throw new InvalidParamsError(extractZodError(validateRes.error.errors));
+  }
+
+  return validateRes.data;
+};
 
 /**
  * Validates a permission object data specific to the permission type.
@@ -39,13 +72,10 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
   return {
     parseAndValidate: async (basePermission: Permission) => {
-      const validatedPermission = parsePermission(
-        basePermission,
-        'native-token-stream',
-      );
+      const validatedPermission = parsePermission(basePermission);
       validatePermissionData(validatedPermission);
 
-      return validatedPermission;
+      return validatedPermission as PermissionTypeMapping['native-token-stream'];
     },
     buildPermissionConfirmationPage: (
       context: PermissionConfirmationContext<'native-token-stream'>,
@@ -53,7 +83,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       return (
         <NativeTokenStreamConfirmationPage
           siteOrigin={context.siteOrigin}
-          account={context.account}
+          address={context.address}
           permission={context.permission}
           balance={context.balance}
           expiry={context.expiry}

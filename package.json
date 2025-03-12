@@ -19,7 +19,6 @@
   "scripts": {
     "build": "yarn workspaces foreach --parallel --topological --verbose run build",
     "build:pack": "yarn workspaces foreach --parallel --interlaced --verbose run build:pack",
-    "generate:orchestrator": "yarn workspace @metamask/7715-permissions-provider run generate:orchestrator",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,jsx,ts,tsx",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",

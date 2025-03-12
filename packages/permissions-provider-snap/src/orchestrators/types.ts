@@ -1,6 +1,9 @@
-import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
-import { type Permission } from '@metamask/7715-permissions-shared/types';
+import type {
+  PermissionResponse,
+  Permission,
+} from '@metamask/7715-permissions-shared/types';
 import type { ComponentOrElement } from '@metamask/snaps-sdk';
+import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 
 import type { MockAccountController } from '../accountController.mock';
@@ -27,7 +30,7 @@ export type AttenuatedResponse<
 export type OrchestrateResult = OneOf<
   | {
       success: true;
-      response: PermissionResponse;
+      response: JsonObject & PermissionResponse; // JsonObject & PermissionResponse to be compatible with the Snap JSON object type
     }
   | {
       success: false;
@@ -104,7 +107,7 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
 };
 
 /**
- * The orchestrator args.
+ * The orchestrator args needed to create a permission orchestrator.
  */
 export type OrchestratorArgs = {
   // TODO: Remove mock accountController: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/54

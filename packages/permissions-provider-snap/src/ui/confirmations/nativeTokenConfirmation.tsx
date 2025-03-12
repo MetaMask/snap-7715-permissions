@@ -17,17 +17,17 @@ import type { PermissionConfirmationProps } from '../types';
  * @param props.siteOrigin - The site origin.
  * @param props.permission - The native-token-stream permission data.
  * @param props.chainId - The chain ID.
- * @param props.account - The account address.
+ * @param props.address - The account address.
  * @param props.balance - The account balance.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
-> = ({ siteOrigin, permission, chainId, account, balance }) => {
+> = ({ siteOrigin, permission, chainId, address, balance }) => {
   const accountDetailsProps: AccountDetailsProps = {
     accounts: [
       {
-        address: account,
+        address,
         balance,
         asset: 'ETH',
       },

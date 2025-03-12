@@ -132,9 +132,19 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
 
 Follow the following steps to add new permission types to the `permissions-provider-snap`:
 
-1. Create new permission type definition with `permission.data` to `./packages/shared/src/types/7715-permissions-types.ts`
-2. Add new permission type definition to the mapping(s) in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/types.ts`
-3. Run `yarn generate:orchestrator <nameOfYourOrchestrator>` script to create your orchestrator template.
-4. Add your orchestrator to `orchestratorModules` and `zodObjectMapper` in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/lookup-table.ts`
+1. Create new permission type definition with `permission.data` to `./packages/shared/src/types/7715-permissions-types.ts` file.
+2. Create a new orchestrator file in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/<NewPermissionTypeOrchestrator.tsx>` directory.
+3. Extend `PermissionTypeMapping` in the new orchestrator file. This will allow TS to automatically revolve the new orchestrator everywhere:
+
+```ts
+declare module './types' {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface PermissionTypeMapping {
+    'new-permission-type': JsonObject & NewPermissionTypeDefinition; // JsonObject & NewPermissionTypeDefination to be compatible with the Snap JSON object type
+  }
+}
+```
+
+4. Add your orchestrator to `orchestratorModules` value in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/lookup-table.ts` file.
 
 You are now all set to implement your orchestrators' interface.
