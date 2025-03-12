@@ -6,7 +6,12 @@ import type {
   PermissionConfirmationRenderHandler,
 } from '../ui';
 import type { SupportedPermissionTypes } from './orchestrator';
-import type { OrchestrateMeta, OrchestrateResult, Orchestrator } from './types';
+import type {
+  OrchestrateMeta,
+  OrchestrateResult,
+  Orchestrator,
+  PermissionContextMeta,
+} from './types';
 
 /**
  * Arguments for running the orchestrate function.
@@ -97,16 +102,20 @@ export const orchestrate = async <
     };
   }
 
-  const permissionContext = await orchestrator.buildPermissionContext(
+  const permissionContextMeta: PermissionContextMeta<TPermissionType> = {
     address,
     sessionAccount,
-    chainIdNum,
-    attenuatedPermission,
-  );
-
-  const accountMeta = await accountController.getAccountMetadata({
     chainId: chainIdNum,
-  });
+    attenuatedPermission,
+    signDelegation: accountController.signDelegation,
+  };
+
+  const [permissionContext, accountMeta] = await Promise.all([
+    orchestrator.buildPermissionContext(permissionContextMeta),
+    accountController.getAccountMetadata({
+      chainId: chainIdNum,
+    }),
+  ]);
 
   return {
     success: true,

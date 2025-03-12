@@ -11,11 +11,13 @@ import {
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
-import type { OrchestratorArgs, OrchestratorFactoryFunction } from '../types';
+import type {
+  OrchestratorFactoryFunction,
+  PermissionContextMeta,
+} from '../types';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { PermissionTypeMapping } from './types';
 
@@ -62,14 +64,11 @@ const validatePermissionData = (
 /**
  * Factory function to create a permission orchestrator for a native-token-stream permission type.
  *
- * @param args - The orchestrator arguments.
  * @returns A permission orchestrator for the native-token-stream permission type.
  */
 export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunction<
   'native-token-stream'
-> = (args: OrchestratorArgs) => {
-  const { accountController } = args;
-
+> = () => {
   return {
     parseAndValidate: async (basePermission: Permission) => {
       const validatedPermission = parsePermission(basePermission);
@@ -92,17 +91,16 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       );
     },
     buildPermissionContext: async (
-      account: Hex,
-      sessionAccount: Hex,
-      chainId: number,
-      _attenuatedPermission: PermissionTypeMapping['native-token-stream'],
+      permissionContextMeta: PermissionContextMeta<'native-token-stream'>,
     ) => {
+      const { address, sessionAccount, chainId, signDelegation } =
+        permissionContextMeta;
       // TODO: Use the delegation builder to attach the correct caveats specific to the permission type
       // https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
-      const delegation = createRootDelegation(sessionAccount, account, []);
+      const delegation = createRootDelegation(sessionAccount, address, []);
 
       // Sign the delegation and encode it to create the permissioncContext
-      const signedDelegation = await accountController.signDelegation({
+      const signedDelegation = await signDelegation({
         chainId,
         delegation,
       });

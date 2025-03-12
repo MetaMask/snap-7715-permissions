@@ -1,3 +1,4 @@
+import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
 import type {
   PermissionResponse,
   Permission,
@@ -6,7 +7,6 @@ import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 
-import type { MockAccountController } from '../accountController.mock';
 import type { PermissionConfirmationContext } from '../ui';
 import type {
   PermissionTypeMapping,
@@ -69,6 +69,22 @@ export type OrchestrateMeta<TPermissionType extends SupportedPermissionTypes> =
     expiry: number;
   };
 
+/**
+ * Metadata required for building a 7715 permission context for DeleGator account.
+ */
+export type PermissionContextMeta<
+  TPermissionType extends SupportedPermissionTypes,
+> = {
+  address: Hex;
+  sessionAccount: Hex;
+  chainId: number;
+  attenuatedPermission: PermissionTypeMapping[TPermissionType];
+  signDelegation: (options: {
+    chainId: number;
+    delegation: DelegationStruct;
+  }) => Promise<DelegationStruct>;
+};
+
 export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   /**
    * Validates the base permission request for the permission type.
@@ -83,17 +99,11 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
 
   /**
    * Builds the delegation object for the permission type.
-   * @param account - The account address.
-   * @param sessionAccount - The session account address.
-   * @param chainId - The chain ID.
-   * @param attenuatedPermission - The attenuated permission object.
+   * @param permissionContextMeta - The permission context metadata.
    * @returns The 7715 permision context(ie. encoded signed delegation).
    */
   buildPermissionContext: (
-    account: Hex,
-    sessionAccount: Hex,
-    chainId: number,
-    attenuatedPermission: PermissionTypeMapping[TPermissionType],
+    permissionContextMeta: PermissionContextMeta<TPermissionType>,
   ) => Promise<Hex>;
 
   /**
@@ -107,16 +117,8 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
 };
 
 /**
- * The orchestrator args needed to create a permission orchestrator.
- */
-export type OrchestratorArgs = {
-  // TODO: Remove mock accountController: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/54
-  accountController: MockAccountController;
-};
-
-/**
  * Factory function for creating a permission orchestrator for a given permission type.
  */
 export type OrchestratorFactoryFunction<
   TPermissionType extends SupportedPermissionTypes,
-> = (args: OrchestratorArgs) => Orchestrator<TPermissionType>;
+> = () => Orchestrator<TPermissionType>;

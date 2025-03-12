@@ -6,6 +6,7 @@ import type { Json } from '@metamask/snaps-sdk';
 
 import type { AccountControllerInterface } from '../accountController';
 import { createMockAccountController } from '../accountController.mock';
+import type { OrchestrateArgs } from '../orchestrators';
 import {
   createPermissionOrchestrator,
   orchestrate,
@@ -71,13 +72,11 @@ export function createRpcHandler(config: {
       ) as SupportedPermissionTypes;
 
       // create orchestrator
-      const orchestrator = createPermissionOrchestrator(permissionType, {
-        accountController: mockAccountController,
-      });
+      const orchestrator = createPermissionOrchestrator(permissionType);
       const permission = await orchestrator.parseAndValidate(firstPermission);
 
       // process the request
-      const orchestrateRes = await orchestrate({
+      const orchestrateArgs: OrchestrateArgs<typeof permissionType> = {
         permissionType,
         accountController: mockAccountController,
         orchestrator,
@@ -89,7 +88,8 @@ export function createRpcHandler(config: {
           expiry: firstRequest.expiry,
         },
         permissionConfirmationRenderHandler,
-      });
+      };
+      const orchestrateRes = await orchestrate(orchestrateArgs);
       logger.debug('isPermissionGranted', orchestrateRes.success);
 
       if (!orchestrateRes.success) {
