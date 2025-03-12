@@ -4,12 +4,13 @@ import type {
   NativeTokenTransferPermission,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
+import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 
 export type OrchestrateResult = OneOf<
   | {
       success: true;
-      response: PermissionResponse;
+      response: JsonObject & PermissionResponse; // JsonObject & PermissionResponse to be compatible with the Snap JSON object type
     }
   | {
       success: false;
@@ -29,8 +30,8 @@ export type SupportedPermissionTypes = keyof PermissionTypeMapping;
  * and are defined as `type: { name: z.string(), description: z.string().optional()}`.
  */
 export type PermissionTypeMapping = {
-  'native-token-stream': NativeTokenStreamPermission;
-  'native-token-transfer': NativeTokenTransferPermission;
+  'native-token-stream': JsonObject & NativeTokenStreamPermission; // JsonObject & NativeTokenStreamPermission to be compatible with the Snap JSON object type
+  'native-token-transfer': JsonObject & NativeTokenTransferPermission; // JsonObject & NativeTokenTransferPermission to be compatible with the Snap JSON object type
 };
 
 /**

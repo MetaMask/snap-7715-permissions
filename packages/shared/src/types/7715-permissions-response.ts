@@ -11,10 +11,25 @@ const zAccountMeta = z.object({
 export type AccountMeta = z.infer<typeof zAccountMeta>;
 
 export const zGrantedPermission = z.object({
+  /**
+   * Is a catch-all to identify a permission for revoking permissions or submitting
+   * Defined in ERC-7679 and ERC-7710.
+   */
   context: zHexStr,
+
+  /**
+   * Optional but when present then fields for factory and factoryData are required as defined in ERC-4337.
+   * They are either both specified, or none.
+   * DApp MUST deploy the accounts by calling the factory contract with factoryData as the calldata.
+   */
   accountMeta: z.array(zAccountMeta).optional(),
+
+  /**
+   * Account to assign the permissions to and is dependent on the account type.
+   */
   signerMeta: z.object({
-    delegationManager: zAddress,
+    userOpBuilder: zAddress.optional(),
+    delegationManager: zAddress.optional(),
   }),
 });
 export const zGrantedPermissions = z.array(zGrantedPermission);

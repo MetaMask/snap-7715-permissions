@@ -28,7 +28,7 @@ export type PermissionConfirmationContext<
   TPermissionType extends SupportedPermissionTypes,
 > = InterfaceContext & {
   permission: PermissionTypeMapping[TPermissionType];
-  readonly account: Hex;
+  readonly address: Hex;
   readonly siteOrigin: string;
   readonly balance: Hex;
   readonly chainId: number;
@@ -43,5 +43,5 @@ export type PermissionConfirmationProps<
 > = JsonObject &
   Pick<
     PermissionConfirmationContext<TPermissionType>,
-    'permission' | 'account' | 'siteOrigin' | 'balance' | 'expiry' | 'chainId'
+    'permission' | 'address' | 'siteOrigin' | 'balance' | 'expiry' | 'chainId'
   >;

@@ -28,22 +28,31 @@ export type WalletSigner = z.infer<typeof zAccountSigner>;
 
 export const zPermissionRequest = z.object({
   /**
-   * hex-encoding of uint256
+   * hex-encoding of uint256 defined the chain with EIP-155
    */
   chainId: zHexStr,
 
   /**
-   * Account is part of 7715, but MetaMask will not require account to be passed in the request so is set to optional.
-   * The permisssions picker UI will allow the user to select the account they want to use.
+   *
+   * The account being targetted for this permission request.
+   * It is optional to let the user choose which account to grant permission for.
    */
-  account: zAddress.optional(),
+  address: zAddress.optional(),
 
   /**
    * unix timestamp in seconds
    */
   expiry: z.number(),
+
+  /**
+   * An account that can be granted with permissions as in ERC-7710
+   */
   signer: zAccountSigner,
-  permission: zPermission,
+
+  /**
+   * Defines the allowed behavior the signer can do on behalf of the account.
+   */
+  permissions: z.array(zPermission),
 });
 export const zPermissionsRequest = z.array(zPermissionRequest);
 

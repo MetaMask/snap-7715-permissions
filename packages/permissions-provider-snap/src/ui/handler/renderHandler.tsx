@@ -62,7 +62,7 @@ export const buildNativeTokenStreamConfirmationPage = (
   return (
     <NativeTokenStreamConfirmationPage
       siteOrigin={context.siteOrigin}
-      account={context.account}
+      address={context.address}
       permission={context.permission}
       balance={context.balance}
       expiry={context.expiry}
