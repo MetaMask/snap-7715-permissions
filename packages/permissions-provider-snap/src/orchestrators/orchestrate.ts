@@ -19,7 +19,7 @@ import type {
 export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
   {
     permissionType: TPermissionType;
-    accountController: MockAccountController; // TODO: Improve to new require passing in the account controller
+    accountController: MockAccountController;
     orchestrator: Orchestrator<TPermissionType>;
     orchestrateMeta: OrchestrateMeta<TPermissionType>;
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
