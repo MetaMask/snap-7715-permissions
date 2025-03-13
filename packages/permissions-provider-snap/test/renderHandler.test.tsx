@@ -42,9 +42,7 @@ describe('Permission Confirmation Render Handler', () => {
     <NativeTokenStreamConfirmationPage
       siteOrigin={mockContext.siteOrigin}
       address={mockContext.address}
-      permission={
-        mockContext.permission as PermissionTypeMapping['native-token-stream']
-      }
+      permission={mockContext.permission}
       balance={mockContext.balance}
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
@@ -124,49 +122,6 @@ describe('Permission Confirmation Render Handler', () => {
         attenuatedExpiry: mockContext.expiry,
         isConfirmed: false,
       });
-    });
-  });
-
-  describe('getPermissionConfirmationPage - native-token-stream', () => {
-    it('should return the native-token-stream confirmation page and context object', async () => {
-      const permissionConfirmationRenderHandler =
-        createPermissionConfirmationRenderHandler(mockSnapProvider);
-
-      const [context, page] =
-        permissionConfirmationRenderHandler.getPermissionConfirmationPage(
-          mockContext,
-          mockPermissionType,
-        );
-
-      expect(context).toStrictEqual(mockContext);
-      expect(page).toStrictEqual(mockPage);
-    });
-
-    it('should throw error when given a permission type that is not supported', async () => {
-      const permissionConfirmationRenderHandler =
-        createPermissionConfirmationRenderHandler(mockSnapProvider);
-
-      const nonSupportedPermissionType: any = 'non-supported-permission';
-      const nonSupportedPermission = {
-        type: nonSupportedPermissionType,
-        data: {
-          justification: 'shh...permission 2',
-        },
-      };
-
-      expect(() =>
-        permissionConfirmationRenderHandler.getPermissionConfirmationPage(
-          {
-            permission: nonSupportedPermission,
-            address,
-            siteOrigin: 'http://localhost:3000',
-            balance: '0x1',
-            expiry: 1,
-            chainId: 11155111,
-          } as PermissionConfirmationContext<typeof nonSupportedPermissionType>,
-          nonSupportedPermissionType,
-        ),
-      ).toThrow('Permission confirmation screen not found');
     });
   });
 });

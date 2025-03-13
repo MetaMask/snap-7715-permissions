@@ -127,3 +127,24 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
 2. Client connect button to connect dapp to kernel snap.
 3. Make a permissions request.
 4. Requests are sent to `kernel snap` -> `gator snap` preinstalls
+
+## Adding new permisssion types
+
+Follow the following steps to add new permission types to the `permissions-provider-snap`:
+
+1. Create new permission type definition with `permission.data` to `./packages/shared/src/types/7715-permissions-types.ts` file.
+2. Create a new orchestrator file in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/<NewPermissionTypeOrchestrator.tsx>` directory.
+3. Extend `PermissionTypeMapping` in the new orchestrator file. This will allow TS to automatically revolve the new orchestrator everywhere:
+
+```ts
+declare module './types' {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface PermissionTypeMapping {
+    'new-permission-type': JsonObject & NewPermissionTypeDefinition; // JsonObject & NewPermissionTypeDefination to be compatible with the Snap JSON object type
+  }
+}
+```
+
+4. Add your orchestrator to `orchestratorModules` value in `./packages/permissions-provider-snap/src/orchestrators/orchestrator/lookup-table.ts` file.
+
+You are now all set to implement your orchestrators' interface.

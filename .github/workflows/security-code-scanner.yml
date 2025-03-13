@@ -2,9 +2,10 @@ name: 'MetaMask Security Code Scanner'
 
 on:
   push:
-    branches: ['main']
+    branches:
+      - main
   pull_request:
-    branches: ['main']
+  workflow_dispatch:
 
 jobs:
   run-security-scan:
@@ -15,7 +16,7 @@ jobs:
       security-events: write
     steps:
       - name: MetaMask Security Code Scanner
-        uses: MetaMask/Security-Code-Scanner@main
+        uses: MetaMask/action-security-code-scanner@v1
         with:
           repo: ${{ github.repository }}
           paths_ignored: |
@@ -38,6 +39,7 @@ jobs:
             node_modules
             storybook/
             test*/
-          rules_excluded: example
+          rules_excluded: |
+            rule1
           project_metrics_token: ${{ secrets.SECURITY_SCAN_METRICS_TOKEN }}
           slack_webhook: ${{ secrets.APPSEC_BOT_SLACK_WEBHOOK }}

@@ -1,12 +1,32 @@
+import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
 import type {
   PermissionResponse,
-  NativeTokenStreamPermission,
-  NativeTokenTransferPermission,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
+import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 
+import type { PermissionConfirmationContext } from '../ui';
+import type {
+  PermissionTypeMapping,
+  SupportedPermissionTypes,
+} from './orchestrator';
+
+/**
+ * The attenuated response after the user confirms the permission request.
+ */
+export type AttenuatedResponse<
+  TPermissionType extends SupportedPermissionTypes,
+> = {
+  isConfirmed: boolean;
+  attenuatedPermission: PermissionTypeMapping[TPermissionType];
+  attenuatedExpiry: number;
+};
+
+/**
+ * The result of orchestrating a permission.
+ */
 export type OrchestrateResult = OneOf<
   | {
       success: true;
@@ -17,22 +37,6 @@ export type OrchestrateResult = OneOf<
       reason: string;
     }
 >;
-
-/**
- * Supported permission types.
- */
-export type SupportedPermissionTypes = keyof PermissionTypeMapping;
-
-/**
- * Mapping of supported permission types to their respective permission types.
- *
- * - In the future, we may want to extend the mapping key to a unique hash to account for permission types that don't have a string literal representation
- * and are defined as `type: { name: z.string(), description: z.string().optional()}`.
- */
-export type PermissionTypeMapping = {
-  'native-token-stream': JsonObject & NativeTokenStreamPermission; // JsonObject & NativeTokenStreamPermission to be compatible with the Snap JSON object type
-  'native-token-transfer': JsonObject & NativeTokenTransferPermission; // JsonObject & NativeTokenTransferPermission to be compatible with the Snap JSON object type
-};
 
 /**
  * Metadata required for orchestrating a permission.
@@ -65,6 +69,22 @@ export type OrchestrateMeta<TPermissionType extends SupportedPermissionTypes> =
     expiry: number;
   };
 
+/**
+ * Metadata required for building a 7715 permission context for DeleGator account.
+ */
+export type PermissionContextMeta<
+  TPermissionType extends SupportedPermissionTypes,
+> = {
+  address: Hex;
+  sessionAccount: Hex;
+  chainId: number;
+  attenuatedPermission: PermissionTypeMapping[TPermissionType];
+  signDelegation: (options: {
+    chainId: number;
+    delegation: DelegationStruct;
+  }) => Promise<DelegationStruct>;
+};
+
 export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   /**
    * Validates the base permission request for the permission type.
@@ -78,13 +98,27 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   ) => Promise<PermissionTypeMapping[TPermissionType]>;
 
   /**
-   * Orchestrates the permission request for the permission type.
-   *
-   * @param permission - The permission to orchestrate.
-   * @returns The permission response.
-   * @throws If the permission request cannot be orchestrated(ie. user denies the request, internal error, etc).
+   * Builds the delegation object for the permission type.
+   * @param permissionContextMeta - The permission context metadata.
+   * @returns The 7715 permision context(ie. encoded signed delegation).
    */
-  orchestrate: (
-    orchestrateMeta: OrchestrateMeta<TPermissionType>,
-  ) => Promise<OrchestrateResult>;
+  buildPermissionContext: (
+    permissionContextMeta: PermissionContextMeta<TPermissionType>,
+  ) => Promise<Hex>;
+
+  /**
+   * Builds the permission confirmation page for the permission type.
+   * @param context - The permission confirmation context.
+   * @returns The permission confirmation page component.
+   */
+  buildPermissionConfirmationPage: (
+    context: PermissionConfirmationContext<TPermissionType>,
+  ) => ComponentOrElement;
 };
+
+/**
+ * Factory function for creating a permission orchestrator for a given permission type.
+ */
+export type OrchestratorFactoryFunction<
+  TPermissionType extends SupportedPermissionTypes,
+> = () => Orchestrator<TPermissionType>;

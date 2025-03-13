@@ -3,14 +3,16 @@ import {
   logger,
 } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
-import type { PermissionConfirmationRenderHandler } from 'src/ui';
 
 import type { AccountControllerInterface } from '../accountController';
 import { createMockAccountController } from '../accountController.mock';
+import type { OrchestrateArgs } from '../orchestrators';
 import {
   createPermissionOrchestrator,
+  orchestrate,
   type SupportedPermissionTypes,
 } from '../orchestrators';
+import type { PermissionConfirmationRenderHandler } from '../ui';
 import { validatePermissionRequestParam } from '../utils';
 
 /**
@@ -39,6 +41,7 @@ export function createRpcHandler(config: {
   permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
 }): RpcHandler {
   const { permissionConfirmationRenderHandler } = config;
+  const mockAccountController = createMockAccountController();
 
   return {
     /**
@@ -68,21 +71,25 @@ export function createRpcHandler(config: {
         firstPermission.type,
       ) as SupportedPermissionTypes;
 
-      // process the request
-      const orchestrator = createPermissionOrchestrator(
-        createMockAccountController(),
-        permissionConfirmationRenderHandler,
-        permissionType,
-      );
+      // create orchestrator
+      const orchestrator = createPermissionOrchestrator(permissionType);
       const permission = await orchestrator.parseAndValidate(firstPermission);
 
-      const orchestrateRes = await orchestrator.orchestrate({
-        permission,
-        chainId: firstRequest.chainId,
-        sessionAccount: firstRequest.signer.data.address,
-        origin: siteOrigin,
-        expiry: firstRequest.expiry,
-      });
+      // process the request
+      const orchestrateArgs: OrchestrateArgs<typeof permissionType> = {
+        permissionType,
+        accountController: mockAccountController,
+        orchestrator,
+        orchestrateMeta: {
+          permission,
+          chainId: firstRequest.chainId,
+          sessionAccount: firstRequest.signer.data.address,
+          origin: siteOrigin,
+          expiry: firstRequest.expiry,
+        },
+        permissionConfirmationRenderHandler,
+      };
+      const orchestrateRes = await orchestrate(orchestrateArgs);
       logger.debug('isPermissionGranted', orchestrateRes.success);
 
       if (!orchestrateRes.success) {
