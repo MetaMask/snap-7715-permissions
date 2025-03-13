@@ -10,7 +10,6 @@ import {
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
-import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 
 import type { PermissionConfirmationContext } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
@@ -18,15 +17,7 @@ import type {
   OrchestratorFactoryFunction,
   PermissionContextMeta,
 } from '../types';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { PermissionTypeMapping } from './types';
-
-declare module './types' {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-  interface PermissionTypeMapping {
-    'native-token-stream': JsonObject & NativeTokenStreamPermission; // JsonObject & NativeTokenStreamPermission to be compatible with the Snap JSON object type
-  }
-}
+import type { PermissionTypeMapping } from './types/types';
 
 /**
  * Parses a permission request and returns the permission object.
@@ -50,14 +41,60 @@ const parsePermission = (
 /**
  * Validates a permission object data specific to the permission type.
  *
- * @param _permission - The permission object.
+ * @param permission - The permission object.
  * @returns True if the permission object data is valid.
- * @throws An error if the permission object data is invalid.
+ * @throws Error if the initial amount is not greater than 0.
+ * @throws Error if the max amount is not greater than 0.
+ * @throws Error if the max amount is less than the initial amount.
+ * @throws Error if the amount per second is not a positive number.
+ * @throws Error if the start time is not a positive number.
  */
 const validatePermissionData = (
-  _permission: NativeTokenStreamPermission,
+  permission: NativeTokenStreamPermission,
 ): true => {
-  // TODO: Implement permission.data validation for the native-token-stream permission type
+  const { initialAmount, maxAmount, amountPerSecond, startTime } =
+    permission.data;
+
+  if (BigInt(maxAmount) <= 0n) {
+    throw new InvalidParamsError(
+      'Invalid maxAmount: must be a positive number',
+    );
+  }
+
+  if (initialAmount) {
+    if (BigInt(initialAmount) <= 0n) {
+      throw new InvalidParamsError(
+        'Invalid initialAmount: must be greater than zero',
+      );
+    }
+
+    if (maxAmount < initialAmount) {
+      throw new InvalidParamsError(
+        'Invalid maxAmount: must be greater than initialAmount',
+      );
+    }
+  }
+
+  if (BigInt(amountPerSecond) <= 0n) {
+    throw new InvalidParamsError(
+      'Invalid amountPerSecond: must be a positive number',
+    );
+  }
+
+  if (startTime <= 0) {
+    throw new InvalidParamsError(
+      'Invalid startTime: must be a positive number',
+    );
+  }
+
+  if (startTime !== Math.floor(startTime)) {
+    throw new InvalidParamsError('Invalid startTime: must be an integer');
+  }
+
+  if (startTime <= Math.floor(Date.now() / 1000)) {
+    throw new InvalidParamsError('Invalid startTime: must be in the future');
+  }
+
   return true;
 };
 

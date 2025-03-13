@@ -1,2 +1,2 @@
 export * from './lookup-table';
-export * from './types';
+export * from './types/types';

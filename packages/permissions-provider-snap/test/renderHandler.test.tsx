@@ -1,7 +1,7 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import { getAddress, toHex } from 'viem';
+import { getAddress } from 'viem';
 
 import type {
   PermissionTypeMapping,
@@ -20,8 +20,8 @@ describe('Permission Confirmation Render Handler', () => {
       justification: 'shh...permission 2',
       initialAmount: '0x1',
       amountPerSecond: '0x1',
-      startTime: toHex(BigInt(1000)),
-      endTime: toHex(BigInt(1000 + 1000)),
+      startTime: 1000,
+      maxAmount: '0x2',
     },
   };
   const mockPermissionType = extractPermissionName(

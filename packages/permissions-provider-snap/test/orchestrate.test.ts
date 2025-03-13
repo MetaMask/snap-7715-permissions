@@ -1,6 +1,6 @@
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import { toHex, getAddress } from 'viem';
+import { getAddress } from 'viem';
 
 import { createMockAccountController } from '../src/accountController.mock';
 import type {
@@ -30,8 +30,8 @@ describe('Orchestrate', () => {
         justification: 'shh...permission 2',
         initialAmount: '0x1',
         amountPerSecond: '0x1',
-        startTime: toHex(BigInt(1000)),
-        endTime: toHex(BigInt(1000 + 1000)),
+        startTime: 1000,
+        maxAmount: '0x2',
       },
     };
     const mockPermissionType = extractPermissionName(
@@ -102,9 +102,9 @@ describe('Orchestrate', () => {
               data: {
                 justification: 'shh...permission 2',
                 amountPerSecond: '0x1',
-                endTime: '0x7d0',
                 initialAmount: '0x1',
-                startTime: '0x3e8',
+                startTime: 1000,
+                maxAmount: '0x2',
               },
               type: 'native-token-stream',
             },
