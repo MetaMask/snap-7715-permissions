@@ -1,0 +1,28 @@
+diff --git a/dist/experimental/index.js b/dist/experimental/index.js
+index 5257c0c4bc533204e456b1448b952c34d3aac85b..5555ed5d267f9b199e3c3940e73b6a01790ac02b 100644
+--- a/dist/experimental/index.js
++++ b/dist/experimental/index.js
+@@ -107,7 +107,8 @@ function formatNativeTokenStreamPermission(permission) {
+       initialAmount: toHexOrUndefined(permission.data.initialAmount),
+       amountPerSecond: toHexOrThrow(permission.data.amountPerSecond),
+       maxAmount: toHexOrUndefined(permission.data.maxAmount),
+-      startTime: permission.data.startTime
++      startTime: permission.data.startTime,
++      justification: permission.data.justification
+     }
+   };
+ }
+diff --git a/dist/experimental/index.mjs b/dist/experimental/index.mjs
+index a856ab19dd0835a17a0376d67e4166939bcc48f2..0e6158018ebc797a6981f0d600b9120124780102 100644
+--- a/dist/experimental/index.mjs
++++ b/dist/experimental/index.mjs
+@@ -107,7 +107,8 @@ function formatNativeTokenStreamPermission(permission) {
+       initialAmount: toHexOrUndefined(permission.data.initialAmount),
+       amountPerSecond: toHexOrThrow(permission.data.amountPerSecond),
+       maxAmount: toHexOrUndefined(permission.data.maxAmount),
+-      startTime: permission.data.startTime
++      startTime: permission.data.startTime,
++      justification: permission.data.justification
+     }
+   };
+ }

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { createClient, custom } from 'viem';
 
 import {
   ConnectButton,
@@ -9,13 +10,10 @@ import {
   Card,
 } from '../components';
 import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
-import {
-  useMetaMask,
-  useInvokeSnap,
-  useMetaMaskContext,
-  useRequestSnap,
-} from '../hooks';
+import { useMetaMask, useMetaMaskContext, useRequestSnap } from '../hooks';
 import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
+import { erc7715ProviderActions } from '@metamask-private/delegator-core-viem/experimental';
+import { sepolia } from 'viem/chains';
 
 const Container = styled.div`
   display: flex;
@@ -114,10 +112,22 @@ const LogWrapper = styled.pre`
 
 const Index = () => {
   const { error } = useMetaMaskContext();
-  const { isFlask, snapsDetected, installedSnaps } = useMetaMask();
+  const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestGatorSnap = useRequestSnap(gatorSnapOrigin);
-  const invokeKernelSnap = useInvokeSnap(kernelSnapOrigin);
+
+  const metaMaskClient = useMemo(() => {
+    if (!provider) return undefined;
+
+    return createClient({
+      transport: custom(provider),
+    }).extend(
+      erc7715ProviderActions({
+        kernelSnapId: kernelSnapOrigin,
+        providerSnapId: gatorSnapOrigin,
+      }),
+    );
+  }, [provider, kernelSnapOrigin, gatorSnapOrigin]);
 
   const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
     ? isFlask
@@ -125,7 +135,7 @@ const Index = () => {
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
   const mockDappSessionAccount = '0x016562aA41A8697720ce0943F003141f5dEAe006';
-  const chainId = '0xaa36a7'; // Sepolia
+  const chainId = sepolia.id;
   const expiry = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now (unix timestamp in seconds)
   const now = Math.floor(Date.now() / 1000); // now (unix timestamp in seconds)
 
@@ -169,10 +179,11 @@ const Index = () => {
         ],
       },
     ];
-    const response = await invokeKernelSnap({
-      method: 'wallet_grantPermissions',
-      params: permissionsRequests,
-    });
+
+    const response = await metaMaskClient?.grantPermissions(
+      permissionsRequests,
+    );
+
     appendToLog('Request Permission(single permission)', response);
   };
 
@@ -237,10 +248,10 @@ const Index = () => {
         ],
       },
     ];
-    const response = await invokeKernelSnap({
-      method: 'wallet_grantPermissions',
-      params: permissionsRequests,
-    });
+    const response = await metaMaskClient?.grantPermissions(
+      permissionsRequests,
+    );
+
     appendToLog('Request Permission(Multi permissions)', response);
   };
 
@@ -266,10 +277,10 @@ const Index = () => {
         ],
       },
     ];
-    const response = await invokeKernelSnap({
-      method: 'wallet_grantPermissions',
-      params: permissionsRequests,
-    });
+    const response = await metaMaskClient?.grantPermissions(
+      permissionsRequests,
+    );
+
     appendToLog('Request Permission(offer not registered)', response);
   };
 
@@ -379,11 +390,9 @@ const Index = () => {
               <CustomMessageButton
                 text="Grant Permission"
                 onClick={handleGrantPermissions}
-                disabled={!installedSnaps[kernelSnapOrigin]}
               />
             ),
           }}
-          disabled={!installedSnaps[kernelSnapOrigin]}
           fullWidth={
             isMetaMaskReady &&
             Boolean(installedSnaps[kernelSnapOrigin]) &&
@@ -403,7 +412,6 @@ const Index = () => {
               />
             ),
           }}
-          disabled={!installedSnaps[kernelSnapOrigin]}
           fullWidth={
             isMetaMaskReady &&
             Boolean(installedSnaps[kernelSnapOrigin]) &&
@@ -420,11 +428,9 @@ const Index = () => {
               <CustomMessageButton
                 text="Grant Permission(no offer registered)"
                 onClick={handleGrantPermissionsNoOffer}
-                disabled={!installedSnaps[kernelSnapOrigin]}
               />
             ),
           }}
-          disabled={!installedSnaps[kernelSnapOrigin]}
           fullWidth={
             isMetaMaskReady &&
             Boolean(installedSnaps[kernelSnapOrigin]) &&

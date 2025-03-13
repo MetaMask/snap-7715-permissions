@@ -57,5 +57,8 @@
       "@lavamoat/preinstall-always-fail": false,
       "sharp": true
     }
+  },
+  "resolutions": {
+    "@metamask-private/delegator-core-viem": "patch:@metamask-private/delegator-core-viem@npm:0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch"
   }
 }

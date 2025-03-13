@@ -26,6 +26,7 @@
     ]
   },
   "dependencies": {
+    "@metamask-private/delegator-core-viem": "0.7.0",
     "@metamask/providers": "^16.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
