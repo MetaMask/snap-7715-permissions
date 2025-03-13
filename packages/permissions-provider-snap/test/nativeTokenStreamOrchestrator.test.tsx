@@ -13,8 +13,7 @@ import type { PermissionConfirmationContext } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 
 describe('native-token-stream Orchestrator', () => {
-  const mockCurrentTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
-  const validFutureTime = mockCurrentTime + 2000;
+  const mockStartTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
 
   const mockbasePermission: Permission = {
     type: 'native-token-stream',
@@ -22,7 +21,7 @@ describe('native-token-stream Orchestrator', () => {
       justification: 'shh...permission 2',
       initialAmount: '0x1',
       amountPerSecond: '0x1',
-      startTime: validFutureTime,
+      startTime: mockStartTime,
       maxAmount: '0x2',
     },
   };
@@ -59,7 +58,6 @@ describe('native-token-stream Orchestrator', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(Date, 'now').mockImplementation(() => mockCurrentTime * 1000);
   });
 
   describe('parseAndValidate', () => {
@@ -77,7 +75,7 @@ describe('native-token-stream Orchestrator', () => {
           justification: 'shh...permission 2',
           amountPerSecond: '0x1',
           initialAmount: '0x1',
-          startTime: validFutureTime,
+          startTime: mockStartTime,
           maxAmount: '0x2',
         },
         type: 'native-token-stream',
@@ -101,7 +99,7 @@ describe('native-token-stream Orchestrator', () => {
             justification: 'shh...permission 2',
             initialAmount: toHex(BigInt(0)),
             amountPerSecond: toHex(BigInt(1)),
-            startTime: validFutureTime,
+            startTime: mockStartTime,
             maxAmount: toHex(BigInt(1)),
           },
         }),
@@ -116,7 +114,7 @@ describe('native-token-stream Orchestrator', () => {
             justification: 'shh...permission 2',
             initialAmount: toHex(BigInt(1)),
             amountPerSecond: toHex(BigInt(1)),
-            startTime: validFutureTime,
+            startTime: mockStartTime,
             maxAmount: toHex(BigInt(0)),
           },
         }),
@@ -131,7 +129,7 @@ describe('native-token-stream Orchestrator', () => {
             justification: 'shh...permission 2',
             initialAmount: toHex(BigInt(2)),
             amountPerSecond: toHex(BigInt(1)),
-            startTime: validFutureTime,
+            startTime: mockStartTime,
             maxAmount: toHex(BigInt(1)),
           },
         }),
@@ -148,7 +146,7 @@ describe('native-token-stream Orchestrator', () => {
             justification: 'shh...permission 2',
             initialAmount: toHex(BigInt(1)),
             amountPerSecond: toHex(BigInt(0)),
-            startTime: validFutureTime,
+            startTime: mockStartTime,
             maxAmount: toHex(BigInt(2)),
           },
         }),
@@ -170,22 +168,6 @@ describe('native-token-stream Orchestrator', () => {
       ).rejects.toThrow('Invalid startTime: must be a positive number');
     });
 
-    it('should throw an error if startTime is in the past', async () => {
-      const pastTime = mockCurrentTime - 1000; // 1 second in the past
-      await expect(
-        orchestrator.parseAndValidate({
-          ...mockbasePermission,
-          data: {
-            justification: 'shh...permission 2',
-            initialAmount: toHex(BigInt(1)),
-            amountPerSecond: toHex(BigInt(1)),
-            startTime: pastTime,
-            maxAmount: toHex(BigInt(2)),
-          },
-        }),
-      ).rejects.toThrow('Invalid startTime: must be in the future');
-    });
-
     it('should throw an error if startTime is not an integer', async () => {
       await expect(
         orchestrator.parseAndValidate({
@@ -194,7 +176,7 @@ describe('native-token-stream Orchestrator', () => {
             justification: 'shh...permission 2',
             initialAmount: toHex(BigInt(1)),
             amountPerSecond: toHex(BigInt(1)),
-            startTime: mockCurrentTime + 0.5,
+            startTime: mockStartTime + 0.5,
             maxAmount: toHex(BigInt(2)),
           },
         }),

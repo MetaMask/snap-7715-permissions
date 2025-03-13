@@ -91,10 +91,6 @@ const validatePermissionData = (
     throw new InvalidParamsError('Invalid startTime: must be an integer');
   }
 
-  if (startTime <= Math.floor(Date.now() / 1000)) {
-    throw new InvalidParamsError('Invalid startTime: must be in the future');
-  }
-
   return true;
 };
 
