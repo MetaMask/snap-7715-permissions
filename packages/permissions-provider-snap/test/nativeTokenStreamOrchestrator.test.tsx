@@ -14,7 +14,7 @@ import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 
 describe('native-token-stream Orchestrator', () => {
   const mockStartTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
-
+  const mockEndTime = mockStartTime + 1000;
   const mockbasePermission: Permission = {
     type: 'native-token-stream',
     data: {
@@ -22,6 +22,7 @@ describe('native-token-stream Orchestrator', () => {
       initialAmount: '0x1',
       amountPerSecond: '0x1',
       startTime: mockStartTime,
+      endTime: mockEndTime,
       maxAmount: '0x2',
     },
   };
@@ -76,6 +77,7 @@ describe('native-token-stream Orchestrator', () => {
           amountPerSecond: '0x1',
           initialAmount: '0x1',
           startTime: mockStartTime,
+          endTime: mockEndTime,
           maxAmount: '0x2',
         },
         type: 'native-token-stream',
@@ -100,6 +102,7 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(BigInt(0)),
             amountPerSecond: toHex(BigInt(1)),
             startTime: mockStartTime,
+            endTime: mockEndTime,
             maxAmount: toHex(BigInt(1)),
           },
         }),
@@ -115,6 +118,7 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(BigInt(1)),
             amountPerSecond: toHex(BigInt(1)),
             startTime: mockStartTime,
+            endTime: mockEndTime,
             maxAmount: toHex(BigInt(0)),
           },
         }),
@@ -130,6 +134,7 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(BigInt(2)),
             amountPerSecond: toHex(BigInt(1)),
             startTime: mockStartTime,
+            endTime: mockEndTime,
             maxAmount: toHex(BigInt(1)),
           },
         }),
@@ -147,6 +152,7 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(BigInt(1)),
             amountPerSecond: toHex(BigInt(0)),
             startTime: mockStartTime,
+            endTime: mockEndTime,
             maxAmount: toHex(BigInt(2)),
           },
         }),
@@ -162,6 +168,7 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(BigInt(1)),
             amountPerSecond: toHex(BigInt(1)),
             startTime: 0,
+            endTime: mockEndTime,
             maxAmount: toHex(BigInt(2)),
           },
         }),
@@ -177,6 +184,7 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(BigInt(1)),
             amountPerSecond: toHex(BigInt(1)),
             startTime: mockStartTime + 0.5,
+            endTime: mockEndTime,
             maxAmount: toHex(BigInt(2)),
           },
         }),

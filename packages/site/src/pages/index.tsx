@@ -127,6 +127,7 @@ const Index = () => {
   const mockDappSessionAccount = '0x016562aA41A8697720ce0943F003141f5dEAe006';
   const chainId = '0xaa36a7'; // Sepolia
   const expiry = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now (unix timestamp in seconds)
+  const tenDaysFromNow = Math.floor(Date.now() / 1000) + 864000; // 10 days from now (unix timestamp in seconds)
   const now = Math.floor(Date.now() / 1000); // now (unix timestamp in seconds)
 
   const [log, setLog] = useState<string[]>([]);
@@ -163,6 +164,7 @@ const Index = () => {
               initialAmount: '0x1',
               amountPerSecond: '0x1',
               startTime: now,
+              endTime: tenDaysFromNow,
               maxAmount: '0x2',
             },
           },
@@ -195,6 +197,7 @@ const Index = () => {
               initialAmount: '0x1',
               amountPerSecond: '0x1',
               startTime: now,
+              endTime: tenDaysFromNow,
               maxAmount: '0x2',
             },
           },

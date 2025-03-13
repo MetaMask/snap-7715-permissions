@@ -82,11 +82,8 @@ export const zNativeTokenStreamPermission = zPermission.extend({
       initialAmount: zHexStr.optional(),
       maxAmount: zHexStr,
       amountPerSecond: zHexStr,
-
-      /**
-       * Unix timestamp in seconds.
-       */
       startTime: z.number(),
+      endTime: z.number(),
     }),
   ),
 });
