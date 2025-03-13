@@ -1,8 +1,9 @@
+import { createRootDelegation } from '@metamask-private/delegator-core-viem';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import { toHex, getAddress } from 'viem';
+import { toHex, getAddress, parseUnits } from 'viem';
 
-import { createMockAccountController } from '../src/accountController.mock';
+import type { AccountControllerInterface } from '../src/accountController';
 import type {
   SupportedPermissionTypes,
   PermissionTypeMapping,
@@ -37,7 +38,13 @@ describe('Orchestrate', () => {
     const mockPermissionType = extractPermissionName(
       nativeTokenStreamPermission.type,
     ) as SupportedPermissionTypes;
-    const mockAccountController = createMockAccountController();
+    const mockAccountController = {
+      getAccountAddress: jest.fn(),
+      signDelegation: jest.fn(),
+      getAccountMetadata: jest.fn(),
+      getAccountBalance: jest.fn(),
+      getDelegationManager: jest.fn(),
+    } as jest.Mocked<AccountControllerInterface>;
     const mockPermissionConfirmationRenderHandler = {
       getConfirmedAttenuatedPermission: jest.fn(),
     } as jest.Mocked<PermissionConfirmationRenderHandler>;
@@ -81,6 +88,22 @@ describe('Orchestrate', () => {
         },
       );
 
+      // prepare mock account controller
+      mockAccountController.getAccountAddress.mockResolvedValueOnce(address);
+      mockAccountController.getAccountBalance.mockResolvedValueOnce(
+        toHex(parseUnits('1', 18)),
+      );
+      mockAccountController.getAccountMetadata.mockResolvedValueOnce({
+        factory: '0x1234567890123456789012345678901234567890',
+        factoryData: '0x000000000000000000000000000000_factory_data',
+      });
+      mockAccountController.getDelegationManager.mockResolvedValueOnce(
+        '0x000000_delegation_manager',
+      );
+      mockAccountController.signDelegation.mockResolvedValueOnce(
+        createRootDelegation(sessionAccount, address, []),
+      );
+
       const res = await orchestrate(orchestrateArgs);
 
       expect(res).toStrictEqual({
@@ -95,7 +118,7 @@ describe('Orchestrate', () => {
           ],
           chainId: '0xaa36a7',
           context:
-            '0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000012345678901234567890123456789012345678900000000000000000000000001234567890123456789012345678901234567890ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000_SIGNED_DELEGATION00000000000000000000000000000000',
+            '0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000012345678901234567890123456789012345678900000000000000000000000001234567890123456789012345678901234567890ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
           expiry: 1,
           permissions: [
             {
@@ -126,6 +149,22 @@ describe('Orchestrate', () => {
           attenuatedExpiry: mockAttenuatedContext.expiry,
           attenuatedPermission: mockAttenuatedContext.permission,
         },
+      );
+
+      // prepare mock account controller
+      mockAccountController.getAccountAddress.mockResolvedValueOnce(address);
+      mockAccountController.getAccountBalance.mockResolvedValueOnce(
+        toHex(parseUnits('1', 18)),
+      );
+      mockAccountController.getAccountMetadata.mockResolvedValueOnce({
+        factory: '0x1234567890123456789012345678901234567890',
+        factoryData: '0x000000000000000000000000000000_factory_data',
+      });
+      mockAccountController.getDelegationManager.mockResolvedValueOnce(
+        '0x000000_delegation_manager',
+      );
+      mockAccountController.signDelegation.mockResolvedValueOnce(
+        createRootDelegation(sessionAccount, address, []),
       );
 
       const res = await orchestrate(orchestrateArgs);

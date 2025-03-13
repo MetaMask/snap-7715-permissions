@@ -1,6 +1,6 @@
 import { fromHex, type Hex } from 'viem';
 
-import type { MockAccountController } from '../accountController.mock';
+import type { AccountControllerInterface } from '../accountController';
 import type {
   PermissionConfirmationContext,
   PermissionConfirmationRenderHandler,
@@ -19,7 +19,7 @@ import type {
 export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
   {
     permissionType: TPermissionType;
-    accountController: MockAccountController;
+    accountController: AccountControllerInterface;
     orchestrator: Orchestrator<TPermissionType>;
     orchestrateMeta: OrchestrateMeta<TPermissionType>;
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
@@ -32,7 +32,7 @@ export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
  * @returns The account address, balance.
  */
 const prepareAccountDetails = async (
-  accountController: MockAccountController,
+  accountController: AccountControllerInterface,
   chainId: number,
 ): Promise<[Hex, Hex]> => {
   return await Promise.all([
@@ -110,12 +110,17 @@ export const orchestrate = async <
     signDelegation: accountController.signDelegation,
   };
 
-  const [permissionContext, accountMeta] = await Promise.all([
-    orchestrator.buildPermissionContext(permissionContextMeta),
-    accountController.getAccountMetadata({
-      chainId: chainIdNum,
-    }),
-  ]);
+  const [permissionContext, accountMeta, delegationManager] = await Promise.all(
+    [
+      orchestrator.buildPermissionContext(permissionContextMeta),
+      accountController.getAccountMetadata({
+        chainId: chainIdNum,
+      }),
+      accountController.getDelegationManager({
+        chainId: chainIdNum,
+      }),
+    ],
+  );
 
   return {
     success: true,
@@ -136,7 +141,7 @@ export const orchestrate = async <
           ? [accountMeta]
           : undefined,
       signerMeta: {
-        delegationManager: '0x000000_delegation_manager', // TODO: Update to use actual values instead of mock values
+        delegationManager,
       },
     },
   } as OrchestrateResult;

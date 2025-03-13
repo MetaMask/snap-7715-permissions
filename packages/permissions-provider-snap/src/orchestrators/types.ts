@@ -7,6 +7,7 @@ import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 
+import type { SignDelegationOptions } from '../accountController';
 import type { PermissionConfirmationContext } from '../ui';
 import type {
   PermissionTypeMapping,
@@ -79,10 +80,7 @@ export type PermissionContextMeta<
   sessionAccount: Hex;
   chainId: number;
   attenuatedPermission: PermissionTypeMapping[TPermissionType];
-  signDelegation: (options: {
-    chainId: number;
-    delegation: DelegationStruct;
-  }) => Promise<DelegationStruct>;
+  signDelegation: (options: SignDelegationOptions) => Promise<DelegationStruct>;
 };
 
 export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
