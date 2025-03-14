@@ -101,7 +101,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         signDelegation,
         caveatBuilder,
       } = permissionContextMeta;
-      // TODO: Using native token all enforcers for now util native token stream enforcer available in delegator-sdk
+      // TODO: Using native token allowance enforcers, for now, until native token stream enforcer is available in delegator-sdk
       const caveats = caveatBuilder
         .addCaveat(
           'nativeTokenTransferAmount',
