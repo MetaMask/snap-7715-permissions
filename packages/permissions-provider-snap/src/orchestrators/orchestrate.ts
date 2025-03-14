@@ -102,12 +102,16 @@ export const orchestrate = async <
     };
   }
 
+  const caveatBuilder = await accountController.getCaveatBuilder({
+    chainId: chainIdNum,
+  });
   const permissionContextMeta: PermissionContextMeta<TPermissionType> = {
     address,
     sessionAccount,
     chainId: chainIdNum,
     attenuatedPermission,
     signDelegation: accountController.signDelegation.bind(accountController), // need to bind the function to the account controller instance
+    caveatBuilder,
   };
 
   const [permissionContext, accountMeta, delegationManager] = await Promise.all(

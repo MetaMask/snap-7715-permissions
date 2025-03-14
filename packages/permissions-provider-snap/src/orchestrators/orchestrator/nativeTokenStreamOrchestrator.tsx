@@ -93,19 +93,28 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
     buildPermissionContext: async (
       permissionContextMeta: PermissionContextMeta<'native-token-stream'>,
     ) => {
-      const { address, sessionAccount, chainId, signDelegation } =
-        permissionContextMeta;
-      // TODO: Use the delegation builder to attach the correct caveats specific to the permission type
-      // https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/41
-      const delegation = createRootDelegation(sessionAccount, address, []);
+      const {
+        address,
+        sessionAccount,
+        chainId,
+        attenuatedPermission,
+        signDelegation,
+        caveatBuilder,
+      } = permissionContextMeta;
+      // TODO: Using native token all enforcers for now util native token stream enforcer available in delegator-sdk
+      const caveats = caveatBuilder
+        .addCaveat(
+          'nativeTokenTransferAmount',
+          BigInt(attenuatedPermission.data.initialAmount ?? 0),
+        )
+        .build();
 
       // Sign the delegation and encode it to create the permissioncContext
       const signedDelegation = await signDelegation({
         chainId,
-        delegation,
+        delegation: createRootDelegation(sessionAccount, address, caveats),
       });
-      const permissionContext = encodeDelegation([signedDelegation]);
-      return permissionContext;
+      return encodeDelegation([signedDelegation]);
     },
   };
 };

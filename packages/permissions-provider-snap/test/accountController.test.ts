@@ -1,5 +1,6 @@
 import { describe, it, beforeEach } from '@jest/globals';
 import {
+  createCaveatBuilder,
   createRootDelegation,
   getDeleGatorEnvironment,
 } from '@metamask-private/delegator-core-viem';
@@ -224,6 +225,31 @@ describe('AccountController', () => {
         accountController.signDelegation({
           chainId: invalidChainId,
           delegation: unsignedDelegation,
+        }),
+      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
+    });
+  });
+
+  describe('getCaveatBuilder()', () => {
+    it('should get the CoreCaveatBuilder for the current account', async () => {
+      const chainId = sepolia.id;
+      const environment = getDeleGatorEnvironment(sepolia.id);
+
+      const expectedCaveatBuilder = createCaveatBuilder(environment);
+
+      const caveatBuilder = await accountController.getCaveatBuilder({
+        chainId,
+      });
+
+      expect(caveatBuilder).toStrictEqual(expectedCaveatBuilder);
+    });
+
+    it('should reject if an invalid chainId is supplied', async () => {
+      const invalidChainId = 12345;
+
+      await expect(
+        accountController.getCaveatBuilder({
+          chainId: invalidChainId,
         }),
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });

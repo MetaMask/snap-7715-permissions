@@ -1,4 +1,7 @@
-import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
+import type {
+  CoreCaveatBuilder,
+  DelegationStruct,
+} from '@metamask-private/delegator-core-viem';
 import type {
   PermissionResponse,
   Permission,
@@ -81,6 +84,7 @@ export type PermissionContextMeta<
   chainId: number;
   attenuatedPermission: PermissionTypeMapping[TPermissionType];
   signDelegation: (options: SignDelegationOptions) => Promise<DelegationStruct>;
+  caveatBuilder: CoreCaveatBuilder;
 };
 
 export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {

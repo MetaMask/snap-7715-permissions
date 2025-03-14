@@ -13,6 +13,7 @@ describe('RpcHandler', () => {
     getAccountMetadata: jest.fn(),
     getAccountBalance: jest.fn(),
     getDelegationManager: jest.fn(),
+    getCaveatBuilder: jest.fn(),
   };
   const mockPermissionConfirmationRenderHandler = {
     getConfirmedAttenuatedPermission: jest.fn(),

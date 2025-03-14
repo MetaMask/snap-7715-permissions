@@ -1,5 +1,7 @@
+import type { CoreCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import {
   CHAIN_ID as ChainsWithDelegatorDeployed,
+  createCaveatBuilder,
   Implementation,
   toMetaMaskSmartAccount,
   type DelegationStruct,
@@ -68,6 +70,7 @@ export type AccountControllerInterface = Pick<
   | 'getAccountMetadata'
   | 'getAccountBalance'
   | 'getDelegationManager'
+  | 'getCaveatBuilder'
 >;
 
 /**
@@ -398,5 +401,26 @@ export class AccountController {
     logger.debug('accountController:signDelegation() - signature resolved');
 
     return { ...delegation, signature };
+  }
+
+  /**
+   * Retrieves a CoreCaveatBuilder for the current account.
+   *
+   * @param options - The base account options including chainId.
+   * @returns A promise resolving to a CoreCaveatBuilder.
+   */
+  public async getCaveatBuilder(
+    options: AccountOptionsBase,
+  ): Promise<CoreCaveatBuilder> {
+    logger.debug('accountController:getCaveatBuilder()');
+
+    const smartAccount = await this.#getMetaMaskSmartAccount(options);
+
+    logger.debug(
+      'accountController:getCaveatBuilder() - smartAccount resolved',
+      smartAccount,
+    );
+
+    return createCaveatBuilder(smartAccount.environment);
   }
 }
