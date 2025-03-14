@@ -107,7 +107,7 @@ export const orchestrate = async <
     sessionAccount,
     chainId: chainIdNum,
     attenuatedPermission,
-    signDelegation: accountController.signDelegation,
+    signDelegation: accountController.signDelegation.bind(accountController), // need to bind the function to the account controller instance
   };
 
   const [permissionContext, accountMeta, delegationManager] = await Promise.all(
