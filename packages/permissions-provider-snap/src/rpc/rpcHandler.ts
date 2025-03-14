@@ -5,7 +5,10 @@ import {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { AccountControllerInterface } from '../accountController';
-import type { OrchestrateArgs } from '../orchestrators';
+import type {
+  OrchestrateArgs,
+  PermissionsContextBuilder,
+} from '../orchestrators';
 import {
   createPermissionOrchestrator,
   orchestrate,
@@ -33,13 +36,19 @@ export type RpcHandler = {
  * @param config - The parameters for creating the RPC handler.
  * @param config.accountController - The account controller interface.
  * @param config.permissionConfirmationRenderHandler - The permission confirmation render handler.
+ * @param config.permissionsContextBuilder - The permissions context builder.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
   accountController: AccountControllerInterface;
   permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
+  permissionsContextBuilder: PermissionsContextBuilder;
 }): RpcHandler {
-  const { permissionConfirmationRenderHandler, accountController } = config;
+  const {
+    permissionConfirmationRenderHandler,
+    accountController,
+    permissionsContextBuilder,
+  } = config;
 
   return {
     /**
@@ -86,6 +95,7 @@ export function createRpcHandler(config: {
           expiry: firstRequest.expiry,
         },
         permissionConfirmationRenderHandler,
+        permissionsContextBuilder,
       };
       const orchestrateRes = await orchestrate(orchestrateArgs);
       logger.debug('isPermissionGranted', orchestrateRes.success);

@@ -1,7 +1,6 @@
 import {
   createCaveatBuilder,
   getDeleGatorEnvironment,
-  type DelegationStruct,
 } from '@metamask-private/delegator-core-viem';
 import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
@@ -102,39 +101,27 @@ describe('native-token-stream Orchestrator', () => {
     });
   });
 
-  describe('buildPermissionContext', () => {
+  describe('buildPermissionCaveats', () => {
     it('should return permission context for a attenuated permission ', async () => {
       const orchestrator = createPermissionOrchestrator(mockPermissionType);
 
-      const res = await orchestrator.buildPermissionContext({
+      const caveats = await orchestrator.buildPermissionCaveats({
         address,
         sessionAccount,
         chainId: 11155111,
         attenuatedPermission:
           mockbasePermission as PermissionTypeMapping[typeof mockPermissionType],
-        signDelegation: jest.fn().mockImplementation(async (options) => {
-          // make sure the caveats are set correctly
-          expect(options.delegation.caveats).toStrictEqual([
-            {
-              args: '0x',
-              enforcer: '0xcfD1BD7922D123Caa194597BF7A0073899a284Df',
-              terms:
-                '0x0000000000000000000000000000000000000000000000000000000000000001',
-            },
-          ]);
-
-          // mock signDelegation
-          return Promise.resolve({
-            ...options.delegation,
-            signature: '0x_signature',
-          } as DelegationStruct);
-        }),
         caveatBuilder: createCaveatBuilder(getDeleGatorEnvironment(sepolia.id)),
       });
 
-      expect(res).toStrictEqual(
-        '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000016562aa41a8697720ce0943f003141f5deae006000000000000000000000000016562aa41a8697720ce0943f003141f5deae008ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000cfd1bd7922d123caa194597bf7a0073899a284df000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005_signature000000000000000000000000000000000000000000000000000000',
-      );
+      expect(caveats).toStrictEqual([
+        {
+          args: '0x',
+          enforcer: '0xcfD1BD7922D123Caa194597BF7A0073899a284Df',
+          terms:
+            '0x0000000000000000000000000000000000000000000000000000000000000001',
+        },
+      ]);
     });
   });
 });

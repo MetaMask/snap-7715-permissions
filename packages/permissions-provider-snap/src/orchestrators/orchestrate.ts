@@ -6,6 +6,7 @@ import type {
   PermissionConfirmationRenderHandler,
 } from '../ui';
 import type { SupportedPermissionTypes } from './orchestrator';
+import type { PermissionsContextBuilder } from './permissionsContextBuilder';
 import type {
   OrchestrateMeta,
   OrchestrateResult,
@@ -23,6 +24,7 @@ export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
     orchestrator: Orchestrator<TPermissionType>;
     orchestrateMeta: OrchestrateMeta<TPermissionType>;
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
+    permissionsContextBuilder: PermissionsContextBuilder;
   };
 
 /**
@@ -63,6 +65,7 @@ export const orchestrate = async <
     orchestrator,
     orchestrateMeta,
     permissionConfirmationRenderHandler,
+    permissionsContextBuilder,
   } = orchestrateArgs;
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
@@ -110,21 +113,26 @@ export const orchestrate = async <
     sessionAccount,
     chainId: chainIdNum,
     attenuatedPermission,
-    signDelegation: accountController.signDelegation.bind(accountController), // need to bind the function to the account controller instance
     caveatBuilder,
   };
 
-  const [permissionContext, accountMeta, delegationManager] = await Promise.all(
-    [
-      orchestrator.buildPermissionContext(permissionContextMeta),
-      accountController.getAccountMetadata({
-        chainId: chainIdNum,
-      }),
-      accountController.getDelegationManager({
-        chainId: chainIdNum,
-      }),
-    ],
-  );
+  const [caveats, accountMeta, delegationManager] = await Promise.all([
+    orchestrator.buildPermissionCaveats(permissionContextMeta),
+    accountController.getAccountMetadata({
+      chainId: chainIdNum,
+    }),
+    accountController.getDelegationManager({
+      chainId: chainIdNum,
+    }),
+  ]);
+
+  const permissionContext =
+    await permissionsContextBuilder.buildPermissionsContext({
+      address,
+      sessionAccount,
+      caveats,
+      chainId: chainIdNum,
+    });
 
   return {
     success: true,

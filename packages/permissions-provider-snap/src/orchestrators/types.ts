@@ -1,6 +1,6 @@
 import type {
+  CaveatStruct,
   CoreCaveatBuilder,
-  DelegationStruct,
 } from '@metamask-private/delegator-core-viem';
 import type {
   PermissionResponse,
@@ -10,7 +10,6 @@ import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 
-import type { SignDelegationOptions } from '../accountController';
 import type { PermissionConfirmationContext } from '../ui';
 import type {
   PermissionTypeMapping,
@@ -83,7 +82,6 @@ export type PermissionContextMeta<
   sessionAccount: Hex;
   chainId: number;
   attenuatedPermission: PermissionTypeMapping[TPermissionType];
-  signDelegation: (options: SignDelegationOptions) => Promise<DelegationStruct>;
   caveatBuilder: CoreCaveatBuilder;
 };
 
@@ -102,11 +100,11 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   /**
    * Builds the delegation object for the permission type.
    * @param permissionContextMeta - The permission context metadata.
-   * @returns The 7715 permision context(ie. encoded signed delegation).
+   * @returns The caveats for the permission type.
    */
-  buildPermissionContext: (
+  buildPermissionCaveats: (
     permissionContextMeta: PermissionContextMeta<TPermissionType>,
-  ) => Promise<Hex>;
+  ) => Promise<CaveatStruct[]>;
 
   /**
    * Builds the permission confirmation page for the permission type.

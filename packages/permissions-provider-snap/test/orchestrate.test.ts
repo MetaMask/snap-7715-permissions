@@ -1,5 +1,4 @@
 import {
-  createRootDelegation,
   createCaveatBuilder,
   getDeleGatorEnvironment,
 } from '@metamask-private/delegator-core-viem';
@@ -18,6 +17,7 @@ import {
   createPermissionOrchestrator,
   orchestrate,
 } from '../src/orchestrators';
+import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
 import type {
   PermissionConfirmationContext,
   PermissionConfirmationRenderHandler,
@@ -54,6 +54,9 @@ describe('Orchestrate', () => {
     const mockPermissionConfirmationRenderHandler = {
       getConfirmedAttenuatedPermission: jest.fn(),
     } as jest.Mocked<PermissionConfirmationRenderHandler>;
+    const mockPermissionsContextBuilder = {
+      buildPermissionsContext: jest.fn(),
+    } as jest.Mocked<PermissionsContextBuilder>;
     const orchestrator = createPermissionOrchestrator(mockPermissionType);
 
     const orchestrateArgs: OrchestrateArgs<typeof mockPermissionType> = {
@@ -70,6 +73,7 @@ describe('Orchestrate', () => {
       },
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
+      permissionsContextBuilder: mockPermissionsContextBuilder,
     };
 
     const mockAttenuatedContext: PermissionConfirmationContext<
@@ -94,6 +98,11 @@ describe('Orchestrate', () => {
         },
       );
 
+      // prepare mock permissions context builder
+      mockPermissionsContextBuilder.buildPermissionsContext.mockResolvedValueOnce(
+        '0x00_some_permission_context',
+      );
+
       // prepare mock account controller
       mockAccountController.getAccountAddress.mockResolvedValueOnce(address);
       mockAccountController.getAccountBalance.mockResolvedValueOnce(
@@ -105,9 +114,6 @@ describe('Orchestrate', () => {
       });
       mockAccountController.getDelegationManager.mockResolvedValueOnce(
         '0x000000_delegation_manager',
-      );
-      mockAccountController.signDelegation.mockResolvedValueOnce(
-        createRootDelegation(sessionAccount, address, []),
       );
       mockAccountController.getCaveatBuilder.mockResolvedValueOnce(
         createCaveatBuilder(getDeleGatorEnvironment(sepolia.id)),
@@ -126,8 +132,7 @@ describe('Orchestrate', () => {
             },
           ],
           chainId: '0xaa36a7',
-          context:
-            '0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000012345678901234567890123456789012345678900000000000000000000000001234567890123456789012345678901234567890ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+          context: '0x00_some_permission_context',
           expiry: 1,
           permissions: [
             {
@@ -160,6 +165,11 @@ describe('Orchestrate', () => {
         },
       );
 
+      // prepare mock permissions context builder
+      mockPermissionsContextBuilder.buildPermissionsContext.mockResolvedValueOnce(
+        '0x00_some_permission_context',
+      );
+
       // prepare mock account controller
       mockAccountController.getAccountAddress.mockResolvedValueOnce(address);
       mockAccountController.getAccountBalance.mockResolvedValueOnce(
@@ -171,9 +181,6 @@ describe('Orchestrate', () => {
       });
       mockAccountController.getDelegationManager.mockResolvedValueOnce(
         '0x000000_delegation_manager',
-      );
-      mockAccountController.signDelegation.mockResolvedValueOnce(
-        createRootDelegation(sessionAccount, address, []),
       );
       mockAccountController.getCaveatBuilder.mockResolvedValueOnce(
         createCaveatBuilder(getDeleGatorEnvironment(sepolia.id)),
