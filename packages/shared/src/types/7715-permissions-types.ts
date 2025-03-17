@@ -80,9 +80,9 @@ export const zNativeTokenStreamPermission = zPermission.extend({
     zMetaMaskPermissionData,
     z.object({
       initialAmount: zHexStr.optional(),
+      maxAmount: zHexStr,
       amountPerSecond: zHexStr,
-      startTime: zHexStr,
-      endTime: zHexStr,
+      startTime: z.number(),
     }),
   ),
 });

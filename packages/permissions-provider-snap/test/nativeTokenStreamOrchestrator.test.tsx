@@ -4,6 +4,7 @@ import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import { getAddress, toHex } from 'viem';
 
 import type {
+  Orchestrator,
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../src/orchestrators';
@@ -12,14 +13,15 @@ import type { PermissionConfirmationContext } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 
 describe('native-token-stream Orchestrator', () => {
+  const mockStartTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
   const mockbasePermission: Permission = {
     type: 'native-token-stream',
     data: {
       justification: 'shh...permission 2',
       initialAmount: '0x1',
       amountPerSecond: '0x1',
-      startTime: toHex(BigInt(1000)),
-      endTime: toHex(BigInt(1000 + 1000)),
+      startTime: mockStartTime,
+      maxAmount: '0x2',
     },
   };
   const mockPermissionType = extractPermissionName(
@@ -58,32 +60,127 @@ describe('native-token-stream Orchestrator', () => {
   });
 
   describe('parseAndValidate', () => {
-    it('should return as parsed permission when parseAndValidate called with valid permission that is supported', async () => {
-      const orchestrator = createPermissionOrchestrator(mockPermissionType);
+    let orchestrator: Orchestrator<'native-token-stream'>;
 
+    beforeEach(() => {
+      orchestrator = createPermissionOrchestrator(mockPermissionType);
+    });
+
+    it('should return as parsed permission when parseAndValidate called with valid permission that is supported', async () => {
       const res = await orchestrator.parseAndValidate(mockbasePermission);
 
       expect(res).toStrictEqual({
         data: {
           justification: 'shh...permission 2',
           amountPerSecond: '0x1',
-          endTime: '0x7d0',
           initialAmount: '0x1',
-          startTime: '0x3e8',
+          startTime: mockStartTime,
+          maxAmount: '0x2',
         },
         type: 'native-token-stream',
       });
     });
 
     it('should throw error when validate called with permission that is not valid', async () => {
-      const orchestrator = createPermissionOrchestrator(mockPermissionType);
-
       await expect(
         orchestrator.parseAndValidate({
           ...mockbasePermission,
           data: {},
         } as unknown as Permission),
       ).rejects.toThrow('Failed type validation: data.justification: Required');
+    });
+
+    it('should throw error with a negative initial amount', async () => {
+      await expect(
+        orchestrator.parseAndValidate({
+          ...mockbasePermission,
+          data: {
+            justification: 'shh...permission 2',
+            initialAmount: toHex(0n),
+            amountPerSecond: toHex(1n),
+            startTime: mockStartTime,
+            maxAmount: toHex(1n),
+          },
+        }),
+      ).rejects.toThrow('Invalid initialAmount: must be greater than zero');
+    });
+
+    it('should throw error with a non-positive max amount', async () => {
+      await expect(
+        orchestrator.parseAndValidate({
+          ...mockbasePermission,
+          data: {
+            justification: 'shh...permission 2',
+            initialAmount: toHex(1n),
+            amountPerSecond: toHex(1n),
+            startTime: mockStartTime,
+            maxAmount: toHex(0n),
+          },
+        }),
+      ).rejects.toThrow('Invalid maxAmount: must be a positive number');
+    });
+
+    it('should throw error when max amount is less than initial amount', async () => {
+      await expect(
+        orchestrator.parseAndValidate({
+          ...mockbasePermission,
+          data: {
+            justification: 'shh...permission 2',
+            initialAmount: toHex(2n),
+            amountPerSecond: toHex(1n),
+            startTime: mockStartTime,
+            maxAmount: toHex(1n),
+          },
+        }),
+      ).rejects.toThrow(
+        'Invalid maxAmount: must be greater than initialAmount',
+      );
+    });
+
+    it('should throw error with a non-positive amount per second', async () => {
+      await expect(
+        orchestrator.parseAndValidate({
+          ...mockbasePermission,
+          data: {
+            justification: 'shh...permission 2',
+            initialAmount: toHex(1n),
+            amountPerSecond: toHex(0n),
+            startTime: mockStartTime,
+            maxAmount: toHex(2n),
+          },
+        }),
+      ).rejects.toThrow('Invalid amountPerSecond: must be a positive number');
+    });
+
+    it('should throw error with a non-positive start time', async () => {
+      await expect(
+        orchestrator.parseAndValidate({
+          ...mockbasePermission,
+          data: {
+            justification: 'shh...permission 2',
+            initialAmount: toHex(1n),
+            amountPerSecond: toHex(1n),
+            startTime: 0,
+
+            maxAmount: toHex(2n),
+          },
+        }),
+      ).rejects.toThrow('Invalid startTime: must be a positive number');
+    });
+
+    it('should throw an error if startTime is not an integer', async () => {
+      await expect(
+        orchestrator.parseAndValidate({
+          ...mockbasePermission,
+          data: {
+            justification: 'shh...permission 2',
+            initialAmount: toHex(1n),
+            amountPerSecond: toHex(1n),
+            startTime: mockStartTime + 0.5,
+            maxAmount: toHex(2n),
+          },
+        }),
+      ).rejects.toThrow('Invalid startTime: must be an integer');
     });
   });
 
