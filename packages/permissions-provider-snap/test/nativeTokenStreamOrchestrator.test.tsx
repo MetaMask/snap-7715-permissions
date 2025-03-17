@@ -96,10 +96,10 @@ describe('native-token-stream Orchestrator', () => {
           ...mockbasePermission,
           data: {
             justification: 'shh...permission 2',
-            initialAmount: toHex(BigInt(0)),
-            amountPerSecond: toHex(BigInt(1)),
+            initialAmount: toHex(BigInt(0n)),
+            amountPerSecond: toHex(BigInt(1n)),
             startTime: mockStartTime,
-            maxAmount: toHex(BigInt(1)),
+            maxAmount: toHex(BigInt(1n)),
           },
         }),
       ).rejects.toThrow('Invalid initialAmount: must be greater than zero');
@@ -111,10 +111,10 @@ describe('native-token-stream Orchestrator', () => {
           ...mockbasePermission,
           data: {
             justification: 'shh...permission 2',
-            initialAmount: toHex(BigInt(1)),
-            amountPerSecond: toHex(BigInt(1)),
+            initialAmount: toHex(BigInt(1n)),
+            amountPerSecond: toHex(BigInt(1n)),
             startTime: mockStartTime,
-            maxAmount: toHex(BigInt(0)),
+            maxAmount: toHex(BigInt(0n)),
           },
         }),
       ).rejects.toThrow('Invalid maxAmount: must be a positive number');
@@ -127,9 +127,9 @@ describe('native-token-stream Orchestrator', () => {
           data: {
             justification: 'shh...permission 2',
             initialAmount: toHex(BigInt(2)),
-            amountPerSecond: toHex(BigInt(1)),
+            amountPerSecond: toHex(BigInt(1n)),
             startTime: mockStartTime,
-            maxAmount: toHex(BigInt(1)),
+            maxAmount: toHex(BigInt(1n)),
           },
         }),
       ).rejects.toThrow(
@@ -143,10 +143,10 @@ describe('native-token-stream Orchestrator', () => {
           ...mockbasePermission,
           data: {
             justification: 'shh...permission 2',
-            initialAmount: toHex(BigInt(1)),
-            amountPerSecond: toHex(BigInt(0)),
+            initialAmount: toHex(BigInt(1n)),
+            amountPerSecond: toHex(BigInt(0n)),
             startTime: mockStartTime,
-            maxAmount: toHex(BigInt(2)),
+            maxAmount: toHex(BigInt(2n)),
           },
         }),
       ).rejects.toThrow('Invalid amountPerSecond: must be a positive number');
@@ -158,11 +158,11 @@ describe('native-token-stream Orchestrator', () => {
           ...mockbasePermission,
           data: {
             justification: 'shh...permission 2',
-            initialAmount: toHex(BigInt(1)),
-            amountPerSecond: toHex(BigInt(1)),
+            initialAmount: toHex(BigInt(1n)),
+            amountPerSecond: toHex(BigInt(1n)),
             startTime: 0,
 
-            maxAmount: toHex(BigInt(2)),
+            maxAmount: toHex(BigInt(2n)),
           },
         }),
       ).rejects.toThrow('Invalid startTime: must be a positive number');
@@ -174,10 +174,10 @@ describe('native-token-stream Orchestrator', () => {
           ...mockbasePermission,
           data: {
             justification: 'shh...permission 2',
-            initialAmount: toHex(BigInt(1)),
-            amountPerSecond: toHex(BigInt(1)),
+            initialAmount: toHex(BigInt(1n)),
+            amountPerSecond: toHex(BigInt(1n)),
             startTime: mockStartTime + 0.5,
-            maxAmount: toHex(BigInt(2)),
+            maxAmount: toHex(BigInt(2n)),
           },
         }),
       ).rejects.toThrow('Invalid startTime: must be an integer');
