@@ -83,7 +83,6 @@ export const zNativeTokenStreamPermission = zPermission.extend({
       maxAmount: zHexStr,
       amountPerSecond: zHexStr,
       startTime: z.number(),
-      endTime: z.number(),
     }),
   ),
 });

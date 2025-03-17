@@ -21,7 +21,6 @@ describe('Permission Confirmation Render Handler', () => {
       initialAmount: '0x1',
       amountPerSecond: '0x1',
       startTime: 1000,
-      endTime: 1000 + 1000,
       maxAmount: '0x2',
     },
   };
