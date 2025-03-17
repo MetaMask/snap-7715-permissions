@@ -18,7 +18,7 @@ import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 import {
-  buttonClickEventHandler,
+  shouldInterfaceResolveHandler,
   createPermissionConfirmationRenderHandler,
   getActiveInterfaceContext,
 } from './ui';
@@ -90,10 +90,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   // TODO: Decouple User input handler: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/84
   const activeContext = await getActiveInterfaceContext(id);
+  let didInterfaceResolve = false;
   if (activeContext) {
     switch (event.type) {
       case UserInputEventType.ButtonClickEvent: {
-        await buttonClickEventHandler(event, id);
+        didInterfaceResolve = await shouldInterfaceResolveHandler(
+          event,
+          id,
+          activeContext,
+        );
         break;
       }
       default: {
@@ -101,25 +106,25 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
       }
     }
 
-    // Update the interface with the new context and UI specific to the permission type
-    const permissionType = extractPermissionName(
-      activeContext.permission.type,
-    ) as SupportedPermissionTypes;
+    // If the interface did not resolve, update the interface with the new context and UI specific to the permission type
+    if (!didInterfaceResolve) {
+      const permissionType = extractPermissionName(
+        activeContext.permission.type,
+      ) as SupportedPermissionTypes;
 
-    const orchestrator = createPermissionOrchestrator(permissionType, {
-      accountController,
-    });
+      const orchestrator = createPermissionOrchestrator(permissionType);
 
-    const permissionConfirmationPage =
-      orchestrator.buildPermissionConfirmationPage(activeContext);
+      const permissionConfirmationPage =
+        orchestrator.buildPermissionConfirmationPage(activeContext);
 
-    await snap.request({
-      method: 'snap_updateInterface',
-      params: {
-        id,
-        context: activeContext,
-        ui: permissionConfirmationPage,
-      },
-    });
+      await snap.request({
+        method: 'snap_updateInterface',
+        params: {
+          id,
+          context: activeContext,
+          ui: permissionConfirmationPage,
+        },
+      });
+    }
   }
 };

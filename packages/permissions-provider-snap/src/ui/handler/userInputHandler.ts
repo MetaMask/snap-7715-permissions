@@ -42,21 +42,24 @@ export const getActiveInterfaceContext = async (activeInterfaceId: string) => {
  *
  * @param event - The button click event.
  * @param activeInterfaceId - The active interface id.
+ * @param activeContext - The active context.
+ * @returns True if snap_resolveInterface is called to resolve the interface.
  */
-export const buttonClickEventHandler = async (
+export const shouldInterfaceResolveHandler = async (
   event: UserInputEvent,
   activeInterfaceId: string,
-) => {
+  activeContext: PermissionConfirmationContext<SupportedPermissionTypes>,
+): Promise<boolean> => {
   if (event.type !== UserInputEventType.ButtonClickEvent) {
     throw new Error('Invalid event type');
   }
 
-  const activeContext = await getActiveInterfaceContext(activeInterfaceId);
   const attenuatedResponse: AttenuatedResponse<SupportedPermissionTypes> = {
     attenuatedPermission: activeContext.permission,
     attenuatedExpiry: activeContext.expiry,
     isConfirmed: false,
   };
+  let didInterfaceResolve = false;
 
   if (event.name === CANCEL_BUTTON) {
     await snap.request({
@@ -66,6 +69,7 @@ export const buttonClickEventHandler = async (
         value: attenuatedResponse,
       },
     });
+    didInterfaceResolve = true;
   } else if (event.name === GRANT_BUTTON) {
     await snap.request({
       method: 'snap_resolveInterface',
@@ -77,5 +81,8 @@ export const buttonClickEventHandler = async (
         },
       },
     });
+    didInterfaceResolve = true;
   }
+
+  return didInterfaceResolve;
 };
