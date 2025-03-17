@@ -10,6 +10,7 @@ import {
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
+import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 
 import type { PermissionConfirmationContext } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
@@ -17,7 +18,14 @@ import type {
   OrchestratorFactoryFunction,
   PermissionContextMeta,
 } from '../types';
-import type { PermissionTypeMapping } from './types/types';
+import type { PermissionTypeMapping } from './types';
+
+declare module './types' {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
+  interface PermissionTypeMapping {
+    'native-token-stream': JsonObject & NativeTokenStreamPermission; // JsonObject & NativeTokenStreamPermission to be compatible with the Snap JSON object type
+  }
+}
 
 /**
  * Parses a permission request and returns the permission object.

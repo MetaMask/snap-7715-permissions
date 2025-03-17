@@ -1,6 +1,6 @@
 import type { OrchestratorFactoryFunction } from '../types';
 import { nativeTokenStreamPermissionOrchestrator } from './nativeTokenStreamOrchestrator';
-import type { SupportedPermissionTypes } from './types/types';
+import type { SupportedPermissionTypes } from './types';
 
 /**
  * Type safe lookup table for permission orchestrator modules.
