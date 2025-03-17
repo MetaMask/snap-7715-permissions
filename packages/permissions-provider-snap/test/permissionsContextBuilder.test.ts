@@ -18,7 +18,7 @@ describe('Permissions Context Builder', () => {
     getAccountMetadata: jest.fn(),
     getAccountBalance: jest.fn(),
     getDelegationManager: jest.fn(),
-    getCaveatBuilder: jest.fn(),
+    getEnvironment: jest.fn(),
   } as jest.Mocked<AccountControllerInterface>;
   describe('buildPermissionsContext', () => {
     it('should build a 7715 permissions context', async () => {

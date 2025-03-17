@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
+import type { CoreCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import {
   zNativeTokenStreamPermission,
@@ -86,17 +87,17 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         />
       );
     },
-    buildPermissionCaveats: async (
+    appendPermissionCaveats: async (
       permissionContextMeta: PermissionContextMeta<'native-token-stream'>,
     ) => {
       const { attenuatedPermission, caveatBuilder } = permissionContextMeta;
       // TODO: Using native token allowance enforcers, for now, until native token stream enforcer is available in delegator-sdk
-      return caveatBuilder
-        .addCaveat(
-          'nativeTokenTransferAmount',
-          BigInt(attenuatedPermission.data.initialAmount ?? 0),
-        )
-        .build();
+      const updatedCaveatBuilder: CoreCaveatBuilder = caveatBuilder.addCaveat(
+        'nativeTokenTransferAmount',
+        BigInt(attenuatedPermission.data.initialAmount ?? 0),
+      );
+
+      return updatedCaveatBuilder;
     },
   };
 };

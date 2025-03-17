@@ -101,11 +101,11 @@ describe('native-token-stream Orchestrator', () => {
     });
   });
 
-  describe('buildPermissionCaveats', () => {
-    it('should return permission context for a attenuated permission ', async () => {
+  describe('appendPermissionCaveats', () => {
+    it('should return a caveat builder with caveats added for the attenuated permission', async () => {
       const orchestrator = createPermissionOrchestrator(mockPermissionType);
 
-      const caveats = await orchestrator.buildPermissionCaveats({
+      const updatedCaveatBuilder = await orchestrator.appendPermissionCaveats({
         address,
         sessionAccount,
         chainId: 11155111,
@@ -114,7 +114,7 @@ describe('native-token-stream Orchestrator', () => {
         caveatBuilder: createCaveatBuilder(getDeleGatorEnvironment(sepolia.id)),
       });
 
-      expect(caveats).toStrictEqual([
+      expect(updatedCaveatBuilder.build()).toStrictEqual([
         {
           args: '0x',
           enforcer: '0xcfD1BD7922D123Caa194597BF7A0073899a284Df',

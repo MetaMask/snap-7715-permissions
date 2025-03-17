@@ -1,3 +1,4 @@
+import { createCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
@@ -105,32 +106,34 @@ export const orchestrate = async <
     };
   }
 
-  const caveatBuilder = await accountController.getCaveatBuilder({
+  const deleGatorEnvironment = await accountController.getEnvironment({
     chainId: chainIdNum,
   });
+
   const permissionContextMeta: PermissionContextMeta<TPermissionType> = {
     address,
     sessionAccount,
     chainId: chainIdNum,
     attenuatedPermission,
-    caveatBuilder,
+    caveatBuilder: createCaveatBuilder(deleGatorEnvironment),
   };
 
-  const [caveats, accountMeta, delegationManager] = await Promise.all([
-    orchestrator.buildPermissionCaveats(permissionContextMeta),
-    accountController.getAccountMetadata({
-      chainId: chainIdNum,
-    }),
-    accountController.getDelegationManager({
-      chainId: chainIdNum,
-    }),
-  ]);
+  const [updatedCaveatBuilder, accountMeta, delegationManager] =
+    await Promise.all([
+      orchestrator.appendPermissionCaveats(permissionContextMeta),
+      accountController.getAccountMetadata({
+        chainId: chainIdNum,
+      }),
+      accountController.getDelegationManager({
+        chainId: chainIdNum,
+      }),
+    ]);
 
   const permissionContext =
     await permissionsContextBuilder.buildPermissionsContext({
       address,
       sessionAccount,
-      caveats,
+      caveats: updatedCaveatBuilder.build(), // prolonging building allow us to add global caveats, such as expiry after permission specific caveats are added
       chainId: chainIdNum,
     });
 

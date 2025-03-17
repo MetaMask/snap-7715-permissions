@@ -1,7 +1,4 @@
-import type {
-  CaveatStruct,
-  CoreCaveatBuilder,
-} from '@metamask-private/delegator-core-viem';
+import type { CoreCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import type {
   PermissionResponse,
   Permission,
@@ -98,13 +95,13 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   ) => Promise<PermissionTypeMapping[TPermissionType]>;
 
   /**
-   * Builds the delegation object for the permission type.
-   * @param permissionContextMeta - The permission context metadata.
-   * @returns The caveats for the permission type.
+   * Appends caveats to caveats builder for the permission type.
+   * @param permissionContextMeta - The permission context metadata that incudes the attenuated permission and the caveats builder.
+   * @returns The an unbuilt caveat builder with caveats added for the permission type.
    */
-  buildPermissionCaveats: (
+  appendPermissionCaveats: (
     permissionContextMeta: PermissionContextMeta<TPermissionType>,
-  ) => Promise<CaveatStruct[]>;
+  ) => Promise<CoreCaveatBuilder>;
 
   /**
    * Builds the permission confirmation page for the permission type.

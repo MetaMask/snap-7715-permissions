@@ -10,7 +10,7 @@ describe('PermissionOrchestrator Factory', () => {
     expect(orchestrator.buildPermissionConfirmationPage).toBeInstanceOf(
       Function,
     );
-    expect(orchestrator.buildPermissionCaveats).toBeInstanceOf(Function);
+    expect(orchestrator.appendPermissionCaveats).toBeInstanceOf(Function);
   });
   it('should throw error when given a permission type that is not supported', async () => {
     expect(() =>

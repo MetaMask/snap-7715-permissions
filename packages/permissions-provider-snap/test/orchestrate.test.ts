@@ -1,7 +1,4 @@
-import {
-  createCaveatBuilder,
-  getDeleGatorEnvironment,
-} from '@metamask-private/delegator-core-viem';
+import { getDeleGatorEnvironment } from '@metamask-private/delegator-core-viem';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import { toHex, getAddress, parseUnits } from 'viem';
@@ -49,7 +46,7 @@ describe('Orchestrate', () => {
       getAccountMetadata: jest.fn(),
       getAccountBalance: jest.fn(),
       getDelegationManager: jest.fn(),
-      getCaveatBuilder: jest.fn(),
+      getEnvironment: jest.fn(),
     } as jest.Mocked<AccountControllerInterface>;
     const mockPermissionConfirmationRenderHandler = {
       getConfirmedAttenuatedPermission: jest.fn(),
@@ -115,8 +112,8 @@ describe('Orchestrate', () => {
       mockAccountController.getDelegationManager.mockResolvedValueOnce(
         '0x000000_delegation_manager',
       );
-      mockAccountController.getCaveatBuilder.mockResolvedValueOnce(
-        createCaveatBuilder(getDeleGatorEnvironment(sepolia.id)),
+      mockAccountController.getEnvironment.mockResolvedValueOnce(
+        getDeleGatorEnvironment(sepolia.id),
       );
 
       const res = await orchestrate(orchestrateArgs);
@@ -182,8 +179,8 @@ describe('Orchestrate', () => {
       mockAccountController.getDelegationManager.mockResolvedValueOnce(
         '0x000000_delegation_manager',
       );
-      mockAccountController.getCaveatBuilder.mockResolvedValueOnce(
-        createCaveatBuilder(getDeleGatorEnvironment(sepolia.id)),
+      mockAccountController.getEnvironment.mockResolvedValueOnce(
+        getDeleGatorEnvironment(sepolia.id),
       );
 
       const res = await orchestrate(orchestrateArgs);
