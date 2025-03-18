@@ -1,6 +1,7 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
-import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
+import type { UserInputEvent } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
 import type {
@@ -10,9 +11,8 @@ import type {
 import type { PermissionConfirmationContext } from '../src/ui';
 import { createPermissionConfirmationRenderHandler } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
-import { UserEventDispatcher } from '../src/userEventDispatcher';
-import { UserInputEvent, UserInputEventType } from '@metamask/snaps-sdk';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
+import { UserEventDispatcher } from '../src/userEventDispatcher';
 
 jest.mock('../src/userEventDispatcher');
 
@@ -24,15 +24,9 @@ describe('Permission Confirmation Render Handler', () => {
     (event: UserInputEvent) => Promise<void>
   >;
 
-  (mockUserEventDispatcher.off as jest.Mock).mockImplementation(function (
-    this: UserEventDispatcher,
-  ) {
-    return this;
-  });
-
-  (
-    mockUserEventDispatcher.handleUserInputEvent as jest.Mock
-  ).mockImplementation(() => {});
+  (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
+    () => mockUserEventDispatcher,
+  );
 
   const address = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
   const permission: NativeTokenStreamPermission = {
@@ -45,9 +39,7 @@ describe('Permission Confirmation Render Handler', () => {
       maxAmount: '0x2',
     },
   };
-  const mockPermissionType = extractPermissionName(
-    permission.type,
-  ) as SupportedPermissionTypes;
+  const mockPermissionType = 'mock-permission-type' as SupportedPermissionTypes;
 
   const mockContext: PermissionConfirmationContext<typeof mockPermissionType> =
     {
@@ -73,23 +65,21 @@ describe('Permission Confirmation Render Handler', () => {
 
   beforeEach(() => {
     mockSnapProvider.request.mockReset();
+    mockSnapProvider.request.mockResolvedValue('OK');
     (mockUserEventDispatcher.on as jest.Mock).mockClear();
     (mockUserEventDispatcher.off as jest.Mock).mockClear();
 
     onButtonClickHandlerPromise = new Promise<
       (event: UserInputEvent) => Promise<void>
     >((resolve, _) => {
-      // Setup mocks for UserEventDispatcher
-      (mockUserEventDispatcher.on as jest.Mock).mockImplementation(function (
-        this: UserEventDispatcher,
-        { eventType, handler }: { eventType: string; handler: any },
-      ) {
-        // Capture the button click handler for later use in tests
-        if (eventType === UserInputEventType.ButtonClickEvent) {
-          resolve(handler);
-        }
-        return this;
-      });
+      (mockUserEventDispatcher.on as jest.Mock).mockImplementation(
+        ({ eventType, handler }) => {
+          if (eventType === UserInputEventType.ButtonClickEvent) {
+            resolve(handler);
+          }
+          return mockUserEventDispatcher;
+        },
+      );
     });
   });
 
@@ -118,8 +108,10 @@ describe('Permission Confirmation Render Handler', () => {
         throw new Error('Expected onButtonClickHandler to be set');
       }
 
+      const onButtonClickHandler = await onButtonClickHandlerPromise;
+
       // simulate clicking the grant button
-      (await onButtonClickHandlerPromise)({
+      await onButtonClickHandler({
         type: UserInputEventType.ButtonClickEvent,
         name: GRANT_BUTTON,
       });
@@ -181,13 +173,18 @@ describe('Permission Confirmation Render Handler', () => {
           mockPermissionType,
         );
 
-      // simulate clicking the cancel button
-      (await onButtonClickHandlerPromise)({
+      if (onButtonClickHandlerPromise === null) {
+        throw new Error('Expected onButtonClickHandler to be set');
+      }
+
+      const onButtonClickHandler = await onButtonClickHandlerPromise;
+
+      await onButtonClickHandler({
         type: UserInputEventType.ButtonClickEvent,
         name: CANCEL_BUTTON,
       });
 
-      await expect(result).rejects.toEqual('User rejected permission request');
+      await expect(result).rejects.toThrow('User rejected permission request');
 
       expect(mockSnapProvider.request).toHaveBeenCalledWith({
         method: 'snap_createInterface',

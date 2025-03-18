@@ -1,19 +1,19 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { UserInputEvent } from '@metamask/snaps-sdk';
 import {
-  UserInputEvent,
   UserInputEventType,
   type ComponentOrElement,
   type SnapsProvider,
 } from '@metamask/snaps-sdk';
+import { Container } from '@metamask/snaps-sdk/jsx';
 
 import type {
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../../orchestrators';
-import type { PermissionConfirmationContext } from '../types';
+import type { UserEventDispatcher } from '../../userEventDispatcher';
 import { ConfirmationFooter } from '../components';
-import { UserEventDispatcher } from '../../userEventDispatcher';
-import { Container } from '@metamask/snaps-sdk/jsx';
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
 
 /**
@@ -48,8 +48,9 @@ export type PermissionConfirmationRenderHandler = {
 /**
  * Creates a permission confirmation render handler for a specific permission type.
  *
- * @param snapsProvider - A snaps provider instance.
- * @param userEventDispatcher - A user event dispatcher instance.
+ * @param options - The options object.
+ * @param options.snapsProvider - A snaps provider instance.
+ * @param options.userEventDispatcher - A user event dispatcher instance.
  * @returns The permission confirmation render handler for the specific permission type.
  */
 export const createPermissionConfirmationRenderHandler = ({
@@ -85,7 +86,7 @@ export const createPermissionConfirmationRenderHandler = ({
 
       const attenuatedPermission = new Promise<
         AttenuatedResponse<TPermissionType>
-      >(async (resolve, reject) => {
+      >((resolve, reject) => {
         const onButtonClick = async (event: UserInputEvent) => {
           logger.debug('onButtonClick', { buttonName: event.name });
 
@@ -100,16 +101,16 @@ export const createPermissionConfirmationRenderHandler = ({
             });
 
             if (!activeContext) {
-              reject('No active context found');
+              reject(new Error('No active context found'));
               return;
             }
 
             if (!activeContext.permission) {
-              reject('No permission found');
+              reject(new Error('No permission found'));
               return;
             }
 
-            const permission = activeContext.permission;
+            const { permission } = activeContext;
 
             resolve({
               isConfirmed: true,
@@ -120,21 +121,26 @@ export const createPermissionConfirmationRenderHandler = ({
           } else if (event.name === CANCEL_BUTTON) {
             logger.debug('onButtonClick - CANCEL_BUTTON');
 
-            reject('User rejected permission request');
+            reject(new Error('User rejected permission request'));
           }
-
-          await snapsProvider.request({
-            method: 'snap_resolveInterface',
-            params: {
-              id: interfaceId,
-              value: {},
-            },
-          });
 
           userEventDispatcher.off({
             eventType: UserInputEventType.ButtonClickEvent,
             handler: onButtonClick,
           });
+
+          snapsProvider
+            .request({
+              method: 'snap_resolveInterface',
+              params: {
+                id: interfaceId,
+                value: {},
+              },
+            })
+            .catch((error) => {
+              logger.error('Error resolving interface', { error });
+              reject(error);
+            });
         };
 
         userEventDispatcher.on({
@@ -142,12 +148,17 @@ export const createPermissionConfirmationRenderHandler = ({
           handler: onButtonClick,
         });
 
-        await snapsProvider.request({
-          method: 'snap_dialog',
-          params: {
-            id: interfaceId,
-          },
-        });
+        snapsProvider
+          .request({
+            method: 'snap_dialog',
+            params: {
+              id: interfaceId,
+            },
+          })
+          .catch((error) => {
+            logger.error('Error dialog', { error });
+            reject(error);
+          });
       });
 
       return attenuatedPermission;

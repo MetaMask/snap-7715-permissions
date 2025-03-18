@@ -1,6 +1,8 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { UserInputEvent, UserInputEventType } from '@metamask/snaps-sdk';
 
+type UserEventHandler = (event: UserInputEvent) => void | Promise<void>;
+
 /**
  * Class responsible for dispatching user input events to registered handlers.
  * Provides a way to register, deregister, and dispatch event handlers
@@ -10,8 +12,7 @@ export class UserEventDispatcher {
   /**
    * Map of event types to array of event handlers
    */
-  readonly #eventHandlers: Map<string, ((event: UserInputEvent) => void)[]> =
-    new Map();
+  readonly #eventHandlers: Map<string, UserEventHandler[]> = new Map();
 
   constructor() {
     logger.debug('userEventDispatcher:constructor()');
@@ -27,7 +28,7 @@ export class UserEventDispatcher {
    */
   public on(args: {
     eventType: UserInputEventType;
-    handler: (event: UserInputEvent) => void;
+    handler: UserEventHandler;
   }): UserEventDispatcher {
     const { eventType, handler } = args;
     logger.debug('userEventDispatcher:on()', {
@@ -66,7 +67,7 @@ export class UserEventDispatcher {
    */
   public off(args: {
     eventType: UserInputEventType;
-    handler: (event: UserInputEvent) => void;
+    handler: UserEventHandler;
   }): UserEventDispatcher {
     const { eventType, handler } = args;
 
@@ -118,7 +119,9 @@ export class UserEventDispatcher {
    * @param args - The event handler arguments as object.
    * @param args.event - The event object containing type and name information.
    */
-  public handleUserInputEvent(args: { event: UserInputEvent }): void {
+  public async handleUserInputEvent(args: {
+    event: UserInputEvent;
+  }): Promise<void> {
     const { event } = args;
 
     logger.debug('userEventDispatcher:handleUserInputEvent()', {
@@ -161,7 +164,7 @@ export class UserEventDispatcher {
       },
     );
 
-    handlers.forEach((handler, index) => {
+    const handlersExecutions = handlers.map(async (handler, index) => {
       try {
         logger.debug(
           'userEventDispatcher:handleUserInputEvent() - executing handler',
@@ -171,7 +174,7 @@ export class UserEventDispatcher {
             handlerIndex: index,
           },
         );
-        handler(event);
+        await handler(event);
       } catch (error) {
         logger.error(
           `Error in event handler for ${event.type}${
@@ -181,6 +184,8 @@ export class UserEventDispatcher {
         );
       }
     });
+
+    await Promise.all(handlersExecutions);
 
     logger.debug(
       'userEventDispatcher:handleUserInputEvent() - handlers executed successfully',

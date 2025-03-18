@@ -6,6 +6,7 @@ import { UserEventDispatcher } from '../src/userEventDispatcher';
 describe('UserEventDispatcher', () => {
   let userEventDispatcher: UserEventDispatcher;
   const eventType = UserInputEventType.ButtonClickEvent;
+  const createHandlerMock = () => jest.fn<() => void>();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -14,7 +15,7 @@ describe('UserEventDispatcher', () => {
 
   describe('on()', () => {
     it('should register an event handler for a specific event type', () => {
-      const handler = jest.fn();
+      const handler = createHandlerMock();
 
       const result = userEventDispatcher.on({
         eventType,
@@ -25,8 +26,8 @@ describe('UserEventDispatcher', () => {
     });
 
     it('should register multiple handlers for the same event type', async () => {
-      const handler1 = jest.fn();
-      const handler2 = jest.fn();
+      const handler1 = createHandlerMock();
+      const handler2 = createHandlerMock();
 
       userEventDispatcher.on({
         eventType,
@@ -38,7 +39,7 @@ describe('UserEventDispatcher', () => {
         handler: handler2,
       });
 
-      userEventDispatcher.handleUserInputEvent({
+      await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
         },
@@ -49,8 +50,8 @@ describe('UserEventDispatcher', () => {
     });
 
     it('should not handlers for a different event type', async () => {
-      const handlerMatchingEventType = jest.fn();
-      const handlerMismatchingEventType = jest.fn();
+      const handlerMatchingEventType = createHandlerMock();
+      const handlerMismatchingEventType = createHandlerMock();
 
       userEventDispatcher.on({
         eventType,
@@ -62,7 +63,7 @@ describe('UserEventDispatcher', () => {
         handler: handlerMismatchingEventType,
       });
 
-      userEventDispatcher.handleUserInputEvent({
+      await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
         },
@@ -73,8 +74,8 @@ describe('UserEventDispatcher', () => {
     });
 
     it('should support method chaining', async () => {
-      const handler1 = jest.fn();
-      const handler2 = jest.fn();
+      const handler1 = createHandlerMock();
+      const handler2 = createHandlerMock();
 
       const result = userEventDispatcher
         .on({
@@ -88,7 +89,7 @@ describe('UserEventDispatcher', () => {
 
       expect(result).toBe(userEventDispatcher);
 
-      userEventDispatcher.handleUserInputEvent({
+      await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
         },
@@ -101,7 +102,7 @@ describe('UserEventDispatcher', () => {
 
   describe('off()', () => {
     it('should remove a registered event handler', async () => {
-      const handler = jest.fn();
+      const handler = createHandlerMock();
 
       userEventDispatcher.on({
         eventType,
@@ -117,7 +118,7 @@ describe('UserEventDispatcher', () => {
 
       expect(result).toBe(userEventDispatcher);
 
-      userEventDispatcher.handleUserInputEvent({
+      await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
         },
@@ -127,8 +128,8 @@ describe('UserEventDispatcher', () => {
     });
 
     it('should do nothing when removing an unregistered handler', async () => {
-      const registeredHandler = jest.fn();
-      const unregisteredHandler = jest.fn();
+      const registeredHandler = createHandlerMock();
+      const unregisteredHandler = createHandlerMock();
 
       userEventDispatcher.on({
         eventType,
@@ -142,7 +143,7 @@ describe('UserEventDispatcher', () => {
         handler: unregisteredHandler,
       });
 
-      userEventDispatcher.handleUserInputEvent({
+      await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
         },
@@ -153,7 +154,7 @@ describe('UserEventDispatcher', () => {
     });
 
     it('should do nothing when removing a handler for an unregistered event type', async () => {
-      const handler = jest.fn();
+      const handler = createHandlerMock();
 
       jest.clearAllMocks();
 
@@ -162,7 +163,7 @@ describe('UserEventDispatcher', () => {
         handler,
       });
 
-      userEventDispatcher.handleUserInputEvent({
+      await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
         },
@@ -172,8 +173,8 @@ describe('UserEventDispatcher', () => {
     });
 
     it('should leave other handlers intact when removing a specific handler', async () => {
-      const handler1 = jest.fn();
-      const handler2 = jest.fn();
+      const handler1 = createHandlerMock();
+      const handler2 = createHandlerMock();
 
       userEventDispatcher
         .on({
@@ -192,7 +193,7 @@ describe('UserEventDispatcher', () => {
         handler: handler1,
       });
 
-      userEventDispatcher.handleUserInputEvent({
+      await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
         },
