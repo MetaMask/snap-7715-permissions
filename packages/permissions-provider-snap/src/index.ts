@@ -13,7 +13,10 @@ import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
 import type { SupportedPermissionTypes } from './orchestrators';
-import { createPermissionOrchestrator } from './orchestrators';
+import {
+  createPermissionOrchestrator,
+  createPermissionsContextBuilder,
+} from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
@@ -30,12 +33,11 @@ const accountController = new AccountController({
   deploymentSalt: '0x',
 });
 
-const permissionConfirmationRenderHandler =
-  createPermissionConfirmationRenderHandler(snap);
-
 const rpcHandler = createRpcHandler({
   accountController,
-  permissionConfirmationRenderHandler,
+  permissionConfirmationRenderHandler:
+    createPermissionConfirmationRenderHandler(snap),
+  permissionsContextBuilder: createPermissionsContextBuilder(accountController),
 });
 
 // configure RPC methods bindings

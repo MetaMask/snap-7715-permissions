@@ -228,4 +228,27 @@ describe('AccountController', () => {
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
   });
+
+  describe('getEnvironment()', () => {
+    it('should get the DeleGator Environment for the current account', async () => {
+      const chainId = sepolia.id;
+      const expectedDeleGatorEnvironment = getDeleGatorEnvironment(sepolia.id);
+
+      const environment = await accountController.getEnvironment({
+        chainId,
+      });
+
+      expect(environment).toStrictEqual(expectedDeleGatorEnvironment);
+    });
+
+    it('should reject if an invalid chainId is supplied', async () => {
+      const invalidChainId = 12345;
+
+      await expect(
+        accountController.getEnvironment({
+          chainId: invalidChainId,
+        }),
+      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
+    });
+  });
 });

@@ -1,3 +1,4 @@
+import { createCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
@@ -6,6 +7,7 @@ import type {
   PermissionConfirmationRenderHandler,
 } from '../ui';
 import type { SupportedPermissionTypes } from './orchestrator';
+import type { PermissionsContextBuilder } from './permissionsContextBuilder';
 import type {
   OrchestrateMeta,
   OrchestrateResult,
@@ -23,6 +25,7 @@ export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
     orchestrator: Orchestrator<TPermissionType>;
     orchestrateMeta: OrchestrateMeta<TPermissionType>;
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
+    permissionsContextBuilder: PermissionsContextBuilder;
   };
 
 /**
@@ -63,6 +66,7 @@ export const orchestrate = async <
     orchestrator,
     orchestrateMeta,
     permissionConfirmationRenderHandler,
+    permissionsContextBuilder,
   } = orchestrateArgs;
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
@@ -102,25 +106,43 @@ export const orchestrate = async <
     };
   }
 
+  const deleGatorEnvironment = await accountController.getEnvironment({
+    chainId: chainIdNum,
+  });
+
   const permissionContextMeta: PermissionContextMeta<TPermissionType> = {
     address,
     sessionAccount,
     chainId: chainIdNum,
     attenuatedPermission,
-    signDelegation: accountController.signDelegation.bind(accountController), // need to bind the function to the account controller instance
+    caveatBuilder: createCaveatBuilder(deleGatorEnvironment),
   };
 
-  const [permissionContext, accountMeta, delegationManager] = await Promise.all(
-    [
-      orchestrator.buildPermissionContext(permissionContextMeta),
+  const [updatedCaveatBuilder, accountMeta, delegationManager] =
+    await Promise.all([
+      orchestrator.appendPermissionCaveats(permissionContextMeta),
       accountController.getAccountMetadata({
         chainId: chainIdNum,
       }),
       accountController.getDelegationManager({
         chainId: chainIdNum,
       }),
-    ],
+    ]);
+
+  // prolonging building allow us to add global caveats, such as expiry after permission specific caveats are added
+  updatedCaveatBuilder.addCaveat(
+    'timestamp',
+    0, // timestampAfter
+    attenuatedExpiry, // timestampBefore
   );
+
+  const permissionContext =
+    await permissionsContextBuilder.buildPermissionsContext({
+      address,
+      sessionAccount,
+      caveats: updatedCaveatBuilder.build(),
+      chainId: chainIdNum,
+    });
 
   return {
     success: true,
