@@ -1,3 +1,4 @@
+import type { DeleGatorEnvironment } from '@metamask-private/delegator-core-viem';
 import {
   CHAIN_ID as ChainsWithDelegatorDeployed,
   Implementation,
@@ -68,6 +69,7 @@ export type AccountControllerInterface = Pick<
   | 'getAccountMetadata'
   | 'getAccountBalance'
   | 'getDelegationManager'
+  | 'getEnvironment'
 >;
 
 /**
@@ -398,5 +400,26 @@ export class AccountController {
     logger.debug('accountController:signDelegation() - signature resolved');
 
     return { ...delegation, signature };
+  }
+
+  /**
+   * Retrieves the environment for the current account.
+   *
+   * @param options - The base account options including chainId.
+   * @returns A promise resolving to a DeleGatorEnvironment.
+   */
+  public async getEnvironment(
+    options: AccountOptionsBase,
+  ): Promise<DeleGatorEnvironment> {
+    logger.debug('accountController:getEnvironment()');
+
+    const smartAccount = await this.#getMetaMaskSmartAccount(options);
+
+    logger.debug(
+      'accountController:getEnvironment() - smartAccount resolved',
+      smartAccount,
+    );
+
+    return smartAccount.environment;
   }
 }

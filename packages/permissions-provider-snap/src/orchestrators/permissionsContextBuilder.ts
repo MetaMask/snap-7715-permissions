@@ -1,0 +1,51 @@
+import type { CaveatStruct } from '@metamask-private/delegator-core-viem';
+import {
+  createRootDelegation,
+  encodeDelegation,
+} from '@metamask-private/delegator-core-viem';
+import type { Hex } from 'viem';
+
+import type { AccountControllerInterface } from '../accountController';
+
+/**
+ * Metadata required for building a permissions context.
+ */
+export type PermissionsContextBuilderMeta = {
+  address: Hex;
+  sessionAccount: Hex;
+  caveats: CaveatStruct[];
+  chainId: number;
+};
+
+/**
+ * Permissions context builder.
+ */
+export type PermissionsContextBuilder = {
+  buildPermissionsContext: (
+    permissionsContextBuilderMeta: PermissionsContextBuilderMeta,
+  ) => Promise<Hex>;
+};
+
+/**
+ * Creates a permissions context builder.
+ *
+ * @param accountController - An account controller instance.
+ * @returns A permissions context builder.
+ */
+export const createPermissionsContextBuilder = (
+  accountController: AccountControllerInterface,
+): PermissionsContextBuilder => {
+  return {
+    buildPermissionsContext: async (
+      permissionsContextBuilderMeta: PermissionsContextBuilderMeta,
+    ) => {
+      const { address, sessionAccount, caveats, chainId } =
+        permissionsContextBuilderMeta;
+      const signedDelegation = await accountController.signDelegation({
+        chainId,
+        delegation: createRootDelegation(sessionAccount, address, caveats),
+      });
+      return encodeDelegation([signedDelegation]);
+    },
+  };
+};
