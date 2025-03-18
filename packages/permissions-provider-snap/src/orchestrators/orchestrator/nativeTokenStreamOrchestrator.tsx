@@ -117,7 +117,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
       return validatedPermission as PermissionTypeMapping['native-token-stream'];
     },
-    buildPermissionConfirmationPage: (
+    buildPermissionConfirmation: (
       context: PermissionConfirmationContext<'native-token-stream'>,
     ) => {
       return (

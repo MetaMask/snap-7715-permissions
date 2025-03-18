@@ -1,9 +1,5 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
-  extractPermissionName,
-  logger,
-} from '@metamask/7715-permissions-shared/utils';
-import {
-  UserInputEventType,
   type Json,
   type JsonRpcParams,
   type OnRpcRequestHandler,
@@ -12,16 +8,11 @@ import {
 import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
-import type { SupportedPermissionTypes } from './orchestrators';
-import { createPermissionOrchestrator } from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
-import {
-  shouldInterfaceResolveHandler,
-  createPermissionConfirmationRenderHandler,
-  getActiveInterfaceContext,
-} from './ui';
+import { createPermissionConfirmationRenderHandler } from './ui';
+import { UserEventDispatcher } from './userEventDispatcher';
 
 // set up dependencies
 const accountController = new AccountController({
@@ -30,8 +21,13 @@ const accountController = new AccountController({
   deploymentSalt: '0x',
 });
 
+const userEventDispatcher = new UserEventDispatcher();
+
 const permissionConfirmationRenderHandler =
-  createPermissionConfirmationRenderHandler(snap);
+  createPermissionConfirmationRenderHandler({
+    snapsProvider: snap,
+    userEventDispatcher,
+  });
 
 const rpcHandler = createRpcHandler({
   accountController,
@@ -87,44 +83,5 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  * @param args.id - The id of the interface.
  * @param args.event - The user input event.
  */
-export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
-  // TODO: Decouple User input handler: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/84
-  const activeContext = await getActiveInterfaceContext(id);
-  let didInterfaceResolve = false;
-  if (activeContext) {
-    switch (event.type) {
-      case UserInputEventType.ButtonClickEvent: {
-        didInterfaceResolve = await shouldInterfaceResolveHandler(
-          event,
-          id,
-          activeContext,
-        );
-        break;
-      }
-      default: {
-        return;
-      }
-    }
-
-    // If the interface did not resolve, update the interface with the new context and UI specific to the permission type
-    if (!didInterfaceResolve) {
-      const permissionType = extractPermissionName(
-        activeContext.permission.type,
-      ) as SupportedPermissionTypes;
-
-      const orchestrator = createPermissionOrchestrator(permissionType);
-
-      const permissionConfirmationPage =
-        orchestrator.buildPermissionConfirmationPage(activeContext);
-
-      await snap.request({
-        method: 'snap_updateInterface',
-        params: {
-          id,
-          context: activeContext,
-          ui: permissionConfirmationPage,
-        },
-      });
-    }
-  }
-};
+export const onUserInput: OnUserInputHandler = async (args) =>
+  userEventDispatcher.handleUserInputEvent(args);

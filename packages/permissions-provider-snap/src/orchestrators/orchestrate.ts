@@ -84,14 +84,13 @@ export const orchestrate = async <
     chainId: chainIdNum,
   };
 
-  const confirmationPage =
-    orchestrator.buildPermissionConfirmationPage(uiContext);
+  const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
 
   // Wait for the successful permission confirmation reponse from the user
   const { attenuatedPermission, attenuatedExpiry, isConfirmed } =
     await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
       uiContext,
-      confirmationPage,
+      permissionDialog,
       permissionType,
     );
 

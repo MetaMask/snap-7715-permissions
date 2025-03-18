@@ -105,11 +105,11 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   ) => Promise<Hex>;
 
   /**
-   * Builds the permission confirmation page for the permission type.
+   * Builds the permission dialog for the permission type.
    * @param context - The permission confirmation context.
    * @returns The permission confirmation page component.
    */
-  buildPermissionConfirmationPage: (
+  buildPermissionConfirmation: (
     context: PermissionConfirmationContext<TPermissionType>,
   ) => ComponentOrElement;
 };
