@@ -100,9 +100,6 @@ describe('Orchestrate', () => {
         '0x00_some_permission_context',
       );
 
-      // prepare mock date.now(January 7, 1995) to make sure startTime is in the past for testing
-      jest.spyOn(Date, 'now').mockReturnValue(789522626000);
-
       // prepare mock account controller
       mockAccountController.getAccountAddress.mockResolvedValueOnce(address);
       mockAccountController.getAccountBalance.mockResolvedValueOnce(
@@ -169,9 +166,6 @@ describe('Orchestrate', () => {
       mockPermissionsContextBuilder.buildPermissionsContext.mockResolvedValueOnce(
         '0x00_some_permission_context',
       );
-
-      // prepare mock date.now(January 7, 1995) to make sure startTime is in the past for testing
-      jest.spyOn(Date, 'now').mockReturnValue(789522626000);
 
       // prepare mock account controller
       mockAccountController.getAccountAddress.mockResolvedValueOnce(address);

@@ -132,7 +132,7 @@ export const orchestrate = async <
   // prolonging building allow us to add global caveats, such as expiry after permission specific caveats are added
   updatedCaveatBuilder.addCaveat(
     'timestamp',
-    Math.floor(Date.now() / 1000), // timestampAfter
+    0, // timestampAfter
     attenuatedExpiry, // timestampBefore
   );
 
