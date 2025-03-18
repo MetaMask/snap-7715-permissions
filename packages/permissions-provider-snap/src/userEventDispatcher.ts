@@ -1,5 +1,5 @@
-import { UserInputEvent, UserInputEventType } from '@metamask/snaps-sdk';
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { UserInputEvent, UserInputEventType } from '@metamask/snaps-sdk';
 
 /**
  * Class responsible for dispatching user input events to registered handlers.
@@ -10,7 +10,7 @@ export class UserEventDispatcher {
   /**
    * Map of event types to array of event handlers
    */
-  private eventHandlers: Map<string, ((event: UserInputEvent) => void)[]> =
+  readonly #eventHandlers: Map<string, ((event: UserInputEvent) => void)[]> =
     new Map();
 
   constructor() {
@@ -19,31 +19,33 @@ export class UserEventDispatcher {
 
   /**
    * Register an event handler for a specific event type.
-   * Handlers can filter by event name internally if needed.
    *
-   * @param eventType - The type of event to listen for
-   * @param handler - The callback function to execute when the event occurs
-   * @returns A reference to this instance for method chaining
+   * @param args - The event handler arguments as object.
+   * @param args.eventType - The type of event to listen for.
+   * @param args.handler - The callback function to execute when the event occurs.
+   * @returns A reference to this instance for method chaining.
    */
-  public on({
-    eventType,
-    handler,
-  }: {
+  public on(args: {
     eventType: UserInputEventType;
     handler: (event: UserInputEvent) => void;
   }): UserEventDispatcher {
+    const { eventType, handler } = args;
     logger.debug('userEventDispatcher:on()', {
       eventType,
     });
 
-    if (!this.eventHandlers.has(eventType)) {
+    if (!this.#eventHandlers.has(eventType)) {
       logger.debug('userEventDispatcher:on() - creating new handlers array', {
         eventType,
       });
-      this.eventHandlers.set(eventType, []);
+      this.#eventHandlers.set(eventType, []);
     }
 
-    const handlers = this.eventHandlers.get(eventType)!;
+    const handlers = this.#eventHandlers.get(eventType);
+    if (!handlers) {
+      throw new Error('Handlers array not found');
+    }
+
     handlers.push(handler);
 
     logger.debug('userEventDispatcher:on() - handler registered', {
@@ -57,48 +59,53 @@ export class UserEventDispatcher {
   /**
    * Deregister an event handler for a specific event type.
    *
-   * @param eventType - The type of event to stop listening for
-   * @param handler - The callback function to remove
-   * @returns A reference to this instance for method chaining
+   * @param args - The event handler arguments as object.
+   * @param args.eventType - The type of event to stop listening for.
+   * @param args.handler - The callback function to remove.
+   * @returns A reference to this instance for method chaining.
    */
-  public off({
-    eventType,
-    handler,
-  }: {
+  public off(args: {
     eventType: UserInputEventType;
     handler: (event: UserInputEvent) => void;
   }): UserEventDispatcher {
+    const { eventType, handler } = args;
+
     logger.debug('userEventDispatcher:off()', {
       eventType,
     });
 
-    if (!this.eventHandlers.has(eventType)) {
+    if (!this.#eventHandlers.has(eventType)) {
       logger.debug('userEventDispatcher:off() - no handlers for event type', {
         eventType,
       });
       return this;
     }
 
-    const handlers = this.eventHandlers.get(eventType)!;
+    const handlers = this.#eventHandlers.get(eventType);
+
+    if (!handlers) {
+      throw new Error('Handlers array not found');
+    }
+
     const index = handlers.indexOf(handler);
 
-    if (index !== -1) {
+    if (index === -1) {
+      logger.debug('userEventDispatcher:off() - handler not found', {
+        eventType,
+      });
+    } else {
       logger.debug('userEventDispatcher:off() - removing handler', {
         eventType,
         handlerIndex: index,
       });
       handlers.splice(index, 1);
-    } else {
-      logger.debug('userEventDispatcher:off() - handler not found', {
-        eventType,
-      });
     }
 
     if (handlers.length === 0) {
       logger.debug('userEventDispatcher:off() - removing empty event type', {
         eventType,
       });
-      this.eventHandlers.delete(eventType);
+      this.#eventHandlers.delete(eventType);
     }
 
     return this;
@@ -108,15 +115,18 @@ export class UserEventDispatcher {
    * Process a user input event and trigger all registered handlers for that event type.
    * Handlers are responsible for filtering by event name if needed.
    *
-   * @param event - The event object containing type and name information
+   * @param args - The event handler arguments as object.
+   * @param args.event - The event object containing type and name information.
    */
-  public handleUserInputEvent({ event }: { event: UserInputEvent }): void {
+  public handleUserInputEvent(args: { event: UserInputEvent }): void {
+    const { event } = args;
+
     logger.debug('userEventDispatcher:handleUserInputEvent()', {
       eventType: event.type,
       name: event.name,
     });
 
-    if (!this.eventHandlers.has(event.type)) {
+    if (!this.#eventHandlers.has(event.type)) {
       logger.debug(
         'userEventDispatcher:handleUserInputEvent() - no handlers for event type',
         {
@@ -126,7 +136,11 @@ export class UserEventDispatcher {
       return;
     }
 
-    const handlers = this.eventHandlers.get(event.type)!;
+    const handlers = this.#eventHandlers.get(event.type);
+
+    if (!handlers) {
+      throw new Error('Handlers array not found');
+    }
 
     if (handlers.length === 0) {
       logger.debug(

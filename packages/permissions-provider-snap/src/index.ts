@@ -82,6 +82,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  * @param args - The user input handler args as object.
  * @param args.id - The id of the interface.
  * @param args.event - The user input event.
+ * @returns Resolves once any registered event handlers have completed.
  */
 export const onUserInput: OnUserInputHandler = async (args) =>
   userEventDispatcher.handleUserInputEvent(args);
