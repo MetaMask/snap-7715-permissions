@@ -33,8 +33,8 @@ describe('Orchestrate', () => {
         justification: 'shh...permission 2',
         initialAmount: '0x1',
         amountPerSecond: '0x1',
-        startTime: toHex(BigInt(1000)),
-        endTime: toHex(BigInt(1000 + 1000)),
+        startTime: 1000,
+        maxAmount: '0x2',
       },
     };
     const mockPermissionType = extractPermissionName(
@@ -81,7 +81,7 @@ describe('Orchestrate', () => {
       address,
       siteOrigin: 'http://localhost:3000',
       balance: '0x1',
-      expiry: 1,
+      expiry: 1742255426,
       chainId: 11155111,
     };
 
@@ -99,6 +99,9 @@ describe('Orchestrate', () => {
       mockPermissionsContextBuilder.buildPermissionsContext.mockResolvedValueOnce(
         '0x00_some_permission_context',
       );
+
+      // prepare mock date.now(January 7, 1995) to make sure startTime is in the past for testing
+      jest.spyOn(Date, 'now').mockReturnValue(789522626000);
 
       // prepare mock account controller
       mockAccountController.getAccountAddress.mockResolvedValueOnce(address);
@@ -130,15 +133,15 @@ describe('Orchestrate', () => {
           ],
           chainId: '0xaa36a7',
           context: '0x00_some_permission_context',
-          expiry: 1,
+          expiry: 1742255426,
           permissions: [
             {
               data: {
                 justification: 'shh...permission 2',
                 amountPerSecond: '0x1',
-                endTime: '0x7d0',
                 initialAmount: '0x1',
-                startTime: '0x3e8',
+                startTime: 1000,
+                maxAmount: '0x2',
               },
               type: 'native-token-stream',
             },
@@ -166,6 +169,9 @@ describe('Orchestrate', () => {
       mockPermissionsContextBuilder.buildPermissionsContext.mockResolvedValueOnce(
         '0x00_some_permission_context',
       );
+
+      // prepare mock date.now(January 7, 1995) to make sure startTime is in the past for testing
+      jest.spyOn(Date, 'now').mockReturnValue(789522626000);
 
       // prepare mock account controller
       mockAccountController.getAccountAddress.mockResolvedValueOnce(address);
