@@ -24,12 +24,13 @@ import type { PermissionConfirmationProps } from '../types';
 export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
 > = ({ siteOrigin, permission, chainId, address, balance }) => {
+  const asset = 'ETH';
   const accountDetailsProps: AccountDetailsProps = {
     accounts: [
       {
         address,
         balance,
-        asset: 'ETH',
+        asset,
       },
     ],
     permissionIndex: 0,
@@ -47,6 +48,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
           siteOrigin={siteOrigin}
           chainId={chainId}
           justification={permission.data.justification}
+          asset={asset}
         />
 
         <AccountDetails
