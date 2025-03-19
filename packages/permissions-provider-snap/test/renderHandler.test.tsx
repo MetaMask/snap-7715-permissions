@@ -1,6 +1,8 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
+import { UserInputEventType, type UserInputEvent } from '@metamask/snaps-sdk';
+import { Container } from '@metamask/snaps-sdk/jsx';
 import { getAddress } from 'viem';
 
 import type {
@@ -9,6 +11,7 @@ import type {
 } from '../src/orchestrators';
 import type { PermissionConfirmationContext } from '../src/ui';
 import { createPermissionConfirmationRenderHandler } from '../src/ui';
+import { ConfirmationFooter } from '../src/ui/components';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 
 describe('Permission Confirmation Render Handler', () => {
@@ -81,7 +84,12 @@ describe('Permission Confirmation Render Handler', () => {
         method: 'snap_createInterface',
         params: {
           context: mockContext,
-          ui: mockPage,
+          ui: (
+            <Container>
+              {mockPage}
+              <ConfirmationFooter />
+            </Container>
+          ),
         },
       });
       expect(mockSnapProvider.request).toHaveBeenNthCalledWith(2, {
@@ -121,6 +129,151 @@ describe('Permission Confirmation Render Handler', () => {
         attenuatedPermission: mockContext.permission,
         attenuatedExpiry: mockContext.expiry,
         isConfirmed: false,
+      });
+    });
+  });
+
+  describe('handleInterfaceResolution', () => {
+    it('should resolve interface when event is cancel button', async () => {
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
+
+      // mock the snap interface resolution
+      const mockInterfaceId = 'mockInterfaceId';
+      mockSnapProvider.request.mockResolvedValueOnce({
+        attenuatedPermission: mockContext.permission,
+        attenuatedExpiry: mockContext.expiry,
+        isConfirmed: false,
+      }); // mock snap_resolveInterface
+
+      const didInterfaceResolve =
+        await permissionConfirmationRenderHandler.handleInterfaceResolution(
+          {
+            type: UserInputEventType.ButtonClickEvent,
+            name: 'cancel',
+          } as UserInputEvent,
+          mockInterfaceId,
+          mockContext,
+        );
+
+      expect(didInterfaceResolve).toBe(true);
+      expect(mockSnapProvider.request).toHaveBeenCalledTimes(1);
+      expect(mockSnapProvider.request).toHaveBeenNthCalledWith(1, {
+        method: 'snap_resolveInterface',
+        params: {
+          id: mockInterfaceId,
+          value: {
+            attenuatedPermission: mockContext.permission,
+            attenuatedExpiry: mockContext.expiry,
+            isConfirmed: false,
+          },
+        },
+      });
+    });
+
+    it('should resolve interface when event is grant button', async () => {
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
+
+      // mock the snap interface resolution
+      const mockInterfaceId = 'mockInterfaceId';
+      mockSnapProvider.request.mockResolvedValueOnce({
+        attenuatedPermission: mockContext.permission,
+        attenuatedExpiry: mockContext.expiry,
+        isConfirmed: false,
+      }); // mock snap_resolveInterface
+
+      const didInterfaceResolve =
+        await permissionConfirmationRenderHandler.handleInterfaceResolution(
+          {
+            type: UserInputEventType.ButtonClickEvent,
+            name: 'grant',
+          } as UserInputEvent,
+          mockInterfaceId,
+          mockContext,
+        );
+
+      expect(didInterfaceResolve).toBe(true);
+      expect(mockSnapProvider.request).toHaveBeenCalledTimes(1);
+      expect(mockSnapProvider.request).toHaveBeenNthCalledWith(1, {
+        method: 'snap_resolveInterface',
+        params: {
+          id: mockInterfaceId,
+          value: {
+            attenuatedPermission: mockContext.permission,
+            attenuatedExpiry: mockContext.expiry,
+            isConfirmed: true,
+          },
+        },
+      });
+    });
+
+    it('should not resolve interface when event is not grant or cancel button', async () => {
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
+
+      const mockInterfaceId = 'mockInterfaceId';
+
+      const didInterfaceResolve =
+        await permissionConfirmationRenderHandler.handleInterfaceResolution(
+          {
+            type: UserInputEventType.ButtonClickEvent,
+            name: 'not-grant-or-cancel',
+          } as UserInputEvent,
+          mockInterfaceId,
+          mockContext,
+        );
+
+      expect(didInterfaceResolve).toBe(false);
+      expect(mockSnapProvider.request).not.toHaveBeenCalled();
+    });
+
+    it('should not resolve interface when event is not a ButtonClickEvent', async () => {
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
+
+      const mockInterfaceId = 'mockInterfaceId';
+
+      const didInterfaceResolve =
+        await permissionConfirmationRenderHandler.handleInterfaceResolution(
+          {
+            type: UserInputEventType.InputChangeEvent,
+          } as UserInputEvent,
+          mockInterfaceId,
+          mockContext,
+        );
+
+      expect(didInterfaceResolve).toBe(false);
+      expect(mockSnapProvider.request).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateInterface', () => {
+    it('should update the interface with the new context and UI', async () => {
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler(mockSnapProvider);
+
+      const mockInterfaceId = 'mockInterfaceId';
+
+      await permissionConfirmationRenderHandler.updateInterface(
+        mockInterfaceId,
+        mockContext,
+        mockPage,
+      );
+
+      expect(mockSnapProvider.request).toHaveBeenCalledTimes(1);
+      expect(mockSnapProvider.request).toHaveBeenNthCalledWith(1, {
+        method: 'snap_updateInterface',
+        params: {
+          id: mockInterfaceId,
+          context: mockContext,
+          ui: (
+            <Container>
+              {mockPage}
+              <ConfirmationFooter />
+            </Container>
+          ),
+        },
       });
     });
   });

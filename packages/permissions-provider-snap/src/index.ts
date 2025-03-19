@@ -1,9 +1,9 @@
+import type { Permission } from '@metamask/7715-permissions-shared/types';
 import {
   extractPermissionName,
   logger,
 } from '@metamask/7715-permissions-shared/utils';
 import {
-  UserInputEventType,
   type Json,
   type JsonRpcParams,
   type OnRpcRequestHandler,
@@ -20,11 +20,8 @@ import {
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
-import {
-  shouldInterfaceResolveHandler,
-  createPermissionConfirmationRenderHandler,
-  getActiveInterfaceContext,
-} from './ui';
+import type { PermissionConfirmationContext } from './ui';
+import { createPermissionConfirmationRenderHandler } from './ui';
 
 // set up dependencies
 const accountController = new AccountController({
@@ -33,10 +30,12 @@ const accountController = new AccountController({
   deploymentSalt: '0x',
 });
 
+const permissionConfirmationRenderHandler =
+  createPermissionConfirmationRenderHandler(snap);
+
 const rpcHandler = createRpcHandler({
   accountController,
-  permissionConfirmationRenderHandler:
-    createPermissionConfirmationRenderHandler(snap),
+  permissionConfirmationRenderHandler,
   permissionsContextBuilder: createPermissionsContextBuilder(accountController),
 });
 
@@ -88,45 +87,53 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  * @param args - The user input handler args as object.
  * @param args.id - The id of the interface.
  * @param args.event - The user input event.
+ * @param args.context - The active context.
  */
-export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
-  // TODO: Decouple User input handler: https://app.zenhub.com/workspaces/readable-permissions-67982ce51eb4360029b2c1a1/issues/gh/metamask/delegator-readable-permissions/84
-  const activeContext = await getActiveInterfaceContext(id);
-  let didInterfaceResolve = false;
-  if (activeContext) {
-    switch (event.type) {
-      case UserInputEventType.ButtonClickEvent: {
-        didInterfaceResolve = await shouldInterfaceResolveHandler(
+export const onUserInput: OnUserInputHandler = async ({
+  id,
+  event,
+  context,
+}) => {
+  try {
+    if (context) {
+      // safely cast the permission type
+      if (!('permission' in context)) {
+        throw new Error('Invalid context');
+      }
+
+      const permissionType = extractPermissionName(
+        (context.permission as Permission).type,
+      ) as SupportedPermissionTypes;
+      const safeContext = context as PermissionConfirmationContext<
+        typeof permissionType
+      >;
+
+      const didInterfaceResolve =
+        await permissionConfirmationRenderHandler.handleInterfaceResolution(
           event,
           id,
-          activeContext,
+          safeContext,
         );
-        break;
-      }
-      default: {
-        return;
-      }
-    }
 
-    // If the interface did not resolve, update the interface with the new context and UI specific to the permission type
-    if (!didInterfaceResolve) {
-      const permissionType = extractPermissionName(
-        activeContext.permission.type,
-      ) as SupportedPermissionTypes;
-
-      const orchestrator = createPermissionOrchestrator(permissionType);
-
-      const permissionConfirmationPage =
-        orchestrator.buildPermissionConfirmationPage(activeContext);
-
-      await snap.request({
-        method: 'snap_updateInterface',
-        params: {
+      // If the interface did not resolve, update the interface with the new context and UI specific to the permission type
+      if (!didInterfaceResolve) {
+        const orchestrator = createPermissionOrchestrator(permissionType);
+        const updatedContext = await orchestrator.handleUserEvent({
           id,
-          context: activeContext,
-          ui: permissionConfirmationPage,
-        },
-      });
+          event,
+          context: safeContext,
+        });
+        const updatedUi =
+          orchestrator.buildPermissionConfirmationPage(updatedContext);
+
+        await permissionConfirmationRenderHandler.updateInterface(
+          id,
+          updatedContext,
+          updatedUi,
+        );
+      }
     }
+  } catch (error) {
+    logger.error('Error handling user input:', error);
   }
 };

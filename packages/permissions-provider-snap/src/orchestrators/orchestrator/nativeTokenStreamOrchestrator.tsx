@@ -140,5 +140,14 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
       return updatedCaveatBuilder;
     },
+    handleUserEvent: async ({ context }) => {
+      if (!context) {
+        throw new Error('No active context found');
+      }
+
+      //  TODO: Handle events for the native-token-stream permission type
+
+      return context;
+    },
   };
 };

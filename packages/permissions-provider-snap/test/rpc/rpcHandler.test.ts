@@ -19,6 +19,8 @@ describe('RpcHandler', () => {
   const mockPermissionConfirmationRenderHandler = {
     getConfirmedAttenuatedPermission: jest.fn(),
     getPermissionConfirmationPage: jest.fn(),
+    handleInterfaceResolution: jest.fn(),
+    updateInterface: jest.fn(),
   } as jest.Mocked<PermissionConfirmationRenderHandler>;
   const mockPermissionsContextBuilder = {
     buildPermissionsContext: jest.fn(),

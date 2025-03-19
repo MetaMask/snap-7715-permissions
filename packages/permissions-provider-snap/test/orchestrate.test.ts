@@ -50,6 +50,8 @@ describe('Orchestrate', () => {
     } as jest.Mocked<AccountControllerInterface>;
     const mockPermissionConfirmationRenderHandler = {
       getConfirmedAttenuatedPermission: jest.fn(),
+      handleInterfaceResolution: jest.fn(),
+      updateInterface: jest.fn(),
     } as jest.Mocked<PermissionConfirmationRenderHandler>;
     const mockPermissionsContextBuilder = {
       buildPermissionsContext: jest.fn(),

@@ -3,8 +3,8 @@ import type {
   PermissionResponse,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
-import type { ComponentOrElement } from '@metamask/snaps-sdk';
-import type { JsonObject } from '@metamask/snaps-sdk/jsx';
+import type { UserInputEvent } from '@metamask/snaps-sdk';
+import type { GenericSnapElement, JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 
 import type { PermissionConfirmationContext } from '../ui';
@@ -110,7 +110,18 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
    */
   buildPermissionConfirmationPage: (
     context: PermissionConfirmationContext<TPermissionType>,
-  ) => ComponentOrElement;
+  ) => GenericSnapElement;
+
+  /**
+   * Handles the user input event for the permission type.
+   * @param args - The user input handler args as object.
+   * @returns The result of the user input event handling.
+   */
+  handleUserEvent: (args: {
+    id: string;
+    event: UserInputEvent;
+    context: PermissionConfirmationContext<TPermissionType> | null;
+  }) => Promise<PermissionConfirmationContext<TPermissionType>>;
 };
 
 /**
