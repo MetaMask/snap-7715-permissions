@@ -64,24 +64,19 @@ const renderIconAsImage = (icon?: string) => {
  * Renders the text with the option to show more.
  *
  * @param text - The text to display.
- * @param label - The label of the text.
  * @param hiddable - Whether the text is hiddable.
  * @returns A text component.
  */
-const renderHiddableText = (
-  text: string,
-  label: string,
-  hiddable?: boolean,
-) => {
+const renderHiddableText = (text: string, hiddable?: boolean) => {
   if (!hiddable) {
     return <Text>{text}</Text>;
   }
 
   // TODO: Add the event handle logic to make the button interactive
-  const buttonName = `request-details.hiddableText.${label}`;
+  const buttonName = 'request-details.hiddableText';
   return (
     <Box direction="horizontal">
-      <Text>{`${text.slice(0, 12)}...`}</Text>
+      <Text color="muted">{`${text.slice(0, 12)}...`}</Text>
       <Button name={buttonName}>Show more</Button>
     </Box>
   );
@@ -137,7 +132,7 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
       </Box>
       <Box direction="horizontal">
         {renderIconAsImage(item.icon)}
-        {renderHiddableText(item.text, item.label, item.hiddable)}
+        {renderHiddableText(item.text, item.hiddable)}
       </Box>
     </Box>
   ));
