@@ -14,6 +14,7 @@ import type {
   Orchestrator,
   PermissionContextMeta,
 } from './types';
+import { SnapsProvider } from '@metamask/snaps-sdk';
 
 /**
  * Arguments for running the orchestrate function.
@@ -26,6 +27,7 @@ export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
     orchestrateMeta: OrchestrateMeta<TPermissionType>;
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
     permissionsContextBuilder: PermissionsContextBuilder;
+    snapsProvider: SnapsProvider;
   };
 
 /**
@@ -67,6 +69,7 @@ export const orchestrate = async <
     orchestrateMeta,
     permissionConfirmationRenderHandler,
     permissionsContextBuilder,
+    snapsProvider,
   } = orchestrateArgs;
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
@@ -90,15 +93,31 @@ export const orchestrate = async <
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
 
-  // Wait for the successful permission confirmation reponse from the user
-  const { attenuatedPermission, attenuatedExpiry, isConfirmed } =
-    await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
+  const { confirmationResult, interfaceId } =
+    await permissionConfirmationRenderHandler.createConfirmationDialog(
       uiContext,
       permissionDialog,
       permissionType,
     );
 
-  if (!isConfirmed) {
+  const isConfirmationAccepted = await confirmationResult;
+
+  const { permission: attenuatedPermission, expiry: attenuatedExpiry } =
+    await orchestrator.resolveAttenuatedPermission({
+      interfaceId,
+      requestedPermission: permission,
+      snapsProvider,
+    });
+
+  await snapsProvider.request({
+    method: 'snap_resolveInterface',
+    params: {
+      id: interfaceId,
+      value: {},
+    },
+  });
+
+  if (!isConfirmationAccepted) {
     return {
       success: false,
       reason: 'User rejected the permissions request',
@@ -128,7 +147,7 @@ export const orchestrate = async <
       }),
     ]);
 
-  // prolonging building allow us to add global caveats, such as expiry after permission specific caveats are added
+  // By deferring building the caveats, we can add global caveats such as Expiry
   updatedCaveatBuilder.addCaveat(
     'timestamp',
     0, // timestampAfter

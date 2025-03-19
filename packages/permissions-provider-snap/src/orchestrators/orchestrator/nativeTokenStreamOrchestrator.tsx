@@ -6,7 +6,7 @@ import {
   type Permission,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
-import { InvalidParamsError } from '@metamask/snaps-sdk';
+import { InvalidParamsError, SnapsProvider } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 
 import type { PermissionConfirmationContext } from '../../ui';
@@ -139,6 +139,34 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       );
 
       return updatedCaveatBuilder;
+    },
+    resolveAttenuatedPermission: async ({
+      snapsProvider,
+      interfaceId,
+      requestedPermission,
+    }: {
+      interfaceId: string;
+      requestedPermission: PermissionTypeMapping['native-token-stream'];
+      snapsProvider: SnapsProvider;
+    }) => {
+      const interfaceState = (await snapsProvider.request({
+        method: 'snap_getInterfaceState',
+        params: { id: interfaceId },
+      })) as {
+        expiry: string;
+      };
+
+      const expiry = Number(interfaceState.expiry);
+
+      const attenuatedPermission = {
+        ...requestedPermission,
+        // todo: append any values that have been modified by the user
+      };
+
+      return {
+        expiry,
+        permission: attenuatedPermission,
+      };
     },
   };
 };

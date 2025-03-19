@@ -34,6 +34,7 @@ const rpcHandler = createRpcHandler({
   accountController,
   permissionConfirmationRenderHandler,
   permissionsContextBuilder: createPermissionsContextBuilder(accountController),
+  snapsProvider: snap,
 });
 
 // configure RPC methods bindings

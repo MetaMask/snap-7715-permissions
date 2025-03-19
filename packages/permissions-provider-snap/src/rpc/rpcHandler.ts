@@ -2,7 +2,7 @@ import {
   extractPermissionName,
   logger,
 } from '@metamask/7715-permissions-shared/utils';
-import type { Json } from '@metamask/snaps-sdk';
+import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 
 import type { AccountControllerInterface } from '../accountController';
 import type {
@@ -43,11 +43,13 @@ export function createRpcHandler(config: {
   accountController: AccountControllerInterface;
   permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
   permissionsContextBuilder: PermissionsContextBuilder;
+  snapsProvider: SnapsProvider;
 }): RpcHandler {
   const {
     permissionConfirmationRenderHandler,
     accountController,
     permissionsContextBuilder,
+    snapsProvider,
   } = config;
 
   return {
@@ -96,6 +98,7 @@ export function createRpcHandler(config: {
         },
         permissionConfirmationRenderHandler,
         permissionsContextBuilder,
+        snapsProvider,
       };
       const orchestrateRes = await orchestrate(orchestrateArgs);
       logger.debug('isPermissionGranted', orchestrateRes.success);

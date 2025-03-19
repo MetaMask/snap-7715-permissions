@@ -1,4 +1,3 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { UserInputEvent, UserInputEventType } from '@metamask/snaps-sdk';
 
 type UserEventHandler = (event: UserInputEvent) => void | Promise<void>;
@@ -12,11 +11,12 @@ export class UserEventDispatcher {
   /**
    * Map of event types to array of event handlers
    */
-  readonly #eventHandlers: Map<string, UserEventHandler[]> = new Map();
+  readonly #eventHandlers = {} as Record<
+    UserInputEventType,
+    UserEventHandler[]
+  >;
 
-  constructor() {
-    logger.debug('userEventDispatcher:constructor()');
-  }
+  constructor() {}
 
   /**
    * Register an event handler for a specific event type.
@@ -31,28 +31,12 @@ export class UserEventDispatcher {
     handler: UserEventHandler;
   }): UserEventDispatcher {
     const { eventType, handler } = args;
-    logger.debug('userEventDispatcher:on()', {
-      eventType,
-    });
 
-    if (!this.#eventHandlers.has(eventType)) {
-      logger.debug('userEventDispatcher:on() - creating new handlers array', {
-        eventType,
-      });
-      this.#eventHandlers.set(eventType, []);
+    if (!this.#eventHandlers[eventType]) {
+      this.#eventHandlers[eventType] = [handler];
+    } else {
+      this.#eventHandlers[eventType].push(handler);
     }
-
-    const handlers = this.#eventHandlers.get(eventType);
-    if (!handlers) {
-      throw new Error('Handlers array not found');
-    }
-
-    handlers.push(handler);
-
-    logger.debug('userEventDispatcher:on() - handler registered', {
-      eventType,
-      handlersCount: handlers.length,
-    });
 
     return this;
   }
@@ -71,42 +55,16 @@ export class UserEventDispatcher {
   }): UserEventDispatcher {
     const { eventType, handler } = args;
 
-    logger.debug('userEventDispatcher:off()', {
-      eventType,
-    });
+    const handlers = this.#eventHandlers[eventType];
 
-    if (!this.#eventHandlers.has(eventType)) {
-      logger.debug('userEventDispatcher:off() - no handlers for event type', {
-        eventType,
-      });
+    if (!handlers?.length) {
       return this;
-    }
-
-    const handlers = this.#eventHandlers.get(eventType);
-
-    if (!handlers) {
-      throw new Error('Handlers array not found');
     }
 
     const index = handlers.indexOf(handler);
 
-    if (index === -1) {
-      logger.debug('userEventDispatcher:off() - handler not found', {
-        eventType,
-      });
-    } else {
-      logger.debug('userEventDispatcher:off() - removing handler', {
-        eventType,
-        handlerIndex: index,
-      });
+    if (index !== -1) {
       handlers.splice(index, 1);
-    }
-
-    if (handlers.length === 0) {
-      logger.debug('userEventDispatcher:off() - removing empty event type', {
-        eventType,
-      });
-      this.#eventHandlers.delete(eventType);
     }
 
     return this;
@@ -124,75 +82,20 @@ export class UserEventDispatcher {
   }): Promise<void> {
     const { event } = args;
 
-    logger.debug('userEventDispatcher:handleUserInputEvent()', {
-      eventType: event.type,
-      name: event.name,
-    });
+    const handlers = this.#eventHandlers[event.type];
 
-    if (!this.#eventHandlers.has(event.type)) {
-      logger.debug(
-        'userEventDispatcher:handleUserInputEvent() - no handlers for event type',
-        {
-          eventType: event.type,
-        },
-      );
+    if (!handlers?.length) {
       return;
     }
 
-    const handlers = this.#eventHandlers.get(event.type);
-
-    if (!handlers) {
-      throw new Error('Handlers array not found');
-    }
-
-    if (handlers.length === 0) {
-      logger.debug(
-        'userEventDispatcher:handleUserInputEvent() - handlers array empty',
-        {
-          eventType: event.type,
-        },
-      );
-      return;
-    }
-
-    logger.debug(
-      'userEventDispatcher:handleUserInputEvent() - executing handlers',
-      {
-        eventType: event.type,
-        name: event.name,
-        handlerCount: handlers.length,
-      },
-    );
-
-    const handlersExecutions = handlers.map(async (handler, index) => {
+    const handlersExecutions = handlers.map(async (handler) => {
       try {
-        logger.debug(
-          'userEventDispatcher:handleUserInputEvent() - executing handler',
-          {
-            eventType: event.type,
-            name: event.name,
-            handlerIndex: index,
-          },
-        );
         await handler(event);
       } catch (error) {
-        logger.error(
-          `Error in event handler for ${event.type}${
-            event.name ? ` on element ${event.name}` : ''
-          }:`,
-          error,
-        );
+        // Error in event handler
       }
     });
 
     await Promise.all(handlersExecutions);
-
-    logger.debug(
-      'userEventDispatcher:handleUserInputEvent() - handlers executed successfully',
-      {
-        eventType: event.type,
-        name: event.name,
-      },
-    );
   }
 }

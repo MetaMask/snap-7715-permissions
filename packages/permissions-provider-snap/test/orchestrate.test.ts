@@ -19,6 +19,7 @@ import type {
   PermissionConfirmationContext,
   PermissionConfirmationRenderHandler,
 } from '../src/ui';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 
 describe('Orchestrate', () => {
   const address = getAddress('0x1234567890123456789012345678901234567890');
@@ -49,12 +50,13 @@ describe('Orchestrate', () => {
       getEnvironment: jest.fn(),
     } as jest.Mocked<AccountControllerInterface>;
     const mockPermissionConfirmationRenderHandler = {
-      getConfirmedAttenuatedPermission: jest.fn(),
+      createConfirmationDialog: jest.fn(),
     } as jest.Mocked<PermissionConfirmationRenderHandler>;
     const mockPermissionsContextBuilder = {
       buildPermissionsContext: jest.fn(),
     } as jest.Mocked<PermissionsContextBuilder>;
     const orchestrator = createPermissionOrchestrator(mockPermissionType);
+    const mockSnapsProvider = createMockSnapsProvider();
 
     const orchestrateArgs: OrchestrateArgs<typeof mockPermissionType> = {
       permissionType: mockPermissionType,
@@ -71,27 +73,15 @@ describe('Orchestrate', () => {
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
       permissionsContextBuilder: mockPermissionsContextBuilder,
-    };
-
-    const mockAttenuatedContext: PermissionConfirmationContext<
-      typeof mockPermissionType
-    > = {
-      permission:
-        nativeTokenStreamPermission as PermissionTypeMapping[typeof mockPermissionType],
-      address,
-      siteOrigin: 'http://localhost:3000',
-      balance: '0x1',
-      expiry: 1742255426,
-      chainId: 11155111,
+      snapsProvider: mockSnapsProvider,
     };
 
     it('should orchestrate and return a successfuly 7715 response when user confirms', async () => {
       // prepare mock user confirmation context
-      mockPermissionConfirmationRenderHandler.getConfirmedAttenuatedPermission.mockResolvedValueOnce(
+      mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
-          isConfirmed: true,
-          attenuatedExpiry: mockAttenuatedContext.expiry,
-          attenuatedPermission: mockAttenuatedContext.permission,
+          interfaceId: 'mock-interface-id',
+          confirmationResult: Promise.resolve(true),
         },
       );
 
@@ -115,6 +105,9 @@ describe('Orchestrate', () => {
       mockAccountController.getEnvironment.mockResolvedValueOnce(
         getDeleGatorEnvironment(sepolia.id),
       );
+      mockSnapsProvider.request.mockResolvedValueOnce({
+        expiry: '1',
+      });
 
       const res = await orchestrate(orchestrateArgs);
 
@@ -130,7 +123,7 @@ describe('Orchestrate', () => {
           ],
           chainId: '0xaa36a7',
           context: '0x00_some_permission_context',
-          expiry: 1742255426,
+          expiry: 1,
           permissions: [
             {
               data: {
@@ -154,11 +147,10 @@ describe('Orchestrate', () => {
 
     it('should orchestrate and return a unsuccessfuly 7715 response when user rejects', async () => {
       // prepare mock user confirmation context
-      mockPermissionConfirmationRenderHandler.getConfirmedAttenuatedPermission.mockResolvedValueOnce(
+      mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
-          isConfirmed: false,
-          attenuatedExpiry: mockAttenuatedContext.expiry,
-          attenuatedPermission: mockAttenuatedContext.permission,
+          interfaceId: 'mock-interface-id',
+          confirmationResult: Promise.resolve(false),
         },
       );
 
@@ -182,6 +174,9 @@ describe('Orchestrate', () => {
       mockAccountController.getEnvironment.mockResolvedValueOnce(
         getDeleGatorEnvironment(sepolia.id),
       );
+      mockSnapsProvider.request.mockResolvedValueOnce({
+        expiry: '1',
+      });
 
       const res = await orchestrate(orchestrateArgs);
 

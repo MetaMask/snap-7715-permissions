@@ -3,7 +3,7 @@ import type {
   PermissionResponse,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
-import type { ComponentOrElement } from '@metamask/snaps-sdk';
+import type { ComponentOrElement, SnapsProvider } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 
@@ -12,17 +12,6 @@ import type {
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from './orchestrator';
-
-/**
- * The attenuated response after the user confirms the permission request.
- */
-export type AttenuatedResponse<
-  TPermissionType extends SupportedPermissionTypes,
-> = {
-  isConfirmed: boolean;
-  attenuatedPermission: PermissionTypeMapping[TPermissionType];
-  attenuatedExpiry: number;
-};
 
 /**
  * The result of orchestrating a permission.
@@ -104,13 +93,22 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   ) => Promise<CoreCaveatBuilder>;
 
   /**
-   * Builds the permission dialog for the permission type.
+   * Builds the permission confirmation for the permission type.
    * @param context - The permission confirmation context.
    * @returns The permission confirmation page component.
    */
   buildPermissionConfirmation: (
     context: PermissionConfirmationContext<TPermissionType>,
   ) => ComponentOrElement;
+
+  resolveAttenuatedPermission: (args: {
+    interfaceId: string;
+    requestedPermission: PermissionTypeMapping['native-token-stream'];
+    snapsProvider: SnapsProvider;
+  }) => Promise<{
+    expiry: number;
+    permission: PermissionTypeMapping[TPermissionType];
+  }>;
 };
 
 /**

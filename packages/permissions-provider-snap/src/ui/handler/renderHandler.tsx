@@ -1,31 +1,16 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { UserInputEvent } from '@metamask/snaps-sdk';
 import {
   UserInputEventType,
   type ComponentOrElement,
   type SnapsProvider,
 } from '@metamask/snaps-sdk';
-import { Container } from '@metamask/snaps-sdk/jsx';
+import { Container, GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type {
-  PermissionTypeMapping,
-  SupportedPermissionTypes,
-} from '../../orchestrators';
+import type { SupportedPermissionTypes } from '../../orchestrators';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
 import { ConfirmationFooter } from '../components';
 import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
-
-/**
- * The attenuated response after the user confirms the permission request.
- */
-export type AttenuatedResponse<
-  TPermissionType extends SupportedPermissionTypes,
-> = {
-  isConfirmed: boolean;
-  attenuatedPermission: PermissionTypeMapping[TPermissionType];
-  attenuatedExpiry: number;
-};
 
 export type PermissionConfirmationRenderHandler = {
   /**
@@ -36,13 +21,14 @@ export type PermissionConfirmationRenderHandler = {
    * @param permissionType - The permission type.
    * @returns The attenuated context data after the user confirms the permission request.
    */
-  getConfirmedAttenuatedPermission: <
-    TPermissionType extends SupportedPermissionTypes,
-  >(
+  createConfirmationDialog: <TPermissionType extends SupportedPermissionTypes>(
     context: PermissionConfirmationContext<TPermissionType>,
     ui: ComponentOrElement,
     permissionType: TPermissionType,
-  ) => Promise<AttenuatedResponse<TPermissionType>>;
+  ) => Promise<{
+    interfaceId: string;
+    confirmationResult: Promise<boolean>;
+  }>;
 };
 
 /**
@@ -61,17 +47,17 @@ export const createPermissionConfirmationRenderHandler = ({
   userEventDispatcher: UserEventDispatcher;
 }): PermissionConfirmationRenderHandler => {
   return {
-    getConfirmedAttenuatedPermission: async <
+    createConfirmationDialog: async <
       TPermissionType extends SupportedPermissionTypes,
     >(
       context: PermissionConfirmationContext<TPermissionType>,
-      permissionDialog: ComponentOrElement,
+      dialogContent: ComponentOrElement,
       _: TPermissionType,
     ) => {
       // append the confirmation footer here to the dialog provided by the specific permission implementation
       const ui = (
         <Container>
-          {permissionDialog as any}
+          {dialogContent as GenericSnapElement}
           <ConfirmationFooter />
         </Container>
       );
@@ -84,44 +70,18 @@ export const createPermissionConfirmationRenderHandler = ({
         },
       });
 
-      const attenuatedPermission = new Promise<
-        AttenuatedResponse<TPermissionType>
-      >((resolve, reject) => {
-        const onButtonClick = async (event: UserInputEvent) => {
-          logger.debug('onButtonClick', { buttonName: event.name });
-
-          if (event.name === GRANT_BUTTON) {
-            logger.debug('onButtonClick - GRANT_BUTTON');
-
-            const activeContext = await snapsProvider.request({
-              method: 'snap_getInterfaceContext',
-              params: {
-                id: interfaceId,
-              },
-            });
-
-            if (!activeContext) {
-              reject(new Error('No active context found'));
+      const confirmationResult = new Promise<boolean>((resolve) => {
+        const onButtonClick = (event: UserInputEvent) => {
+          let isConfirmationAccepted = false;
+          switch (event.name) {
+            case GRANT_BUTTON:
+              isConfirmationAccepted = true;
+              break;
+            case CANCEL_BUTTON:
+              isConfirmationAccepted = false;
+              break;
+            default:
               return;
-            }
-
-            if (!activeContext.permission) {
-              reject(new Error('No permission found'));
-              return;
-            }
-
-            const { permission } = activeContext;
-
-            resolve({
-              isConfirmed: true,
-              attenuatedPermission:
-                permission as PermissionTypeMapping[TPermissionType],
-              attenuatedExpiry: activeContext.expiry as number,
-            });
-          } else if (event.name === CANCEL_BUTTON) {
-            logger.debug('onButtonClick - CANCEL_BUTTON');
-
-            reject(new Error('User rejected permission request'));
           }
 
           userEventDispatcher.off({
@@ -129,39 +89,26 @@ export const createPermissionConfirmationRenderHandler = ({
             handler: onButtonClick,
           });
 
-          snapsProvider
-            .request({
-              method: 'snap_resolveInterface',
-              params: {
-                id: interfaceId,
-                value: {},
-              },
-            })
-            .catch((error) => {
-              logger.error('Error resolving interface', { error });
-              reject(error);
-            });
+          resolve(isConfirmationAccepted);
         };
 
         userEventDispatcher.on({
           eventType: UserInputEventType.ButtonClickEvent,
           handler: onButtonClick,
         });
-
-        snapsProvider
-          .request({
-            method: 'snap_dialog',
-            params: {
-              id: interfaceId,
-            },
-          })
-          .catch((error) => {
-            logger.error('Error dialog', { error });
-            reject(error);
-          });
       });
 
-      return attenuatedPermission;
+      snapsProvider.request({
+        method: 'snap_dialog',
+        params: {
+          id: interfaceId,
+        },
+      });
+
+      return {
+        interfaceId,
+        confirmationResult,
+      };
     },
   };
 };
