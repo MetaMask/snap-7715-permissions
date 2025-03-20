@@ -84,22 +84,28 @@ export const orchestrate = async <
     address,
     siteOrigin: origin,
     balance,
-    expiry,
     chainId: chainIdNum,
+    expiry,
   };
 
-  const confirmationPage =
-    orchestrator.buildPermissionConfirmationPage(uiContext);
+  const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
 
-  // Wait for the successful permission confirmation reponse from the user
-  const { attenuatedPermission, attenuatedExpiry, isConfirmed } =
-    await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
+  const { confirmationResult } =
+    await permissionConfirmationRenderHandler.createConfirmationDialog(
       uiContext,
-      confirmationPage,
+      permissionDialog,
       permissionType,
     );
 
-  if (!isConfirmed) {
+  const isConfirmationAccepted = await confirmationResult;
+
+  const { permission: attenuatedPermission, expiry: attenuatedExpiry } =
+    await orchestrator.resolveAttenuatedPermission({
+      requestedPermission: permission,
+      requestedExpiry: expiry,
+    });
+
+  if (!isConfirmationAccepted) {
     return {
       success: false,
       reason: 'User rejected the permissions request',
@@ -129,7 +135,7 @@ export const orchestrate = async <
       }),
     ]);
 
-  // prolonging building allow us to add global caveats, such as expiry after permission specific caveats are added
+  // By deferring building the caveats, we can add global caveats such as Expiry
   updatedCaveatBuilder.addCaveat(
     'timestamp',
     0, // timestampAfter

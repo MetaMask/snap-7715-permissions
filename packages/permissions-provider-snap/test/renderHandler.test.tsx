@@ -1,6 +1,7 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
-import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
+import type { UserInputEvent } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
 import type {
@@ -10,9 +11,23 @@ import type {
 import type { PermissionConfirmationContext } from '../src/ui';
 import { createPermissionConfirmationRenderHandler } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
+import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
+import { UserEventDispatcher } from '../src/userEventDispatcher';
+
+jest.mock('../src/userEventDispatcher');
 
 describe('Permission Confirmation Render Handler', () => {
   const mockSnapProvider = createMockSnapsProvider();
+  const mockUserEventDispatcher = new UserEventDispatcher();
+
+  let onButtonClickHandlerPromise: Promise<
+    (args: { event: UserInputEvent }) => Promise<void>
+  >;
+
+  (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
+    () => mockUserEventDispatcher,
+  );
+
   const address = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
   const permission: NativeTokenStreamPermission = {
     type: 'native-token-stream',
@@ -24,9 +39,8 @@ describe('Permission Confirmation Render Handler', () => {
       maxAmount: '0x2',
     },
   };
-  const mockPermissionType = extractPermissionName(
-    permission.type,
-  ) as SupportedPermissionTypes;
+  const mockPermissionType = 'mock-permission-type' as SupportedPermissionTypes;
+
   const mockContext: PermissionConfirmationContext<typeof mockPermissionType> =
     {
       permission:
@@ -51,76 +65,152 @@ describe('Permission Confirmation Render Handler', () => {
 
   beforeEach(() => {
     mockSnapProvider.request.mockReset();
+    mockSnapProvider.request.mockResolvedValue('OK');
+    (mockUserEventDispatcher.on as jest.Mock).mockClear();
+    (mockUserEventDispatcher.off as jest.Mock).mockClear();
+
+    onButtonClickHandlerPromise = new Promise<
+      (args: { event: UserInputEvent }) => Promise<void>
+    >((resolve, _) => {
+      (mockUserEventDispatcher.on as jest.Mock).mockImplementation(
+        ({ eventType, handler }) => {
+          if (eventType === UserInputEventType.ButtonClickEvent) {
+            resolve(handler);
+          }
+          return mockUserEventDispatcher;
+        },
+      );
+    });
   });
 
-  describe('getConfirmedAttenuatedPermission - native-token-stream', () => {
-    it('should render the confirmation screen and return attenuated results after user confirms', async () => {
-      const permissionConfirmationRenderHandler =
-        createPermissionConfirmationRenderHandler(mockSnapProvider);
-
-      // mock the snap dialog user interaction
-      const mockInterfaceId = 'mockInterfaceId';
+  describe('createConfirmationDialog()', () => {
+    it('should handle user approving a permission request', async () => {
+      const mockInterfaceId = 'mock-interface-id';
       mockSnapProvider.request
-        .mockResolvedValueOnce(mockInterfaceId) // mock snap_createInterface
-        .mockResolvedValueOnce({
-          attenuatedPermission: mockContext.permission,
-          attenuatedExpiry: mockContext.expiry,
-          isConfirmed: true,
-        }); // mock snap_dialog resolves with type AttenuatedResponse
+        .mockResolvedValueOnce(mockInterfaceId) // snap_createInterface
+        .mockResolvedValueOnce({}) // snap_dialog
+        .mockResolvedValueOnce({}); // snap_resolveInterface
 
-      // render the permission confirmation page
-      const attenuatedRes =
-        await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler({
+          snapsProvider: mockSnapProvider,
+          userEventDispatcher: mockUserEventDispatcher,
+        });
+
+      const { interfaceId, confirmationResult } =
+        await permissionConfirmationRenderHandler.createConfirmationDialog(
           mockContext,
           mockPage,
           mockPermissionType,
         );
 
-      expect(mockSnapProvider.request).toHaveBeenCalledTimes(2);
-      expect(mockSnapProvider.request).toHaveBeenNthCalledWith(1, {
-        method: 'snap_createInterface',
-        params: {
-          context: mockContext,
-          ui: mockPage,
+      expect(interfaceId).toEqual(mockInterfaceId);
+
+      if (onButtonClickHandlerPromise === null) {
+        throw new Error('Expected onButtonClickHandler to be set');
+      }
+
+      const onButtonClickHandler = await onButtonClickHandlerPromise;
+
+      // simulate clicking the grant button
+      await onButtonClickHandler({
+        event: {
+          type: UserInputEventType.ButtonClickEvent,
+          name: GRANT_BUTTON,
         },
       });
-      expect(mockSnapProvider.request).toHaveBeenNthCalledWith(2, {
+
+      await expect(confirmationResult).resolves.toEqual(true);
+
+      expect(mockSnapProvider.request).toHaveBeenCalledWith({
+        method: 'snap_createInterface',
+        params: expect.objectContaining({
+          context: mockContext,
+          ui: expect.any(Object),
+        }),
+      });
+
+      expect(mockSnapProvider.request).toHaveBeenCalledWith({
         method: 'snap_dialog',
         params: { id: mockInterfaceId },
       });
 
-      expect(attenuatedRes).toStrictEqual({
-        attenuatedPermission: mockContext.permission,
-        attenuatedExpiry: mockContext.expiry,
-        isConfirmed: true,
+      // close dialog and cleanup
+
+      expect(mockSnapProvider.request).toHaveBeenCalledWith({
+        method: 'snap_resolveInterface',
+        params: { id: mockInterfaceId, value: {} },
+      });
+
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
+        eventType: UserInputEventType.ButtonClickEvent,
+        handler: expect.any(Function),
+        interfaceId: mockInterfaceId,
       });
     });
 
-    it('should throw error when user cancels confirmation screen', async () => {
-      const permissionConfirmationRenderHandler =
-        createPermissionConfirmationRenderHandler(mockSnapProvider);
-
-      // mock the snap dialog user interaction
-      const mockInterfaceId = 'mockInterfaceId';
+    it('should handle user rejecting a permission request', async () => {
+      const mockInterfaceId = 'mock-interface-id';
       mockSnapProvider.request
-        .mockResolvedValueOnce(mockInterfaceId) // mock snap_createInterface
-        .mockResolvedValueOnce({
-          attenuatedPermission: mockContext.permission,
-          attenuatedExpiry: mockContext.expiry,
-          isConfirmed: false,
-        }); // mock snap_dialog resolves with type AttenuatedResponse
+        .mockResolvedValueOnce(mockInterfaceId) // snap_createInterface
+        .mockResolvedValueOnce({}) // snap_dialog
+        .mockResolvedValueOnce({}); // snap_resolveInterface
 
-      const attenuatedRes =
-        await permissionConfirmationRenderHandler.getConfirmedAttenuatedPermission(
+      const permissionConfirmationRenderHandler =
+        createPermissionConfirmationRenderHandler({
+          snapsProvider: mockSnapProvider,
+          userEventDispatcher: mockUserEventDispatcher,
+        });
+
+      const { interfaceId, confirmationResult } =
+        await permissionConfirmationRenderHandler.createConfirmationDialog(
           mockContext,
           mockPage,
           mockPermissionType,
         );
 
-      expect(attenuatedRes).toStrictEqual({
-        attenuatedPermission: mockContext.permission,
-        attenuatedExpiry: mockContext.expiry,
-        isConfirmed: false,
+      expect(interfaceId).toEqual(mockInterfaceId);
+
+      if (onButtonClickHandlerPromise === null) {
+        throw new Error('Expected onButtonClickHandler to be set');
+      }
+
+      const onButtonClickHandler = await onButtonClickHandlerPromise;
+
+      // simulate clicking the cancel button
+      await onButtonClickHandler({
+        event: {
+          type: UserInputEventType.ButtonClickEvent,
+          name: CANCEL_BUTTON,
+        },
+      });
+
+      await expect(confirmationResult).resolves.toEqual(false);
+
+      expect(mockSnapProvider.request).toHaveBeenCalledWith({
+        method: 'snap_createInterface',
+        params: expect.objectContaining({
+          context: mockContext,
+          ui: expect.any(Object),
+        }),
+      });
+
+      expect(mockSnapProvider.request).toHaveBeenCalledWith({
+        method: 'snap_dialog',
+        params: { id: mockInterfaceId },
+      });
+
+      // close dialog and cleanup
+
+      expect(mockSnapProvider.request).toHaveBeenCalledWith({
+        method: 'snap_resolveInterface',
+        params: { id: mockInterfaceId, value: {} },
+      });
+
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
+        eventType: UserInputEventType.ButtonClickEvent,
+        handler: expect.any(Function),
+        interfaceId: mockInterfaceId,
       });
     });
   });

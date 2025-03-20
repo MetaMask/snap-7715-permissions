@@ -14,17 +14,6 @@ import type {
 } from './orchestrator';
 
 /**
- * The attenuated response after the user confirms the permission request.
- */
-export type AttenuatedResponse<
-  TPermissionType extends SupportedPermissionTypes,
-> = {
-  isConfirmed: boolean;
-  attenuatedPermission: PermissionTypeMapping[TPermissionType];
-  attenuatedExpiry: number;
-};
-
-/**
  * The result of orchestrating a permission.
  */
 export type OrchestrateResult = OneOf<
@@ -104,13 +93,21 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   ) => Promise<CoreCaveatBuilder>;
 
   /**
-   * Builds the permission confirmation page for the permission type.
+   * Builds the permission confirmation for the permission type.
    * @param context - The permission confirmation context.
    * @returns The permission confirmation page component.
    */
-  buildPermissionConfirmationPage: (
+  buildPermissionConfirmation: (
     context: PermissionConfirmationContext<TPermissionType>,
   ) => ComponentOrElement;
+
+  resolveAttenuatedPermission: (args: {
+    requestedPermission: PermissionTypeMapping[TPermissionType];
+    requestedExpiry: number;
+  }) => Promise<{
+    expiry: number;
+    permission: PermissionTypeMapping[TPermissionType];
+  }>;
 };
 
 /**

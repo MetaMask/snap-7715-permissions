@@ -1,13 +1,8 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import { Box, Container, Divider } from '@metamask/snaps-sdk/jsx';
+import { Box, Divider } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountDetailsProps } from '../components';
-import {
-  AccountDetails,
-  ConfirmationFooter,
-  Header,
-  RequestDetails,
-} from '../components';
+import { AccountDetails, Header, RequestDetails } from '../components';
 import type { PermissionConfirmationProps } from '../types';
 
 /**
@@ -35,26 +30,23 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
     permissionIndex: 0,
   };
   return (
-    <Container>
-      <Box>
-        <Header
-          title="Permission request"
-          subtitle="<place holder subtitle for native-token-stream>"
-        />
-        <Divider />
+    <Box>
+      <Header
+        title="Permission request"
+        subtitle="<place holder subtitle for native-token-stream>"
+      />
+      <Divider />
 
-        <RequestDetails
-          siteOrigin={siteOrigin}
-          chainId={chainId}
-          justification={permission.data.justification}
-        />
+      <RequestDetails
+        siteOrigin={siteOrigin}
+        chainId={chainId}
+        justification={permission.data.justification}
+      />
 
-        <AccountDetails
-          accounts={accountDetailsProps.accounts}
-          permissionIndex={accountDetailsProps.permissionIndex}
-        />
-      </Box>
-      <ConfirmationFooter />
-    </Container>
+      <AccountDetails
+        accounts={accountDetailsProps.accounts}
+        permissionIndex={accountDetailsProps.permissionIndex}
+      />
+    </Box>
   );
 };
