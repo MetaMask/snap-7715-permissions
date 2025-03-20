@@ -1,5 +1,5 @@
 import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
-import type { InterfaceContext } from '@metamask/snaps-sdk';
+import type { InterfaceContext, UserInputEvent } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
@@ -45,3 +45,12 @@ export type PermissionConfirmationProps<
     PermissionConfirmationContext<TPermissionType>,
     'permission' | 'address' | 'siteOrigin' | 'balance' | 'expiry' | 'chainId'
   >;
+
+/**
+ * The event handler function signature for handling snap user input events.
+ */
+export type EventHandler = (args: {
+  id: string;
+  event: UserInputEvent;
+  context: InterfaceContext | null;
+}) => Promise<void>;

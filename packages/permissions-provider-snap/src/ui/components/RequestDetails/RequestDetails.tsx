@@ -11,7 +11,11 @@ import {
 import { extractChain } from 'viem';
 import * as ALL_CHAINS from 'viem/chains';
 
-import { ASSET_ICONS, NETWORK_ICONS } from '../iconConstant';
+import { ASSET_ICONS, NETWORK_ICONS } from '../../iconConstant';
+
+export enum RequestDetailsEventNames {
+  ShowMoreButton = 'request-details.show-more-button',
+}
 
 type RequestDetailsProps = JsonObject & {
   siteOrigin: string;
@@ -72,12 +76,10 @@ const renderHiddableText = (text: string, hiddable?: boolean) => {
     return <Text>{text}</Text>;
   }
 
-  // TODO: Add the event handle logic to make the button interactive
-  const buttonName = 'request-details.hiddableText';
   return (
     <Box direction="horizontal">
       <Text color="muted">{`${text.slice(0, 12)}...`}</Text>
-      <Button name={buttonName}>Show more</Button>
+      <Button name={RequestDetailsEventNames.ShowMoreButton}>Show more</Button>
     </Box>
   );
 };
