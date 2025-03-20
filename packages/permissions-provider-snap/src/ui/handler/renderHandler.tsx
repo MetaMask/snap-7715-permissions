@@ -4,7 +4,7 @@ import {
   type ComponentOrElement,
   type SnapsProvider,
 } from '@metamask/snaps-sdk';
-import { Container, GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import { Container, type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { SupportedPermissionTypes } from '../../orchestrators';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
@@ -70,7 +70,7 @@ export const createPermissionConfirmationRenderHandler = ({
         },
       });
 
-      const confirmationResult = new Promise<boolean>((resolve) => {
+      const confirmationResult = new Promise<boolean>((resolve, reject) => {
         const onButtonClick = (event: UserInputEvent) => {
           let isConfirmationAccepted = false;
           switch (event.name) {
@@ -96,13 +96,18 @@ export const createPermissionConfirmationRenderHandler = ({
           eventType: UserInputEventType.ButtonClickEvent,
           handler: onButtonClick,
         });
-      });
 
-      snapsProvider.request({
-        method: 'snap_dialog',
-        params: {
-          id: interfaceId,
-        },
+        snapsProvider
+          .request({
+            method: 'snap_dialog',
+            params: {
+              id: interfaceId,
+            },
+          })
+          .catch((error) => {
+            const reason = error as Error;
+            reject(reason);
+          });
       });
 
       return {

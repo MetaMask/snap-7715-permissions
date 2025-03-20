@@ -14,6 +14,7 @@ import type { PermissionConfirmationProps } from '../types';
  * @param props.chainId - The chain ID.
  * @param props.address - The account address.
  * @param props.balance - The account balance.
+ * @param props.expiry - The expiry.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamConfirmationPage: SnapComponent<

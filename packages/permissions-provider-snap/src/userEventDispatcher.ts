@@ -16,8 +16,6 @@ export class UserEventDispatcher {
     UserEventHandler[]
   >;
 
-  constructor() {}
-
   /**
    * Register an event handler for a specific event type.
    *
@@ -32,10 +30,10 @@ export class UserEventDispatcher {
   }): UserEventDispatcher {
     const { eventType, handler } = args;
 
-    if (!this.#eventHandlers[eventType]) {
-      this.#eventHandlers[eventType] = [handler];
-    } else {
+    if (this.#eventHandlers[eventType]) {
       this.#eventHandlers[eventType].push(handler);
+    } else {
+      this.#eventHandlers[eventType] = [handler];
     }
 
     return this;

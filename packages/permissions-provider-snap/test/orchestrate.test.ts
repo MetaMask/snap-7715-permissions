@@ -1,4 +1,5 @@
 import { getDeleGatorEnvironment } from '@metamask-private/delegator-core-viem';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import { toHex, getAddress, parseUnits } from 'viem';
@@ -15,11 +16,7 @@ import {
   orchestrate,
 } from '../src/orchestrators';
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
-import type {
-  PermissionConfirmationContext,
-  PermissionConfirmationRenderHandler,
-} from '../src/ui';
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
+import type { PermissionConfirmationRenderHandler } from '../src/ui';
 
 describe('Orchestrate', () => {
   const address = getAddress('0x1234567890123456789012345678901234567890');

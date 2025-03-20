@@ -1,4 +1,5 @@
 import { createCaveatBuilder } from '@metamask-private/delegator-core-viem';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
@@ -14,7 +15,6 @@ import type {
   Orchestrator,
   PermissionContextMeta,
 } from './types';
-import { SnapsProvider } from '@metamask/snaps-sdk';
 
 /**
  * Arguments for running the orchestrate function.

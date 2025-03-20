@@ -37,6 +37,7 @@ export type RpcHandler = {
  * @param config.accountController - The account controller interface.
  * @param config.permissionConfirmationRenderHandler - The permission confirmation render handler.
  * @param config.permissionsContextBuilder - The permissions context builder.
+ * @param config.snapsProvider - The snaps provider.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {

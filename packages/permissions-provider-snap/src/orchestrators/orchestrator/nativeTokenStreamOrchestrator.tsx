@@ -6,7 +6,7 @@ import {
   type Permission,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
-import { InvalidParamsError, SnapsProvider } from '@metamask/snaps-sdk';
+import { InvalidParamsError, type SnapsProvider } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 
 import type { PermissionConfirmationContext } from '../../ui';
