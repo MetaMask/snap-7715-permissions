@@ -102,9 +102,8 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   ) => ComponentOrElement;
 
   resolveAttenuatedPermission: (args: {
-    interfaceId: string;
-    requestedPermission: PermissionTypeMapping['native-token-stream'];
-    snapsProvider: SnapsProvider;
+    requestedPermission: PermissionTypeMapping[TPermissionType];
+    requestedExpiry: number;
   }) => Promise<{
     expiry: number;
     permission: PermissionTypeMapping[TPermissionType];

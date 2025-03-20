@@ -1,5 +1,5 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import { Box, Divider, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
+import { Box, Divider } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountDetailsProps } from '../components';
 import { AccountDetails, Header, RequestDetails } from '../components';
@@ -19,7 +19,7 @@ import type { PermissionConfirmationProps } from '../types';
  */
 export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
-> = ({ siteOrigin, permission, chainId, address, balance, expiry }) => {
+> = ({ siteOrigin, permission, chainId, address, balance }) => {
   const accountDetailsProps: AccountDetailsProps = {
     accounts: [
       {
@@ -43,10 +43,6 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         chainId={chainId}
         justification={permission.data.justification}
       />
-      <Section>
-        <Text>Expiry</Text>
-        <Input name="expiry" value={expiry.toString()} />
-      </Section>
 
       <AccountDetails
         accounts={accountDetailsProps.accounts}

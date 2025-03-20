@@ -7,6 +7,7 @@ describe('UserEventDispatcher', () => {
   let userEventDispatcher: UserEventDispatcher;
   const eventType = UserInputEventType.ButtonClickEvent;
   const createHandlerMock = () => jest.fn<() => void>();
+  const interfaceId = '123';
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -19,6 +20,7 @@ describe('UserEventDispatcher', () => {
 
       const result = userEventDispatcher.on({
         eventType,
+        interfaceId,
         handler,
       });
 
@@ -31,11 +33,13 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher.on({
         eventType,
+        interfaceId,
         handler: handler1,
       });
 
       userEventDispatcher.on({
         eventType,
+        interfaceId,
         handler: handler2,
       });
 
@@ -43,6 +47,8 @@ describe('UserEventDispatcher', () => {
         event: {
           type: eventType,
         },
+        id: interfaceId,
+        context: null,
       });
 
       expect(handler1).toHaveBeenCalled();
@@ -55,11 +61,13 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher.on({
         eventType,
+        interfaceId,
         handler: handlerMatchingEventType,
       });
 
       userEventDispatcher.on({
         eventType: UserInputEventType.FileUploadEvent,
+        interfaceId,
         handler: handlerMismatchingEventType,
       });
 
@@ -67,10 +75,30 @@ describe('UserEventDispatcher', () => {
         event: {
           type: eventType,
         },
+        id: interfaceId,
+        context: null,
       });
 
       expect(handlerMatchingEventType).toHaveBeenCalled();
       expect(handlerMismatchingEventType).not.toHaveBeenCalled();
+    });
+
+    it('should not handlers for different interface ids', async () => {
+      const handler = createHandlerMock();
+
+      userEventDispatcher.on({
+        eventType,
+        interfaceId: '123',
+        handler,
+      });
+
+      await userEventDispatcher.handleUserInputEvent({
+        event: { type: eventType },
+        id: '456',
+        context: null,
+      });
+
+      expect(handler).not.toHaveBeenCalled();
     });
 
     it('should support method chaining', async () => {
@@ -80,10 +108,12 @@ describe('UserEventDispatcher', () => {
       const result = userEventDispatcher
         .on({
           eventType,
+          interfaceId,
           handler: handler1,
         })
         .on({
           eventType,
+          interfaceId,
           handler: handler2,
         });
 
@@ -93,6 +123,8 @@ describe('UserEventDispatcher', () => {
         event: {
           type: eventType,
         },
+        id: interfaceId,
+        context: null,
       });
 
       expect(handler1).toHaveBeenCalled();
@@ -106,6 +138,7 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher.on({
         eventType,
+        interfaceId,
         handler,
       });
 
@@ -113,6 +146,7 @@ describe('UserEventDispatcher', () => {
 
       const result = userEventDispatcher.off({
         eventType,
+        interfaceId,
         handler,
       });
 
@@ -122,6 +156,8 @@ describe('UserEventDispatcher', () => {
         event: {
           type: eventType,
         },
+        id: interfaceId,
+        context: null,
       });
 
       expect(handler).not.toHaveBeenCalled();
@@ -133,6 +169,7 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher.on({
         eventType,
+        interfaceId,
         handler: registeredHandler,
       });
 
@@ -140,6 +177,7 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher.off({
         eventType,
+        interfaceId,
         handler: unregisteredHandler,
       });
 
@@ -147,6 +185,8 @@ describe('UserEventDispatcher', () => {
         event: {
           type: eventType,
         },
+        id: interfaceId,
+        context: null,
       });
 
       expect(registeredHandler).toHaveBeenCalled();
@@ -160,6 +200,7 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher.off({
         eventType,
+        interfaceId,
         handler,
       });
 
@@ -167,6 +208,8 @@ describe('UserEventDispatcher', () => {
         event: {
           type: eventType,
         },
+        id: interfaceId,
+        context: null,
       });
 
       expect(handler).not.toHaveBeenCalled();
@@ -179,10 +222,12 @@ describe('UserEventDispatcher', () => {
       userEventDispatcher
         .on({
           eventType,
+          interfaceId,
           handler: handler1,
         })
         .on({
           eventType,
+          interfaceId,
           handler: handler2,
         });
 
@@ -190,6 +235,7 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher.off({
         eventType,
+        interfaceId,
         handler: handler1,
       });
 
@@ -197,6 +243,8 @@ describe('UserEventDispatcher', () => {
         event: {
           type: eventType,
         },
+        id: interfaceId,
+        context: null,
       });
 
       expect(handler1).not.toHaveBeenCalled();

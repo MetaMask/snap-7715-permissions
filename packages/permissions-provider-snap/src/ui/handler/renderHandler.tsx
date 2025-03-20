@@ -1,4 +1,8 @@
-import type { UserInputEvent } from '@metamask/snaps-sdk';
+import type {
+  ButtonClickEvent,
+  InterfaceContext,
+  UserInputEvent,
+} from '@metamask/snaps-sdk';
 import {
   UserInputEventType,
   type ComponentOrElement,
@@ -71,7 +75,7 @@ export const createPermissionConfirmationRenderHandler = ({
       });
 
       const confirmationResult = new Promise<boolean>((resolve, reject) => {
-        const onButtonClick = (event: UserInputEvent) => {
+        const onButtonClick = ({ event }: { event: ButtonClickEvent }) => {
           let isConfirmationAccepted = false;
           switch (event.name) {
             case GRANT_BUTTON:
@@ -86,6 +90,7 @@ export const createPermissionConfirmationRenderHandler = ({
 
           userEventDispatcher.off({
             eventType: UserInputEventType.ButtonClickEvent,
+            interfaceId,
             handler: onButtonClick,
           });
 
@@ -94,6 +99,7 @@ export const createPermissionConfirmationRenderHandler = ({
 
         userEventDispatcher.on({
           eventType: UserInputEventType.ButtonClickEvent,
+          interfaceId,
           handler: onButtonClick,
         });
 

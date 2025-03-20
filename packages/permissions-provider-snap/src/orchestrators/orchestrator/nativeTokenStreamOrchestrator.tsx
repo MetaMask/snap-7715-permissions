@@ -141,30 +141,18 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       return updatedCaveatBuilder;
     },
     resolveAttenuatedPermission: async ({
-      snapsProvider,
-      interfaceId,
       requestedPermission,
+      requestedExpiry,
     }: {
-      interfaceId: string;
       requestedPermission: PermissionTypeMapping['native-token-stream'];
-      snapsProvider: SnapsProvider;
+      requestedExpiry: number;
     }) => {
-      const interfaceState = (await snapsProvider.request({
-        method: 'snap_getInterfaceState',
-        params: { id: interfaceId },
-      })) as {
-        expiry: string;
-      };
-
-      const expiry = Number(interfaceState.expiry);
-
       const attenuatedPermission = {
         ...requestedPermission,
-        // todo: append any values that have been modified by the user
       };
 
       return {
-        expiry,
+        expiry: requestedExpiry,
         permission: attenuatedPermission,
       };
     },

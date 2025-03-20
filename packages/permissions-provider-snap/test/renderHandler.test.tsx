@@ -21,7 +21,7 @@ describe('Permission Confirmation Render Handler', () => {
   const mockUserEventDispatcher = new UserEventDispatcher();
 
   let onButtonClickHandlerPromise: Promise<
-    (event: UserInputEvent) => Promise<void>
+    (args: { event: UserInputEvent }) => Promise<void>
   >;
 
   (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
@@ -70,7 +70,7 @@ describe('Permission Confirmation Render Handler', () => {
     (mockUserEventDispatcher.off as jest.Mock).mockClear();
 
     onButtonClickHandlerPromise = new Promise<
-      (event: UserInputEvent) => Promise<void>
+      (args: { event: UserInputEvent }) => Promise<void>
     >((resolve, _) => {
       (mockUserEventDispatcher.on as jest.Mock).mockImplementation(
         ({ eventType, handler }) => {
@@ -113,8 +113,10 @@ describe('Permission Confirmation Render Handler', () => {
 
       // simulate clicking the grant button
       await onButtonClickHandler({
-        type: UserInputEventType.ButtonClickEvent,
-        name: GRANT_BUTTON,
+        event: {
+          type: UserInputEventType.ButtonClickEvent,
+          name: GRANT_BUTTON,
+        },
       });
 
       await expect(confirmationResult).resolves.toEqual(true);
@@ -137,6 +139,7 @@ describe('Permission Confirmation Render Handler', () => {
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
         eventType: UserInputEventType.ButtonClickEvent,
         handler: expect.any(Function),
+        interfaceId: mockInterfaceId,
       });
     });
 
@@ -169,8 +172,10 @@ describe('Permission Confirmation Render Handler', () => {
 
       // simulate clicking the cancel button
       await onButtonClickHandler({
-        type: UserInputEventType.ButtonClickEvent,
-        name: CANCEL_BUTTON,
+        event: {
+          type: UserInputEventType.ButtonClickEvent,
+          name: CANCEL_BUTTON,
+        },
       });
 
       await expect(confirmationResult).resolves.toEqual(false);
@@ -193,6 +198,7 @@ describe('Permission Confirmation Render Handler', () => {
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
         eventType: UserInputEventType.ButtonClickEvent,
         handler: expect.any(Function),
+        interfaceId: mockInterfaceId,
       });
     });
   });

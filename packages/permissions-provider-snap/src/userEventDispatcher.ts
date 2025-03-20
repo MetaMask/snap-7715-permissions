@@ -1,7 +1,33 @@
-import type { UserInputEvent, UserInputEventType } from '@metamask/snaps-sdk';
+import { logger } from '@metamask/7715-permissions-shared/utils';
+import type {
+  ButtonClickEvent,
+  FileUploadEvent,
+  FormSubmitEvent,
+  InputChangeEvent,
+  InterfaceContext,
+  UserInputEvent,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 
-type UserEventHandler = (event: UserInputEvent) => void | Promise<void>;
+type UserInputEventByType<TUserInputEventType extends UserInputEventType> = {
+  [UserInputEventType.ButtonClickEvent]: ButtonClickEvent;
+  [UserInputEventType.FormSubmitEvent]: FormSubmitEvent;
+  [UserInputEventType.InputChangeEvent]: InputChangeEvent;
+  [UserInputEventType.FileUploadEvent]: FileUploadEvent;
+}[TUserInputEventType];
 
+type UserEventHandler<TUserInputEventType extends UserInputEventType> = (args: {
+  event: UserInputEventByType<TUserInputEventType>;
+  context: InterfaceContext | null;
+}) => void | Promise<void>;
+
+const getUserInputEventKey = ({
+  eventType,
+  interfaceId,
+}: {
+  eventType: UserInputEventType;
+  interfaceId: string;
+}) => `${eventType}:${interfaceId}`;
 /**
  * Class responsible for dispatching user input events to registered handlers.
  * Provides a way to register, deregister, and dispatch event handlers
@@ -11,10 +37,9 @@ export class UserEventDispatcher {
   /**
    * Map of event types to array of event handlers
    */
-  readonly #eventHandlers = {} as Record<
-    UserInputEventType,
-    UserEventHandler[]
-  >;
+  readonly #eventHandlers = {} as {
+    [userInputEventKey: string]: UserEventHandler<UserInputEventType>[];
+  };
 
   /**
    * Register an event handler for a specific event type.
@@ -24,16 +49,26 @@ export class UserEventDispatcher {
    * @param args.handler - The callback function to execute when the event occurs.
    * @returns A reference to this instance for method chaining.
    */
-  public on(args: {
-    eventType: UserInputEventType;
-    handler: UserEventHandler;
+  public on<TUserInputEventType extends UserInputEventType>(args: {
+    eventType: TUserInputEventType;
+    interfaceId: string;
+    handler: UserEventHandler<TUserInputEventType>;
   }): UserEventDispatcher {
-    const { eventType, handler } = args;
+    const { eventType, handler, interfaceId } = args;
 
-    if (this.#eventHandlers[eventType]) {
-      this.#eventHandlers[eventType].push(handler);
+    const eventKey = getUserInputEventKey({
+      eventType,
+      interfaceId,
+    });
+
+    if (this.#eventHandlers[eventKey]) {
+      this.#eventHandlers[eventKey]?.push(
+        handler as UserEventHandler<UserInputEventType>,
+      );
     } else {
-      this.#eventHandlers[eventType] = [handler];
+      this.#eventHandlers[eventKey] = [
+        handler as UserEventHandler<UserInputEventType>,
+      ];
     }
 
     return this;
@@ -44,22 +79,31 @@ export class UserEventDispatcher {
    *
    * @param args - The event handler arguments as object.
    * @param args.eventType - The type of event to stop listening for.
+   * @param args.interfaceId - The id of the interface.
    * @param args.handler - The callback function to remove.
    * @returns A reference to this instance for method chaining.
    */
-  public off(args: {
-    eventType: UserInputEventType;
-    handler: UserEventHandler;
+  public off<TUserInputEventType extends UserInputEventType>(args: {
+    eventType: TUserInputEventType;
+    interfaceId: string;
+    handler: UserEventHandler<TUserInputEventType>;
   }): UserEventDispatcher {
-    const { eventType, handler } = args;
+    const { eventType, handler, interfaceId } = args;
 
-    const handlers = this.#eventHandlers[eventType];
+    const eventKey = getUserInputEventKey({
+      eventType,
+      interfaceId,
+    });
+
+    const handlers = this.#eventHandlers[eventKey];
 
     if (!handlers?.length) {
       return this;
     }
 
-    const index = handlers.indexOf(handler);
+    const index = handlers.indexOf(
+      handler as UserEventHandler<UserInputEventType>,
+    );
 
     if (index !== -1) {
       handlers.splice(index, 1);
@@ -74,13 +118,21 @@ export class UserEventDispatcher {
    *
    * @param args - The event handler arguments as object.
    * @param args.event - The event object containing type and name information.
+   * @param args.id - The id of the interface.
    */
   public async handleUserInputEvent(args: {
     event: UserInputEvent;
+    id: string;
+    context: InterfaceContext | null;
   }): Promise<void> {
-    const { event } = args;
+    const { event, id, context } = args;
 
-    const handlers = this.#eventHandlers[event.type];
+    const eventKey = getUserInputEventKey({
+      eventType: event.type,
+      interfaceId: id,
+    });
+
+    const handlers = this.#eventHandlers[eventKey];
 
     if (!handlers?.length) {
       return;
@@ -88,9 +140,15 @@ export class UserEventDispatcher {
 
     const handlersExecutions = handlers.map(async (handler) => {
       try {
-        await handler(event);
+        await handler({
+          event,
+          context,
+        });
       } catch (error) {
-        // Error in event handler
+        logger.error(
+          `Error in event handler for event type ${event.type} and interface id ${id}:`,
+          error,
+        );
       }
     });
 

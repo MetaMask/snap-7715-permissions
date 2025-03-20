@@ -87,8 +87,8 @@ export const orchestrate = async <
     address,
     siteOrigin: origin,
     balance,
-    expiry,
     chainId: chainIdNum,
+    expiry,
   };
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
@@ -104,9 +104,8 @@ export const orchestrate = async <
 
   const { permission: attenuatedPermission, expiry: attenuatedExpiry } =
     await orchestrator.resolveAttenuatedPermission({
-      interfaceId,
       requestedPermission: permission,
-      snapsProvider,
+      requestedExpiry: expiry,
     });
 
   await snapsProvider.request({
