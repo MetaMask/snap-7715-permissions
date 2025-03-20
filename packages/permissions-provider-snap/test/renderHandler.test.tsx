@@ -88,7 +88,8 @@ describe('Permission Confirmation Render Handler', () => {
       const mockInterfaceId = 'mock-interface-id';
       mockSnapProvider.request
         .mockResolvedValueOnce(mockInterfaceId) // snap_createInterface
-        .mockResolvedValueOnce({}); // snap_dialog
+        .mockResolvedValueOnce({}) // snap_dialog
+        .mockResolvedValueOnce({}); // snap_resolveInterface
 
       const permissionConfirmationRenderHandler =
         createPermissionConfirmationRenderHandler({
@@ -136,6 +137,11 @@ describe('Permission Confirmation Render Handler', () => {
 
       // close dialog and cleanup
 
+      expect(mockSnapProvider.request).toHaveBeenCalledWith({
+        method: 'snap_resolveInterface',
+        params: { id: mockInterfaceId, value: {} },
+      });
+
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
         eventType: UserInputEventType.ButtonClickEvent,
         handler: expect.any(Function),
@@ -147,7 +153,8 @@ describe('Permission Confirmation Render Handler', () => {
       const mockInterfaceId = 'mock-interface-id';
       mockSnapProvider.request
         .mockResolvedValueOnce(mockInterfaceId) // snap_createInterface
-        .mockResolvedValueOnce({}); // snap_dialog
+        .mockResolvedValueOnce({}) // snap_dialog
+        .mockResolvedValueOnce({}); // snap_resolveInterface
 
       const permissionConfirmationRenderHandler =
         createPermissionConfirmationRenderHandler({
@@ -194,6 +201,11 @@ describe('Permission Confirmation Render Handler', () => {
       });
 
       // close dialog and cleanup
+
+      expect(mockSnapProvider.request).toHaveBeenCalledWith({
+        method: 'snap_resolveInterface',
+        params: { id: mockInterfaceId, value: {} },
+      });
 
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
         eventType: UserInputEventType.ButtonClickEvent,

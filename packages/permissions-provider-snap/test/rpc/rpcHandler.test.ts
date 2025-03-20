@@ -36,7 +36,6 @@ describe('RpcHandler', () => {
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
       permissionsContextBuilder: mockPermissionsContextBuilder,
-      snapsProvider: mockSnapsProvider,
     });
   });
 

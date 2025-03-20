@@ -1,5 +1,4 @@
 import { createCaveatBuilder } from '@metamask-private/delegator-core-viem';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
@@ -27,7 +26,6 @@ export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
     orchestrateMeta: OrchestrateMeta<TPermissionType>;
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
     permissionsContextBuilder: PermissionsContextBuilder;
-    snapsProvider: SnapsProvider;
   };
 
 /**
@@ -69,7 +67,6 @@ export const orchestrate = async <
     orchestrateMeta,
     permissionConfirmationRenderHandler,
     permissionsContextBuilder,
-    snapsProvider,
   } = orchestrateArgs;
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;

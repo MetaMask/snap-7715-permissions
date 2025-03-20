@@ -70,7 +70,6 @@ describe('Orchestrate', () => {
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
       permissionsContextBuilder: mockPermissionsContextBuilder,
-      snapsProvider: mockSnapsProvider,
     };
 
     it('should orchestrate and return a successfuly 7715 response when user confirms', async () => {
