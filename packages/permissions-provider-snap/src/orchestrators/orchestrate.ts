@@ -93,7 +93,7 @@ export const orchestrate = async <
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
 
-  const { confirmationResult, interfaceId } =
+  const { confirmationResult } =
     await permissionConfirmationRenderHandler.createConfirmationDialog(
       uiContext,
       permissionDialog,
@@ -107,14 +107,6 @@ export const orchestrate = async <
       requestedPermission: permission,
       requestedExpiry: expiry,
     });
-
-  await snapsProvider.request({
-    method: 'snap_resolveInterface',
-    params: {
-      id: interfaceId,
-      value: {},
-    },
-  });
 
   if (!isConfirmationAccepted) {
     return {

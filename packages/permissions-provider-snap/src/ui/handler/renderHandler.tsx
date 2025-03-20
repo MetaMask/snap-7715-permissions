@@ -90,6 +90,14 @@ export const createPermissionConfirmationRenderHandler = ({
             handler: onButtonClick,
           });
 
+          snapsProvider.request({
+            method: 'snap_resolveInterface',
+            params: {
+              id: interfaceId,
+              value: {},
+            },
+          });
+
           resolve(isConfirmationAccepted);
         };
 
@@ -110,6 +118,14 @@ export const createPermissionConfirmationRenderHandler = ({
             const reason = error as Error;
             reject(reason);
           });
+      }).finally(() => {
+        snapsProvider.request({
+          method: 'snap_resolveInterface',
+          params: {
+            id: interfaceId,
+            value: {},
+          },
+        });
       });
 
       return {
