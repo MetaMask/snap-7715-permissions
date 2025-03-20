@@ -1,8 +1,4 @@
-import type {
-  ButtonClickEvent,
-  InterfaceContext,
-  UserInputEvent,
-} from '@metamask/snaps-sdk';
+import type { ButtonClickEvent } from '@metamask/snaps-sdk';
 import {
   UserInputEventType,
   type ComponentOrElement,

@@ -3,7 +3,7 @@ import type {
   PermissionResponse,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
-import type { ComponentOrElement, SnapsProvider } from '@metamask/snaps-sdk';
+import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Address, Hex, OneOf } from 'viem';
 

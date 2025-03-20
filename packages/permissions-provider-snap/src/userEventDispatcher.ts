@@ -46,6 +46,7 @@ export class UserEventDispatcher {
    *
    * @param args - The event handler arguments as object.
    * @param args.eventType - The type of event to listen for.
+   * @param args.interfaceId - The id of the interface to listen for events on.
    * @param args.handler - The callback function to execute when the event occurs.
    * @returns A reference to this instance for method chaining.
    */
@@ -119,6 +120,7 @@ export class UserEventDispatcher {
    * @param args - The event handler arguments as object.
    * @param args.event - The event object containing type and name information.
    * @param args.id - The id of the interface.
+   * @param args.context - The interface context object that can be modified by handlers.
    */
   public async handleUserInputEvent(args: {
     event: UserInputEvent;
