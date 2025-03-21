@@ -20,14 +20,15 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
 > = ({ siteOrigin, permission, chainId, address, balance }) => {
   const accountDetailsProps: AccountDetailsProps = {
-    accounts: [
-      {
-        address,
-        balance,
-        asset: 'ETH',
-      },
-    ],
-    permissionIndex: 0,
+    account: {
+      address,
+      assetBalance: balance,
+      value: 1000.5,
+    },
+    senderDetails: {
+      title: 'Stream from',
+      tooltip: 'Tooltip text',
+    },
   };
   return (
     <Box>
@@ -44,8 +45,8 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       />
 
       <AccountDetails
-        accounts={accountDetailsProps.accounts}
-        permissionIndex={accountDetailsProps.permissionIndex}
+        account={accountDetailsProps.account}
+        senderDetails={accountDetailsProps.senderDetails}
       />
     </Box>
   );
