@@ -114,7 +114,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
       return validatedPermission as PermissionTypeMapping['native-token-stream'];
     },
-    buildPermissionConfirmationPage: (
+    buildPermissionConfirmation: (
       context: PermissionConfirmationContext<'native-token-stream'>,
     ) => {
       return (
@@ -139,6 +139,22 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       );
 
       return updatedCaveatBuilder;
+    },
+    resolveAttenuatedPermission: async ({
+      requestedPermission,
+      requestedExpiry,
+    }: {
+      requestedPermission: PermissionTypeMapping['native-token-stream'];
+      requestedExpiry: number;
+    }) => {
+      const attenuatedPermission = {
+        ...requestedPermission,
+      };
+
+      return {
+        expiry: requestedExpiry,
+        permission: attenuatedPermission,
+      };
     },
   };
 };

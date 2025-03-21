@@ -45,12 +45,3 @@ export type PermissionConfirmationProps<
     PermissionConfirmationContext<TPermissionType>,
     'permission' | 'address' | 'siteOrigin' | 'balance' | 'expiry' | 'chainId'
   >;
-
-/**
- * The event handler function signature for handling snap user input events.
- */
-export type EventHandler = (args: {
-  id: string;
-  event: UserInputEvent;
-  context: InterfaceContext | null;
-}) => Promise<void>;

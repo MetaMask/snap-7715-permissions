@@ -188,11 +188,11 @@ describe('native-token-stream Orchestrator', () => {
     });
   });
 
-  describe('buildPermissionConfirmationPage', () => {
+  describe('buildPermissionConfirmation', () => {
     it('should return the native-token-stream confirmation page', async () => {
       const orchestrator = createPermissionOrchestrator(mockPermissionType);
 
-      const res = orchestrator.buildPermissionConfirmationPage(mockUiContext);
+      const res = orchestrator.buildPermissionConfirmation(mockUiContext);
 
       expect(res).toStrictEqual(mockPage);
     });

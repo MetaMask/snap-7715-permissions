@@ -19,10 +19,10 @@
   "scripts": {
     "build": "yarn workspaces foreach --parallel --topological --verbose run build",
     "build:pack": "yarn workspaces foreach --parallel --interlaced --verbose run build:pack",
-    "lint": "yarn lint:eslint && yarn lint:misc --check",
-    "lint:eslint": "eslint . --cache --ext js,jsx,ts,tsx",
-    "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
-    "lint:misc": "prettier '**/*.json' '**/*.md' '!**/CHANGELOG.md' '**/*.yml' --ignore-path .gitignore",
+    "lint": "yarn workspaces foreach --parallel run lint",
+    "lint:eslint": "yarn workspaces foreach --parallel run lint:eslint",
+    "lint:fix": "yarn workspaces foreach --parallel run lint:fix",
+    "lint:misc": "yarn workspaces foreach --parallel run lint:misc",
     "start": "yarn workspaces foreach --parallel --interlaced --verbose run start",
     "test": "yarn workspaces foreach --parallel --interlaced --verbose run test"
   },

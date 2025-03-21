@@ -28,15 +28,15 @@ type ItemDetails = {
   label: string;
   text: string;
   tooltipText?: string;
-  hiddable?: boolean;
-  icon?: string;
+  isHideable?: boolean;
+  iconUrl?: string;
 };
 
 /**
  * Renders a tooltip with the given text.
  *
  * @param tooltipText - The text to display in the tooltip.
- * @returns A tooltip component.
+ * @returns A tooltip component or null if no tooltip text is specified.
  */
 const renderTooltip = (tooltipText?: string) => {
   if (!tooltipText) {
@@ -53,32 +53,36 @@ const renderTooltip = (tooltipText?: string) => {
 /**
  * Renders an icon with the given URL.
  *
- * @param icon - The URL of the icon to display.
- * @returns An image component.
+ * @param iconUrl - The URL of the icon to display.
+ * @returns An image component null if no icon url is specified.
  */
-const renderIconAsImage = (icon?: string) => {
-  if (!icon) {
+const renderIconAsImage = (iconUrl?: string) => {
+  if (!iconUrl) {
     return null;
   }
 
-  return <Image src={icon} />;
+  return <Image src={iconUrl} />;
 };
 
 /**
- * Renders the text with the option to show more.
+ * Renders a text component or a text component with a button to show more.
  *
  * @param text - The text to display.
- * @param hiddable - Whether the text is hiddable.
- * @returns A text component.
+ * @param isHideable - Whether the text is isHideable.
+ * @returns A text component or a text component with a button to show more.
  */
-const renderHiddableText = (text: string, hiddable?: boolean) => {
-  if (!hiddable) {
+const renderIsHideableText = (text: string, isHideable?: boolean) => {
+  if (!isHideable) {
     return <Text>{text}</Text>;
   }
 
   return (
     <Box direction="horizontal">
-      <Text color="muted">{`${text.slice(0, 12)}...`}</Text>
+      {isHideable ? (
+        <Text color="muted">{`${text.slice(0, 12)}...`}</Text>
+      ) : (
+        <Text color="muted">text</Text>
+      )}
       <Button name={RequestDetailsEventNames.ShowMoreButton}>Show more</Button>
     </Box>
   );
@@ -88,7 +92,7 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
   siteOrigin,
   justification,
   chainId,
-  asset,
+  asset, // TODO: Update to use caip-19 asset
 }) => {
   // @ts-expect-error - extractChain does not work well with dynamic `chains`
   const chain = extractChain({
@@ -111,18 +115,18 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
     {
       label: 'Network',
       text: chain.name,
-      icon: networkIcon,
+      iconUrl: networkIcon,
     },
     {
       label: 'Token',
       text: asset,
-      icon: assetIcon,
+      iconUrl: assetIcon,
     },
     {
       label: 'Reason',
       text: justification ?? 'No reason provided',
       tooltipText: 'Tooltip text',
-      hiddable: true,
+      isHideable: true,
     },
   ];
 
@@ -133,8 +137,8 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
         {renderTooltip(item.tooltipText)}
       </Box>
       <Box direction="horizontal">
-        {renderIconAsImage(item.icon)}
-        {renderHiddableText(item.text, item.hiddable)}
+        {renderIconAsImage(item.iconUrl)}
+        {renderIsHideableText(item.text, item.isHideable)}
       </Box>
     </Box>
   ));
