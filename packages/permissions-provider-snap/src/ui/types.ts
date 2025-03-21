@@ -1,5 +1,5 @@
 import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
-import type { InterfaceContext, UserInputEvent } from '@metamask/snaps-sdk';
+import type { InterfaceContext } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
