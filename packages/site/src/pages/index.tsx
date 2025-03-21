@@ -5,13 +5,12 @@ import { createClient, custom } from 'viem';
 import {
   ConnectButton,
   InstallFlaskButton,
-  ReconnectButton,
   CustomMessageButton,
   Card,
 } from '../components';
 import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import { useMetaMask, useMetaMaskContext, useRequestSnap } from '../hooks';
-import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
+import { isLocalSnap } from '../utils';
 import { erc7715ProviderActions } from '@metamask-private/delegator-core-viem/experimental';
 import { sepolia } from 'viem/chains';
 
@@ -62,7 +61,7 @@ const CardContainer = styled.div`
   margin-top: 1.5rem;
 `;
 
-const Notice = styled.div`
+const Box = styled.div`
   background-color: ${({ theme }) => theme.colors.background?.alternative};
   border: 1px solid ${({ theme }) => theme.colors.border?.default};
   color: ${({ theme }) => theme.colors.text?.alternative};
@@ -71,7 +70,7 @@ const Notice = styled.div`
   margin-top: 2.4rem;
   max-width: 60rem;
   width: 100%;
-
+  overflow-x: hidden;
   & > * {
     margin: 0;
   }
@@ -99,22 +98,41 @@ const ErrorMessage = styled.div`
   }
 `;
 
-const LogWrapper = styled.pre`
-  background-color: ${(props) => props.theme.colors.primary?.default};
-  padding: 1rem;
-  border-radius: 0.5rem;
-  width: 50%;
-  height: 16rem;
-  overflow-x: auto;
-  overflow-y: auto;
-  word-break: break-word;
+const StyledForm = styled.form`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+
+  label {
+    display: inline-block;
+    width: 150px;
+    margin-right: 1rem;
+    font-weight: 500;
+  }
+
+  textarea,
+  input {
+    padding: 0.8rem;
+    border: 1px solid ${({ theme }) => theme.colors.border?.default};
+    border-radius: 5px;
+    flex-grow: 1;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  }
 `;
 
 const Index = () => {
   const { error } = useMetaMaskContext();
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
-  const requestGatorSnap = useRequestSnap(gatorSnapOrigin);
+  const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
 
   const metaMaskClient = useMemo(() => {
     if (!provider) return undefined;
@@ -132,26 +150,68 @@ const Index = () => {
   const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
     ? isFlask
     : snapsDetected;
+
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
   const mockDappSessionAccount = '0x016562aA41A8697720ce0943F003141f5dEAe006';
   const chainId = sepolia.id;
-  const expiry = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now (unix timestamp in seconds)
-  const now = Math.floor(Date.now() / 1000); // now (unix timestamp in seconds)
+  const [initialAmount, setInitialAmount] = useState<bigint>(1n);
+  const [amountPerSecond, setAmountPerSecond] = useState<bigint>(1n);
+  const [maxAmount, setMaxAmount] = useState<bigint>(2000n);
+  const [startTime, setStartTime] = useState<number>(
+    Math.floor(Date.now() / 1000),
+  );
+  const [expiry, setExpiry] = useState<number>(
+    Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
+  );
+  const [justification, setJustification] = useState<string>('Money please!');
+  const [permissionType, setPermissionType] = useState<string>(
+    'native-token-stream',
+  );
+  const [permissionResponse, setPermissionResponse] = useState<any>(null);
+  const handleInitialAmountChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = event.target.value;
+    setInitialAmount(BigInt(value));
+  };
 
-  const [log, setLog] = useState<string[]>([]);
-  const appendToLog = (action: string, response: any) => {
-    const timestamp = new Date().toISOString();
-    const body = JSON.stringify(
-      response,
-      (_, value: any) =>
-        typeof value === 'bigint' || typeof value === 'number'
-          ? BigInt(value).toString()
-          : value,
-      2,
-    );
-    const logEntry = `${timestamp} - ${action}:\n${body}`;
-    setLog((prevLog) => [...prevLog, logEntry]);
+  const handleAmountPerSecondChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = event.target.value;
+    setAmountPerSecond(BigInt(value));
+  };
+
+  const handleMaxAmountChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = event.target.value;
+    setMaxAmount(BigInt(value));
+  };
+
+  const handleStartTimeChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = event.target.value;
+    setStartTime(Number(value));
+  };
+
+  const handleJustificationChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setJustification(event.target.value);
+  };
+
+  const handleExpiryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setExpiry(Number(value));
+  };
+
+  const handlePermissionTypeChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setPermissionType(event.target.value);
   };
 
   const handleGrantPermissions = async () => {
@@ -167,13 +227,13 @@ const Index = () => {
         },
         permissions: [
           {
-            type: 'native-token-stream',
+            type: permissionType,
             data: {
-              justification: 'shh...permission 1',
-              initialAmount: '0x1',
-              amountPerSecond: '0x1',
-              startTime: now,
-              maxAmount: '0x2',
+              justification,
+              initialAmount,
+              amountPerSecond,
+              startTime,
+              maxAmount,
             },
           },
         ],
@@ -183,105 +243,7 @@ const Index = () => {
     const response = await metaMaskClient?.grantPermissions(
       permissionsRequests,
     );
-
-    appendToLog('Request Permission(single permission)', response);
-  };
-
-  const handleGrantPermissionsMulti = async () => {
-    const permissionsRequests = [
-      {
-        chainId,
-        expiry,
-        signer: {
-          type: 'account',
-          data: {
-            address: mockDappSessionAccount,
-          },
-        },
-        permissions: [
-          {
-            type: 'native-token-stream',
-            data: {
-              justification: 'shh...permission 1',
-              initialAmount: '0x1',
-              amountPerSecond: '0x1',
-              startTime: now,
-              maxAmount: '0x2',
-            },
-          },
-        ],
-      },
-      {
-        chainId,
-        expiry,
-        signer: {
-          type: 'account',
-          data: {
-            address: mockDappSessionAccount,
-          },
-        },
-        permissions: [
-          {
-            type: 'erc20-token-stream',
-            data: {
-              justification: 'shh...permission 2',
-            },
-          },
-        ],
-      },
-      {
-        chainId,
-        expiry,
-        signer: {
-          type: 'account',
-          data: {
-            address: mockDappSessionAccount,
-          },
-        },
-        permissions: [
-          {
-            type: 'erc20-token-stream',
-            data: {
-              justification: 'shh...permission 3',
-            },
-          },
-        ],
-      },
-    ];
-    const response = await metaMaskClient?.grantPermissions(
-      permissionsRequests,
-    );
-
-    appendToLog('Request Permission(Multi permissions)', response);
-  };
-
-  const handleGrantPermissionsNoOffer = async () => {
-    const permissionsRequests = [
-      {
-        chainId,
-        expiry,
-        signer: {
-          type: 'account',
-          data: {
-            address: mockDappSessionAccount,
-          },
-        },
-        permissions: [
-          {
-            type: 'erc721-token-transfer', // This permission type is not registered by gator snap
-            data: {
-              justification: 'shh',
-              allowance: '0x1DCD6500',
-            },
-          },
-        ],
-      },
-    ];
-    const response = await metaMaskClient?.grantPermissions(
-      permissionsRequests,
-    );
-
-    appendToLog('Request Permission(offer not registered)', response);
+    setPermissionResponse(response);
   };
 
   return (
@@ -292,15 +254,98 @@ const Index = () => {
       <Subtitle>
         Get started by installing snaps and sending permissions requests.
       </Subtitle>
-      <LogWrapper>
-        {log.length > 0 ? log.join('\n\n') : 'No actions logged...'}
-      </LogWrapper>
+
       <CardContainer>
         {error && (
           <ErrorMessage>
             <b>An error happened:</b> {error.message}
           </ErrorMessage>
         )}
+
+        {permissionResponse && (
+          <Box style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
+          </Box>
+        )}
+        <Box>
+          <StyledForm>
+            <div>
+              <label htmlFor="permissionType">Permission Type:</label>
+              <input
+                type="text"
+                id="permissionType"
+                name="permissionType"
+                value={permissionType}
+                onChange={handlePermissionTypeChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="initialAmount">Initial Amount:</label>
+              <input
+                type="text"
+                id="initialAmount"
+                name="initialAmount"
+                value={initialAmount.toString()}
+                onChange={handleInitialAmountChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="amountPerSecond">Amount Per Second:</label>
+              <input
+                type="text"
+                id="amountPerSecond"
+                name="amountPerSecond"
+                value={amountPerSecond.toString()}
+                onChange={handleAmountPerSecondChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="maxAmount">Max Amount:</label>
+              <input
+                type="text"
+                id="maxAmount"
+                name="maxAmount"
+                value={maxAmount.toString()}
+                onChange={handleMaxAmountChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="startTime">Start Time:</label>
+              <input
+                type="number"
+                id="startTime"
+                name="startTime"
+                value={startTime}
+                onChange={handleStartTimeChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="justification">Justification:</label>
+              <textarea
+                id="justification"
+                name="justification"
+                rows={3}
+                value={justification}
+                onChange={handleJustificationChange}
+              ></textarea>
+            </div>
+            <div>
+              <label htmlFor="expiry">Expiry:</label>
+              <input
+                type="number"
+                id="expiry"
+                name="expiry"
+                value={expiry}
+                onChange={handleExpiryChange}
+              />
+            </div>
+          </StyledForm>
+          <CustomMessageButton
+            text="Grant Permission"
+            onClick={handleGrantPermissions}
+          />
+        </Box>
+
         {!isMetaMaskReady && (
           <Card
             content={{
@@ -313,138 +358,46 @@ const Index = () => {
           />
         )}
 
-        {/* Show connect buttons */}
-        {!isKernelSnapReady && (
-          <Card
-            content={{
-              title: 'Connect(kernel)',
-              description:
-                'Get started by connecting to and installing the kernel snap.',
-              button: (
-                <ConnectButton
-                  onClick={requestKernelSnap}
-                  disabled={!isMetaMaskReady}
-                />
-              ),
-            }}
-            disabled={!isMetaMaskReady}
-          />
-        )}
-        {!isGatorSnapReady && (
-          <Card
-            content={{
-              title: 'Connect(gator)',
-              description:
-                'Get started by connecting to and installing the gator snap.',
-              button: (
-                <ConnectButton
-                  onClick={requestGatorSnap}
-                  disabled={!isMetaMaskReady}
-                />
-              ),
-            }}
-            disabled={!isMetaMaskReady}
-          />
-        )}
-
-        {/* Show reconnect buttons */}
-        {shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin]) && (
-          <Card
-            content={{
-              title: 'Reconnect(kernel)',
-              description:
-                'While connected to a local running kernel snap this button will always be displayed in order to update the snap if a change is made.',
-              button: (
-                <ReconnectButton
-                  onClick={requestKernelSnap}
-                  disabled={!isKernelSnapReady}
-                />
-              ),
-            }}
-            disabled={!isKernelSnapReady}
-          />
-        )}
-        {shouldDisplayReconnectButton(installedSnaps[gatorSnapOrigin]) && (
-          <Card
-            content={{
-              title: 'Reconnect(gator)',
-              description:
-                'While connected to a local running gator snap this button will always be displayed in order to update the snap if a change is made.',
-              button: (
-                <ReconnectButton
-                  onClick={requestGatorSnap}
-                  disabled={!isGatorSnapReady}
-                />
-              ),
-            }}
-            disabled={!isGatorSnapReady}
-          />
-        )}
-
-        {/* Send permissions request */}
         <Card
           content={{
-            title: 'Grant Permission',
-            description: 'Send a single 7715 permission request to MetaMask.',
-            button: (
-              <CustomMessageButton
-                text="Grant Permission"
-                onClick={handleGrantPermissions}
-              />
-            ),
-          }}
-          fullWidth={
-            isMetaMaskReady &&
-            Boolean(installedSnaps[kernelSnapOrigin]) &&
-            !shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])
-          }
-        />
-
-        <Card
-          content={{
-            title: 'Grant Permissions',
-            description: 'Send a multiple 7715 permission request to MetaMask.',
-            button: (
-              <CustomMessageButton
-                text="Grant Permissions"
-                onClick={handleGrantPermissionsMulti}
-                disabled={!installedSnaps[kernelSnapOrigin]}
-              />
-            ),
-          }}
-          fullWidth={
-            isMetaMaskReady &&
-            Boolean(installedSnaps[kernelSnapOrigin]) &&
-            !shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])
-          }
-        />
-
-        <Card
-          content={{
-            title: 'Grant Permission(no offer registered)',
+            title: `${isKernelSnapReady ? 'Reconnect' : 'Connect'}(kernel)`,
             description:
-              'Send a single 7715 permission request to MetaMask with a type that is not registered by gator snap.',
+              'Get started by connecting to and installing the kernel snap.',
             button: (
-              <CustomMessageButton
-                text="Grant Permission(no offer registered)"
-                onClick={handleGrantPermissionsNoOffer}
+              <ConnectButton
+                onClick={requestKernelSnap}
+                disabled={!isMetaMaskReady}
+                isReconnect={isKernelSnapReady}
               />
             ),
           }}
-          fullWidth={
-            isMetaMaskReady &&
-            Boolean(installedSnaps[kernelSnapOrigin]) &&
-            !shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])
-          }
+          disabled={!isMetaMaskReady}
         />
-        <Notice>
+
+        <Card
+          content={{
+            title: `${isGatorSnapReady ? 'Reconnect' : 'Connect'}(provider)`,
+            description:
+              'Get started by connecting to and installing the permission provider snap.',
+            button: (
+              <ConnectButton
+                onClick={requestPermissionSnap}
+                disabled={!isMetaMaskReady}
+                isReconnect={isGatorSnapReady}
+              />
+            ),
+          }}
+          disabled={!isMetaMaskReady}
+        />
+
+        <Box>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}
             <b>package.json</b> must be located in the server root directory and
             the bundle must be hosted at the location specified by the location
             field.
           </p>
-        </Notice>
+        </Box>
       </CardContainer>
     </Container>
   );
