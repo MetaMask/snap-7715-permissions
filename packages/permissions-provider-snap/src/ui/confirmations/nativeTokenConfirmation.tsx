@@ -14,16 +14,24 @@ import type { PermissionConfirmationProps } from '../types';
  * @param props.chainId - The chain ID.
  * @param props.address - The account address.
  * @param props.balance - The account balance.
+ * @param props.valueFormattedAsCurrency - The account balance formatted as currency that matches the user's preferences.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
-> = ({ siteOrigin, permission, chainId, address, balance }) => {
+> = ({
+  siteOrigin,
+  permission,
+  chainId,
+  address,
+  balance,
+  valueFormattedAsCurrency,
+}) => {
   const accountDetailsProps: AccountDetailsProps = {
     account: {
       address,
-      assetBalance: balance,
-      value: 1000.5,
+      balance,
+      valueFormattedAsCurrency,
     },
     senderDetails: {
       title: 'Stream from',

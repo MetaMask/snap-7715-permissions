@@ -16,6 +16,7 @@ import {
   orchestrate,
 } from '../src/orchestrators';
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
+import type { TokenPricesService } from '../src/services';
 import type { PermissionConfirmationRenderHandler } from '../src/ui';
 
 describe('Orchestrate', () => {
@@ -52,6 +53,9 @@ describe('Orchestrate', () => {
     const mockPermissionsContextBuilder = {
       buildPermissionsContext: jest.fn(),
     } as jest.Mocked<PermissionsContextBuilder>;
+    const mockTokenPricesService = {
+      getCryptoToFiatConversion: jest.fn(),
+    } as unknown as jest.Mocked<TokenPricesService>;
     const orchestrator = createPermissionOrchestrator(mockPermissionType);
     const mockSnapsProvider = createMockSnapsProvider();
 
@@ -70,6 +74,7 @@ describe('Orchestrate', () => {
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
       permissionsContextBuilder: mockPermissionsContextBuilder,
+      tokenPricesService: mockTokenPricesService,
     };
 
     it('should orchestrate and return a successfuly 7715 response when user confirms', async () => {

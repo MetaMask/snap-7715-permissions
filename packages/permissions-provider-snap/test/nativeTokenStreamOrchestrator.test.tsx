@@ -46,6 +46,7 @@ describe('native-token-stream Orchestrator', () => {
     balance: '0x1',
     expiry: 1,
     chainId: 11155111,
+    valueFormattedAsCurrency: '$1,000.00',
   };
 
   const mockPage = (
@@ -56,6 +57,7 @@ describe('native-token-stream Orchestrator', () => {
       balance={mockUiContext.balance}
       expiry={mockUiContext.expiry}
       chainId={mockUiContext.chainId}
+      valueFormattedAsCurrency={mockUiContext.valueFormattedAsCurrency}
     />
   );
 

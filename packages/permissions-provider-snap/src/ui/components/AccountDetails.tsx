@@ -14,8 +14,8 @@ import { formatTokenBalance } from '../../utils';
 export type AccountDetailsProps = {
   account: {
     address: Hex;
-    value: number;
-    assetBalance: string;
+    valueFormattedAsCurrency: string;
+    balance: string;
   };
   senderDetails: {
     title: string;
@@ -27,7 +27,7 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
   account,
   senderDetails,
 }) => {
-  const { address, assetBalance, value } = account;
+  const { address, balance, valueFormattedAsCurrency } = account;
   const { title, tooltip } = senderDetails;
   return (
     <Section>
@@ -43,9 +43,9 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
         </Box>
 
         <Box direction="horizontal" alignment="end">
-          <Text color="muted">${value.toString()}</Text>
+          <Text color="muted">{valueFormattedAsCurrency}</Text>
           <Text color="alternative">
-            {`${formatTokenBalance(assetBalance)}`} available
+            {`${formatTokenBalance(balance)}`} available
           </Text>
         </Box>
       </Box>

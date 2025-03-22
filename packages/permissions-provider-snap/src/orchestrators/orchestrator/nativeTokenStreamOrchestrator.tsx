@@ -125,6 +125,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           balance={context.balance}
           expiry={context.expiry}
           chainId={context.chainId}
+          valueFormattedAsCurrency={context.valueFormattedAsCurrency}
         />
       );
     },

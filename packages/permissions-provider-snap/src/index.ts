@@ -8,10 +8,12 @@ import {
 import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
+import { PriceApiClient } from './clients';
 import { createPermissionsContextBuilder } from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { TokenPricesService } from './services';
 import { createPermissionConfirmationRenderHandler } from './ui';
 import { UserEventDispatcher } from './userEventDispatcher';
 
@@ -30,10 +32,15 @@ const permissionConfirmationRenderHandler =
     userEventDispatcher,
   });
 
+// eslint-disable-next-line no-restricted-globals
+const priceApiClient = new PriceApiClient(process.env.PRICE_API_BASE_URL ?? '');
+const tokenPricesService = new TokenPricesService(priceApiClient, snap);
+
 const rpcHandler = createRpcHandler({
   accountController,
   permissionConfirmationRenderHandler,
   permissionsContextBuilder: createPermissionsContextBuilder(accountController),
+  tokenPricesService,
 });
 
 // configure RPC methods bindings
