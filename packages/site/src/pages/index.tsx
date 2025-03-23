@@ -70,7 +70,7 @@ const Box = styled.div`
   margin-top: 2.4rem;
   max-width: 60rem;
   width: 100%;
-  overflow-x: hidden;
+
   & > * {
     margin: 0;
   }
@@ -106,7 +106,7 @@ const StyledForm = styled.form`
 
   label {
     display: inline-block;
-    width: 150px;
+    width: 9rem;
     margin-right: 1rem;
     font-weight: 500;
   }
@@ -115,7 +115,7 @@ const StyledForm = styled.form`
   input {
     padding: 0.8rem;
     border: 1px solid ${({ theme }) => theme.colors.border?.default};
-    border-radius: 5px;
+    border-radius: 0.3rem;
     flex-grow: 1;
   }
 
@@ -128,14 +128,42 @@ const StyledForm = styled.form`
   }
 `;
 
+const ResponseContainer = styled.div`
+  position: relative;
+  max-height: 50rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
+const CopyButton = styled.button`
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  background-color: ${({ theme }) => theme.colors.primary?.default};
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primary?.alternative};
+  }
+  cursor: pointer;
+  font-size: 2rem;
+`;
+
 const Index = () => {
   const { error } = useMetaMaskContext();
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
 
+  const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
+    ? isFlask
+    : snapsDetected;
+
   const metaMaskClient = useMemo(() => {
-    if (!provider) return undefined;
+    if (!provider || !isMetaMaskReady) return undefined;
 
     return createClient({
       transport: custom(provider),
@@ -145,11 +173,7 @@ const Index = () => {
         providerSnapId: gatorSnapOrigin,
       }),
     );
-  }, [provider, kernelSnapOrigin, gatorSnapOrigin]);
-
-  const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
-    ? isFlask
-    : snapsDetected;
+  }, [provider, kernelSnapOrigin, gatorSnapOrigin, isMetaMaskReady]);
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
@@ -169,6 +193,8 @@ const Index = () => {
     'native-token-stream',
   );
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
+  const [isCopied, setIsCopied] = useState(false);
+
   const handleInitialAmountChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -246,6 +272,20 @@ const Index = () => {
     setPermissionResponse(response);
   };
 
+  const handleCopyToClipboard = () => {
+    if (permissionResponse) {
+      navigator.clipboard
+        .writeText(JSON.stringify(permissionResponse, null, 2))
+        .then(() => {
+          setIsCopied(true);
+          setTimeout(() => setIsCopied(false), 2000);
+        })
+        .catch((err) => {
+          console.error('Failed to copy: ', err);
+        });
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -263,88 +303,98 @@ const Index = () => {
         )}
 
         {permissionResponse && (
-          <Box style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
+          <Box>
+            <ResponseContainer>
+              <CopyButton
+                onClick={handleCopyToClipboard}
+                title={'Copy to clipboard'}
+              >
+                {isCopied ? '✅' : '📝'}
+              </CopyButton>
+              <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
+            </ResponseContainer>
           </Box>
         )}
-        <Box>
-          <StyledForm>
-            <div>
-              <label htmlFor="permissionType">Permission Type:</label>
-              <input
-                type="text"
-                id="permissionType"
-                name="permissionType"
-                value={permissionType}
-                onChange={handlePermissionTypeChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="initialAmount">Initial Amount:</label>
-              <input
-                type="text"
-                id="initialAmount"
-                name="initialAmount"
-                value={initialAmount.toString()}
-                onChange={handleInitialAmountChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="amountPerSecond">Amount Per Second:</label>
-              <input
-                type="text"
-                id="amountPerSecond"
-                name="amountPerSecond"
-                value={amountPerSecond.toString()}
-                onChange={handleAmountPerSecondChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="maxAmount">Max Amount:</label>
-              <input
-                type="text"
-                id="maxAmount"
-                name="maxAmount"
-                value={maxAmount.toString()}
-                onChange={handleMaxAmountChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="startTime">Start Time:</label>
-              <input
-                type="number"
-                id="startTime"
-                name="startTime"
-                value={startTime}
-                onChange={handleStartTimeChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="justification">Justification:</label>
-              <textarea
-                id="justification"
-                name="justification"
-                rows={3}
-                value={justification}
-                onChange={handleJustificationChange}
-              ></textarea>
-            </div>
-            <div>
-              <label htmlFor="expiry">Expiry:</label>
-              <input
-                type="number"
-                id="expiry"
-                name="expiry"
-                value={expiry}
-                onChange={handleExpiryChange}
-              />
-            </div>
-          </StyledForm>
-          <CustomMessageButton
-            text="Grant Permission"
-            onClick={handleGrantPermissions}
-          />
-        </Box>
+        {metaMaskClient && (
+          <Box style={{ position: 'relative' }}>
+            <StyledForm>
+              <div>
+                <label htmlFor="permissionType">Permission Type:</label>
+                <input
+                  type="text"
+                  id="permissionType"
+                  name="permissionType"
+                  value={permissionType}
+                  onChange={handlePermissionTypeChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="initialAmount">Initial Amount:</label>
+                <input
+                  type="text"
+                  id="initialAmount"
+                  name="initialAmount"
+                  value={initialAmount.toString()}
+                  onChange={handleInitialAmountChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="amountPerSecond">Amount Per Second:</label>
+                <input
+                  type="text"
+                  id="amountPerSecond"
+                  name="amountPerSecond"
+                  value={amountPerSecond.toString()}
+                  onChange={handleAmountPerSecondChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="maxAmount">Max Amount:</label>
+                <input
+                  type="text"
+                  id="maxAmount"
+                  name="maxAmount"
+                  value={maxAmount.toString()}
+                  onChange={handleMaxAmountChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="startTime">Start Time:</label>
+                <input
+                  type="number"
+                  id="startTime"
+                  name="startTime"
+                  value={startTime}
+                  onChange={handleStartTimeChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="justification">Justification:</label>
+                <textarea
+                  id="justification"
+                  name="justification"
+                  rows={3}
+                  value={justification}
+                  onChange={handleJustificationChange}
+                ></textarea>
+              </div>
+              <div>
+                <label htmlFor="expiry">Expiry:</label>
+                <input
+                  type="number"
+                  id="expiry"
+                  name="expiry"
+                  value={expiry}
+                  onChange={handleExpiryChange}
+                />
+              </div>
+            </StyledForm>
+            <CustomMessageButton
+              text="Grant Permission"
+              onClick={handleGrantPermissions}
+            />
+          </Box>
+        )}
 
         {!isMetaMaskReady && (
           <Card
