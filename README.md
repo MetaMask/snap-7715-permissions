@@ -79,8 +79,9 @@ When CI runs, it will use the `SNAP_ENV=production` value. If this value is chan
 1. Set the .env `SNAP_ENV=production` in:
    - `./packages/permissions-kernel-snap/.env`
    - `./packages/permissions-provider-snap/.env`
-2. Building the snaps with `yarn build` should update the shasum if applicable.
-3. Push changes to your remote branch.
+2. Set `PRICE_API_BASE_URL=<prod_base_url>` in `./packages/permissions-provider-snap/.env` to
+3. Building the snaps with `yarn build` should update the shasum if applicable.
+4. Push changes to your remote branch.
 
 ### Using NPM packages with scripts
 
