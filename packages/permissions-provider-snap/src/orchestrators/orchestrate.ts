@@ -162,7 +162,7 @@ export const orchestrate = async <
           address: sessionAccount,
         },
       },
-      permissions: [attenuatedPermission],
+      permission: attenuatedPermission,
       context: permissionContext,
       accountMeta:
         accountMeta.factory && accountMeta.factoryData
