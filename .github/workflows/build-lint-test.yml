@@ -28,6 +28,7 @@ jobs:
       - prepare
     env:
       SNAP_ENV: production
+      PRICE_API_BASE_URL: ${{ secrets.PRICE_API_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -93,6 +94,7 @@ jobs:
       - build
     env:
       SNAP_ENV: production
+      PRICE_API_BASE_URL: ${{ secrets.PRICE_API_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js

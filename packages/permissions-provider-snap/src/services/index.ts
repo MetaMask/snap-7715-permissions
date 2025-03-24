@@ -1,1 +1,1 @@
-export * from './TokenPricesService';
+export * from './tokenPricesService';

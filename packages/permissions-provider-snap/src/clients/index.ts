@@ -1,2 +1,2 @@
-export * from './PriceApiClient';
+export * from './priceApiClient';
 export * from './types';
