@@ -1,8 +1,16 @@
+// TODO: Add more currencies and locales that we support
 export type Locale = 'en';
 
 export type Preferences = {
   locale: Locale;
   currency: string;
+};
+
+// Default Preferences, to be used if there is not a valid translation in
+// the requested locale.
+export const FALLBACK_PREFERENCE: Preferences = {
+  locale: 'en',
+  currency: 'USD',
 };
 
 /**

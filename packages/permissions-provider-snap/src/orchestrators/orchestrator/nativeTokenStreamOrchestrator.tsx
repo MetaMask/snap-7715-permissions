@@ -157,5 +157,12 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         permission: attenuatedPermission,
       };
     },
+    getTokenCaipAssetType(
+      _: PermissionTypeMapping['native-token-stream'],
+      _chainId: number,
+    ) {
+      // TODO: Use the chainId to determine the native asset type since native token is not always ETH on all chains
+      return `eip155:1/slip44:60`;
+    },
   };
 };

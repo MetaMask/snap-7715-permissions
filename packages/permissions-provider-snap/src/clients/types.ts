@@ -1,10 +1,4 @@
 import type { CaipAssetType } from '@metamask/utils';
-
-/**
- * The response for the spot prices API.
- */
-export type SpotPricesRes = Record<CaipAssetType, { price: number }>;
-
 /**
  * The params for the price API client to fetch spot prices.
  */
@@ -71,3 +65,11 @@ export type VsCurrencyParam =
   | 'xau'
   | 'bits'
   | 'sats';
+
+/**
+ * The response for the spot prices API.
+ */
+export type SpotPricesRes = Record<
+  CaipAssetType,
+  Record<VsCurrencyParam, number>
+>;

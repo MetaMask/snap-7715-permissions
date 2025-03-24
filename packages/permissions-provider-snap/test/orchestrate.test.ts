@@ -77,7 +77,7 @@ describe('Orchestrate', () => {
       tokenPricesService: mockTokenPricesService,
     };
 
-    it('should orchestrate and return a successfuly 7715 response when user confirms', async () => {
+    it('should orchestrate and return a successfully 7715 response when user confirms', async () => {
       // prepare mock user confirmation context
       mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
@@ -89,6 +89,11 @@ describe('Orchestrate', () => {
       // prepare mock permissions context builder
       mockPermissionsContextBuilder.buildPermissionsContext.mockResolvedValueOnce(
         '0x00_some_permission_context',
+      );
+
+      // prepare mock token prices service
+      mockTokenPricesService.getCryptoToFiatConversion.mockResolvedValueOnce(
+        '$1000',
       );
 
       // prepare mock account controller
@@ -146,7 +151,7 @@ describe('Orchestrate', () => {
       });
     });
 
-    it('should orchestrate and return a unsuccessfuly 7715 response when user rejects', async () => {
+    it('should orchestrate and return a unsuccessfully 7715 response when user rejects', async () => {
       // prepare mock user confirmation context
       mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
@@ -178,6 +183,11 @@ describe('Orchestrate', () => {
       mockSnapsProvider.request.mockResolvedValueOnce({
         expiry: '1',
       });
+
+      // prepare mock token prices service
+      mockTokenPricesService.getCryptoToFiatConversion.mockResolvedValueOnce(
+        '$1000',
+      );
 
       const res = await orchestrate(orchestrateArgs);
 

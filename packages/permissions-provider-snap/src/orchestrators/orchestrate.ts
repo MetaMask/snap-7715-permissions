@@ -74,6 +74,10 @@ export const orchestrate = async <
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
   const chainIdNum = fromHex(chainId, 'number');
+  const caipAssetType = orchestrator.getTokenCaipAssetType(
+    permission,
+    chainIdNum,
+  );
 
   // Get the user account details
   const [address, balance] = await prepareAccountDetails(
@@ -81,12 +85,8 @@ export const orchestrate = async <
     fromHex(chainId, 'number'),
   );
 
-  // calculate the value Formatted as currency
   const valueFormattedAsCurrency =
-    await tokenPricesService.getCryptoToFiatConversion(
-      'eip155:1/slip44:60',
-      balance,
-    );
+    await tokenPricesService.getCryptoToFiatConversion(caipAssetType, balance);
 
   // Prepare specific context object and confirmation page for the permission type
   const uiContext: PermissionConfirmationContext<TPermissionType> = {

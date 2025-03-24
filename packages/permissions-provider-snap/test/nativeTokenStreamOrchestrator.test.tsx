@@ -223,4 +223,21 @@ describe('native-token-stream Orchestrator', () => {
       ]);
     });
   });
+
+  describe('getTokenCaipAssetType', () => {
+    let orchestrator: Orchestrator<'native-token-stream'>;
+
+    beforeEach(() => {
+      orchestrator = createPermissionOrchestrator(mockPermissionType);
+    });
+
+    it('should return the caip19 asset type for the permission', async () => {
+      const res = orchestrator.getTokenCaipAssetType(
+        mockbasePermission as PermissionTypeMapping[typeof mockPermissionType],
+        11155111,
+      );
+
+      expect(res).toStrictEqual('eip155:1/slip44:60');
+    });
+  });
 });

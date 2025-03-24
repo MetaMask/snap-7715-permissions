@@ -3,9 +3,9 @@ import {
   Text,
   Icon,
   Box,
-  Address,
   Tooltip,
   Section,
+  Avatar,
 } from '@metamask/snaps-sdk/jsx';
 import { type Hex } from 'viem';
 
@@ -28,6 +28,7 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
   senderDetails,
 }) => {
   const { address, balance, valueFormattedAsCurrency } = account;
+  console.log('address', address);
   const { title, tooltip } = senderDetails;
   return (
     <Section>
@@ -39,7 +40,11 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
               <Icon name="question" size="inherit" color="muted" />
             </Tooltip>
           </Box>
-          <Address avatar={true} address={address} displayName={true} />
+
+          <Box direction="horizontal">
+            <Avatar address={`eip155:1:${address}`} size="sm" />
+            <Text color="default">Gator Account</Text>
+          </Box>
         </Box>
 
         <Box direction="horizontal" alignment="end">
