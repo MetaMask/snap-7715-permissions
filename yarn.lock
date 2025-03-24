@@ -2613,7 +2613,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask-private/delegator-core-viem@npm:0.7.0":
+"@metamask-private/delegator-core-viem@npm:0.7.0, @metamask-private/delegator-core-viem@npm:^0.7.0":
   version: 0.7.0
   resolution: "@metamask-private/delegator-core-viem@npm:0.7.0"
   dependencies:
@@ -2627,13 +2627,13 @@ __metadata:
 
 "@metamask-private/delegator-core-viem@patch:@metamask-private/delegator-core-viem@npm:0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch::locator=root%40workspace%3A.":
   version: 0.7.0
-  resolution: "@metamask-private/delegator-core-viem@patch:@metamask-private/delegator-core-viem@npm%3A0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch::version=0.7.0&hash=d26460&locator=root%40workspace%3A."
+  resolution: "@metamask-private/delegator-core-viem@patch:@metamask-private/delegator-core-viem@npm%3A0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch::version=0.7.0&hash=fa3591&locator=root%40workspace%3A."
   dependencies:
     "@metamask-private/delegation-utils": ^0.7.0
     webauthn-p256: ^0.0.5
   peerDependencies:
     viem: ">=2.18.2 <3.0.0"
-  checksum: 6a270618143699d587462fc423b44d88ac2e8f52ae992823d98e9a319eb9b62e43412ee670e597d1be90e8e9f8d8b74179cee859eef4e13a5a65a11cf7b398c3
+  checksum: c77c64219d8210963b1e6b4d44ec721b66d48e3dea2ed03232a8f84e697e6d1cd856d5c89959023ae12817747c4db7de221619a365adc2c5d1c210a5b46a363f
   languageName: node
   linkType: hard
 
