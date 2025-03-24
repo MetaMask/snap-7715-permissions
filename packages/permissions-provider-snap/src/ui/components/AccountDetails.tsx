@@ -28,7 +28,6 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
   senderDetails,
 }) => {
   const { address, balance, valueFormattedAsCurrency } = account;
-  console.log('address', address);
   const { title, tooltip } = senderDetails;
   return (
     <Section>
