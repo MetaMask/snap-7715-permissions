@@ -1,18 +1,28 @@
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { createClient, custom } from 'viem';
+import { createClient, http, custom, Hex, createPublicClient } from 'viem';
 
 import {
   ConnectButton,
   InstallFlaskButton,
   CustomMessageButton,
   Card,
+  Title,
 } from '../components';
 import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
-import { useMetaMask, useMetaMaskContext, useRequestSnap } from '../hooks';
+import {
+  useMetaMask,
+  useMetaMaskContext,
+  useRequestSnap,
+  useDelegateAccount,
+  useBundlerClient,
+} from '../hooks';
 import { isLocalSnap } from '../utils';
 import { erc7715ProviderActions } from '@metamask-private/delegator-core-viem/experimental';
-import { sepolia } from 'viem/chains';
+import { sepolia as chain } from 'viem/chains';
+import { UserOperationReceipt } from 'viem/account-abstraction';
+
+const BUNDLER_RPC_URL = process.env.BUNDLER_RPC_URL;
 
 const Container = styled.div`
   display: flex;
@@ -130,9 +140,11 @@ const StyledForm = styled.form`
 
 const ResponseContainer = styled.div`
   position: relative;
-  max-height: 50rem;
-  overflow-y: auto;
-  overflow-x: hidden;
+  & pre {
+    max-height: 50rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 `;
 
 const CopyButton = styled.button`
@@ -157,6 +169,11 @@ const Index = () => {
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
+  const { delegateAccount } = useDelegateAccount({ chain });
+  const { bundlerClient, getFeePerGas } = useBundlerClient({
+    chain,
+    bundlerRpcUrl: BUNDLER_RPC_URL,
+  });
 
   const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
     ? isFlask
@@ -177,23 +194,24 @@ const Index = () => {
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
-  const mockDappSessionAccount = '0x016562aA41A8697720ce0943F003141f5dEAe006';
-  const chainId = sepolia.id;
-  const [initialAmount, setInitialAmount] = useState<bigint>(1n);
-  const [amountPerSecond, setAmountPerSecond] = useState<bigint>(1n);
-  const [maxAmount, setMaxAmount] = useState<bigint>(2000n);
-  const [startTime, setStartTime] = useState<number>(
-    Math.floor(Date.now() / 1000),
-  );
-  const [expiry, setExpiry] = useState<number>(
+
+  const chainId = chain.id;
+  const [initialAmount, setInitialAmount] = useState(1n);
+  const [amountPerSecond, setAmountPerSecond] = useState(1n);
+  const [maxAmount, setMaxAmount] = useState(2000n);
+  const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
+  const [expiry, setExpiry] = useState(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
   );
-  const [justification, setJustification] = useState<string>('Money please!');
-  const [permissionType, setPermissionType] = useState<string>(
-    'native-token-stream',
-  );
+  const [justification, setJustification] = useState('Money please!');
+  const [permissionType, setPermissionType] = useState('native-token-stream');
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
   const [isCopied, setIsCopied] = useState(false);
+
+  const [to, setTo] = useState<Hex>('0x');
+  const [data, setData] = useState<Hex>('0x');
+  const [value, setValue] = useState<bigint>(0n);
+  const [receipt, setReceipt] = useState<UserOperationReceipt>();
 
   const handleInitialAmountChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -240,7 +258,64 @@ const Index = () => {
     setPermissionType(event.target.value);
   };
 
+  const handleToChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTo(event.target.value as Hex);
+  };
+
+  const handleDataChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setData(event.target.value as Hex);
+  };
+
+  const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(BigInt(event.target.value));
+  };
+
+  const handleRedeemPermission = async () => {
+    if (!delegateAccount) {
+      throw new Error('Delegate account not found');
+    }
+
+    const feePerGas = await getFeePerGas();
+
+    const accountMetadata = permissionResponse[0].accountMeta;
+    const permissionsContext = permissionResponse[0].context;
+    const delegationManager =
+      permissionResponse[0].signerMeta.delegationManager;
+
+    const publicClient = createPublicClient({
+      chain,
+      transport: http(),
+    });
+
+    const userOperationHash =
+      await bundlerClient.sendUserOperationWithDelegation({
+        publicClient,
+        account: delegateAccount,
+        calls: [
+          {
+            to,
+            data,
+            value,
+            permissionsContext,
+            delegationManager,
+          },
+        ],
+        ...feePerGas,
+        accountMetadata,
+      });
+
+    const receipt = await bundlerClient.waitForUserOperationReceipt({
+      hash: userOperationHash,
+    });
+
+    setReceipt(receipt);
+  };
+
   const handleGrantPermissions = async () => {
+    if (!delegateAccount) {
+      throw new Error('Delegate account not found');
+    }
+
     const permissionsRequests = [
       {
         chainId,
@@ -248,7 +323,7 @@ const Index = () => {
         signer: {
           type: 'account',
           data: {
-            address: mockDappSessionAccount,
+            address: delegateAccount.address,
           },
         },
         permission: {
@@ -303,6 +378,7 @@ const Index = () => {
         {permissionResponse && (
           <Box>
             <ResponseContainer>
+              <Title>Permission Response</Title>
               <CopyButton
                 onClick={handleCopyToClipboard}
                 title={'Copy to clipboard'}
@@ -311,6 +387,66 @@ const Index = () => {
               </CopyButton>
               <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
             </ResponseContainer>
+
+            <StyledForm>
+              <Title>Redeem Permission</Title>
+              <div>
+                <label htmlFor="to">To:</label>
+                <input
+                  type="text"
+                  id="to"
+                  name="to"
+                  value={to}
+                  onChange={handleToChange}
+                  placeholder="Recipient address"
+                />
+              </div>
+              <div>
+                <label htmlFor="data">Data:</label>
+                <input
+                  type="text"
+                  id="data"
+                  name="data"
+                  value={data}
+                  onChange={handleDataChange}
+                  placeholder="Transaction calldata (hex)"
+                />
+              </div>
+              <div>
+                <label htmlFor="value">Value:</label>
+                <input
+                  type="text"
+                  id="value"
+                  name="value"
+                  value={value.toString()}
+                  onChange={handleValueChange}
+                  placeholder="ETH value to send"
+                />
+              </div>
+              <div>
+                <label>From:</label>
+                <div>{delegateAccount?.address}</div>
+              </div>
+            </StyledForm>
+            <CustomMessageButton
+              text="Redeem Permission"
+              onClick={handleRedeemPermission}
+            />
+
+            {receipt && (
+              <div style={{ marginTop: '1rem' }}>
+                <ResponseContainer>
+                  <Title>User operation receipt</Title>
+                  <pre>
+                    {JSON.stringify(
+                      receipt,
+                      (_, v) => (typeof v === 'bigint' ? v.toString() : v),
+                      2,
+                    )}
+                  </pre>
+                </ResponseContainer>
+              </div>
+            )}
           </Box>
         )}
         {metaMaskClient && (
