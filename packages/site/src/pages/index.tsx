@@ -251,18 +251,16 @@ const Index = () => {
             address: mockDappSessionAccount,
           },
         },
-        permissions: [
-          {
-            type: permissionType,
-            data: {
-              justification,
-              initialAmount,
-              amountPerSecond,
-              startTime,
-              maxAmount,
-            },
+        permission: {
+          type: permissionType,
+          data: {
+            justification,
+            initialAmount,
+            amountPerSecond,
+            startTime,
+            maxAmount,
           },
-        ],
+        },
       },
     ];
 
