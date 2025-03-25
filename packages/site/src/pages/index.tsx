@@ -343,9 +343,9 @@ const Index = () => {
       },
     ];
 
-    const response = await metaMaskClient?.grantPermissions({
-      permissions: permissionsRequests,
-    });
+    const response = await metaMaskClient?.grantPermissions(
+      permissionsRequests,
+    );
     setPermissionResponse(response);
   };
 
