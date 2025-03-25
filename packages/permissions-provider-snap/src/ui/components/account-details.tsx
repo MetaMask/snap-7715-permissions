@@ -32,7 +32,7 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
     <SelectorOption value={account.address}>
       <Card
         title={<Address address={account.address} displayName={true} />}
-        description="Spending Account"
+        description="Spending account"
         value={`${weiToEth(account.balance)} ${account.asset}`}
       />
     </SelectorOption>

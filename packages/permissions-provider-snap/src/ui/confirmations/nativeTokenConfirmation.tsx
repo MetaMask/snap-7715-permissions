@@ -55,7 +55,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         permissionIndex={accountDetailsProps.permissionIndex}
       />
 
-      <StreamAmount chainId={chainId} permission={permission} />
+      <StreamAmount permission={permission} />
     </Box>
   );
 };
