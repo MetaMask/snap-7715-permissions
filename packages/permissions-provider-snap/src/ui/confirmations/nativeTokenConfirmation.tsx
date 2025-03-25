@@ -27,6 +27,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
   balance,
   valueFormattedAsCurrency,
 }) => {
+  const asset = 'ETH';
   const accountDetailsProps: AccountDetailsProps = {
     account: {
       address,
@@ -50,6 +51,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         siteOrigin={siteOrigin}
         chainId={chainId}
         justification={permission.data.justification}
+        asset={asset}
       />
 
       <AccountDetails

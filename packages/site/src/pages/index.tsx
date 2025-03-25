@@ -159,7 +159,7 @@ const Index = () => {
           {
             type: 'native-token-stream',
             data: {
-              justification: 'shh...permission 1',
+              justification: 'This is the reason for the permission',
               initialAmount: '0x1',
               amountPerSecond: '0x1',
               startTime: now,
