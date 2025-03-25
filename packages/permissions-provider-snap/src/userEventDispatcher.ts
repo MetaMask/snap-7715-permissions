@@ -9,17 +9,20 @@ import type {
   UserInputEventType,
 } from '@metamask/snaps-sdk';
 
-type UserInputEventByType<TUserInputEventType extends UserInputEventType> = {
+export type UserInputEventByType<
+  TUserInputEventType extends UserInputEventType,
+> = {
   [UserInputEventType.ButtonClickEvent]: ButtonClickEvent;
   [UserInputEventType.FormSubmitEvent]: FormSubmitEvent;
   [UserInputEventType.InputChangeEvent]: InputChangeEvent;
   [UserInputEventType.FileUploadEvent]: FileUploadEvent;
 }[TUserInputEventType];
 
-type UserEventHandler<TUserInputEventType extends UserInputEventType> = (args: {
-  event: UserInputEventByType<TUserInputEventType>;
-  context: InterfaceContext | null;
-}) => void | Promise<void>;
+export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
+  (args: {
+    event: UserInputEventByType<TUserInputEventType>;
+    context: InterfaceContext | null;
+  }) => void | Promise<void>;
 
 const getUserInputEventKey = ({
   eventType,
