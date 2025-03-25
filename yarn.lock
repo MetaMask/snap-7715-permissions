@@ -2613,7 +2613,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask-private/delegator-core-viem@npm:0.7.0, @metamask-private/delegator-core-viem@npm:^0.7.0":
+"@metamask-private/delegator-core-viem@npm:0.7.0":
   version: 0.7.0
   resolution: "@metamask-private/delegator-core-viem@npm:0.7.0"
   dependencies:
@@ -2642,7 +2642,7 @@ __metadata:
   resolution: "@metamask/7715-permissions-provider@workspace:packages/permissions-provider-snap"
   dependencies:
     "@jest/globals": ^29.5.0
-    "@metamask-private/delegator-core-viem": ^0.7.0
+    "@metamask-private/delegator-core-viem": 0.7.0
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -15074,26 +15074,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ox@npm:0.6.9":
-  version: 0.6.9
-  resolution: "ox@npm:0.6.9"
-  dependencies:
-    "@adraffy/ens-normalize": ^1.10.1
-    "@noble/curves": ^1.6.0
-    "@noble/hashes": ^1.5.0
-    "@scure/bip32": ^1.5.0
-    "@scure/bip39": ^1.4.0
-    abitype: ^1.0.6
-    eventemitter3: 5.0.1
-  peerDependencies:
-    typescript: ">=5.4.0"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 6f35c9710ab3edb8146f0d2a7c482517c8e1cb2adf0cfb7aba23a17209cf7171546ad017cce98dd9e0f60cee5d77ddaaa72961023e4456de093d985b5712c546
-  languageName: node
-  linkType: hard
-
 "p-cancelable@npm:^2.0.0":
   version: 2.1.1
   resolution: "p-cancelable@npm:2.1.1"
@@ -17412,7 +17392,7 @@ __metadata:
     rimraf: ^3.0.2
     styled-components: 5.3.3
     typescript: ^4.7.4
-    viem: 2.23.14
+    viem: 2.23.15
   languageName: unknown
   linkType: soft
 
@@ -19031,28 +19011,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:2.23.14, viem@npm:^2.21.29":
-  version: 2.23.14
-  resolution: "viem@npm:2.23.14"
-  dependencies:
-    "@noble/curves": 1.8.1
-    "@noble/hashes": 1.7.1
-    "@scure/bip32": 1.6.2
-    "@scure/bip39": 1.5.4
-    abitype: 1.0.8
-    isows: 1.0.6
-    ox: 0.6.9
-    ws: 8.18.1
-  peerDependencies:
-    typescript: ">=5.0.4"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 6c0bda43d8d25f5f460680b61eeda1e0d153e94eaa860405706f62e6e9e734cee592877976836f5cef7f0ec8b3e4f4d873ecff77093c9533ed5e3cfab45c7d31
-  languageName: node
-  linkType: hard
-
-"viem@npm:^2.21.29":
+"viem@npm:2.23.15, viem@npm:^2.21.29":
   version: 2.23.15
   resolution: "viem@npm:2.23.15"
   dependencies:
@@ -19424,21 +19383,6 @@ __metadata:
     imurmurhash: ^0.1.4
     signal-exit: ^4.0.1
   checksum: 8dbb0e2512c2f72ccc20ccedab9986c7d02d04039ed6e8780c987dc4940b793339c50172a1008eed7747001bfacc0ca47562668a069a7506c46c77d7ba3926a9
-  languageName: node
-  linkType: hard
-
-"ws@npm:8.18.1":
-  version: 8.18.1
-  resolution: "ws@npm:8.18.1"
-  peerDependencies:
-    bufferutil: ^4.0.1
-    utf-8-validate: ">=5.0.2"
-  peerDependenciesMeta:
-    bufferutil:
-      optional: true
-    utf-8-validate:
-      optional: true
-  checksum: 4658357185d891bc45cc2d42a84f9e192d047e8476fb5cba25b604f7d75ca87ca0dd54cd0b2cc49aeee57c79045a741cb7d0b14501953ac60c790cd105c42f23
   languageName: node
   linkType: hard
 
