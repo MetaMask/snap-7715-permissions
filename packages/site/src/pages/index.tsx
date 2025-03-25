@@ -1,6 +1,9 @@
+import { erc7715ProviderActions } from '@metamask-private/delegator-core-viem/experimental';
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { createClient, http, custom, Hex, createPublicClient } from 'viem';
+import { type Hex, createClient, http, custom, createPublicClient } from 'viem';
+import type { UserOperationReceipt } from 'viem/account-abstraction';
+import { sepolia as chain } from 'viem/chains';
 
 import {
   ConnectButton,
@@ -18,11 +21,9 @@ import {
   useBundlerClient,
 } from '../hooks';
 import { isLocalSnap } from '../utils';
-import { erc7715ProviderActions } from '@metamask-private/delegator-core-viem/experimental';
-import { sepolia as chain } from 'viem/chains';
-import { UserOperationReceipt } from 'viem/account-abstraction';
 
-const BUNDLER_RPC_URL = process.env.BUNDLER_RPC_URL;
+/* eslint-disable no-restricted-globals */
+const BUNDLER_RPC_URL = process.env.NEXT_PUBLIC_BUNDLER_RPC_URL;
 
 const Container = styled.div`
   display: flex;
@@ -180,7 +181,9 @@ const Index = () => {
     : snapsDetected;
 
   const metaMaskClient = useMemo(() => {
-    if (!provider || !isMetaMaskReady) return undefined;
+    if (!provider || !isMetaMaskReady) {
+      return undefined;
+    }
 
     return createClient({
       transport: custom(provider),
@@ -213,61 +216,64 @@ const Index = () => {
   const [value, setValue] = useState<bigint>(0n);
   const [receipt, setReceipt] = useState<UserOperationReceipt>();
 
-  const handleInitialAmountChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const value = event.target.value;
-    setInitialAmount(BigInt(value));
+  const handleInitialAmountChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setInitialAmount(BigInt(inputValue));
   };
 
-  const handleAmountPerSecondChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const value = event.target.value;
-    setAmountPerSecond(BigInt(value));
+  const handleAmountPerSecondChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountPerSecond(BigInt(inputValue));
   };
 
-  const handleMaxAmountChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const value = event.target.value;
-    setMaxAmount(BigInt(value));
+  const handleMaxAmountChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setMaxAmount(BigInt(inputValue));
   };
 
-  const handleStartTimeChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const value = event.target.value;
-    setStartTime(Number(value));
+  const handleStartTimeChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setStartTime(Number(inputValue));
   };
 
-  const handleJustificationChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    setJustification(event.target.value);
+  const handleJustificationChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setJustification(inputValue);
   };
 
-  const handleExpiryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setExpiry(Number(value));
+  const handleExpiryChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setExpiry(Number(inputValue));
   };
 
-  const handlePermissionTypeChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setPermissionType(event.target.value);
+  const handlePermissionTypeChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setPermissionType(inputValue);
   };
 
-  const handleToChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTo(event.target.value as Hex);
+  const handleToChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setTo(inputValue as Hex);
   };
 
-  const handleDataChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setData(event.target.value as Hex);
+  const handleDataChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setData(inputValue as Hex);
   };
 
-  const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(BigInt(event.target.value));
+  const handleValueChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(BigInt(inputValue));
   };
 
   const handleRedeemPermission = async () => {
@@ -277,10 +283,8 @@ const Index = () => {
 
     const feePerGas = await getFeePerGas();
 
-    const accountMetadata = permissionResponse[0].accountMeta;
-    const permissionsContext = permissionResponse[0].context;
-    const delegationManager =
-      permissionResponse[0].signerMeta.delegationManager;
+    const { accountMeta, context, signerMeta } = permissionResponse[0];
+    const { delegationManager } = signerMeta;
 
     const publicClient = createPublicClient({
       chain,
@@ -296,19 +300,19 @@ const Index = () => {
             to,
             data,
             value,
-            permissionsContext,
+            permissionsContext: context,
             delegationManager,
           },
         ],
         ...feePerGas,
-        accountMetadata,
+        accountMetadata: accountMeta,
       });
 
-    const receipt = await bundlerClient.waitForUserOperationReceipt({
+    const operationReceipt = await bundlerClient.waitForUserOperationReceipt({
       hash: userOperationHash,
     });
 
-    setReceipt(receipt);
+    setReceipt(operationReceipt);
   };
 
   const handleGrantPermissions = async () => {
@@ -339,9 +343,9 @@ const Index = () => {
       },
     ];
 
-    const response = await metaMaskClient?.grantPermissions(
-      permissionsRequests,
-    );
+    const response = await metaMaskClient?.grantPermissions({
+      permissions: permissionsRequests,
+    });
     setPermissionResponse(response);
   };
 
@@ -353,8 +357,8 @@ const Index = () => {
           setIsCopied(true);
           setTimeout(() => setIsCopied(false), 2000);
         })
-        .catch((err) => {
-          console.error('Failed to copy: ', err);
+        .catch((clipboardError) => {
+          console.error('Failed to copy: ', clipboardError);
         });
     }
   };
@@ -440,7 +444,8 @@ const Index = () => {
                   <pre>
                     {JSON.stringify(
                       receipt,
-                      (_, v) => (typeof v === 'bigint' ? v.toString() : v),
+                      (_key, val) =>
+                        typeof val === 'bigint' ? val.toString() : val,
                       2,
                     )}
                   </pre>
