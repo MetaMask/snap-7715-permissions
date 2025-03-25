@@ -16,6 +16,7 @@ import {
   useRequestSnap,
 } from '../hooks';
 import { isLocalSnap, shouldDisplayReconnectButton } from '../utils';
+import { parseUnits, toHex } from 'viem';
 
 const Container = styled.div`
   display: flex;
@@ -160,10 +161,10 @@ const Index = () => {
             type: 'native-token-stream',
             data: {
               justification: 'This is the reason for the permission',
-              initialAmount: '0x1',
-              amountPerSecond: '0x1',
+              initialAmount: toHex(parseUnits('.5', 18)), // .5 ETH in wei,
+              amountPerSecond: toHex(parseUnits('.5', 18)), // .5 ETH in wei,
               startTime: now,
-              maxAmount: '0x2',
+              maxAmount: toHex(parseUnits('2.5', 18)), // 2.5 ETH in wei,
             },
           },
         ],

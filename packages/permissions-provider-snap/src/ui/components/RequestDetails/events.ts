@@ -31,6 +31,6 @@ const onShowMoreButtonClick: UserEventHandler<
   // TODO: Add the event handle logic to make the button interactive
 };
 
-export const eventHandlers = {
+export const requestDetailsEventHandlers = {
   [RequestDetailsEventNames.ShowMoreButton]: onShowMoreButtonClick,
 };

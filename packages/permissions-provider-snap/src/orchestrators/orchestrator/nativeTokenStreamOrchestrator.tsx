@@ -73,7 +73,7 @@ const validatePermissionData = (
       );
     }
 
-    if (maxAmount < initialAmount) {
+    if (BigInt(maxAmount) < BigInt(initialAmount)) {
       throw new InvalidParamsError(
         'Invalid maxAmount: must be greater than initialAmount',
       );

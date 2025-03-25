@@ -2,7 +2,12 @@ import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box, Divider } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountDetailsProps } from '../components';
-import { AccountDetails, Header, RequestDetails } from '../components';
+import {
+  AccountDetails,
+  Header,
+  RequestDetails,
+  StreamAmount,
+} from '../components';
 import type { PermissionConfirmationProps } from '../types';
 
 /**
@@ -49,6 +54,8 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         accounts={accountDetailsProps.accounts}
         permissionIndex={accountDetailsProps.permissionIndex}
       />
+
+      <StreamAmount chainId={chainId} permission={permission} />
     </Box>
   );
 };
