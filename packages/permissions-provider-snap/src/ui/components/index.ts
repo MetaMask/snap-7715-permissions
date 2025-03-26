@@ -1,4 +1,4 @@
-export * from './header';
+export * from './RequestHeader';
 export * from './RequestDetails';
 export * from './AccountDetails';
 export * from './spending-cap-details';

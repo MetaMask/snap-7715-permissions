@@ -1,8 +1,8 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import { Box, Divider } from '@metamask/snaps-sdk/jsx';
+import { Box } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountDetailsProps } from '../components';
-import { AccountDetails, Header, RequestDetails } from '../components';
+import { AccountDetails, RequestHeader, RequestDetails } from '../components';
 import type { PermissionConfirmationProps } from '../types';
 
 /**
@@ -41,11 +41,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
   };
   return (
     <Box>
-      <Header
-        title="Permission request"
-        subtitle="<place holder subtitle for native-token-stream>"
-      />
-      <Divider />
+      <RequestHeader title="Create a token stream" />
 
       <RequestDetails
         siteOrigin={siteOrigin}
