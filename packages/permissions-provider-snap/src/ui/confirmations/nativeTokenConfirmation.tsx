@@ -51,7 +51,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         permissionIndex={accountDetailsProps.permissionIndex}
       />
 
-      <StreamAmount permission={permission} />
+      <StreamAmount maxAmount={permission.data.maxAmount} />
     </Box>
   );
 };
