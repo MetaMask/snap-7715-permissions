@@ -9,8 +9,8 @@ import {
   Input,
   Dropdown,
 } from '@metamask/snaps-sdk/jsx';
+import type { Hex } from 'viem';
 
-import type { PermissionTypeMapping } from '../../../orchestrators';
 import { weiToEth } from '../../../utils';
 
 export enum StreamAmountEventNames {
@@ -19,7 +19,7 @@ export enum StreamAmountEventNames {
 }
 
 type StreamAmountProps = {
-  permission: PermissionTypeMapping['native-token-stream'];
+  maxAmount: Hex;
 };
 
 /**
@@ -42,7 +42,7 @@ const inputDetails = (text: string, tooltip: string) => (
 );
 
 export const StreamAmount: SnapComponent<StreamAmountProps> = ({
-  permission,
+  maxAmount,
 }) => {
   return (
     <Section>
@@ -50,8 +50,8 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
       <Input
         name={StreamAmountEventNames.StreamAmount}
         type="number"
-        placeholder={weiToEth(permission.data.maxAmount)}
-        value={permission.data.maxAmount}
+        placeholder={weiToEth(maxAmount)}
+        value={maxAmount}
         disabled={true}
       />
 
