@@ -2627,13 +2627,13 @@ __metadata:
 
 "@metamask-private/delegator-core-viem@patch:@metamask-private/delegator-core-viem@npm:0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch::locator=root%40workspace%3A.":
   version: 0.7.0
-  resolution: "@metamask-private/delegator-core-viem@patch:@metamask-private/delegator-core-viem@npm%3A0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch::version=0.7.0&hash=d26460&locator=root%40workspace%3A."
+  resolution: "@metamask-private/delegator-core-viem@patch:@metamask-private/delegator-core-viem@npm%3A0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch::version=0.7.0&hash=fa3591&locator=root%40workspace%3A."
   dependencies:
     "@metamask-private/delegation-utils": ^0.7.0
     webauthn-p256: ^0.0.5
   peerDependencies:
     viem: ">=2.18.2 <3.0.0"
-  checksum: 6a270618143699d587462fc423b44d88ac2e8f52ae992823d98e9a319eb9b62e43412ee670e597d1be90e8e9f8d8b74179cee859eef4e13a5a65a11cf7b398c3
+  checksum: c77c64219d8210963b1e6b4d44ec721b66d48e3dea2ed03232a8f84e697e6d1cd856d5c89959023ae12817747c4db7de221619a365adc2c5d1c210a5b46a363f
   languageName: node
   linkType: hard
 
@@ -2642,7 +2642,7 @@ __metadata:
   resolution: "@metamask/7715-permissions-provider@workspace:packages/permissions-provider-snap"
   dependencies:
     "@jest/globals": ^29.5.0
-    "@metamask-private/delegator-core-viem": ^0.7.0
+    "@metamask-private/delegator-core-viem": 0.7.0
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -15074,6 +15074,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ox@npm:0.6.9":
+  version: 0.6.9
+  resolution: "ox@npm:0.6.9"
+  dependencies:
+    "@adraffy/ens-normalize": ^1.10.1
+    "@noble/curves": ^1.6.0
+    "@noble/hashes": ^1.5.0
+    "@scure/bip32": ^1.5.0
+    "@scure/bip39": ^1.4.0
+    abitype: ^1.0.6
+    eventemitter3: 5.0.1
+  peerDependencies:
+    typescript: ">=5.4.0"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 6f35c9710ab3edb8146f0d2a7c482517c8e1cb2adf0cfb7aba23a17209cf7171546ad017cce98dd9e0f60cee5d77ddaaa72961023e4456de093d985b5712c546
+  languageName: node
+  linkType: hard
+
 "p-cancelable@npm:^2.0.0":
   version: 2.1.1
   resolution: "p-cancelable@npm:2.1.1"
@@ -17392,7 +17412,7 @@ __metadata:
     rimraf: ^3.0.2
     styled-components: 5.3.3
     typescript: ^4.7.4
-    viem: 2.22.21
+    viem: 2.23.15
   languageName: unknown
   linkType: soft
 
@@ -19011,7 +19031,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:2.22.21, viem@npm:^2.21.29":
+"viem@npm:2.23.15":
+  version: 2.23.15
+  resolution: "viem@npm:2.23.15"
+  dependencies:
+    "@noble/curves": 1.8.1
+    "@noble/hashes": 1.7.1
+    "@scure/bip32": 1.6.2
+    "@scure/bip39": 1.5.4
+    abitype: 1.0.8
+    isows: 1.0.6
+    ox: 0.6.9
+    ws: 8.18.1
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: b92e2067a855627770742954917f43850bd6dbf8f0dfdcbf7e4acff1946d53ba26d1bf4bdef324bcdc8007b98aa6892a02cc42bbdc1a179787b31dc682f08a4a
+  languageName: node
+  linkType: hard
+
+"viem@npm:^2.21.29":
   version: 2.22.21
   resolution: "viem@npm:2.22.21"
   dependencies:
@@ -19398,6 +19439,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 91d4d35bc99ff6df483bdf029b9ea4bfd7af1f16fc91231a96777a63d263e1eabf486e13a2353970efc534f9faa43bdbf9ee76525af22f4752cbc5ebda333975
+  languageName: node
+  linkType: hard
+
+"ws@npm:8.18.1":
+  version: 8.18.1
+  resolution: "ws@npm:8.18.1"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 4658357185d891bc45cc2d42a84f9e192d047e8476fb5cba25b604f7d75ca87ca0dd54cd0b2cc49aeee57c79045a741cb7d0b14501953ac60c790cd105c42f23
   languageName: node
   linkType: hard
 

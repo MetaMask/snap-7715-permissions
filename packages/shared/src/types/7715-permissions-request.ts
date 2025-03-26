@@ -52,7 +52,7 @@ export const zPermissionRequest = z.object({
   /**
    * Defines the allowed behavior the signer can do on behalf of the account.
    */
-  permissions: z.array(zPermission),
+  permission: zPermission,
 });
 export const zPermissionsRequest = z.array(zPermissionRequest);
 

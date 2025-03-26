@@ -15,8 +15,8 @@ import {
 
 import { Header } from './components';
 
-const renderPermissions = (origin: string, permissions: Permission[]) => {
-  return permissions.map((permission, _) => (
+const renderPermission = (origin: string, permission: Permission) => {
+  return (
     <Section>
       <Row label="Origin">
         <Text>{`The site at ${origin} requests access to **${extractPermissionName(
@@ -32,7 +32,7 @@ const renderPermissions = (origin: string, permissions: Permission[]) => {
         <Bold>However, no offers found for the requested permission.</Bold>
       </Text>
     </Section>
-  ));
+  );
 };
 
 export const NoOffersFoundPage = (
@@ -49,7 +49,7 @@ export const NoOffersFoundPage = (
 
       {requestedPermission.map((value, _) => (
         <Box direction="vertical" alignment="center">
-          {renderPermissions(origin, value.permissions)}
+          {renderPermission(origin, value.permission)}
         </Box>
       ))}
     </Box>

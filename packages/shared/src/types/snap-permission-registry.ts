@@ -60,7 +60,7 @@ export const zPermissionOfferRegistry = z.record(
 );
 
 /**
- * This is the registry of all registered permission capabilities offered by permission's provider snaps.
+ * This is the registry of all registered permission capabilities offered by permissions provider snaps.
  * It is how the kernel encodes its knowledge of a permission.
  * The key is the snap host id.
  */
