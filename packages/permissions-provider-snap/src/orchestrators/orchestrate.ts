@@ -81,6 +81,7 @@ export const orchestrate = async <
   // Prepare specific context object and confirmation page for the permission type
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permission,
+    permissionRules: {},
     address,
     siteOrigin: origin,
     balance,

@@ -2,7 +2,12 @@ import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountDetailsProps } from '../components';
-import { AccountDetails, RequestHeader, RequestDetails } from '../components';
+import {
+  AccountDetails,
+  RequestHeader,
+  RequestDetails,
+  NativeTokenStreamPermissionRules,
+} from '../components';
 import type { PermissionConfirmationProps } from '../types';
 
 /**
@@ -14,11 +19,21 @@ import type { PermissionConfirmationProps } from '../types';
  * @param props.chainId - The chain ID.
  * @param props.address - The account address.
  * @param props.balance - The account balance.
+ * @param props.expiry - The unix timestamp in seconds when the granted permission is set to expire.
+ * @param props.permissionRules - The permission rules.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
-> = ({ siteOrigin, permission, chainId, address, balance }) => {
+> = ({
+  siteOrigin,
+  permission,
+  chainId,
+  address,
+  balance,
+  expiry,
+  permissionRules,
+}) => {
   const asset = 'ETH';
   const accountDetailsProps: AccountDetailsProps = {
     accounts: [
@@ -44,6 +59,11 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       <AccountDetails
         accounts={accountDetailsProps.accounts}
         permissionIndex={accountDetailsProps.permissionIndex}
+      />
+
+      <NativeTokenStreamPermissionRules
+        permissionRules={permissionRules}
+        expiry={expiry}
       />
     </Box>
   );

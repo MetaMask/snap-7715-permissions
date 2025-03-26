@@ -8,6 +8,7 @@ import {
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
+import type { Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
@@ -21,6 +22,15 @@ declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
   interface PermissionTypeMapping {
     'native-token-stream': JsonObject & NativeTokenStreamPermission; // JsonObject & NativeTokenStreamPermission to be compatible with the Snap JSON object type
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
+  interface PermissionRulesMapping {
+    'native-token-stream': JsonObject & {
+      maxAllowance?: Hex | 'unlimited';
+      initialAmount?: Hex;
+      startTime?: number;
+    };
   }
 }
 
@@ -125,6 +135,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           balance={context.balance}
           expiry={context.expiry}
           chainId={context.chainId}
+          permissionRules={context.permissionRules}
         />
       );
     },
