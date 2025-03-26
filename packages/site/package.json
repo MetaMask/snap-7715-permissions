@@ -26,13 +26,13 @@
     ]
   },
   "dependencies": {
-    "@metamask-private/delegator-core-viem": "0.7.0",
+    "@metamask-private/delegator-core-viem": "0.7.1",
     "@metamask/providers": "^16.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
     "styled-components": "5.3.3",
-    "viem": "2.23.15"
+    "viem": "2.22.21"
   },
   "devDependencies": {
     "@metamask/eslint-config": "^12.2.0",

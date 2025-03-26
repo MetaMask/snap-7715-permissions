@@ -2593,10 +2593,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask-private/delegation-abis@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "@metamask-private/delegation-abis@npm:0.7.1"
+  checksum: 64653f396c5ca9f65966819f6393f9e2a1270e694d037366034820dd402a7020bf619df43d74fa210677e3ea8801beb7d1b1aaf9fb4181aacee417a33a209eb8
+  languageName: node
+  linkType: hard
+
 "@metamask-private/delegation-deployments@npm:^0.7.0":
   version: 0.7.0
   resolution: "@metamask-private/delegation-deployments@npm:0.7.0"
   checksum: 3591f5d22755d57c05a1ac5ad45449411093d3f2d77d437c18b2080b7318a3ec4e12927e46d7f970fb3253498dfa3d2b56490a3376ff0009f7668b6f15baf563
+  languageName: node
+  linkType: hard
+
+"@metamask-private/delegation-deployments@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "@metamask-private/delegation-deployments@npm:0.7.1"
+  checksum: 2fe8d136e3cf846ae07a209e23b929246a1a35bd44ea67296b8a53ea3816d6a3fed77e57702344db2e5f62a2cfec11b2e14c9b7be90ba2fe35d9950c614dddc2
   languageName: node
   linkType: hard
 
@@ -2613,6 +2627,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask-private/delegation-utils@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "@metamask-private/delegation-utils@npm:0.7.1"
+  dependencies:
+    "@metamask-private/delegation-abis": ^0.7.1
+    "@metamask-private/delegation-deployments": ^0.7.1
+    buffer: ^6.0.3
+  peerDependencies:
+    viem: ">=2.18.2 <3.0.0"
+  checksum: ca881f1dd6c5e22e3d29ccc9ae5c52b64b821378118f3da616bb809196a42eaab9b5c2eaec9e5161fb5db35e14f25664fc29849a69500e6b0ca732fa8d3c7caf
+  languageName: node
+  linkType: hard
+
 "@metamask-private/delegator-core-viem@npm:0.7.0":
   version: 0.7.0
   resolution: "@metamask-private/delegator-core-viem@npm:0.7.0"
@@ -2625,15 +2652,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask-private/delegator-core-viem@patch:@metamask-private/delegator-core-viem@npm:0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch::locator=root%40workspace%3A.":
-  version: 0.7.0
-  resolution: "@metamask-private/delegator-core-viem@patch:@metamask-private/delegator-core-viem@npm%3A0.7.0#.yarn/patches/@metamask-private-delegator-core-viem-npm-0.7.0-23bac58ff7.patch::version=0.7.0&hash=fa3591&locator=root%40workspace%3A."
+"@metamask-private/delegator-core-viem@npm:0.7.1":
+  version: 0.7.1
+  resolution: "@metamask-private/delegator-core-viem@npm:0.7.1"
   dependencies:
-    "@metamask-private/delegation-utils": ^0.7.0
+    "@metamask-private/delegation-utils": ^0.7.1
     webauthn-p256: ^0.0.5
   peerDependencies:
     viem: ">=2.18.2 <3.0.0"
-  checksum: c77c64219d8210963b1e6b4d44ec721b66d48e3dea2ed03232a8f84e697e6d1cd856d5c89959023ae12817747c4db7de221619a365adc2c5d1c210a5b46a363f
+  checksum: 88245c4e517602d9730365a1fb26fcc972bd8679499861e8942634587eed6d844567d334179f1d9fc07c63eb41fd6cec93055e7c6a01dc16a7de134fba133a96
   languageName: node
   linkType: hard
 
@@ -15074,26 +15101,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ox@npm:0.6.9":
-  version: 0.6.9
-  resolution: "ox@npm:0.6.9"
-  dependencies:
-    "@adraffy/ens-normalize": ^1.10.1
-    "@noble/curves": ^1.6.0
-    "@noble/hashes": ^1.5.0
-    "@scure/bip32": ^1.5.0
-    "@scure/bip39": ^1.4.0
-    abitype: ^1.0.6
-    eventemitter3: 5.0.1
-  peerDependencies:
-    typescript: ">=5.4.0"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 6f35c9710ab3edb8146f0d2a7c482517c8e1cb2adf0cfb7aba23a17209cf7171546ad017cce98dd9e0f60cee5d77ddaaa72961023e4456de093d985b5712c546
-  languageName: node
-  linkType: hard
-
 "p-cancelable@npm:^2.0.0":
   version: 2.1.1
   resolution: "p-cancelable@npm:2.1.1"
@@ -17374,7 +17381,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask-private/delegator-core-viem": 0.7.0
+    "@metamask-private/delegator-core-viem": 0.7.1
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-browser": ^12.1.0
     "@metamask/eslint-config-jest": ^12.1.0
@@ -17412,7 +17419,7 @@ __metadata:
     rimraf: ^3.0.2
     styled-components: 5.3.3
     typescript: ^4.7.4
-    viem: 2.23.15
+    viem: 2.22.21
   languageName: unknown
   linkType: soft
 
@@ -19031,28 +19038,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:2.23.15":
-  version: 2.23.15
-  resolution: "viem@npm:2.23.15"
-  dependencies:
-    "@noble/curves": 1.8.1
-    "@noble/hashes": 1.7.1
-    "@scure/bip32": 1.6.2
-    "@scure/bip39": 1.5.4
-    abitype: 1.0.8
-    isows: 1.0.6
-    ox: 0.6.9
-    ws: 8.18.1
-  peerDependencies:
-    typescript: ">=5.0.4"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: b92e2067a855627770742954917f43850bd6dbf8f0dfdcbf7e4acff1946d53ba26d1bf4bdef324bcdc8007b98aa6892a02cc42bbdc1a179787b31dc682f08a4a
-  languageName: node
-  linkType: hard
-
-"viem@npm:^2.21.29":
+"viem@npm:2.22.21, viem@npm:^2.21.29":
   version: 2.22.21
   resolution: "viem@npm:2.22.21"
   dependencies:
@@ -19439,21 +19425,6 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 91d4d35bc99ff6df483bdf029b9ea4bfd7af1f16fc91231a96777a63d263e1eabf486e13a2353970efc534f9faa43bdbf9ee76525af22f4752cbc5ebda333975
-  languageName: node
-  linkType: hard
-
-"ws@npm:8.18.1":
-  version: 8.18.1
-  resolution: "ws@npm:8.18.1"
-  peerDependencies:
-    bufferutil: ^4.0.1
-    utf-8-validate: ">=5.0.2"
-  peerDependenciesMeta:
-    bufferutil:
-      optional: true
-    utf-8-validate:
-      optional: true
-  checksum: 4658357185d891bc45cc2d42a84f9e192d047e8476fb5cba25b604f7d75ca87ca0dd54cd0b2cc49aeee57c79045a741cb7d0b14501953ac60c790cd105c42f23
   languageName: node
   linkType: hard
 

@@ -166,7 +166,13 @@ const CopyButton = styled.button`
 `;
 
 const Index = () => {
-  const { error } = useMetaMaskContext();
+  const { error: metaMaskContextError } = useMetaMaskContext();
+  const [permissionResponseError, setPermissionResponseError] =
+    useState<Error | null>(null);
+
+  const errors = [metaMaskContextError, permissionResponseError].filter(
+    (e) => !!e,
+  );
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
@@ -209,6 +215,7 @@ const Index = () => {
   const [justification, setJustification] = useState('Money please!');
   const [permissionType, setPermissionType] = useState('native-token-stream');
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
+
   const [isCopied, setIsCopied] = useState(false);
 
   const [to, setTo] = useState<Hex>('0x');
@@ -343,10 +350,15 @@ const Index = () => {
       },
     ];
 
-    const response = await metaMaskClient?.grantPermissions(
-      permissionsRequests,
-    );
-    setPermissionResponse(response);
+    try {
+      const response = await metaMaskClient?.grantPermissions(
+        permissionsRequests,
+      );
+      setPermissionResponse(response);
+    } catch (error) {
+      setPermissionResponse(null);
+      setPermissionResponseError(error as Error);
+    }
   };
 
   const handleCopyToClipboard = () => {
@@ -373,11 +385,11 @@ const Index = () => {
       </Subtitle>
 
       <CardContainer>
-        {error && (
+        {errors.map((error) => (
           <ErrorMessage>
             <b>An error happened:</b> {error.message}
           </ErrorMessage>
-        )}
+        ))}
 
         {permissionResponse && (
           <Box>
