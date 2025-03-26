@@ -59,28 +59,31 @@ const validatePermissionData = (
 ): true => {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
+  const bigIntAmountPerSecond = BigInt(amountPerSecond);
+  const bigIntMaxAmount = BigInt(maxAmount);
 
-  if (BigInt(maxAmount) <= 0n) {
+  if (bigIntMaxAmount <= 0n) {
     throw new InvalidParamsError(
       'Invalid maxAmount: must be a positive number',
     );
   }
 
   if (initialAmount) {
-    if (BigInt(initialAmount) <= 0n) {
+    const bigIntInitialAmount = BigInt(initialAmount);
+    if (bigIntInitialAmount <= 0n) {
       throw new InvalidParamsError(
         'Invalid initialAmount: must be greater than zero',
       );
     }
 
-    if (BigInt(maxAmount) < BigInt(initialAmount)) {
+    if (bigIntMaxAmount < bigIntInitialAmount) {
       throw new InvalidParamsError(
         'Invalid maxAmount: must be greater than initialAmount',
       );
     }
   }
 
-  if (BigInt(amountPerSecond) <= 0n) {
+  if (bigIntAmountPerSecond <= 0n) {
     throw new InvalidParamsError(
       'Invalid amountPerSecond: must be a positive number',
     );
