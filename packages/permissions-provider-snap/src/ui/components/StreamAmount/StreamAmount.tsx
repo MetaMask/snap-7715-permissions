@@ -54,10 +54,12 @@ const calculateStreamRate = (
   wei: string | number | Hex,
   timePeriod: TimePeriod,
   tokenDecimal = 18,
-): number => {
+): string => {
   const tokenBalance = formatUnits(BigInt(wei), tokenDecimal);
   const tokenBalanceNum = parseFloat(tokenBalance);
-  return tokenBalanceNum / TIME_PERIOD_MAPPING[timePeriod];
+  return (tokenBalanceNum / TIME_PERIOD_MAPPING[timePeriod]).toFixed(
+    tokenDecimal,
+  );
 };
 
 /**
