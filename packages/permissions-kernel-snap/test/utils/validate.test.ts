@@ -36,7 +36,7 @@ describe('validate utils', () => {
             },
           },
         ]),
-      ).toThrow('Failed type validation: 0.permissions: Required');
+      ).toThrow('Failed type validation: 0.permission: Required');
     });
 
     it('throw error if params is empty', async () => {

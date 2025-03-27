@@ -130,18 +130,17 @@ describe('Orchestrate', () => {
           chainId: '0xaa36a7',
           context: '0x00_some_permission_context',
           expiry: 1,
-          permissions: [
-            {
-              data: {
-                justification: 'shh...permission 2',
-                amountPerSecond: '0x1',
-                initialAmount: '0x1',
-                startTime: 1000,
-                maxAmount: '0x2',
-              },
-              type: 'native-token-stream',
+          permission: {
+            data: {
+              justification: 'shh...permission 2',
+              amountPerSecond: '0x1',
+              initialAmount: '0x1',
+              startTime: 1000,
+              maxAmount: '0x2',
             },
-          ],
+            type: 'native-token-stream',
+          },
+
           signer: {
             data: { address: sessionAccount },
             type: 'account',
