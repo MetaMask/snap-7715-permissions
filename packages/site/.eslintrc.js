@@ -9,6 +9,9 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       extends: ['@metamask/eslint-config-browser'],
+      rules: {
+        'no-restricted-globals': 'off',
+      },
     },
   ],
 

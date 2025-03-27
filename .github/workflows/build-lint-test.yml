@@ -3,6 +3,10 @@ name: Build, Lint, and Test
 on:
   workflow_call:
 
+env:
+  NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  SNAP_ENV: production
+
 jobs:
   prepare:
     name: Prepare
@@ -18,16 +22,12 @@ jobs:
           always-auth: true
       - name: Install Yarn dependencies
         run: yarn --immutable
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   build:
     name: Build
     runs-on: ubuntu-latest
     needs:
       - prepare
-    env:
-      SNAP_ENV: production
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -38,8 +38,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           always-auth: true
       - run: yarn --immutable --immutable-cache
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn build
       - name: Cache permissions-kernel snap build
         uses: actions/cache@v4
@@ -74,8 +72,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           always-auth: true
       - run: yarn --immutable --immutable-cache
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn lint
       - name: Require clean working directory
         shell: bash
@@ -91,8 +87,6 @@ jobs:
     needs:
       - prepare
       - build
-    env:
-      SNAP_ENV: production
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -113,8 +107,6 @@ jobs:
           path: ./packages/permissions-provider-snap/dist
           key: 7715-permissions-provider-${{ runner.os }}-${{ github.sha }}
       - run: yarn install --immutable
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Run e2e tests
         run: yarn test
       - name: Require clean working directory
