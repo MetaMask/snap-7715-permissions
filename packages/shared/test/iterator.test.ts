@@ -14,15 +14,13 @@ describe('createPermissionsRequestIterator', () => {
           address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
         },
       },
-      permissions: [
-        {
-          type: 'native-token-transfer',
-          data: {
-            justification: 'shh',
-            allowance: toHex(1),
-          },
+      permission: {
+        type: 'native-token-transfer',
+        data: {
+          justification: 'shh',
+          allowance: toHex(1),
         },
-      ],
+      },
     },
     {
       chainId: toHex(11155111),
@@ -33,16 +31,14 @@ describe('createPermissionsRequestIterator', () => {
           address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
         },
       },
-      permissions: [
-        {
-          type: 'erc20-token-transfer',
-          data: {
-            justification: 'shh',
-            address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
-            allowance: toHex(10000),
-          },
+      permission: {
+        type: 'erc20-token-transfer',
+        data: {
+          justification: 'shh',
+          address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+          allowance: toHex(10000),
         },
-      ],
+      },
     },
     {
       chainId: toHex(11155111),
@@ -53,16 +49,14 @@ describe('createPermissionsRequestIterator', () => {
           address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
         },
       },
-      permissions: [
-        {
-          type: 'erc20-token-transfer',
-          data: {
-            justification: 'shh',
-            address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
-            allowance: toHex(100),
-          },
+      permission: {
+        type: 'erc20-token-transfer',
+        data: {
+          justification: 'shh',
+          address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
+          allowance: toHex(100),
         },
-      ],
+      },
     },
   ];
   it('should create an iterator with all items defaulted to "pending" status', () => {
