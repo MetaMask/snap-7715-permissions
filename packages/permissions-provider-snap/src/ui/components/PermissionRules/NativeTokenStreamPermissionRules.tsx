@@ -51,18 +51,28 @@ const convertTimestampToReadableDate = (timestamp: number) => {
 };
 
 /**
- * Renders a tooltip with text and an icon.
+ * Renders a tooltip with text and an close icon.
  *
  * @param text - The text to display.
  * @param tooltip - The tooltip text to display.
+ * @param removeName - The name of the remove button.
  * @returns The JSX element to render.
  */
-const renderTooltip = (text: string, tooltip: string) => (
-  <Box direction="horizontal">
-    <Text>{text}</Text>
-    <Tooltip content={<Text>{tooltip}</Text>}>
-      <Icon name="question" size="inherit" color="muted" />
-    </Tooltip>
+const renderRuleItemDetails = (
+  text: string,
+  tooltip: string,
+  removeName: string,
+) => (
+  <Box direction="horizontal" alignment="space-between">
+    <Box direction="horizontal">
+      <Text>{text}</Text>
+      <Tooltip content={<Text>{tooltip}</Text>}>
+        <Icon name="question" size="inherit" color="muted" />
+      </Tooltip>
+    </Box>
+    <Button name={removeName}>
+      <Icon name="close" size="inherit" color="primary" />
+    </Button>
   </Box>
 );
 
@@ -81,19 +91,14 @@ const renderRuleItemAllowance = (
   tooltip: string,
   inputName: string,
   removeName: string,
-  allowance: Hex | 'unlimited',
+  allowance: Hex | 'Unlimited',
 ) => (
   <Box direction="vertical">
-    <Box direction="horizontal" alignment="space-between">
-      {renderTooltip(text, tooltip)}
-      <Button name={removeName}>
-        <Icon name="close" size="inherit" color="primary" />
-      </Button>
-    </Box>
+    {renderRuleItemDetails(text, tooltip, removeName)}
     <Input
       name={inputName}
       type="number"
-      placeholder={allowance === 'unlimited' ? allowance : weiToEth(allowance)}
+      placeholder={allowance === 'Unlimited' ? allowance : weiToEth(allowance)}
       value={allowance}
       disabled={true}
     />
@@ -118,12 +123,7 @@ const renderRuleItemTimestamp = (
   timestamp: number,
 ) => (
   <Box direction="vertical">
-    <Box direction="horizontal" alignment="space-between">
-      {renderTooltip(text, tooltip)}
-      <Button name={removeName}>
-        <Icon name="close" size="inherit" color="primary" />
-      </Button>
-    </Box>
+    {renderRuleItemDetails(text, tooltip, removeName)}
     <Input
       name={inputName}
       type="text"

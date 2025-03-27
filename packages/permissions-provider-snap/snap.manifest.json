@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
   "description": "Grants 7715 permissions from a DeleGator smart account",
-  "proposedName": "MetaMask 7715 Permissions Provider",
+  "proposedName": "MetaMask Smart Account",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "TiAJunigexxVWl+aUUWuYV+Zr7s7SofhwGK9KGwtVHk=",
+    "shasum": "1skhdqD6ek63wtrzq5YA2BfYQzvs6i6Ct5BLaltMRV4=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

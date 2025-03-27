@@ -46,6 +46,9 @@ describe('native-token-stream Orchestrator', () => {
     balance: '0x1',
     expiry: 1,
     chainId: 11155111,
+    permissionRules: {
+      maxAllowance: 'Unlimited',
+    },
   };
 
   const mockPage = (
@@ -56,6 +59,7 @@ describe('native-token-stream Orchestrator', () => {
       balance={mockUiContext.balance}
       expiry={mockUiContext.expiry}
       chainId={mockUiContext.chainId}
+      permissionRules={mockUiContext.permissionRules}
     />
   );
 

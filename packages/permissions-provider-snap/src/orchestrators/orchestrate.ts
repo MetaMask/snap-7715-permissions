@@ -85,7 +85,7 @@ export const orchestrate = async <
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permission,
     permissionRules: {
-      maxAllowance: 'unlimited',
+      maxAllowance: 'Unlimited',
       initialAmount: permission.data.initialAmount,
       startTime: permission.data.startTime,
     } as PermissionRulesMapping[TPermissionType],

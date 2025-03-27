@@ -27,7 +27,7 @@ declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
   interface PermissionRulesMapping {
     'native-token-stream': JsonObject & {
-      maxAllowance?: Hex | 'unlimited';
+      maxAllowance?: Hex | 'Unlimited';
       initialAmount?: Hex;
       startTime?: number;
     };
