@@ -7,7 +7,7 @@ import type {
 } from '@metamask/snaps-sdk';
 
 import type { UserEventHandler } from '../../../userEventDispatcher';
-import { NativeTokenStreamPermissionRulesEventNames } from './NativeTokenStreamPermissionRules';
+import { NativeTokenStreamRulesEventNames } from './NativeTokenStreamRules';
 
 /**
  * Handles the "initial-amount" value change event.
@@ -195,21 +195,17 @@ const onExpiryRemoveButtonClick: UserEventHandler<
 
 export const requestDetailsEventHandlers = {
   // input change events handlers
-  [NativeTokenStreamPermissionRulesEventNames.InitialAmount]:
-    onInitialAmountInputChange,
-  [NativeTokenStreamPermissionRulesEventNames.MaxAllowance]:
-    onMaxAllowanceInputChange,
-  [NativeTokenStreamPermissionRulesEventNames.StartTime]:
-    onStartTimeInputChange,
-  [NativeTokenStreamPermissionRulesEventNames.Expiry]: onExpiryInputChange,
+  [NativeTokenStreamRulesEventNames.InitialAmount]: onInitialAmountInputChange,
+  [NativeTokenStreamRulesEventNames.MaxAllowance]: onMaxAllowanceInputChange,
+  [NativeTokenStreamRulesEventNames.StartTime]: onStartTimeInputChange,
+  [NativeTokenStreamRulesEventNames.Expiry]: onExpiryInputChange,
 
   // remove button click events handlers
-  [NativeTokenStreamPermissionRulesEventNames.InitialAmountRemove]:
+  [NativeTokenStreamRulesEventNames.InitialAmountRemove]:
     onInitialAmountRemoveButtonClick,
-  [NativeTokenStreamPermissionRulesEventNames.MaxAllowanceRemove]:
+  [NativeTokenStreamRulesEventNames.MaxAllowanceRemove]:
     onMaxAllowanceRemoveButtonClick,
-  [NativeTokenStreamPermissionRulesEventNames.StartTimeRemove]:
+  [NativeTokenStreamRulesEventNames.StartTimeRemove]:
     onStartTimeRemoveButtonClick,
-  [NativeTokenStreamPermissionRulesEventNames.ExpiryRemove]:
-    onExpiryRemoveButtonClick,
+  [NativeTokenStreamRulesEventNames.ExpiryRemove]: onExpiryRemoveButtonClick,
 };

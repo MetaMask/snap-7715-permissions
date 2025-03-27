@@ -46,7 +46,7 @@ describe('native-token-stream Orchestrator', () => {
     balance: '0x1',
     expiry: 1,
     chainId: 11155111,
-    permissionRules: {
+    permissionSpecificRules: {
       maxAllowance: 'Unlimited',
     },
   };
@@ -59,7 +59,7 @@ describe('native-token-stream Orchestrator', () => {
       balance={mockUiContext.balance}
       expiry={mockUiContext.expiry}
       chainId={mockUiContext.chainId}
-      permissionRules={mockUiContext.permissionRules}
+      permissionSpecificRules={mockUiContext.permissionSpecificRules}
     />
   );
 

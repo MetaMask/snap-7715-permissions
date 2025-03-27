@@ -50,7 +50,7 @@ describe('Permission Confirmation Render Handler', () => {
       balance: '0x1',
       expiry: 1,
       chainId: 11155111,
-      permissionRules: {
+      permissionSpecificRules: {
         maxAllowance: 'Unlimited',
       },
     };
@@ -63,7 +63,7 @@ describe('Permission Confirmation Render Handler', () => {
       balance={mockContext.balance}
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
-      permissionRules={mockContext.permissionRules}
+      permissionSpecificRules={mockContext.permissionSpecificRules}
     />
   );
 

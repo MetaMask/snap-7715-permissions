@@ -7,7 +7,7 @@ import type {
   PermissionConfirmationRenderHandler,
 } from '../ui';
 import type {
-  PermissionRulesMapping,
+  PermissionSpecificRulesMapping,
   SupportedPermissionTypes,
 } from './orchestrator';
 import type { PermissionsContextBuilder } from './permissionsContextBuilder';
@@ -84,11 +84,11 @@ export const orchestrate = async <
   // Prepare specific context object and confirmation page for the permission type
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permission,
-    permissionRules: {
+    permissionSpecificRules: {
       maxAllowance: 'Unlimited',
       initialAmount: permission.data.initialAmount,
       startTime: permission.data.startTime,
-    } as PermissionRulesMapping[TPermissionType],
+    } as PermissionSpecificRulesMapping[TPermissionType],
     address,
     siteOrigin: origin,
     balance,

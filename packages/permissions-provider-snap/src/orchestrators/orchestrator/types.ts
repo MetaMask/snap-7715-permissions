@@ -13,7 +13,7 @@ export interface PermissionTypeMapping {}
 export type SupportedPermissionTypes = keyof PermissionTypeMapping;
 
 /**
- * Mapping of the attenuated rules that users can adjust for each permission type.
+ * Mapping of the attenuated rules that users can adjust for that are specific to the permission type.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/consistent-type-definitions
-export interface PermissionRulesMapping {}
+export interface PermissionSpecificRulesMapping {}

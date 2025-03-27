@@ -25,7 +25,7 @@ declare module './types' {
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
-  interface PermissionRulesMapping {
+  interface PermissionSpecificRulesMapping {
     'native-token-stream': JsonObject & {
       maxAllowance?: Hex | 'Unlimited';
       initialAmount?: Hex;
@@ -135,7 +135,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           balance={context.balance}
           expiry={context.expiry}
           chainId={context.chainId}
-          permissionRules={context.permissionRules}
+          permissionSpecificRules={context.permissionSpecificRules}
         />
       );
     },
