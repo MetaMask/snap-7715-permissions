@@ -51,7 +51,7 @@ const TIME_PERIOD_MAPPING: Record<TimePeriod, number> = {
  * @returns The stream rate for the given total balance and time period.
  */
 const calculateStreamRate = (
-  wei: string | number | Hex,
+  wei: Hex,
   timePeriod: TimePeriod,
   tokenDecimal = 18,
 ): string => {

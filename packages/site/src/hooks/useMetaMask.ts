@@ -60,5 +60,5 @@ export const useMetaMask = () => {
     detect().catch(console.error);
   }, [provider]);
 
-  return { isFlask, snapsDetected, installedSnaps, getSnaps };
+  return { isFlask, snapsDetected, installedSnaps, getSnaps, provider };
 };

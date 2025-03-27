@@ -96,15 +96,9 @@ export const findRelevantPermissions = (
 ): PermissionsRequest => {
   return permissionsToGrant.filter((permissionRequest) => {
     const foundMatchingOffer = allRegisteredOffers.find((registeredOffer) => {
-      // TODO: Only supporting one permission per request for now, but this will be updated in the future
-      const permission = permissionRequest.permissions[0];
-      if (!permission) {
-        return false;
-      }
-
       if (
         extractPermissionName(registeredOffer.type) ===
-          extractPermissionName(permission.type) &&
+          extractPermissionName(permissionRequest.permission.type) &&
         registeredOffer.hostId === PERMISSIONS_PROVIDER_SNAP_ID
       ) {
         return true;

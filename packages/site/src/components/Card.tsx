@@ -35,7 +35,7 @@ const CardWrapper = styled.div<{
   }
 `;
 
-const Title = styled.h2`
+export const Title = styled.h2`
   font-size: ${({ theme }) => theme.fontSizes.large};
   margin: 0;
   ${({ theme }) => theme.mediaQueries.small} {
