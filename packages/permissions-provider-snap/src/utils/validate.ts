@@ -15,12 +15,5 @@ export const validatePermissionRequestParam = (
     );
   }
 
-  if (
-    validateGrantAttenuatedPermissionsParams.data.permissionsRequest.length ===
-    0
-  ) {
-    throw Error('params are empty');
-  }
-
   return validateGrantAttenuatedPermissionsParams.data;
 };

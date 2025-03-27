@@ -158,6 +158,14 @@ export const orchestrate = async <
       chainId: chainIdNum,
     });
 
+  // todo: RPC failure attempting to serialize response if accountMeta is undefined
+  const accountMetaObject =
+    accountMeta.factory && accountMeta.factoryData
+      ? {
+          accountMeta: [accountMeta],
+        }
+      : {};
+
   return {
     success: true,
     response: {
@@ -170,12 +178,9 @@ export const orchestrate = async <
           address: sessionAccount,
         },
       },
-      permissions: [attenuatedPermission],
+      permission: attenuatedPermission,
       context: permissionContext,
-      accountMeta:
-        accountMeta.factory && accountMeta.factoryData
-          ? [accountMeta]
-          : undefined,
+      ...accountMetaObject,
       signerMeta: {
         delegationManager,
       },

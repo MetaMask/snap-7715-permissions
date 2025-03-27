@@ -28,7 +28,7 @@
     "build:preinstalled-snap": "node scripts/build-preinstalled-snap.js",
     "clean": "rimraf dist",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
-    "lint:eslint": "eslint . --cache",
+    "lint:eslint": "npx eslint . --cache",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
     "prepublishOnly": "mm-snap manifest",
@@ -37,7 +37,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@metamask-private/delegator-core-viem": "^0.6.0",
+    "@metamask-private/delegator-core-viem": "0.7.0",
     "@metamask/7715-permissions-shared": "workspace:*",
     "@metamask/snaps-sdk": "^6.17.1",
     "viem": "^2.21.29"
