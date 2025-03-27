@@ -1,10 +1,141 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import { Text, Section } from '@metamask/snaps-sdk/jsx';
+import {
+  Text,
+  Section,
+  Box,
+  Tooltip,
+  Icon,
+  Input,
+  Button,
+} from '@metamask/snaps-sdk/jsx';
+import type { Hex } from 'viem';
 
 import type { PermissionRulesProps } from '../..';
+import { weiToEth } from '../../../utils';
+
+export enum NativeTokenStreamPermissionRulesEventNames {
+  InitialAmount = 'native-token-stream-permission-rules:initial-allowance',
+  InitialAmountRemove = 'native-token-stream-permission-rules:initial-allowance-remove',
+
+  MaxAllowance = 'native-token-stream-permission-rules:max-allowance',
+  MaxAllowanceRemove = 'native-token-stream-permission-rules:max-allowance-remove',
+
+  StartTime = 'native-token-stream-permission-rules:start-time',
+  StartTimeRemove = 'native-token-stream-permission-rules:start-time-remove',
+
+  Expiry = 'native-token-stream-permission-rules:expiry',
+  ExpiryRemove = 'native-token-stream-permission-rules:expiry-remove',
+}
 
 /**
- * Renders the native-token-stream permission rules.
+ * Converts a unix timestamp(in seconds) to a human-readable date format (MM/DD/YYYY).
+ *
+ * @param timestamp - The unix timestamp in seconds.
+ * @returns The formatted date string.
+ */
+const convertTimestampToReadableDate = (timestamp: number) => {
+  const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  };
+  const formattedDate = date.toLocaleDateString('en-US', options);
+  const [month, day, year] = formattedDate.split('/');
+  if (!month || !day || !year) {
+    throw new Error('Invalid date format');
+  }
+
+  // Format the date as MM/DD/YYYY
+  return `${month}/${day}/${year}`;
+};
+
+/**
+ * Renders a tooltip with text and an icon.
+ *
+ * @param text - The text to display.
+ * @param tooltip - The tooltip text to display.
+ * @returns The JSX element to render.
+ */
+const renderTooltip = (text: string, tooltip: string) => (
+  <Box direction="horizontal">
+    <Text>{text}</Text>
+    <Tooltip content={<Text>{tooltip}</Text>}>
+      <Icon name="question" size="inherit" color="muted" />
+    </Tooltip>
+  </Box>
+);
+
+/**
+ * Renders a rule item with an allowance input field.
+ *
+ * @param text - The text to display.
+ * @param tooltip - The tooltip text to display.
+ * @param inputName - The name of the input field.
+ * @param removeName - The name of the remove button.
+ * @param allowance - The allowance value to display.
+ * @returns The JSX element to render.
+ */
+const renderRuleItemAllowance = (
+  text: string,
+  tooltip: string,
+  inputName: string,
+  removeName: string,
+  allowance: Hex | 'unlimited',
+) => (
+  <Box direction="vertical">
+    <Box direction="horizontal" alignment="space-between">
+      {renderTooltip(text, tooltip)}
+      <Button name={removeName}>
+        <Icon name="close" size="inherit" color="primary" />
+      </Button>
+    </Box>
+    <Input
+      name={inputName}
+      type="number"
+      placeholder={allowance === 'unlimited' ? allowance : weiToEth(allowance)}
+      value={allowance}
+      disabled={true}
+    />
+  </Box>
+);
+
+/**
+ * Renders a rule item with a timestamp input field.
+ *
+ * @param text - The text to display.
+ * @param tooltip - The tooltip text to display.
+ * @param inputName - The name of the input field.
+ * @param removeName - The name of the remove button.
+ * @param timestamp - The timestamp value to display.
+ * @returns The JSX element to render.
+ */
+const renderRuleItemTimestamp = (
+  text: string,
+  tooltip: string,
+  inputName: string,
+  removeName: string,
+  timestamp: number,
+) => (
+  <Box direction="vertical">
+    <Box direction="horizontal" alignment="space-between">
+      {renderTooltip(text, tooltip)}
+      <Button name={removeName}>
+        <Icon name="close" size="inherit" color="primary" />
+      </Button>
+    </Box>
+    <Input
+      name={inputName}
+      type="text"
+      placeholder={convertTimestampToReadableDate(timestamp)}
+      value={convertTimestampToReadableDate(timestamp)}
+      disabled={true}
+    />
+  </Box>
+);
+
+/**
+ * Renders the native-token-stream attenuation adjusted permission rules.
  *
  * @param props - The permission rules props.
  * @param props.permissionRules - The permission rules.
@@ -14,10 +145,56 @@ import type { PermissionRulesProps } from '../..';
 export const NativeTokenStreamPermissionRules: SnapComponent<
   PermissionRulesProps<'native-token-stream'>
 > = ({ permissionRules, expiry }) => {
+  const { maxAllowance, initialAmount, startTime } = permissionRules;
   return (
     <Section>
-      <Text>{expiry.toString()}</Text>
-      <Text>{JSON.stringify(permissionRules)}</Text>
+      {initialAmount ? (
+        <Box>
+          {renderRuleItemAllowance(
+            'Initial amount',
+            'tooltip text',
+            NativeTokenStreamPermissionRulesEventNames.InitialAmount,
+            NativeTokenStreamPermissionRulesEventNames.InitialAmountRemove,
+            initialAmount,
+          )}
+        </Box>
+      ) : null}
+
+      {maxAllowance ? (
+        <Box>
+          {renderRuleItemAllowance(
+            'Max allowance',
+            'tooltip text',
+            NativeTokenStreamPermissionRulesEventNames.MaxAllowance,
+            NativeTokenStreamPermissionRulesEventNames.MaxAllowanceRemove,
+            maxAllowance,
+          )}
+        </Box>
+      ) : null}
+
+      {startTime ? (
+        <Box>
+          {renderRuleItemTimestamp(
+            'Start date',
+            'tooltip text',
+            NativeTokenStreamPermissionRulesEventNames.StartTime,
+            NativeTokenStreamPermissionRulesEventNames.StartTimeRemove,
+            startTime,
+          )}
+        </Box>
+      ) : null}
+
+      {expiry ? (
+        <Box>
+          {renderRuleItemTimestamp(
+            'Expiration date',
+            'tooltip text',
+            NativeTokenStreamPermissionRulesEventNames.Expiry,
+            NativeTokenStreamPermissionRulesEventNames.ExpiryRemove,
+            expiry,
+          )}
+        </Box>
+      ) : null}
     </Section>
   );
 };
