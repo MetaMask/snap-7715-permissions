@@ -15,10 +15,10 @@ type BaseRuleProps = {
   text: string;
   tooltip: string;
   inputName: string;
-  removeName: string;
+  removeRuleButtonName: string;
 };
 
-export type AllowanceRuleProps = BaseRuleProps & {
+export type TokenValueRuleProps = BaseRuleProps & {
   allowance: Hex | 'Unlimited';
 };
 
@@ -54,13 +54,13 @@ const convertTimestampToReadableDate = (timestamp: number) => {
  *
  * @param text - The text to display.
  * @param tooltip - The tooltip text to display.
- * @param removeName - The name of the remove button.
+ * @param removeRuleButtonName - The name of the remove button.
  * @returns The JSX element to render.
  */
 const renderRuleItemDetails = (
   text: string,
   tooltip: string,
-  removeName: string,
+  removeRuleButtonName: string,
 ) => (
   <Box direction="horizontal" alignment="space-between">
     <Box direction="horizontal">
@@ -69,7 +69,7 @@ const renderRuleItemDetails = (
         <Icon name="question" size="inherit" color="muted" />
       </Tooltip>
     </Box>
-    <Button name={removeName}>
+    <Button name={removeRuleButtonName}>
       <Icon name="close" size="inherit" color="primary" />
     </Button>
   </Box>
@@ -82,19 +82,19 @@ const renderRuleItemDetails = (
  * @param props.text - The text to display.
  * @param props.tooltip - The tooltip text to display.
  * @param props.inputName - The name of the input field.
- * @param props.removeName - The name of the remove button.
+ * @param props.removeRuleButtonName - The name of the remove button.
  * @param props.allowance - The allowance value to display.
  * @returns The JSX element to render.
  */
-export const AllowanceRule: SnapComponent<AllowanceRuleProps> = ({
+export const TokenValueRule: SnapComponent<TokenValueRuleProps> = ({
   text,
   tooltip,
   inputName,
-  removeName,
+  removeRuleButtonName,
   allowance,
 }) => (
   <Box direction="vertical">
-    {renderRuleItemDetails(text, tooltip, removeName)}
+    {renderRuleItemDetails(text, tooltip, removeRuleButtonName)}
     <Input
       name={inputName}
       type="number"
@@ -114,7 +114,7 @@ export const AllowanceRule: SnapComponent<AllowanceRuleProps> = ({
  * @param props.text - The text to display.
  * @param props.tooltip - The tooltip text to display.
  * @param props.inputName - The name of the input field.
- * @param props.removeName - The name of the remove button.
+ * @param props.removeRuleButtonName - The name of the remove button.
  * @param props.timestamp - The timestamp value to display.
  * @returns The JSX element to render.
  */
@@ -122,11 +122,11 @@ export const TimestampRule: SnapComponent<TimestampRuleProps> = ({
   text,
   tooltip,
   inputName,
-  removeName,
+  removeRuleButtonName,
   timestamp,
 }) => (
   <Box direction="vertical">
-    {renderRuleItemDetails(text, tooltip, removeName)}
+    {renderRuleItemDetails(text, tooltip, removeRuleButtonName)}
     <Input
       name={inputName}
       type="text"

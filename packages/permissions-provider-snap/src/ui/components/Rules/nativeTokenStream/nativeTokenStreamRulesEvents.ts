@@ -6,7 +6,7 @@ import type {
   UserInputEventType,
 } from '@metamask/snaps-sdk';
 
-import type { UserEventHandler } from '../../../userEventDispatcher';
+import type { UserEventHandler } from '../../../../userEventDispatcher';
 import { NativeTokenStreamRulesEventNames } from './NativeTokenStreamRules';
 
 /**

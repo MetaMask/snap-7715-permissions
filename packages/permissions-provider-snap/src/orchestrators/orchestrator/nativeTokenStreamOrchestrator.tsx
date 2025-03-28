@@ -16,7 +16,10 @@ import type {
   OrchestratorFactoryFunction,
   PermissionContextMeta,
 } from '../types';
-import type { PermissionTypeMapping } from './types';
+import type {
+  PermissionSpecificRulesMapping,
+  PermissionTypeMapping,
+} from './types';
 
 declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
@@ -174,6 +177,15 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
     ) {
       // TODO: Use the chainId to determine the native asset type since native token is not always ETH on all chains
       return `eip155:1/slip44:60`;
+    },
+    getPermissionSpecificRules: (
+      permission: PermissionTypeMapping['native-token-stream'],
+    ) => {
+      return {
+        maxAllowance: 'Unlimited',
+        initialAmount: permission.data.initialAmount,
+        startTime: permission.data.startTime,
+      } as PermissionSpecificRulesMapping['native-token-stream'];
     },
   };
 };

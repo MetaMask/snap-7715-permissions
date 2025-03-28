@@ -1,8 +1,8 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Section } from '@metamask/snaps-sdk/jsx';
 
-import type { PermissionSpecificRulesProps } from '../..';
-import { AllowanceRule, TimestampRule } from './Rules';
+import type { PermissionSpecificRulesProps } from '../../../types';
+import { TokenValueRule, TimestampRule } from '../Rules';
 
 export enum NativeTokenStreamRulesEventNames {
   InitialAmount = 'native-token-stream-rules:initial-allowance',
@@ -33,21 +33,25 @@ export const NativeTokenStreamRules: SnapComponent<
   return (
     <Section>
       {initialAmount ? (
-        <AllowanceRule
+        <TokenValueRule
           text="Initial amount"
           tooltip="tooltip text"
           inputName={NativeTokenStreamRulesEventNames.InitialAmount}
-          removeName={NativeTokenStreamRulesEventNames.InitialAmountRemove}
+          removeRuleButtonName={
+            NativeTokenStreamRulesEventNames.InitialAmountRemove
+          }
           allowance={initialAmount}
         />
       ) : null}
 
       {maxAllowance ? (
-        <AllowanceRule
+        <TokenValueRule
           text="Max allowance"
           tooltip="tooltip text"
           inputName={NativeTokenStreamRulesEventNames.MaxAllowance}
-          removeName={NativeTokenStreamRulesEventNames.MaxAllowanceRemove}
+          removeRuleButtonName={
+            NativeTokenStreamRulesEventNames.MaxAllowanceRemove
+          }
           allowance={maxAllowance}
         />
       ) : null}
@@ -57,7 +61,9 @@ export const NativeTokenStreamRules: SnapComponent<
           text="Start date"
           tooltip="tooltip text"
           inputName={NativeTokenStreamRulesEventNames.StartTime}
-          removeName={NativeTokenStreamRulesEventNames.StartTimeRemove}
+          removeRuleButtonName={
+            NativeTokenStreamRulesEventNames.StartTimeRemove
+          }
           timestamp={startTime}
         />
       ) : null}
@@ -67,7 +73,7 @@ export const NativeTokenStreamRules: SnapComponent<
           text="Expiration date"
           tooltip="tooltip text"
           inputName={NativeTokenStreamRulesEventNames.Expiry}
-          removeName={NativeTokenStreamRulesEventNames.ExpiryRemove}
+          removeRuleButtonName={NativeTokenStreamRulesEventNames.ExpiryRemove}
           timestamp={expiry}
         />
       ) : null}
