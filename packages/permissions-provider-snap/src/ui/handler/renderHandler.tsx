@@ -7,10 +7,18 @@ import {
 import { Container, type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { SupportedPermissionTypes } from '../../orchestrators';
-import type { UserEventDispatcher } from '../../userEventDispatcher';
+import type {
+  UserEventDispatcher,
+  UserEventHandler,
+} from '../../userEventDispatcher';
 import { ConfirmationFooter } from '../components';
 import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
+
+export type DialogContentEventHandlers = {
+  eventType: UserInputEventType;
+  handler: UserEventHandler<UserInputEventType>;
+};
 
 export type PermissionConfirmationRenderHandler = {
   /**
@@ -23,12 +31,24 @@ export type PermissionConfirmationRenderHandler = {
    */
   createConfirmationDialog: <TPermissionType extends SupportedPermissionTypes>(
     context: PermissionConfirmationContext<TPermissionType>,
-    ui: ComponentOrElement,
+    dialogContent: ComponentOrElement,
     permissionType: TPermissionType,
+    dialogContentEventHandlers: DialogContentEventHandlers[],
   ) => Promise<{
     interfaceId: string;
     confirmationResult: Promise<boolean>;
   }>;
+
+  /**
+   * Cleanup the dialog content event handlers.
+   *
+   * @param interfaceId - The interface ID of the dialog.
+   * @param dialogContentEventHandlers - The dialog content event handlers to cleanup.
+   */
+  cleanupDialogContentEventHandlers: (
+    interfaceId: string,
+    dialogContentEventHandlers: DialogContentEventHandlers[],
+  ) => void;
 };
 
 /**
@@ -53,6 +73,7 @@ export const createPermissionConfirmationRenderHandler = ({
       context: PermissionConfirmationContext<TPermissionType>,
       dialogContent: ComponentOrElement,
       _: TPermissionType,
+      dialogContentEventHandlers: DialogContentEventHandlers[],
     ) => {
       // append the confirmation footer here to the dialog provided by the specific permission implementation
       const ui = (
@@ -112,6 +133,17 @@ export const createPermissionConfirmationRenderHandler = ({
           handler: onButtonClick,
         });
 
+        // Register event handlers for dialog content events
+        if (dialogContentEventHandlers.length > 0) {
+          dialogContentEventHandlers.forEach(({ eventType, handler }) => {
+            userEventDispatcher.on({
+              eventType,
+              interfaceId,
+              handler,
+            });
+          });
+        }
+
         snapsProvider
           .request({
             method: 'snap_dialog',
@@ -129,6 +161,21 @@ export const createPermissionConfirmationRenderHandler = ({
         interfaceId,
         confirmationResult,
       };
+    },
+    cleanupDialogContentEventHandlers: (
+      interfaceId: string,
+      dialogContentEventHandlers: DialogContentEventHandlers[],
+    ) => {
+      if (!dialogContentEventHandlers.length) {
+        return;
+      }
+      dialogContentEventHandlers.forEach(({ eventType, handler }) => {
+        userEventDispatcher.off({
+          eventType,
+          interfaceId,
+          handler,
+        });
+      });
     },
   };
 };

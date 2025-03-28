@@ -164,5 +164,9 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       // TODO: Use the chainId to determine the native asset type since native token is not always ETH on all chains
       return `eip155:1/slip44:60`;
     },
+    getConfirmationDialogEventHandlers: () => {
+      // TODO: Add all native token stream events handlers
+      return [];
+    },
   };
 };

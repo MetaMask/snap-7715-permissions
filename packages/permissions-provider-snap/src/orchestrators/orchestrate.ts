@@ -3,9 +3,10 @@ import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
 import type { TokenPricesService } from '../services';
-import type {
-  PermissionConfirmationContext,
-  PermissionConfirmationRenderHandler,
+import {
+  sharedComponentsEventHandlers,
+  type PermissionConfirmationContext,
+  type PermissionConfirmationRenderHandler,
 } from '../ui';
 import type { SupportedPermissionTypes } from './orchestrator';
 import type { PermissionsContextBuilder } from './permissionsContextBuilder';
@@ -101,11 +102,16 @@ export const orchestrate = async <
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
 
-  const { confirmationResult } =
+  const dialogContentEventHandlers = [
+    ...sharedComponentsEventHandlers,
+    ...orchestrator.getConfirmationDialogEventHandlers(),
+  ];
+  const { confirmationResult, interfaceId } =
     await permissionConfirmationRenderHandler.createConfirmationDialog(
       uiContext,
       permissionDialog,
       permissionType,
+      dialogContentEventHandlers,
     );
 
   const isConfirmationAccepted = await confirmationResult;
@@ -115,6 +121,12 @@ export const orchestrate = async <
       requestedPermission: permission,
       requestedExpiry: expiry,
     });
+
+  // Cleanup the event handlers after the dialog is closed
+  permissionConfirmationRenderHandler.cleanupDialogContentEventHandlers(
+    interfaceId,
+    dialogContentEventHandlers,
+  );
 
   if (!isConfirmationAccepted) {
     return {
