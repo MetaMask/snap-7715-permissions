@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "VezRdqwTWuih4SUeTHsglHYc82TfZxATX3IIUyxq3pc=",
+    "shasum": "6zYDNpDKJysTKiDHFLLd//hdCF2eZoQqgne/3UZXEjM=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -34,7 +34,8 @@
     "endowment:network-access": {},
     "snap_getEntropy": {},
     "snap_dialog": {},
-    "endowment:lifecycle-hooks": {}
+    "endowment:lifecycle-hooks": {},
+    "snap_getPreferences": {}
   },
   "platformVersion": "6.17.1",
   "manifestVersion": "0.1"

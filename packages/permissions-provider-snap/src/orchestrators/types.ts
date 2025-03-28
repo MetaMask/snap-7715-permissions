@@ -5,6 +5,7 @@ import type {
 } from '@metamask/7715-permissions-shared/types';
 import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
+import type { CaipAssetType } from '@metamask/utils';
 import type { Address, Hex, OneOf } from 'viem';
 
 import type { PermissionConfirmationContext } from '../ui';
@@ -72,6 +73,13 @@ export type PermissionContextMeta<
 };
 
 export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
+  /**
+   * Return the CAIP-19 asset type for the given chain ID for the permission type.
+   */
+  getTokenCaipAssetType: (
+    requestedPermission: PermissionTypeMapping[TPermissionType],
+    chainId: number,
+  ) => CaipAssetType;
   /**
    * Validates the base permission request for the permission type.
    *

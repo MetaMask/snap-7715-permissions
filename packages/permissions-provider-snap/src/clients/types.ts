@@ -1,0 +1,75 @@
+import type { CaipAssetType } from '@metamask/utils';
+/**
+ * The params for the price API client to fetch spot prices.
+ */
+export type VsCurrencyParam =
+  | 'btc'
+  | 'eth'
+  | 'ltc'
+  | 'bch'
+  | 'bnb'
+  | 'eos'
+  | 'xrp'
+  | 'xlm'
+  | 'link'
+  | 'dot'
+  | 'yfi'
+  | 'usd'
+  | 'aed'
+  | 'ars'
+  | 'aud'
+  | 'bdt'
+  | 'bhd'
+  | 'bmd'
+  | 'brl'
+  | 'cad'
+  | 'chf'
+  | 'clp'
+  | 'cny'
+  | 'czk'
+  | 'dkk'
+  | 'eur'
+  | 'gbp'
+  | 'gel'
+  | 'hkd'
+  | 'huf'
+  | 'idr'
+  | 'ils'
+  | 'inr'
+  | 'jpy'
+  | 'krw'
+  | 'kwd'
+  | 'lkr'
+  | 'mmk'
+  | 'mxn'
+  | 'myr'
+  | 'ngn'
+  | 'nok'
+  | 'nzd'
+  | 'php'
+  | 'pkr'
+  | 'pln'
+  | 'rub'
+  | 'sar'
+  | 'sek'
+  | 'sgd'
+  | 'thb'
+  | 'try'
+  | 'twd'
+  | 'uah'
+  | 'vef'
+  | 'vnd'
+  | 'zar'
+  | 'xdr'
+  | 'xag'
+  | 'xau'
+  | 'bits'
+  | 'sats';
+
+/**
+ * The response for the spot prices API.
+ */
+export type SpotPricesRes = Record<
+  CaipAssetType,
+  Record<VsCurrencyParam, number>
+>;
