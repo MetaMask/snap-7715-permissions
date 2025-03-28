@@ -46,6 +46,7 @@ describe('native-token-stream Orchestrator', () => {
     balance: '0x1',
     expiry: 1,
     chainId: 11155111,
+    valueFormattedAsCurrency: '$1,000.00',
     permissionSpecificRules: {
       maxAllowance: 'Unlimited',
     },
@@ -59,6 +60,7 @@ describe('native-token-stream Orchestrator', () => {
       balance={mockUiContext.balance}
       expiry={mockUiContext.expiry}
       chainId={mockUiContext.chainId}
+      valueFormattedAsCurrency={mockUiContext.valueFormattedAsCurrency}
       permissionSpecificRules={mockUiContext.permissionSpecificRules}
     />
   );
@@ -223,6 +225,23 @@ describe('native-token-stream Orchestrator', () => {
             '0x0000000000000000000000000000000000000000000000000000000000000001',
         },
       ]);
+    });
+  });
+
+  describe('getTokenCaipAssetType', () => {
+    let orchestrator: Orchestrator<'native-token-stream'>;
+
+    beforeEach(() => {
+      orchestrator = createPermissionOrchestrator(mockPermissionType);
+    });
+
+    it('should return the caip19 asset type for the permission', async () => {
+      const res = orchestrator.getTokenCaipAssetType(
+        mockbasePermission as PermissionTypeMapping[typeof mockPermissionType],
+        11155111,
+      );
+
+      expect(res).toStrictEqual('eip155:1/slip44:60');
     });
   });
 });

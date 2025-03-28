@@ -1,12 +1,16 @@
+/* eslint-disable n/no-process-env */
 import { type SnapConfig } from '@metamask/snaps-cli';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
 
 dotenv.config();
 
-// eslint-disable-next-line n/no-process-env
 if (!process.env.SNAP_ENV) {
   throw new Error('SNAP_ENV must be set as an environment variable.');
+}
+
+if (!process.env.PRICE_API_BASE_URL) {
+  throw new Error('PRICE_API_BASE_URL must be set as an environment variable.');
 }
 
 const config: SnapConfig = {
@@ -17,10 +21,11 @@ const config: SnapConfig = {
   },
   polyfills: {
     buffer: true,
+    crypto: true,
   },
   environment: {
-    // eslint-disable-next-line n/no-process-env
     SNAP_ENV: process.env.SNAP_ENV,
+    PRICE_API_BASE_URL: process.env.PRICE_API_BASE_URL,
   },
 };
 

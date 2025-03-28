@@ -33,6 +33,7 @@ export type PermissionConfirmationContext<
   readonly address: Hex;
   readonly siteOrigin: string;
   readonly balance: Hex;
+  readonly valueFormattedAsCurrency: string;
   readonly chainId: number;
   expiry: number;
 };
@@ -49,6 +50,7 @@ export type PermissionConfirmationProps<
     | 'address'
     | 'siteOrigin'
     | 'balance'
+    | 'valueFormattedAsCurrency'
     | 'expiry'
     | 'chainId'
     | 'permissionSpecificRules'

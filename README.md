@@ -28,6 +28,7 @@ GATSBY_GATOR_SNAP_ORIGIN=local:http://localhost:8081
 ### permissions-provider-snap
 
 - SNAP_ENV: The snap uses `SNAP_ENV` to dynamically set the kernel snap snapId
+- PRICE_API_BASE_URL: The base URL for the price API used to fetch realtime token spot prices.
 
 ## Getting Started
 
@@ -36,7 +37,8 @@ Clone the [snap-7715-permissions repository](https://github.com/MetaMask/snap-77
 1. Set the .env `SNAP_ENV=local` in:
    - `./packages/permissions-kernel-snap/.env`
    - `./packages/permissions-provider-snap/.env`
-2. Install and start up snaps with development site
+2. Set `PRICE_API_BASE_URL=http://localhost:8003` in `./packages/permissions-provider-snap/.env` to fetch spot prices from mock price API running locally.
+3. Install and start up snaps with development site
 
 ```shell
 yarn install && yarn start
@@ -59,8 +61,9 @@ The development site will start up on `http://localhost:8000/`
 1. Set the .env `SNAP_ENV=local` in:
    - `./packages/permissions-kernel-snap/.env`
    - `./packages/permissions-provider-snap/.env`
-2. Run `yarn build`
-3. Run `yarn test` to run the tests once.
+2. Set `PRICE_API_BASE_URL=http://localhost:8003` in `./packages/permissions-provider-snap/.env` to fetch spot prices from mock price API running locally.
+3. Run `yarn build`
+4. Run `yarn test` to run the tests once.
 
 ### Linting
 
@@ -76,8 +79,9 @@ When CI runs, it will use the `SNAP_ENV=production` value. If this value is chan
 1. Set the .env `SNAP_ENV=production` in:
    - `./packages/permissions-kernel-snap/.env`
    - `./packages/permissions-provider-snap/.env`
-2. Building the snaps with `yarn build` should update the shasum if applicable.
-3. Push changes to your remote branch.
+2. Set `PRICE_API_BASE_URL=<prod_base_url>` in `./packages/permissions-provider-snap/.env` to
+3. Building the snaps with `yarn build` should update the shasum if applicable.
+4. Push changes to your remote branch.
 
 ### Using NPM packages with scripts
 
@@ -97,7 +101,8 @@ The tarball will allow us to test preinstall on the public [metamask-extension b
 1. Update the .env `SNAP_ENV=prod` in:
    - `./packages/permissions-kernel-snap/.env`
    - `./packages/permissions-provider-snap/.env`
-2. From root of repo run the following:
+2. Set `PRICE_API_BASE_URL=http://localhost:8003` in `./packages/permissions-provider-snap/.env` to fetch spot prices from mock price API running locally.
+3. From root of repo run the following:
 
 ```bash
 mkdir deps
@@ -128,7 +133,7 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
 3. Make a permissions request.
 4. Requests are sent to `kernel snap` -> `gator snap` preinstalls
 
-## Adding new permisssion types
+## Adding new permission types
 
 Follow the following steps to add new permission types to the `permissions-provider-snap`:
 
@@ -140,7 +145,7 @@ Follow the following steps to add new permission types to the `permissions-provi
 declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface PermissionTypeMapping {
-    'new-permission-type': JsonObject & NewPermissionTypeDefinition; // JsonObject & NewPermissionTypeDefination to be compatible with the Snap JSON object type
+    'new-permission-type': JsonObject & NewPermissionTypeDefinition; // JsonObject & NewPermissionTypeDefinition to be compatible with the Snap JSON object type
   }
 }
 ```

@@ -9,7 +9,7 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
-import { weiToEth } from '../../../utils';
+import { formatTokenBalance } from '../../../utils';
 
 type BaseRuleProps = {
   text: string;
@@ -98,7 +98,9 @@ export const AllowanceRule: SnapComponent<AllowanceRuleProps> = ({
     <Input
       name={inputName}
       type="number"
-      placeholder={allowance === 'Unlimited' ? allowance : weiToEth(allowance)}
+      placeholder={
+        allowance === 'Unlimited' ? allowance : formatTokenBalance(allowance)
+      }
       value={allowance}
       disabled={true}
     />

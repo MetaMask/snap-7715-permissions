@@ -50,6 +50,7 @@ describe('Permission Confirmation Render Handler', () => {
       balance: '0x1',
       expiry: 1,
       chainId: 11155111,
+      valueFormattedAsCurrency: '$1,000.00',
       permissionSpecificRules: {
         maxAllowance: 'Unlimited',
       },
@@ -63,6 +64,7 @@ describe('Permission Confirmation Render Handler', () => {
       balance={mockContext.balance}
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
+      valueFormattedAsCurrency={mockContext.valueFormattedAsCurrency}
       permissionSpecificRules={mockContext.permissionSpecificRules}
     />
   );
