@@ -1,4 +1,12 @@
 import type { GatsbyConfig } from 'gatsby';
+import dotenv from 'dotenv';
+
+dotenv.config({
+  path:
+    process.env.SNAP_ENV === 'development'
+      ? '.env.development'
+      : '.env.production',
+});
 
 const config: GatsbyConfig = {
   // This is required to make use of the React 17+ JSX transform.
