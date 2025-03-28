@@ -1,62 +1,38 @@
 {
-  "name": "@metamask/7715-permissions-provider",
+  "name": "@metamask/mock-price-api",
   "version": "0.1.0",
-  "description": "Grants 7715 permissions from a DeleGator smart account",
+  "private": true,
+  "description": "Mock Price API to token price data",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "license": "(MIT-0 OR Apache-2.0)",
-  "exports": {
-    "./package.json": "./package.json",
-    "./snap.manifest.json": "./snap.manifest.json",
-    "./images/icon.svg": "./images/icon.svg",
-    "./dist/bundle.js": "./dist/bundle.js",
-    "./dist/preinstalled-snap.json": "./dist/preinstalled-snap.json"
-  },
-  "main": "./dist/bundle.js",
-  "files": [
-    "dist/",
-    "images/",
-    "snap.manifest.json"
-  ],
   "scripts": {
     "allow-scripts": "yarn workspace root allow-scripts",
-    "build": "mm-snap build && yarn build:preinstalled-snap",
-    "build:clean": "yarn clean && yarn build",
-    "build:pack": "yarn build:clean && yarn pack --filename ../../deps/snap-b-0.1.0.tgz",
-    "build:preinstalled-snap": "node scripts/build-preinstalled-snap.js",
-    "clean": "rimraf dist",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
-    "lint:eslint": "npx eslint . --cache",
+    "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
-    "prepublishOnly": "mm-snap manifest",
-    "serve": "mm-snap serve",
-    "start": "mm-snap watch",
-    "test": "jest"
+    "start": "tsx ./src/server.ts"
   },
   "dependencies": {
-    "@metamask-private/delegator-core-viem": "0.7.0",
-    "@metamask/7715-permissions-shared": "workspace:*",
-    "@metamask/snaps-sdk": "^6.17.1",
-    "@metamask/utils": "^11.3.0",
-    "viem": "^2.21.29"
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
-    "@metamask/auto-changelog": "^3.4.4",
     "@metamask/eslint-config": "^12.2.0",
     "@metamask/eslint-config-jest": "^12.1.0",
     "@metamask/eslint-config-nodejs": "^12.1.0",
     "@metamask/eslint-config-typescript": "^12.1.0",
     "@metamask/snaps-cli": "^6.6.0",
     "@metamask/snaps-jest": "^8.9.0",
-    "@types/react": "18.2.4",
-    "@types/react-dom": "18.2.4",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
-    "dotenv": "16.4.5",
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "~2.26.0",
@@ -70,14 +46,11 @@
     "prettier-plugin-packagejson": "^2.2.11",
     "rimraf": "^3.0.2",
     "ts-jest": "^29.1.0",
+    "tsx": "^4.19.3",
     "typescript": "^4.7.4"
   },
   "packageManager": "yarn@3.2.1",
   "engines": {
     "node": ">=18.6.0"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   }
 }

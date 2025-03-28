@@ -6,6 +6,7 @@ on:
 env:
   NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   SNAP_ENV: production
+  PRICE_API_BASE_URL: ${{ secrets.PRICE_API_BASE_URL }}
 
 jobs:
   prepare:

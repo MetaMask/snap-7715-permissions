@@ -14,6 +14,7 @@ import {
   orchestrate,
   type SupportedPermissionTypes,
 } from '../orchestrators';
+import type { TokenPricesService } from '../services';
 import type { PermissionConfirmationRenderHandler } from '../ui';
 import { validatePermissionRequestParam } from '../utils';
 
@@ -37,17 +38,20 @@ export type RpcHandler = {
  * @param config.accountController - The account controller interface.
  * @param config.permissionConfirmationRenderHandler - The permission confirmation render handler.
  * @param config.permissionsContextBuilder - The permissions context builder.
+ * @param config.tokenPricesService - The token prices service.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
   accountController: AccountControllerInterface;
   permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
   permissionsContextBuilder: PermissionsContextBuilder;
+  tokenPricesService: TokenPricesService;
 }): RpcHandler {
   const {
     permissionConfirmationRenderHandler,
     accountController,
     permissionsContextBuilder,
+    tokenPricesService,
   } = config;
 
   return {
@@ -92,6 +96,7 @@ export function createRpcHandler(config: {
         },
         permissionConfirmationRenderHandler,
         permissionsContextBuilder,
+        tokenPricesService,
       };
       const orchestrateRes = await orchestrate(orchestrateArgs);
       logger.debug('isPermissionGranted', orchestrateRes.success);

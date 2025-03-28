@@ -4,6 +4,7 @@ import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testi
 import type { AccountControllerInterface } from '../../src/accountController';
 import type { PermissionsContextBuilder } from '../../src/orchestrators';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
+import type { TokenPricesService } from '../../src/services';
 import type { PermissionConfirmationRenderHandler } from '../../src/ui';
 
 describe('RpcHandler', () => {
@@ -22,6 +23,9 @@ describe('RpcHandler', () => {
   const mockPermissionsContextBuilder = {
     buildPermissionsContext: jest.fn(),
   } as jest.Mocked<PermissionsContextBuilder>;
+  const mockTokenPricesService = {
+    getCryptoToFiatConversion: jest.fn(),
+  } as unknown as jest.Mocked<TokenPricesService>;
   const mockSnapsProvider = createMockSnapsProvider();
 
   beforeEach(() => {
@@ -36,6 +40,7 @@ describe('RpcHandler', () => {
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
       permissionsContextBuilder: mockPermissionsContextBuilder,
+      tokenPricesService: mockTokenPricesService,
     });
   });
 

@@ -31,6 +31,7 @@ export type PermissionConfirmationContext<
   readonly address: Hex;
   readonly siteOrigin: string;
   readonly balance: Hex;
+  readonly valueFormattedAsCurrency: string;
   readonly chainId: number;
   expiry: number;
 };
@@ -43,5 +44,11 @@ export type PermissionConfirmationProps<
 > = JsonObject &
   Pick<
     PermissionConfirmationContext<TPermissionType>,
-    'permission' | 'address' | 'siteOrigin' | 'balance' | 'expiry' | 'chainId'
+    | 'permission'
+    | 'address'
+    | 'siteOrigin'
+    | 'balance'
+    | 'valueFormattedAsCurrency'
+    | 'expiry'
+    | 'chainId'
   >;
