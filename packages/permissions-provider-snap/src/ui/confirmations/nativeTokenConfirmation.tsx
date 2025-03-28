@@ -7,6 +7,7 @@ import {
   RequestHeader,
   RequestDetails,
   NativeTokenStreamRules,
+  RulesSelector,
 } from '../components';
 import type { PermissionConfirmationProps } from '../types';
 
@@ -68,6 +69,8 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         permissionSpecificRules={permissionSpecificRules}
         expiry={expiry}
       />
+
+      <RulesSelector permissionSpecificRules={permissionSpecificRules} />
     </Box>
   );
 };
