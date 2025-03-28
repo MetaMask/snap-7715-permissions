@@ -193,7 +193,7 @@ const onExpiryRemoveButtonClick: UserEventHandler<
   // TODO: Add the event handle logic to make the button interactive
 };
 
-export const requestDetailsEventHandlers = {
+export const nativeTokenStreamRulesEventHandlers = {
   // input change events handlers
   [NativeTokenStreamRulesEventNames.InitialAmount]: onInitialAmountInputChange,
   [NativeTokenStreamRulesEventNames.MaxAllowance]: onMaxAllowanceInputChange,
