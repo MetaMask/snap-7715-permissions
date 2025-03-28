@@ -1,2 +1,2 @@
 export * from './NativeTokenStreamRules';
-export * from './nativeTokenStreamRulesEvents';
+export * from './events';
