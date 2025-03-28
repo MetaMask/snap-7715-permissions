@@ -16,6 +16,7 @@ import {
   orchestrate,
 } from '../src/orchestrators';
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
+import type { TokenPricesService } from '../src/services';
 import type { PermissionConfirmationRenderHandler } from '../src/ui';
 
 describe('Orchestrate', () => {
@@ -52,6 +53,9 @@ describe('Orchestrate', () => {
     const mockPermissionsContextBuilder = {
       buildPermissionsContext: jest.fn(),
     } as jest.Mocked<PermissionsContextBuilder>;
+    const mockTokenPricesService = {
+      getCryptoToFiatConversion: jest.fn(),
+    } as unknown as jest.Mocked<TokenPricesService>;
     const orchestrator = createPermissionOrchestrator(mockPermissionType);
     const mockSnapsProvider = createMockSnapsProvider();
 
@@ -70,9 +74,10 @@ describe('Orchestrate', () => {
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
       permissionsContextBuilder: mockPermissionsContextBuilder,
+      tokenPricesService: mockTokenPricesService,
     };
 
-    it('should orchestrate and return a successfuly 7715 response when user confirms', async () => {
+    it('should orchestrate and return a successfully 7715 response when user confirms', async () => {
       // prepare mock user confirmation context
       mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
@@ -84,6 +89,11 @@ describe('Orchestrate', () => {
       // prepare mock permissions context builder
       mockPermissionsContextBuilder.buildPermissionsContext.mockResolvedValueOnce(
         '0x00_some_permission_context',
+      );
+
+      // prepare mock token prices service
+      mockTokenPricesService.getCryptoToFiatConversion.mockResolvedValueOnce(
+        '$1000',
       );
 
       // prepare mock account controller
@@ -140,7 +150,7 @@ describe('Orchestrate', () => {
       });
     });
 
-    it('should orchestrate and return a unsuccessfuly 7715 response when user rejects', async () => {
+    it('should orchestrate and return a unsuccessfully 7715 response when user rejects', async () => {
       // prepare mock user confirmation context
       mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
@@ -172,6 +182,11 @@ describe('Orchestrate', () => {
       mockSnapsProvider.request.mockResolvedValueOnce({
         expiry: '1',
       });
+
+      // prepare mock token prices service
+      mockTokenPricesService.getCryptoToFiatConversion.mockResolvedValueOnce(
+        '$1000',
+      );
 
       const res = await orchestrate(orchestrateArgs);
 

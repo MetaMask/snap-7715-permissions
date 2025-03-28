@@ -11,7 +11,7 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
-import { weiToEth } from '../../../utils';
+import { formatTokenBalance } from '../../../utils';
 
 export enum StreamAmountEventNames {
   StreamAmount = 'stream-amount:amount',
@@ -50,7 +50,7 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
       <Input
         name={StreamAmountEventNames.StreamAmount}
         type="number"
-        placeholder={weiToEth(maxAmount)}
+        placeholder={formatTokenBalance(maxAmount)}
         value={maxAmount}
         disabled={true}
       />

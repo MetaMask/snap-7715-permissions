@@ -2,6 +2,7 @@ import { createCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
+import type { TokenPricesService } from '../services';
 import type {
   PermissionConfirmationContext,
   PermissionConfirmationRenderHandler,
@@ -26,6 +27,7 @@ export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
     orchestrateMeta: OrchestrateMeta<TPermissionType>;
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
     permissionsContextBuilder: PermissionsContextBuilder;
+    tokenPricesService: TokenPricesService;
   };
 
 /**
@@ -67,16 +69,24 @@ export const orchestrate = async <
     orchestrateMeta,
     permissionConfirmationRenderHandler,
     permissionsContextBuilder,
+    tokenPricesService,
   } = orchestrateArgs;
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
   const chainIdNum = fromHex(chainId, 'number');
+  const caipAssetType = orchestrator.getTokenCaipAssetType(
+    permission,
+    chainIdNum,
+  );
 
   // Get the user account details
   const [address, balance] = await prepareAccountDetails(
     accountController,
     fromHex(chainId, 'number'),
   );
+
+  const valueFormattedAsCurrency =
+    await tokenPricesService.getCryptoToFiatConversion(caipAssetType, balance);
 
   // Prepare specific context object and confirmation page for the permission type
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
@@ -86,6 +96,7 @@ export const orchestrate = async <
     balance,
     chainId: chainIdNum,
     expiry,
+    valueFormattedAsCurrency,
   };
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);

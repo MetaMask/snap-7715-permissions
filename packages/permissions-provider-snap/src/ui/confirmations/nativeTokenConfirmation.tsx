@@ -19,21 +19,30 @@ import type { PermissionConfirmationProps } from '../types';
  * @param props.chainId - The chain ID.
  * @param props.address - The account address.
  * @param props.balance - The account balance.
+ * @param props.valueFormattedAsCurrency - The account balance formatted as currency that matches the user's preferences.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
-> = ({ siteOrigin, permission, chainId, address, balance }) => {
+> = ({
+  siteOrigin,
+  permission,
+  chainId,
+  address,
+  balance,
+  valueFormattedAsCurrency,
+}) => {
   const asset = 'ETH';
   const accountDetailsProps: AccountDetailsProps = {
-    accounts: [
-      {
-        address,
-        balance,
-        asset,
-      },
-    ],
-    permissionIndex: 0,
+    account: {
+      address,
+      balance,
+      valueFormattedAsCurrency,
+    },
+    senderDetails: {
+      title: 'Stream from',
+      tooltip: 'Tooltip text',
+    },
   };
   return (
     <Box>
@@ -47,8 +56,8 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       />
 
       <AccountDetails
-        accounts={accountDetailsProps.accounts}
-        permissionIndex={accountDetailsProps.permissionIndex}
+        account={accountDetailsProps.account}
+        senderDetails={accountDetailsProps.senderDetails}
       />
 
       <StreamAmount maxAmount={permission.data.maxAmount} />
