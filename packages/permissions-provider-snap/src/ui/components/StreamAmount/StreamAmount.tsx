@@ -10,6 +10,7 @@ import {
   Dropdown,
 } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
+import { formatUnits } from 'viem';
 
 import { formatTokenBalance } from '../../../utils';
 
@@ -23,30 +24,71 @@ type StreamAmountProps = {
 };
 
 /**
+ * An enum representing the time periods for which the stream rate can be calculated.
+ */
+enum TimePeriod {
+  DAILY = 'Daily',
+  WEEKLY = 'Weekly',
+  MONTHLY = 'Monthly',
+}
+
+/**
+ * A mapping of time periods to their equivalent seconds.
+ */
+const TIME_PERIOD_MAPPING: Record<TimePeriod, number> = {
+  [TimePeriod.DAILY]: 60 * 60 * 24, // 86,400(seconds)
+  [TimePeriod.WEEKLY]: 60 * 60 * 24 * 7, // 604,800(seconds)
+  [TimePeriod.MONTHLY]: 60 * 60 * 24 * 30, // 2,592,000(seconds)
+};
+
+/**
+ * Calculate the stream rate for the given total balance and time period.
+ * - stream rate = total balance of asset / time period(in seconds).
+ *
+ * @param wei - The total balance of the asset.
+ * @param timePeriod - The time period for which the stream rate is calculated.
+ * @param tokenDecimal - The decimal places for the token.
+ * @returns The stream rate for the given total balance and time period.
+ */
+const calculateStreamRate = (
+  wei: Hex,
+  timePeriod: TimePeriod,
+  tokenDecimal = 18,
+): string => {
+  const tokenBalance = formatUnits(BigInt(wei), tokenDecimal);
+  const tokenBalanceNum = parseFloat(tokenBalance);
+  return (tokenBalanceNum / TIME_PERIOD_MAPPING[timePeriod]).toFixed(
+    tokenDecimal,
+  );
+};
+
+/**
  * Helper function to display text and tooltip for input fields.
  *
- * @param text - The text to display.
+ * @param leftText - The text to display on the left side.
+ * @param rightText - The text to display on the right side.
  * @param tooltip - The tooltip text.
  * @returns Return a component with text and tooltip.
  */
-const inputDetails = (text: string, tooltip: string) => (
+const inputDetails = (leftText: string, rightText: string, tooltip: string) => (
   <Box direction="horizontal" alignment="space-between">
     <Box direction="horizontal">
-      <Text>{text}</Text>
+      <Text>{leftText}</Text>
       <Tooltip content={<Text>{tooltip}</Text>}>
         <Icon name="question" size="inherit" color="muted" />
       </Tooltip>
     </Box>
-    <Text color="muted">Required</Text>
+    <Text color="alternative">{rightText}</Text>
   </Box>
 );
 
 export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   maxAmount,
 }) => {
+  const timePeriodValue = TimePeriod.WEEKLY;
   return (
     <Section>
-      {inputDetails('Stream Amount', 'tooltip text')}
+      {inputDetails('Stream Amount', 'Required', 'tooltip text')}
       <Input
         name={StreamAmountEventNames.StreamAmount}
         type="number"
@@ -55,16 +97,22 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
         disabled={true}
       />
 
-      {inputDetails('Period', 'tooltip text')}
+      {inputDetails('Period', 'Required', 'tooltip text')}
       <Dropdown
         name={StreamAmountEventNames.Period}
         disabled={true}
-        value="Weekly"
+        value={timePeriodValue}
       >
-        <Option value="Monthly">Monthly</Option>
-        <Option value="Weekly">Weekly</Option>
-        <Option value="Daily">Daily</Option>
+        <Option value={TimePeriod.MONTHLY}>{TimePeriod.MONTHLY}</Option>
+        <Option value={TimePeriod.WEEKLY}>{TimePeriod.WEEKLY}</Option>
+        <Option value={TimePeriod.DAILY}>{TimePeriod.DAILY}</Option>
       </Dropdown>
+
+      {inputDetails(
+        'Stream rate',
+        `${calculateStreamRate(maxAmount, timePeriodValue)} ETH/sec`,
+        'tooltip text',
+      )}
     </Section>
   );
 };
