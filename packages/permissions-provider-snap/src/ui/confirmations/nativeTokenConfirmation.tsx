@@ -2,7 +2,12 @@ import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountDetailsProps } from '../components';
-import { AccountDetails, RequestHeader, RequestDetails } from '../components';
+import {
+  AccountDetails,
+  RequestHeader,
+  RequestDetails,
+  StreamAmount,
+} from '../components';
 import type { PermissionConfirmationProps } from '../types';
 
 /**
@@ -54,6 +59,8 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         account={accountDetailsProps.account}
         senderDetails={accountDetailsProps.senderDetails}
       />
+
+      <StreamAmount maxAmount={permission.data.maxAmount} />
     </Box>
   );
 };
