@@ -51,6 +51,9 @@ describe('Permission Confirmation Render Handler', () => {
       expiry: 1,
       chainId: 11155111,
       valueFormattedAsCurrency: '$1,000.00',
+      permissionSpecificRules: {
+        maxAllowance: 'Unlimited',
+      },
     };
 
   const mockPage = (
@@ -62,6 +65,7 @@ describe('Permission Confirmation Render Handler', () => {
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
       valueFormattedAsCurrency={mockContext.valueFormattedAsCurrency}
+      permissionSpecificRules={mockContext.permissionSpecificRules}
     />
   );
 

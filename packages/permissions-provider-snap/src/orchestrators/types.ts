@@ -10,6 +10,7 @@ import type { Address, Hex, OneOf } from 'viem';
 
 import type { PermissionConfirmationContext } from '../ui';
 import type {
+  PermissionSpecificRulesMapping,
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from './orchestrator';
@@ -116,6 +117,15 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
     expiry: number;
     permission: PermissionTypeMapping[TPermissionType];
   }>;
+
+  /**
+   * Gets the permission specific rules for the permission type. These are default values depending on the permission type.
+   * @param permission - The permission to get the specific rules for.
+   * @returns The permission specific rules for the permission type.
+   */
+  getPermissionSpecificRules: (
+    permission: PermissionTypeMapping[TPermissionType],
+  ) => PermissionSpecificRulesMapping[TPermissionType];
 };
 
 /**

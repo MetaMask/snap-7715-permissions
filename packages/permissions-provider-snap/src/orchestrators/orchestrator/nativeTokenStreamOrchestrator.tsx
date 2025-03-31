@@ -8,6 +8,7 @@ import {
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
+import type { Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
@@ -15,12 +16,24 @@ import type {
   OrchestratorFactoryFunction,
   PermissionContextMeta,
 } from '../types';
-import type { PermissionTypeMapping } from './types';
+import type {
+  PermissionSpecificRulesMapping,
+  PermissionTypeMapping,
+} from './types';
 
 declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
   interface PermissionTypeMapping {
     'native-token-stream': JsonObject & NativeTokenStreamPermission; // JsonObject & NativeTokenStreamPermission to be compatible with the Snap JSON object type
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
+  interface PermissionSpecificRulesMapping {
+    'native-token-stream': JsonObject & {
+      maxAllowance?: Hex | 'Unlimited';
+      initialAmount?: Hex;
+      startTime?: number;
+    };
   }
 }
 
@@ -129,6 +142,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           expiry={context.expiry}
           chainId={context.chainId}
           valueFormattedAsCurrency={context.valueFormattedAsCurrency}
+          permissionSpecificRules={context.permissionSpecificRules}
         />
       );
     },
@@ -166,6 +180,15 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
     ) {
       // TODO: Use the chainId to determine the native asset type since native token is not always ETH on all chains
       return `eip155:1/slip44:60`;
+    },
+    getPermissionSpecificRules: (
+      permission: PermissionTypeMapping['native-token-stream'],
+    ) => {
+      return {
+        maxAllowance: 'Unlimited',
+        initialAmount: permission.data.initialAmount,
+        startTime: permission.data.startTime,
+      } as PermissionSpecificRulesMapping['native-token-stream'];
     },
   };
 };

@@ -47,6 +47,9 @@ describe('native-token-stream Orchestrator', () => {
     expiry: 1,
     chainId: 11155111,
     valueFormattedAsCurrency: '$1,000.00',
+    permissionSpecificRules: {
+      maxAllowance: 'Unlimited',
+    },
   };
 
   const mockPage = (
@@ -58,6 +61,7 @@ describe('native-token-stream Orchestrator', () => {
       expiry={mockUiContext.expiry}
       chainId={mockUiContext.chainId}
       valueFormattedAsCurrency={mockUiContext.valueFormattedAsCurrency}
+      permissionSpecificRules={mockUiContext.permissionSpecificRules}
     />
   );
 
