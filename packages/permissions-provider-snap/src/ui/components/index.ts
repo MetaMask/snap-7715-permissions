@@ -4,4 +4,5 @@ export * from './AccountDetails';
 export * from './spending-cap-details';
 export * from './pagination';
 export * from './confirmation-footer';
+export * from './StreamAmount';
 export * from './Rules';

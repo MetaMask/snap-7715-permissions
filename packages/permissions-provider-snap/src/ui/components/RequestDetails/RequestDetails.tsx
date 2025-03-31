@@ -11,7 +11,7 @@ import {
 import { extractChain } from 'viem';
 import * as ALL_CHAINS from 'viem/chains';
 
-import { ASSET_ICONS, NETWORK_ICONS } from '../../iconConstant';
+import { ICONS } from '../../iconConstant';
 
 export enum RequestDetailsEventNames {
   ShowMoreButton = 'request-details.show-more-button',
@@ -100,9 +100,8 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
     id: chainId as any,
   });
 
-  const networkIcon = NETWORK_ICONS[chainId];
-  const assetIcon = ASSET_ICONS[chainId];
-  if (!networkIcon || !assetIcon) {
+  const icons = ICONS[chainId];
+  if (!icons) {
     throw new Error('No icon found');
   }
 
@@ -115,12 +114,12 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
     {
       label: 'Network',
       text: chain.name,
-      iconUrl: networkIcon,
+      iconUrl: icons.network,
     },
     {
       label: 'Token',
       text: asset,
-      iconUrl: assetIcon,
+      iconUrl: icons.token,
     },
     {
       label: 'Reason',
