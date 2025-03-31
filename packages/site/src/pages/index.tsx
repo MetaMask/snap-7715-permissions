@@ -1,7 +1,15 @@
 import { erc7715ProviderActions } from '@metamask-private/delegator-core-viem/experimental';
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { type Hex, createClient, http, custom, createPublicClient } from 'viem';
+import {
+  type Hex,
+  createClient,
+  http,
+  custom,
+  createPublicClient,
+  parseUnits,
+  toHex,
+} from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
 import { sepolia as chain } from 'viem/chains';
 
@@ -205,9 +213,15 @@ const Index = () => {
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
 
   const chainId = chain.id;
-  const [initialAmount, setInitialAmount] = useState(1n);
-  const [amountPerSecond, setAmountPerSecond] = useState(1n);
-  const [maxAmount, setMaxAmount] = useState(2000n);
+  const [initialAmount, setInitialAmount] = useState(
+    BigInt(toHex(parseUnits('.5', 18))),
+  ); // .5 ETH in wei
+  const [amountPerSecond, setAmountPerSecond] = useState(
+    BigInt(toHex(parseUnits('.5', 18))),
+  ); // .5 ETH in wei
+  const [maxAmount, setMaxAmount] = useState(
+    BigInt(toHex(parseUnits('2.5', 18))),
+  ); // 2.5 ETH in wei
   const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
   const [expiry, setExpiry] = useState(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now

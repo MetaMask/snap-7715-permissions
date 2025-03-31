@@ -8,10 +8,7 @@ import type {
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../src/orchestrators';
-import type {
-  DialogContentEventHandlers,
-  PermissionConfirmationContext,
-} from '../src/ui';
+import type { PermissionConfirmationContext } from '../src/ui';
 import { createPermissionConfirmationRenderHandler } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
@@ -54,6 +51,9 @@ describe('Permission Confirmation Render Handler', () => {
       expiry: 1,
       chainId: 11155111,
       valueFormattedAsCurrency: '$1,000.00',
+      permissionSpecificRules: {
+        maxAllowance: 'Unlimited',
+      },
     };
 
   const mockPage = (
@@ -65,15 +65,9 @@ describe('Permission Confirmation Render Handler', () => {
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
       valueFormattedAsCurrency={mockContext.valueFormattedAsCurrency}
+      permissionSpecificRules={mockContext.permissionSpecificRules}
     />
   );
-
-  const mockPageEventHandlers: DialogContentEventHandlers[] = [
-    {
-      eventType: UserInputEventType.ButtonClickEvent,
-      handler: jest.fn(),
-    },
-  ];
 
   beforeEach(() => {
     mockSnapProvider.request.mockReset();
@@ -114,7 +108,6 @@ describe('Permission Confirmation Render Handler', () => {
           mockContext,
           mockPage,
           mockPermissionType,
-          mockPageEventHandlers,
         );
 
       expect(interfaceId).toEqual(mockInterfaceId);
@@ -180,7 +173,6 @@ describe('Permission Confirmation Render Handler', () => {
           mockContext,
           mockPage,
           mockPermissionType,
-          mockPageEventHandlers,
         );
 
       expect(interfaceId).toEqual(mockInterfaceId);
@@ -226,49 +218,6 @@ describe('Permission Confirmation Render Handler', () => {
         handler: expect.any(Function),
         interfaceId: mockInterfaceId,
       });
-    });
-
-    it('should register the dialog content EventHandlers when creating the confirmation dialog', async () => {
-      const mockInterfaceId = 'mock-interface-id';
-      mockSnapProvider.request
-        .mockResolvedValueOnce(mockInterfaceId) // snap_createInterface
-        .mockResolvedValueOnce({}) // snap_dialog
-        .mockResolvedValueOnce({}); // snap_resolveInterface
-
-      const permissionConfirmationRenderHandler =
-        createPermissionConfirmationRenderHandler({
-          snapsProvider: mockSnapProvider,
-          userEventDispatcher: mockUserEventDispatcher,
-        });
-
-      const { interfaceId } =
-        await permissionConfirmationRenderHandler.createConfirmationDialog(
-          mockContext,
-          mockPage,
-          mockPermissionType,
-          mockPageEventHandlers,
-        );
-
-      expect(interfaceId).toEqual(mockInterfaceId);
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  describe('cleanupDialogContentEventHandlers()', () => {
-    it('should deregister dialog content EventHandlers', async () => {
-      const mockInterfaceId = 'mock-interface-id';
-      const permissionConfirmationRenderHandler =
-        createPermissionConfirmationRenderHandler({
-          snapsProvider: mockSnapProvider,
-          userEventDispatcher: mockUserEventDispatcher,
-        });
-
-      permissionConfirmationRenderHandler.cleanupDialogContentEventHandlers(
-        mockInterfaceId,
-        mockPageEventHandlers,
-      );
-
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
     });
   });
 });

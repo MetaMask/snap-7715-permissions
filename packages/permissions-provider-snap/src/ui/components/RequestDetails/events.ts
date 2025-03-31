@@ -2,8 +2,10 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { ButtonClickEvent, InterfaceContext } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
-import type { UserEventHandler } from '../../../userEventDispatcher';
-import type { DialogContentEventHandlers } from '../../handler';
+import type {
+  DialogContentEventHandlers,
+  UserEventHandler,
+} from '../../../userEventDispatcher';
 import { RequestDetailsEventNames } from './RequestDetails';
 
 /**

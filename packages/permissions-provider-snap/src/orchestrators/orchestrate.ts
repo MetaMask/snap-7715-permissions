@@ -8,6 +8,7 @@ import {
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
 } from '../ui';
+import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { SupportedPermissionTypes } from './orchestrator';
 import type { PermissionsContextBuilder } from './permissionsContextBuilder';
 import type {
@@ -29,6 +30,7 @@ export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
     permissionsContextBuilder: PermissionsContextBuilder;
     tokenPricesService: TokenPricesService;
+    userEventDispatcher: UserEventDispatcher;
   };
 
 /**
@@ -71,6 +73,7 @@ export const orchestrate = async <
     permissionConfirmationRenderHandler,
     permissionsContextBuilder,
     tokenPricesService,
+    userEventDispatcher,
   } = orchestrateArgs;
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
@@ -92,6 +95,8 @@ export const orchestrate = async <
   // Prepare specific context object and confirmation page for the permission type
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permission,
+    permissionSpecificRules:
+      orchestrator.getPermissionSpecificRules(permission),
     address,
     siteOrigin: origin,
     balance,
@@ -102,17 +107,28 @@ export const orchestrate = async <
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
 
-  const dialogContentEventHandlers = [
-    ...sharedComponentsEventHandlers,
-    ...orchestrator.getConfirmationDialogEventHandlers(),
-  ];
   const { confirmationResult, interfaceId } =
     await permissionConfirmationRenderHandler.createConfirmationDialog(
       uiContext,
       permissionDialog,
       permissionType,
-      dialogContentEventHandlers,
     );
+
+  // Register event handlers for confirmation dialog
+  const dialogContentEventHandlers = [
+    ...sharedComponentsEventHandlers,
+    ...orchestrator.getConfirmationDialogEventHandlers(),
+  ];
+
+  if (dialogContentEventHandlers.length > 0) {
+    dialogContentEventHandlers.forEach(({ eventType, handler }) => {
+      userEventDispatcher.on({
+        eventType,
+        interfaceId,
+        handler,
+      });
+    });
+  }
 
   const isConfirmationAccepted = await confirmationResult;
 
@@ -123,10 +139,15 @@ export const orchestrate = async <
     });
 
   // Cleanup the event handlers after the dialog is closed
-  permissionConfirmationRenderHandler.cleanupDialogContentEventHandlers(
-    interfaceId,
-    dialogContentEventHandlers,
-  );
+  if (dialogContentEventHandlers.length > 0) {
+    dialogContentEventHandlers.forEach(({ eventType, handler }) => {
+      userEventDispatcher.off({
+        eventType,
+        interfaceId,
+        handler,
+      });
+    });
+  }
 
   if (!isConfirmationAccepted) {
     return {

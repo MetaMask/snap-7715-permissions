@@ -18,11 +18,19 @@ import {
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
 import type { TokenPricesService } from '../src/services';
 import type { PermissionConfirmationRenderHandler } from '../src/ui';
+import { UserEventDispatcher } from '../src/userEventDispatcher';
+
+jest.mock('../src/userEventDispatcher');
 
 describe('Orchestrate', () => {
   const address = getAddress('0x1234567890123456789012345678901234567890');
   const sessionAccount = getAddress(
     '0x1234567890123456789012345678901234567890',
+  );
+  const mockUserEventDispatcher = new UserEventDispatcher();
+
+  (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
+    () => mockUserEventDispatcher,
   );
 
   describe('native-token-stream', () => {
@@ -76,6 +84,7 @@ describe('Orchestrate', () => {
         mockPermissionConfirmationRenderHandler,
       permissionsContextBuilder: mockPermissionsContextBuilder,
       tokenPricesService: mockTokenPricesService,
+      userEventDispatcher: mockUserEventDispatcher,
     };
 
     it('should orchestrate and return a successfully 7715 response when user confirms', async () => {
@@ -118,6 +127,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(1);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -191,6 +202,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(1);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

@@ -4,6 +4,7 @@ import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
 import type {
+  PermissionSpecificRulesMapping,
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../orchestrators';
@@ -28,6 +29,7 @@ export type PermissionConfirmationContext<
   TPermissionType extends SupportedPermissionTypes,
 > = InterfaceContext & {
   permission: PermissionTypeMapping[TPermissionType];
+  permissionSpecificRules: PermissionSpecificRulesMapping[TPermissionType];
   readonly address: Hex;
   readonly siteOrigin: string;
   readonly balance: Hex;
@@ -51,4 +53,15 @@ export type PermissionConfirmationProps<
     | 'valueFormattedAsCurrency'
     | 'expiry'
     | 'chainId'
+    | 'permissionSpecificRules'
   >;
+
+/**
+ * The props for the permission rules.
+ */
+export type PermissionSpecificRulesProps<
+  TPermissionType extends SupportedPermissionTypes,
+> = JsonObject & {
+  permissionSpecificRules: PermissionSpecificRulesMapping[TPermissionType];
+  expiry: number;
+};
