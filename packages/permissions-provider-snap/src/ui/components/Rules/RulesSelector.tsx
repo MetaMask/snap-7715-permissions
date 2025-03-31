@@ -7,7 +7,7 @@ import type {
 } from '../../../orchestrators';
 
 export enum RulesSelectorsEventNames {
-  AddMoreRules = 'rules-selector:expiry-remove',
+  AddMoreRules = 'rules-selector:add-more-rules',
 }
 
 type RulesSelectorProps<TPermissionType extends SupportedPermissionTypes> = {

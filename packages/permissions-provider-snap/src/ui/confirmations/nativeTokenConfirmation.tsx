@@ -6,6 +6,7 @@ import {
   AccountDetails,
   RequestHeader,
   RequestDetails,
+  StreamAmount,
   NativeTokenStreamRules,
   RulesSelector,
 } from '../components';
@@ -64,6 +65,8 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         account={accountDetailsProps.account}
         senderDetails={accountDetailsProps.senderDetails}
       />
+
+      <StreamAmount maxAmount={permission.data.maxAmount} />
 
       <NativeTokenStreamRules
         permissionSpecificRules={permissionSpecificRules}
