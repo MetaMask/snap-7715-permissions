@@ -11,6 +11,11 @@ import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
+import {
+  nativeTokenStreamRulesEventHandlers,
+  requestDetailsButtonEventHandlers,
+  rulesSelectorEventHandlers,
+} from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
 import type {
   OrchestratorFactoryFunction,
@@ -191,8 +196,11 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       } as PermissionSpecificRulesMapping['native-token-stream'];
     },
     getConfirmationDialogEventHandlers: () => {
-      // TODO: Add all native token stream events handlers
-      return [];
+      return [
+        ...requestDetailsButtonEventHandlers,
+        ...rulesSelectorEventHandlers,
+        ...nativeTokenStreamRulesEventHandlers,
+      ];
     },
   };
 };

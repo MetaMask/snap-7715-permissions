@@ -127,8 +127,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(1);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(10);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(10);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -202,8 +202,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(1);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(10);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(10);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

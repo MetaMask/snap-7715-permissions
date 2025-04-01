@@ -4,7 +4,6 @@ import { fromHex, type Hex } from 'viem';
 import type { AccountControllerInterface } from '../accountController';
 import type { TokenPricesService } from '../services';
 import {
-  sharedComponentsEventHandlers,
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
 } from '../ui';
@@ -115,10 +114,8 @@ export const orchestrate = async <
     );
 
   // Register event handlers for confirmation dialog
-  const dialogContentEventHandlers = [
-    ...sharedComponentsEventHandlers,
-    ...orchestrator.getConfirmationDialogEventHandlers(),
-  ];
+  const dialogContentEventHandlers =
+    orchestrator.getConfirmationDialogEventHandlers();
 
   if (dialogContentEventHandlers.length > 0) {
     dialogContentEventHandlers.forEach(({ eventType, handler }) => {

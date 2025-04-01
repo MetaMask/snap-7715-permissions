@@ -254,7 +254,7 @@ describe('native-token-stream Orchestrator', () => {
 
     it('should return confirmation dialog EventHandlers', async () => {
       const res = orchestrator.getConfirmationDialogEventHandlers();
-      expect(res).toStrictEqual([]);
+      expect(res.length).toStrictEqual(10);
     });
   });
 });
