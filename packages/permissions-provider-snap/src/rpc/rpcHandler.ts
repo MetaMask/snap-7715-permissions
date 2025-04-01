@@ -16,6 +16,7 @@ import {
 } from '../orchestrators';
 import type { TokenPricesService } from '../services';
 import type { PermissionConfirmationRenderHandler } from '../ui';
+import type { UserEventDispatcher } from '../userEventDispatcher';
 import { validatePermissionRequestParam } from '../utils';
 
 /**
@@ -39,6 +40,7 @@ export type RpcHandler = {
  * @param config.permissionConfirmationRenderHandler - The permission confirmation render handler.
  * @param config.permissionsContextBuilder - The permissions context builder.
  * @param config.tokenPricesService - The token prices service.
+ * @param config.userEventDispatcher - The user event dispatcher.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
@@ -46,12 +48,14 @@ export function createRpcHandler(config: {
   permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
   permissionsContextBuilder: PermissionsContextBuilder;
   tokenPricesService: TokenPricesService;
+  userEventDispatcher: UserEventDispatcher;
 }): RpcHandler {
   const {
     permissionConfirmationRenderHandler,
     accountController,
     permissionsContextBuilder,
     tokenPricesService,
+    userEventDispatcher,
   } = config;
 
   return {
@@ -97,6 +101,7 @@ export function createRpcHandler(config: {
         permissionConfirmationRenderHandler,
         permissionsContextBuilder,
         tokenPricesService,
+        userEventDispatcher,
       };
       const orchestrateRes = await orchestrate(orchestrateArgs);
       logger.debug('isPermissionGranted', orchestrateRes.success);

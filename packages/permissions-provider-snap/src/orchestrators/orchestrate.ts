@@ -3,10 +3,11 @@ import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
 import type { TokenPricesService } from '../services';
-import type {
-  PermissionConfirmationContext,
-  PermissionConfirmationRenderHandler,
+import {
+  type PermissionConfirmationContext,
+  type PermissionConfirmationRenderHandler,
 } from '../ui';
+import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { SupportedPermissionTypes } from './orchestrator';
 import type { PermissionsContextBuilder } from './permissionsContextBuilder';
 import type {
@@ -28,6 +29,7 @@ export type OrchestrateArgs<TPermissionType extends SupportedPermissionTypes> =
     permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
     permissionsContextBuilder: PermissionsContextBuilder;
     tokenPricesService: TokenPricesService;
+    userEventDispatcher: UserEventDispatcher;
   };
 
 /**
@@ -70,6 +72,7 @@ export const orchestrate = async <
     permissionConfirmationRenderHandler,
     permissionsContextBuilder,
     tokenPricesService,
+    userEventDispatcher,
   } = orchestrateArgs;
   const { chainId, sessionAccount, origin, expiry, permission } =
     orchestrateMeta;
@@ -103,12 +106,26 @@ export const orchestrate = async <
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
 
-  const { confirmationResult } =
+  const { confirmationResult, interfaceId } =
     await permissionConfirmationRenderHandler.createConfirmationDialog(
       uiContext,
       permissionDialog,
       permissionType,
     );
+
+  // Register event handlers for confirmation dialog
+  const dialogContentEventHandlers =
+    orchestrator.getConfirmationDialogEventHandlers();
+
+  if (dialogContentEventHandlers.length > 0) {
+    dialogContentEventHandlers.forEach(({ eventType, handler }) => {
+      userEventDispatcher.on({
+        eventType,
+        interfaceId,
+        handler,
+      });
+    });
+  }
 
   const isConfirmationAccepted = await confirmationResult;
 
@@ -117,6 +134,17 @@ export const orchestrate = async <
       requestedPermission: permission,
       requestedExpiry: expiry,
     });
+
+  // Cleanup the event handlers after the dialog is closed
+  if (dialogContentEventHandlers.length > 0) {
+    dialogContentEventHandlers.forEach(({ eventType, handler }) => {
+      userEventDispatcher.off({
+        eventType,
+        interfaceId,
+        handler,
+      });
+    });
+  }
 
   if (!isConfirmationAccepted) {
     return {

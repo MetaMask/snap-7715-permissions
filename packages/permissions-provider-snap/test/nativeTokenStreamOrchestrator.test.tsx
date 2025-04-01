@@ -244,4 +244,17 @@ describe('native-token-stream Orchestrator', () => {
       expect(res).toStrictEqual('eip155:1/slip44:60');
     });
   });
+
+  describe('getConfirmationDialogEventHandlers', () => {
+    let orchestrator: Orchestrator<'native-token-stream'>;
+
+    beforeEach(() => {
+      orchestrator = createPermissionOrchestrator(mockPermissionType);
+    });
+
+    it('should return confirmation dialog EventHandlers', async () => {
+      const res = orchestrator.getConfirmationDialogEventHandlers();
+      expect(res.length).toStrictEqual(10);
+    });
+  });
 });
