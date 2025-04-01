@@ -66,11 +66,10 @@ const calculateStreamRate = (
  * Helper function to display text and tooltip for input fields.
  *
  * @param leftText - The text to display on the left side.
- * @param rightText - The text to display on the right side.
  * @param tooltip - The tooltip text.
  * @returns Return a component with text and tooltip.
  */
-const inputDetails = (leftText: string, rightText: string, tooltip: string) => (
+const inputDetails = (leftText: string, tooltip: string) => (
   <Box direction="horizontal" alignment="space-between">
     <Box direction="horizontal">
       <Text>{leftText}</Text>
@@ -78,7 +77,6 @@ const inputDetails = (leftText: string, rightText: string, tooltip: string) => (
         <Icon name="question" size="inherit" color="muted" />
       </Tooltip>
     </Box>
-    <Text color="alternative">{rightText}</Text>
   </Box>
 );
 
@@ -86,9 +84,10 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   maxAmount,
 }) => {
   const timePeriodValue = TimePeriod.WEEKLY;
+  const streamRate = calculateStreamRate(maxAmount, timePeriodValue);
   return (
     <Section>
-      {inputDetails('Stream Amount', 'Required', 'tooltip text')}
+      {inputDetails('Stream Amount', 'tooltip text')}
       <Input
         name={StreamAmountEventNames.StreamAmount}
         type="number"
@@ -97,7 +96,7 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
         disabled={true}
       />
 
-      {inputDetails('Period', 'Required', 'tooltip text')}
+      {inputDetails('Period', 'tooltip text')}
       <Dropdown
         name={StreamAmountEventNames.Period}
         disabled={true}
@@ -108,11 +107,14 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
         <Option value={TimePeriod.DAILY}>{TimePeriod.DAILY}</Option>
       </Dropdown>
 
-      {inputDetails(
-        'Stream rate',
-        `${calculateStreamRate(maxAmount, timePeriodValue)} ETH/sec`,
-        'tooltip text',
-      )}
+      {inputDetails('Stream rate', 'tooltip text')}
+      <Input
+        name="stream-rate"
+        type="text"
+        placeholder={`${streamRate} ETH/sec`}
+        value={`${streamRate} ETH/sec`}
+        disabled={true}
+      />
     </Section>
   );
 };
