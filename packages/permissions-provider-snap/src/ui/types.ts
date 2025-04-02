@@ -9,6 +9,8 @@ import type {
   SupportedPermissionTypes,
 } from '../orchestrators';
 
+export type ElementState = Record<string, any>;
+
 /**
  * The delegation in transit object with salt as a hex string to be compatible with the Snap context { [prop: string]: Json; } object.
  */
@@ -36,6 +38,7 @@ export type PermissionConfirmationContext<
   readonly valueFormattedAsCurrency: string;
   readonly chainId: number;
   expiry: number;
+  elementState: ElementState;
 };
 
 /**

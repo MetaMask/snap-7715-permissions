@@ -1,11 +1,13 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { ButtonClickEvent, InterfaceContext } from '@metamask/snaps-sdk';
+import type { ButtonClickEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type {
   DialogContentEventHandlers,
-  UserEventHandler,
-} from '../../../userEventDispatcher';
+  SupportedPermissionTypes,
+} from '../../../orchestrators';
+import type { UserEventHandler } from '../../../userEventDispatcher';
+import type { PermissionConfirmationContext } from '../../types';
 import { RulesSelectorsEventNames } from './RulesSelector';
 
 /**
@@ -13,16 +15,16 @@ import { RulesSelectorsEventNames } from './RulesSelector';
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onAddMoreRulesButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: ButtonClickEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -33,13 +35,14 @@ const onAddMoreRulesButtonClick: UserEventHandler<
   }
   logger.debug(
     `Handling onAddMoreRulesButtonClick event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
 
 export const rulesSelectorEventHandlers: DialogContentEventHandlers[] = [
   {
+    state: {},
     eventType: UserInputEventType.ButtonClickEvent,
     handler: onAddMoreRulesButtonClick as UserEventHandler<UserInputEventType>,
   },

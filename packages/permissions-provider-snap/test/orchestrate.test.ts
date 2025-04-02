@@ -57,7 +57,6 @@ describe('Orchestrate', () => {
     } as jest.Mocked<AccountControllerInterface>;
     const mockPermissionConfirmationRenderHandler = {
       createConfirmationDialog: jest.fn(),
-      cleanupDialogContentEventHandlers: jest.fn(),
     } as jest.Mocked<PermissionConfirmationRenderHandler>;
     const mockPermissionsContextBuilder = {
       buildPermissionsContext: jest.fn(),

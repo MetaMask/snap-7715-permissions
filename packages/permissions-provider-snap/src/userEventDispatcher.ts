@@ -1,4 +1,8 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { Permission } from '@metamask/7715-permissions-shared/types';
+import {
+  extractPermissionName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
 import type {
   ButtonClickEvent,
   FileUploadEvent,
@@ -9,10 +13,8 @@ import type {
   UserInputEventType,
 } from '@metamask/snaps-sdk';
 
-export type DialogContentEventHandlers = {
-  eventType: UserInputEventType;
-  handler: UserEventHandler<UserInputEventType>;
-};
+import type { SupportedPermissionTypes } from './orchestrators';
+import type { PermissionConfirmationContext } from './ui';
 
 export type UserInputEventByType<
   TUserInputEventType extends UserInputEventType,
@@ -26,7 +28,7 @@ export type UserInputEventByType<
 export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
   (args: {
     event: UserInputEventByType<TUserInputEventType>;
-    context: InterfaceContext | null;
+    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
   }) => void | Promise<void>;
 
 const getUserInputEventKey = ({
@@ -137,6 +139,22 @@ export class UserEventDispatcher {
   }): Promise<void> {
     const { event, id, context } = args;
 
+    // safely cast the permission type
+    if (!context) {
+      return;
+    }
+
+    if (!('permission' in context)) {
+      return;
+    }
+
+    const permissionType = extractPermissionName(
+      (context.permission as Permission).type,
+    ) as SupportedPermissionTypes;
+    const parsedContext = context as PermissionConfirmationContext<
+      typeof permissionType
+    >;
+
     const eventKey = getUserInputEventKey({
       eventType: event.type,
       interfaceId: id,
@@ -152,7 +170,7 @@ export class UserEventDispatcher {
       try {
         await handler({
           event,
-          context,
+          attenuatedContext: parsedContext,
         });
       } catch (error) {
         logger.error(

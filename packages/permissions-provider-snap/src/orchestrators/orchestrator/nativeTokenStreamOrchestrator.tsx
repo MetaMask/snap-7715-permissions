@@ -163,13 +163,11 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
       return updatedCaveatBuilder;
     },
-    resolveAttenuatedPermission: async ({
-      requestedPermission,
-      requestedExpiry,
-    }: {
-      requestedPermission: PermissionTypeMapping['native-token-stream'];
-      requestedExpiry: number;
-    }) => {
+    resolveAttenuatedPermission: async (
+      attenuatedContext: PermissionConfirmationContext<'native-token-stream'>,
+    ) => {
+      const { permission: requestedPermission, expiry: requestedExpiry } =
+        attenuatedContext;
       const attenuatedPermission = {
         ...requestedPermission,
       };

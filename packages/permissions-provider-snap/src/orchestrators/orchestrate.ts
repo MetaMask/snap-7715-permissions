@@ -3,6 +3,7 @@ import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
 import type { TokenPricesService } from '../services';
+import type { ElementState } from '../ui';
 import {
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
@@ -92,6 +93,9 @@ export const orchestrate = async <
     await tokenPricesService.getCryptoToFiatConversion(caipAssetType, balance);
 
   // Prepare specific context object and confirmation page for the permission type
+  const dialogContentEventHandlers =
+    orchestrator.getConfirmationDialogEventHandlers();
+
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permission,
     permissionSpecificRules:
@@ -102,6 +106,12 @@ export const orchestrate = async <
     chainId: chainIdNum,
     expiry,
     valueFormattedAsCurrency,
+    elementState: dialogContentEventHandlers.reduce((acc, { state }) => {
+      return {
+        ...acc,
+        state,
+      } as ElementState;
+    }, {}),
   };
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
@@ -114,9 +124,6 @@ export const orchestrate = async <
     );
 
   // Register event handlers for confirmation dialog
-  const dialogContentEventHandlers =
-    orchestrator.getConfirmationDialogEventHandlers();
-
   if (dialogContentEventHandlers.length > 0) {
     dialogContentEventHandlers.forEach(({ eventType, handler }) => {
       userEventDispatcher.on({
@@ -127,13 +134,11 @@ export const orchestrate = async <
     });
   }
 
-  const isConfirmationAccepted = await confirmationResult;
+  const { isConfirmationAccepted, attenuatedContext } =
+    await confirmationResult;
 
   const { permission: attenuatedPermission, expiry: attenuatedExpiry } =
-    await orchestrator.resolveAttenuatedPermission({
-      requestedPermission: permission,
-      requestedExpiry: expiry,
-    });
+    await orchestrator.resolveAttenuatedPermission(attenuatedContext);
 
   // Cleanup the event handlers after the dialog is closed
   if (dialogContentEventHandlers.length > 0) {

@@ -12,6 +12,11 @@ import { ConfirmationFooter } from '../components';
 import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
 
+export type ConfirmationResult = {
+  isConfirmationAccepted: boolean;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
+};
+
 export type PermissionConfirmationRenderHandler = {
   /**
    * Render the permission confirmation page and get the attenuated context data after the user confirms the permission request.
@@ -27,7 +32,7 @@ export type PermissionConfirmationRenderHandler = {
     permissionType: TPermissionType,
   ) => Promise<{
     interfaceId: string;
-    confirmationResult: Promise<boolean>;
+    confirmationResult: Promise<ConfirmationResult>;
   }>;
 };
 
@@ -70,21 +75,50 @@ export const createPermissionConfirmationRenderHandler = ({
         },
       });
 
-      const confirmationResult = new Promise<boolean>((resolve, reject) => {
-        const onButtonClick = ({ event }: { event: ButtonClickEvent }) => {
-          let isConfirmationAccepted = false;
-          switch (event.name) {
-            case GRANT_BUTTON:
-              isConfirmationAccepted = true;
-              break;
-            case CANCEL_BUTTON:
-              isConfirmationAccepted = false;
-              break;
-            default:
-              return;
-          }
+      const confirmationResult = new Promise<ConfirmationResult>(
+        (resolve, reject) => {
+          const onButtonClick = ({
+            event,
+            attenuatedContext,
+          }: {
+            event: ButtonClickEvent;
+            attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
+          }) => {
+            let isConfirmationAccepted = false;
+            switch (event.name) {
+              case GRANT_BUTTON:
+                isConfirmationAccepted = true;
+                break;
+              case CANCEL_BUTTON:
+                isConfirmationAccepted = false;
+                break;
+              default:
+                return;
+            }
 
-          userEventDispatcher.off({
+            userEventDispatcher.off({
+              eventType: UserInputEventType.ButtonClickEvent,
+              interfaceId,
+              handler: onButtonClick,
+            });
+
+            snapsProvider
+              .request({
+                method: 'snap_resolveInterface',
+                params: {
+                  id: interfaceId,
+                  value: {},
+                },
+              })
+              .catch((error) => {
+                const reason = error as Error;
+                reject(reason);
+              });
+
+            resolve({ isConfirmationAccepted, attenuatedContext });
+          };
+
+          userEventDispatcher.on({
             eventType: UserInputEventType.ButtonClickEvent,
             interfaceId,
             handler: onButtonClick,
@@ -92,38 +126,17 @@ export const createPermissionConfirmationRenderHandler = ({
 
           snapsProvider
             .request({
-              method: 'snap_resolveInterface',
+              method: 'snap_dialog',
               params: {
                 id: interfaceId,
-                value: {},
               },
             })
             .catch((error) => {
               const reason = error as Error;
               reject(reason);
             });
-
-          resolve(isConfirmationAccepted);
-        };
-
-        userEventDispatcher.on({
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: onButtonClick,
-        });
-
-        snapsProvider
-          .request({
-            method: 'snap_dialog',
-            params: {
-              id: interfaceId,
-            },
-          })
-          .catch((error) => {
-            const reason = error as Error;
-            reject(reason);
-          });
-      });
+        },
+      );
 
       return {
         interfaceId,

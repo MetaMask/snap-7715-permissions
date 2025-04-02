@@ -54,6 +54,7 @@ describe('Permission Confirmation Render Handler', () => {
       permissionSpecificRules: {
         maxAllowance: 'Unlimited',
       },
+      elementState: {},
     };
 
   const mockPage = (

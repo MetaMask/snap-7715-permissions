@@ -50,6 +50,7 @@ describe('native-token-stream Orchestrator', () => {
     permissionSpecificRules: {
       maxAllowance: 'Unlimited',
     },
+    elementState: {},
   };
 
   const mockPage = (
@@ -62,6 +63,7 @@ describe('native-token-stream Orchestrator', () => {
       chainId={mockUiContext.chainId}
       valueFormattedAsCurrency={mockUiContext.valueFormattedAsCurrency}
       permissionSpecificRules={mockUiContext.permissionSpecificRules}
+      elementState={mockUiContext.elementState}
     />
   );
 

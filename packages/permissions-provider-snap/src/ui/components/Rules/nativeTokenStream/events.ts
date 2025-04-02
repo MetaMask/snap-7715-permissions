@@ -1,15 +1,13 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type {
-  ButtonClickEvent,
-  InputChangeEvent,
-  InterfaceContext,
-} from '@metamask/snaps-sdk';
+import type { ButtonClickEvent, InputChangeEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type {
   DialogContentEventHandlers,
-  UserEventHandler,
-} from '../../../../userEventDispatcher';
+  SupportedPermissionTypes,
+} from '../../../../orchestrators';
+import type { UserEventHandler } from '../../../../userEventDispatcher';
+import type { PermissionConfirmationContext } from '../../../types';
 import { NativeTokenStreamRulesEventNames } from './NativeTokenStreamRules';
 
 /**
@@ -17,16 +15,16 @@ import { NativeTokenStreamRulesEventNames } from './NativeTokenStreamRules';
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onInitialAmountInputChange: UserEventHandler<
   UserInputEventType.InputChangeEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: InputChangeEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -37,7 +35,7 @@ const onInitialAmountInputChange: UserEventHandler<
   }
   logger.debug(
     `Handling onInitialAmountInputChange event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
@@ -47,16 +45,16 @@ const onInitialAmountInputChange: UserEventHandler<
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onInitialAmountRemoveButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: ButtonClickEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -67,7 +65,7 @@ const onInitialAmountRemoveButtonClick: UserEventHandler<
   }
   logger.debug(
     `Handling onInitialAmountRemoveButtonClick event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
@@ -77,16 +75,16 @@ const onInitialAmountRemoveButtonClick: UserEventHandler<
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onMaxAllowanceInputChange: UserEventHandler<
   UserInputEventType.InputChangeEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: InputChangeEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -97,7 +95,7 @@ const onMaxAllowanceInputChange: UserEventHandler<
   }
   logger.debug(
     `Handling onMaxAllowanceInputChange event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
@@ -107,16 +105,16 @@ const onMaxAllowanceInputChange: UserEventHandler<
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onMaxAllowanceRemoveButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: ButtonClickEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -127,7 +125,7 @@ const onMaxAllowanceRemoveButtonClick: UserEventHandler<
   }
   logger.debug(
     `Handling onMaxAllowanceRemoveButtonClick event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
@@ -137,16 +135,16 @@ const onMaxAllowanceRemoveButtonClick: UserEventHandler<
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onStartTimeInputChange: UserEventHandler<
   UserInputEventType.InputChangeEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: InputChangeEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -157,7 +155,7 @@ const onStartTimeInputChange: UserEventHandler<
   }
   logger.debug(
     `Handling onStartTimeInputChange event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
@@ -167,16 +165,16 @@ const onStartTimeInputChange: UserEventHandler<
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onStartTimeRemoveButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: ButtonClickEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -187,7 +185,7 @@ const onStartTimeRemoveButtonClick: UserEventHandler<
   }
   logger.debug(
     `Handling onStartTimeRemoveButtonClick event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
@@ -197,16 +195,16 @@ const onStartTimeRemoveButtonClick: UserEventHandler<
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onExpiryInputChange: UserEventHandler<
   UserInputEventType.InputChangeEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: InputChangeEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -217,7 +215,7 @@ const onExpiryInputChange: UserEventHandler<
   }
   logger.debug(
     `Handling onInitialAmountInputChange event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
@@ -227,16 +225,16 @@ const onExpiryInputChange: UserEventHandler<
  *
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
- * @param args.context - The interface context.
+ * @param args.attenuatedContext - The interface context.
  */
 const onExpiryRemoveButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
 > = async ({
   event,
-  context,
+  attenuatedContext,
 }: {
   event: ButtonClickEvent;
-  context: InterfaceContext | null;
+  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
 }) => {
   const eventName = event.name;
   if (!eventName) {
@@ -247,7 +245,7 @@ const onExpiryRemoveButtonClick: UserEventHandler<
   }
   logger.debug(
     `Handling onExpiryRemoveButtonClick event:`,
-    JSON.stringify({ event, context }, undefined, 2),
+    JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
 };
@@ -256,41 +254,49 @@ export const nativeTokenStreamRulesEventHandlers: DialogContentEventHandlers[] =
   [
     // input change events handlers
     {
+      state: {},
       eventType: UserInputEventType.InputChangeEvent,
       handler:
         onInitialAmountInputChange as UserEventHandler<UserInputEventType>,
     },
     {
+      state: {},
       eventType: UserInputEventType.InputChangeEvent,
       handler:
         onMaxAllowanceInputChange as UserEventHandler<UserInputEventType>,
     },
     {
+      state: {},
       eventType: UserInputEventType.InputChangeEvent,
       handler: onStartTimeInputChange as UserEventHandler<UserInputEventType>,
     },
     {
+      state: {},
       eventType: UserInputEventType.InputChangeEvent,
       handler: onExpiryInputChange as UserEventHandler<UserInputEventType>,
     },
 
     // remove button click events handlers
     {
+      state: {},
       eventType: UserInputEventType.ButtonClickEvent,
       handler:
         onInitialAmountRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
+      state: {},
       eventType: UserInputEventType.ButtonClickEvent,
       handler:
         onMaxAllowanceRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
+      state: {},
       eventType: UserInputEventType.ButtonClickEvent,
       handler:
         onStartTimeRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
+      state: {},
       eventType: UserInputEventType.ButtonClickEvent,
       handler:
         onExpiryRemoveButtonClick as UserEventHandler<UserInputEventType>,
