@@ -1,7 +1,10 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { ButtonClickEvent, UserInputEventType } from '@metamask/snaps-sdk';
 
-import type { SupportedPermissionTypes } from '../../../orchestrators';
+import type {
+  DialogContentEventHandlers,
+  SupportedPermissionTypes,
+} from '../../../orchestrators';
 import type { UserEventHandler } from '../../../userEventDispatcher';
 import type { PermissionConfirmationContext } from '../../types';
 import { StreamAmountEventNames } from './StreamAmount';
@@ -50,7 +53,15 @@ const onPeriodClick: UserEventHandler<
   );
 };
 
-export const streamAmountEventHandlers = {
-  [StreamAmountEventNames.StreamAmount]: onStreamAmountClick,
-  [StreamAmountEventNames.Period]: onPeriodClick,
-};
+export const streamAmountEventHandlers: DialogContentEventHandlers[] = [
+  {
+    state: {},
+    eventName: StreamAmountEventNames.StreamAmount,
+    handler: onStreamAmountClick as UserEventHandler<UserInputEventType>,
+  },
+  {
+    state: {},
+    eventName: StreamAmountEventNames.Period,
+    handler: onPeriodClick as UserEventHandler<UserInputEventType>,
+  },
+];

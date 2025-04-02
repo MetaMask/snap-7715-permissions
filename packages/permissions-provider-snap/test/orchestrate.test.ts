@@ -17,7 +17,10 @@ import {
 } from '../src/orchestrators';
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
 import type { TokenPricesService } from '../src/services';
-import type { PermissionConfirmationRenderHandler } from '../src/ui';
+import type {
+  PermissionConfirmationContext,
+  PermissionConfirmationRenderHandler,
+} from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
 
 jest.mock('../src/userEventDispatcher');
@@ -66,6 +69,22 @@ describe('Orchestrate', () => {
     } as unknown as jest.Mocked<TokenPricesService>;
     const orchestrator = createPermissionOrchestrator(mockPermissionType);
     const mockSnapsProvider = createMockSnapsProvider();
+    const mockAttenuatedContext: PermissionConfirmationContext<
+      typeof mockPermissionType
+    > = {
+      permission:
+        nativeTokenStreamPermission as PermissionTypeMapping[typeof mockPermissionType],
+      address,
+      siteOrigin: 'http://localhost:3000',
+      balance: '0x1',
+      expiry: 1,
+      chainId: 11155111,
+      valueFormattedAsCurrency: '$1,000.00',
+      permissionSpecificRules: {
+        maxAllowance: 'Unlimited',
+      },
+      elementState: {},
+    };
 
     const orchestrateArgs: OrchestrateArgs<typeof mockPermissionType> = {
       permissionType: mockPermissionType,
@@ -91,7 +110,10 @@ describe('Orchestrate', () => {
       mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
           interfaceId: 'mock-interface-id',
-          confirmationResult: Promise.resolve(true),
+          confirmationResult: Promise.resolve({
+            isConfirmationAccepted: true,
+            attenuatedContext: mockAttenuatedContext,
+          }),
         },
       );
 
@@ -166,7 +188,10 @@ describe('Orchestrate', () => {
       mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
           interfaceId: 'mock-interface-id',
-          confirmationResult: Promise.resolve(false),
+          confirmationResult: Promise.resolve({
+            isConfirmationAccepted: false,
+            attenuatedContext: mockAttenuatedContext,
+          }),
         },
       );
 

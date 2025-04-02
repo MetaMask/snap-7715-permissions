@@ -21,7 +21,7 @@ import type {
 
 export type DialogContentEventHandlers = {
   state: ElementState;
-  eventType: UserInputEventType;
+  eventName: string;
   handler: UserEventHandler<UserInputEventType>;
 };
 

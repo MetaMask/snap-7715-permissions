@@ -1,6 +1,9 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { ButtonClickEvent, InputChangeEvent } from '@metamask/snaps-sdk';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import type {
+  ButtonClickEvent,
+  InputChangeEvent,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 
 import type {
   DialogContentEventHandlers,
@@ -255,49 +258,49 @@ export const nativeTokenStreamRulesEventHandlers: DialogContentEventHandlers[] =
     // input change events handlers
     {
       state: {},
-      eventType: UserInputEventType.InputChangeEvent,
+      eventName: NativeTokenStreamRulesEventNames.InitialAmount,
       handler:
         onInitialAmountInputChange as UserEventHandler<UserInputEventType>,
     },
     {
       state: {},
-      eventType: UserInputEventType.InputChangeEvent,
+      eventName: NativeTokenStreamRulesEventNames.MaxAllowance,
       handler:
         onMaxAllowanceInputChange as UserEventHandler<UserInputEventType>,
     },
     {
       state: {},
-      eventType: UserInputEventType.InputChangeEvent,
+      eventName: NativeTokenStreamRulesEventNames.StartTime,
       handler: onStartTimeInputChange as UserEventHandler<UserInputEventType>,
     },
     {
       state: {},
-      eventType: UserInputEventType.InputChangeEvent,
+      eventName: NativeTokenStreamRulesEventNames.Expiry,
       handler: onExpiryInputChange as UserEventHandler<UserInputEventType>,
     },
 
     // remove button click events handlers
     {
       state: {},
-      eventType: UserInputEventType.ButtonClickEvent,
+      eventName: NativeTokenStreamRulesEventNames.InitialAmountRemove,
       handler:
         onInitialAmountRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
       state: {},
-      eventType: UserInputEventType.ButtonClickEvent,
+      eventName: NativeTokenStreamRulesEventNames.MaxAllowanceRemove,
       handler:
         onMaxAllowanceRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
       state: {},
-      eventType: UserInputEventType.ButtonClickEvent,
+      eventName: NativeTokenStreamRulesEventNames.StartTimeRemove,
       handler:
         onStartTimeRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
       state: {},
-      eventType: UserInputEventType.ButtonClickEvent,
+      eventName: NativeTokenStreamRulesEventNames.ExpiryRemove,
       handler:
         onExpiryRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },

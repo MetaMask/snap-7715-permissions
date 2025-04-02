@@ -32,12 +32,12 @@ export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
   }) => void | Promise<void>;
 
 const getUserInputEventKey = ({
-  eventType,
+  eventName,
   interfaceId,
 }: {
-  eventType: UserInputEventType;
+  eventName: string;
   interfaceId: string;
-}) => `${eventType}:${interfaceId}`;
+}) => `${eventName}:${interfaceId}`;
 /**
  * Class responsible for dispatching user input events to registered handlers.
  * Provides a way to register, deregister, and dispatch event handlers
@@ -55,20 +55,20 @@ export class UserEventDispatcher {
    * Register an event handler for a specific event type.
    *
    * @param args - The event handler arguments as object.
-   * @param args.eventType - The type of event to listen for.
+   * @param args.eventName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.interfaceId - The id of the interface to listen for events on.
    * @param args.handler - The callback function to execute when the event occurs.
    * @returns A reference to this instance for method chaining.
    */
   public on<TUserInputEventType extends UserInputEventType>(args: {
-    eventType: TUserInputEventType;
+    eventName: string;
     interfaceId: string;
     handler: UserEventHandler<TUserInputEventType>;
   }): UserEventDispatcher {
-    const { eventType, handler, interfaceId } = args;
+    const { eventName, handler, interfaceId } = args;
 
     const eventKey = getUserInputEventKey({
-      eventType,
+      eventName,
       interfaceId,
     });
 
@@ -89,20 +89,20 @@ export class UserEventDispatcher {
    * Deregister an event handler for a specific event type.
    *
    * @param args - The event handler arguments as object.
-   * @param args.eventType - The type of event to stop listening for.
+   * @param args.eventName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.interfaceId - The id of the interface.
    * @param args.handler - The callback function to remove.
    * @returns A reference to this instance for method chaining.
    */
   public off<TUserInputEventType extends UserInputEventType>(args: {
-    eventType: TUserInputEventType;
+    eventName: string;
     interfaceId: string;
     handler: UserEventHandler<TUserInputEventType>;
   }): UserEventDispatcher {
-    const { eventType, handler, interfaceId } = args;
+    const { eventName, handler, interfaceId } = args;
 
     const eventKey = getUserInputEventKey({
-      eventType,
+      eventName,
       interfaceId,
     });
 
@@ -139,7 +139,10 @@ export class UserEventDispatcher {
   }): Promise<void> {
     const { event, id, context } = args;
 
-    // safely cast the permission type
+    if (!event.name) {
+      return;
+    }
+
     if (!context) {
       return;
     }
@@ -156,7 +159,7 @@ export class UserEventDispatcher {
     >;
 
     const eventKey = getUserInputEventKey({
-      eventType: event.type,
+      eventName: event.name,
       interfaceId: id,
     });
 

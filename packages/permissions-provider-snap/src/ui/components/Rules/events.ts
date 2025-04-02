@@ -1,6 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { ButtonClickEvent } from '@metamask/snaps-sdk';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import type { ButtonClickEvent, UserInputEventType } from '@metamask/snaps-sdk';
 
 import type {
   DialogContentEventHandlers,
@@ -43,7 +42,7 @@ const onAddMoreRulesButtonClick: UserEventHandler<
 export const rulesSelectorEventHandlers: DialogContentEventHandlers[] = [
   {
     state: {},
-    eventType: UserInputEventType.ButtonClickEvent,
+    eventName: RulesSelectorsEventNames.AddMoreRules,
     handler: onAddMoreRulesButtonClick as UserEventHandler<UserInputEventType>,
   },
 ];

@@ -1,13 +1,15 @@
-import type { ButtonClickEvent } from '@metamask/snaps-sdk';
+import type { ButtonClickEvent, UserInputEventType } from '@metamask/snaps-sdk';
 import {
-  UserInputEventType,
   type ComponentOrElement,
   type SnapsProvider,
 } from '@metamask/snaps-sdk';
 import { Container, type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { SupportedPermissionTypes } from '../../orchestrators';
-import type { UserEventDispatcher } from '../../userEventDispatcher';
+import type {
+  UserEventDispatcher,
+  UserEventHandler,
+} from '../../userEventDispatcher';
 import { ConfirmationFooter } from '../components';
 import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
@@ -77,7 +79,9 @@ export const createPermissionConfirmationRenderHandler = ({
 
       const confirmationResult = new Promise<ConfirmationResult>(
         (resolve, reject) => {
-          const onButtonClick = ({
+          const onButtonClick: UserEventHandler<
+            UserInputEventType.ButtonClickEvent
+          > = ({
             event,
             attenuatedContext,
           }: {
@@ -93,11 +97,13 @@ export const createPermissionConfirmationRenderHandler = ({
                 isConfirmationAccepted = false;
                 break;
               default:
-                return;
+                throw new Error(
+                  `Unexpected event name. Expected ${GRANT_BUTTON} or ${CANCEL_BUTTON}.`,
+                );
             }
 
             userEventDispatcher.off({
-              eventType: UserInputEventType.ButtonClickEvent,
+              eventName: event.name,
               interfaceId,
               handler: onButtonClick,
             });
@@ -119,7 +125,13 @@ export const createPermissionConfirmationRenderHandler = ({
           };
 
           userEventDispatcher.on({
-            eventType: UserInputEventType.ButtonClickEvent,
+            eventName: GRANT_BUTTON,
+            interfaceId,
+            handler: onButtonClick,
+          });
+
+          userEventDispatcher.on({
+            eventName: CANCEL_BUTTON,
             interfaceId,
             handler: onButtonClick,
           });

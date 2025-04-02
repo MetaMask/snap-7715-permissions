@@ -1,13 +1,39 @@
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
 import { UserInputEventType } from '@metamask/snaps-sdk';
+import { getAddress } from 'viem';
 
+import type { PermissionTypeMapping } from '../src/orchestrators';
+import type { PermissionConfirmationContext } from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
 
 describe('UserEventDispatcher', () => {
   let userEventDispatcher: UserEventDispatcher;
   const eventType = UserInputEventType.ButtonClickEvent;
+  const eventName = 'buttonClickEvent-name';
   const createHandlerMock = () => jest.fn<() => void>();
   const interfaceId = '123';
+  const mockContext: PermissionConfirmationContext<'native-token-stream'> = {
+    permission: {
+      type: 'native-token-stream',
+      data: {
+        justification: 'shh...permission 2',
+        initialAmount: '0x1',
+        amountPerSecond: '0x1',
+        startTime: 1000,
+        maxAmount: '0x2',
+      },
+    } as PermissionTypeMapping['native-token-stream'],
+    address: getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008'),
+    siteOrigin: 'http://localhost:3000',
+    balance: '0x1',
+    expiry: 1,
+    chainId: 11155111,
+    valueFormattedAsCurrency: '$1,000.00',
+    permissionSpecificRules: {
+      maxAllowance: 'Unlimited',
+    },
+    elementState: {},
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -19,7 +45,7 @@ describe('UserEventDispatcher', () => {
       const handler = createHandlerMock();
 
       const result = userEventDispatcher.on({
-        eventType,
+        eventName,
         interfaceId,
         handler,
       });
@@ -32,13 +58,13 @@ describe('UserEventDispatcher', () => {
       const handler2 = createHandlerMock();
 
       userEventDispatcher.on({
-        eventType,
+        eventName,
         interfaceId,
         handler: handler1,
       });
 
       userEventDispatcher.on({
-        eventType,
+        eventName,
         interfaceId,
         handler: handler2,
       });
@@ -46,27 +72,28 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
+          name: eventName,
         },
         id: interfaceId,
-        context: null,
+        context: mockContext,
       });
 
       expect(handler1).toHaveBeenCalled();
       expect(handler2).toHaveBeenCalled();
     });
 
-    it('should not handlers for a different event type', async () => {
+    it('should not handlers for a different event name', async () => {
       const handlerMatchingEventType = createHandlerMock();
       const handlerMismatchingEventType = createHandlerMock();
 
       userEventDispatcher.on({
-        eventType,
+        eventName,
         interfaceId,
         handler: handlerMatchingEventType,
       });
 
       userEventDispatcher.on({
-        eventType: UserInputEventType.FileUploadEvent,
+        eventName: 'fileUploadEvent-name',
         interfaceId,
         handler: handlerMismatchingEventType,
       });
@@ -74,9 +101,10 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
+          name: eventName,
         },
         id: interfaceId,
-        context: null,
+        context: mockContext,
       });
 
       expect(handlerMatchingEventType).toHaveBeenCalled();
@@ -87,15 +115,18 @@ describe('UserEventDispatcher', () => {
       const handler = createHandlerMock();
 
       userEventDispatcher.on({
-        eventType,
+        eventName,
         interfaceId: '123',
         handler,
       });
 
       await userEventDispatcher.handleUserInputEvent({
-        event: { type: eventType },
+        event: {
+          type: eventType,
+          name: eventName,
+        },
         id: '456',
-        context: null,
+        context: mockContext,
       });
 
       expect(handler).not.toHaveBeenCalled();
@@ -107,12 +138,12 @@ describe('UserEventDispatcher', () => {
 
       const result = userEventDispatcher
         .on({
-          eventType,
+          eventName,
           interfaceId,
           handler: handler1,
         })
         .on({
-          eventType,
+          eventName,
           interfaceId,
           handler: handler2,
         });
@@ -122,9 +153,10 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
+          name: eventName,
         },
         id: interfaceId,
-        context: null,
+        context: mockContext,
       });
 
       expect(handler1).toHaveBeenCalled();
@@ -137,7 +169,7 @@ describe('UserEventDispatcher', () => {
       const handler = createHandlerMock();
 
       userEventDispatcher.on({
-        eventType,
+        eventName,
         interfaceId,
         handler,
       });
@@ -145,7 +177,7 @@ describe('UserEventDispatcher', () => {
       jest.clearAllMocks();
 
       const result = userEventDispatcher.off({
-        eventType,
+        eventName,
         interfaceId,
         handler,
       });
@@ -155,9 +187,10 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
+          name: eventName,
         },
         id: interfaceId,
-        context: null,
+        context: mockContext,
       });
 
       expect(handler).not.toHaveBeenCalled();
@@ -168,7 +201,7 @@ describe('UserEventDispatcher', () => {
       const unregisteredHandler = createHandlerMock();
 
       userEventDispatcher.on({
-        eventType,
+        eventName,
         interfaceId,
         handler: registeredHandler,
       });
@@ -176,7 +209,7 @@ describe('UserEventDispatcher', () => {
       jest.clearAllMocks();
 
       userEventDispatcher.off({
-        eventType,
+        eventName: 'unregisteredEvent-name',
         interfaceId,
         handler: unregisteredHandler,
       });
@@ -184,9 +217,10 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
+          name: eventName,
         },
         id: interfaceId,
-        context: null,
+        context: mockContext,
       });
 
       expect(registeredHandler).toHaveBeenCalled();
@@ -199,7 +233,7 @@ describe('UserEventDispatcher', () => {
       jest.clearAllMocks();
 
       userEventDispatcher.off({
-        eventType,
+        eventName,
         interfaceId,
         handler,
       });
@@ -207,9 +241,10 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
+          name: eventName,
         },
         id: interfaceId,
-        context: null,
+        context: mockContext,
       });
 
       expect(handler).not.toHaveBeenCalled();
@@ -221,12 +256,12 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher
         .on({
-          eventType,
+          eventName,
           interfaceId,
           handler: handler1,
         })
         .on({
-          eventType,
+          eventName,
           interfaceId,
           handler: handler2,
         });
@@ -234,7 +269,7 @@ describe('UserEventDispatcher', () => {
       jest.clearAllMocks();
 
       userEventDispatcher.off({
-        eventType,
+        eventName,
         interfaceId,
         handler: handler1,
       });
@@ -242,13 +277,74 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
+          name: eventName,
+        },
+        id: interfaceId,
+        context: mockContext,
+      });
+
+      expect(handler1).not.toHaveBeenCalled();
+      expect(handler2).toHaveBeenCalled();
+    });
+  });
+
+  describe('handleUserInputEvent()', () => {
+    it('should not process the event if the context is empty', async () => {
+      const handler1 = createHandlerMock();
+      const handler2 = createHandlerMock();
+
+      userEventDispatcher.on({
+        eventName,
+        interfaceId,
+        handler: handler1,
+      });
+
+      userEventDispatcher.on({
+        eventName,
+        interfaceId,
+        handler: handler2,
+      });
+
+      await userEventDispatcher.handleUserInputEvent({
+        event: {
+          type: eventType,
+          name: eventName,
         },
         id: interfaceId,
         context: null,
       });
 
       expect(handler1).not.toHaveBeenCalled();
-      expect(handler2).toHaveBeenCalled();
+      expect(handler2).not.toHaveBeenCalled();
+    });
+
+    it('should not process the event if the event name is empty', async () => {
+      const handler1 = createHandlerMock();
+      const handler2 = createHandlerMock();
+
+      userEventDispatcher.on({
+        eventName: '',
+        interfaceId,
+        handler: handler1,
+      });
+
+      userEventDispatcher.on({
+        eventName: '',
+        interfaceId,
+        handler: handler2,
+      });
+
+      await userEventDispatcher.handleUserInputEvent({
+        event: {
+          type: eventType,
+          name: eventName,
+        },
+        id: interfaceId,
+        context: null,
+      });
+
+      expect(handler1).not.toHaveBeenCalled();
+      expect(handler2).not.toHaveBeenCalled();
     });
   });
 });

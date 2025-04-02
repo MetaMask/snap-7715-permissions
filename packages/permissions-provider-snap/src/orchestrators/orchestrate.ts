@@ -83,7 +83,6 @@ export const orchestrate = async <
     chainIdNum,
   );
 
-  // Get the user account details
   const [address, balance] = await prepareAccountDetails(
     accountController,
     fromHex(chainId, 'number'),
@@ -125,26 +124,23 @@ export const orchestrate = async <
 
   // Register event handlers for confirmation dialog
   if (dialogContentEventHandlers.length > 0) {
-    dialogContentEventHandlers.forEach(({ eventType, handler }) => {
+    dialogContentEventHandlers.forEach(({ eventName, handler }) => {
       userEventDispatcher.on({
-        eventType,
+        eventName,
         interfaceId,
         handler,
       });
     });
   }
 
+  // Wait for the user to accept or reject the permission request
   const { isConfirmationAccepted, attenuatedContext } =
     await confirmationResult;
 
-  const { permission: attenuatedPermission, expiry: attenuatedExpiry } =
-    await orchestrator.resolveAttenuatedPermission(attenuatedContext);
-
-  // Cleanup the event handlers after the dialog is closed
   if (dialogContentEventHandlers.length > 0) {
-    dialogContentEventHandlers.forEach(({ eventType, handler }) => {
+    dialogContentEventHandlers.forEach(({ eventName, handler }) => {
       userEventDispatcher.off({
-        eventType,
+        eventName,
         interfaceId,
         handler,
       });
@@ -157,6 +153,10 @@ export const orchestrate = async <
       reason: 'User rejected the permissions request',
     };
   }
+
+  // User accepted the permission request, build the response
+  const { permission: attenuatedPermission, expiry: attenuatedExpiry } =
+    await orchestrator.resolveAttenuatedPermission(attenuatedContext);
 
   const deleGatorEnvironment = await accountController.getEnvironment({
     chainId: chainIdNum,
