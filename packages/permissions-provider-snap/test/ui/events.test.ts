@@ -68,7 +68,9 @@ describe('Confirmation Dialog event handlers', () => {
           state: {} as any,
         };
         const stateBefore =
-          contextWithEmptyState.state[NativeTokenStreamDialogEventNames.ShowMoreButton];
+          contextWithEmptyState.state[
+            NativeTokenStreamDialogEventNames.ShowMoreButton
+          ];
         expect(stateBefore).toBeUndefined();
 
         // mutate state

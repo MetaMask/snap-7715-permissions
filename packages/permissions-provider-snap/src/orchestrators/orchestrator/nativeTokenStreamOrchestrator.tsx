@@ -202,9 +202,12 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       } as PermissionSpecificRulesMapping['native-token-stream'];
     },
     getConfirmationDialogEventHandlers: (
-      permission: PermissionTypeMapping['native-token-stream'],
+      _: PermissionTypeMapping['native-token-stream'],
     ) => {
       return {
+        // TODO: Add rules event: For rules event the permission.data must be
+        // extracted to populate the rules initial state. This is why this function
+        // requires the permission object. Marked as _ to resolve linter error.
         state: {
           [NativeTokenStreamDialogEventNames.ShowMoreButton]: true,
         },
