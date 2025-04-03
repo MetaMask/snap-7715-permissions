@@ -41,6 +41,7 @@ const rpcHandler = createRpcHandler({
   permissionConfirmationRenderHandler,
   permissionsContextBuilder: createPermissionsContextBuilder(accountController),
   tokenPricesService,
+  userEventDispatcher,
 });
 
 // configure RPC methods bindings

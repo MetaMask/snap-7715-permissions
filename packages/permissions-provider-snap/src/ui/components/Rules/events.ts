@@ -1,11 +1,11 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type {
-  ButtonClickEvent,
-  InterfaceContext,
-  UserInputEventType,
-} from '@metamask/snaps-sdk';
+import type { ButtonClickEvent, InterfaceContext } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
-import type { UserEventHandler } from '../../../userEventDispatcher';
+import type {
+  DialogContentEventHandlers,
+  UserEventHandler,
+} from '../../../userEventDispatcher';
 import { RulesSelectorsEventNames } from './RulesSelector';
 
 /**
@@ -24,6 +24,13 @@ const onAddMoreRulesButtonClick: UserEventHandler<
   event: ButtonClickEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === RulesSelectorsEventNames.AddMoreRules)) {
+    return;
+  }
   logger.debug(
     `Handling onAddMoreRulesButtonClick event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -31,6 +38,9 @@ const onAddMoreRulesButtonClick: UserEventHandler<
   // TODO: Add the event handle logic to make the button interactive
 };
 
-export const rulesSelectorEventHandlers = {
-  [RulesSelectorsEventNames.AddMoreRules]: onAddMoreRulesButtonClick,
-};
+export const rulesSelectorEventHandlers: DialogContentEventHandlers[] = [
+  {
+    eventType: UserInputEventType.ButtonClickEvent,
+    handler: onAddMoreRulesButtonClick as UserEventHandler<UserInputEventType>,
+  },
+];

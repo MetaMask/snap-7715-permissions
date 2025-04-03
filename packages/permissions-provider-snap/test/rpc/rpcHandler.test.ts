@@ -6,6 +6,9 @@ import type { PermissionsContextBuilder } from '../../src/orchestrators';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 import type { TokenPricesService } from '../../src/services';
 import type { PermissionConfirmationRenderHandler } from '../../src/ui';
+import { UserEventDispatcher } from '../../src/userEventDispatcher';
+
+jest.mock('../../src/userEventDispatcher');
 
 describe('RpcHandler', () => {
   let handler: RpcHandler;
@@ -27,6 +30,11 @@ describe('RpcHandler', () => {
     getCryptoToFiatConversion: jest.fn(),
   } as unknown as jest.Mocked<TokenPricesService>;
   const mockSnapsProvider = createMockSnapsProvider();
+  const mockUserEventDispatcher = new UserEventDispatcher();
+
+  (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
+    () => mockUserEventDispatcher,
+  );
 
   beforeEach(() => {
     mockSnapsProvider.request.mockClear();
@@ -41,6 +49,7 @@ describe('RpcHandler', () => {
         mockPermissionConfirmationRenderHandler,
       permissionsContextBuilder: mockPermissionsContextBuilder,
       tokenPricesService: mockTokenPricesService,
+      userEventDispatcher: mockUserEventDispatcher,
     });
   });
 

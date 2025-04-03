@@ -3,10 +3,13 @@ import type {
   ButtonClickEvent,
   InputChangeEvent,
   InterfaceContext,
-  UserInputEventType,
 } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
-import type { UserEventHandler } from '../../../../userEventDispatcher';
+import type {
+  DialogContentEventHandlers,
+  UserEventHandler,
+} from '../../../../userEventDispatcher';
 import { NativeTokenStreamRulesEventNames } from './NativeTokenStreamRules';
 
 /**
@@ -25,6 +28,13 @@ const onInitialAmountInputChange: UserEventHandler<
   event: InputChangeEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === NativeTokenStreamRulesEventNames.InitialAmount)) {
+    return;
+  }
   logger.debug(
     `Handling onInitialAmountInputChange event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -48,6 +58,13 @@ const onInitialAmountRemoveButtonClick: UserEventHandler<
   event: ButtonClickEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === NativeTokenStreamRulesEventNames.InitialAmountRemove)) {
+    return;
+  }
   logger.debug(
     `Handling onInitialAmountRemoveButtonClick event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -71,6 +88,13 @@ const onMaxAllowanceInputChange: UserEventHandler<
   event: InputChangeEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === NativeTokenStreamRulesEventNames.MaxAllowance)) {
+    return;
+  }
   logger.debug(
     `Handling onMaxAllowanceInputChange event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -94,6 +118,13 @@ const onMaxAllowanceRemoveButtonClick: UserEventHandler<
   event: ButtonClickEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === NativeTokenStreamRulesEventNames.MaxAllowanceRemove)) {
+    return;
+  }
   logger.debug(
     `Handling onMaxAllowanceRemoveButtonClick event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -117,6 +148,13 @@ const onStartTimeInputChange: UserEventHandler<
   event: InputChangeEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === NativeTokenStreamRulesEventNames.StartTime)) {
+    return;
+  }
   logger.debug(
     `Handling onStartTimeInputChange event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -140,6 +178,13 @@ const onStartTimeRemoveButtonClick: UserEventHandler<
   event: ButtonClickEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === NativeTokenStreamRulesEventNames.StartTimeRemove)) {
+    return;
+  }
   logger.debug(
     `Handling onStartTimeRemoveButtonClick event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -163,6 +208,13 @@ const onExpiryInputChange: UserEventHandler<
   event: InputChangeEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === NativeTokenStreamRulesEventNames.Expiry)) {
+    return;
+  }
   logger.debug(
     `Handling onInitialAmountInputChange event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -186,6 +238,13 @@ const onExpiryRemoveButtonClick: UserEventHandler<
   event: ButtonClickEvent;
   context: InterfaceContext | null;
 }) => {
+  const eventName = event.name;
+  if (!eventName) {
+    return;
+  }
+  if (!(eventName === NativeTokenStreamRulesEventNames.ExpiryRemove)) {
+    return;
+  }
   logger.debug(
     `Handling onExpiryRemoveButtonClick event:`,
     JSON.stringify({ event, context }, undefined, 2),
@@ -193,19 +252,47 @@ const onExpiryRemoveButtonClick: UserEventHandler<
   // TODO: Add the event handle logic to make the button interactive
 };
 
-export const nativeTokenStreamRulesEventHandlers = {
-  // input change events handlers
-  [NativeTokenStreamRulesEventNames.InitialAmount]: onInitialAmountInputChange,
-  [NativeTokenStreamRulesEventNames.MaxAllowance]: onMaxAllowanceInputChange,
-  [NativeTokenStreamRulesEventNames.StartTime]: onStartTimeInputChange,
-  [NativeTokenStreamRulesEventNames.Expiry]: onExpiryInputChange,
+export const nativeTokenStreamRulesEventHandlers: DialogContentEventHandlers[] =
+  [
+    // input change events handlers
+    {
+      eventType: UserInputEventType.InputChangeEvent,
+      handler:
+        onInitialAmountInputChange as UserEventHandler<UserInputEventType>,
+    },
+    {
+      eventType: UserInputEventType.InputChangeEvent,
+      handler:
+        onMaxAllowanceInputChange as UserEventHandler<UserInputEventType>,
+    },
+    {
+      eventType: UserInputEventType.InputChangeEvent,
+      handler: onStartTimeInputChange as UserEventHandler<UserInputEventType>,
+    },
+    {
+      eventType: UserInputEventType.InputChangeEvent,
+      handler: onExpiryInputChange as UserEventHandler<UserInputEventType>,
+    },
 
-  // remove button click events handlers
-  [NativeTokenStreamRulesEventNames.InitialAmountRemove]:
-    onInitialAmountRemoveButtonClick,
-  [NativeTokenStreamRulesEventNames.MaxAllowanceRemove]:
-    onMaxAllowanceRemoveButtonClick,
-  [NativeTokenStreamRulesEventNames.StartTimeRemove]:
-    onStartTimeRemoveButtonClick,
-  [NativeTokenStreamRulesEventNames.ExpiryRemove]: onExpiryRemoveButtonClick,
-};
+    // remove button click events handlers
+    {
+      eventType: UserInputEventType.ButtonClickEvent,
+      handler:
+        onInitialAmountRemoveButtonClick as UserEventHandler<UserInputEventType>,
+    },
+    {
+      eventType: UserInputEventType.ButtonClickEvent,
+      handler:
+        onMaxAllowanceRemoveButtonClick as UserEventHandler<UserInputEventType>,
+    },
+    {
+      eventType: UserInputEventType.ButtonClickEvent,
+      handler:
+        onStartTimeRemoveButtonClick as UserEventHandler<UserInputEventType>,
+    },
+    {
+      eventType: UserInputEventType.ButtonClickEvent,
+      handler:
+        onExpiryRemoveButtonClick as UserEventHandler<UserInputEventType>,
+    },
+  ];

@@ -9,6 +9,11 @@ import type {
   UserInputEventType,
 } from '@metamask/snaps-sdk';
 
+export type DialogContentEventHandlers = {
+  eventType: UserInputEventType;
+  handler: UserEventHandler<UserInputEventType>;
+};
+
 export type UserInputEventByType<
   TUserInputEventType extends UserInputEventType,
 > = {
