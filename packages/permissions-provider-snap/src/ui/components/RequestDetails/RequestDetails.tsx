@@ -13,23 +13,19 @@ import * as ALL_CHAINS from 'viem/chains';
 
 import { ICONS } from '../../iconConstant';
 
-export enum RequestDetailsEventNames {
-  ShowMoreButton = 'request-details.show-more-button',
-}
-
 type RequestDetailsProps = JsonObject & {
   siteOrigin: string;
   justification: string | undefined;
   chainId: number;
   asset: string;
-  isHideableToggle: boolean;
+  isShowMore: boolean;
+  showMoreEventName: string;
 };
 
 type ItemDetails = {
   label: string;
   text: string;
   tooltipText?: string;
-  isHideable?: boolean;
   iconUrl?: string;
 };
 
@@ -69,10 +65,15 @@ const renderIconAsImage = (iconUrl?: string) => {
  * Renders a text component or a text component with a button to show more.
  *
  * @param text - The text to display.
+ * @param eventName - Event name for the toggle button.
  * @param isHideable - Whether the text is isHideable.
  * @returns A text component or a text component with a button to show more.
  */
-const renderIsHideableText = (text: string, isHideable?: boolean) => {
+const renderShowMoreText = (
+  text: string,
+  eventName: string,
+  isHideable: boolean,
+) => {
   if (!isHideable) {
     return <Text>{text}</Text>;
   }
@@ -84,7 +85,7 @@ const renderIsHideableText = (text: string, isHideable?: boolean) => {
       ) : (
         <Text color="muted">text</Text>
       )}
-      <Button name={RequestDetailsEventNames.ShowMoreButton}>Show</Button>
+      <Button name={eventName}>Show</Button>
     </Box>
   );
 };
@@ -94,7 +95,8 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
   justification,
   chainId,
   asset, // TODO: Update to use caip-19 asset
-  isHideableToggle,
+  isShowMore,
+  showMoreEventName,
 }) => {
   // @ts-expect-error - extractChain does not work well with dynamic `chains`
   const chain = extractChain({
@@ -127,7 +129,6 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
       label: 'Reason',
       text: justification ?? 'No reason provided',
       tooltipText: 'Tooltip text',
-      isHideable: isHideableToggle,
     },
   ];
 
@@ -139,7 +140,11 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
       </Box>
       <Box direction="horizontal">
         {renderIconAsImage(item.iconUrl)}
-        {renderIsHideableText(item.text, item.isHideable)}
+        {item.label === 'Reason' ? (
+          renderShowMoreText(item.text, showMoreEventName, isShowMore)
+        ) : (
+          <Text>{item.text}</Text>
+        )}
       </Box>
     </Box>
   ));

@@ -14,10 +14,10 @@ import type {
 } from '../src/orchestrators';
 import { createPermissionOrchestrator } from '../src/orchestrators';
 import {
-  RequestDetailsEventNames,
+  NativeTokenStreamDialogEventNames,
   type PermissionConfirmationContext,
+  NativeTokenStreamConfirmationPage,
 } from '../src/ui';
-import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 
 describe('native-token-stream Orchestrator', () => {
   const mockStartTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
@@ -54,7 +54,7 @@ describe('native-token-stream Orchestrator', () => {
       maxAllowance: 'Unlimited',
     },
     state: {
-      [RequestDetailsEventNames.ShowMoreButton]: false,
+      [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
     },
   };
 

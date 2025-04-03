@@ -5,7 +5,7 @@ import { getAddress } from 'viem';
 
 import type { PermissionTypeMapping } from '../src/orchestrators';
 import {
-  RequestDetailsEventNames,
+  NativeTokenStreamDialogEventNames,
   type PermissionConfirmationContext,
 } from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
@@ -37,7 +37,7 @@ describe('UserEventDispatcher', () => {
       maxAllowance: 'Unlimited',
     },
     state: {
-      [RequestDetailsEventNames.ShowMoreButton]: false,
+      [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
     },
   };
   const mockSnapProvider = createMockSnapsProvider();

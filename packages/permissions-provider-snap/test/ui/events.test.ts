@@ -4,7 +4,7 @@ import { getAddress } from 'viem';
 import type { PermissionTypeMapping } from '../../src/orchestrators';
 import {
   onShowMoreButtonClick,
-  RequestDetailsEventNames,
+  NativeTokenStreamDialogEventNames,
   type PermissionConfirmationContext,
 } from '../../src/ui';
 
@@ -34,7 +34,7 @@ describe('Confirmation Dialog event handlers', () => {
           maxAllowance: 'Unlimited',
         },
         state: {
-          [RequestDetailsEventNames.ShowMoreButton]: false,
+          [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
         },
       };
 
@@ -42,7 +42,7 @@ describe('Confirmation Dialog event handlers', () => {
       it('should mutate show more state', async () => {
         const stateBefore =
           mockNativeTokenStreamContext.state[
-            RequestDetailsEventNames.ShowMoreButton
+            NativeTokenStreamDialogEventNames.ShowMoreButton
           ];
         expect(stateBefore).toBe(false);
 
@@ -50,7 +50,7 @@ describe('Confirmation Dialog event handlers', () => {
         const updatedContext = await onShowMoreButtonClick({
           event: {
             type: UserInputEventType.ButtonClickEvent,
-            name: RequestDetailsEventNames.ShowMoreButton,
+            name: NativeTokenStreamDialogEventNames.ShowMoreButton,
           },
           attenuatedContext: mockNativeTokenStreamContext,
         });
@@ -58,7 +58,7 @@ describe('Confirmation Dialog event handlers', () => {
         expect(updatedContext).toBeDefined();
         const stateAfter = (
           updatedContext as PermissionConfirmationContext<'native-token-stream'>
-        ).state[RequestDetailsEventNames.ShowMoreButton];
+        ).state[NativeTokenStreamDialogEventNames.ShowMoreButton];
         expect(stateAfter).toBe(true);
       });
 
@@ -68,14 +68,14 @@ describe('Confirmation Dialog event handlers', () => {
           state: {} as any,
         };
         const stateBefore =
-          contextWithEmptyState.state[RequestDetailsEventNames.ShowMoreButton];
+          contextWithEmptyState.state[NativeTokenStreamDialogEventNames.ShowMoreButton];
         expect(stateBefore).toBeUndefined();
 
         // mutate state
         const updatedContext = await onShowMoreButtonClick({
           event: {
             type: UserInputEventType.ButtonClickEvent,
-            name: RequestDetailsEventNames.ShowMoreButton,
+            name: NativeTokenStreamDialogEventNames.ShowMoreButton,
           },
           attenuatedContext: contextWithEmptyState,
         });
@@ -83,14 +83,14 @@ describe('Confirmation Dialog event handlers', () => {
         expect(updatedContext).toBeDefined();
         const stateAfter = (
           updatedContext as PermissionConfirmationContext<'native-token-stream'>
-        ).state[RequestDetailsEventNames.ShowMoreButton];
+        ).state[NativeTokenStreamDialogEventNames.ShowMoreButton];
         expect(stateAfter).toBeUndefined();
       });
 
       it('should not mutate show more state if event name in incorrect', async () => {
         const stateBefore =
           mockNativeTokenStreamContext.state[
-            RequestDetailsEventNames.ShowMoreButton
+            NativeTokenStreamDialogEventNames.ShowMoreButton
           ];
         expect(stateBefore).toBe(false);
 
@@ -106,7 +106,7 @@ describe('Confirmation Dialog event handlers', () => {
         expect(updatedContext).toBeDefined();
         const stateAfter = (
           updatedContext as PermissionConfirmationContext<'native-token-stream'>
-        ).state[RequestDetailsEventNames.ShowMoreButton];
+        ).state[NativeTokenStreamDialogEventNames.ShowMoreButton];
         expect(stateAfter).toBe(false);
       });
     });

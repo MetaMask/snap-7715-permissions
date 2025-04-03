@@ -2,7 +2,6 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { UserEventHandler } from '../../../userEventDispatcher';
-import { RequestDetailsEventNames } from './RequestDetails';
 
 /**
  * Handles the "Show More" button click event.
@@ -20,17 +19,16 @@ export const onShowMoreButtonClick: UserEventHandler<
     `Handling onShowMoreButtonClick event:`,
     JSON.stringify({ attenuatedContext }, undefined, 2),
   );
-  const foundState =
-    attenuatedContext.state[RequestDetailsEventNames.ShowMoreButton];
+  const eventName = event.name ?? '';
+  const foundStateItem = attenuatedContext.state[eventName];
 
-  return foundState === undefined ||
-    event.name !== RequestDetailsEventNames.ShowMoreButton
+  return foundStateItem === undefined
     ? attenuatedContext
     : {
         ...attenuatedContext,
         state: {
           ...attenuatedContext.state,
-          [RequestDetailsEventNames.ShowMoreButton]: !foundState,
+          [eventName]: !foundStateItem,
         },
       };
 };

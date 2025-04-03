@@ -9,9 +9,16 @@ import {
   StreamAmount,
   NativeTokenStreamRules,
   RulesSelector,
-  RequestDetailsEventNames,
 } from '../components';
 import type { PermissionConfirmationProps } from '../types';
+
+/**
+ * The event names for the native-token-stream permission confirmation page.
+ * These events are used to handle user interactions with the confirmation page.
+ */
+export enum NativeTokenStreamDialogEventNames {
+  ShowMoreButton = 'request-details.show-more-button-native-token-stream',
+}
 
 /**
  * The native-token-stream permission confirmation page.
@@ -62,7 +69,8 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         chainId={chainId}
         justification={permission.data.justification}
         asset={asset}
-        isHideableToggle={state[RequestDetailsEventNames.ShowMoreButton]}
+        isShowMore={state[NativeTokenStreamDialogEventNames.ShowMoreButton]}
+        showMoreEventName={NativeTokenStreamDialogEventNames.ShowMoreButton}
       />
 
       <AccountDetails

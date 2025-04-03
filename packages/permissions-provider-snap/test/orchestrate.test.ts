@@ -18,7 +18,7 @@ import {
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
 import type { TokenPricesService } from '../src/services';
 import {
-  RequestDetailsEventNames,
+  NativeTokenStreamDialogEventNames,
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
 } from '../src/ui';
@@ -91,7 +91,7 @@ describe('Orchestrate', () => {
         maxAllowance: 'Unlimited',
       },
       state: {
-        [RequestDetailsEventNames.ShowMoreButton]: false,
+        [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
       },
     };
 

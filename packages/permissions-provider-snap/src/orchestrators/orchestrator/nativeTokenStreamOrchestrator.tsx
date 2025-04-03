@@ -12,7 +12,10 @@ import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
-import { onShowMoreButtonClick, RequestDetailsEventNames } from '../../ui';
+import {
+  onShowMoreButtonClick,
+  NativeTokenStreamDialogEventNames,
+} from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
 import type { UserEventHandler } from '../../userEventDispatcher';
 import type {
@@ -41,7 +44,7 @@ declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
   interface PermissionConfirmationStateMapping {
     'native-token-stream': JsonObject & {
-      [RequestDetailsEventNames.ShowMoreButton]: boolean;
+      [NativeTokenStreamDialogEventNames.ShowMoreButton]: boolean;
     };
   }
 }
@@ -198,14 +201,16 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         startTime: permission.data.startTime,
       } as PermissionSpecificRulesMapping['native-token-stream'];
     },
-    getConfirmationDialogEventHandlers: (permission: PermissionTypeMapping['native-token-stream']) => {
+    getConfirmationDialogEventHandlers: (
+      permission: PermissionTypeMapping['native-token-stream'],
+    ) => {
       return {
         state: {
-          [RequestDetailsEventNames.ShowMoreButton]: true,
+          [NativeTokenStreamDialogEventNames.ShowMoreButton]: true,
         },
         dialogContentEventHandlers: [
           {
-            eventName: RequestDetailsEventNames.ShowMoreButton,
+            eventName: NativeTokenStreamDialogEventNames.ShowMoreButton,
             handler:
               onShowMoreButtonClick as UserEventHandler<UserInputEventType>,
           },

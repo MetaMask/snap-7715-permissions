@@ -11,7 +11,7 @@ import type {
 import type { PermissionConfirmationContext } from '../src/ui';
 import {
   createPermissionConfirmationRenderHandler,
-  RequestDetailsEventNames,
+  NativeTokenStreamDialogEventNames,
 } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
@@ -61,7 +61,7 @@ describe('Permission Confirmation Render Handler', () => {
         maxAllowance: 'Unlimited',
       },
       state: {
-        [RequestDetailsEventNames.ShowMoreButton]: false,
+        [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
       },
     };
 
