@@ -69,7 +69,7 @@ const renderRuleItemDetails = (
         <Icon name="question" size="inherit" color="muted" />
       </Tooltip>
     </Box>
-    <Button name={removeRuleButtonName}>DELETE</Button>
+    <Button name={removeRuleButtonName}>Remove</Button>
   </Box>
 );
 
