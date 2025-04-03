@@ -17,9 +17,10 @@ import {
 } from '../src/orchestrators';
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
 import type { TokenPricesService } from '../src/services';
-import type {
-  PermissionConfirmationContext,
-  PermissionConfirmationRenderHandler,
+import {
+  RequestDetailsEventNames,
+  type PermissionConfirmationContext,
+  type PermissionConfirmationRenderHandler,
 } from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
 
@@ -30,11 +31,17 @@ describe('Orchestrate', () => {
   const sessionAccount = getAddress(
     '0x1234567890123456789012345678901234567890',
   );
-  const mockUserEventDispatcher = new UserEventDispatcher();
+  const mockSnapProvider = createMockSnapsProvider();
+
+  const mockUserEventDispatcher = new UserEventDispatcher(mockSnapProvider);
 
   (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
     () => mockUserEventDispatcher,
   );
+
+  beforeEach(() => {
+    mockSnapProvider.request.mockReset();
+  });
 
   describe('native-token-stream', () => {
     const nativeTokenStreamPermission: NativeTokenStreamPermission = {
@@ -83,7 +90,9 @@ describe('Orchestrate', () => {
       permissionSpecificRules: {
         maxAllowance: 'Unlimited',
       },
-      elementState: {},
+      state: {
+        [RequestDetailsEventNames.ShowMoreButton]: false,
+      },
     };
 
     const orchestrateArgs: OrchestrateArgs<typeof mockPermissionType> = {
@@ -148,8 +157,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(10);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(10);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(1);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -226,8 +235,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(10);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(10);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(1);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

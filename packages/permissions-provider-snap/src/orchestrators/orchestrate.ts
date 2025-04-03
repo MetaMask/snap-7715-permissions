@@ -3,7 +3,6 @@ import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';
 import type { TokenPricesService } from '../services';
-import type { ElementState } from '../ui';
 import {
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
@@ -92,8 +91,8 @@ export const orchestrate = async <
     await tokenPricesService.getCryptoToFiatConversion(caipAssetType, balance);
 
   // Prepare specific context object and confirmation page for the permission type
-  const dialogContentEventHandlers =
-    orchestrator.getConfirmationDialogEventHandlers();
+  const { state, dialogContentEventHandlers } =
+    orchestrator.getConfirmationDialogEventHandlers(permission);
 
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permission,
@@ -105,12 +104,7 @@ export const orchestrate = async <
     chainId: chainIdNum,
     expiry,
     valueFormattedAsCurrency,
-    elementState: dialogContentEventHandlers.reduce((acc, { state }) => {
-      return {
-        ...acc,
-        state,
-      } as ElementState;
-    }, {}),
+    state,
   };
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);

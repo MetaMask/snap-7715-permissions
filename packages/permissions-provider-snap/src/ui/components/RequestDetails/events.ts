@@ -1,12 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { ButtonClickEvent, UserInputEventType } from '@metamask/snaps-sdk';
+import type { UserInputEventType } from '@metamask/snaps-sdk';
 
-import type {
-  DialogContentEventHandlers,
-  SupportedPermissionTypes,
-} from '../../../orchestrators';
 import type { UserEventHandler } from '../../../userEventDispatcher';
-import type { PermissionConfirmationContext } from '../../types';
 import { RequestDetailsEventNames } from './RequestDetails';
 
 /**
@@ -15,34 +10,27 @@ import { RequestDetailsEventNames } from './RequestDetails';
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns Returns a new copy of the attenuatedContext to capture mutation rather than mutating the original state or
+ * returns the original state if event name in incorrect.
  */
-const onShowMoreButtonClick: UserEventHandler<
+export const onShowMoreButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
-> = async ({
-  event,
-  attenuatedContext,
-}: {
-  event: ButtonClickEvent;
-  attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
-}) => {
-  const eventName = event.name;
-  if (!eventName) {
-    return;
-  }
-  if (!(eventName === RequestDetailsEventNames.ShowMoreButton)) {
-    return;
-  }
-  // TODO: Add the event handle logic to make the button interactive
+> = async ({ event, attenuatedContext }) => {
   logger.debug(
     `Handling onShowMoreButtonClick event:`,
-    JSON.stringify({ event, attenuatedContext }, undefined, 2),
+    JSON.stringify({ attenuatedContext }, undefined, 2),
   );
-};
+  const foundState =
+    attenuatedContext.state[RequestDetailsEventNames.ShowMoreButton];
 
-export const requestDetailsButtonEventHandlers: DialogContentEventHandlers[] = [
-  {
-    state: {},
-    eventName: RequestDetailsEventNames.ShowMoreButton,
-    handler: onShowMoreButtonClick as UserEventHandler<UserInputEventType>,
-  },
-];
+  return foundState === undefined ||
+    event.name !== RequestDetailsEventNames.ShowMoreButton
+    ? attenuatedContext
+    : {
+        ...attenuatedContext,
+        state: {
+          ...attenuatedContext.state,
+          [RequestDetailsEventNames.ShowMoreButton]: !foundState,
+        },
+      };
+};

@@ -15,6 +15,7 @@ import { StreamAmountEventNames } from './StreamAmount';
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onStreamAmountClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
@@ -29,6 +30,8 @@ const onStreamAmountClick: UserEventHandler<
     `Handling onStreamAmountClick event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
+
+  return attenuatedContext;
 };
 
 /**
@@ -37,6 +40,7 @@ const onStreamAmountClick: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onPeriodClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
@@ -51,16 +55,15 @@ const onPeriodClick: UserEventHandler<
     `Handling onPeriodClick event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
+  return attenuatedContext;
 };
 
 export const streamAmountEventHandlers: DialogContentEventHandlers[] = [
   {
-    state: {},
     eventName: StreamAmountEventNames.StreamAmount,
     handler: onStreamAmountClick as UserEventHandler<UserInputEventType>,
   },
   {
-    state: {},
     eventName: StreamAmountEventNames.Period,
     handler: onPeriodClick as UserEventHandler<UserInputEventType>,
   },

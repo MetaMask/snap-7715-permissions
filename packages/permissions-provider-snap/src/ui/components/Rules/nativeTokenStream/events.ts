@@ -19,6 +19,7 @@ import { NativeTokenStreamRulesEventNames } from './NativeTokenStreamRules';
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onInitialAmountInputChange: UserEventHandler<
   UserInputEventType.InputChangeEvent
@@ -31,16 +32,19 @@ const onInitialAmountInputChange: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === NativeTokenStreamRulesEventNames.InitialAmount)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Initial Amount input.`,
+    );
   }
   logger.debug(
     `Handling onInitialAmountInputChange event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 /**
@@ -49,6 +53,7 @@ const onInitialAmountInputChange: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onInitialAmountRemoveButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
@@ -61,16 +66,19 @@ const onInitialAmountRemoveButtonClick: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === NativeTokenStreamRulesEventNames.InitialAmountRemove)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Initial Amount Remove button.`,
+    );
   }
   logger.debug(
     `Handling onInitialAmountRemoveButtonClick event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 /**
@@ -79,6 +87,7 @@ const onInitialAmountRemoveButtonClick: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onMaxAllowanceInputChange: UserEventHandler<
   UserInputEventType.InputChangeEvent
@@ -91,16 +100,19 @@ const onMaxAllowanceInputChange: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === NativeTokenStreamRulesEventNames.MaxAllowance)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Max Allowance input.`,
+    );
   }
   logger.debug(
     `Handling onMaxAllowanceInputChange event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 /**
@@ -109,6 +121,7 @@ const onMaxAllowanceInputChange: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onMaxAllowanceRemoveButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
@@ -121,16 +134,19 @@ const onMaxAllowanceRemoveButtonClick: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === NativeTokenStreamRulesEventNames.MaxAllowanceRemove)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Max Allowance Remove button.`,
+    );
   }
   logger.debug(
     `Handling onMaxAllowanceRemoveButtonClick event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 /**
@@ -139,6 +155,7 @@ const onMaxAllowanceRemoveButtonClick: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onStartTimeInputChange: UserEventHandler<
   UserInputEventType.InputChangeEvent
@@ -151,16 +168,19 @@ const onStartTimeInputChange: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === NativeTokenStreamRulesEventNames.StartTime)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Start Time input.`,
+    );
   }
   logger.debug(
     `Handling onStartTimeInputChange event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 /**
@@ -169,6 +189,7 @@ const onStartTimeInputChange: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onStartTimeRemoveButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
@@ -181,16 +202,19 @@ const onStartTimeRemoveButtonClick: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === NativeTokenStreamRulesEventNames.StartTimeRemove)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Start Time Remove button.`,
+    );
   }
   logger.debug(
     `Handling onStartTimeRemoveButtonClick event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 /**
@@ -199,6 +223,7 @@ const onStartTimeRemoveButtonClick: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onExpiryInputChange: UserEventHandler<
   UserInputEventType.InputChangeEvent
@@ -211,16 +236,19 @@ const onExpiryInputChange: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === NativeTokenStreamRulesEventNames.Expiry)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Expiry input.`,
+    );
   }
   logger.debug(
     `Handling onInitialAmountInputChange event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 /**
@@ -229,6 +257,7 @@ const onExpiryInputChange: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onExpiryRemoveButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
@@ -241,65 +270,60 @@ const onExpiryRemoveButtonClick: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === NativeTokenStreamRulesEventNames.ExpiryRemove)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Expiry Remove button.`,
+    );
   }
   logger.debug(
     `Handling onExpiryRemoveButtonClick event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 export const nativeTokenStreamRulesEventHandlers: DialogContentEventHandlers[] =
   [
     // input change events handlers
     {
-      state: {},
       eventName: NativeTokenStreamRulesEventNames.InitialAmount,
       handler:
         onInitialAmountInputChange as UserEventHandler<UserInputEventType>,
     },
     {
-      state: {},
       eventName: NativeTokenStreamRulesEventNames.MaxAllowance,
       handler:
         onMaxAllowanceInputChange as UserEventHandler<UserInputEventType>,
     },
     {
-      state: {},
       eventName: NativeTokenStreamRulesEventNames.StartTime,
       handler: onStartTimeInputChange as UserEventHandler<UserInputEventType>,
     },
     {
-      state: {},
       eventName: NativeTokenStreamRulesEventNames.Expiry,
       handler: onExpiryInputChange as UserEventHandler<UserInputEventType>,
     },
 
     // remove button click events handlers
     {
-      state: {},
       eventName: NativeTokenStreamRulesEventNames.InitialAmountRemove,
       handler:
         onInitialAmountRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
-      state: {},
       eventName: NativeTokenStreamRulesEventNames.MaxAllowanceRemove,
       handler:
         onMaxAllowanceRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
-      state: {},
       eventName: NativeTokenStreamRulesEventNames.StartTimeRemove,
       handler:
         onStartTimeRemoveButtonClick as UserEventHandler<UserInputEventType>,
     },
     {
-      state: {},
       eventName: NativeTokenStreamRulesEventNames.ExpiryRemove,
       handler:
         onExpiryRemoveButtonClick as UserEventHandler<UserInputEventType>,

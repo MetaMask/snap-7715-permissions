@@ -22,6 +22,7 @@ type RequestDetailsProps = JsonObject & {
   justification: string | undefined;
   chainId: number;
   asset: string;
+  isHideableToggle: boolean;
 };
 
 type ItemDetails = {
@@ -83,7 +84,7 @@ const renderIsHideableText = (text: string, isHideable?: boolean) => {
       ) : (
         <Text color="muted">text</Text>
       )}
-      <Button name={RequestDetailsEventNames.ShowMoreButton}>Show more</Button>
+      <Button name={RequestDetailsEventNames.ShowMoreButton}>Show</Button>
     </Box>
   );
 };
@@ -93,6 +94,7 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
   justification,
   chainId,
   asset, // TODO: Update to use caip-19 asset
+  isHideableToggle,
 }) => {
   // @ts-expect-error - extractChain does not work well with dynamic `chains`
   const chain = extractChain({
@@ -125,7 +127,7 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
       label: 'Reason',
       text: justification ?? 'No reason provided',
       tooltipText: 'Tooltip text',
-      isHideable: true,
+      isHideable: isHideableToggle,
     },
   ];
 

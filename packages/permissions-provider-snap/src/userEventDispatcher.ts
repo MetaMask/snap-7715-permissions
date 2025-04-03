@@ -9,12 +9,19 @@ import type {
   FormSubmitEvent,
   InputChangeEvent,
   InterfaceContext,
+  SnapsProvider,
   UserInputEvent,
   UserInputEventType,
 } from '@metamask/snaps-sdk';
 
-import type { SupportedPermissionTypes } from './orchestrators';
-import type { PermissionConfirmationContext } from './ui';
+import {
+  createPermissionOrchestrator,
+  type SupportedPermissionTypes,
+} from './orchestrators';
+import {
+  buildConfirmationDialog,
+  type PermissionConfirmationContext,
+} from './ui';
 
 export type UserInputEventByType<
   TUserInputEventType extends UserInputEventType,
@@ -29,7 +36,7 @@ export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
   (args: {
     event: UserInputEventByType<TUserInputEventType>;
     attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
-  }) => void | Promise<void>;
+  }) => void | Promise<PermissionConfirmationContext<SupportedPermissionTypes>>;
 
 const getUserInputEventKey = ({
   eventName,
@@ -50,6 +57,12 @@ export class UserEventDispatcher {
   readonly #eventHandlers = {} as {
     [userInputEventKey: string]: UserEventHandler<UserInputEventType>[];
   };
+
+  readonly #snapsProvider: SnapsProvider;
+
+  constructor(snapsProvider: SnapsProvider) {
+    this.#snapsProvider = snapsProvider;
+  }
 
   /**
    * Register an event handler for a specific event type.
@@ -151,13 +164,6 @@ export class UserEventDispatcher {
       return;
     }
 
-    const permissionType = extractPermissionName(
-      (context.permission as Permission).type,
-    ) as SupportedPermissionTypes;
-    const parsedContext = context as PermissionConfirmationContext<
-      typeof permissionType
-    >;
-
     const eventKey = getUserInputEventKey({
       eventName: event.name,
       interfaceId: id,
@@ -169,12 +175,31 @@ export class UserEventDispatcher {
       return;
     }
 
+    const permissionType = extractPermissionName(
+      (context.permission as Permission).type,
+    ) as SupportedPermissionTypes;
+
     const handlersExecutions = handlers.map(async (handler) => {
       try {
-        await handler({
+        const updatedContext = await handler({
           event,
-          attenuatedContext: parsedContext,
+          attenuatedContext: context as PermissionConfirmationContext<
+            typeof permissionType
+          >,
         });
+        if (updatedContext) {
+          await this.#snapsProvider.request({
+            method: 'snap_updateInterface',
+            params: {
+              id,
+              ui: buildConfirmationDialog(
+                createPermissionOrchestrator(
+                  permissionType,
+                ).buildPermissionConfirmation(updatedContext),
+              ),
+            },
+          });
+        }
       } catch (error) {
         logger.error(
           `Error in event handler for event type ${event.type} and interface id ${id}:`,

@@ -15,6 +15,7 @@ import { RulesSelectorsEventNames } from './RulesSelector';
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
+ * @returns The updated context.
  */
 const onAddMoreRulesButtonClick: UserEventHandler<
   UserInputEventType.ButtonClickEvent
@@ -27,21 +28,23 @@ const onAddMoreRulesButtonClick: UserEventHandler<
 }) => {
   const eventName = event.name;
   if (!eventName) {
-    return;
+    throw new Error('Event name is missing.');
   }
   if (!(eventName === RulesSelectorsEventNames.AddMoreRules)) {
-    return;
+    throw new Error(
+      `Event name ${eventName} is not supported for the Add More Rules button.`,
+    );
   }
   logger.debug(
     `Handling onAddMoreRulesButtonClick event:`,
     JSON.stringify({ event, attenuatedContext }, undefined, 2),
   );
   // TODO: Add the event handle logic to make the button interactive
+  return attenuatedContext;
 };
 
 export const rulesSelectorEventHandlers: DialogContentEventHandlers[] = [
   {
-    state: {},
     eventName: RulesSelectorsEventNames.AddMoreRules,
     handler: onAddMoreRulesButtonClick as UserEventHandler<UserInputEventType>,
   },

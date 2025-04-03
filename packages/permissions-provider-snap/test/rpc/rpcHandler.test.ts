@@ -30,7 +30,7 @@ describe('RpcHandler', () => {
     getCryptoToFiatConversion: jest.fn(),
   } as unknown as jest.Mocked<TokenPricesService>;
   const mockSnapsProvider = createMockSnapsProvider();
-  const mockUserEventDispatcher = new UserEventDispatcher();
+  const mockUserEventDispatcher = new UserEventDispatcher(mockSnapsProvider);
 
   (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
     () => mockUserEventDispatcher,

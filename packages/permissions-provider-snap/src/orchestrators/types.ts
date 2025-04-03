@@ -11,7 +11,7 @@ import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { CaipAssetType } from '@metamask/utils';
 import type { Address, Hex, OneOf } from 'viem';
 
-import type { ElementState, PermissionConfirmationContext } from '../ui';
+import type { State, PermissionConfirmationContext } from '../ui';
 import type { UserEventHandler } from '../userEventDispatcher';
 import type {
   PermissionSpecificRulesMapping,
@@ -20,7 +20,6 @@ import type {
 } from './orchestrator';
 
 export type DialogContentEventHandlers = {
-  state: ElementState;
   eventName: string;
   handler: UserEventHandler<UserInputEventType>;
 };
@@ -139,9 +138,16 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   /**
    * Returns a set of event handlers for the confirmation dialog specific to the permission type.
    * These event handlers are used to handle user input events in the confirmation dialog.
+   *
+   * @param permission - The permission for the confirmation dialog.
    * @returns An array of event handlers for the confirmation dialog.
    */
-  getConfirmationDialogEventHandlers: () => DialogContentEventHandlers[];
+  getConfirmationDialogEventHandlers: (
+    permission: PermissionTypeMapping[TPermissionType],
+  ) => {
+    state: State<TPermissionType>;
+    dialogContentEventHandlers: DialogContentEventHandlers[];
+  };
 };
 
 /**

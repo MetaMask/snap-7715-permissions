@@ -18,7 +18,7 @@ sequenceDiagram
  participant orchestrate
  participant orchestrator(permission specific)
  participant PermissionConfirmationContext
- participant renderHandler
+ participant PermissionConfirmationRenderHandler
  participant ConfirmationDialog
 participant UI module
 
@@ -32,9 +32,9 @@ participant UI module
  orchestrate->>orchestrator(permission specific): Call the .getConfirmationDialogEventHandlers() on the orchestrator to return a set of event handlers for the confirmation dialog specific to the permission type.
 orchestrator->>UI module: Fetch the permission JSX component
  orchestrate->>PermissionConfirmationContext: Builds the Snap UI context with the handler and UI elements default state.
- orchestrate->>renderHandler: Create the confirmation dialog
+ orchestrate->>PermissionConfirmationRenderHandler: Create the confirmation dialog
  orchestrate->>UserEventDispatcher: Register the event handlers
- orchestrate->>renderHandler: Wait for the confirmation result.
+ orchestrate->>PermissionConfirmationRenderHandler: Wait for the confirmation result.
  ConfirmationDialog->>onUserInput: Events are sent to onUserInput.
 ```
 

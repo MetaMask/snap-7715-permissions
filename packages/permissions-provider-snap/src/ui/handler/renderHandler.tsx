@@ -3,14 +3,13 @@ import {
   type ComponentOrElement,
   type SnapsProvider,
 } from '@metamask/snaps-sdk';
-import { Container, type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { SupportedPermissionTypes } from '../../orchestrators';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../../userEventDispatcher';
-import { ConfirmationFooter } from '../components';
+import { buildConfirmationDialog } from '../confirmations';
 import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
 
@@ -61,19 +60,11 @@ export const createPermissionConfirmationRenderHandler = ({
       dialogContent: ComponentOrElement,
       _: TPermissionType,
     ) => {
-      // append the confirmation footer here to the dialog provided by the specific permission implementation
-      const ui = (
-        <Container>
-          {dialogContent as GenericSnapElement}
-          <ConfirmationFooter />
-        </Container>
-      );
-
       const interfaceId = await snapsProvider.request({
         method: 'snap_createInterface',
         params: {
           context,
-          ui,
+          ui: buildConfirmationDialog(dialogContent),
         },
       });
 

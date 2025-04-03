@@ -13,7 +13,10 @@ import type {
   SupportedPermissionTypes,
 } from '../src/orchestrators';
 import { createPermissionOrchestrator } from '../src/orchestrators';
-import type { PermissionConfirmationContext } from '../src/ui';
+import {
+  RequestDetailsEventNames,
+  type PermissionConfirmationContext,
+} from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 
 describe('native-token-stream Orchestrator', () => {
@@ -50,7 +53,9 @@ describe('native-token-stream Orchestrator', () => {
     permissionSpecificRules: {
       maxAllowance: 'Unlimited',
     },
-    elementState: {},
+    state: {
+      [RequestDetailsEventNames.ShowMoreButton]: false,
+    },
   };
 
   const mockPage = (
@@ -63,7 +68,7 @@ describe('native-token-stream Orchestrator', () => {
       chainId={mockUiContext.chainId}
       valueFormattedAsCurrency={mockUiContext.valueFormattedAsCurrency}
       permissionSpecificRules={mockUiContext.permissionSpecificRules}
-      elementState={mockUiContext.elementState}
+      state={mockUiContext.state}
     />
   );
 
@@ -255,8 +260,12 @@ describe('native-token-stream Orchestrator', () => {
     });
 
     it('should return confirmation dialog EventHandlers', async () => {
-      const res = orchestrator.getConfirmationDialogEventHandlers();
-      expect(res.length).toStrictEqual(10);
+      const parsedPermission = await orchestrator.parseAndValidate(
+        mockbasePermission,
+      );
+      const { dialogContentEventHandlers } =
+        orchestrator.getConfirmationDialogEventHandlers(parsedPermission);
+      expect(dialogContentEventHandlers.length).toStrictEqual(1);
     });
   });
 });

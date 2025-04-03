@@ -9,7 +9,10 @@ import type {
   SupportedPermissionTypes,
 } from '../src/orchestrators';
 import type { PermissionConfirmationContext } from '../src/ui';
-import { createPermissionConfirmationRenderHandler } from '../src/ui';
+import {
+  createPermissionConfirmationRenderHandler,
+  RequestDetailsEventNames,
+} from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
@@ -18,7 +21,7 @@ jest.mock('../src/userEventDispatcher');
 
 describe('Permission Confirmation Render Handler', () => {
   const mockSnapProvider = createMockSnapsProvider();
-  const mockUserEventDispatcher = new UserEventDispatcher();
+  const mockUserEventDispatcher = new UserEventDispatcher(mockSnapProvider);
 
   let onButtonClickHandlerPromise: Promise<
     (args: {
@@ -57,7 +60,9 @@ describe('Permission Confirmation Render Handler', () => {
       permissionSpecificRules: {
         maxAllowance: 'Unlimited',
       },
-      elementState: {},
+      state: {
+        [RequestDetailsEventNames.ShowMoreButton]: false,
+      },
     };
 
   const mockPage = (
@@ -70,6 +75,7 @@ describe('Permission Confirmation Render Handler', () => {
       chainId={mockContext.chainId}
       valueFormattedAsCurrency={mockContext.valueFormattedAsCurrency}
       permissionSpecificRules={mockContext.permissionSpecificRules}
+      state={mockContext.state}
     />
   );
 

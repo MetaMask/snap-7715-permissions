@@ -6,17 +6,15 @@ import {
   type Permission,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import type { UserInputEventType } from '@metamask/snaps-sdk';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
-import {
-  nativeTokenStreamRulesEventHandlers,
-  requestDetailsButtonEventHandlers,
-  rulesSelectorEventHandlers,
-} from '../../ui';
+import { onShowMoreButtonClick, RequestDetailsEventNames } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
+import type { UserEventHandler } from '../../userEventDispatcher';
 import type {
   OrchestratorFactoryFunction,
   PermissionContextMeta,
@@ -38,6 +36,12 @@ declare module './types' {
       maxAllowance?: Hex | 'Unlimited';
       initialAmount?: Hex;
       startTime?: number;
+    };
+  }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
+  interface PermissionConfirmationStateMapping {
+    'native-token-stream': JsonObject & {
+      [RequestDetailsEventNames.ShowMoreButton]: boolean;
     };
   }
 }
@@ -148,6 +152,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           chainId={context.chainId}
           valueFormattedAsCurrency={context.valueFormattedAsCurrency}
           permissionSpecificRules={context.permissionSpecificRules}
+          state={context.state}
         />
       );
     },
@@ -193,12 +198,19 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         startTime: permission.data.startTime,
       } as PermissionSpecificRulesMapping['native-token-stream'];
     },
-    getConfirmationDialogEventHandlers: () => {
-      return [
-        ...requestDetailsButtonEventHandlers,
-        ...rulesSelectorEventHandlers,
-        ...nativeTokenStreamRulesEventHandlers,
-      ];
+    getConfirmationDialogEventHandlers: (permission: PermissionTypeMapping['native-token-stream']) => {
+      return {
+        state: {
+          [RequestDetailsEventNames.ShowMoreButton]: true,
+        },
+        dialogContentEventHandlers: [
+          {
+            eventName: RequestDetailsEventNames.ShowMoreButton,
+            handler:
+              onShowMoreButtonClick as UserEventHandler<UserInputEventType>,
+          },
+        ],
+      };
     },
   };
 };

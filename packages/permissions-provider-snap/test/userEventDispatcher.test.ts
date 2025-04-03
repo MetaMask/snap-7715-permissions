@@ -1,9 +1,13 @@
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
 import type { PermissionTypeMapping } from '../src/orchestrators';
-import type { PermissionConfirmationContext } from '../src/ui';
+import {
+  RequestDetailsEventNames,
+  type PermissionConfirmationContext,
+} from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
 
 describe('UserEventDispatcher', () => {
@@ -32,12 +36,16 @@ describe('UserEventDispatcher', () => {
     permissionSpecificRules: {
       maxAllowance: 'Unlimited',
     },
-    elementState: {},
+    state: {
+      [RequestDetailsEventNames.ShowMoreButton]: false,
+    },
   };
+  const mockSnapProvider = createMockSnapsProvider();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    userEventDispatcher = new UserEventDispatcher();
+    mockSnapProvider.request.mockReset();
+    userEventDispatcher = new UserEventDispatcher(mockSnapProvider);
   });
 
   describe('on()', () => {
