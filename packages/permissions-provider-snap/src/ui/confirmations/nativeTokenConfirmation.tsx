@@ -47,7 +47,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
     },
     senderDetails: {
       title: 'Stream from',
-      tooltip: 'Tooltip text',
+      tooltip: 'The account that the token stream comes from.',
     },
   };
   return (

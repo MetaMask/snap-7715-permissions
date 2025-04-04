@@ -83,7 +83,7 @@ const renderIsHideableText = (text: string, isHideable?: boolean) => {
       ) : (
         <Text color="muted">text</Text>
       )}
-      <Button name={RequestDetailsEventNames.ShowMoreButton}>Show more</Button>
+      <Button name={RequestDetailsEventNames.ShowMoreButton}>Show</Button>
     </Box>
   );
 };
@@ -109,7 +109,7 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
     {
       label: 'Recipient',
       text: siteOrigin,
-      tooltipText: 'Recipient tool tip text',
+      tooltipText: 'Site receiving the token stream allowance.',
     },
     {
       label: 'Network',
@@ -124,7 +124,8 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
     {
       label: 'Reason',
       text: justification ?? 'No reason provided',
-      tooltipText: 'Tooltip text',
+      tooltipText:
+        'Reason given by the recipient for requesting this token stream allowance.',
       isHideable: true,
     },
   ];

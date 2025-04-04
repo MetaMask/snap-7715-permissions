@@ -87,7 +87,10 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   const streamRate = calculateStreamRate(maxAmount, timePeriodValue);
   return (
     <Section>
-      {inputDetails('Stream Amount', 'tooltip text')}
+      {inputDetails(
+        'Stream amount',
+        'Number of tokens streamed in the specified time period.',
+      )}
       <Input
         name={StreamAmountEventNames.StreamAmount}
         type="number"
@@ -96,7 +99,10 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
         disabled={true}
       />
 
-      {inputDetails('Period', 'tooltip text')}
+      {inputDetails(
+        'Period',
+        'How often this token stream updates, shown as hourly, daily, weekly, monthly, or yearly.',
+      )}
       <Dropdown
         name={StreamAmountEventNames.Period}
         disabled={true}
@@ -107,7 +113,10 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
         <Option value={TimePeriod.DAILY}>{TimePeriod.DAILY}</Option>
       </Dropdown>
 
-      {inputDetails('Stream rate', 'tooltip text')}
+      {inputDetails(
+        'Stream rate',
+        'How many tokens are available each second.',
+      )}
       <Input
         name="stream-rate"
         type="text"
