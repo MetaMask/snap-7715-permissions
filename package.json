@@ -1,18 +1,13 @@
 {
-  "name": "root",
+  "name": "@metamask/snap-7715-permissions-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "",
-  "homepage": "https://github.com/MetaMask/snap-7715-permissions#readme",
-  "bugs": {
-    "url": "https://github.com/MetaMask/snap-7715-permissions/issues"
-  },
+  "description": "Monorepo for 7715 permissions snaps.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MetaMask/snap-7715-permissions.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
-  "author": "",
+  "files": [],
   "workspaces": [
     "packages/*"
   ],
@@ -29,6 +24,7 @@
   "devDependencies": {
     "@lavamoat/allow-scripts": "^3.0.0",
     "@lavamoat/preinstall-always-fail": "^2.0.0",
+    "@metamask/create-release-branch": "^4.1.1",
     "@metamask/eslint-config": "^12.2.0",
     "@metamask/eslint-config-jest": "^12.1.0",
     "@metamask/eslint-config-nodejs": "^12.1.0",
