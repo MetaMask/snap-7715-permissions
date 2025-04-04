@@ -2,11 +2,6 @@ name: Build, Lint, and Test
 
 on:
   workflow_call:
-    secrets:
-      PRICE_API_BASE_URL:
-        required: true
-      NPM_AUTH_TOKEN:
-        required: true
 
 env:
   NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

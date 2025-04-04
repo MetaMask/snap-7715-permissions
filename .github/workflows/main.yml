@@ -34,9 +34,7 @@ jobs:
   build-lint-test:
     name: Build, lint, and test
     uses: ./.github/workflows/build-lint-test.yml
-    secrets: 
-      NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      PRICE_API_BASE_URL: ${{ secrets.PRICE_API_BASE_URL }}
+    secrets: inherit
 
   is-release:
     name: Determine whether this is a release merge commit
