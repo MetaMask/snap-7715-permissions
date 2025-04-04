@@ -60,7 +60,7 @@ jobs:
           subteam: S042S7RE4AE # @metamask-npm-publishers
 
 
-  # Uncomment the following job to publish to NPM after testing the dry run
+  # TODO: Uncomment the following job to publish to NPM after testing the dry run
   # publish-npm:
   #   name: Publish to NPM
   #   environment: npm-publish
