@@ -6,16 +6,12 @@ import {
   type Permission,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
-import type { UserInputEventType } from '@metamask/snaps-sdk';
-import { InvalidParamsError } from '@metamask/snaps-sdk';
+import { InvalidParamsError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
-import {
-  onShowMoreButtonClick,
-  NativeTokenStreamDialogEventNames,
-} from '../../ui';
+import { NativeTokenStreamDialogEventNames, shouldToggleBool } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
 import type { UserEventHandler } from '../../userEventDispatcher';
 import type {
@@ -44,7 +40,7 @@ declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
   interface PermissionConfirmationStateMapping {
     'native-token-stream': JsonObject & {
-      [NativeTokenStreamDialogEventNames.ShowMoreButton]: boolean;
+      [NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded]: boolean;
     };
   }
 }
@@ -209,13 +205,15 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         // extracted to populate the rules initial state. This is why this function
         // requires the permission object. Marked as _ to resolve linter error.
         state: {
-          [NativeTokenStreamDialogEventNames.ShowMoreButton]: true,
+          [NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded]:
+            true,
         },
         dialogContentEventHandlers: [
           {
-            eventName: NativeTokenStreamDialogEventNames.ShowMoreButton,
-            handler:
-              onShowMoreButtonClick as UserEventHandler<UserInputEventType>,
+            eventName:
+              NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded,
+            eventType: UserInputEventType.ButtonClickEvent,
+            handler: shouldToggleBool as UserEventHandler<UserInputEventType>,
           },
         ],
       };

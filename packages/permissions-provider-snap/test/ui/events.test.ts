@@ -3,7 +3,7 @@ import { getAddress } from 'viem';
 
 import type { PermissionTypeMapping } from '../../src/orchestrators';
 import {
-  onShowMoreButtonClick,
+  shouldToggleBool,
   NativeTokenStreamDialogEventNames,
   type PermissionConfirmationContext,
 } from '../../src/ui';
@@ -38,7 +38,7 @@ describe('Confirmation Dialog event handlers', () => {
         },
       };
 
-    describe('onShowMoreButtonClick - event', () => {
+    describe('shouldToggleBool - event', () => {
       it('should mutate show more state', async () => {
         const stateBefore =
           mockNativeTokenStreamContext.state[
@@ -47,7 +47,7 @@ describe('Confirmation Dialog event handlers', () => {
         expect(stateBefore).toBe(false);
 
         // mutate state
-        const updatedContext = await onShowMoreButtonClick({
+        const updatedContext = await shouldToggleBool({
           event: {
             type: UserInputEventType.ButtonClickEvent,
             name: NativeTokenStreamDialogEventNames.ShowMoreButton,
@@ -74,7 +74,7 @@ describe('Confirmation Dialog event handlers', () => {
         expect(stateBefore).toBeUndefined();
 
         // mutate state
-        const updatedContext = await onShowMoreButtonClick({
+        const updatedContext = await shouldToggleBool({
           event: {
             type: UserInputEventType.ButtonClickEvent,
             name: NativeTokenStreamDialogEventNames.ShowMoreButton,
@@ -97,7 +97,7 @@ describe('Confirmation Dialog event handlers', () => {
         expect(stateBefore).toBe(false);
 
         // mutate state
-        const updatedContext = await onShowMoreButtonClick({
+        const updatedContext = await shouldToggleBool({
           event: {
             type: UserInputEventType.ButtonClickEvent,
             name: 'some other event name',

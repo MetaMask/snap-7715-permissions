@@ -1,5 +1,4 @@
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
@@ -40,12 +39,10 @@ describe('UserEventDispatcher', () => {
       [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
     },
   };
-  const mockSnapProvider = createMockSnapsProvider();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockSnapProvider.request.mockReset();
-    userEventDispatcher = new UserEventDispatcher(mockSnapProvider);
+    userEventDispatcher = new UserEventDispatcher();
   });
 
   describe('on()', () => {
@@ -59,35 +56,6 @@ describe('UserEventDispatcher', () => {
       });
 
       expect(result).toBe(userEventDispatcher);
-    });
-
-    it('should register multiple handlers for the same event type', async () => {
-      const handler1 = createHandlerMock();
-      const handler2 = createHandlerMock();
-
-      userEventDispatcher.on({
-        eventName,
-        interfaceId,
-        handler: handler1,
-      });
-
-      userEventDispatcher.on({
-        eventName,
-        interfaceId,
-        handler: handler2,
-      });
-
-      await userEventDispatcher.handleUserInputEvent({
-        event: {
-          type: eventType,
-          name: eventName,
-        },
-        id: interfaceId,
-        context: mockContext,
-      });
-
-      expect(handler1).toHaveBeenCalled();
-      expect(handler2).toHaveBeenCalled();
     });
 
     it('should not handlers for a different event name', async () => {
@@ -293,66 +261,6 @@ describe('UserEventDispatcher', () => {
 
       expect(handler1).not.toHaveBeenCalled();
       expect(handler2).toHaveBeenCalled();
-    });
-  });
-
-  describe('handleUserInputEvent()', () => {
-    it('should not process the event if the context is empty', async () => {
-      const handler1 = createHandlerMock();
-      const handler2 = createHandlerMock();
-
-      userEventDispatcher.on({
-        eventName,
-        interfaceId,
-        handler: handler1,
-      });
-
-      userEventDispatcher.on({
-        eventName,
-        interfaceId,
-        handler: handler2,
-      });
-
-      await userEventDispatcher.handleUserInputEvent({
-        event: {
-          type: eventType,
-          name: eventName,
-        },
-        id: interfaceId,
-        context: null,
-      });
-
-      expect(handler1).not.toHaveBeenCalled();
-      expect(handler2).not.toHaveBeenCalled();
-    });
-
-    it('should not process the event if the event name is empty', async () => {
-      const handler1 = createHandlerMock();
-      const handler2 = createHandlerMock();
-
-      userEventDispatcher.on({
-        eventName: '',
-        interfaceId,
-        handler: handler1,
-      });
-
-      userEventDispatcher.on({
-        eventName: '',
-        interfaceId,
-        handler: handler2,
-      });
-
-      await userEventDispatcher.handleUserInputEvent({
-        event: {
-          type: eventType,
-          name: eventName,
-        },
-        id: interfaceId,
-        context: null,
-      });
-
-      expect(handler1).not.toHaveBeenCalled();
-      expect(handler2).not.toHaveBeenCalled();
     });
   });
 });

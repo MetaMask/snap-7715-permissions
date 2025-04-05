@@ -12,7 +12,7 @@ import {
 import type { Hex } from 'viem';
 import { formatUnits } from 'viem';
 
-import { formatTokenBalance } from '../../../utils';
+import { formatTokenBalance } from '../../utils';
 
 export enum StreamAmountEventNames {
   StreamAmount = 'stream-amount:amount',

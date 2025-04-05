@@ -1,7 +1,8 @@
-import type { ButtonClickEvent, UserInputEventType } from '@metamask/snaps-sdk';
+import type { ButtonClickEvent } from '@metamask/snaps-sdk';
 import {
   type ComponentOrElement,
   type SnapsProvider,
+  UserInputEventType,
 } from '@metamask/snaps-sdk';
 
 import type { SupportedPermissionTypes } from '../../orchestrators';
@@ -96,7 +97,7 @@ export const createPermissionConfirmationRenderHandler = ({
             userEventDispatcher.off({
               eventName: event.name,
               interfaceId,
-              handler: onButtonClick,
+              eventType: UserInputEventType.ButtonClickEvent,
             });
 
             snapsProvider
@@ -117,12 +118,14 @@ export const createPermissionConfirmationRenderHandler = ({
 
           userEventDispatcher.on({
             eventName: GRANT_BUTTON,
+            eventType: UserInputEventType.ButtonClickEvent,
             interfaceId,
             handler: onButtonClick,
           });
 
           userEventDispatcher.on({
             eventName: CANCEL_BUTTON,
+            eventType: UserInputEventType.ButtonClickEvent,
             interfaceId,
             handler: onButtonClick,
           });

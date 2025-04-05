@@ -17,7 +17,7 @@ import type { PermissionConfirmationProps } from '../types';
  * These events are used to handle user interactions with the confirmation page.
  */
 export enum NativeTokenStreamDialogEventNames {
-  ShowMoreButton = 'request-details.show-more-button-native-token-stream',
+  JustificationShowMoreExpanded = 'request-details.show-more-button-native-token-stream',
 }
 
 /**
@@ -69,8 +69,12 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         chainId={chainId}
         justification={permission.data.justification}
         asset={asset}
-        isShowMore={state[NativeTokenStreamDialogEventNames.ShowMoreButton]}
-        showMoreEventName={NativeTokenStreamDialogEventNames.ShowMoreButton}
+        isJustificationShowMoreExpanded={
+          state[NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded]
+        }
+        justificationShowMoreExpandedEventName={
+          NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded
+        }
       />
 
       <AccountDetails

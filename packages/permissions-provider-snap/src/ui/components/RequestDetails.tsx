@@ -11,15 +11,15 @@ import {
 import { extractChain } from 'viem';
 import * as ALL_CHAINS from 'viem/chains';
 
-import { ICONS } from '../../iconConstant';
+import { ICONS } from '../iconConstant';
 
 type RequestDetailsProps = JsonObject & {
   siteOrigin: string;
   justification: string | undefined;
   chainId: number;
   asset: string;
-  isShowMore: boolean;
-  showMoreEventName: string;
+  isJustificationShowMoreExpanded: boolean;
+  justificationShowMoreExpandedEventName: string;
 };
 
 type ItemDetails = {
@@ -95,8 +95,8 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
   justification,
   chainId,
   asset, // TODO: Update to use caip-19 asset
-  isShowMore,
-  showMoreEventName,
+  isJustificationShowMoreExpanded,
+  justificationShowMoreExpandedEventName,
 }) => {
   // @ts-expect-error - extractChain does not work well with dynamic `chains`
   const chain = extractChain({
@@ -141,7 +141,11 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
       <Box direction="horizontal">
         {renderIconAsImage(item.iconUrl)}
         {item.label === 'Reason' ? (
-          renderShowMoreText(item.text, showMoreEventName, isShowMore)
+          renderShowMoreText(
+            item.text,
+            justificationShowMoreExpandedEventName,
+            isJustificationShowMoreExpanded,
+          )
         ) : (
           <Text>{item.text}</Text>
         )}

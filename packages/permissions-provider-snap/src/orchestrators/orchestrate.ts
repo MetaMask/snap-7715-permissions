@@ -118,9 +118,10 @@ export const orchestrate = async <
 
   // Register event handlers for confirmation dialog
   if (dialogContentEventHandlers.length > 0) {
-    dialogContentEventHandlers.forEach(({ eventName, handler }) => {
+    dialogContentEventHandlers.forEach(({ eventName, eventType, handler }) => {
       userEventDispatcher.on({
         eventName,
+        eventType,
         interfaceId,
         handler,
       });
@@ -132,11 +133,11 @@ export const orchestrate = async <
     await confirmationResult;
 
   if (dialogContentEventHandlers.length > 0) {
-    dialogContentEventHandlers.forEach(({ eventName, handler }) => {
+    dialogContentEventHandlers.forEach(({ eventName, eventType }) => {
       userEventDispatcher.off({
         eventName,
+        eventType,
         interfaceId,
-        handler,
       });
     });
   }

@@ -21,6 +21,7 @@ import type {
 
 export type DialogContentEventHandlers = {
   eventName: string;
+  eventType: UserInputEventType;
   handler: UserEventHandler<UserInputEventType>;
 };
 
