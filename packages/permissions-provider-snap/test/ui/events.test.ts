@@ -5,6 +5,7 @@ import { getAddress } from 'viem';
 import {
   handleToggleBooleanClicked,
   NativeTokenStreamDialogElementNames,
+  TimePeriod,
   type PermissionConfirmationContext,
 } from '../../src/ui';
 
@@ -33,6 +34,7 @@ describe('Confirmation Dialog event handlers', () => {
           [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
             false,
           [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
+          [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
         },
       };
 
