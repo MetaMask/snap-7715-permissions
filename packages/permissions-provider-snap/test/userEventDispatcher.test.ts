@@ -1,10 +1,11 @@
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
-import type { PermissionTypeMapping } from '../src/orchestrators';
 import {
-  NativeTokenStreamDialogEventNames,
+  NativeTokenStreamDialogElementNames,
+  TimePeriod,
   type PermissionConfirmationContext,
 } from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
@@ -12,20 +13,12 @@ import { UserEventDispatcher } from '../src/userEventDispatcher';
 describe('UserEventDispatcher', () => {
   let userEventDispatcher: UserEventDispatcher;
   const eventType = UserInputEventType.ButtonClickEvent;
-  const eventName = 'buttonClickEvent-name';
+  const elementName = 'buttonClickEvent-name';
   const createHandlerMock = () => jest.fn<() => void>();
   const interfaceId = '123';
   const mockContext: PermissionConfirmationContext<'native-token-stream'> = {
-    permission: {
-      type: 'native-token-stream',
-      data: {
-        justification: 'shh...permission 2',
-        initialAmount: '0x1',
-        amountPerSecond: '0x1',
-        startTime: 1000,
-        maxAmount: '0x2',
-      },
-    } as PermissionTypeMapping['native-token-stream'],
+    permissionType: 'native-token-stream',
+    justification: 'shh...permission 2',
     address: getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008'),
     siteOrigin: 'http://localhost:3000',
     balance: '0x1',
@@ -36,13 +29,18 @@ describe('UserEventDispatcher', () => {
       maxAllowance: 'Unlimited',
     },
     state: {
-      [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
+      [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+        false,
+      [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
+      [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
     },
   };
+  const mockSnapsProvider = createMockSnapsProvider();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    userEventDispatcher = new UserEventDispatcher();
+    mockSnapsProvider.request.mockReset();
+    userEventDispatcher = new UserEventDispatcher(mockSnapsProvider);
   });
 
   describe('on()', () => {
@@ -50,7 +48,8 @@ describe('UserEventDispatcher', () => {
       const handler = createHandlerMock();
 
       const result = userEventDispatcher.on({
-        eventName,
+        elementName,
+        eventType,
         interfaceId,
         handler,
       });
@@ -63,13 +62,15 @@ describe('UserEventDispatcher', () => {
       const handlerMismatchingEventType = createHandlerMock();
 
       userEventDispatcher.on({
-        eventName,
+        elementName,
+        eventType,
         interfaceId,
         handler: handlerMatchingEventType,
       });
 
       userEventDispatcher.on({
-        eventName: 'fileUploadEvent-name',
+        elementName: 'fileUploadEvent-name',
+        eventType,
         interfaceId,
         handler: handlerMismatchingEventType,
       });
@@ -77,7 +78,7 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
-          name: eventName,
+          name: elementName,
         },
         id: interfaceId,
         context: mockContext,
@@ -91,7 +92,8 @@ describe('UserEventDispatcher', () => {
       const handler = createHandlerMock();
 
       userEventDispatcher.on({
-        eventName,
+        elementName,
+        eventType,
         interfaceId: '123',
         handler,
       });
@@ -99,7 +101,7 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
-          name: eventName,
+          name: elementName,
         },
         id: '456',
         context: mockContext,
@@ -114,12 +116,14 @@ describe('UserEventDispatcher', () => {
 
       const result = userEventDispatcher
         .on({
-          eventName,
+          elementName,
+          eventType,
           interfaceId,
           handler: handler1,
         })
         .on({
-          eventName,
+          elementName,
+          eventType,
           interfaceId,
           handler: handler2,
         });
@@ -129,7 +133,7 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
-          name: eventName,
+          name: elementName,
         },
         id: interfaceId,
         context: mockContext,
@@ -145,7 +149,8 @@ describe('UserEventDispatcher', () => {
       const handler = createHandlerMock();
 
       userEventDispatcher.on({
-        eventName,
+        elementName,
+        eventType,
         interfaceId,
         handler,
       });
@@ -153,7 +158,8 @@ describe('UserEventDispatcher', () => {
       jest.clearAllMocks();
 
       const result = userEventDispatcher.off({
-        eventName,
+        elementName,
+        eventType,
         interfaceId,
         handler,
       });
@@ -163,7 +169,7 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
-          name: eventName,
+          name: elementName,
         },
         id: interfaceId,
         context: mockContext,
@@ -177,7 +183,8 @@ describe('UserEventDispatcher', () => {
       const unregisteredHandler = createHandlerMock();
 
       userEventDispatcher.on({
-        eventName,
+        elementName,
+        eventType,
         interfaceId,
         handler: registeredHandler,
       });
@@ -185,7 +192,8 @@ describe('UserEventDispatcher', () => {
       jest.clearAllMocks();
 
       userEventDispatcher.off({
-        eventName: 'unregisteredEvent-name',
+        elementName: 'unregisteredEvent-name',
+        eventType,
         interfaceId,
         handler: unregisteredHandler,
       });
@@ -193,7 +201,7 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
-          name: eventName,
+          name: elementName,
         },
         id: interfaceId,
         context: mockContext,
@@ -209,7 +217,8 @@ describe('UserEventDispatcher', () => {
       jest.clearAllMocks();
 
       userEventDispatcher.off({
-        eventName,
+        elementName,
+        eventType,
         interfaceId,
         handler,
       });
@@ -217,7 +226,7 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
-          name: eventName,
+          name: elementName,
         },
         id: interfaceId,
         context: mockContext,
@@ -232,12 +241,14 @@ describe('UserEventDispatcher', () => {
 
       userEventDispatcher
         .on({
-          eventName,
+          elementName,
+          eventType,
           interfaceId,
           handler: handler1,
         })
         .on({
-          eventName,
+          elementName,
+          eventType,
           interfaceId,
           handler: handler2,
         });
@@ -245,7 +256,8 @@ describe('UserEventDispatcher', () => {
       jest.clearAllMocks();
 
       userEventDispatcher.off({
-        eventName,
+        elementName,
+        eventType,
         interfaceId,
         handler: handler1,
       });
@@ -253,7 +265,7 @@ describe('UserEventDispatcher', () => {
       await userEventDispatcher.handleUserInputEvent({
         event: {
           type: eventType,
-          name: eventName,
+          name: elementName,
         },
         id: interfaceId,
         context: mockContext,

@@ -1,17 +1,22 @@
-import type { Permission } from '@metamask/7715-permissions-shared/types';
-import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
   ButtonClickEvent,
   FileUploadEvent,
   FormSubmitEvent,
   InputChangeEvent,
   InterfaceContext,
+  SnapsProvider,
   UserInputEvent,
   UserInputEventType,
 } from '@metamask/snaps-sdk';
 
-import { type SupportedPermissionTypes } from './orchestrators';
-import { type PermissionConfirmationContext } from './ui';
+import type { SupportedPermissionTypes } from './orchestrators';
+import type { PermissionConfirmationContext } from './ui';
+
+export type DialogContentEventHandlers = {
+  eventType: UserInputEventType;
+  handler: UserEventHandler<UserInputEventType>;
+};
 
 export type UserInputEventByType<
   TUserInputEventType extends UserInputEventType,
@@ -26,17 +31,20 @@ export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
   (args: {
     event: UserInputEventByType<TUserInputEventType>;
     attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
-  }) => void | Promise<PermissionConfirmationContext<SupportedPermissionTypes>>;
+    permissionType: SupportedPermissionTypes;
+    snapsProvider: SnapsProvider;
+    interfaceId: string;
+  }) => void | Promise<void>;
 
 const getUserInputEventKey = ({
-  eventName,
+  elementName,
   eventType,
   interfaceId,
 }: {
-  eventName: string;
+  elementName: string;
   eventType: UserInputEventType;
   interfaceId: string;
-}) => `${eventName}:${eventType}${interfaceId}`;
+}) => `${elementName}:${eventType}${interfaceId}`;
 /**
  * Class responsible for dispatching user input events to registered handlers.
  * Provides a way to register, deregister, and dispatch event handlers
@@ -44,38 +52,51 @@ const getUserInputEventKey = ({
  */
 export class UserEventDispatcher {
   /**
-   * Map of userInputEventKey(eventName-eventType) to an event handler
+   * Map of event types to array of event handlers
    */
   readonly #eventHandlers = {} as {
-    [userInputEventKey: string]: UserEventHandler<UserInputEventType>;
+    [userInputEventKey: string]: UserEventHandler<UserInputEventType>[];
   };
+
+  #snapsProvider: SnapsProvider;
+
+  constructor(snapsProvider: SnapsProvider) {
+    this.#snapsProvider = snapsProvider;
+  }
 
   /**
    * Register an event handler for a specific event type.
    *
    * @param args - The event handler arguments as object.
-   * @param args.eventName - The name that will be sent to onUserInput when a user interacts with the interface.
+   * @param args.elementName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.eventType - The type of event to listen for.
    * @param args.interfaceId - The id of the interface to listen for events on.
    * @param args.handler - The callback function to execute when the event occurs.
    * @returns A reference to this instance for method chaining.
    */
   public on<TUserInputEventType extends UserInputEventType>(args: {
-    eventName: string;
+    elementName: string;
     eventType: UserInputEventType;
     interfaceId: string;
     handler: UserEventHandler<TUserInputEventType>;
   }): UserEventDispatcher {
-    const { eventName, eventType, handler, interfaceId } = args;
+    const { elementName, eventType, handler, interfaceId } = args;
 
     const eventKey = getUserInputEventKey({
-      eventName,
+      elementName,
       eventType,
       interfaceId,
     });
 
-    this.#eventHandlers[eventKey] =
-      handler as UserEventHandler<UserInputEventType>;
+    if (this.#eventHandlers[eventKey]) {
+      this.#eventHandlers[eventKey]?.push(
+        handler as UserEventHandler<UserInputEventType>,
+      );
+    } else {
+      this.#eventHandlers[eventKey] = [
+        handler as UserEventHandler<UserInputEventType>,
+      ];
+    }
 
     return this;
   }
@@ -84,31 +105,39 @@ export class UserEventDispatcher {
    * Deregister an event handler for a specific event type.
    *
    * @param args - The event handler arguments as object.
-   * @param args.eventName - The name that will be sent to onUserInput when a user interacts with the interface.
+   * @param args.elementName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.eventType - The type of event to stop listening for.
    * @param args.interfaceId - The id of the interface.
+   * @param args.handler - The callback function to remove.
    * @returns A reference to this instance for method chaining.
    */
-  public off(args: {
-    eventName: string;
-    eventType: UserInputEventType;
+  public off<TUserInputEventType extends UserInputEventType>(args: {
+    elementName: string;
+    eventType: TUserInputEventType;
     interfaceId: string;
+    handler: UserEventHandler<TUserInputEventType>;
   }): UserEventDispatcher {
-    const { eventName, eventType, interfaceId } = args;
+    const { eventType, handler, interfaceId, elementName } = args;
 
     const eventKey = getUserInputEventKey({
-      eventName,
+      elementName,
       eventType,
       interfaceId,
     });
 
-    const handler = this.#eventHandlers[eventKey];
+    const handlers = this.#eventHandlers[eventKey];
 
-    if (!handler) {
+    if (!handlers?.length) {
       return this;
     }
 
-    delete this.#eventHandlers[eventKey];
+    const index = handlers.indexOf(
+      handler as UserEventHandler<UserInputEventType>,
+    );
+
+    if (index !== -1) {
+      handlers.splice(index, 1);
+    }
 
     return this;
   }
@@ -121,38 +150,47 @@ export class UserEventDispatcher {
    * @param args.event - The event object containing type and name information.
    * @param args.id - The id of the interface.
    * @param args.context - The interface context object that can be modified by handlers.
-   * @returns A promise that resolves to the updated context or void.
    */
   public async handleUserInputEvent(args: {
     event: UserInputEvent;
     id: string;
     context: InterfaceContext | null;
-  }): Promise<null | PermissionConfirmationContext<SupportedPermissionTypes>> {
+  }): Promise<void> {
     const { event, id, context } = args;
 
     const eventKey = getUserInputEventKey({
-      eventName: event.name ?? '',
+      elementName: event.name ?? '',
       eventType: event.type,
       interfaceId: id,
     });
 
-    const handler = this.#eventHandlers[eventKey];
+    const handlers = this.#eventHandlers[eventKey];
 
-    if (!handler) {
-      return null;
+    if (!handlers?.length) {
+      return;
     }
 
-    const permissionType = extractPermissionName(
-      (context?.permission as Permission).type,
-    ) as SupportedPermissionTypes;
+    const permissionType = context?.permissionType as SupportedPermissionTypes;
 
-    const updatedContext = await handler({
-      event,
-      attenuatedContext: context as PermissionConfirmationContext<
-        typeof permissionType
-      >,
+    const handlersExecutions = handlers.map(async (handler) => {
+      try {
+        await handler({
+          event,
+          attenuatedContext: context as PermissionConfirmationContext<
+            typeof permissionType
+          >,
+          snapsProvider: this.#snapsProvider,
+          interfaceId: id,
+          permissionType,
+        });
+      } catch (error) {
+        logger.error(
+          `Error in event handler for event type ${event.type} and interface id ${id}:`,
+          error,
+        );
+      }
     });
 
-    return updatedContext ?? null;
+    await Promise.all(handlersExecutions);
   }
 }

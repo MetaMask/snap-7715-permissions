@@ -20,7 +20,7 @@ import type {
 } from './orchestrator';
 
 export type DialogContentEventHandlers = {
-  eventName: string;
+  elementName: string;
   eventType: UserInputEventType;
   handler: UserEventHandler<UserInputEventType>;
 };
@@ -121,10 +121,11 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   ) => ComponentOrElement;
 
   resolveAttenuatedPermission: (
+    requestedPermission: PermissionTypeMapping[TPermissionType],
     attenuatedContext: PermissionConfirmationContext<TPermissionType>,
   ) => Promise<{
     expiry: number;
-    permission: PermissionTypeMapping[TPermissionType];
+    attenuatedPermission: PermissionTypeMapping[TPermissionType];
   }>;
 
   /**

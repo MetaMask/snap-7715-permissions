@@ -13,8 +13,8 @@ export type StateSelectorFn<TPermissionType extends SupportedPermissionTypes> =
   ) => PermissionConfirmationStateMapping[TPermissionType][string] | undefined;
 
 /**
- * Updates the context state handler for a specific key in the state.
- * It applies the provided selector function to get the new value for the given key.
+ * Receives a context object, and returns a new context object updated with the value identified
+ * by the specified `key` within the context object, replaced with the value returned from the specified `selector`.
  *
  * @param key - The key in the state to update.
  * @param selector - The selector function that takes the current state and returns the new value for the key.

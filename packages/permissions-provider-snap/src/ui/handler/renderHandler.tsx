@@ -1,16 +1,17 @@
 import type { ButtonClickEvent } from '@metamask/snaps-sdk';
 import {
+  UserInputEventType,
   type ComponentOrElement,
   type SnapsProvider,
-  UserInputEventType,
 } from '@metamask/snaps-sdk';
+import { Container, type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { SupportedPermissionTypes } from '../../orchestrators';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../../userEventDispatcher';
-import { buildConfirmationDialog } from '../confirmations';
+import { ConfirmationFooter } from '../components';
 import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
 
@@ -36,6 +37,45 @@ export type PermissionConfirmationRenderHandler = {
     interfaceId: string;
     confirmationResult: Promise<ConfirmationResult>;
   }>;
+};
+
+/**
+ * Builds an interactive confirmation dialog for the user to confirm or cancel a permission request.
+ *
+ * @param dialogContent - The permission confirmation dialog to render.
+ * @returns The interactive confirmation page.
+ */
+export const buildConfirmationDialog = (
+  dialogContent: ComponentOrElement,
+): JSX.Element => (
+  <Container>
+    {dialogContent as GenericSnapElement}
+    <ConfirmationFooter />
+  </Container>
+);
+
+/**
+ * Updates the interface of the snap with the given interface ID and dialog content.
+ *
+ * @param snapsProvider - The snaps provider instance.
+ * @param interfaceId - The ID of the interface to update.
+ * @param dialogContent - The new dialog content to set for the interface.
+ * @param context - The permission confirmation context.
+ */
+export const updateInterface = async (
+  snapsProvider: SnapsProvider,
+  interfaceId: string,
+  dialogContent: ComponentOrElement,
+  context: PermissionConfirmationContext<SupportedPermissionTypes>,
+) => {
+  await snapsProvider.request({
+    method: 'snap_updateInterface',
+    params: {
+      id: interfaceId,
+      context,
+      ui: buildConfirmationDialog(dialogContent),
+    },
+  });
 };
 
 /**
@@ -95,9 +135,10 @@ export const createPermissionConfirmationRenderHandler = ({
             }
 
             userEventDispatcher.off({
-              eventName: event.name,
+              elementName: event.name,
               interfaceId,
               eventType: UserInputEventType.ButtonClickEvent,
+              handler: onButtonClick,
             });
 
             snapsProvider
@@ -117,14 +158,14 @@ export const createPermissionConfirmationRenderHandler = ({
           };
 
           userEventDispatcher.on({
-            eventName: GRANT_BUTTON,
+            elementName: GRANT_BUTTON,
             eventType: UserInputEventType.ButtonClickEvent,
             interfaceId,
             handler: onButtonClick,
           });
 
           userEventDispatcher.on({
-            eventName: CANCEL_BUTTON,
+            elementName: CANCEL_BUTTON,
             eventType: UserInputEventType.ButtonClickEvent,
             interfaceId,
             handler: onButtonClick,

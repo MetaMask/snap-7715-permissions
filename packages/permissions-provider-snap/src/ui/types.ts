@@ -6,7 +6,6 @@ import type { Hex } from 'viem';
 import type {
   PermissionConfirmationStateMapping,
   PermissionSpecificRulesMapping,
-  PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../orchestrators';
 
@@ -35,8 +34,9 @@ export type SerializableDelegation = Omit<DelegationStruct, 'salt'> & {
 export type PermissionConfirmationContext<
   TPermissionType extends SupportedPermissionTypes,
 > = InterfaceContext & {
-  permission: PermissionTypeMapping[TPermissionType];
+  readonly permissionType: TPermissionType;
   permissionSpecificRules: PermissionSpecificRulesMapping[TPermissionType];
+  readonly justification: string;
   readonly address: Hex;
   readonly siteOrigin: string;
   readonly balance: Hex;
@@ -54,7 +54,7 @@ export type PermissionConfirmationProps<
 > = JsonObject &
   Pick<
     PermissionConfirmationContext<TPermissionType>,
-    | 'permission'
+    | 'justification'
     | 'address'
     | 'siteOrigin'
     | 'balance'

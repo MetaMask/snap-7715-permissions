@@ -16,8 +16,10 @@ import type { PermissionConfirmationProps } from '../types';
  * The event names for the native-token-stream permission confirmation page.
  * These events are used to handle user interactions with the confirmation page.
  */
-export enum NativeTokenStreamDialogEventNames {
-  JustificationShowMoreExpanded = 'request-details.show-more-button-native-token-stream',
+export enum NativeTokenStreamDialogElementNames {
+  JustificationShowMoreExpanded = 'justification-show-more-button-native-token-stream',
+  MaxAmountInput = 'max-amount-input-native-token-stream',
+  PeriodInput = 'period-input-native-token-stream',
 }
 
 /**
@@ -25,7 +27,7 @@ export enum NativeTokenStreamDialogEventNames {
  *
  * @param props - The permission confirmation props.
  * @param props.siteOrigin - The site origin.
- * @param props.permission - The native-token-stream permission data.
+ * @param props.justification - The justification for the permission.
  * @param props.chainId - The chain ID.
  * @param props.address - The account address.
  * @param props.balance - The account balance.
@@ -39,7 +41,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
   PermissionConfirmationProps<'native-token-stream'>
 > = ({
   siteOrigin,
-  permission,
+  justification,
   chainId,
   address,
   balance,
@@ -60,6 +62,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       tooltip: 'Tooltip text',
     },
   };
+
   return (
     <Box>
       <RequestHeader title="Create a token stream" />
@@ -67,13 +70,15 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       <RequestDetails
         siteOrigin={siteOrigin}
         chainId={chainId}
-        justification={permission.data.justification}
+        justification={justification}
         asset={asset}
         isJustificationShowMoreExpanded={
-          state[NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded]
+          state[
+            NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
+          ]
         }
         justificationShowMoreExpandedEventName={
-          NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded
+          NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
         }
       />
 
@@ -82,7 +87,12 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         senderDetails={accountDetailsProps.senderDetails}
       />
 
-      <StreamAmount maxAmount={permission.data.maxAmount} />
+      <StreamAmount
+        maxAmount={state[NativeTokenStreamDialogElementNames.MaxAmountInput]}
+        maxAmountEventName={NativeTokenStreamDialogElementNames.MaxAmountInput}
+        period={state[NativeTokenStreamDialogElementNames.PeriodInput]}
+        periodEventName={NativeTokenStreamDialogElementNames.PeriodInput}
+      />
 
       <NativeTokenStreamRules
         permissionSpecificRules={permissionSpecificRules}

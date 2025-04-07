@@ -1,29 +1,25 @@
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
-import type { PermissionTypeMapping } from '../../src/orchestrators';
 import {
-  shouldToggleBool,
-  NativeTokenStreamDialogEventNames,
+  handleToggleBooleanClicked,
+  NativeTokenStreamDialogElementNames,
   type PermissionConfirmationContext,
 } from '../../src/ui';
 
 describe('Confirmation Dialog event handlers', () => {
   const address = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');
+  const mockSnapsProvider = createMockSnapsProvider();
+  beforeEach(() => {
+    mockSnapsProvider.request.mockReset();
+  });
 
   describe('native-token-stream confirmation dialog', () => {
     const mockNativeTokenStreamContext: PermissionConfirmationContext<'native-token-stream'> =
       {
-        permission: {
-          type: 'native-token-stream',
-          data: {
-            justification: 'shh...permission 2',
-            initialAmount: '0x1',
-            amountPerSecond: '0x1',
-            startTime: 1000,
-            maxAmount: '0x2',
-          },
-        } as PermissionTypeMapping['native-token-stream'],
+        permissionType: 'native-token-stream',
+        justification: 'shh...permission 2',
         address,
         siteOrigin: 'http://localhost:3000',
         balance: '0x1',
@@ -34,82 +30,80 @@ describe('Confirmation Dialog event handlers', () => {
           maxAllowance: 'Unlimited',
         },
         state: {
-          [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
+          [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+            false,
+          [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
         },
       };
 
-    describe('shouldToggleBool - event', () => {
-      it('should mutate show more state', async () => {
+    describe('handleToggleBooleanClicked - event', () => {
+      it('should mutate justification show more state', async () => {
         const stateBefore =
           mockNativeTokenStreamContext.state[
-            NativeTokenStreamDialogEventNames.ShowMoreButton
+            NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
           ];
         expect(stateBefore).toBe(false);
 
-        // mutate state
-        const updatedContext = await shouldToggleBool({
+        await handleToggleBooleanClicked({
           event: {
             type: UserInputEventType.ButtonClickEvent,
-            name: NativeTokenStreamDialogEventNames.ShowMoreButton,
+            name: NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
           },
           attenuatedContext: mockNativeTokenStreamContext,
+          snapsProvider: mockSnapsProvider,
+          interfaceId: 'mockInterfaceId',
+          permissionType: 'native-token-stream',
         });
 
-        expect(updatedContext).toBeDefined();
-        const stateAfter = (
-          updatedContext as PermissionConfirmationContext<'native-token-stream'>
-        ).state[NativeTokenStreamDialogEventNames.ShowMoreButton];
-        expect(stateAfter).toBe(true);
+        expect(mockSnapsProvider.request).toHaveBeenCalled();
       });
 
-      it('should not mutate show more state if it is not found in context', async () => {
+      it('should not mutate justification show more state if it is not found in context', async () => {
         const contextWithEmptyState = {
           ...mockNativeTokenStreamContext,
           state: {} as any,
         };
         const stateBefore =
           contextWithEmptyState.state[
-            NativeTokenStreamDialogEventNames.ShowMoreButton
+            NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
           ];
         expect(stateBefore).toBeUndefined();
 
         // mutate state
-        const updatedContext = await shouldToggleBool({
+        await handleToggleBooleanClicked({
           event: {
             type: UserInputEventType.ButtonClickEvent,
-            name: NativeTokenStreamDialogEventNames.ShowMoreButton,
+            name: NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
           },
           attenuatedContext: contextWithEmptyState,
+          snapsProvider: mockSnapsProvider,
+          interfaceId: 'mockInterfaceId',
+          permissionType: 'native-token-stream',
         });
 
-        expect(updatedContext).toBeDefined();
-        const stateAfter = (
-          updatedContext as PermissionConfirmationContext<'native-token-stream'>
-        ).state[NativeTokenStreamDialogEventNames.ShowMoreButton];
-        expect(stateAfter).toBeUndefined();
+        expect(mockSnapsProvider.request).not.toHaveBeenCalled();
       });
 
-      it('should not mutate show more state if event name in incorrect', async () => {
+      it('should not mutate justification show more state if event name in incorrect', async () => {
         const stateBefore =
           mockNativeTokenStreamContext.state[
-            NativeTokenStreamDialogEventNames.ShowMoreButton
+            NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
           ];
         expect(stateBefore).toBe(false);
 
         // mutate state
-        const updatedContext = await shouldToggleBool({
+        await handleToggleBooleanClicked({
           event: {
             type: UserInputEventType.ButtonClickEvent,
             name: 'some other event name',
           },
           attenuatedContext: mockNativeTokenStreamContext,
+          snapsProvider: mockSnapsProvider,
+          interfaceId: 'mockInterfaceId',
+          permissionType: 'native-token-stream',
         });
 
-        expect(updatedContext).toBeDefined();
-        const stateAfter = (
-          updatedContext as PermissionConfirmationContext<'native-token-stream'>
-        ).state[NativeTokenStreamDialogEventNames.ShowMoreButton];
-        expect(stateAfter).toBe(false);
+        expect(mockSnapsProvider.request).not.toHaveBeenCalled();
       });
     });
   });

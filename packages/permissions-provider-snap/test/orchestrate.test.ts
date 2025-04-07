@@ -18,7 +18,8 @@ import {
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
 import type { TokenPricesService } from '../src/services';
 import {
-  NativeTokenStreamDialogEventNames,
+  NativeTokenStreamDialogElementNames,
+  TimePeriod,
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
 } from '../src/ui';
@@ -51,7 +52,7 @@ describe('Orchestrate', () => {
         initialAmount: '0x1',
         amountPerSecond: '0x1',
         startTime: 1000,
-        maxAmount: '0x2',
+        maxAmount: toHex(parseUnits('1', 18)),
       },
     };
     const mockPermissionType = extractPermissionName(
@@ -79,8 +80,8 @@ describe('Orchestrate', () => {
     const mockAttenuatedContext: PermissionConfirmationContext<
       typeof mockPermissionType
     > = {
-      permission:
-        nativeTokenStreamPermission as PermissionTypeMapping[typeof mockPermissionType],
+      permissionType: mockPermissionType,
+      justification: nativeTokenStreamPermission.data.justification,
       address,
       siteOrigin: 'http://localhost:3000',
       balance: '0x1',
@@ -91,7 +92,11 @@ describe('Orchestrate', () => {
         maxAllowance: 'Unlimited',
       },
       state: {
-        [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
+        [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+          false,
+        [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+          nativeTokenStreamPermission.data.maxAmount,
+        [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
       },
     };
 
@@ -157,8 +162,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(1);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(3);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -175,10 +180,10 @@ describe('Orchestrate', () => {
           permission: {
             data: {
               justification: 'shh...permission 2',
-              amountPerSecond: '0x1',
+              amountPerSecond: '0x180f8a7451f',
               initialAmount: '0x1',
               startTime: 1000,
-              maxAmount: '0x2',
+              maxAmount: '0xde0b6b3a7640000',
             },
             type: 'native-token-stream',
           },
@@ -235,8 +240,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(1);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(1);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(3);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

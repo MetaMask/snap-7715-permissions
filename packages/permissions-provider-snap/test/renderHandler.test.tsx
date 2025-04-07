@@ -4,14 +4,12 @@ import type { UserInputEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
-import type {
-  PermissionTypeMapping,
-  SupportedPermissionTypes,
-} from '../src/orchestrators';
+import type { SupportedPermissionTypes } from '../src/orchestrators';
 import type { PermissionConfirmationContext } from '../src/ui';
 import {
   createPermissionConfirmationRenderHandler,
-  NativeTokenStreamDialogEventNames,
+  NativeTokenStreamDialogElementNames,
+  TimePeriod,
 } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
@@ -49,8 +47,8 @@ describe('Permission Confirmation Render Handler', () => {
 
   const mockContext: PermissionConfirmationContext<typeof mockPermissionType> =
     {
-      permission:
-        permission as PermissionTypeMapping[typeof mockPermissionType],
+      permissionType: mockPermissionType,
+      justification: permission.data.justification,
       address,
       siteOrigin: 'http://localhost:3000',
       balance: '0x1',
@@ -61,7 +59,11 @@ describe('Permission Confirmation Render Handler', () => {
         maxAllowance: 'Unlimited',
       },
       state: {
-        [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
+        [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+          false,
+        [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+          permission.data.maxAmount,
+        [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
       },
     };
 
@@ -69,7 +71,7 @@ describe('Permission Confirmation Render Handler', () => {
     <NativeTokenStreamConfirmationPage
       siteOrigin={mockContext.siteOrigin}
       address={mockContext.address}
-      permission={mockContext.permission}
+      justification={mockContext.justification}
       balance={mockContext.balance}
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
@@ -89,8 +91,8 @@ describe('Permission Confirmation Render Handler', () => {
       (args: { event: UserInputEvent }) => Promise<void>
     >((resolve, _) => {
       (mockUserEventDispatcher.on as jest.Mock).mockImplementation(
-        ({ eventName, handler }) => {
-          if (eventName === CANCEL_BUTTON || eventName === GRANT_BUTTON) {
+        ({ elementName, handler }) => {
+          if (elementName === CANCEL_BUTTON || elementName === GRANT_BUTTON) {
             resolve(handler);
           }
           return mockUserEventDispatcher;
@@ -163,7 +165,8 @@ describe('Permission Confirmation Render Handler', () => {
       });
 
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
-        eventName: GRANT_BUTTON,
+        elementName: GRANT_BUTTON,
+        eventType: UserInputEventType.ButtonClickEvent,
         handler: expect.any(Function),
         interfaceId: mockInterfaceId,
       });
@@ -232,7 +235,8 @@ describe('Permission Confirmation Render Handler', () => {
       });
 
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
-        eventName: CANCEL_BUTTON,
+        elementName: CANCEL_BUTTON,
+        eventType: UserInputEventType.ButtonClickEvent,
         handler: expect.any(Function),
         interfaceId: mockInterfaceId,
       });

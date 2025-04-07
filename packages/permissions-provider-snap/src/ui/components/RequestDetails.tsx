@@ -15,7 +15,7 @@ import { ICONS } from '../iconConstant';
 
 type RequestDetailsProps = JsonObject & {
   siteOrigin: string;
-  justification: string | undefined;
+  justification?: string | undefined;
   chainId: number;
   asset: string;
   isJustificationShowMoreExpanded: boolean;

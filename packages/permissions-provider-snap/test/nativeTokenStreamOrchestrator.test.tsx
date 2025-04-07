@@ -14,9 +14,10 @@ import type {
 } from '../src/orchestrators';
 import { createPermissionOrchestrator } from '../src/orchestrators';
 import {
-  NativeTokenStreamDialogEventNames,
+  NativeTokenStreamDialogElementNames,
   type PermissionConfirmationContext,
   NativeTokenStreamConfirmationPage,
+  TimePeriod,
 } from '../src/ui';
 
 describe('native-token-stream Orchestrator', () => {
@@ -42,8 +43,8 @@ describe('native-token-stream Orchestrator', () => {
   const mockUiContext: PermissionConfirmationContext<
     typeof mockPermissionType
   > = {
-    permission:
-      mockbasePermission as PermissionTypeMapping[typeof mockPermissionType],
+    permissionType: mockPermissionType,
+    justification: mockbasePermission.data.justification,
     address,
     siteOrigin: 'http://localhost:3000',
     balance: '0x1',
@@ -54,7 +55,11 @@ describe('native-token-stream Orchestrator', () => {
       maxAllowance: 'Unlimited',
     },
     state: {
-      [NativeTokenStreamDialogEventNames.ShowMoreButton]: false,
+      [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+        false,
+      [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+        mockbasePermission.data.maxAmount,
+      [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
     },
   };
 
@@ -62,7 +67,7 @@ describe('native-token-stream Orchestrator', () => {
     <NativeTokenStreamConfirmationPage
       siteOrigin={mockUiContext.siteOrigin}
       address={mockUiContext.address}
-      permission={mockUiContext.permission}
+      justification={mockUiContext.justification}
       balance={mockUiContext.balance}
       expiry={mockUiContext.expiry}
       chainId={mockUiContext.chainId}
@@ -265,7 +270,7 @@ describe('native-token-stream Orchestrator', () => {
       );
       const { dialogContentEventHandlers } =
         orchestrator.getConfirmationDialogEventHandlers(parsedPermission);
-      expect(dialogContentEventHandlers.length).toStrictEqual(1);
+      expect(dialogContentEventHandlers.length).toStrictEqual(3);
     });
   });
 });

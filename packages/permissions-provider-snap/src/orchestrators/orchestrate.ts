@@ -95,7 +95,8 @@ export const orchestrate = async <
     orchestrator.getConfirmationDialogEventHandlers(permission);
 
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
-    permission,
+    permissionType,
+    justification: permission.data.justification,
     permissionSpecificRules:
       orchestrator.getPermissionSpecificRules(permission),
     address,
@@ -118,14 +119,16 @@ export const orchestrate = async <
 
   // Register event handlers for confirmation dialog
   if (dialogContentEventHandlers.length > 0) {
-    dialogContentEventHandlers.forEach(({ eventName, eventType, handler }) => {
-      userEventDispatcher.on({
-        eventName,
-        eventType,
-        interfaceId,
-        handler,
-      });
-    });
+    dialogContentEventHandlers.forEach(
+      ({ elementName, eventType, handler }) => {
+        userEventDispatcher.on({
+          elementName,
+          eventType,
+          interfaceId,
+          handler,
+        });
+      },
+    );
   }
 
   // Wait for the user to accept or reject the permission request
@@ -133,13 +136,16 @@ export const orchestrate = async <
     await confirmationResult;
 
   if (dialogContentEventHandlers.length > 0) {
-    dialogContentEventHandlers.forEach(({ eventName, eventType }) => {
-      userEventDispatcher.off({
-        eventName,
-        eventType,
-        interfaceId,
-      });
-    });
+    dialogContentEventHandlers.forEach(
+      ({ elementName, eventType, handler }) => {
+        userEventDispatcher.off({
+          elementName,
+          eventType,
+          interfaceId,
+          handler,
+        });
+      },
+    );
   }
 
   if (!isConfirmationAccepted) {
@@ -150,8 +156,11 @@ export const orchestrate = async <
   }
 
   // User accepted the permission request, build the response
-  const { permission: attenuatedPermission, expiry: attenuatedExpiry } =
-    await orchestrator.resolveAttenuatedPermission(attenuatedContext);
+  const { attenuatedPermission, expiry: attenuatedExpiry } =
+    await orchestrator.resolveAttenuatedPermission(
+      permission,
+      attenuatedContext as PermissionConfirmationContext<TPermissionType>,
+    );
 
   const deleGatorEnvironment = await accountController.getEnvironment({
     chainId: chainIdNum,

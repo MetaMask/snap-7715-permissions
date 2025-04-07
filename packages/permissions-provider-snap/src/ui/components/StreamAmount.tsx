@@ -14,19 +14,17 @@ import { formatUnits } from 'viem';
 
 import { formatTokenBalance } from '../../utils';
 
-export enum StreamAmountEventNames {
-  StreamAmount = 'stream-amount:amount',
-  Period = 'stream-amount:period',
-}
-
 type StreamAmountProps = {
   maxAmount: Hex;
+  maxAmountEventName: string;
+  period: TimePeriod;
+  periodEventName: string;
 };
 
 /**
  * An enum representing the time periods for which the stream rate can be calculated.
  */
-enum TimePeriod {
+export enum TimePeriod {
   DAILY = 'Daily',
   WEEKLY = 'Weekly',
   MONTHLY = 'Monthly',
@@ -35,7 +33,7 @@ enum TimePeriod {
 /**
  * A mapping of time periods to their equivalent seconds.
  */
-const TIME_PERIOD_MAPPING: Record<TimePeriod, number> = {
+export const TIME_PERIOD_MAPPING: Record<TimePeriod, number> = {
   [TimePeriod.DAILY]: 60 * 60 * 24, // 86,400(seconds)
   [TimePeriod.WEEKLY]: 60 * 60 * 24 * 7, // 604,800(seconds)
   [TimePeriod.MONTHLY]: 60 * 60 * 24 * 30, // 2,592,000(seconds)
@@ -84,25 +82,22 @@ const inputDetails = (leftText: string, rightText: string, tooltip: string) => (
 
 export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   maxAmount,
+  maxAmountEventName,
+  period,
+  periodEventName,
 }) => {
-  const timePeriodValue = TimePeriod.WEEKLY;
   return (
     <Section>
       {inputDetails('Stream Amount', 'Required', 'tooltip text')}
       <Input
-        name={StreamAmountEventNames.StreamAmount}
+        name={maxAmountEventName}
         type="number"
         placeholder={formatTokenBalance(maxAmount)}
         value={maxAmount}
-        disabled={true}
       />
 
       {inputDetails('Period', 'Required', 'tooltip text')}
-      <Dropdown
-        name={StreamAmountEventNames.Period}
-        disabled={true}
-        value={timePeriodValue}
-      >
+      <Dropdown name={periodEventName} value={period}>
         <Option value={TimePeriod.MONTHLY}>{TimePeriod.MONTHLY}</Option>
         <Option value={TimePeriod.WEEKLY}>{TimePeriod.WEEKLY}</Option>
         <Option value={TimePeriod.DAILY}>{TimePeriod.DAILY}</Option>
@@ -110,7 +105,7 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
 
       {inputDetails(
         'Stream rate',
-        `${calculateStreamRate(maxAmount, timePeriodValue)} ETH/sec`,
+        `${calculateStreamRate(maxAmount, period)} ETH/sec`,
         'tooltip text',
       )}
     </Section>

@@ -8,10 +8,17 @@ import {
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
+import { toHex, type Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
-import { NativeTokenStreamDialogEventNames, shouldToggleBool } from '../../ui';
+import {
+  NativeTokenStreamDialogElementNames,
+  TIME_PERIOD_MAPPING,
+  TimePeriod,
+  handleReplaceTextInput,
+  handleReplaceValueInput,
+  handleToggleBooleanClicked,
+} from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
 import type { UserEventHandler } from '../../userEventDispatcher';
 import type {
@@ -40,7 +47,9 @@ declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
   interface PermissionConfirmationStateMapping {
     'native-token-stream': JsonObject & {
-      [NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded]: boolean;
+      [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]: boolean;
+      [NativeTokenStreamDialogElementNames.MaxAmountInput]: Hex;
+      [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
     };
   }
 }
@@ -145,7 +154,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         <NativeTokenStreamConfirmationPage
           siteOrigin={context.siteOrigin}
           address={context.address}
-          permission={context.permission}
+          justification={context.justification}
           balance={context.balance}
           expiry={context.expiry}
           chainId={context.chainId}
@@ -168,17 +177,28 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       return updatedCaveatBuilder;
     },
     resolveAttenuatedPermission: async (
+      requestedPermission: PermissionTypeMapping['native-token-stream'],
       attenuatedContext: PermissionConfirmationContext<'native-token-stream'>,
     ) => {
-      const { permission: requestedPermission, expiry: requestedExpiry } =
-        attenuatedContext;
-      const attenuatedPermission = {
-        ...requestedPermission,
-      };
+      const { state, expiry: requestedExpiry } = attenuatedContext;
+
+      const maxAmount =
+        state[NativeTokenStreamDialogElementNames.MaxAmountInput];
+      const period = state[NativeTokenStreamDialogElementNames.PeriodInput];
+      const amountPerSecond = toHex(
+        BigInt(maxAmount) / BigInt(TIME_PERIOD_MAPPING[period]),
+      );
 
       return {
         expiry: requestedExpiry,
-        permission: attenuatedPermission,
+        attenuatedPermission: {
+          ...requestedPermission,
+          data: {
+            ...requestedPermission.data,
+            maxAmount,
+            amountPerSecond,
+          },
+        } as PermissionTypeMapping['native-token-stream'],
       };
     },
     getTokenCaipAssetType(
@@ -198,22 +218,36 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       } as PermissionSpecificRulesMapping['native-token-stream'];
     },
     getConfirmationDialogEventHandlers: (
-      _: PermissionTypeMapping['native-token-stream'],
+      permission: PermissionTypeMapping['native-token-stream'],
     ) => {
       return {
-        // TODO: Add rules event: For rules event the permission.data must be
-        // extracted to populate the rules initial state. This is why this function
-        // requires the permission object. Marked as _ to resolve linter error.
         state: {
-          [NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded]:
+          [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
             true,
+          [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+            permission.data.maxAmount,
+          [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
         },
+
         dialogContentEventHandlers: [
           {
-            eventName:
-              NativeTokenStreamDialogEventNames.JustificationShowMoreExpanded,
+            elementName:
+              NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
             eventType: UserInputEventType.ButtonClickEvent,
-            handler: shouldToggleBool as UserEventHandler<UserInputEventType>,
+            handler:
+              handleToggleBooleanClicked as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.MaxAmountInput,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceValueInput as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.PeriodInput,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceTextInput as UserEventHandler<UserInputEventType>,
           },
         ],
       };
