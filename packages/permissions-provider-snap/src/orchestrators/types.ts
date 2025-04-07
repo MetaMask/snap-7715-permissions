@@ -14,7 +14,6 @@ import type { Address, Hex, OneOf } from 'viem';
 import type { State, PermissionConfirmationContext } from '../ui';
 import type { UserEventHandler } from '../userEventDispatcher';
 import type {
-  PermissionSpecificRulesMapping,
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from './orchestrator';
@@ -129,23 +128,16 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   }>;
 
   /**
-   * Gets the permission specific rules for the permission type. These are default values depending on the permission type.
-   * @param permission - The permission to get the specific rules for.
-   * @returns The permission specific rules for the permission type.
-   */
-  getPermissionSpecificRules: (
-    permission: PermissionTypeMapping[TPermissionType],
-  ) => PermissionSpecificRulesMapping[TPermissionType];
-
-  /**
    * Returns a set of event handlers for the confirmation dialog specific to the permission type.
    * These event handlers are used to handle user input events in the confirmation dialog.
    *
    * @param permission - The permission for the confirmation dialog.
+   * @param expiry - The expiry of the permission.
    * @returns An array of event handlers for the confirmation dialog.
    */
   getConfirmationDialogEventHandlers: (
     permission: PermissionTypeMapping[TPermissionType],
+    expiry: number,
   ) => {
     state: State<TPermissionType>;
     dialogContentEventHandlers: DialogContentEventHandlers[];

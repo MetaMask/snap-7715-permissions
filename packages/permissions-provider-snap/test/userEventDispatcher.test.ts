@@ -25,14 +25,16 @@ describe('UserEventDispatcher', () => {
     expiry: 1,
     chainId: 11155111,
     valueFormattedAsCurrency: '$1,000.00',
-    permissionSpecificRules: {
-      maxAllowance: 'Unlimited',
-    },
     state: {
       [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
         false,
       [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+      [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+      [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
+      [NativeTokenStreamDialogElementNames.StartTimeRule]: 1234,
+      [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+      [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
     },
   };
   const mockSnapsProvider = createMockSnapsProvider();

@@ -8,6 +8,7 @@ import {
   RequestDetails,
   StreamAmount,
   NativeTokenStreamRules,
+  AddMoreRule,
   RulesSelector,
 } from '../components';
 import type { PermissionConfirmationProps } from '../types';
@@ -20,6 +21,20 @@ export enum NativeTokenStreamDialogElementNames {
   JustificationShowMoreExpanded = 'justification-show-more-button-native-token-stream',
   MaxAmountInput = 'max-amount-input-native-token-stream',
   PeriodInput = 'period-input-native-token-stream',
+
+  AddMoreRulesToggle = 'add-more-rules-toggle-native-token-stream',
+  SaveRuleButton = 'save-rule-button-native-token-stream',
+  InitialAmountRule = 'initial-amount-rule-native-token-stream',
+  InitialAmountRemove = 'initial-amount-remove-native-token-stream',
+
+  MaxAllowanceRule = 'max-allowance-rule-native-token-stream',
+  MaxAllowanceRemove = 'max-allowance-remove-native-token-stream',
+
+  StartTimeRule = 'start-time-rule-native-token-stream',
+  StartTimeRemove = 'start-time-remove-native-token-stream',
+
+  ExpiryRule = 'expiry-rule-native-token-stream',
+  ExpiryRemove = 'expiry-remove-native-token-stream',
 }
 
 /**
@@ -31,9 +46,7 @@ export enum NativeTokenStreamDialogElementNames {
  * @param props.chainId - The chain ID.
  * @param props.address - The account address.
  * @param props.balance - The account balance.
- * @param props.expiry - The unix timestamp in seconds when the granted permission is set to expire.
  * @param props.valueFormattedAsCurrency - The account balance formatted as currency that matches the user's preferences.
- * @param props.permissionSpecificRules - The permission rules.
  * @param props.state - The state of the dynamic components.
  * @returns The JSX element to render.
  */
@@ -45,9 +58,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
   chainId,
   address,
   balance,
-  expiry,
   valueFormattedAsCurrency,
-  permissionSpecificRules,
   state,
 }) => {
   const asset = 'ETH';
@@ -62,6 +73,29 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       tooltip: 'Tooltip text',
     },
   };
+  const nativeTokenStreamRulesKeys = [
+    NativeTokenStreamDialogElementNames.InitialAmountRule,
+    NativeTokenStreamDialogElementNames.MaxAllowanceRule,
+    NativeTokenStreamDialogElementNames.StartTimeRule,
+    NativeTokenStreamDialogElementNames.ExpiryRule,
+  ];
+
+  if (state[NativeTokenStreamDialogElementNames.AddMoreRulesToggle]) {
+    return (
+      <Box>
+        <RulesSelector
+          closeRuleSelectorButtonEventName={
+            NativeTokenStreamDialogElementNames.AddMoreRulesToggle
+          }
+          saveRuleButtonEventName={
+            NativeTokenStreamDialogElementNames.SaveRuleButton
+          }
+          nativeTokenStreamRuleKeys={nativeTokenStreamRulesKeys}
+          state={state}
+        />
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -95,11 +129,43 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       />
 
       <NativeTokenStreamRules
-        permissionSpecificRules={permissionSpecificRules}
-        expiry={expiry}
+        initialAmount={
+          state[NativeTokenStreamDialogElementNames.InitialAmountRule]
+        }
+        maxAllowance={
+          state[NativeTokenStreamDialogElementNames.MaxAllowanceRule]
+        }
+        startTime={state[NativeTokenStreamDialogElementNames.StartTimeRule]}
+        expiry={state[NativeTokenStreamDialogElementNames.ExpiryRule]}
+        initialAmountRemoveEventName={
+          NativeTokenStreamDialogElementNames.InitialAmountRemove
+        }
+        initialAmountInputEventName={
+          NativeTokenStreamDialogElementNames.InitialAmountRule
+        }
+        maxAllowanceRemoveEventName={
+          NativeTokenStreamDialogElementNames.MaxAllowanceRemove
+        }
+        maxAllowanceInputEventName={
+          NativeTokenStreamDialogElementNames.MaxAllowanceRule
+        }
+        startTimeRemoveEventName={
+          NativeTokenStreamDialogElementNames.StartTimeRemove
+        }
+        startTimeInputEventName={
+          NativeTokenStreamDialogElementNames.StartTimeRule
+        }
+        expiryRemoveEventName={NativeTokenStreamDialogElementNames.ExpiryRemove}
+        expiryInputEventName={NativeTokenStreamDialogElementNames.ExpiryRule}
       />
 
-      <RulesSelector permissionSpecificRules={permissionSpecificRules} />
+      <AddMoreRule
+        nativeTokenStreamRuleKeys={nativeTokenStreamRulesKeys}
+        state={state}
+        addMoreButtonEventName={
+          NativeTokenStreamDialogElementNames.AddMoreRulesToggle
+        }
+      />
     </Box>
   );
 };

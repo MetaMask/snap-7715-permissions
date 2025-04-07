@@ -92,13 +92,11 @@ export const orchestrate = async <
 
   // Prepare specific context object and confirmation page for the permission type
   const { state, dialogContentEventHandlers } =
-    orchestrator.getConfirmationDialogEventHandlers(permission);
+    orchestrator.getConfirmationDialogEventHandlers(permission, expiry);
 
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
     permissionType,
     justification: permission.data.justification,
-    permissionSpecificRules:
-      orchestrator.getPermissionSpecificRules(permission),
     address,
     siteOrigin: origin,
     balance,

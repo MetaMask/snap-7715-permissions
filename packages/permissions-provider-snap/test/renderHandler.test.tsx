@@ -55,15 +55,19 @@ describe('Permission Confirmation Render Handler', () => {
       expiry: 1,
       chainId: 11155111,
       valueFormattedAsCurrency: '$1,000.00',
-      permissionSpecificRules: {
-        maxAllowance: 'Unlimited',
-      },
       state: {
         [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
           false,
         [NativeTokenStreamDialogElementNames.MaxAmountInput]:
           permission.data.maxAmount,
         [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+        [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
+        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+        [NativeTokenStreamDialogElementNames.InitialAmountRule]:
+          permission.data.initialAmount ?? null,
+        [NativeTokenStreamDialogElementNames.StartTimeRule]:
+          permission.data.startTime,
+        [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
       },
     };
 
@@ -76,7 +80,6 @@ describe('Permission Confirmation Render Handler', () => {
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
       valueFormattedAsCurrency={mockContext.valueFormattedAsCurrency}
-      permissionSpecificRules={mockContext.permissionSpecificRules}
       state={mockContext.state}
     />
   );

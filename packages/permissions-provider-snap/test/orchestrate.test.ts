@@ -88,15 +88,17 @@ describe('Orchestrate', () => {
       expiry: 1,
       chainId: 11155111,
       valueFormattedAsCurrency: '$1,000.00',
-      permissionSpecificRules: {
-        maxAllowance: 'Unlimited',
-      },
       state: {
         [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
           false,
         [NativeTokenStreamDialogElementNames.MaxAmountInput]:
           nativeTokenStreamPermission.data.maxAmount,
         [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+        [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
+        [NativeTokenStreamDialogElementNames.StartTimeRule]: 1234,
+        [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+        [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
       },
     };
 
@@ -162,8 +164,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(3);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(8);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(8);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -240,8 +242,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(3);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(8);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(8);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

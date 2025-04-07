@@ -143,3 +143,5 @@ export const handleReplaceTextInput: UserEventHandler<
     updatedContext,
   );
 };
+
+// TODO: Add event handlers for removing and adding rules.

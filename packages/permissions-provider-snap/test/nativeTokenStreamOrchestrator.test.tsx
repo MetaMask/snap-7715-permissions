@@ -51,15 +51,19 @@ describe('native-token-stream Orchestrator', () => {
     expiry: 1,
     chainId: 11155111,
     valueFormattedAsCurrency: '$1,000.00',
-    permissionSpecificRules: {
-      maxAllowance: 'Unlimited',
-    },
     state: {
       [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
         false,
       [NativeTokenStreamDialogElementNames.MaxAmountInput]:
         mockbasePermission.data.maxAmount,
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+      [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
+      [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+      [NativeTokenStreamDialogElementNames.InitialAmountRule]:
+        mockbasePermission.data.initialAmount,
+      [NativeTokenStreamDialogElementNames.StartTimeRule]:
+        mockbasePermission.data.startTime,
+      [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
     },
   };
 
@@ -72,7 +76,6 @@ describe('native-token-stream Orchestrator', () => {
       expiry={mockUiContext.expiry}
       chainId={mockUiContext.chainId}
       valueFormattedAsCurrency={mockUiContext.valueFormattedAsCurrency}
-      permissionSpecificRules={mockUiContext.permissionSpecificRules}
       state={mockUiContext.state}
     />
   );
@@ -269,8 +272,11 @@ describe('native-token-stream Orchestrator', () => {
         mockbasePermission,
       );
       const { dialogContentEventHandlers } =
-        orchestrator.getConfirmationDialogEventHandlers(parsedPermission);
-      expect(dialogContentEventHandlers.length).toStrictEqual(3);
+        orchestrator.getConfirmationDialogEventHandlers(
+          parsedPermission,
+          mockUiContext.expiry,
+        );
+      expect(dialogContentEventHandlers.length).toStrictEqual(8);
     });
   });
 });

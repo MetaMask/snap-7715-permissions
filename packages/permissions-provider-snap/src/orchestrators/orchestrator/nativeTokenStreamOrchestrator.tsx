@@ -25,10 +25,7 @@ import type {
   OrchestratorFactoryFunction,
   PermissionContextMeta,
 } from '../types';
-import type {
-  PermissionSpecificRulesMapping,
-  PermissionTypeMapping,
-} from './types';
+import type { PermissionTypeMapping } from './types';
 
 declare module './types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
@@ -37,19 +34,20 @@ declare module './types' {
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
-  interface PermissionSpecificRulesMapping {
-    'native-token-stream': JsonObject & {
-      maxAllowance?: Hex | 'Unlimited';
-      initialAmount?: Hex;
-      startTime?: number;
-    };
-  }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
   interface PermissionConfirmationStateMapping {
     'native-token-stream': JsonObject & {
       [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]: boolean;
       [NativeTokenStreamDialogElementNames.MaxAmountInput]: Hex;
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
+
+      [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: boolean;
+      [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+        | Hex
+        | 'Unlimited'
+        | null;
+      [NativeTokenStreamDialogElementNames.InitialAmountRule]: Hex | null;
+      [NativeTokenStreamDialogElementNames.StartTimeRule]: number | null;
+      [NativeTokenStreamDialogElementNames.ExpiryRule]: number | null;
     };
   }
 }
@@ -159,7 +157,6 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           expiry={context.expiry}
           chainId={context.chainId}
           valueFormattedAsCurrency={context.valueFormattedAsCurrency}
-          permissionSpecificRules={context.permissionSpecificRules}
           state={context.state}
         />
       );
@@ -208,17 +205,9 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       // TODO: Use the chainId to determine the native asset type since native token is not always ETH on all chains
       return `eip155:1/slip44:60`;
     },
-    getPermissionSpecificRules: (
-      permission: PermissionTypeMapping['native-token-stream'],
-    ) => {
-      return {
-        maxAllowance: 'Unlimited',
-        initialAmount: permission.data.initialAmount,
-        startTime: permission.data.startTime,
-      } as PermissionSpecificRulesMapping['native-token-stream'];
-    },
     getConfirmationDialogEventHandlers: (
       permission: PermissionTypeMapping['native-token-stream'],
+      expiry: number,
     ) => {
       return {
         state: {
@@ -227,6 +216,15 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           [NativeTokenStreamDialogElementNames.MaxAmountInput]:
             permission.data.maxAmount,
           [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+
+          // Rules
+          [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
+          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+          [NativeTokenStreamDialogElementNames.InitialAmountRule]:
+            permission.data.initialAmount ?? null,
+          [NativeTokenStreamDialogElementNames.StartTimeRule]:
+            permission.data.startTime,
+          [NativeTokenStreamDialogElementNames.ExpiryRule]: expiry,
         },
 
         dialogContentEventHandlers: [
@@ -245,6 +243,38 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           },
           {
             elementName: NativeTokenStreamDialogElementNames.PeriodInput,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceTextInput as UserEventHandler<UserInputEventType>,
+          },
+
+          // Rules
+          {
+            elementName: NativeTokenStreamDialogElementNames.AddMoreRulesToggle,
+            eventType: UserInputEventType.ButtonClickEvent,
+            handler:
+              handleToggleBooleanClicked as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.MaxAllowanceRule,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceValueInput as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.InitialAmountRule,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceValueInput as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.StartTimeRule,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceTextInput as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.ExpiryRule,
             eventType: UserInputEventType.InputChangeEvent,
             handler:
               handleReplaceTextInput as UserEventHandler<UserInputEventType>,

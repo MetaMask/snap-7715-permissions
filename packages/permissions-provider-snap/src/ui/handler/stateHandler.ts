@@ -27,7 +27,7 @@ export const updateContextStateHandler = <
   selector: StateSelectorFn<TPermissionType>,
 ) => {
   return (context: PermissionConfirmationContext<TPermissionType>) => {
-    if (!context.state[key]) {
+    if (context.state[key] === undefined) {
       return context;
     }
 
