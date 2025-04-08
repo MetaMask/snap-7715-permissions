@@ -1,7 +1,11 @@
 {
   "name": "@metamask/permissions-kernel",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Manage onchain 7715 permissions",
+  "homepage": "https://github.com/MetaMask/snap-7715-permissions/tree/main/packages/permissions-kernel-snap#readme",
+  "bugs": {
+    "url": "https://github.com/MetaMask/core/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"

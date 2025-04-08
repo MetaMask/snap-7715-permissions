@@ -1,26 +1,23 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Grants 7715 permissions from a DeleGator smart account",
-  "proposedName": "MetaMask Smart Account",
+  "proposedName": "Gator Permissions",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "35hP7KRyUI3KbNOPCnbLGKNwgocJIzxyp7aEEAqzgV8=",
+    "shasum": "q5kMAuioUwqfV7HXylEidC6RwuU1hBxewIB+NU8e2yY=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "@metamask/7715-permissions-provider",
+        "packageName": "@metamask/gator-permissions",
         "registry": "https://registry.npmjs.org/"
       }
     }
   },
   "initialPermissions": {
-    "endowment:keyring": {
-      "allowedOrigins": ["http://localhost:3001"]
-    },
     "endowment:rpc": {
       "dapps": true,
       "snaps": true
