@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import type { CoreCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import {
   zNativeTokenStreamPermission,
