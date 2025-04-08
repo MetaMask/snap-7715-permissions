@@ -22,7 +22,7 @@ jobs:
         uses: MetaMask/action-checkout-and-setup@v1
         with:
           is-high-risk-environment: false
-          cache-node-modules: ${{ matrix.node-version == '22.x' }}
+          cache-node-modules: ${{ matrix.node-version == '21.x' }}
       - name: Fetch workspace package names
         id: workspace-package-names
         run: |
@@ -32,17 +32,17 @@ jobs:
   validate-changelog:
     name: Validate changelog
     runs-on: ubuntu-latest
-    needs: prepare
+    needs:
+      - prepare
     strategy:
       matrix:
         node-version: [21.x]
-        package-name: ${{ fromJson(needs.prepare.outputs.child-workspace-package-names) }}
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
         with:
           is-high-risk-environment: false
-      - run: yarn workspace ${{ matrix.package-name }} changelog:validate
+      - run: yarn changelog:validate
       - name: Require clean working directory
         shell: bash
         run: |
