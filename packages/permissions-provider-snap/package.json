@@ -42,13 +42,13 @@
   },
   "dependencies": {
     "@metamask-private/delegator-core-viem": "0.7.0",
-    "@metamask/7715-permissions-shared": "workspace:*",
     "@metamask/snaps-sdk": "^6.17.1",
     "@metamask/utils": "^11.3.0",
     "viem": "^2.21.29"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
+    "@metamask/7715-permissions-shared": "workspace:*",
     "@metamask/auto-changelog": "^3.4.4",
     "@metamask/eslint-config": "^12.2.0",
     "@metamask/eslint-config-jest": "^12.1.0",
@@ -62,16 +62,12 @@
     "@typescript-eslint/parser": "^5.42.1",
     "dotenv": "16.4.5",
     "eslint": "^8.45.0",
-    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "~2.26.0",
     "eslint-plugin-jest": "^27.1.5",
     "eslint-plugin-jsdoc": "^41.1.2",
     "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.5.0",
-    "prettier": "^2.7.1",
-    "prettier-plugin-packagejson": "^2.2.11",
     "rimraf": "^3.0.2",
     "ts-jest": "^29.1.0",
     "typescript": "^4.7.4"

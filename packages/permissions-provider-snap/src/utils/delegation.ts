@@ -11,11 +11,10 @@ import type { SerializableDelegation } from '../ui/types';
  */
 export const convertToSerializableDelegation = (
   delegation: DelegationStruct,
-): SerializableDelegation =>
-  ({
-    ...delegation,
-    salt: toHex(delegation.salt),
-  } as SerializableDelegation);
+): SerializableDelegation => ({
+  ...delegation,
+  salt: toHex(delegation.salt),
+});
 
 /**
  * Converts a delegation in transit object to a delegation struct object.
