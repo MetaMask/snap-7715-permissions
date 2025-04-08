@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Manage onchain 7715 permissions",
   "proposedName": "MetaMask Permissions Kernel",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "Pxrl+IJBk0MW0zw9e2W69h1CM9UG3cqlihq6KEIeMWs=",
+    "shasum": "vl8tAztj3S9fKJswQOVK63HmM/TtUe8X2Dvf6BsCrAg=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -25,7 +25,7 @@
     },
     "wallet_snap": {
       "local:http://localhost:8081": {},
-      "npm:@metamask/7715-permissions-provider": {}
+      "npm:@metamask/gator-permissions": {}
     },
     "snap_manageState": {},
     "endowment:page-home": {}
