@@ -37,7 +37,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@metamask-private/delegator-core-viem": "0.7.0",
+    "@metamask-private/delegator-core-viem": "0.8.1",
     "@metamask/7715-permissions-shared": "workspace:*",
     "@metamask/snaps-sdk": "^6.17.1",
     "@metamask/utils": "^11.3.0",

@@ -220,7 +220,7 @@ describe('native-token-stream Orchestrator', () => {
       expect(updatedCaveatBuilder.build()).toStrictEqual([
         {
           args: '0x',
-          enforcer: '0xcfD1BD7922D123Caa194597BF7A0073899a284Df',
+          enforcer: '0xF71af580b9c3078fbc2BBF16FbB8EEd82b330320',
           terms:
             '0x0000000000000000000000000000000000000000000000000000000000000001',
         },
