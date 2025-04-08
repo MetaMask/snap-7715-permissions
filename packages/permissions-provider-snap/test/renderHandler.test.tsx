@@ -68,6 +68,7 @@ describe('Permission Confirmation Render Handler', () => {
         [NativeTokenStreamDialogElementNames.StartTimeRule]:
           permission.data.startTime,
         [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+        [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
       },
     };
 

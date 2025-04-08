@@ -5,7 +5,7 @@ import type { State } from '../../types';
 
 type RulesSelectorProps = {
   addMoreButtonEventName: string;
-  nativeTokenStreamRuleKeys: string[];
+  ruleStateKeys: string[];
   state: State<'native-token-stream'>;
 };
 
@@ -14,18 +14,18 @@ type RulesSelectorProps = {
  *
  * @param props - The rules selector props.
  * @param props.addMoreButtonEventName - The event name for the add more button.
- * @param props.nativeTokenStreamRuleKeys - The keys of the native token stream rules.
+ * @param props.ruleStateKeys - The keys of the rules in the state.
  * @param props.state - The state of the native token stream.
  * @returns The JSX element to render.
  */
 export const AddMoreRule: SnapComponent<RulesSelectorProps> = ({
   addMoreButtonEventName,
-  nativeTokenStreamRuleKeys,
+  ruleStateKeys,
   state,
 }) => {
   // If all of the rule felids are set then do not show the add more button
   const isShowAddMorRuleButtonDisabled = Object.keys(state)
-    .filter((key) => nativeTokenStreamRuleKeys.includes(key))
+    .filter((key) => ruleStateKeys.includes(key))
     .every((key) => state[key] !== null);
 
   return (

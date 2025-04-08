@@ -4,38 +4,54 @@ import {
   Button,
   Field,
   Form,
-  Input,
   Text,
   Section,
   Icon,
+  Option,
   Bold,
+  Dropdown,
 } from '@metamask/snaps-sdk/jsx';
 
 import type { State } from '../../types';
 
-type RulesSelectorProps = {
+export type RulesSelectorProps = {
   closeRuleSelectorButtonEventName: string;
   saveRuleButtonEventName: string;
-  nativeTokenStreamRuleKeys: string[];
+  selectedRuleDropdownEventName: string;
   state: State<'native-token-stream'>;
+  ruleMeta: RuleMeta[];
+};
+
+export type RuleMeta = {
+  stateKey: string;
+  name: string;
 };
 
 /**
  * Renders the rules selector component to add more rules.
  *
  * @param props - The rules selector props.
- * @param props.nativeTokenStreamRuleKeys - The keys of the native token stream rules.
  * @param props.closeRuleSelectorButtonEventName - The event name for the close button.
  * @param props.saveRuleButtonEventName - The event name for the save button.
+ * @param props.selectedRuleDropdownEventName - The event name for the selected rule dropdown.
  * @param props.state - The state of the native token stream.
+ * @param props.ruleMeta - The metadata for the rules.
  * @returns The JSX element to render.
  */
 export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
   closeRuleSelectorButtonEventName,
   saveRuleButtonEventName,
-  nativeTokenStreamRuleKeys,
+  selectedRuleDropdownEventName,
+  ruleMeta,
   state,
 }) => {
+  const dropDownValue = state[selectedRuleDropdownEventName] as string;
+  const dropdownOptions = ruleMeta.map((rule) => (
+    <Option value={rule.stateKey}>{rule.name}</Option>
+  ));
+
+  const isSaveButtonDisabled = dropDownValue === '';
+
   return (
     <Box>
       <Section>
@@ -56,9 +72,18 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
 
         <Form name="form-to-fill">
           <Field>
-            <Input name="firstName" placeholder="Enter your first name" />
+            <Dropdown
+              name={selectedRuleDropdownEventName}
+              value={dropDownValue}
+            >
+              {dropdownOptions}
+            </Dropdown>
           </Field>
-          <Button name={saveRuleButtonEventName} type="submit">
+          <Button
+            name={saveRuleButtonEventName}
+            disabled={isSaveButtonDisabled}
+            type="submit"
+          >
             Save
           </Button>
         </Form>

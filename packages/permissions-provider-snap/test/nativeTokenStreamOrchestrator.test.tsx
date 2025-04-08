@@ -64,6 +64,7 @@ describe('native-token-stream Orchestrator', () => {
       [NativeTokenStreamDialogElementNames.StartTimeRule]:
         mockbasePermission.data.startTime,
       [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+      [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
     },
   };
 

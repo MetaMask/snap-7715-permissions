@@ -37,6 +37,7 @@ describe('Confirmation Dialog event handlers', () => {
           [NativeTokenStreamDialogElementNames.StartTimeRule]: 1222333,
           [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
           [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
+          [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
         },
       };
 

@@ -41,6 +41,8 @@ declare module './types' {
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
 
       [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: boolean;
+      [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: string;
+
       [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
         | Hex
         | 'Unlimited'
@@ -219,6 +221,8 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
           // Rules
           [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
+          [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+
           [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
           [NativeTokenStreamDialogElementNames.InitialAmountRule]:
             permission.data.initialAmount ?? null,

@@ -1,7 +1,7 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box } from '@metamask/snaps-sdk/jsx';
 
-import type { AccountDetailsProps } from '../components';
+import type { AccountDetailsProps, RuleMeta } from '../components';
 import {
   AccountDetails,
   RequestHeader,
@@ -24,6 +24,8 @@ export enum NativeTokenStreamDialogElementNames {
 
   AddMoreRulesToggle = 'add-more-rules-toggle-native-token-stream',
   SaveRuleButton = 'save-rule-button-native-token-stream',
+  SelectedRuleDropdown = 'selected-rule-dropdown-native-token-stream',
+
   InitialAmountRule = 'initial-amount-rule-native-token-stream',
   InitialAmountRemove = 'initial-amount-remove-native-token-stream',
 
@@ -73,11 +75,30 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       tooltip: 'Tooltip text',
     },
   };
-  const nativeTokenStreamRulesKeys = [
+  const ruleStateKeys = [
     NativeTokenStreamDialogElementNames.InitialAmountRule,
     NativeTokenStreamDialogElementNames.MaxAllowanceRule,
     NativeTokenStreamDialogElementNames.StartTimeRule,
     NativeTokenStreamDialogElementNames.ExpiryRule,
+  ];
+
+  const ruleMeta: RuleMeta[] = [
+    {
+      stateKey: NativeTokenStreamDialogElementNames.InitialAmountRule,
+      name: 'Initial Amount',
+    },
+    {
+      stateKey: NativeTokenStreamDialogElementNames.MaxAllowanceRule,
+      name: 'Max Allowance',
+    },
+    {
+      stateKey: NativeTokenStreamDialogElementNames.StartTimeRule,
+      name: 'Start Time',
+    },
+    {
+      stateKey: NativeTokenStreamDialogElementNames.ExpiryRule,
+      name: 'Expiry',
+    },
   ];
 
   if (state[NativeTokenStreamDialogElementNames.AddMoreRulesToggle]) {
@@ -90,8 +111,11 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
           saveRuleButtonEventName={
             NativeTokenStreamDialogElementNames.SaveRuleButton
           }
-          nativeTokenStreamRuleKeys={nativeTokenStreamRulesKeys}
+          selectedRuleDropdownEventName={
+            NativeTokenStreamDialogElementNames.SelectedRuleDropdown
+          }
           state={state}
+          ruleMeta={ruleMeta}
         />
       </Box>
     );
@@ -160,7 +184,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       />
 
       <AddMoreRule
-        nativeTokenStreamRuleKeys={nativeTokenStreamRulesKeys}
+        ruleStateKeys={ruleStateKeys}
         state={state}
         addMoreButtonEventName={
           NativeTokenStreamDialogElementNames.AddMoreRulesToggle
