@@ -30,6 +30,8 @@
     "build:clean": "yarn clean && yarn build",
     "build:pack": "yarn build:clean && yarn pack --filename ../../deps/snap-b-0.1.0.tgz",
     "build:preinstalled-snap": "node scripts/build-preinstalled-snap.js",
+    "changelog:update": "../../scripts/update-changelog.sh @metamask/gator-permissions",
+    "changelog:validate": "../../scripts/validate-changelog.sh @metamask/gator-permissions",
     "clean": "rimraf dist",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "npx eslint . --cache",
