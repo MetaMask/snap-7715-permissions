@@ -18,7 +18,7 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
  */
 export const useDelegateAccount = ({ chain }: { chain: Chain }) => {
   const [delegateAccount, setDelegateAccount] =
-    useState<MetaMaskSmartAccount<Implementation> | null>(null);
+    useState<MetaMaskSmartAccount | null>();
 
   useEffect(() => {
     const initializeDelegateAccount = async () => {
