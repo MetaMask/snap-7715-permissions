@@ -18,12 +18,38 @@ type BaseRuleProps = {
   removeRuleButtonName: string;
 };
 
+export type RuleMeta = {
+  stateKey: string;
+  name: string;
+  inputType: 'number' | 'text';
+  placeholder: string;
+  validation: {
+    validationError: string;
+  };
+};
+
 export type TokenValueRuleProps = BaseRuleProps & {
   allowance: Hex | 'Unlimited';
 };
 
 export type TimestampRuleProps = BaseRuleProps & {
   timestamp: number;
+};
+
+/**
+ * Filters the rule meta to only include the rules that are not in the active rule state keys.
+ *
+ * @param ruleMeta - The rule meta to filter.
+ * @param activeRuleStateKeys - The keys of the rules in the state.
+ * @returns The filtered rule meta.
+ */
+export const filterNotActiveRuleMeta = (
+  ruleMeta: RuleMeta[],
+  activeRuleStateKeys: string[],
+) => {
+  return ruleMeta.filter(
+    (rule) => !activeRuleStateKeys.includes(rule.stateKey),
+  );
 };
 
 /**

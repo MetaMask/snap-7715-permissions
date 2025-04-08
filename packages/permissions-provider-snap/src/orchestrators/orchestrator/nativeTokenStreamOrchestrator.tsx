@@ -42,6 +42,7 @@ declare module './types' {
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
 
       // Add Rules
+      [NativeTokenStreamDialogElementNames.ActiveRulesStateKeys]: string[];
       [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: boolean;
       [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: string;
       [NativeTokenStreamDialogElementNames.SelectedRuleInput]: string;
@@ -223,6 +224,11 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
 
           // Adding Rules
+          [NativeTokenStreamDialogElementNames.ActiveRulesStateKeys]: [
+            NativeTokenStreamDialogElementNames.InitialAmountRule,
+            NativeTokenStreamDialogElementNames.MaxAllowanceRule,
+            NativeTokenStreamDialogElementNames.ExpiryRule,
+          ],
           [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
           [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
           [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',

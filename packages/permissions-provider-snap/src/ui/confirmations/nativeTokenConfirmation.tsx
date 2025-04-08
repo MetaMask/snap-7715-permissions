@@ -22,6 +22,7 @@ export enum NativeTokenStreamDialogElementNames {
   MaxAmountInput = 'max-amount-input-native-token-stream',
   PeriodInput = 'period-input-native-token-stream',
 
+  ActiveRulesStateKeys = 'active-rules-state-keys-native-token-stream',
   AddMoreRulesToggle = 'add-more-rules-toggle-native-token-stream',
   AddMoreRulesFormSubmit = 'add-more-rules-form-submit-native-token-stream',
   SelectedRuleDropdown = 'selected-rule-dropdown-native-token-stream',
@@ -76,13 +77,6 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       tooltip: 'Tooltip text',
     },
   };
-  const ruleStateKeys = [
-    NativeTokenStreamDialogElementNames.InitialAmountRule,
-    NativeTokenStreamDialogElementNames.MaxAllowanceRule,
-    NativeTokenStreamDialogElementNames.StartTimeRule,
-    NativeTokenStreamDialogElementNames.ExpiryRule,
-  ];
-
   const ruleMeta: RuleMeta[] = [
     {
       stateKey: NativeTokenStreamDialogElementNames.InitialAmountRule,
@@ -138,8 +132,15 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
           addMoreRulesFormSubmitEventName={
             NativeTokenStreamDialogElementNames.AddMoreRulesFormSubmit
           }
-          ruleStateKeys={ruleStateKeys}
-          state={state}
+          activeRuleStateKeys={
+            state[NativeTokenStreamDialogElementNames.ActiveRulesStateKeys]
+          }
+          selectedDropDownValue={
+            state[NativeTokenStreamDialogElementNames.SelectedRuleDropdown]
+          }
+          selectedInputValue={
+            state[NativeTokenStreamDialogElementNames.SelectedRuleInput]
+          }
           ruleMeta={ruleMeta}
         />
       </Box>
@@ -209,11 +210,13 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       />
 
       <AddMoreRule
-        ruleStateKeys={ruleStateKeys}
-        state={state}
+        activeRuleStateKeys={
+          state[NativeTokenStreamDialogElementNames.ActiveRulesStateKeys]
+        }
         addMoreButtonEventName={
           NativeTokenStreamDialogElementNames.AddMoreRulesToggle
         }
+        ruleMeta={ruleMeta}
       />
     </Box>
   );

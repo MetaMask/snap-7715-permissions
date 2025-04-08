@@ -13,26 +13,17 @@ import {
   Input,
 } from '@metamask/snaps-sdk/jsx';
 
-import type { State } from '../../types';
+import { filterNotActiveRuleMeta, type RuleMeta } from './Rules';
 
 export type RulesSelectorProps = JsonObject & {
   closeRuleSelectorButtonEventName: string;
   selectedRuleDropdownEventName: string;
   selectedRuleInputEventName: string;
   addMoreRulesFormSubmitEventName: string;
-  ruleStateKeys: string[];
-  state: State<'native-token-stream'>;
+  activeRuleStateKeys: string[];
+  selectedDropDownValue: string;
+  selectedInputValue: string;
   ruleMeta: RuleMeta[];
-};
-
-export type RuleMeta = {
-  stateKey: string;
-  name: string;
-  inputType: 'number' | 'text';
-  placeholder: string;
-  validation: {
-    validationError: string;
-  };
 };
 
 /**
@@ -56,8 +47,9 @@ const valueValidator = (value: string, ruleMeta: RuleMeta) => {
  * @param props.selectedRuleDropdownEventName - The event name for the selected rule dropdown.
  * @param props.selectedRuleInputEventName - The event name for the selected rule input.
  * @param props.addMoreRulesFormSubmitEventName - The event name for the add more rules form submit.
- * @param props.ruleStateKeys - The keys of the rules in the state.
- * @param props.state - The state of the native token stream.
+ * @param props.activeRuleStateKeys - The keys of the rules in the state.
+ * @param props.selectedDropDownValue - The value of the selected dropdown.
+ * @param props.selectedInputValue - The value of the selected input.
  * @param props.ruleMeta - The metadata for the rules.
  * @returns The JSX element to render.
  */
@@ -66,34 +58,23 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
   selectedRuleDropdownEventName,
   selectedRuleInputEventName,
   addMoreRulesFormSubmitEventName,
-  ruleStateKeys,
+  selectedDropDownValue,
+  selectedInputValue,
+  activeRuleStateKeys,
   ruleMeta,
-  state,
 }) => {
-  // Only allow adding rule for item that have not been added to the state
-  const filterState: Record<string, any> = {};
-  Object.entries(state).forEach(([key, value]) => {
-    if (ruleStateKeys.includes(key)) {
-      filterState[key] = value;
-    }
-  });
-  const filteredRuleMeta = ruleMeta.filter(
-    (rule) => filterState[rule.stateKey] === null,
+  const filteredRuleMeta = filterNotActiveRuleMeta(
+    ruleMeta,
+    activeRuleStateKeys,
   );
 
-  const dropdownOptions = filteredRuleMeta.map((rule) => (
-    <Option value={rule.stateKey}>{rule.name}</Option>
-  ));
-
   // Get the value of the dropdown and input field
-  let dropDownValue = '';
-  if (state[selectedRuleDropdownEventName]) {
-    dropDownValue = state[selectedRuleDropdownEventName] as string;
-  } else {
+  let dropDownValue = selectedDropDownValue;
+  if (!selectedDropDownValue) {
     dropDownValue = filteredRuleMeta[0]?.stateKey as string;
   }
-  const inputValue = state[selectedRuleInputEventName] as string;
-  const isSaveButtonDisabled = dropDownValue === '' || inputValue === '';
+  const isSaveButtonDisabled =
+    dropDownValue === '' || selectedInputValue === '';
   const isInputDisabled = dropDownValue === '';
 
   // Show any error for the input field
@@ -102,7 +83,7 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
     (rule) => rule.stateKey === dropDownValue,
   );
   if (foundRuleMeta) {
-    inputErrorMessage = valueValidator(inputValue, foundRuleMeta);
+    inputErrorMessage = valueValidator(selectedInputValue, foundRuleMeta);
   }
 
   return (
@@ -126,13 +107,15 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
         <Form name={addMoreRulesFormSubmitEventName}>
           <Field>
             <Dropdown name={selectedRuleDropdownEventName}>
-              {dropdownOptions}
+              {filteredRuleMeta.map((rule) => (
+                <Option value={rule.stateKey}>{rule.name}</Option>
+              ))}
             </Dropdown>
           </Field>
           <Field error={inputErrorMessage}>
             <Input
               name={selectedRuleInputEventName}
-              value={inputValue}
+              value={selectedInputValue}
               disabled={isInputDisabled}
               type={foundRuleMeta?.inputType ?? 'text'}
               placeholder={foundRuleMeta?.placeholder}
