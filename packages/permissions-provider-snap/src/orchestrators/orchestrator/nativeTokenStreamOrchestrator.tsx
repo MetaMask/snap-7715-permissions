@@ -15,6 +15,7 @@ import {
   NativeTokenStreamDialogElementNames,
   TIME_PERIOD_MAPPING,
   TimePeriod,
+  handleFormSubmit,
   handleReplaceTextInput,
   handleReplaceValueInput,
   handleToggleBooleanClicked,
@@ -40,8 +41,10 @@ declare module './types' {
       [NativeTokenStreamDialogElementNames.MaxAmountInput]: Hex;
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
 
+      // Add Rules
       [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: boolean;
       [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: string;
+      [NativeTokenStreamDialogElementNames.SelectedRuleInput]: string;
 
       [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
         | Hex
@@ -219,15 +222,16 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
             permission.data.maxAmount,
           [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
 
-          // Rules
+          // Adding Rules
           [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
           [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+          [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
 
+          // Rules values
           [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
           [NativeTokenStreamDialogElementNames.InitialAmountRule]:
             permission.data.initialAmount ?? null,
-          [NativeTokenStreamDialogElementNames.StartTimeRule]:
-            permission.data.startTime,
+          [NativeTokenStreamDialogElementNames.StartTimeRule]: null,
           [NativeTokenStreamDialogElementNames.ExpiryRule]: expiry,
         },
 
@@ -252,13 +256,34 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
               handleReplaceTextInput as UserEventHandler<UserInputEventType>,
           },
 
-          // Rules
+          // Adding Rules
           {
             elementName: NativeTokenStreamDialogElementNames.AddMoreRulesToggle,
             eventType: UserInputEventType.ButtonClickEvent,
             handler:
               handleToggleBooleanClicked as UserEventHandler<UserInputEventType>,
           },
+          {
+            elementName:
+              NativeTokenStreamDialogElementNames.AddMoreRulesFormSubmit,
+            eventType: UserInputEventType.FormSubmitEvent,
+            handler: handleFormSubmit as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName:
+              NativeTokenStreamDialogElementNames.SelectedRuleDropdown,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceTextInput as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.SelectedRuleInput,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceTextInput as UserEventHandler<UserInputEventType>,
+          },
+
+          // Remove Rules
           {
             elementName: NativeTokenStreamDialogElementNames.MaxAllowanceRule,
             eventType: UserInputEventType.InputChangeEvent,

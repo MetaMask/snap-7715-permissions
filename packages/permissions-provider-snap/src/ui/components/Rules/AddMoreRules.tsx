@@ -24,19 +24,25 @@ export const AddMoreRule: SnapComponent<RulesSelectorProps> = ({
   state,
 }) => {
   // If all of the rule felids are set then do not show the add more button
-  const isShowAddMorRuleButtonDisabled = Object.keys(state)
-    .filter((key) => ruleStateKeys.includes(key))
-    .every((key) => state[key] !== null);
+  const filterState: Record<string, any> = {};
+  Object.entries(state).forEach(([key, value]) => {
+    if (ruleStateKeys.includes(key)) {
+      filterState[key] = value;
+    }
+  });
+
+  const isShowAddMorRuleButtonDisabled = Object.values(filterState).every(
+    (value) => value !== null,
+  );
 
   return (
-    <Box direction="horizontal" center={true} alignment="center">
-      <Icon name="add" size="inherit" color="primary" />
-      <Button
-        name={addMoreButtonEventName}
-        disabled={!isShowAddMorRuleButtonDisabled}
-      >
-        Add more rules
-      </Button>
+    <Box>
+      {!isShowAddMorRuleButtonDisabled && (
+        <Box direction="horizontal" center={true} alignment="center">
+          <Icon name="add" size="inherit" color="primary" />
+          <Button name={addMoreButtonEventName}>Add more rules</Button>
+        </Box>
+      )}
     </Box>
   );
 };

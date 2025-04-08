@@ -23,8 +23,9 @@ export enum NativeTokenStreamDialogElementNames {
   PeriodInput = 'period-input-native-token-stream',
 
   AddMoreRulesToggle = 'add-more-rules-toggle-native-token-stream',
-  SaveRuleButton = 'save-rule-button-native-token-stream',
+  AddMoreRulesFormSubmit = 'add-more-rules-form-submit-native-token-stream',
   SelectedRuleDropdown = 'selected-rule-dropdown-native-token-stream',
+  SelectedRuleInput = 'selected-rule-input-native-token-stream',
 
   InitialAmountRule = 'initial-amount-rule-native-token-stream',
   InitialAmountRemove = 'initial-amount-remove-native-token-stream',
@@ -86,18 +87,38 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
     {
       stateKey: NativeTokenStreamDialogElementNames.InitialAmountRule,
       name: 'Initial Amount',
+      inputType: 'number',
+      placeholder: '0.00',
+      validation: {
+        validationError: 'Please enter a valid initial amount',
+      },
     },
     {
       stateKey: NativeTokenStreamDialogElementNames.MaxAllowanceRule,
       name: 'Max Allowance',
+      inputType: 'number',
+      placeholder: '0.00',
+      validation: {
+        validationError: 'Please enter a valid max allowance',
+      },
     },
     {
       stateKey: NativeTokenStreamDialogElementNames.StartTimeRule,
       name: 'Start Time',
+      inputType: 'text',
+      placeholder: 'MM/DD/YYYY',
+      validation: {
+        validationError: 'Enter a valid date',
+      },
     },
     {
       stateKey: NativeTokenStreamDialogElementNames.ExpiryRule,
       name: 'Expiry',
+      inputType: 'text',
+      placeholder: 'MM/DD/YYYY',
+      validation: {
+        validationError: 'Enter a valid date',
+      },
     },
   ];
 
@@ -108,12 +129,16 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
           closeRuleSelectorButtonEventName={
             NativeTokenStreamDialogElementNames.AddMoreRulesToggle
           }
-          saveRuleButtonEventName={
-            NativeTokenStreamDialogElementNames.SaveRuleButton
-          }
           selectedRuleDropdownEventName={
             NativeTokenStreamDialogElementNames.SelectedRuleDropdown
           }
+          selectedRuleInputEventName={
+            NativeTokenStreamDialogElementNames.SelectedRuleInput
+          }
+          addMoreRulesFormSubmitEventName={
+            NativeTokenStreamDialogElementNames.AddMoreRulesFormSubmit
+          }
+          ruleStateKeys={ruleStateKeys}
           state={state}
           ruleMeta={ruleMeta}
         />

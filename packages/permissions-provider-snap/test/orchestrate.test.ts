@@ -100,6 +100,7 @@ describe('Orchestrate', () => {
         [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
         [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
         [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+        [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
       },
     };
 
@@ -165,8 +166,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(8);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(8);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(11);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(11);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -243,8 +244,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(8);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(8);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(11);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(11);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

@@ -36,6 +36,7 @@ describe('UserEventDispatcher', () => {
       [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
       [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
       [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+      [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
     },
   };
   const mockSnapsProvider = createMockSnapsProvider();

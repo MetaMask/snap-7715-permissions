@@ -65,6 +65,7 @@ describe('native-token-stream Orchestrator', () => {
         mockbasePermission.data.startTime,
       [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
       [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+      [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
     },
   };
 
@@ -277,7 +278,7 @@ describe('native-token-stream Orchestrator', () => {
           parsedPermission,
           mockUiContext.expiry,
         );
-      expect(dialogContentEventHandlers.length).toStrictEqual(8);
+      expect(dialogContentEventHandlers.length).toStrictEqual(11);
     });
   });
 });
