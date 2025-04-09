@@ -2761,81 +2761,42 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask-private/delegation-abis@npm:^0.7.0":
-  version: 0.7.0
-  resolution: "@metamask-private/delegation-abis@npm:0.7.0"
-  checksum: 0234b5348e0e3ea45fa6b2253886df2881dea1113025db6e6d243d31a635e556a803430900fa40e27d5c19ed3fe157ad777e819da85531589cddd4ef76b7196c
+"@metamask-private/delegation-abis@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@metamask-private/delegation-abis@npm:0.8.1"
+  checksum: 460f7ae2e97273bf9ddb90590635a6e5450847469a9c7535a2073d4880b70bdcb41e3424858b695d442b37ea613dc6887e585142f36f49208d40dd471f7bd696
   languageName: node
   linkType: hard
 
-"@metamask-private/delegation-abis@npm:^0.7.1":
-  version: 0.7.1
-  resolution: "@metamask-private/delegation-abis@npm:0.7.1"
-  checksum: 64653f396c5ca9f65966819f6393f9e2a1270e694d037366034820dd402a7020bf619df43d74fa210677e3ea8801beb7d1b1aaf9fb4181aacee417a33a209eb8
+"@metamask-private/delegation-deployments@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@metamask-private/delegation-deployments@npm:0.8.1"
+  checksum: 205419c8e712494ff747e2cb94d07728d3acb71662eef8c7c4ec5a5da3e642f4a26d40f023a54524aa00ad9eda0a34d064bf6e6eced9bcaaa9394a8bc0c677f9
   languageName: node
   linkType: hard
 
-"@metamask-private/delegation-deployments@npm:^0.7.0":
-  version: 0.7.0
-  resolution: "@metamask-private/delegation-deployments@npm:0.7.0"
-  checksum: 3591f5d22755d57c05a1ac5ad45449411093d3f2d77d437c18b2080b7318a3ec4e12927e46d7f970fb3253498dfa3d2b56490a3376ff0009f7668b6f15baf563
-  languageName: node
-  linkType: hard
-
-"@metamask-private/delegation-deployments@npm:^0.7.1":
-  version: 0.7.1
-  resolution: "@metamask-private/delegation-deployments@npm:0.7.1"
-  checksum: 2fe8d136e3cf846ae07a209e23b929246a1a35bd44ea67296b8a53ea3816d6a3fed77e57702344db2e5f62a2cfec11b2e14c9b7be90ba2fe35d9950c614dddc2
-  languageName: node
-  linkType: hard
-
-"@metamask-private/delegation-utils@npm:^0.7.0":
-  version: 0.7.0
-  resolution: "@metamask-private/delegation-utils@npm:0.7.0"
+"@metamask-private/delegation-utils@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@metamask-private/delegation-utils@npm:0.8.1"
   dependencies:
-    "@metamask-private/delegation-abis": ^0.7.0
-    "@metamask-private/delegation-deployments": ^0.7.0
+    "@metamask-private/delegation-abis": ^0.8.1
+    "@metamask-private/delegation-deployments": ^0.8.1
     buffer: ^6.0.3
   peerDependencies:
     viem: ">=2.18.2 <3.0.0"
-  checksum: 61eeafc6bfdbd47c43c7386df0d761503cd7cc2dec16c3410908747cef86cb61f25ba193fe96a389be8dca3f9f75fc55181fb851103e11c8abf78620b8d4fad3
+  checksum: 718b49b87d8dd80c995a772729ec95cf7dee8191f3f0359861d0c70a41b0588c5c040fb1f5e38541162504184a3ed99e47a3516c100122e4858c7e914f01c7a3
   languageName: node
   linkType: hard
 
-"@metamask-private/delegation-utils@npm:^0.7.1":
-  version: 0.7.1
-  resolution: "@metamask-private/delegation-utils@npm:0.7.1"
+"@metamask-private/delegator-core-viem@npm:0.8.1":
+  version: 0.8.1
+  resolution: "@metamask-private/delegator-core-viem@npm:0.8.1"
   dependencies:
-    "@metamask-private/delegation-abis": ^0.7.1
-    "@metamask-private/delegation-deployments": ^0.7.1
-    buffer: ^6.0.3
-  peerDependencies:
-    viem: ">=2.18.2 <3.0.0"
-  checksum: ca881f1dd6c5e22e3d29ccc9ae5c52b64b821378118f3da616bb809196a42eaab9b5c2eaec9e5161fb5db35e14f25664fc29849a69500e6b0ca732fa8d3c7caf
-  languageName: node
-  linkType: hard
-
-"@metamask-private/delegator-core-viem@npm:0.7.0":
-  version: 0.7.0
-  resolution: "@metamask-private/delegator-core-viem@npm:0.7.0"
-  dependencies:
-    "@metamask-private/delegation-utils": ^0.7.0
+    "@metamask-private/delegation-utils": ^0.8.1
     webauthn-p256: ^0.0.5
   peerDependencies:
     viem: ">=2.18.2 <3.0.0"
-  checksum: ad0b084c5a75ecff6d34d6188cf5fb5b49faffae95b1c67707366e780cc57417ce2e426dd2648c0f94bedab8ab5863aaf0281fa9d143aba40b411cada2eb5f53
-  languageName: node
-  linkType: hard
-
-"@metamask-private/delegator-core-viem@npm:0.7.1":
-  version: 0.7.1
-  resolution: "@metamask-private/delegator-core-viem@npm:0.7.1"
-  dependencies:
-    "@metamask-private/delegation-utils": ^0.7.1
-    webauthn-p256: ^0.0.5
-  peerDependencies:
-    viem: ">=2.18.2 <3.0.0"
-  checksum: 88245c4e517602d9730365a1fb26fcc972bd8679499861e8942634587eed6d844567d334179f1d9fc07c63eb41fd6cec93055e7c6a01dc16a7de134fba133a96
+  checksum: c66a37371344f19fbdf0bd0e3425de957896d6b3907be315c961e6f581112bd691a2ff5de6990264c8054339dd23bbe1b87e384f0a2d4651a207c952d8844ec7
   languageName: node
   linkType: hard
 
@@ -3152,7 +3113,7 @@ __metadata:
   resolution: "@metamask/gator-permissions@workspace:packages/permissions-provider-snap"
   dependencies:
     "@jest/globals": ^29.5.0
-    "@metamask-private/delegator-core-viem": 0.7.0
+    "@metamask-private/delegator-core-viem": 0.8.1
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -18366,7 +18327,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask-private/delegator-core-viem": 0.7.1
+    "@metamask-private/delegator-core-viem": 0.8.1
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-browser": ^12.1.0
     "@metamask/eslint-config-jest": ^12.1.0

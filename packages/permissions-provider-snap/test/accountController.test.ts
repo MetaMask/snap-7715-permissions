@@ -1,6 +1,6 @@
 import { describe, it, beforeEach } from '@jest/globals';
 import {
-  createRootDelegation,
+  createDelegation,
   getDeleGatorEnvironment,
 } from '@metamask-private/delegator-core-viem';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
@@ -13,7 +13,7 @@ describe('AccountController', () => {
   const entropy =
     '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
   // constant derived via delegator-core-viem
-  const expectedAddress = '0xD1feB94b097Bd806a67F16c7b549f7e894C0a546';
+  const expectedAddress = '0x0fA5946C378FCa9B9Aa97dCb4Bb78F834A170f45';
   const expectedBalance = '0x1000000000000000000';
   let accountController: AccountController;
   const mockSnapsProvider = createMockSnapsProvider();
@@ -192,11 +192,11 @@ describe('AccountController', () => {
   });
 
   describe('signDelegation()', () => {
-    const unsignedDelegation = createRootDelegation(
-      '0x1234567890abcdef1234567890abcdef12345678',
-      '0x1234567890abcdef1234567890abcdef12345678',
-      [],
-    );
+    const unsignedDelegation = createDelegation({
+      to: '0x1234567890abcdef1234567890abcdef12345678',
+      from: '0x1234567890abcdef1234567890abcdef12345678',
+      caveats: [],
+    });
 
     it('should sign a delegation', async () => {
       const signedDelegation = await accountController.signDelegation({
