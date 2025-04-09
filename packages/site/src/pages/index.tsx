@@ -31,7 +31,7 @@ import {
 import { isLocalSnap } from '../utils';
 
 /* eslint-disable no-restricted-globals */
-const BUNDLER_RPC_URL = process.env.NEXT_PUBLIC_BUNDLER_RPC_URL;
+const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
 
 const Container = styled.div`
   display: flex;
@@ -235,7 +235,9 @@ const Index = () => {
   const [to, setTo] = useState<Hex>('0x');
   const [data, setData] = useState<Hex>('0x');
   const [value, setValue] = useState<bigint>(0n);
-  const [receipt, setReceipt] = useState<UserOperationReceipt>();
+  const [receipt, setReceipt] = useState<UserOperationReceipt | null>(null);
+
+  const [isWorking, setIsWorking] = useState(false);
 
   const handleInitialAmountChange = ({
     target: { value: inputValue },
@@ -301,6 +303,9 @@ const Index = () => {
     if (!delegateAccount) {
       throw new Error('Delegate account not found');
     }
+    setIsWorking(true);
+    setReceipt(null);
+    setPermissionResponseError(null);
 
     const feePerGas = await getFeePerGas();
 
@@ -312,28 +317,33 @@ const Index = () => {
       transport: http(),
     });
 
-    const userOperationHash =
-      await bundlerClient.sendUserOperationWithDelegation({
-        publicClient,
-        account: delegateAccount,
-        calls: [
-          {
-            to,
-            data,
-            value,
-            permissionsContext: context,
-            delegationManager,
-          },
-        ],
-        ...feePerGas,
-        accountMetadata: accountMeta,
+    try {
+      const userOperationHash =
+        await bundlerClient.sendUserOperationWithDelegation({
+          publicClient,
+          account: delegateAccount,
+          calls: [
+            {
+              to,
+              data,
+              value,
+              permissionsContext: context,
+              delegationManager,
+            },
+          ],
+          ...feePerGas,
+          accountMetadata: accountMeta,
+        });
+
+      const operationReceipt = await bundlerClient.waitForUserOperationReceipt({
+        hash: userOperationHash,
       });
 
-    const operationReceipt = await bundlerClient.waitForUserOperationReceipt({
-      hash: userOperationHash,
-    });
-
-    setReceipt(operationReceipt);
+      setReceipt(operationReceipt);
+    } catch (error) {
+      setPermissionResponseError(error as Error);
+    }
+    setIsWorking(false);
   };
 
   const handleGrantPermissions = async () => {
@@ -364,6 +374,10 @@ const Index = () => {
       },
     ];
 
+    setIsWorking(true);
+    setPermissionResponse(null);
+    setReceipt(null);
+    setPermissionResponseError(null);
     try {
       const response = await metaMaskClient?.grantPermissions(
         permissionsRequests,
@@ -373,6 +387,7 @@ const Index = () => {
       setPermissionResponse(null);
       setPermissionResponseError(error as Error);
     }
+    setIsWorking(false);
   };
 
   const handleCopyToClipboard = () => {
@@ -397,7 +412,7 @@ const Index = () => {
       <Subtitle>
         Get started by installing snaps and sending permissions requests.
       </Subtitle>
-
+      {isWorking && <p>Loading...</p>}
       <CardContainer>
         {errors.map((error) => (
           <ErrorMessage>
@@ -407,17 +422,21 @@ const Index = () => {
 
         {permissionResponse && (
           <Box>
-            <ResponseContainer>
-              <Title>Permission Response</Title>
-              <CopyButton
-                onClick={handleCopyToClipboard}
-                title={'Copy to clipboard'}
-              >
-                {isCopied ? '✅' : '📝'}
-              </CopyButton>
-              <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
-            </ResponseContainer>
-
+            {receipt && (
+              <div style={{ marginTop: '1rem' }}>
+                <ResponseContainer>
+                  <Title>User operation receipt</Title>
+                  <pre>
+                    {JSON.stringify(
+                      receipt,
+                      (_key, val) =>
+                        typeof val === 'bigint' ? val.toString() : val,
+                      2,
+                    )}
+                  </pre>
+                </ResponseContainer>
+              </div>
+            )}
             <StyledForm>
               <Title>Redeem Permission</Title>
               <div>
@@ -461,27 +480,22 @@ const Index = () => {
             <CustomMessageButton
               text="Redeem Permission"
               onClick={handleRedeemPermission}
+              disabled={isWorking}
             />
-
-            {receipt && (
-              <div style={{ marginTop: '1rem' }}>
-                <ResponseContainer>
-                  <Title>User operation receipt</Title>
-                  <pre>
-                    {JSON.stringify(
-                      receipt,
-                      (_key, val) =>
-                        typeof val === 'bigint' ? val.toString() : val,
-                      2,
-                    )}
-                  </pre>
-                </ResponseContainer>
-              </div>
-            )}
           </Box>
         )}
         {metaMaskClient && (
           <Box style={{ position: 'relative' }}>
+            <ResponseContainer>
+              <Title>Permission Response</Title>
+              <CopyButton
+                onClick={handleCopyToClipboard}
+                title={'Copy to clipboard'}
+              >
+                {isCopied ? '✅' : '📝'}
+              </CopyButton>
+              <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
+            </ResponseContainer>
             <StyledForm>
               <div>
                 <label htmlFor="permissionType">Permission Type:</label>
@@ -557,6 +571,7 @@ const Index = () => {
             <CustomMessageButton
               text="Grant Permission"
               onClick={handleGrantPermissions}
+              disabled={isWorking}
             />
           </Box>
         )}

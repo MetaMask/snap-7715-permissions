@@ -1,24 +1,21 @@
 {
-  "name": "root",
-  "version": "0.1.0",
+  "name": "@metamask/snap-7715-permissions-monorepo",
+  "version": "0.0.1",
   "private": true,
-  "description": "",
-  "homepage": "https://github.com/MetaMask/snap-7715-permissions#readme",
-  "bugs": {
-    "url": "https://github.com/MetaMask/snap-7715-permissions/issues"
-  },
+  "description": "Monorepo for 7715 permissions snaps.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MetaMask/snap-7715-permissions.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
-  "author": "",
+  "files": [],
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "build": "yarn workspaces foreach --parallel --topological --verbose run build",
     "build:pack": "yarn workspaces foreach --parallel --interlaced --verbose run build:pack",
+    "changelog:update": "yarn workspaces foreach --all --no-private --parallel --interlaced --verbose run changelog:update",
+    "changelog:validate": "yarn workspaces foreach --all --no-private --parallel --interlaced --verbose run changelog:validate",
     "lint": "yarn workspaces foreach --parallel run lint",
     "lint:eslint": "yarn workspaces foreach --parallel run lint:eslint",
     "lint:fix": "yarn workspaces foreach --parallel run lint:fix",
@@ -29,6 +26,7 @@
   "devDependencies": {
     "@lavamoat/allow-scripts": "^3.0.0",
     "@lavamoat/preinstall-always-fail": "^2.0.0",
+    "@metamask/create-release-branch": "^4.1.1",
     "@metamask/eslint-config": "^12.2.0",
     "@metamask/eslint-config-jest": "^12.1.0",
     "@metamask/eslint-config-nodejs": "^12.1.0",
@@ -36,15 +34,16 @@
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "eslint": "^8.45.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "~2.26.0",
     "eslint-plugin-jest": "^27.1.5",
     "eslint-plugin-jsdoc": "^41.1.2",
     "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-promise": "^6.1.1",
-    "prettier": "^2.7.1",
-    "prettier-plugin-packagejson": "^2.2.18",
+    "prettier": "^3.3.3",
+    "prettier-2": "npm:prettier@^2.8.8",
+    "prettier-plugin-packagejson": "^2.4.5",
     "sharp": "^0.32.6",
     "typescript": "^4.7.4"
   },

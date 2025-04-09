@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import type { CoreCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import {
   zNativeTokenStreamPermission,
@@ -160,13 +159,26 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       permissionContextMeta: PermissionContextMeta<'native-token-stream'>,
     ) => {
       const { attenuatedPermission, caveatBuilder } = permissionContextMeta;
-      // TODO: Using native token allowance enforcers, for now, until native token stream enforcer is available in delegator-sdk
-      const updatedCaveatBuilder: CoreCaveatBuilder = caveatBuilder.addCaveat(
-        'nativeTokenTransferAmount',
-        BigInt(attenuatedPermission.data.initialAmount ?? 0),
-      );
 
-      return updatedCaveatBuilder;
+      const { initialAmount, maxAmount, amountPerSecond, startTime } =
+        attenuatedPermission.data;
+
+      const intialAmountBigInt =
+        initialAmount === undefined ? 0n : BigInt(initialAmount);
+
+      caveatBuilder
+        .addCaveat(
+          'nativeTokenStreaming',
+          intialAmountBigInt,
+          BigInt(maxAmount),
+          BigInt(amountPerSecond),
+          startTime,
+        )
+        // don't allow any calldata as this could be used to extract additional authority
+        // not included in a native token stream permission
+        .addCaveat('exactCalldata', '0x');
+
+      return caveatBuilder;
     },
     resolveAttenuatedPermission: async (
       requestedPermission: PermissionTypeMapping['native-token-stream'],

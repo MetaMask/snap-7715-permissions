@@ -14,6 +14,7 @@ describe('Confirmation Dialog event handlers', () => {
   const mockSnapsProvider = createMockSnapsProvider();
   beforeEach(() => {
     mockSnapsProvider.request.mockReset();
+    // eslint-disable-next-line no-restricted-globals
     (global as any).snap = mockSnapsProvider;
   });
 
@@ -81,7 +82,9 @@ describe('Confirmation Dialog event handlers', () => {
             interfaceId: 'mockInterfaceId',
             permissionType: 'native-token-stream',
           }),
-        ).rejects.toThrow('Event name justification-show-more-button-native-token-stream not found in state');
+        ).rejects.toThrow(
+          'Event name justification-show-more-button-native-token-stream not found in state',
+        );
       });
 
       it('should not mutate justification show more state if event name in incorrect', async () => {
@@ -101,7 +104,9 @@ describe('Confirmation Dialog event handlers', () => {
             interfaceId: 'mockInterfaceId',
             permissionType: 'native-token-stream',
           }),
-        ).rejects.toThrow('Event name some other event name not found in state');
+        ).rejects.toThrow(
+          'Event name some other event name not found in state',
+        );
       });
     });
   });

@@ -15,8 +15,8 @@ import { formatUnits } from 'viem';
 import { formatTokenBalance } from '../../utils';
 
 type StreamAmountProps = {
-  maxAmount: Hex;
-  maxAmountElementName: string;
+  streamAmount: Hex;
+  streamAmountElementName: string;
   period: TimePeriod;
   periodElementName: string;
 };
@@ -81,8 +81,8 @@ const inputDetails = (leftText: string, rightText: string, tooltip: string) => (
 );
 
 export const StreamAmount: SnapComponent<StreamAmountProps> = ({
-  maxAmount,
-  maxAmountElementName,
+  streamAmount,
+  streamAmountElementName,
   period,
   periodElementName,
 }) => {
@@ -90,10 +90,10 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
     <Section>
       {inputDetails('Stream Amount', 'Required', 'tooltip text')}
       <Input
-        name={maxAmountElementName}
+        name={streamAmountElementName}
         type="number"
-        placeholder={formatTokenBalance(maxAmount)}
-        value={maxAmount}
+        placeholder={formatTokenBalance(streamAmount)}
+        value={streamAmount}
       />
 
       {inputDetails('Period', 'Required', 'tooltip text')}
@@ -105,7 +105,7 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
 
       {inputDetails(
         'Stream rate',
-        `${calculateStreamRate(maxAmount, period)} ETH/sec`,
+        `${calculateStreamRate(streamAmount, period)} ETH/sec`,
         'tooltip text',
       )}
     </Section>
