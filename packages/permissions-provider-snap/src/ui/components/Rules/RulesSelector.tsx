@@ -6,7 +6,7 @@ import type {
   SupportedPermissionTypes,
 } from '../../../orchestrators';
 
-export enum RulesSelectorsEventNames {
+export enum RulesSelectorsElementNames {
   AddMoreRules = 'rules-selector:add-more-rules',
 }
 
@@ -29,7 +29,7 @@ export const RulesSelector: SnapComponent<
   return (
     <Box direction="horizontal" center={true} alignment="center">
       <Icon name="add" size="inherit" color="primary" />
-      <Button name={RulesSelectorsEventNames.AddMoreRules}>
+      <Button name={RulesSelectorsElementNames.AddMoreRules}>
         Add more rules
       </Button>
     </Box>

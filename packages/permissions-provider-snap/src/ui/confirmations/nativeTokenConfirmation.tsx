@@ -77,7 +77,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
             NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
           ]
         }
-        justificationShowMoreExpandedEventName={
+        justificationShowMoreExpandedElementName={
           NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
         }
       />
@@ -89,9 +89,11 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
 
       <StreamAmount
         maxAmount={state[NativeTokenStreamDialogElementNames.MaxAmountInput]}
-        maxAmountEventName={NativeTokenStreamDialogElementNames.MaxAmountInput}
+        maxAmountElementName={
+          NativeTokenStreamDialogElementNames.MaxAmountInput
+        }
         period={state[NativeTokenStreamDialogElementNames.PeriodInput]}
-        periodEventName={NativeTokenStreamDialogElementNames.PeriodInput}
+        periodElementName={NativeTokenStreamDialogElementNames.PeriodInput}
       />
 
       <NativeTokenStreamRules

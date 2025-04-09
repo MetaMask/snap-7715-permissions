@@ -5,7 +5,6 @@ import type {
   FormSubmitEvent,
   InputChangeEvent,
   InterfaceContext,
-  SnapsProvider,
   UserInputEvent,
   UserInputEventType,
 } from '@metamask/snaps-sdk';
@@ -32,7 +31,6 @@ export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
     event: UserInputEventByType<TUserInputEventType>;
     attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
     permissionType: SupportedPermissionTypes;
-    snapsProvider: SnapsProvider;
     interfaceId: string;
   }) => void | Promise<void>;
 
@@ -44,7 +42,7 @@ const getUserInputEventKey = ({
   elementName: string;
   eventType: UserInputEventType;
   interfaceId: string;
-}) => `${elementName}:${eventType}${interfaceId}`;
+}) => `${elementName}:${eventType}:${interfaceId}`;
 /**
  * Class responsible for dispatching user input events to registered handlers.
  * Provides a way to register, deregister, and dispatch event handlers
@@ -57,12 +55,6 @@ export class UserEventDispatcher {
   readonly #eventHandlers = {} as {
     [userInputEventKey: string]: UserEventHandler<UserInputEventType>[];
   };
-
-  #snapsProvider: SnapsProvider;
-
-  constructor(snapsProvider: SnapsProvider) {
-    this.#snapsProvider = snapsProvider;
-  }
 
   /**
    * Register an event handler for a specific event type.
@@ -179,7 +171,6 @@ export class UserEventDispatcher {
           attenuatedContext: context as PermissionConfirmationContext<
             typeof permissionType
           >,
-          snapsProvider: this.#snapsProvider,
           interfaceId: id,
           permissionType,
         });

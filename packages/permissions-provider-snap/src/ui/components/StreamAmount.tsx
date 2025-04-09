@@ -16,9 +16,9 @@ import { formatTokenBalance } from '../../utils';
 
 type StreamAmountProps = {
   maxAmount: Hex;
-  maxAmountEventName: string;
+  maxAmountElementName: string;
   period: TimePeriod;
-  periodEventName: string;
+  periodElementName: string;
 };
 
 /**
@@ -33,7 +33,7 @@ export enum TimePeriod {
 /**
  * A mapping of time periods to their equivalent seconds.
  */
-export const TIME_PERIOD_MAPPING: Record<TimePeriod, number> = {
+export const TIME_PERIOD_TO_SECOND: Record<TimePeriod, number> = {
   [TimePeriod.DAILY]: 60 * 60 * 24, // 86,400(seconds)
   [TimePeriod.WEEKLY]: 60 * 60 * 24 * 7, // 604,800(seconds)
   [TimePeriod.MONTHLY]: 60 * 60 * 24 * 30, // 2,592,000(seconds)
@@ -55,7 +55,7 @@ const calculateStreamRate = (
 ): string => {
   const tokenBalance = formatUnits(BigInt(wei), tokenDecimal);
   const tokenBalanceNum = parseFloat(tokenBalance);
-  return (tokenBalanceNum / TIME_PERIOD_MAPPING[timePeriod]).toFixed(
+  return (tokenBalanceNum / TIME_PERIOD_TO_SECOND[timePeriod]).toFixed(
     tokenDecimal,
   );
 };
@@ -82,22 +82,22 @@ const inputDetails = (leftText: string, rightText: string, tooltip: string) => (
 
 export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   maxAmount,
-  maxAmountEventName,
+  maxAmountElementName,
   period,
-  periodEventName,
+  periodElementName,
 }) => {
   return (
     <Section>
       {inputDetails('Stream Amount', 'Required', 'tooltip text')}
       <Input
-        name={maxAmountEventName}
+        name={maxAmountElementName}
         type="number"
         placeholder={formatTokenBalance(maxAmount)}
         value={maxAmount}
       />
 
       {inputDetails('Period', 'Required', 'tooltip text')}
-      <Dropdown name={periodEventName} value={period}>
+      <Dropdown name={periodElementName} value={period}>
         <Option value={TimePeriod.MONTHLY}>{TimePeriod.MONTHLY}</Option>
         <Option value={TimePeriod.WEEKLY}>{TimePeriod.WEEKLY}</Option>
         <Option value={TimePeriod.DAILY}>{TimePeriod.DAILY}</Option>
