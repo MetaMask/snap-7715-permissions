@@ -20,7 +20,7 @@ export enum StreamAmountEventNames {
 }
 
 type StreamAmountProps = {
-  maxAmount: Hex;
+  streamAmount: Hex;
 };
 
 /**
@@ -81,10 +81,10 @@ const inputDetails = (leftText: string, tooltip: string) => (
 );
 
 export const StreamAmount: SnapComponent<StreamAmountProps> = ({
-  maxAmount,
+  streamAmount,
 }) => {
   const timePeriodValue = TimePeriod.WEEKLY;
-  const streamRate = calculateStreamRate(maxAmount, timePeriodValue);
+  const streamRate = calculateStreamRate(streamAmount, timePeriodValue);
   return (
     <Section>
       {inputDetails(
@@ -94,8 +94,8 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
       <Input
         name={StreamAmountEventNames.StreamAmount}
         type="number"
-        placeholder={formatTokenBalance(maxAmount)}
-        value={maxAmount}
+        placeholder={formatTokenBalance(streamAmount)}
+        value={streamAmount}
         disabled={true}
       />
 

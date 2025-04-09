@@ -8,23 +8,16 @@ import {
   Image,
   Button,
 } from '@metamask/snaps-sdk/jsx';
-import { extractChain } from 'viem';
-import * as ALL_CHAINS from 'viem/chains';
-
-import { ICONS } from '../../iconConstant';
 
 export enum RequestDetailsEventNames {
   ShowMoreButton = 'request-details.show-more-button',
 }
 
 type RequestDetailsProps = JsonObject & {
-  siteOrigin: string;
-  justification: string | undefined;
-  chainId: number;
-  asset: string;
+  itemDetails: ItemDetails[];
 };
 
-type ItemDetails = {
+export type ItemDetails = {
   label: string;
   text: string;
   tooltipText?: string;
@@ -89,48 +82,9 @@ const renderIsHideableText = (text: string, isHideable?: boolean) => {
 };
 
 export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
-  siteOrigin,
-  justification,
-  chainId,
-  asset, // TODO: Update to use caip-19 asset
+  itemDetails,
 }) => {
-  // @ts-expect-error - extractChain does not work well with dynamic `chains`
-  const chain = extractChain({
-    chains: Object.values(ALL_CHAINS),
-    id: chainId as any,
-  });
-
-  const icons = ICONS[chainId];
-  if (!icons) {
-    throw new Error('No icon found');
-  }
-
-  const items: ItemDetails[] = [
-    {
-      label: 'Recipient',
-      text: siteOrigin,
-      tooltipText: 'Site receiving the token stream allowance.',
-    },
-    {
-      label: 'Network',
-      text: chain.name,
-      iconUrl: icons.network,
-    },
-    {
-      label: 'Token',
-      text: asset,
-      iconUrl: icons.token,
-    },
-    {
-      label: 'Reason',
-      text: justification ?? 'No reason provided',
-      tooltipText:
-        'Reason given by the recipient for requesting this token stream allowance.',
-      isHideable: true,
-    },
-  ];
-
-  const itemsDisplay = items.map((item) => (
+  const itemsDisplay = itemDetails.map((item) => (
     <Box direction="horizontal" alignment="space-between">
       <Box direction="horizontal">
         <Text>{item.label}</Text>
