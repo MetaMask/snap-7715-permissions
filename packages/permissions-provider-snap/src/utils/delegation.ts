@@ -15,7 +15,7 @@ export const convertToSerializableDelegation = (
   ({
     ...delegation,
     salt: toHex(delegation.salt),
-  } as SerializableDelegation);
+  }) as SerializableDelegation;
 
 /**
  * Converts a delegation in transit object to a delegation struct object.

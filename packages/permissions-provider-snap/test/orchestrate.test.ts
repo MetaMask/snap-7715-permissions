@@ -19,6 +19,7 @@ import type { PermissionsContextBuilder } from '../src/orchestrators/permissions
 import type { TokenPricesService } from '../src/services';
 import {
   NativeTokenStreamDialogElementNames,
+  RulesSelectorElementNames,
   TimePeriod,
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
@@ -94,13 +95,15 @@ describe('Orchestrate', () => {
         [NativeTokenStreamDialogElementNames.MaxAmountInput]:
           nativeTokenStreamPermission.data.maxAmount,
         [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
-        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
-        [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
-        [NativeTokenStreamDialogElementNames.StartTimeRule]: 1234,
-        [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
-        [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
+        [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
         [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
         [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+        rules: {
+          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+          [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
+          [NativeTokenStreamDialogElementNames.StartTimeRule]: 1234,
+          [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+        },
       },
     };
 

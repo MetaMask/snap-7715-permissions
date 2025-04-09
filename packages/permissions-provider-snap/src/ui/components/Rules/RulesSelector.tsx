@@ -15,8 +15,11 @@ import {
 
 import { filterNotActiveRuleMeta, type RuleMeta } from './Rules';
 
+export enum RulesSelectorElementNames {
+  AddMoreRulesPageToggle = 'add-more-rules-page-toggle',
+}
+
 export type RulesSelectorProps = JsonObject & {
-  closeRuleSelectorButtonEventName: string;
   selectedRuleDropdownEventName: string;
   selectedRuleInputEventName: string;
   addMoreRulesFormSubmitEventName: string;
@@ -43,7 +46,6 @@ const valueValidator = (value: string, ruleMeta: RuleMeta) => {
  * Renders the rules selector component to add more rules.
  *
  * @param props - The rules selector props.
- * @param props.closeRuleSelectorButtonEventName - The event name for the close button.
  * @param props.selectedRuleDropdownEventName - The event name for the selected rule dropdown.
  * @param props.selectedRuleInputEventName - The event name for the selected rule input.
  * @param props.addMoreRulesFormSubmitEventName - The event name for the add more rules form submit.
@@ -54,7 +56,6 @@ const valueValidator = (value: string, ruleMeta: RuleMeta) => {
  * @returns The JSX element to render.
  */
 export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
-  closeRuleSelectorButtonEventName,
   selectedRuleDropdownEventName,
   selectedRuleInputEventName,
   addMoreRulesFormSubmitEventName,
@@ -97,7 +98,7 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
             </Text>
           </Box>
           <Box direction="horizontal" alignment="end">
-            <Button name={closeRuleSelectorButtonEventName}>
+            <Button name={RulesSelectorElementNames.AddMoreRulesPageToggle}>
               <Icon name="close" size="inherit" color="primary" />
             </Button>
           </Box>
@@ -123,7 +124,7 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
           </Field>
           <Button
             disabled={isSaveButtonDisabled}
-            name={closeRuleSelectorButtonEventName}
+            name={RulesSelectorElementNames.AddMoreRulesPageToggle}
             type="submit"
           >
             Save

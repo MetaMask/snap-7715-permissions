@@ -5,6 +5,7 @@ import { getAddress } from 'viem';
 import {
   handleToggleBooleanClicked,
   NativeTokenStreamDialogElementNames,
+  RulesSelectorElementNames,
   TimePeriod,
   type PermissionConfirmationContext,
 } from '../../src/ui';
@@ -32,13 +33,15 @@ describe('Confirmation Dialog event handlers', () => {
             false,
           [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
           [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
-          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
-          [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
-          [NativeTokenStreamDialogElementNames.StartTimeRule]: 1222333,
-          [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
-          [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
+          [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
           [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
           [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+          rules: {
+            [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+            [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
+            [NativeTokenStreamDialogElementNames.StartTimeRule]: 1222333,
+            [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+          },
         },
       };
 

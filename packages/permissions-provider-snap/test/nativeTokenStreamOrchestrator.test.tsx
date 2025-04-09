@@ -18,6 +18,7 @@ import {
   type PermissionConfirmationContext,
   NativeTokenStreamConfirmationPage,
   TimePeriod,
+  RulesSelectorElementNames,
 } from '../src/ui';
 
 describe('native-token-stream Orchestrator', () => {
@@ -57,15 +58,17 @@ describe('native-token-stream Orchestrator', () => {
       [NativeTokenStreamDialogElementNames.MaxAmountInput]:
         mockbasePermission.data.maxAmount,
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
-      [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
-      [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
-      [NativeTokenStreamDialogElementNames.InitialAmountRule]:
-        mockbasePermission.data.initialAmount,
-      [NativeTokenStreamDialogElementNames.StartTimeRule]:
-        mockbasePermission.data.startTime,
-      [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+      [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
       [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
       [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+      rules: {
+        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+        [NativeTokenStreamDialogElementNames.InitialAmountRule]:
+          mockbasePermission.data.initialAmount,
+        [NativeTokenStreamDialogElementNames.StartTimeRule]:
+          mockbasePermission.data.startTime,
+        [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+      },
     },
   };
 
@@ -270,9 +273,8 @@ describe('native-token-stream Orchestrator', () => {
     });
 
     it('should return confirmation dialog EventHandlers', async () => {
-      const parsedPermission = await orchestrator.parseAndValidate(
-        mockbasePermission,
-      );
+      const parsedPermission =
+        await orchestrator.parseAndValidate(mockbasePermission);
       const { dialogContentEventHandlers } =
         orchestrator.getConfirmationDialogEventHandlers(
           parsedPermission,

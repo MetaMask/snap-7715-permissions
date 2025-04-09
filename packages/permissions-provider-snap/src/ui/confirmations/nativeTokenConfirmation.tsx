@@ -10,6 +10,8 @@ import {
   NativeTokenStreamRules,
   AddMoreRule,
   RulesSelector,
+  RulesSelectorElementNames,
+  filterNotActiveRuleMeta,
 } from '../components';
 import type { PermissionConfirmationProps } from '../types';
 
@@ -22,23 +24,14 @@ export enum NativeTokenStreamDialogElementNames {
   MaxAmountInput = 'max-amount-input-native-token-stream',
   PeriodInput = 'period-input-native-token-stream',
 
-  ActiveRulesStateKeys = 'active-rules-state-keys-native-token-stream',
-  AddMoreRulesToggle = 'add-more-rules-toggle-native-token-stream',
   AddMoreRulesFormSubmit = 'add-more-rules-form-submit-native-token-stream',
   SelectedRuleDropdown = 'selected-rule-dropdown-native-token-stream',
   SelectedRuleInput = 'selected-rule-input-native-token-stream',
 
   InitialAmountRule = 'initial-amount-rule-native-token-stream',
-  InitialAmountRemove = 'initial-amount-remove-native-token-stream',
-
   MaxAllowanceRule = 'max-allowance-rule-native-token-stream',
-  MaxAllowanceRemove = 'max-allowance-remove-native-token-stream',
-
   StartTimeRule = 'start-time-rule-native-token-stream',
-  StartTimeRemove = 'start-time-remove-native-token-stream',
-
   ExpiryRule = 'expiry-rule-native-token-stream',
-  ExpiryRemove = 'expiry-remove-native-token-stream',
 }
 
 /**
@@ -116,13 +109,18 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
     },
   ];
 
-  if (state[NativeTokenStreamDialogElementNames.AddMoreRulesToggle]) {
+  const stateRules = state.rules as Record<string, any>;
+  const activeRuleStateKeys = Object.keys(stateRules).filter(
+    (key) => stateRules[key] !== null && stateRules[key],
+  );
+  const isActiveRulesEmpty =
+    filterNotActiveRuleMeta(ruleMeta, activeRuleStateKeys).length !==
+    ruleMeta.length;
+
+  if (state[RulesSelectorElementNames.AddMoreRulesPageToggle]) {
     return (
       <Box>
         <RulesSelector
-          closeRuleSelectorButtonEventName={
-            NativeTokenStreamDialogElementNames.AddMoreRulesToggle
-          }
           selectedRuleDropdownEventName={
             NativeTokenStreamDialogElementNames.SelectedRuleDropdown
           }
@@ -132,9 +130,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
           addMoreRulesFormSubmitEventName={
             NativeTokenStreamDialogElementNames.AddMoreRulesFormSubmit
           }
-          activeRuleStateKeys={
-            state[NativeTokenStreamDialogElementNames.ActiveRulesStateKeys]
-          }
+          activeRuleStateKeys={activeRuleStateKeys}
           selectedDropDownValue={
             state[NativeTokenStreamDialogElementNames.SelectedRuleDropdown]
           }
@@ -178,44 +174,31 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         periodEventName={NativeTokenStreamDialogElementNames.PeriodInput}
       />
 
-      <NativeTokenStreamRules
-        initialAmount={
-          state[NativeTokenStreamDialogElementNames.InitialAmountRule]
-        }
-        maxAllowance={
-          state[NativeTokenStreamDialogElementNames.MaxAllowanceRule]
-        }
-        startTime={state[NativeTokenStreamDialogElementNames.StartTimeRule]}
-        expiry={state[NativeTokenStreamDialogElementNames.ExpiryRule]}
-        initialAmountRemoveEventName={
-          NativeTokenStreamDialogElementNames.InitialAmountRemove
-        }
-        initialAmountInputEventName={
-          NativeTokenStreamDialogElementNames.InitialAmountRule
-        }
-        maxAllowanceRemoveEventName={
-          NativeTokenStreamDialogElementNames.MaxAllowanceRemove
-        }
-        maxAllowanceInputEventName={
-          NativeTokenStreamDialogElementNames.MaxAllowanceRule
-        }
-        startTimeRemoveEventName={
-          NativeTokenStreamDialogElementNames.StartTimeRemove
-        }
-        startTimeInputEventName={
-          NativeTokenStreamDialogElementNames.StartTimeRule
-        }
-        expiryRemoveEventName={NativeTokenStreamDialogElementNames.ExpiryRemove}
-        expiryInputEventName={NativeTokenStreamDialogElementNames.ExpiryRule}
-      />
+      {isActiveRulesEmpty && (
+        <NativeTokenStreamRules
+          initialAmount={
+            state.rules[NativeTokenStreamDialogElementNames.InitialAmountRule]
+          }
+          maxAllowance={
+            state.rules[NativeTokenStreamDialogElementNames.MaxAllowanceRule]
+          }
+          startTime={
+            state.rules[NativeTokenStreamDialogElementNames.StartTimeRule]
+          }
+          expiry={state.rules[NativeTokenStreamDialogElementNames.ExpiryRule]}
+          initialAmountEventName={
+            NativeTokenStreamDialogElementNames.InitialAmountRule
+          }
+          maxAllowanceEventName={
+            NativeTokenStreamDialogElementNames.MaxAllowanceRule
+          }
+          startTimeEventName={NativeTokenStreamDialogElementNames.StartTimeRule}
+          expiryEventName={NativeTokenStreamDialogElementNames.ExpiryRule}
+        />
+      )}
 
       <AddMoreRule
-        activeRuleStateKeys={
-          state[NativeTokenStreamDialogElementNames.ActiveRulesStateKeys]
-        }
-        addMoreButtonEventName={
-          NativeTokenStreamDialogElementNames.AddMoreRulesToggle
-        }
+        activeRuleStateKeys={activeRuleStateKeys}
         ruleMeta={ruleMeta}
       />
     </Box>

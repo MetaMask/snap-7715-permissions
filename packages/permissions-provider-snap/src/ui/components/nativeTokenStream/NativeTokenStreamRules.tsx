@@ -10,17 +10,10 @@ export type NativeTokenStreamRulesProps = {
   startTime: number | null;
   expiry: number | null;
 
-  initialAmountRemoveEventName: string;
-  initialAmountInputEventName: string;
-
-  maxAllowanceRemoveEventName: string;
-  maxAllowanceInputEventName: string;
-
-  startTimeRemoveEventName: string;
-  startTimeInputEventName: string;
-
-  expiryRemoveEventName: string;
-  expiryInputEventName: string;
+  initialAmountEventName: string;
+  maxAllowanceEventName: string;
+  startTimeEventName: string;
+  expiryEventName: string;
 };
 
 /**
@@ -31,14 +24,10 @@ export type NativeTokenStreamRulesProps = {
  * @param props.maxAllowance - The max allowance of the native token stream.
  * @param props.startTime - The start time of the native token stream.
  * @param props.expiry - The unix timestamp in seconds when the granted permission is set to expire.
- * @param props.initialAmountRemoveEventName - The event name for the initial amount remove.
- * @param props.initialAmountInputEventName - The event name for the initial amount input.
- * @param props.maxAllowanceRemoveEventName - The event name for the max allowance remove.
- * @param props.maxAllowanceInputEventName - The event name for the max allowance input.
- * @param props.startTimeRemoveEventName - The event name for the start time remove.
- * @param props.startTimeInputEventName - The event name for the start time input.
- * @param props.expiryRemoveEventName - The event name for the expiry remove.
- * @param props.expiryInputEventName - The event name for the expiry input.
+ * @param props.initialAmountEventName - The event name for the initial amount .
+ * @param props.maxAllowanceEventName - The event name for the max allowance .
+ * @param props.startTimeEventName - The event name for the start time .
+ * @param props.expiryEventName - The event name for the expiry remove.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamRules: SnapComponent<
@@ -48,14 +37,10 @@ export const NativeTokenStreamRules: SnapComponent<
   initialAmount,
   startTime,
   expiry,
-  initialAmountRemoveEventName,
-  initialAmountInputEventName,
-  maxAllowanceRemoveEventName,
-  maxAllowanceInputEventName,
-  startTimeRemoveEventName,
-  startTimeInputEventName,
-  expiryRemoveEventName,
-  expiryInputEventName,
+  initialAmountEventName,
+  maxAllowanceEventName,
+  startTimeEventName,
+  expiryEventName,
 }) => {
   return (
     <Section>
@@ -63,8 +48,8 @@ export const NativeTokenStreamRules: SnapComponent<
         <TokenValueRule
           text="Initial amount"
           tooltip="tooltip text"
-          inputName={initialAmountInputEventName}
-          removeRuleButtonName={initialAmountRemoveEventName}
+          inputName={`${initialAmountEventName}-input`}
+          removeRuleButtonName={initialAmountEventName}
           allowance={initialAmount}
         />
       ) : null}
@@ -73,8 +58,8 @@ export const NativeTokenStreamRules: SnapComponent<
         <TokenValueRule
           text="Max allowance"
           tooltip="tooltip text"
-          inputName={maxAllowanceInputEventName}
-          removeRuleButtonName={maxAllowanceRemoveEventName}
+          inputName={`${maxAllowanceEventName}-input`}
+          removeRuleButtonName={maxAllowanceEventName}
           allowance={maxAllowance}
         />
       ) : null}
@@ -83,8 +68,8 @@ export const NativeTokenStreamRules: SnapComponent<
         <TimestampRule
           text="Start date"
           tooltip="tooltip text"
-          inputName={startTimeInputEventName}
-          removeRuleButtonName={startTimeRemoveEventName}
+          inputName={`${startTimeEventName}-input`}
+          removeRuleButtonName={startTimeEventName}
           timestamp={startTime}
         />
       ) : null}
@@ -93,8 +78,8 @@ export const NativeTokenStreamRules: SnapComponent<
         <TimestampRule
           text="Expiration date"
           tooltip="tooltip text"
-          inputName={expiryInputEventName}
-          removeRuleButtonName={expiryRemoveEventName}
+          inputName={`${expiryEventName}-input`}
+          removeRuleButtonName={expiryEventName}
           timestamp={expiry}
         />
       ) : null}

@@ -9,6 +9,7 @@ import type { PermissionConfirmationContext } from '../src/ui';
 import {
   createPermissionConfirmationRenderHandler,
   NativeTokenStreamDialogElementNames,
+  RulesSelectorElementNames,
   TimePeriod,
 } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
@@ -61,15 +62,17 @@ describe('Permission Confirmation Render Handler', () => {
         [NativeTokenStreamDialogElementNames.MaxAmountInput]:
           permission.data.maxAmount,
         [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
-        [NativeTokenStreamDialogElementNames.AddMoreRulesToggle]: false,
-        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
-        [NativeTokenStreamDialogElementNames.InitialAmountRule]:
-          permission.data.initialAmount ?? null,
-        [NativeTokenStreamDialogElementNames.StartTimeRule]:
-          permission.data.startTime,
-        [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+        [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
         [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
         [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+        rules: {
+          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+          [NativeTokenStreamDialogElementNames.InitialAmountRule]:
+            permission.data.initialAmount ?? null,
+          [NativeTokenStreamDialogElementNames.StartTimeRule]:
+            permission.data.startTime,
+          [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+        },
       },
     };
 
