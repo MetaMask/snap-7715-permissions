@@ -15,7 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Improve test coverage for kernel snap ([#18](https://github.com/MetaMask/snap-7715-permissions/pull/18))
 
-
-### Fixed
-
-### Removed
+[Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/
