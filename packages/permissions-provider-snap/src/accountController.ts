@@ -1,9 +1,9 @@
-import type { DeleGatorEnvironment } from '@metamask-private/delegator-core-viem';
 import {
   CHAIN_ID as ChainsWithDelegatorDeployed,
   Implementation,
   toMetaMaskSmartAccount,
-  type DelegationStruct,
+  type Delegation,
+  type DeleGatorEnvironment,
   type MetaMaskSmartAccount,
 } from '@metamask-private/delegator-core-viem';
 import { logger } from '@metamask/7715-permissions-shared/utils';
@@ -56,7 +56,7 @@ export type AccountOptionsBase = {
  * Options for signing a delegation.
  */
 export type SignDelegationOptions = AccountOptionsBase & {
-  delegation: Omit<DelegationStruct, 'signature'>;
+  delegation: Omit<Delegation, 'signature'>;
 };
 
 /**
@@ -380,7 +380,7 @@ export class AccountController {
    */
   public async signDelegation(
     options: SignDelegationOptions,
-  ): Promise<DelegationStruct> {
+  ): Promise<Delegation> {
     logger.debug('accountController:signDelegation()');
 
     const { chainId, delegation } = options;

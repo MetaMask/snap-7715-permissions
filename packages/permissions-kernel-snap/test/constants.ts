@@ -5,7 +5,7 @@ import type { KernelState } from '../src/stateManagement';
 export const TEST_CASE_PERMISSION_PROVIDER_SNAP_ID =
   // eslint-disable-next-line no-restricted-globals
   process.env.SNAP_ENV === 'production'
-    ? 'npm:@metamask/7715-permissions-provider'
+    ? 'npm:@metamask/gator-permissions'
     : 'local:http://localhost:8081';
 
 export const TEST_CASE_DEFAULT_STATE: KernelState = {

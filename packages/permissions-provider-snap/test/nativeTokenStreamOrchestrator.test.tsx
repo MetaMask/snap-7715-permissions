@@ -219,10 +219,17 @@ describe('native-token-stream Orchestrator', () => {
 
       expect(updatedCaveatBuilder.build()).toStrictEqual([
         {
-          args: '0x',
-          enforcer: '0xcfD1BD7922D123Caa194597BF7A0073899a284Df',
+          // native token stream enforcer
+          enforcer: '0xD10b97905a320b13a0608f7E9cC506b56747df19',
           terms:
-            '0x0000000000000000000000000000000000000000000000000000000000000001',
+            '0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000002f0ed63d',
+          args: '0x',
+        },
+        {
+          // exact calldata enforcer
+          enforcer: '0x99F2e9bF15ce5eC84685604836F71aB835DBBdED',
+          terms: '0x',
+          args: '0x',
         },
       ]);
     });
