@@ -1,7 +1,7 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box } from '@metamask/snaps-sdk/jsx';
 
-import type { AccountDetailsProps } from '../components';
+import type { AccountDetailsProps, TimePeriod } from '../components';
 import {
   AccountDetails,
   RequestHeader,
@@ -11,6 +11,7 @@ import {
   RulesSelector,
 } from '../components';
 import type { PermissionConfirmationProps } from '../types';
+import { Hex } from 'viem';
 
 /**
  * The event names for the native-token-stream permission confirmation page.
@@ -75,7 +76,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         isJustificationShowMoreExpanded={
           state[
             NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
-          ]
+          ] as boolean
         }
         justificationShowMoreExpandedElementName={
           NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
@@ -88,11 +89,11 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       />
 
       <StreamAmount
-        maxAmount={state[NativeTokenStreamDialogElementNames.MaxAmountInput]}
+        maxAmount={state[NativeTokenStreamDialogElementNames.MaxAmountInput] as Hex}
         maxAmountElementName={
           NativeTokenStreamDialogElementNames.MaxAmountInput
         }
-        period={state[NativeTokenStreamDialogElementNames.PeriodInput]}
+        period={state[NativeTokenStreamDialogElementNames.PeriodInput] as TimePeriod}
         periodElementName={NativeTokenStreamDialogElementNames.PeriodInput}
       />
 
