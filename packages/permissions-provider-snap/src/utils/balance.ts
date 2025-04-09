@@ -24,7 +24,7 @@ export const formatTokenBalance = (
  * @param tokenDecimal - The number of decimal places the token uses.
  * @returns The hex string.
  */
-export const convertBalanceToHex = (
+export const convertValueToHex = (
   value: string | number,
   tokenDecimal = 18,
 ): Hex => {

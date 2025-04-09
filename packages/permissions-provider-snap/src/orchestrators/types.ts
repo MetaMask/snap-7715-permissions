@@ -11,7 +11,7 @@ import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { CaipAssetType } from '@metamask/utils';
 import type { Address, Hex, OneOf } from 'viem';
 
-import type { State, PermissionConfirmationContext } from '../ui';
+import type { PermissionConfirmationContext, State } from '../ui';
 import type { UserEventHandler } from '../userEventDispatcher';
 import type {
   PermissionTypeMapping,

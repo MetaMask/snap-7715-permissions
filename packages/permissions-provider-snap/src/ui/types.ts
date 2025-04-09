@@ -1,4 +1,4 @@
-import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
+import type { Delegation } from '@metamask-private/delegator-core-viem';
 import type { InterfaceContext } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
@@ -17,7 +17,7 @@ export type State<TPermissionType extends SupportedPermissionTypes> =
 /**
  * The delegation in transit object with salt as a hex string to be compatible with the Snap context { [prop: string]: Json; } object.
  */
-export type SerializableDelegation = Omit<DelegationStruct, 'salt'> & {
+export type SerializableDelegation = Omit<Delegation, 'salt'> & {
   readonly delegate: Hex;
   readonly delegator: Hex;
   salt: Hex;

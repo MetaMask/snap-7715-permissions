@@ -1,12 +1,39 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { UserInputEventType } from '@metamask/snaps-sdk';
+import type { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
 
+import type { SupportedPermissionTypes } from '../../orchestrators';
 import { createPermissionOrchestrator } from '../../orchestrators';
 import type { UserEventHandler } from '../../userEventDispatcher';
-import { convertBalanceToHex } from '../../utils';
+import { convertValueToHex } from '../../utils';
 import { RulesSelectorElementNames } from '../components';
+import type { PermissionConfirmationContext } from '../types';
 import { updateInterface } from './renderHandler';
-import { updateContextStateHandler } from './stateHandler';
+
+/**
+ * Updates the interface with the new context object.
+ *
+ * @param permissionType - The permission type.
+ * @param snapsProvider - The snaps provider.
+ * @param interfaceId - The interface ID.
+ * @param context - The context.
+ */
+const updateInterfaceHandler = async <
+  TPermissionType extends SupportedPermissionTypes,
+>(
+  permissionType: TPermissionType,
+  snapsProvider: SnapsProvider,
+  interfaceId: string,
+  context: PermissionConfirmationContext<TPermissionType>,
+) => {
+  await updateInterface(
+    snapsProvider,
+    interfaceId,
+    createPermissionOrchestrator(permissionType).buildPermissionConfirmation(
+      context,
+    ),
+    context,
+  );
+};
 
 /**
  * Handles the user button click event for toggling a boolean value in the attenuated context.
@@ -14,7 +41,6 @@ import { updateContextStateHandler } from './stateHandler';
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
- * @param args.snapsProvider - The snaps provider.
  * @param args.interfaceId - The interface ID.
  * @param args.permissionType - The permission type.
  * @returns Returns a new copy of the attenuatedContext to capture mutation rather than mutating the original state or
@@ -22,36 +48,23 @@ import { updateContextStateHandler } from './stateHandler';
  */
 export const handleToggleBooleanClicked: UserEventHandler<
   UserInputEventType.ButtonClickEvent
-> = async ({
-  event,
-  attenuatedContext,
-  snapsProvider,
-  interfaceId,
-  permissionType,
-}) => {
+> = async ({ event, attenuatedContext, interfaceId, permissionType }) => {
   logger.debug(
     `Handling handleToggleBooleanClicked event:`,
     JSON.stringify({ attenuatedContext }, undefined, 2),
   );
   const eventName = event.name ?? '';
   if (attenuatedContext.state[eventName] === undefined) {
-    return;
+    throw new Error(`Event name ${eventName} not found in state`);
   }
 
-  const updatedContextFunc = updateContextStateHandler(
-    eventName,
-    (state) => !state[eventName],
-  );
-
-  const updatedContext = updatedContextFunc(attenuatedContext);
-  await updateInterface(
-    snapsProvider,
-    interfaceId,
-    createPermissionOrchestrator(permissionType).buildPermissionConfirmation(
-      updatedContext,
-    ),
-    updatedContext,
-  );
+  await updateInterfaceHandler(permissionType, snap, interfaceId, {
+    ...attenuatedContext,
+    state: {
+      ...attenuatedContext.state,
+      [eventName]: !attenuatedContext.state[eventName],
+    },
+  });
 };
 
 /**
@@ -60,7 +73,6 @@ export const handleToggleBooleanClicked: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
- * @param args.snapsProvider - The snaps provider.
  * @param args.interfaceId - The interface ID.
  * @param args.permissionType - The permission type.
  * @returns Returns a new copy of the attenuatedContext to capture mutation rather than mutating the original state or
@@ -68,35 +80,23 @@ export const handleToggleBooleanClicked: UserEventHandler<
  */
 export const handleReplaceValueInput: UserEventHandler<
   UserInputEventType.InputChangeEvent
-> = async ({
-  event,
-  attenuatedContext,
-  snapsProvider,
-  interfaceId,
-  permissionType,
-}) => {
+> = async ({ event, attenuatedContext, interfaceId, permissionType }) => {
   logger.debug(
     `Handling handleReplaceValueInput event:`,
     JSON.stringify({ attenuatedContext }, undefined, 2),
   );
   const eventName = event.name;
   if (attenuatedContext.state[eventName] === undefined) {
-    return;
+    throw new Error(`Event name ${eventName} not found in state`);
   }
 
-  const updatedContextFunc = updateContextStateHandler(eventName, () =>
-    convertBalanceToHex(event.value as string),
-  );
-
-  const updatedContext = updatedContextFunc(attenuatedContext);
-  await updateInterface(
-    snapsProvider,
-    interfaceId,
-    createPermissionOrchestrator(permissionType).buildPermissionConfirmation(
-      updatedContext,
-    ),
-    updatedContext,
-  );
+  await updateInterfaceHandler(permissionType, snap, interfaceId, {
+    ...attenuatedContext,
+    state: {
+      ...attenuatedContext.state,
+      [eventName]: convertValueToHex(event.value as string),
+    },
+  });
 };
 
 /**
@@ -105,7 +105,6 @@ export const handleReplaceValueInput: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
- * @param args.snapsProvider - The snaps provider.
  * @param args.interfaceId - The interface ID.
  * @param args.permissionType - The permission type.
  * @returns Returns a new copy of the attenuatedContext to capture mutation rather than mutating the original state or
@@ -113,36 +112,23 @@ export const handleReplaceValueInput: UserEventHandler<
  */
 export const handleReplaceTextInput: UserEventHandler<
   UserInputEventType.InputChangeEvent
-> = async ({
-  event,
-  attenuatedContext,
-  snapsProvider,
-  interfaceId,
-  permissionType,
-}) => {
+> = async ({ event, attenuatedContext, interfaceId, permissionType }) => {
   logger.debug(
     `Handling handleReplaceTextInput event:`,
     JSON.stringify({ attenuatedContext }, undefined, 2),
   );
   const eventName = event.name;
   if (attenuatedContext.state[eventName] === undefined) {
-    return;
+    throw new Error(`Event name ${eventName} not found in state`);
   }
 
-  const updatedContextFunc = updateContextStateHandler(
-    eventName,
-    () => event.value,
-  );
-
-  const updatedContext = updatedContextFunc(attenuatedContext);
-  await updateInterface(
-    snapsProvider,
-    interfaceId,
-    createPermissionOrchestrator(permissionType).buildPermissionConfirmation(
-      updatedContext,
-    ),
-    updatedContext,
-  );
+  await updateInterfaceHandler(permissionType, snap, interfaceId, {
+    ...attenuatedContext,
+    state: {
+      ...attenuatedContext.state,
+      [eventName]: event.value,
+    },
+  });
 };
 
 /**
@@ -151,7 +137,6 @@ export const handleReplaceTextInput: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
- * @param args.snapsProvider - The snaps provider.
  * @param args.interfaceId - The interface ID.
  * @param args.permissionType - The permission type.
  * @returns Returns a new copy of the attenuatedContext to capture mutation rather than mutating the original state or
@@ -159,13 +144,7 @@ export const handleReplaceTextInput: UserEventHandler<
  */
 export const handleFormSubmit: UserEventHandler<
   UserInputEventType.FormSubmitEvent
-> = async ({
-  event,
-  attenuatedContext,
-  snapsProvider,
-  interfaceId,
-  permissionType,
-}) => {
+> = async ({ event, attenuatedContext, interfaceId, permissionType }) => {
   logger.debug(
     `Handling handleFormSubmit event:`,
     JSON.stringify({ attenuatedContext, event }, undefined, 2),
@@ -174,6 +153,8 @@ export const handleFormSubmit: UserEventHandler<
   const rulesKeys = Object.keys(attenuatedContext.state.rules);
   let eventName = '';
   let value = '';
+
+  // Extract the rule name and value from the form event.values
   Object.keys(event.value).forEach((eventValueKey) => {
     const extractedValue = event.value[eventValueKey] as string;
     if (rulesKeys.includes(extractedValue)) {
@@ -183,45 +164,36 @@ export const handleFormSubmit: UserEventHandler<
     }
   });
   if (!eventName || !value) {
-    return;
+    throw new Error('Invalid event name or value');
   }
 
-  // Rest to form values to empty string by passing the updated context to capture all mutations
-  // A better approach would be to have `updateContextStateHandler` accept a array of keys to update rather than a single key
-  const updatedContextRulesFunc = updateContextStateHandler(
-    'rules',
-    (state) => ({
-      ...state.rules,
-      [eventName]: value,
+  // Update the context with the new value
+  const updateContext = Object.keys(event.value).reduce(
+    (acc, eventValueKey) => ({
+      ...acc,
+      state: {
+        ...acc.state,
+        [eventValueKey]: '', // Reset the form value to empty string
+      },
     }),
-  );
-
-  const updatedRulesContext = Object.keys(event.value).reduce(
-    (acc, eventValueKey) => {
-      const updatedContextFormFunc = updateContextStateHandler(
-        eventValueKey,
-        (state) => (state[eventValueKey] = ''),
-      );
-      return updatedContextFormFunc(acc);
+    {
+      ...attenuatedContext,
+      state: {
+        ...attenuatedContext.state,
+        [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+        rules: {
+          ...attenuatedContext.state.rules,
+          [eventName]: value,
+        },
+      },
     },
-    updatedContextRulesFunc(attenuatedContext),
   );
 
-  // Close the rules selector after form submit
-  const updatedContextRulesPageToggleFunc = updateContextStateHandler(
-    RulesSelectorElementNames.AddMoreRulesPageToggle,
-    (state) => !state[RulesSelectorElementNames.AddMoreRulesPageToggle],
-  );
-
-  const updatedContext = updatedContextRulesPageToggleFunc(updatedRulesContext);
-
-  await updateInterface(
-    snapsProvider,
+  await updateInterfaceHandler(
+    permissionType,
+    snap,
     interfaceId,
-    createPermissionOrchestrator(permissionType).buildPermissionConfirmation(
-      updatedContext,
-    ),
-    updatedContext,
+    updateContext,
   );
 };
 
@@ -231,7 +203,6 @@ export const handleFormSubmit: UserEventHandler<
  * @param args - The user input handler args as object.
  * @param args.event - The user input event.
  * @param args.attenuatedContext - The interface context.
- * @param args.snapsProvider - The snaps provider.
  * @param args.interfaceId - The interface ID.
  * @param args.permissionType - The permission type.
  * @returns Returns a new copy of the attenuatedContext to capture mutation rather than mutating the original state or
@@ -239,33 +210,21 @@ export const handleFormSubmit: UserEventHandler<
  */
 export const handleRemoveRuleClicked: UserEventHandler<
   UserInputEventType.ButtonClickEvent
-> = async ({
-  event,
-  attenuatedContext,
-  snapsProvider,
-  interfaceId,
-  permissionType,
-}) => {
+> = async ({ event, attenuatedContext, interfaceId, permissionType }) => {
   logger.debug(
     `Handling handleRemoveRuleClicked event:`,
     JSON.stringify({ attenuatedContext }, undefined, 2),
   );
 
   const eventName = event.name ?? '';
-  const updatedContextRulesFunc = updateContextStateHandler(
-    'rules',
-    (state) => ({
-      ...state.rules,
-      [eventName]: null,
-    }),
-  );
-  const updatedContext = updatedContextRulesFunc(attenuatedContext);
-  await updateInterface(
-    snapsProvider,
-    interfaceId,
-    createPermissionOrchestrator(permissionType).buildPermissionConfirmation(
-      updatedContext,
-    ),
-    updatedContext,
-  );
+  await updateInterfaceHandler(permissionType, snap, interfaceId, {
+    ...attenuatedContext,
+    state: {
+      ...attenuatedContext.state,
+      rules: {
+        ...attenuatedContext.state.rules,
+        [eventName]: null,
+      },
+    },
+  });
 };

@@ -20,7 +20,7 @@ jest.mock('../src/userEventDispatcher');
 
 describe('Permission Confirmation Render Handler', () => {
   const mockSnapProvider = createMockSnapsProvider();
-  const mockUserEventDispatcher = new UserEventDispatcher(mockSnapProvider);
+  const mockUserEventDispatcher = new UserEventDispatcher();
 
   let onButtonClickHandlerPromise: Promise<
     (args: {

@@ -1,5 +1,4 @@
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
@@ -42,12 +41,10 @@ describe('UserEventDispatcher', () => {
       },
     },
   };
-  const mockSnapsProvider = createMockSnapsProvider();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockSnapsProvider.request.mockReset();
-    userEventDispatcher = new UserEventDispatcher(mockSnapsProvider);
+    userEventDispatcher = new UserEventDispatcher();
   });
 
   describe('on()', () => {

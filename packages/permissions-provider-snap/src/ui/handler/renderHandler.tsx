@@ -154,7 +154,10 @@ export const createPermissionConfirmationRenderHandler = ({
                 reject(reason);
               });
 
-            resolve({ isConfirmationAccepted, attenuatedContext });
+            resolve({
+              isConfirmationAccepted,
+              attenuatedContext,
+            });
           };
 
           userEventDispatcher.on({

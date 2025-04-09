@@ -19,7 +19,7 @@ type RequestDetailsProps = JsonObject & {
   chainId: number;
   asset: string;
   isJustificationShowMoreExpanded: boolean;
-  justificationShowMoreExpandedEventName: string;
+  justificationShowMoreExpandedElementName: string;
 };
 
 type ItemDetails = {
@@ -65,13 +65,13 @@ const renderIconAsImage = (iconUrl?: string) => {
  * Renders a text component or a text component with a button to show more.
  *
  * @param text - The text to display.
- * @param eventName - Event name for the toggle button.
+ * @param elementName - Element name for the toggle button.
  * @param isHideable - Whether the text is isHideable.
  * @returns A text component or a text component with a button to show more.
  */
 const renderShowMoreText = (
   text: string,
-  eventName: string,
+  elementName: string,
   isHideable: boolean,
 ) => {
   if (!isHideable) {
@@ -85,7 +85,7 @@ const renderShowMoreText = (
       ) : (
         <Text color="muted">text</Text>
       )}
-      <Button name={eventName}>Show</Button>
+      <Button name={elementName}>Show</Button>
     </Box>
   );
 };
@@ -96,7 +96,7 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
   chainId,
   asset, // TODO: Update to use caip-19 asset
   isJustificationShowMoreExpanded,
-  justificationShowMoreExpandedEventName,
+  justificationShowMoreExpandedElementName,
 }) => {
   // @ts-expect-error - extractChain does not work well with dynamic `chains`
   const chain = extractChain({
@@ -143,7 +143,7 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
         {item.label === 'Reason' ? (
           renderShowMoreText(
             item.text,
-            justificationShowMoreExpandedEventName,
+            justificationShowMoreExpandedElementName,
             isJustificationShowMoreExpanded,
           )
         ) : (

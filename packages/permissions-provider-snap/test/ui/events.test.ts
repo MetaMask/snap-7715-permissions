@@ -15,6 +15,8 @@ describe('Confirmation Dialog event handlers', () => {
   const mockSnapsProvider = createMockSnapsProvider();
   beforeEach(() => {
     mockSnapsProvider.request.mockReset();
+    // eslint-disable-next-line no-restricted-globals
+    (global as any).snap = mockSnapsProvider;
   });
 
   describe('native-token-stream confirmation dialog', () => {
@@ -59,7 +61,6 @@ describe('Confirmation Dialog event handlers', () => {
             name: NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
           },
           attenuatedContext: mockNativeTokenStreamContext,
-          snapsProvider: mockSnapsProvider,
           interfaceId: 'mockInterfaceId',
           permissionType: 'native-token-stream',
         });
@@ -78,19 +79,19 @@ describe('Confirmation Dialog event handlers', () => {
           ];
         expect(stateBefore).toBeUndefined();
 
-        // mutate state
-        await handleToggleBooleanClicked({
-          event: {
-            type: UserInputEventType.ButtonClickEvent,
-            name: NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
-          },
-          attenuatedContext: contextWithEmptyState,
-          snapsProvider: mockSnapsProvider,
-          interfaceId: 'mockInterfaceId',
-          permissionType: 'native-token-stream',
-        });
-
-        expect(mockSnapsProvider.request).not.toHaveBeenCalled();
+        await expect(
+          handleToggleBooleanClicked({
+            event: {
+              type: UserInputEventType.ButtonClickEvent,
+              name: NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
+            },
+            attenuatedContext: contextWithEmptyState,
+            interfaceId: 'mockInterfaceId',
+            permissionType: 'native-token-stream',
+          }),
+        ).rejects.toThrow(
+          'Event name justification-show-more-button-native-token-stream not found in state',
+        );
       });
 
       it('should not mutate justification show more state if event name in incorrect', async () => {
@@ -100,19 +101,19 @@ describe('Confirmation Dialog event handlers', () => {
           ];
         expect(stateBefore).toBe(false);
 
-        // mutate state
-        await handleToggleBooleanClicked({
-          event: {
-            type: UserInputEventType.ButtonClickEvent,
-            name: 'some other event name',
-          },
-          attenuatedContext: mockNativeTokenStreamContext,
-          snapsProvider: mockSnapsProvider,
-          interfaceId: 'mockInterfaceId',
-          permissionType: 'native-token-stream',
-        });
-
-        expect(mockSnapsProvider.request).not.toHaveBeenCalled();
+        await expect(
+          handleToggleBooleanClicked({
+            event: {
+              type: UserInputEventType.ButtonClickEvent,
+              name: 'some other event name',
+            },
+            attenuatedContext: mockNativeTokenStreamContext,
+            interfaceId: 'mockInterfaceId',
+            permissionType: 'native-token-stream',
+          }),
+        ).rejects.toThrow(
+          'Event name some other event name not found in state',
+        );
       });
     });
   });

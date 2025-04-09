@@ -33,17 +33,12 @@ describe('Orchestrate', () => {
   const sessionAccount = getAddress(
     '0x1234567890123456789012345678901234567890',
   );
-  const mockSnapProvider = createMockSnapsProvider();
 
-  const mockUserEventDispatcher = new UserEventDispatcher(mockSnapProvider);
+  const mockUserEventDispatcher = new UserEventDispatcher();
 
   (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
     () => mockUserEventDispatcher,
   );
-
-  beforeEach(() => {
-    mockSnapProvider.request.mockReset();
-  });
 
   describe('native-token-stream', () => {
     const nativeTokenStreamPermission: NativeTokenStreamPermission = {
