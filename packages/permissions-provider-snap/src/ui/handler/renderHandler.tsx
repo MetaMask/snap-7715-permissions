@@ -156,7 +156,7 @@ export const createPermissionConfirmationRenderHandler = ({
 
             resolve({
               isConfirmationAccepted,
-              attenuatedContext: attenuatedContext as PermissionConfirmationContext<SupportedPermissionTypes>,
+              attenuatedContext,
             });
           };
 

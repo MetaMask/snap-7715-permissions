@@ -43,6 +43,14 @@ declare module './types' {
       startTime?: number;
     };
   }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
+  interface PermissionConfirmationStateMapping {
+    'native-token-stream': JsonObject & {
+      [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]: boolean;
+      [NativeTokenStreamDialogElementNames.MaxAmountInput]: Hex;
+      [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
+    };
+  }
 }
 
 /**
@@ -187,8 +195,8 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       const { state, expiry: requestedExpiry } = attenuatedContext;
 
       const maxAmount =
-        state[NativeTokenStreamDialogElementNames.MaxAmountInput] as Hex;
-      const period = state[NativeTokenStreamDialogElementNames.PeriodInput] as TimePeriod;
+        state[NativeTokenStreamDialogElementNames.MaxAmountInput];
+      const period = state[NativeTokenStreamDialogElementNames.PeriodInput];
       const amountPerSecond = toHex(
         BigInt(maxAmount) / BigInt(TIME_PERIOD_TO_SECOND[period]),
       );

@@ -1,8 +1,7 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
 
-import type { AccountDetailsProps, TimePeriod } from '../components';
+import type { AccountDetailsProps } from '../components';
 import {
   AccountDetails,
   RequestHeader,
@@ -76,7 +75,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         isJustificationShowMoreExpanded={
           state[
             NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
-          ] as boolean
+          ]
         }
         justificationShowMoreExpandedElementName={
           NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
@@ -89,15 +88,11 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       />
 
       <StreamAmount
-        streamAmount={
-          state[NativeTokenStreamDialogElementNames.MaxAmountInput] as Hex
-        }
+        streamAmount={state[NativeTokenStreamDialogElementNames.MaxAmountInput]}
         streamAmountElementName={
           NativeTokenStreamDialogElementNames.MaxAmountInput
         }
-        period={
-          state[NativeTokenStreamDialogElementNames.PeriodInput] as TimePeriod
-        }
+        period={state[NativeTokenStreamDialogElementNames.PeriodInput]}
         periodElementName={NativeTokenStreamDialogElementNames.PeriodInput}
       />
 
