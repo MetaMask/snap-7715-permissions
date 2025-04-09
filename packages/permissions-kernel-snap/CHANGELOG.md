@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.2]
+## [0.0.1]
 
 ### Uncategorized
 
@@ -77,5 +77,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Improve test coverage for kernel snap ([#18](https://github.com/MetaMask/snap-7715-permissions/pull/18))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel@0.0.2...HEAD
-[0.0.2]: https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/permissions-kernel@0.0.2
+[Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel@0.0.1...HEAD
+[0.0.1]: git+https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/permissions-kernel@0.0.1

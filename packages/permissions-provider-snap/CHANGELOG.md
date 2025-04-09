@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.2]
+## [0.0.1]
 
 ### Uncategorized
 
@@ -142,5 +142,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove unnecessary code within the permission provider and add placeholder confirmation with simple "Confirm" "Reject" options. ([#21](https://github.com/MetaMask/snap-7715-permissions/pull/21))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions@0.0.2...HEAD
-[0.0.2]: https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/gator-permissions@0.0.2
+[Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions@0.0.1...HEAD
+[0.0.1]: git+https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/gator-permissions@0.0.1
