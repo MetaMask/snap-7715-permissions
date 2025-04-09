@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Manage onchain 7715 permissions",
   "proposedName": "MetaMask Permissions Kernel",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "vl8tAztj3S9fKJswQOVK63HmM/TtUe8X2Dvf6BsCrAg=",
+    "shasum": "LCeomAqI0V1sxrUpZ6CmWtiFHrAnc/T3VXqOlvlalaA=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
