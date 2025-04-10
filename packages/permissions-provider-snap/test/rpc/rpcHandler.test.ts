@@ -1,5 +1,4 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 
 import type { AccountControllerInterface } from '../../src/accountController';
 import type { PermissionsContextBuilder } from '../../src/orchestrators';
@@ -29,7 +28,6 @@ describe('RpcHandler', () => {
   const mockTokenPricesService = {
     getCryptoToFiatConversion: jest.fn(),
   } as unknown as jest.Mocked<TokenPricesService>;
-  const mockSnapsProvider = createMockSnapsProvider();
   const mockUserEventDispatcher = new UserEventDispatcher();
 
   (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
@@ -37,7 +35,6 @@ describe('RpcHandler', () => {
   );
 
   beforeEach(() => {
-    mockSnapsProvider.request.mockClear();
     mockAccountController.getAccountAddress.mockClear();
     mockAccountController.signDelegation.mockClear();
     mockAccountController.getAccountMetadata.mockClear();

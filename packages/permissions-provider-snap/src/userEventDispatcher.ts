@@ -9,6 +9,9 @@ import type {
   UserInputEventType,
 } from '@metamask/snaps-sdk';
 
+import type { SupportedPermissionTypes } from './orchestrators';
+import type { PermissionConfirmationContext } from './ui';
+
 export type DialogContentEventHandlers = {
   eventType: UserInputEventType;
   handler: UserEventHandler<UserInputEventType>;
@@ -26,16 +29,20 @@ export type UserInputEventByType<
 export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
   (args: {
     event: UserInputEventByType<TUserInputEventType>;
-    context: InterfaceContext | null;
+    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
+    permissionType: SupportedPermissionTypes;
+    interfaceId: string;
   }) => void | Promise<void>;
 
 const getUserInputEventKey = ({
+  elementName,
   eventType,
   interfaceId,
 }: {
+  elementName: string;
   eventType: UserInputEventType;
   interfaceId: string;
-}) => `${eventType}:${interfaceId}`;
+}) => `${elementName}:${eventType}:${interfaceId}`;
 /**
  * Class responsible for dispatching user input events to registered handlers.
  * Provides a way to register, deregister, and dispatch event handlers
@@ -53,19 +60,22 @@ export class UserEventDispatcher {
    * Register an event handler for a specific event type.
    *
    * @param args - The event handler arguments as object.
+   * @param args.elementName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.eventType - The type of event to listen for.
    * @param args.interfaceId - The id of the interface to listen for events on.
    * @param args.handler - The callback function to execute when the event occurs.
    * @returns A reference to this instance for method chaining.
    */
   public on<TUserInputEventType extends UserInputEventType>(args: {
-    eventType: TUserInputEventType;
+    elementName: string;
+    eventType: UserInputEventType;
     interfaceId: string;
     handler: UserEventHandler<TUserInputEventType>;
   }): UserEventDispatcher {
-    const { eventType, handler, interfaceId } = args;
+    const { elementName, eventType, handler, interfaceId } = args;
 
     const eventKey = getUserInputEventKey({
+      elementName,
       eventType,
       interfaceId,
     });
@@ -87,19 +97,22 @@ export class UserEventDispatcher {
    * Deregister an event handler for a specific event type.
    *
    * @param args - The event handler arguments as object.
+   * @param args.elementName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.eventType - The type of event to stop listening for.
    * @param args.interfaceId - The id of the interface.
    * @param args.handler - The callback function to remove.
    * @returns A reference to this instance for method chaining.
    */
   public off<TUserInputEventType extends UserInputEventType>(args: {
+    elementName: string;
     eventType: TUserInputEventType;
     interfaceId: string;
     handler: UserEventHandler<TUserInputEventType>;
   }): UserEventDispatcher {
-    const { eventType, handler, interfaceId } = args;
+    const { eventType, handler, interfaceId, elementName } = args;
 
     const eventKey = getUserInputEventKey({
+      elementName,
       eventType,
       interfaceId,
     });
@@ -138,6 +151,7 @@ export class UserEventDispatcher {
     const { event, id, context } = args;
 
     const eventKey = getUserInputEventKey({
+      elementName: event.name ?? '',
       eventType: event.type,
       interfaceId: id,
     });
@@ -148,11 +162,17 @@ export class UserEventDispatcher {
       return;
     }
 
+    const permissionType = context?.permissionType as SupportedPermissionTypes;
+
     const handlersExecutions = handlers.map(async (handler) => {
       try {
         await handler({
           event,
-          context,
+          attenuatedContext: context as PermissionConfirmationContext<
+            typeof permissionType
+          >,
+          interfaceId: id,
+          permissionType,
         });
       } catch (error) {
         logger.error(

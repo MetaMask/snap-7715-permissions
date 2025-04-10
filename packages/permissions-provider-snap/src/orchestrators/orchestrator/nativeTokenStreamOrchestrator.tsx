@@ -5,17 +5,21 @@ import {
   type Permission,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
-import { InvalidParamsError } from '@metamask/snaps-sdk';
+import { InvalidParamsError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
+import { toHex, type Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
 import {
-  nativeTokenStreamRulesEventHandlers,
-  requestDetailsButtonEventHandlers,
-  rulesSelectorEventHandlers,
+  NativeTokenStreamDialogElementNames,
+  TIME_PERIOD_TO_SECOND,
+  TimePeriod,
+  handleReplaceTextInput,
+  handleReplaceValueInput,
+  handleToggleBooleanClicked,
 } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
+import type { UserEventHandler } from '../../userEventDispatcher';
 import type {
   OrchestratorFactoryFunction,
   PermissionContextMeta,
@@ -37,6 +41,14 @@ declare module './types' {
       maxAllowance?: Hex | 'Unlimited';
       initialAmount?: Hex;
       startTime?: number;
+    };
+  }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
+  interface PermissionConfirmationStateMapping {
+    'native-token-stream': JsonObject & {
+      [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]: boolean;
+      [NativeTokenStreamDialogElementNames.MaxAmountInput]: Hex;
+      [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
     };
   }
 }
@@ -141,12 +153,13 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         <NativeTokenStreamConfirmationPage
           siteOrigin={context.siteOrigin}
           address={context.address}
-          permission={context.permission}
+          justification={context.justification}
           balance={context.balance}
           expiry={context.expiry}
           chainId={context.chainId}
           valueFormattedAsCurrency={context.valueFormattedAsCurrency}
           permissionSpecificRules={context.permissionSpecificRules}
+          state={context.state}
         />
       );
     },
@@ -175,20 +188,29 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
       return caveatBuilder;
     },
-    resolveAttenuatedPermission: async ({
-      requestedPermission,
-      requestedExpiry,
-    }: {
-      requestedPermission: PermissionTypeMapping['native-token-stream'];
-      requestedExpiry: number;
-    }) => {
-      const attenuatedPermission = {
-        ...requestedPermission,
-      };
+    resolveAttenuatedPermission: async (
+      requestedPermission: PermissionTypeMapping['native-token-stream'],
+      attenuatedContext: PermissionConfirmationContext<'native-token-stream'>,
+    ) => {
+      const { state, expiry: requestedExpiry } = attenuatedContext;
+
+      const maxAmount =
+        state[NativeTokenStreamDialogElementNames.MaxAmountInput];
+      const period = state[NativeTokenStreamDialogElementNames.PeriodInput];
+      const amountPerSecond = toHex(
+        BigInt(maxAmount) / BigInt(TIME_PERIOD_TO_SECOND[period]),
+      );
 
       return {
         expiry: requestedExpiry,
-        permission: attenuatedPermission,
+        attenuatedPermission: {
+          ...requestedPermission,
+          data: {
+            ...requestedPermission.data,
+            maxAmount,
+            amountPerSecond,
+          },
+        } as PermissionTypeMapping['native-token-stream'],
       };
     },
     getTokenCaipAssetType(
@@ -207,12 +229,40 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         startTime: permission.data.startTime,
       } as PermissionSpecificRulesMapping['native-token-stream'];
     },
-    getConfirmationDialogEventHandlers: () => {
-      return [
-        ...requestDetailsButtonEventHandlers,
-        ...rulesSelectorEventHandlers,
-        ...nativeTokenStreamRulesEventHandlers,
-      ];
+    getConfirmationDialogEventHandlers: (
+      permission: PermissionTypeMapping['native-token-stream'],
+    ) => {
+      return {
+        state: {
+          [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+            true,
+          [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+            permission.data.maxAmount,
+          [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+        },
+
+        dialogContentEventHandlers: [
+          {
+            elementName:
+              NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
+            eventType: UserInputEventType.ButtonClickEvent,
+            handler:
+              handleToggleBooleanClicked as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.MaxAmountInput,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceValueInput as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName: NativeTokenStreamDialogElementNames.PeriodInput,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceTextInput as UserEventHandler<UserInputEventType>,
+          },
+        ],
+      };
     },
   };
 };

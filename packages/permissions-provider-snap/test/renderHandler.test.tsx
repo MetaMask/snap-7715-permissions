@@ -4,12 +4,13 @@ import type { UserInputEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
-import type {
-  PermissionTypeMapping,
-  SupportedPermissionTypes,
-} from '../src/orchestrators';
+import type { SupportedPermissionTypes } from '../src/orchestrators';
 import type { PermissionConfirmationContext } from '../src/ui';
-import { createPermissionConfirmationRenderHandler } from '../src/ui';
+import {
+  createPermissionConfirmationRenderHandler,
+  NativeTokenStreamDialogElementNames,
+  TimePeriod,
+} from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
@@ -21,7 +22,10 @@ describe('Permission Confirmation Render Handler', () => {
   const mockUserEventDispatcher = new UserEventDispatcher();
 
   let onButtonClickHandlerPromise: Promise<
-    (args: { event: UserInputEvent }) => Promise<void>
+    (args: {
+      event: UserInputEvent;
+      attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
+    }) => Promise<void>
   >;
 
   (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
@@ -43,8 +47,8 @@ describe('Permission Confirmation Render Handler', () => {
 
   const mockContext: PermissionConfirmationContext<typeof mockPermissionType> =
     {
-      permission:
-        permission as PermissionTypeMapping[typeof mockPermissionType],
+      permissionType: mockPermissionType,
+      justification: permission.data.justification,
       address,
       siteOrigin: 'http://localhost:3000',
       balance: '0x1',
@@ -54,18 +58,26 @@ describe('Permission Confirmation Render Handler', () => {
       permissionSpecificRules: {
         maxAllowance: 'Unlimited',
       },
+      state: {
+        [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+          false,
+        [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+          permission.data.maxAmount,
+        [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+      },
     };
 
   const mockPage = (
     <NativeTokenStreamConfirmationPage
       siteOrigin={mockContext.siteOrigin}
       address={mockContext.address}
-      permission={mockContext.permission}
+      justification={mockContext.justification}
       balance={mockContext.balance}
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
       valueFormattedAsCurrency={mockContext.valueFormattedAsCurrency}
       permissionSpecificRules={mockContext.permissionSpecificRules}
+      state={mockContext.state}
     />
   );
 
@@ -79,8 +91,8 @@ describe('Permission Confirmation Render Handler', () => {
       (args: { event: UserInputEvent }) => Promise<void>
     >((resolve, _) => {
       (mockUserEventDispatcher.on as jest.Mock).mockImplementation(
-        ({ eventType, handler }) => {
-          if (eventType === UserInputEventType.ButtonClickEvent) {
+        ({ elementName, handler }) => {
+          if (elementName === CANCEL_BUTTON || elementName === GRANT_BUTTON) {
             resolve(handler);
           }
           return mockUserEventDispatcher;
@@ -124,9 +136,13 @@ describe('Permission Confirmation Render Handler', () => {
           type: UserInputEventType.ButtonClickEvent,
           name: GRANT_BUTTON,
         },
+        attenuatedContext: mockContext,
       });
 
-      await expect(confirmationResult).resolves.toEqual(true);
+      await expect(confirmationResult).resolves.toEqual({
+        isConfirmationAccepted: true,
+        attenuatedContext: mockContext,
+      });
 
       expect(mockSnapProvider.request).toHaveBeenCalledWith({
         method: 'snap_createInterface',
@@ -149,6 +165,7 @@ describe('Permission Confirmation Render Handler', () => {
       });
 
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
+        elementName: GRANT_BUTTON,
         eventType: UserInputEventType.ButtonClickEvent,
         handler: expect.any(Function),
         interfaceId: mockInterfaceId,
@@ -189,9 +206,13 @@ describe('Permission Confirmation Render Handler', () => {
           type: UserInputEventType.ButtonClickEvent,
           name: CANCEL_BUTTON,
         },
+        attenuatedContext: mockContext,
       });
 
-      await expect(confirmationResult).resolves.toEqual(false);
+      await expect(confirmationResult).resolves.toEqual({
+        isConfirmationAccepted: false,
+        attenuatedContext: mockContext,
+      });
 
       expect(mockSnapProvider.request).toHaveBeenCalledWith({
         method: 'snap_createInterface',
@@ -214,6 +235,7 @@ describe('Permission Confirmation Render Handler', () => {
       });
 
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
+        elementName: CANCEL_BUTTON,
         eventType: UserInputEventType.ButtonClickEvent,
         handler: expect.any(Function),
         interfaceId: mockInterfaceId,

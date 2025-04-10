@@ -4,10 +4,16 @@ import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
 import type {
+  PermissionConfirmationStateMapping,
   PermissionSpecificRulesMapping,
-  PermissionTypeMapping,
   SupportedPermissionTypes,
 } from '../orchestrators';
+
+/**
+ * The state of the permission dialog components.
+ */
+export type State<TPermissionType extends SupportedPermissionTypes> =
+  PermissionConfirmationStateMapping[TPermissionType];
 
 /**
  * The delegation in transit object with salt as a hex string to be compatible with the Snap context { [prop: string]: Json; } object.
@@ -28,14 +34,16 @@ export type SerializableDelegation = Omit<Delegation, 'salt'> & {
 export type PermissionConfirmationContext<
   TPermissionType extends SupportedPermissionTypes,
 > = InterfaceContext & {
-  permission: PermissionTypeMapping[TPermissionType];
+  readonly permissionType: TPermissionType;
   permissionSpecificRules: PermissionSpecificRulesMapping[TPermissionType];
+  readonly justification: string;
   readonly address: Hex;
   readonly siteOrigin: string;
   readonly balance: Hex;
   readonly valueFormattedAsCurrency: string;
   readonly chainId: number;
   expiry: number;
+  state: State<TPermissionType>;
 };
 
 /**
@@ -46,7 +54,7 @@ export type PermissionConfirmationProps<
 > = JsonObject &
   Pick<
     PermissionConfirmationContext<TPermissionType>,
-    | 'permission'
+    | 'justification'
     | 'address'
     | 'siteOrigin'
     | 'balance'
@@ -54,6 +62,7 @@ export type PermissionConfirmationProps<
     | 'expiry'
     | 'chainId'
     | 'permissionSpecificRules'
+    | 'state'
   >;
 
 /**

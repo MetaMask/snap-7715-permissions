@@ -17,7 +17,12 @@ import {
 } from '../src/orchestrators';
 import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
 import type { TokenPricesService } from '../src/services';
-import type { PermissionConfirmationRenderHandler } from '../src/ui';
+import {
+  NativeTokenStreamDialogElementNames,
+  TimePeriod,
+  type PermissionConfirmationContext,
+  type PermissionConfirmationRenderHandler,
+} from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
 
 jest.mock('../src/userEventDispatcher');
@@ -27,6 +32,7 @@ describe('Orchestrate', () => {
   const sessionAccount = getAddress(
     '0x1234567890123456789012345678901234567890',
   );
+
   const mockUserEventDispatcher = new UserEventDispatcher();
 
   (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
@@ -41,7 +47,7 @@ describe('Orchestrate', () => {
         initialAmount: '0x1',
         amountPerSecond: '0x1',
         startTime: 1000,
-        maxAmount: '0x2',
+        maxAmount: toHex(parseUnits('1', 18)),
       },
     };
     const mockPermissionType = extractPermissionName(
@@ -57,7 +63,6 @@ describe('Orchestrate', () => {
     } as jest.Mocked<AccountControllerInterface>;
     const mockPermissionConfirmationRenderHandler = {
       createConfirmationDialog: jest.fn(),
-      cleanupDialogContentEventHandlers: jest.fn(),
     } as jest.Mocked<PermissionConfirmationRenderHandler>;
     const mockPermissionsContextBuilder = {
       buildPermissionsContext: jest.fn(),
@@ -67,6 +72,28 @@ describe('Orchestrate', () => {
     } as unknown as jest.Mocked<TokenPricesService>;
     const orchestrator = createPermissionOrchestrator(mockPermissionType);
     const mockSnapsProvider = createMockSnapsProvider();
+    const mockAttenuatedContext: PermissionConfirmationContext<
+      typeof mockPermissionType
+    > = {
+      permissionType: mockPermissionType,
+      justification: nativeTokenStreamPermission.data.justification,
+      address,
+      siteOrigin: 'http://localhost:3000',
+      balance: '0x1',
+      expiry: 1,
+      chainId: 11155111,
+      valueFormattedAsCurrency: '$1,000.00',
+      permissionSpecificRules: {
+        maxAllowance: 'Unlimited',
+      },
+      state: {
+        [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+          false,
+        [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+          nativeTokenStreamPermission.data.maxAmount,
+        [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+      },
+    };
 
     const orchestrateArgs: OrchestrateArgs<typeof mockPermissionType> = {
       permissionType: mockPermissionType,
@@ -92,7 +119,10 @@ describe('Orchestrate', () => {
       mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
           interfaceId: 'mock-interface-id',
-          confirmationResult: Promise.resolve(true),
+          confirmationResult: Promise.resolve({
+            isConfirmationAccepted: true,
+            attenuatedContext: mockAttenuatedContext,
+          }),
         },
       );
 
@@ -127,8 +157,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(10);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(10);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(3);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -145,10 +175,10 @@ describe('Orchestrate', () => {
           permission: {
             data: {
               justification: 'shh...permission 2',
-              amountPerSecond: '0x1',
+              amountPerSecond: '0x180f8a7451f',
               initialAmount: '0x1',
               startTime: 1000,
-              maxAmount: '0x2',
+              maxAmount: '0xde0b6b3a7640000',
             },
             type: 'native-token-stream',
           },
@@ -167,7 +197,10 @@ describe('Orchestrate', () => {
       mockPermissionConfirmationRenderHandler.createConfirmationDialog.mockResolvedValueOnce(
         {
           interfaceId: 'mock-interface-id',
-          confirmationResult: Promise.resolve(false),
+          confirmationResult: Promise.resolve({
+            isConfirmationAccepted: false,
+            attenuatedContext: mockAttenuatedContext,
+          }),
         },
       );
 
@@ -202,8 +235,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(10);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(10);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(3);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

@@ -3,18 +3,27 @@ import type {
   PermissionResponse,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
-import type { ComponentOrElement } from '@metamask/snaps-sdk';
+import type {
+  ComponentOrElement,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { CaipAssetType } from '@metamask/utils';
 import type { Address, Hex, OneOf } from 'viem';
 
-import type { PermissionConfirmationContext } from '../ui';
-import type { DialogContentEventHandlers } from '../userEventDispatcher';
+import type { PermissionConfirmationContext, State } from '../ui';
+import type { UserEventHandler } from '../userEventDispatcher';
 import type {
   PermissionSpecificRulesMapping,
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from './orchestrator';
+
+export type DialogContentEventHandlers = {
+  elementName: string;
+  eventType: UserInputEventType;
+  handler: UserEventHandler<UserInputEventType>;
+};
 
 /**
  * The result of orchestrating a permission.
@@ -111,12 +120,12 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
     context: PermissionConfirmationContext<TPermissionType>,
   ) => ComponentOrElement;
 
-  resolveAttenuatedPermission: (args: {
-    requestedPermission: PermissionTypeMapping[TPermissionType];
-    requestedExpiry: number;
-  }) => Promise<{
+  resolveAttenuatedPermission: (
+    requestedPermission: PermissionTypeMapping[TPermissionType],
+    attenuatedContext: PermissionConfirmationContext<TPermissionType>,
+  ) => Promise<{
     expiry: number;
-    permission: PermissionTypeMapping[TPermissionType];
+    attenuatedPermission: PermissionTypeMapping[TPermissionType];
   }>;
 
   /**
@@ -131,9 +140,16 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   /**
    * Returns a set of event handlers for the confirmation dialog specific to the permission type.
    * These event handlers are used to handle user input events in the confirmation dialog.
+   *
+   * @param permission - The permission for the confirmation dialog.
    * @returns An array of event handlers for the confirmation dialog.
    */
-  getConfirmationDialogEventHandlers: () => DialogContentEventHandlers[];
+  getConfirmationDialogEventHandlers: (
+    permission: PermissionTypeMapping[TPermissionType],
+  ) => {
+    state: State<TPermissionType>;
+    dialogContentEventHandlers: DialogContentEventHandlers[];
+  };
 };
 
 /**

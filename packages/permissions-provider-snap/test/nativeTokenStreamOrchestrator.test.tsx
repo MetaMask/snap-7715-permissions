@@ -13,8 +13,12 @@ import type {
   SupportedPermissionTypes,
 } from '../src/orchestrators';
 import { createPermissionOrchestrator } from '../src/orchestrators';
-import type { PermissionConfirmationContext } from '../src/ui';
-import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
+import {
+  NativeTokenStreamDialogElementNames,
+  type PermissionConfirmationContext,
+  NativeTokenStreamConfirmationPage,
+  TimePeriod,
+} from '../src/ui';
 
 describe('native-token-stream Orchestrator', () => {
   const mockStartTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
@@ -39,8 +43,8 @@ describe('native-token-stream Orchestrator', () => {
   const mockUiContext: PermissionConfirmationContext<
     typeof mockPermissionType
   > = {
-    permission:
-      mockbasePermission as PermissionTypeMapping[typeof mockPermissionType],
+    permissionType: mockPermissionType,
+    justification: mockbasePermission.data.justification,
     address,
     siteOrigin: 'http://localhost:3000',
     balance: '0x1',
@@ -50,18 +54,26 @@ describe('native-token-stream Orchestrator', () => {
     permissionSpecificRules: {
       maxAllowance: 'Unlimited',
     },
+    state: {
+      [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+        false,
+      [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+        mockbasePermission.data.maxAmount,
+      [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+    },
   };
 
   const mockPage = (
     <NativeTokenStreamConfirmationPage
       siteOrigin={mockUiContext.siteOrigin}
       address={mockUiContext.address}
-      permission={mockUiContext.permission}
+      justification={mockUiContext.justification}
       balance={mockUiContext.balance}
       expiry={mockUiContext.expiry}
       chainId={mockUiContext.chainId}
       valueFormattedAsCurrency={mockUiContext.valueFormattedAsCurrency}
       permissionSpecificRules={mockUiContext.permissionSpecificRules}
+      state={mockUiContext.state}
     />
   );
 
@@ -260,8 +272,12 @@ describe('native-token-stream Orchestrator', () => {
     });
 
     it('should return confirmation dialog EventHandlers', async () => {
-      const res = orchestrator.getConfirmationDialogEventHandlers();
-      expect(res.length).toStrictEqual(10);
+      const parsedPermission = await orchestrator.parseAndValidate(
+        mockbasePermission,
+      );
+      const { dialogContentEventHandlers } =
+        orchestrator.getConfirmationDialogEventHandlers(parsedPermission);
+      expect(dialogContentEventHandlers.length).toStrictEqual(3);
     });
   });
 });

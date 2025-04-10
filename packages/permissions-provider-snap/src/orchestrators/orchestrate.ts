@@ -82,7 +82,6 @@ export const orchestrate = async <
     chainIdNum,
   );
 
-  // Get the user account details
   const [address, balance] = await prepareAccountDetails(
     accountController,
     fromHex(chainId, 'number'),
@@ -92,8 +91,12 @@ export const orchestrate = async <
     await tokenPricesService.getCryptoToFiatConversion(caipAssetType, balance);
 
   // Prepare specific context object and confirmation page for the permission type
+  const { state, dialogContentEventHandlers } =
+    orchestrator.getConfirmationDialogEventHandlers(permission);
+
   const uiContext: PermissionConfirmationContext<TPermissionType> = {
-    permission,
+    permissionType,
+    justification: permission.data.justification,
     permissionSpecificRules:
       orchestrator.getPermissionSpecificRules(permission),
     address,
@@ -102,6 +105,7 @@ export const orchestrate = async <
     chainId: chainIdNum,
     expiry,
     valueFormattedAsCurrency,
+    state,
   };
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
@@ -114,36 +118,34 @@ export const orchestrate = async <
     );
 
   // Register event handlers for confirmation dialog
-  const dialogContentEventHandlers =
-    orchestrator.getConfirmationDialogEventHandlers();
-
   if (dialogContentEventHandlers.length > 0) {
-    dialogContentEventHandlers.forEach(({ eventType, handler }) => {
-      userEventDispatcher.on({
-        eventType,
-        interfaceId,
-        handler,
-      });
-    });
+    dialogContentEventHandlers.forEach(
+      ({ elementName, eventType, handler }) => {
+        userEventDispatcher.on({
+          elementName,
+          eventType,
+          interfaceId,
+          handler,
+        });
+      },
+    );
   }
 
-  const isConfirmationAccepted = await confirmationResult;
+  // Wait for the user to accept or reject the permission request
+  const { isConfirmationAccepted, attenuatedContext } =
+    await confirmationResult;
 
-  const { permission: attenuatedPermission, expiry: attenuatedExpiry } =
-    await orchestrator.resolveAttenuatedPermission({
-      requestedPermission: permission,
-      requestedExpiry: expiry,
-    });
-
-  // Cleanup the event handlers after the dialog is closed
   if (dialogContentEventHandlers.length > 0) {
-    dialogContentEventHandlers.forEach(({ eventType, handler }) => {
-      userEventDispatcher.off({
-        eventType,
-        interfaceId,
-        handler,
-      });
-    });
+    dialogContentEventHandlers.forEach(
+      ({ elementName, eventType, handler }) => {
+        userEventDispatcher.off({
+          elementName,
+          eventType,
+          interfaceId,
+          handler,
+        });
+      },
+    );
   }
 
   if (!isConfirmationAccepted) {
@@ -152,6 +154,13 @@ export const orchestrate = async <
       reason: 'User rejected the permissions request',
     };
   }
+
+  // User accepted the permission request, build the response
+  const { attenuatedPermission, expiry: attenuatedExpiry } =
+    await orchestrator.resolveAttenuatedPermission(
+      permission,
+      attenuatedContext as PermissionConfirmationContext<TPermissionType>,
+    );
 
   const deleGatorEnvironment = await accountController.getEnvironment({
     chainId: chainIdNum,
