@@ -12,7 +12,7 @@ import { toHex, type Hex } from 'viem';
 import type { PermissionConfirmationContext } from '../../ui';
 import {
   NativeTokenStreamDialogElementNames,
-  TIME_PERIOD_TO_SECOND,
+  TIME_PERIOD_TO_SECONDS,
   TimePeriod,
   handleReplaceTextInput,
   handleReplaceValueInput,
@@ -198,7 +198,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         state[NativeTokenStreamDialogElementNames.MaxAmountInput];
       const period = state[NativeTokenStreamDialogElementNames.PeriodInput];
       const amountPerSecond = toHex(
-        BigInt(maxAmount) / BigInt(TIME_PERIOD_TO_SECOND[period]),
+        BigInt(maxAmount) / BigInt(TIME_PERIOD_TO_SECONDS[period]),
       );
 
       return {

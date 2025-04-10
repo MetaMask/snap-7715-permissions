@@ -9,8 +9,7 @@ import {
   Input,
   Dropdown,
 } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
-import { formatUnits } from 'viem';
+import { formatUnits, type Hex } from 'viem';
 
 import { formatTokenBalance } from '../../utils';
 
@@ -33,31 +32,37 @@ export enum TimePeriod {
 /**
  * A mapping of time periods to their equivalent seconds.
  */
-export const TIME_PERIOD_TO_SECOND: Record<TimePeriod, number> = {
-  [TimePeriod.DAILY]: 60 * 60 * 24, // 86,400(seconds)
-  [TimePeriod.WEEKLY]: 60 * 60 * 24 * 7, // 604,800(seconds)
-  [TimePeriod.MONTHLY]: 60 * 60 * 24 * 30, // 2,592,000(seconds)
+export const TIME_PERIOD_TO_SECONDS: Record<TimePeriod, bigint> = {
+  [TimePeriod.DAILY]: 60n * 60n * 24n, // 86,400(seconds)
+  [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800(seconds)
+  // Monthly is difficult because months are not consistent in length.
+  // We approximate by calculating the number of seconds in 1/12th of a year.
+  [TimePeriod.MONTHLY]: (60n * 60n * 24n * 365n) / 12n, // 2,629,760(seconds)
 };
 
 /**
  * Calculate the stream rate for the given total balance and time period.
  * - stream rate = total balance of asset / time period(in seconds).
  *
- * @param wei - The total balance of the asset.
+ * @param streamAmountPerPeriod - The stream amount per period.
  * @param timePeriod - The time period for which the stream rate is calculated.
  * @param tokenDecimal - The decimal places for the token.
  * @returns The stream rate for the given total balance and time period.
  */
-const calculateStreamRate = (
-  wei: Hex,
+export const formatStreamRatePerSecond = (
+  streamAmountPerPeriod: Hex,
   timePeriod: TimePeriod,
   tokenDecimal = 18,
 ): string => {
-  const tokenBalance = formatUnits(BigInt(wei), tokenDecimal);
-  const tokenBalanceNum = parseFloat(tokenBalance);
-  return (tokenBalanceNum / TIME_PERIOD_TO_SECOND[timePeriod]).toFixed(
+  const streamRatePerSecond =
+    BigInt(streamAmountPerPeriod) / TIME_PERIOD_TO_SECONDS[timePeriod];
+
+  const streamRatePerSecondFormatted = formatUnits(
+    streamRatePerSecond,
     tokenDecimal,
   );
+
+  return streamRatePerSecondFormatted;
 };
 
 /**
@@ -84,7 +89,7 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   period,
   periodElementName,
 }) => {
-  const streamRate = calculateStreamRate(streamAmount, period);
+  const streamRate = formatStreamRatePerSecond(streamAmount, period);
   return (
     <Section>
       {inputDetails(
