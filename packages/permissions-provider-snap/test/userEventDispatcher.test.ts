@@ -9,6 +9,7 @@ import {
   type PermissionConfirmationContext,
 } from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
+import { convertTimestampToReadableDate } from '../src/utils';
 
 describe('UserEventDispatcher', () => {
   let userEventDispatcher: UserEventDispatcher;
@@ -36,8 +37,10 @@ describe('UserEventDispatcher', () => {
       rules: {
         [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
         [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
-        [NativeTokenStreamDialogElementNames.StartTimeRule]: 1222333,
-        [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+        [NativeTokenStreamDialogElementNames.StartTimeRule]:
+          convertTimestampToReadableDate(1222333),
+        [NativeTokenStreamDialogElementNames.ExpiryRule]:
+          convertTimestampToReadableDate(1),
       },
     },
   };

@@ -1,14 +1,13 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Section } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
 
-import { TokenValueRule, TimestampRule } from '../Rules';
+import { TextRule } from '../Rules';
 
 export type NativeTokenStreamRulesProps = {
-  initialAmount: Hex | null;
-  maxAllowance: Hex | null | 'Unlimited';
-  startTime: number | null;
-  expiry: number | null;
+  initialAmount: string | null;
+  maxAllowance: string | null | 'Unlimited';
+  startTime: string | null;
+  expiry: string | null;
 
   initialAmountEventName: string;
   maxAllowanceEventName: string;
@@ -45,42 +44,42 @@ export const NativeTokenStreamRules: SnapComponent<
   return (
     <Section>
       {initialAmount ? (
-        <TokenValueRule
+        <TextRule
           text="Initial amount"
           tooltip="tooltip text"
           inputName={`${initialAmountEventName}-input`}
           removeRuleButtonName={initialAmountEventName}
-          allowance={initialAmount}
+          textValue={initialAmount}
         />
       ) : null}
 
       {maxAllowance ? (
-        <TokenValueRule
+        <TextRule
           text="Max allowance"
           tooltip="tooltip text"
           inputName={`${maxAllowanceEventName}-input`}
           removeRuleButtonName={maxAllowanceEventName}
-          allowance={maxAllowance}
+          textValue={maxAllowance}
         />
       ) : null}
 
       {startTime ? (
-        <TimestampRule
+        <TextRule
           text="Start date"
           tooltip="tooltip text"
           inputName={`${startTimeEventName}-input`}
           removeRuleButtonName={startTimeEventName}
-          timestamp={startTime}
+          textValue={startTime}
         />
       ) : null}
 
       {expiry ? (
-        <TimestampRule
+        <TextRule
           text="Expiration date"
           tooltip="tooltip text"
           inputName={`${expiryEventName}-input`}
           removeRuleButtonName={expiryEventName}
-          timestamp={expiry}
+          textValue={expiry}
         />
       ) : null}
     </Section>

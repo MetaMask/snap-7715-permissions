@@ -94,10 +94,10 @@ describe('Orchestrate', () => {
         [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
         [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
         rules: {
-          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
-          [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
-          [NativeTokenStreamDialogElementNames.StartTimeRule]: 1234,
-          [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: null,
+          [NativeTokenStreamDialogElementNames.InitialAmountRule]: null,
+          [NativeTokenStreamDialogElementNames.StartTimeRule]: null,
+          [NativeTokenStreamDialogElementNames.ExpiryRule]: null,
         },
       },
     };
@@ -158,9 +158,6 @@ describe('Orchestrate', () => {
       mockAccountController.getEnvironment.mockResolvedValueOnce(
         getDeleGatorEnvironment(sepolia.id),
       );
-      mockSnapsProvider.request.mockResolvedValueOnce({
-        expiry: '1',
-      });
 
       const res = await orchestrate(orchestrateArgs);
 

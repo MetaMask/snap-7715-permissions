@@ -40,9 +40,9 @@ describe('Confirmation Dialog event handlers', () => {
           [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
           rules: {
             [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
-            [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
-            [NativeTokenStreamDialogElementNames.StartTimeRule]: 1222333,
-            [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+            [NativeTokenStreamDialogElementNames.InitialAmountRule]: '3.0',
+            [NativeTokenStreamDialogElementNames.StartTimeRule]: '01/07/2025',
+            [NativeTokenStreamDialogElementNames.ExpiryRule]: '01/07/2026',
           },
         },
       };

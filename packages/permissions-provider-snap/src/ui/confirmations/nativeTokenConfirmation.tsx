@@ -1,7 +1,11 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box } from '@metamask/snaps-sdk/jsx';
 
-import type { AccountDetailsProps, RuleMeta } from '../components';
+import type {
+  AccountDetailsProps,
+  RuleMeta,
+  RuleValidationTypes,
+} from '../components';
 import {
   AccountDetails,
   RequestHeader,
@@ -70,41 +74,52 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       tooltip: 'Tooltip text',
     },
   };
-  const ruleMeta: RuleMeta[] = [
+  const startOfTodayHumanReadable = Math.floor(
+    new Date().setHours(0, 0, 0, 0) / 1000,
+  );
+  const ruleMeta: RuleMeta<RuleValidationTypes>[] = [
     {
       stateKey: NativeTokenStreamDialogElementNames.InitialAmountRule,
       name: 'Initial Amount',
-      inputType: 'number',
       placeholder: '0.00',
-      validation: {
-        validationError: 'Please enter a valid initial amount',
+      ruleValidator: {
+        validationType: 'value',
+        emptyInputValidationError: 'Please enter a valid initial amount',
+        inputConstraintValidationError: 'Not enough ETH available',
+        compareValue: balance,
       },
     },
     {
       stateKey: NativeTokenStreamDialogElementNames.MaxAllowanceRule,
       name: 'Max Allowance',
-      inputType: 'number',
       placeholder: '0.00',
-      validation: {
-        validationError: 'Please enter a valid max allowance',
+      ruleValidator: {
+        validationType: 'value',
+        emptyInputValidationError: 'Please enter a valid max allowance',
+        inputConstraintValidationError: 'Not enough ETH available',
+        compareValue: balance,
       },
     },
     {
       stateKey: NativeTokenStreamDialogElementNames.StartTimeRule,
       name: 'Start Time',
-      inputType: 'text',
       placeholder: 'MM/DD/YYYY',
-      validation: {
-        validationError: 'Enter a valid date',
+      ruleValidator: {
+        validationType: 'timestamp',
+        emptyInputValidationError: 'Enter a valid date',
+        inputConstraintValidationError: 'Must be today or later',
+        compareValue: startOfTodayHumanReadable,
       },
     },
     {
       stateKey: NativeTokenStreamDialogElementNames.ExpiryRule,
       name: 'Expiry',
-      inputType: 'text',
       placeholder: 'MM/DD/YYYY',
-      validation: {
-        validationError: 'Enter a valid date',
+      ruleValidator: {
+        validationType: 'timestamp',
+        emptyInputValidationError: 'Enter a valid date',
+        inputConstraintValidationError: 'Must be today or later',
+        compareValue: startOfTodayHumanReadable,
       },
     },
   ];

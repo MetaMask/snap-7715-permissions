@@ -13,6 +13,12 @@ import {
   Input,
 } from '@metamask/snaps-sdk/jsx';
 
+import {
+  convertReadableDateToTimestampToday,
+  convertValueToHex,
+  isHumanReadableInCorrectFormat,
+} from '../../../utils';
+import type { RuleValidationTypes } from './Rules';
 import { filterNotActiveRuleMeta, type RuleMeta } from './Rules';
 
 export enum RulesSelectorElementNames {
@@ -26,19 +32,52 @@ export type RulesSelectorProps = JsonObject & {
   activeRuleStateKeys: string[];
   selectedDropDownValue: string;
   selectedInputValue: string;
-  ruleMeta: RuleMeta[];
+  ruleMeta: RuleMeta<RuleValidationTypes>[];
 };
 
 /**
- * Validates the value against the rule meta.
- * @param value - The value to validate.
+ * Validates the input value against the rule meta.
+ * @param inputValue - The input value to validate.
  * @param ruleMeta - The rule meta to validate against.
  * @returns The validation error if the value is invalid, otherwise undefined.
  */
-const valueValidator = (value: string, ruleMeta: RuleMeta) => {
-  if (value === '') {
-    return ruleMeta.validation.validationError;
+const validator = (
+  inputValue: string,
+  ruleMeta: RuleMeta<RuleValidationTypes>,
+): string | undefined => {
+  const { ruleValidator } = ruleMeta;
+  const { validationType } = ruleValidator;
+  if (inputValue === '') {
+    return ruleValidator.emptyInputValidationError;
   }
+
+  switch (validationType) {
+    case 'value':
+      if (
+        BigInt(convertValueToHex(inputValue)) >
+        BigInt(ruleValidator.compareValue)
+      ) {
+        return ruleValidator.inputConstraintValidationError;
+      }
+      break;
+    case 'timestamp':
+      if (!isHumanReadableInCorrectFormat(inputValue)) {
+        return ruleValidator.emptyInputValidationError;
+      }
+
+      if (
+        !(
+          BigInt(convertReadableDateToTimestampToday(inputValue)) >=
+          BigInt(ruleValidator.compareValue)
+        )
+      ) {
+        return ruleValidator.inputConstraintValidationError;
+      }
+      break;
+    default:
+      throw new Error('Invalid validation type');
+  }
+
   return undefined;
 };
 
@@ -74,9 +113,6 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
   if (!selectedDropDownValue) {
     dropDownValue = filteredRuleMeta[0]?.stateKey as string;
   }
-  const isSaveButtonDisabled =
-    dropDownValue === '' || selectedInputValue === '';
-  const isInputDisabled = dropDownValue === '';
 
   // Show any error for the input field
   let inputErrorMessage: string | undefined;
@@ -84,8 +120,15 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
     (rule) => rule.stateKey === dropDownValue,
   );
   if (foundRuleMeta) {
-    inputErrorMessage = valueValidator(selectedInputValue, foundRuleMeta);
+    inputErrorMessage = validator(selectedInputValue, foundRuleMeta);
   }
+
+  // Set the disabled state for the input field and save button
+  const isInputDisabled = dropDownValue === '';
+  const isSaveButtonDisabled =
+    dropDownValue === '' ||
+    selectedInputValue === '' ||
+    inputErrorMessage !== undefined;
 
   return (
     <Box>
@@ -118,7 +161,7 @@ export const RulesSelector: SnapComponent<RulesSelectorProps> = ({
               name={selectedRuleInputEventName}
               value={selectedInputValue}
               disabled={isInputDisabled}
-              type={foundRuleMeta?.inputType ?? 'text'}
+              type={'text'}
               placeholder={foundRuleMeta?.placeholder}
             />
           </Field>

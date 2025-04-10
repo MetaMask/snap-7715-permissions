@@ -23,6 +23,12 @@ import {
 } from '../../ui';
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
 import type { UserEventHandler } from '../../userEventDispatcher';
+import {
+  convertReadableDateToTimestampToday,
+  convertTimestampToReadableDate,
+  convertValueToHex,
+  formatTokenBalance,
+} from '../../utils';
 import type {
   OrchestratorFactoryFunction,
   PermissionContextMeta,
@@ -43,13 +49,10 @@ declare module './types' {
       [NativeTokenStreamDialogElementNames.MaxAmountInput]: Hex;
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
       rules: {
-        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
-          | Hex
-          | 'Unlimited'
-          | null;
-        [NativeTokenStreamDialogElementNames.InitialAmountRule]: Hex | null;
-        [NativeTokenStreamDialogElementNames.StartTimeRule]: number | null;
-        [NativeTokenStreamDialogElementNames.ExpiryRule]: number | null;
+        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: string | null;
+        [NativeTokenStreamDialogElementNames.InitialAmountRule]: string | null;
+        [NativeTokenStreamDialogElementNames.StartTimeRule]: string | null;
+        [NativeTokenStreamDialogElementNames.ExpiryRule]: string | null;
       };
       [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: string;
       [NativeTokenStreamDialogElementNames.SelectedRuleInput]: string;
@@ -197,21 +200,35 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
     ) => {
       const { state, expiry: requestedExpiry } = attenuatedContext;
 
-      const maxAmount =
+      const attenuatedMaxAmount =
         state[NativeTokenStreamDialogElementNames.MaxAmountInput];
       const period = state[NativeTokenStreamDialogElementNames.PeriodInput];
-      const amountPerSecond = toHex(
-        BigInt(maxAmount) / BigInt(TIME_PERIOD_TO_SECOND[period]),
+      const attenuatedAmountPerSecond = toHex(
+        BigInt(attenuatedMaxAmount) / BigInt(TIME_PERIOD_TO_SECOND[period]),
       );
+      const attenuatedExpiry =
+        state.rules[NativeTokenStreamDialogElementNames.ExpiryRule];
+      const attenuatedInitialAmount =
+        state.rules[NativeTokenStreamDialogElementNames.InitialAmountRule];
+      const attenuatedStartTime =
+        state.rules[NativeTokenStreamDialogElementNames.StartTimeRule];
 
       return {
-        expiry: requestedExpiry,
+        expiry: attenuatedExpiry
+          ? convertReadableDateToTimestampToday(attenuatedExpiry)
+          : requestedExpiry,
         attenuatedPermission: {
           ...requestedPermission,
           data: {
             ...requestedPermission.data,
-            maxAmount,
-            amountPerSecond,
+            maxAmount: attenuatedMaxAmount,
+            amountPerSecond: attenuatedAmountPerSecond,
+            initialAmount: attenuatedInitialAmount
+              ? convertValueToHex(attenuatedInitialAmount)
+              : requestedPermission.data.initialAmount,
+            startTime: attenuatedStartTime
+              ? convertReadableDateToTimestampToday(attenuatedStartTime)
+              : requestedPermission.data.startTime,
           },
         } as PermissionTypeMapping['native-token-stream'],
       };
@@ -234,13 +251,18 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           [NativeTokenStreamDialogElementNames.MaxAmountInput]:
             permission.data.maxAmount,
           [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+
+          // Rules are in human readable format is state so UI components do not need to convert them
           rules: {
             [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
-            [NativeTokenStreamDialogElementNames.InitialAmountRule]:
-              permission.data.initialAmount ?? null,
+            [NativeTokenStreamDialogElementNames.InitialAmountRule]: permission
+              .data.initialAmount
+              ? formatTokenBalance(permission.data.initialAmount)
+              : null,
             [NativeTokenStreamDialogElementNames.StartTimeRule]:
-              permission.data.startTime,
-            [NativeTokenStreamDialogElementNames.ExpiryRule]: expiry,
+              convertTimestampToReadableDate(permission.data.startTime),
+            [NativeTokenStreamDialogElementNames.ExpiryRule]:
+              convertTimestampToReadableDate(expiry),
           },
           [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
           [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',

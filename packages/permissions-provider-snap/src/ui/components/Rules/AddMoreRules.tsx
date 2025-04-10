@@ -1,12 +1,13 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box, Icon, Button } from '@metamask/snaps-sdk/jsx';
 
+import type { RuleValidationTypes } from './Rules';
 import { filterNotActiveRuleMeta, type RuleMeta } from './Rules';
 import { RulesSelectorElementNames } from './RulesSelector';
 
 type RulesSelectorProps = {
   activeRuleStateKeys: string[];
-  ruleMeta: RuleMeta[];
+  ruleMeta: RuleMeta<RuleValidationTypes>[];
 };
 
 /**

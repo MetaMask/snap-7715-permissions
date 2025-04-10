@@ -20,6 +20,7 @@ import {
   TimePeriod,
   RulesSelectorElementNames,
 } from '../src/ui';
+import { convertTimestampToReadableDate } from '../src/utils';
 
 describe('native-token-stream Orchestrator', () => {
   const mockStartTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
@@ -66,8 +67,9 @@ describe('native-token-stream Orchestrator', () => {
         [NativeTokenStreamDialogElementNames.InitialAmountRule]:
           mockbasePermission.data.initialAmount,
         [NativeTokenStreamDialogElementNames.StartTimeRule]:
-          mockbasePermission.data.startTime,
-        [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+          convertTimestampToReadableDate(mockbasePermission.data.startTime),
+        [NativeTokenStreamDialogElementNames.ExpiryRule]:
+          convertTimestampToReadableDate(10000000),
       },
     },
   };

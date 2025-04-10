@@ -15,6 +15,7 @@ import {
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
+import { convertTimestampToReadableDate } from '../src/utils';
 
 jest.mock('../src/userEventDispatcher');
 
@@ -70,8 +71,9 @@ describe('Permission Confirmation Render Handler', () => {
           [NativeTokenStreamDialogElementNames.InitialAmountRule]:
             permission.data.initialAmount ?? null,
           [NativeTokenStreamDialogElementNames.StartTimeRule]:
-            permission.data.startTime,
-          [NativeTokenStreamDialogElementNames.ExpiryRule]: 1,
+            convertTimestampToReadableDate(permission.data.startTime),
+          [NativeTokenStreamDialogElementNames.ExpiryRule]:
+            convertTimestampToReadableDate(10000000),
         },
       },
     };
