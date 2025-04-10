@@ -280,8 +280,9 @@ describe('native-token-stream Orchestrator', () => {
     });
 
     it('should return confirmation dialog EventHandlers', async () => {
-      const parsedPermission =
-        await orchestrator.parseAndValidate(mockbasePermission);
+      const parsedPermission = await orchestrator.parseAndValidate(
+        mockbasePermission,
+      );
       const { dialogContentEventHandlers } =
         orchestrator.getConfirmationDialogEventHandlers(
           parsedPermission,
