@@ -9,19 +9,16 @@ import {
   Button,
 } from '@metamask/snaps-sdk/jsx';
 
-export enum RequestDetailsEventNames {
-  ShowMoreButton = 'request-details.show-more-button',
-}
-
 type RequestDetailsProps = JsonObject & {
   itemDetails: ItemDetails[];
+  isJustificationShowMoreExpanded: boolean;
+  justificationShowMoreExpandedElementName: string;
 };
 
 export type ItemDetails = {
   label: string;
   text: string;
   tooltipText?: string;
-  isHideable?: boolean;
   iconUrl?: string;
 };
 
@@ -61,10 +58,15 @@ const renderIconAsImage = (iconUrl?: string) => {
  * Renders a text component or a text component with a button to show more.
  *
  * @param text - The text to display.
+ * @param elementName - Element name for the toggle button.
  * @param isHideable - Whether the text is isHideable.
  * @returns A text component or a text component with a button to show more.
  */
-const renderIsHideableText = (text: string, isHideable?: boolean) => {
+const renderShowMoreText = (
+  text: string,
+  elementName: string,
+  isHideable: boolean,
+) => {
   if (!isHideable) {
     return <Text>{text}</Text>;
   }
@@ -76,13 +78,15 @@ const renderIsHideableText = (text: string, isHideable?: boolean) => {
       ) : (
         <Text color="muted">text</Text>
       )}
-      <Button name={RequestDetailsEventNames.ShowMoreButton}>Show</Button>
+      <Button name={elementName}>Show</Button>
     </Box>
   );
 };
 
 export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
   itemDetails,
+  isJustificationShowMoreExpanded,
+  justificationShowMoreExpandedElementName,
 }) => {
   const itemsDisplay = itemDetails.map((item) => (
     <Box direction="horizontal" alignment="space-between">
@@ -92,7 +96,15 @@ export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
       </Box>
       <Box direction="horizontal">
         {renderIconAsImage(item.iconUrl)}
-        {renderIsHideableText(item.text, item.isHideable)}
+        {item.label === 'Reason' ? (
+          renderShowMoreText(
+            item.text,
+            justificationShowMoreExpandedElementName,
+            isJustificationShowMoreExpanded,
+          )
+        ) : (
+          <Text>{item.text}</Text>
+        )}
       </Box>
     </Box>
   ));

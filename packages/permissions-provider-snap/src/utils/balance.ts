@@ -1,5 +1,5 @@
 import type { Hex } from 'viem';
-import { formatUnits } from 'viem';
+import { formatUnits, parseUnits, toHex } from 'viem';
 
 /**
  * Formats a token balance to a human-readable string.
@@ -16,4 +16,17 @@ export const formatTokenBalance = (
   const ethBalance = formatUnits(BigInt(wei), tokenDecimal);
   const ethBalanceNum = parseFloat(ethBalance);
   return ethBalanceNum.toFixed(decimalPlaces);
+};
+
+/**
+ * Converts a token balance to a hex string with the given decimal places.
+ * @param value - The value to convert.
+ * @param tokenDecimal - The number of decimal places the token uses.
+ * @returns The hex string.
+ */
+export const convertValueToHex = (
+  value: string | number,
+  tokenDecimal = 18,
+): Hex => {
+  return toHex(parseUnits(value.toString(), tokenDecimal));
 };
