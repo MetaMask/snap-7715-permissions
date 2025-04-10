@@ -34,8 +34,8 @@ export const NativeTokenStreamRules: SnapComponent<
     <Section>
       {initialAmount ? (
         <TokenValueRule
-          text="Initial amount"
-          tooltip="tooltip text"
+          text="Initial allowance"
+          tooltip="The amount that can be taken out by the recipient immediately after the start date."
           inputName={NativeTokenStreamRulesElementNames.InitialAmount}
           removeRuleButtonName={
             NativeTokenStreamRulesElementNames.InitialAmountRemove
@@ -47,7 +47,7 @@ export const NativeTokenStreamRules: SnapComponent<
       {maxAllowance ? (
         <TokenValueRule
           text="Max allowance"
-          tooltip="tooltip text"
+          tooltip="The token stream stops when the max allowance is reached. This includes the initial allowance and the streaming amount each period."
           inputName={NativeTokenStreamRulesElementNames.MaxAllowance}
           removeRuleButtonName={
             NativeTokenStreamRulesElementNames.MaxAllowanceRemove
@@ -59,7 +59,7 @@ export const NativeTokenStreamRules: SnapComponent<
       {startTime ? (
         <TimestampRule
           text="Start date"
-          tooltip="tooltip text"
+          tooltip="Start date for the token stream allowance."
           inputName={NativeTokenStreamRulesElementNames.StartTime}
           removeRuleButtonName={
             NativeTokenStreamRulesElementNames.StartTimeRemove
@@ -71,7 +71,7 @@ export const NativeTokenStreamRules: SnapComponent<
       {expiry ? (
         <TimestampRule
           text="Expiration date"
-          tooltip="tooltip text"
+          tooltip="Date when tokens can no longer be taken out by the receiver."
           inputName={NativeTokenStreamRulesElementNames.Expiry}
           removeRuleButtonName={NativeTokenStreamRulesElementNames.ExpiryRemove}
           timestamp={expiry}

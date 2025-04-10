@@ -64,11 +64,10 @@ const calculateStreamRate = (
  * Helper function to display text and tooltip for input fields.
  *
  * @param leftText - The text to display on the left side.
- * @param rightText - The text to display on the right side.
  * @param tooltip - The tooltip text.
  * @returns Return a component with text and tooltip.
  */
-const inputDetails = (leftText: string, rightText: string, tooltip: string) => (
+const inputDetails = (leftText: string, tooltip: string) => (
   <Box direction="horizontal" alignment="space-between">
     <Box direction="horizontal">
       <Text>{leftText}</Text>
@@ -76,7 +75,6 @@ const inputDetails = (leftText: string, rightText: string, tooltip: string) => (
         <Icon name="question" size="inherit" color="muted" />
       </Tooltip>
     </Box>
-    <Text color="alternative">{rightText}</Text>
   </Box>
 );
 
@@ -86,9 +84,13 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   period,
   periodElementName,
 }) => {
+  const streamRate = calculateStreamRate(streamAmount, period);
   return (
     <Section>
-      {inputDetails('Stream Amount', 'Required', 'tooltip text')}
+      {inputDetails(
+        'Stream amount',
+        'Number of tokens streamed in the specified time period.',
+      )}
       <Input
         name={streamAmountElementName}
         type="number"
@@ -96,7 +98,10 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
         value={streamAmount}
       />
 
-      {inputDetails('Period', 'Required', 'tooltip text')}
+      {inputDetails(
+        'Period',
+        'The time period over which the streaming rate is specified. The calculated streaming rate is per second.',
+      )}
       <Dropdown name={periodElementName} value={period}>
         <Option value={TimePeriod.MONTHLY}>{TimePeriod.MONTHLY}</Option>
         <Option value={TimePeriod.WEEKLY}>{TimePeriod.WEEKLY}</Option>
@@ -105,9 +110,15 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
 
       {inputDetails(
         'Stream rate',
-        `${calculateStreamRate(streamAmount, period)} ETH/sec`,
-        'tooltip text',
+        'How many tokens are available each second.',
       )}
+      <Input
+        name="stream-rate"
+        type="text"
+        placeholder={`${streamRate} ETH/sec`}
+        value={`${streamRate} ETH/sec`}
+        disabled={true}
+      />
     </Section>
   );
 };

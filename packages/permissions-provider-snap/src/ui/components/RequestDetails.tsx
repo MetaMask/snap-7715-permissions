@@ -8,21 +8,14 @@ import {
   Image,
   Button,
 } from '@metamask/snaps-sdk/jsx';
-import { extractChain } from 'viem';
-import * as ALL_CHAINS from 'viem/chains';
-
-import { ICONS } from '../iconConstant';
 
 type RequestDetailsProps = JsonObject & {
-  siteOrigin: string;
-  justification?: string | undefined;
-  chainId: number;
-  asset: string;
+  itemDetails: ItemDetails[];
   isJustificationShowMoreExpanded: boolean;
   justificationShowMoreExpandedElementName: string;
 };
 
-type ItemDetails = {
+export type ItemDetails = {
   label: string;
   text: string;
   tooltipText?: string;
@@ -91,48 +84,11 @@ const renderShowMoreText = (
 };
 
 export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
-  siteOrigin,
-  justification,
-  chainId,
-  asset, // TODO: Update to use caip-19 asset
+  itemDetails,
   isJustificationShowMoreExpanded,
   justificationShowMoreExpandedElementName,
 }) => {
-  // @ts-expect-error - extractChain does not work well with dynamic `chains`
-  const chain = extractChain({
-    chains: Object.values(ALL_CHAINS),
-    id: chainId as any,
-  });
-
-  const icons = ICONS[chainId];
-  if (!icons) {
-    throw new Error('No icon found');
-  }
-
-  const items: ItemDetails[] = [
-    {
-      label: 'Recipient',
-      text: siteOrigin,
-      tooltipText: 'Recipient tool tip text',
-    },
-    {
-      label: 'Network',
-      text: chain.name,
-      iconUrl: icons.network,
-    },
-    {
-      label: 'Token',
-      text: asset,
-      iconUrl: icons.token,
-    },
-    {
-      label: 'Reason',
-      text: justification ?? 'No reason provided',
-      tooltipText: 'Tooltip text',
-    },
-  ];
-
-  const itemsDisplay = items.map((item) => (
+  const itemsDisplay = itemDetails.map((item) => (
     <Box direction="horizontal" alignment="space-between">
       <Box direction="horizontal">
         <Text>{item.label}</Text>
