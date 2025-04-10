@@ -35,7 +35,7 @@ export const NativeTokenStreamRules: SnapComponent<
       {initialAmount ? (
         <TokenValueRule
           text="Initial allowance"
-          tooltip="The amount that can be taken out by the recipient after permission is approved. Can be withdrawn before start date."
+          tooltip="The amount that can be taken out by the recipient immediately after the start date."
           inputName={NativeTokenStreamRulesElementNames.InitialAmount}
           removeRuleButtonName={
             NativeTokenStreamRulesElementNames.InitialAmountRemove

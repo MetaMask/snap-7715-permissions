@@ -100,7 +100,7 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
 
       {inputDetails(
         'Period',
-        'How often this token stream updates, shown as hourly, daily, weekly, monthly, or yearly.',
+        'The time period over which the streaming rate is specified. The calculated streaming rate is per second.',
       )}
       <Dropdown name={periodElementName} value={period}>
         <Option value={TimePeriod.MONTHLY}>{TimePeriod.MONTHLY}</Option>
