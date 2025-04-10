@@ -89,8 +89,7 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   period,
   periodElementName,
 }) => {
-  const timePeriodValue = TimePeriod.WEEKLY;
-  const streamRate = formatStreamRatePerSecond(streamAmount, timePeriodValue);
+  const streamRate = formatStreamRatePerSecond(streamAmount, period);
   return (
     <Section>
       {inputDetails(
