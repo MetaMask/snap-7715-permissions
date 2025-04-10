@@ -1,5 +1,7 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box } from '@metamask/snaps-sdk/jsx';
+import { extractChain } from 'viem';
+import * as ALL_CHAINS from 'viem/chains';
 
 import type {
   AccountDetailsProps,
@@ -17,6 +19,7 @@ import {
   RulesSelectorElementNames,
   filterNotActiveRuleMeta,
 } from '../components';
+import { ICONS } from '../iconConstant';
 import type { PermissionConfirmationProps } from '../types';
 
 /**
@@ -71,7 +74,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
     },
     senderDetails: {
       title: 'Stream from',
-      tooltip: 'Tooltip text',
+      tooltip: 'The account that the token stream comes from.',
     },
   };
   const startOfTodayHumanReadable = Math.floor(
@@ -158,15 +161,46 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
     );
   }
 
+  // @ts-expect-error - extractChain does not work well with dynamic `chains`
+  const chain = extractChain({
+    chains: Object.values(ALL_CHAINS),
+    id: chainId as any,
+  });
+  const icons = ICONS[chainId];
+  if (!icons) {
+    throw new Error('No icon found');
+  }
+
+  const items: ItemDetails[] = [
+    {
+      label: 'Recipient',
+      text: siteOrigin,
+      tooltipText: 'Site receiving the token stream allowance.',
+    },
+    {
+      label: 'Network',
+      text: chain.name,
+      iconUrl: icons.network,
+    },
+    {
+      label: 'Token',
+      text: asset,
+      iconUrl: icons.token,
+    },
+    {
+      label: 'Reason',
+      text: justification ?? 'No reason provided',
+      tooltipText:
+        'Reason given by the recipient for requesting this token stream allowance.',
+    },
+  ];
+
   return (
     <Box>
       <RequestHeader title="Create a token stream" />
 
       <RequestDetails
-        siteOrigin={siteOrigin}
-        chainId={chainId}
-        justification={justification}
-        asset={asset}
+        itemDetails={items}
         isJustificationShowMoreExpanded={
           state[
             NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded
