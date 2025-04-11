@@ -1,10 +1,10 @@
+import type { Permission } from '@metamask/7715-permissions-shared/types';
+import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import {
   createCaveatBuilder,
   getDeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
-import type { Permission } from '@metamask/7715-permissions-shared/types';
-import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import { getAddress, toHex } from 'viem';
+import { getAddress, parseUnits, toHex } from 'viem';
 import { sepolia } from 'viem/chains';
 
 import type {
@@ -20,7 +20,11 @@ import {
   TimePeriod,
   RulesSelectorElementNames,
 } from '../src/ui';
-import { convertTimestampToReadableDate } from '../src/utils';
+import {
+  convertReadableDateToTimestamp,
+  convertTimestampToReadableDate,
+  getMaxUint256,
+} from '../src/utils';
 
 describe('native-token-stream Orchestrator', () => {
   const mockStartTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
@@ -283,14 +287,358 @@ describe('native-token-stream Orchestrator', () => {
     });
 
     it('should return confirmation dialog EventHandlers', async () => {
-      const parsedPermission =
-        await orchestrator.parseAndValidate(mockbasePermission);
+      const parsedPermission = await orchestrator.parseAndValidate(
+        mockbasePermission,
+      );
       const { dialogContentEventHandlers } =
         orchestrator.getConfirmationDialogEventHandlers(
           parsedPermission,
           mockUiContext.expiry,
         );
       expect(dialogContentEventHandlers.length).toStrictEqual(12);
+    });
+  });
+
+  describe('resolveAttenuatedPermission', () => {
+    let orchestrator: Orchestrator<'native-token-stream'>;
+    const mockRequestedPermission = {
+      type: 'native-token-stream',
+      data: {
+        justification: 'test justification',
+        initialAmount: toHex(parseUnits('0.5', 18)),
+        amountPerSecond: toHex(parseUnits('0.5', 18)),
+        startTime: mockStartTime,
+        maxAmount: toHex(parseUnits('2.5', 18)),
+      },
+    } as PermissionTypeMapping['native-token-stream'];
+
+    beforeEach(() => {
+      orchestrator = createPermissionOrchestrator(mockPermissionType);
+    });
+
+    it('should return attenuated permission with all fields when all rules are set', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {
+            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+              parseUnits('3', 18),
+            ),
+            [NativeTokenStreamDialogElementNames.PeriodInput]:
+              TimePeriod.WEEKLY,
+            rules: {
+              [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+                'Unlimited',
+              [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0.5',
+              [NativeTokenStreamDialogElementNames.StartTimeRule]: '01/01/2025',
+              [NativeTokenStreamDialogElementNames.ExpiryRule]: '01/01/2026',
+            },
+            [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+              false,
+            [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+            [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+            [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
+          },
+        };
+
+      const result = await orchestrator.resolveAttenuatedPermission(
+        mockRequestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result).toEqual({
+        expiry: convertReadableDateToTimestamp('01/01/2026'),
+        attenuatedPermission: {
+          type: 'native-token-stream',
+          data: {
+            justification: 'test justification',
+            initialAmount: toHex(parseUnits('0.5', 18)),
+            amountPerSecond: '0x482e9f5cf5d',
+            startTime: convertReadableDateToTimestamp('01/01/2025'),
+            maxAmount: getMaxUint256(),
+          },
+        },
+      });
+    });
+
+    it('should use requested expiry when no expiry rule is set', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {
+            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+              parseUnits('3', 18),
+            ),
+            [NativeTokenStreamDialogElementNames.PeriodInput]:
+              TimePeriod.WEEKLY,
+            rules: {
+              [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+                'Unlimited',
+              [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0.5',
+              [NativeTokenStreamDialogElementNames.StartTimeRule]: '01/01/2025',
+              [NativeTokenStreamDialogElementNames.ExpiryRule]: null,
+            },
+            [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+              false,
+            [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+            [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+            [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
+          },
+        };
+
+      const result = await orchestrator.resolveAttenuatedPermission(
+        mockRequestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result.expiry).toBe(10000000);
+    });
+
+    it('should use requested start time when no start time rule is set', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {
+            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+              parseUnits('3', 18),
+            ),
+            [NativeTokenStreamDialogElementNames.PeriodInput]:
+              TimePeriod.WEEKLY,
+            rules: {
+              [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+                'Unlimited',
+              [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0.5',
+              [NativeTokenStreamDialogElementNames.StartTimeRule]: null,
+              [NativeTokenStreamDialogElementNames.ExpiryRule]: '01/01/2026',
+            },
+            [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+              false,
+            [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+            [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+            [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
+          },
+        };
+
+      const result = await orchestrator.resolveAttenuatedPermission(
+        mockRequestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result.attenuatedPermission.data.startTime).toBe(mockStartTime);
+    });
+
+    it('should calculate amount per second based on max amount and period when the max amount it adjusted', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {
+            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+              parseUnits('3', 18),
+            ),
+            [NativeTokenStreamDialogElementNames.PeriodInput]:
+              TimePeriod.WEEKLY,
+            rules: {
+              [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: null,
+              [NativeTokenStreamDialogElementNames.InitialAmountRule]: null,
+              [NativeTokenStreamDialogElementNames.StartTimeRule]: null,
+              [NativeTokenStreamDialogElementNames.ExpiryRule]: null,
+            },
+            [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+              false,
+            [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+            [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+            [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
+          },
+        };
+
+      const result = await orchestrator.resolveAttenuatedPermission(
+        mockRequestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result.attenuatedPermission.data.amountPerSecond).toBe(
+        '0x482e9f5cf5d',
+      );
+    });
+
+    it('should handle max allowance rule when set to unlimited', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {
+            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+              parseUnits('1', 18),
+            ),
+            [NativeTokenStreamDialogElementNames.PeriodInput]:
+              TimePeriod.WEEKLY,
+            rules: {
+              [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+                'Unlimited',
+              [NativeTokenStreamDialogElementNames.InitialAmountRule]: null,
+              [NativeTokenStreamDialogElementNames.StartTimeRule]: null,
+              [NativeTokenStreamDialogElementNames.ExpiryRule]: null,
+            },
+            [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+              false,
+            [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+            [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+            [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
+          },
+        };
+
+      const result = await orchestrator.resolveAttenuatedPermission(
+        mockRequestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result.expiry).toStrictEqual(10000000);
+      expect(result.attenuatedPermission.data).toStrictEqual({
+        justification: 'test justification',
+        initialAmount: '0x0',
+        amountPerSecond: '0x180f8a7451f',
+        startTime: mockStartTime,
+        maxAmount: getMaxUint256(),
+      });
+    });
+
+    it('should handle max allowance rule when set to amount', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {
+            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+              parseUnits('1', 18),
+            ),
+            [NativeTokenStreamDialogElementNames.PeriodInput]:
+              TimePeriod.WEEKLY,
+            rules: {
+              [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: '20',
+              [NativeTokenStreamDialogElementNames.InitialAmountRule]: null,
+              [NativeTokenStreamDialogElementNames.StartTimeRule]: null,
+              [NativeTokenStreamDialogElementNames.ExpiryRule]: null,
+            },
+            [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+              false,
+            [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+            [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+            [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
+          },
+        };
+
+      const result = await orchestrator.resolveAttenuatedPermission(
+        mockRequestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result.expiry).toStrictEqual(10000000);
+      expect(result.attenuatedPermission.data).toStrictEqual({
+        justification: 'test justification',
+        initialAmount: '0x0',
+        amountPerSecond: '0x180f8a7451f',
+        startTime: mockStartTime,
+        maxAmount: '0x1158e460913d00000',
+      });
+    });
+
+    it('should use zero default when initial amount is removed from rules', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {
+            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+              parseUnits('3', 18),
+            ),
+            [NativeTokenStreamDialogElementNames.PeriodInput]:
+              TimePeriod.WEEKLY,
+            rules: {
+              [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+                'Unlimited',
+              [NativeTokenStreamDialogElementNames.InitialAmountRule]: null,
+              [NativeTokenStreamDialogElementNames.StartTimeRule]: '01/01/2025',
+              [NativeTokenStreamDialogElementNames.ExpiryRule]: '01/01/2026',
+            },
+            [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+              false,
+            [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+            [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+            [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
+          },
+        };
+
+      const result = await orchestrator.resolveAttenuatedPermission(
+        mockRequestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result).toEqual({
+        expiry: convertReadableDateToTimestamp('01/01/2026'),
+        attenuatedPermission: {
+          type: 'native-token-stream',
+          data: {
+            justification: 'test justification',
+            initialAmount: toHex(parseUnits('0', 18)),
+            amountPerSecond: '0x482e9f5cf5d',
+            startTime: convertReadableDateToTimestamp('01/01/2025'),
+            maxAmount: getMaxUint256(),
+          },
+        },
+      });
     });
   });
 });
