@@ -1,4 +1,4 @@
-# @metamask/permissions-kernel
+# @metamask/permissions-kernel-snap
 
 This snap manages a `permissions offer registry` of all the permissions a user is willing to grant via a 7715 permissions request. A dApp will make a 7715 permissions request to the kernel, which will forward the request to a permissions provider snap for user attenuation. The kernel rejects the request if the dApp asks for permission that is not in the registry.
 
