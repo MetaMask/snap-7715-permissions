@@ -1,14 +1,17 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import {
-  type Json,
-  type JsonRpcParams,
-  type OnRpcRequestHandler,
-  type OnUserInputHandler,
+import type {
+  OnHomePageHandler,
+  OnInstallHandler,
+  Json,
+  JsonRpcParams,
+  OnRpcRequestHandler,
+  OnUserInputHandler,
 } from '@metamask/snaps-sdk';
 import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
 import { PriceApiClient } from './clients';
+import { HomePage } from './homepage';
 import { createPermissionsContextBuilder } from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
@@ -24,7 +27,12 @@ const accountController = new AccountController({
   deploymentSalt: '0x',
 });
 
-const userEventDispatcher = new UserEventDispatcher(snap);
+const homepage = new HomePage({
+  accountController,
+  snapsProvider: snap,
+});
+
+const userEventDispatcher = new UserEventDispatcher();
 
 const permissionConfirmationRenderHandler =
   createPermissionConfirmationRenderHandler({
@@ -96,3 +104,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  */
 export const onUserInput: OnUserInputHandler = async (args) =>
   userEventDispatcher.handleUserInputEvent(args);
+
+export const onHomePage: OnHomePageHandler = async () => {
+  return {
+    content: await homepage.buildHomepage(),
+  };
+};
+
+export const onInstall: OnInstallHandler = async () => {
+  await homepage.showWelcomeScreen();
+};
