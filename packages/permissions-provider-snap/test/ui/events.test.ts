@@ -44,6 +44,7 @@ describe('Confirmation Dialog event handlers', () => {
             [NativeTokenStreamDialogElementNames.StartTimeRule]: '01/07/2025',
             [NativeTokenStreamDialogElementNames.ExpiryRule]: '01/07/2026',
           },
+          [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
         },
       };
 

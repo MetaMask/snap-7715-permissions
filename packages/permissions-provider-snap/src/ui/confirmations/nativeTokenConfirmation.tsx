@@ -3,8 +3,10 @@ import { Box } from '@metamask/snaps-sdk/jsx';
 import { extractChain } from 'viem';
 import * as ALL_CHAINS from 'viem/chains';
 
+import { getMaxUint256, getStartOfNextDay, getStartOfToday } from '../../utils';
 import type {
   AccountDetailsProps,
+  ItemDetails,
   RuleMeta,
   RuleValidationTypes,
 } from '../components';
@@ -39,6 +41,7 @@ export enum NativeTokenStreamDialogElementNames {
   MaxAllowanceRule = 'max-allowance-rule-native-token-stream',
   StartTimeRule = 'start-time-rule-native-token-stream',
   ExpiryRule = 'expiry-rule-native-token-stream',
+  MaxAllowanceDropdown = 'max-allowance-dropdown-native-token-stream',
 }
 
 /**
@@ -77,9 +80,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       tooltip: 'The account that the token stream comes from.',
     },
   };
-  const startOfTodayHumanReadable = Math.floor(
-    new Date().setHours(0, 0, 0, 0) / 1000,
-  );
+
   const ruleMeta: RuleMeta<RuleValidationTypes>[] = [
     {
       stateKey: NativeTokenStreamDialogElementNames.InitialAmountRule,
@@ -100,7 +101,12 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         validationType: 'value',
         emptyInputValidationError: 'Please enter a valid max allowance',
         inputConstraintValidationError: 'Not enough ETH available',
-        compareValue: balance,
+        compareValue: getMaxUint256(),
+        unlimitedAllowanceDropDown: {
+          dropdownKey: NativeTokenStreamDialogElementNames.MaxAllowanceDropdown,
+          dropdownValue:
+            state[NativeTokenStreamDialogElementNames.MaxAllowanceDropdown],
+        },
       },
     },
     {
@@ -111,7 +117,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         validationType: 'timestamp',
         emptyInputValidationError: 'Enter a valid date',
         inputConstraintValidationError: 'Must be today or later',
-        compareValue: startOfTodayHumanReadable,
+        compareValue: getStartOfToday(),
       },
     },
     {
@@ -121,8 +127,8 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       ruleValidator: {
         validationType: 'timestamp',
         emptyInputValidationError: 'Enter a valid date',
-        inputConstraintValidationError: 'Must be today or later',
-        compareValue: startOfTodayHumanReadable,
+        inputConstraintValidationError: 'Must be after start time',
+        compareValue: getStartOfNextDay(),
       },
     },
   ];
@@ -139,13 +145,13 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
     return (
       <Box>
         <RulesSelector
-          selectedRuleDropdownEventName={
+          selectedRuleDropdownElementName={
             NativeTokenStreamDialogElementNames.SelectedRuleDropdown
           }
-          selectedRuleInputEventName={
+          selectedRuleInputElementName={
             NativeTokenStreamDialogElementNames.SelectedRuleInput
           }
-          addMoreRulesFormSubmitEventName={
+          addMoreRulesFormSubmitElementName={
             NativeTokenStreamDialogElementNames.AddMoreRulesFormSubmit
           }
           activeRuleStateKeys={activeRuleStateKeys}

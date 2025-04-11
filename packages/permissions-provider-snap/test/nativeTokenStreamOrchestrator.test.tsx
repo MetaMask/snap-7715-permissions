@@ -71,6 +71,7 @@ describe('native-token-stream Orchestrator', () => {
         [NativeTokenStreamDialogElementNames.ExpiryRule]:
           convertTimestampToReadableDate(10000000),
       },
+      [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
     },
   };
 
@@ -290,7 +291,7 @@ describe('native-token-stream Orchestrator', () => {
           parsedPermission,
           mockUiContext.expiry,
         );
-      expect(dialogContentEventHandlers.length).toStrictEqual(11);
+      expect(dialogContentEventHandlers.length).toStrictEqual(12);
     });
   });
 });

@@ -28,6 +28,19 @@ type RuleValidationInputCheckMapping = {
 };
 
 /**
+ * The type of the unlimited allowance drop down selector.
+ */
+export type UnlimitedAllowanceDropDownSelector = {
+  dropdownKey: string;
+  dropdownValue: string;
+};
+
+/**
+ * The options for the unlimited allowance drop down selector.
+ */
+export const UNLIMITED_ALLOWANCE_DROP_DOWN_OPTIONS = ['Specify', 'Unlimited'];
+
+/**
  * The validator for a rule to allow the component to validate the input and display the correct error message.
  */
 export type RuleValidator<TValidationType extends RuleValidationTypes> = {
@@ -35,6 +48,7 @@ export type RuleValidator<TValidationType extends RuleValidationTypes> = {
   emptyInputValidationError: string;
   inputConstraintValidationError: string;
   compareValue: RuleValidationInputCheckMapping[TValidationType];
+  unlimitedAllowanceDropDown?: UnlimitedAllowanceDropDownSelector;
 };
 
 /**

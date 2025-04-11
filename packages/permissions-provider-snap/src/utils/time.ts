@@ -27,7 +27,7 @@ export const convertTimestampToReadableDate = (timestamp: number) => {
  * @param date - The human-readable date string.
  * @returns The unix timestamp in seconds.
  */
-export const convertReadableDateToTimestampToday = (date: string) => {
+export const convertReadableDateToTimestamp = (date: string) => {
   const [month, day, year] = date.split('/');
   if (!month || !day || !year) {
     throw new Error('Invalid date format');
@@ -49,4 +49,29 @@ export const isHumanReadableInCorrectFormat = (date: string) => {
     return false;
   }
   return true;
+};
+
+/**
+ * Returns the Unix timestamp (in seconds) for the start of today (12:00 AM).
+ *
+ * @returns Unix timestamp at 12:00:00 AM of today.
+ */
+export const getStartOfToday = (): number => {
+  const now = new Date();
+  const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+  return Math.floor(startOfToday.getTime() / 1000);
+};
+
+/**
+ * Returns the Unix timestamp (in seconds) for the start of the next day (12:00 AM).
+ *
+ * @returns Unix timestamp at 12:00:00 AM of the next day.
+ */
+export const getStartOfNextDay = (): number => {
+  const now = new Date();
+  const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+  const startOfTomorrow = new Date(
+    startOfToday.getTime() + 24 * 60 * 60 * 1000,
+  );
+  return Math.floor(startOfTomorrow.getTime() / 1000);
 };

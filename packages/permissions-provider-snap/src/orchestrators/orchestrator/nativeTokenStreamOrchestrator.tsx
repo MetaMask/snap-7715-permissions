@@ -24,10 +24,11 @@ import {
 import { NativeTokenStreamConfirmationPage } from '../../ui/confirmations';
 import type { UserEventHandler } from '../../userEventDispatcher';
 import {
-  convertReadableDateToTimestampToday,
+  convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
-  convertValueToHex,
   formatTokenBalance,
+  maxAllowanceParser,
+  zeroDefaultParser,
 } from '../../utils';
 import type {
   OrchestratorFactoryFunction,
@@ -56,6 +57,7 @@ declare module './types' {
       };
       [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: string;
       [NativeTokenStreamDialogElementNames.SelectedRuleInput]: string;
+      [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: string;
     };
   }
 }
@@ -212,22 +214,24 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         state.rules[NativeTokenStreamDialogElementNames.InitialAmountRule];
       const attenuatedStartTime =
         state.rules[NativeTokenStreamDialogElementNames.StartTimeRule];
+      const attenuatedMaxAllowance =
+        state.rules[NativeTokenStreamDialogElementNames.MaxAllowanceRule];
 
       return {
         expiry: attenuatedExpiry
-          ? convertReadableDateToTimestampToday(attenuatedExpiry)
+          ? convertReadableDateToTimestamp(attenuatedExpiry)
           : requestedExpiry,
         attenuatedPermission: {
           ...requestedPermission,
           data: {
             ...requestedPermission.data,
-            maxAmount: attenuatedMaxAmount,
+            maxAmount: attenuatedMaxAllowance
+              ? maxAllowanceParser(attenuatedMaxAllowance)
+              : attenuatedMaxAmount,
             amountPerSecond: attenuatedAmountPerSecond,
-            initialAmount: attenuatedInitialAmount
-              ? convertValueToHex(attenuatedInitialAmount)
-              : requestedPermission.data.initialAmount,
+            initialAmount: zeroDefaultParser(attenuatedInitialAmount),
             startTime: attenuatedStartTime
-              ? convertReadableDateToTimestampToday(attenuatedStartTime)
+              ? convertReadableDateToTimestamp(attenuatedStartTime)
               : requestedPermission.data.startTime,
           },
         } as PermissionTypeMapping['native-token-stream'],
@@ -267,6 +271,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
           [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
           [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+          [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
         },
 
         dialogContentEventHandlers: [
@@ -315,6 +320,13 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           },
           {
             elementName: NativeTokenStreamDialogElementNames.SelectedRuleInput,
+            eventType: UserInputEventType.InputChangeEvent,
+            handler:
+              handleReplaceTextInput as UserEventHandler<UserInputEventType>,
+          },
+          {
+            elementName:
+              NativeTokenStreamDialogElementNames.MaxAllowanceDropdown,
             eventType: UserInputEventType.InputChangeEvent,
             handler:
               handleReplaceTextInput as UserEventHandler<UserInputEventType>,

@@ -25,6 +25,7 @@ import {
   type PermissionConfirmationRenderHandler,
 } from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
+import { formatTokenBalance } from '../src/utils';
 
 jest.mock('../src/userEventDispatcher');
 
@@ -45,7 +46,7 @@ describe('Orchestrate', () => {
       type: 'native-token-stream',
       data: {
         justification: 'shh...permission 2',
-        initialAmount: '0x1',
+        initialAmount: toHex(parseUnits('1', 18)),
         amountPerSecond: '0x1',
         startTime: 1000,
         maxAmount: toHex(parseUnits('1', 18)),
@@ -95,10 +96,16 @@ describe('Orchestrate', () => {
         [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
         rules: {
           [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: null,
-          [NativeTokenStreamDialogElementNames.InitialAmountRule]: null,
+          [NativeTokenStreamDialogElementNames.InitialAmountRule]:
+            nativeTokenStreamPermission.data.initialAmount
+              ? formatTokenBalance(
+                  nativeTokenStreamPermission.data.initialAmount,
+                )
+              : null,
           [NativeTokenStreamDialogElementNames.StartTimeRule]: null,
           [NativeTokenStreamDialogElementNames.ExpiryRule]: null,
         },
+        [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
       },
     };
 
@@ -161,8 +168,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(11);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(11);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(12);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(12);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -180,7 +187,7 @@ describe('Orchestrate', () => {
             data: {
               justification: 'shh...permission 2',
               amountPerSecond: '0x180f8a7451f',
-              initialAmount: '0x1',
+              initialAmount: '0xde0b6b3a7640000',
               startTime: 1000,
               maxAmount: '0xde0b6b3a7640000',
             },
@@ -239,8 +246,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(11);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(11);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(12);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(12);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

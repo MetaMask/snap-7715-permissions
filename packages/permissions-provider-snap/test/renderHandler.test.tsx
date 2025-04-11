@@ -75,6 +75,7 @@ describe('Permission Confirmation Render Handler', () => {
           [NativeTokenStreamDialogElementNames.ExpiryRule]:
             convertTimestampToReadableDate(10000000),
         },
+        [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
       },
     };
 

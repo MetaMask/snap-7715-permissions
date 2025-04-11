@@ -42,6 +42,7 @@ describe('UserEventDispatcher', () => {
         [NativeTokenStreamDialogElementNames.ExpiryRule]:
           convertTimestampToReadableDate(1),
       },
+      [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
     },
   };
 
