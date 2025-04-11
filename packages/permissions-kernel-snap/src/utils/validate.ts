@@ -24,7 +24,16 @@ import { PERMISSIONS_PROVIDER_SNAP_ID } from '../permissions/origin';
 export const parsePermissionRequestParam = (
   params: any,
 ): PermissionsRequest => {
-  const validatePermissionsRequest = zPermissionsRequest.safeParse(params);
+  // TODO: Default isAdjustmentAllowed to false for all incoming requests
+  // remove this once the SDK is updated to include isAdjustmentAllowed
+  const paramsWithIsAdjustmentAllowed = params.map((param: any) => ({
+    ...param,
+    isAdjustmentAllowed: false,
+  }));
+
+  const validatePermissionsRequest = zPermissionsRequest.safeParse(
+    paramsWithIsAdjustmentAllowed,
+  );
   if (!validatePermissionsRequest.success) {
     throw new InvalidParamsError(
       extractZodError(validatePermissionsRequest.error.errors),

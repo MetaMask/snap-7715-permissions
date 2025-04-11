@@ -235,6 +235,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         }
         period={state[NativeTokenStreamDialogElementNames.PeriodInput]}
         periodElementName={NativeTokenStreamDialogElementNames.PeriodInput}
+        isAdjustmentAllowed={isAdjustmentAllowed}
       />
 
       {isActiveRulesEmpty && (
