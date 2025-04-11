@@ -9,13 +9,13 @@ import {
 describe('Time Utility Functions', () => {
   describe('convertTimestampToReadableDate', () => {
     it('should convert a Unix timestamp to MM/DD/YYYY format', () => {
-      const timestamp = 1672531200;
-      expect(convertTimestampToReadableDate(timestamp)).toBe('12/31/2022');
+      const timestamp = 1747022400;
+      expect(convertTimestampToReadableDate(timestamp)).toBe('05/12/2025');
     });
 
     it('should handle different dates correctly', () => {
-      const timestamp = 1704067200;
-      expect(convertTimestampToReadableDate(timestamp)).toBe('12/31/2023');
+      const timestamp = 1749700800;
+      expect(convertTimestampToReadableDate(timestamp)).toBe('06/12/2025');
     });
 
     it('should throw an error for invalid date format', () => {
@@ -28,14 +28,14 @@ describe('Time Utility Functions', () => {
 
   describe('convertReadableDateToTimestamp', () => {
     it('should convert MM/DD/YYYY format to Unix timestamp', () => {
-      const date = '01/01/2023';
-      const expectedTimestamp = 1672549200;
+      const date = '04/11/2025';
+      const expectedTimestamp = 1744344000;
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
     });
 
     it('should handle different dates correctly', () => {
-      const date = '12/31/2023';
-      const expectedTimestamp = 1703998800;
+      const date = '04/11/2025';
+      const expectedTimestamp = 1744344000;
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
     });
 
@@ -50,12 +50,12 @@ describe('Time Utility Functions', () => {
   describe('isHumanReadableInCorrectFormat', () => {
     it('should return true for valid MM/DD/YYYY format', () => {
       expect(isHumanReadableInCorrectFormat('01/01/2023')).toBe(true);
-      expect(isHumanReadableInCorrectFormat('12/31/2023')).toBe(true);
+      expect(isHumanReadableInCorrectFormat('12/10/2023')).toBe(true);
     });
 
     it('should return false for invalid formats', () => {
       expect(isHumanReadableInCorrectFormat('invalid-date')).toBe(false);
-      expect(isHumanReadableInCorrectFormat('01-01-2023')).toBe(false);
+      expect(isHumanReadableInCorrectFormat('01-07-2023')).toBe(false);
       expect(isHumanReadableInCorrectFormat('')).toBe(false);
     });
   });

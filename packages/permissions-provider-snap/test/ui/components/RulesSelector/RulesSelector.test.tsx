@@ -47,12 +47,12 @@ describe('RulesSelector', () => {
           validationType: 'timestamp',
           emptyInputValidationError: 'Date cannot be empty',
           inputConstraintValidationError: 'Date is invalid',
-          compareValue: 1672531200, // 12/31/2022
+          compareValue: 1744308258, // 04/11/2025
         },
       };
 
       // timestamp is valid since it is after the compareValue
-      const result = validator('12/31/2023', timestampRuleMeta);
+      const result = validator('04/11/2025', timestampRuleMeta);
       expect(result).toBeUndefined();
     });
 
@@ -63,12 +63,12 @@ describe('RulesSelector', () => {
           validationType: 'timestamp',
           emptyInputValidationError: 'Date cannot be empty',
           inputConstraintValidationError: 'Date is invalid',
-          compareValue: 1672531200, // 12/31/2022
+          compareValue: 1744308258, // 04/11/2025
         },
       };
 
       // timestamp is invalid since it is before the compareValue
-      const result = validator('12/31/2021', timestampRuleMeta);
+      const result = validator('04/11/2024', timestampRuleMeta);
       expect(result).toBe('Date is invalid');
     });
   });
