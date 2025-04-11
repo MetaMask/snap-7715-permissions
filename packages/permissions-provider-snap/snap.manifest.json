@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Grants 7715 permissions from a DeleGator smart account",
   "proposedName": "Gator Permissions",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "tFwms627rh607d7ex8sV5oK614KkeNAA4SoQAeodbBg=",
+    "shasum": "p8wg/EFzaX/uxqivpgszIVrpW+nYBEu0etXhn1xrF8M=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
