@@ -1,5 +1,5 @@
 {
-  "name": "@metamask/gator-permissions",
+  "name": "@metamask/gator-permissions-snap",
   "version": "0.0.1",
   "description": "Grants 7715 permissions from a DeleGator smart account",
   "homepage": "https://github.com/MetaMask/snap-7715-permissions/tree/main/packages/permissions-kernel-snap#readme",
@@ -30,8 +30,8 @@
     "build:clean": "yarn clean && yarn build",
     "build:pack": "yarn build:clean && yarn pack --filename ../../deps/snap-b-0.1.0.tgz",
     "build:preinstalled-snap": "node scripts/build-preinstalled-snap.js",
-    "changelog:update": "../../scripts/update-changelog.sh @metamask/gator-permissions",
-    "changelog:validate": "../../scripts/validate-changelog.sh @metamask/gator-permissions",
+    "changelog:update": "../../scripts/update-changelog.sh @metamask/gator-permissions-snap",
+    "changelog:validate": "../../scripts/validate-changelog.sh @metamask/gator-permissions-snap",
     "clean": "rimraf dist",
     "lint": "yarn lint:eslint",
     "lint:complete": "yarn lint:eslint && yarn lint:constraints && yarn lint:misc --check && yarn lint:dependencies --check && yarn lint:changelog",

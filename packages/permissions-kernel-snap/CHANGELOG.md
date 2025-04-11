@@ -23,5 +23,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add validate logic for native token stream permission data ([#33](https://github.com/MetaMask/snap-7715-permissions/pull/33))
 - Update 7715 types to match mm proposed types ([#30](https://github.com/MetaMask/snap-7715-permissions/pull/30))
 
-[Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel@0.0.1...HEAD
-[0.0.1]: git+https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/permissions-kernel@0.0.1
+[Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.0.1...HEAD
+[0.0.1]: git+https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/permissions-kernel-snap@0.0.1

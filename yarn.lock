@@ -3091,9 +3091,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/gator-permissions@workspace:packages/permissions-provider-snap":
+"@metamask/gator-permissions-snap@workspace:packages/permissions-provider-snap":
   version: 0.0.0-use.local
-  resolution: "@metamask/gator-permissions@workspace:packages/permissions-provider-snap"
+  resolution: "@metamask/gator-permissions-snap@workspace:packages/permissions-provider-snap"
   dependencies:
     "@jest/globals": ^29.5.0
     "@metamask/7715-permissions-shared": "workspace:*"
@@ -3252,9 +3252,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/permissions-kernel@workspace:packages/permissions-kernel-snap":
+"@metamask/permissions-kernel-snap@workspace:packages/permissions-kernel-snap":
   version: 0.0.0-use.local
-  resolution: "@metamask/permissions-kernel@workspace:packages/permissions-kernel-snap"
+  resolution: "@metamask/permissions-kernel-snap@workspace:packages/permissions-kernel-snap"
   dependencies:
     "@jest/globals": ^29.5.0
     "@metamask/7715-permissions-shared": "workspace:*"

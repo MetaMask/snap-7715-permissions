@@ -30,5 +30,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions@0.0.1...HEAD
-[0.0.1]: git+https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/gator-permissions@0.0.1
+[Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.0.1...HEAD
+[0.0.1]: git+https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/gator-permissions-snap@0.0.1
