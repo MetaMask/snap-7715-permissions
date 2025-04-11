@@ -1,8 +1,8 @@
-import type { Caveat } from '@metamask-private/delegator-core-viem';
+import type { Caveat } from '@metamask/delegation-toolkit';
 import {
   createDelegation,
   encodeDelegation,
-} from '@metamask-private/delegator-core-viem';
+} from '@metamask/delegation-toolkit';
 import type { Address, Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';

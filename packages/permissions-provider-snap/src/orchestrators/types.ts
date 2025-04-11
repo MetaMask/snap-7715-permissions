@@ -1,8 +1,8 @@
-import type { CoreCaveatBuilder } from '@metamask-private/delegator-core-viem';
 import type {
   PermissionResponse,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
+import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import type {
   ComponentOrElement,
   UserInputEventType,

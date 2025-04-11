@@ -1,3 +1,4 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
   CHAIN_ID as ChainsWithDelegatorDeployed,
   Implementation,
@@ -5,8 +6,7 @@ import {
   type Delegation,
   type DeleGatorEnvironment,
   type MetaMaskSmartAccount,
-} from '@metamask-private/delegator-core-viem';
-import { logger } from '@metamask/7715-permissions-shared/utils';
+} from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import {
   createClient,

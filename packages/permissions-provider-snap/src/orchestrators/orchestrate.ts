@@ -1,4 +1,4 @@
-import { createCaveatBuilder } from '@metamask-private/delegator-core-viem';
+import { createCaveatBuilder } from '@metamask/delegation-toolkit';
 import { fromHex, type Hex } from 'viem';
 
 import type { AccountControllerInterface } from '../accountController';

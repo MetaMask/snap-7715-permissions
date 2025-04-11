@@ -1,4 +1,4 @@
-import type { Caveat, Delegation } from '@metamask-private/delegator-core-viem';
+import type { Caveat, Delegation } from '@metamask/delegation-toolkit';
 import { getAddress } from 'viem';
 
 import type { AccountControllerInterface } from '../src/accountController';
