@@ -77,6 +77,7 @@ describe('native-token-stream Orchestrator', () => {
       },
       [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
     },
+    isAdjustmentAllowed: true,
   };
 
   const mockPage = (
@@ -89,6 +90,7 @@ describe('native-token-stream Orchestrator', () => {
       chainId={mockUiContext.chainId}
       valueFormattedAsCurrency={mockUiContext.valueFormattedAsCurrency}
       state={mockUiContext.state}
+      isAdjustmentAllowed={mockUiContext.isAdjustmentAllowed}
     />
   );
 
@@ -347,6 +349,7 @@ describe('native-token-stream Orchestrator', () => {
             [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
             [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
           },
+          isAdjustmentAllowed: true,
         };
 
       const result = await orchestrator.resolveAttenuatedPermission(
@@ -400,6 +403,7 @@ describe('native-token-stream Orchestrator', () => {
             [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
             [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
           },
+          isAdjustmentAllowed: true,
         };
 
       const result = await orchestrator.resolveAttenuatedPermission(
@@ -441,6 +445,7 @@ describe('native-token-stream Orchestrator', () => {
             [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
             [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
           },
+          isAdjustmentAllowed: true,
         };
 
       const result = await orchestrator.resolveAttenuatedPermission(
@@ -481,6 +486,7 @@ describe('native-token-stream Orchestrator', () => {
             [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
             [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
           },
+          isAdjustmentAllowed: true,
         };
 
       const result = await orchestrator.resolveAttenuatedPermission(
@@ -524,6 +530,7 @@ describe('native-token-stream Orchestrator', () => {
             [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
             [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
           },
+          isAdjustmentAllowed: true,
         };
 
       const result = await orchestrator.resolveAttenuatedPermission(
@@ -571,6 +578,7 @@ describe('native-token-stream Orchestrator', () => {
             [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
             [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
           },
+          isAdjustmentAllowed: true,
         };
 
       const result = await orchestrator.resolveAttenuatedPermission(
@@ -619,6 +627,7 @@ describe('native-token-stream Orchestrator', () => {
             [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
             [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
           },
+          isAdjustmentAllowed: true,
         };
 
       const result = await orchestrator.resolveAttenuatedPermission(
@@ -635,6 +644,61 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(parseUnits('0', 18)),
             amountPerSecond: '0x482e9f5cf5d',
             startTime: convertReadableDateToTimestamp('01/01/2025'),
+            maxAmount: getMaxUint256(),
+          },
+        },
+      });
+    });
+
+    it('should return an un-attenuated permission when adjustment is not allowed', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {
+            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+              parseUnits('3', 18),
+            ),
+            [NativeTokenStreamDialogElementNames.PeriodInput]:
+              TimePeriod.WEEKLY,
+            rules: {
+              [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+                'Unlimited',
+              [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0.5',
+              [NativeTokenStreamDialogElementNames.StartTimeRule]: '01/01/2025',
+              [NativeTokenStreamDialogElementNames.ExpiryRule]: '01/01/2026',
+            },
+            [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
+              false,
+            [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+            [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+            [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
+          },
+          isAdjustmentAllowed: false,
+        };
+
+      // adjust are added to the state but they are not used
+      const result = await orchestrator.resolveAttenuatedPermission(
+        mockRequestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result).toEqual({
+        expiry: 10000000,
+        attenuatedPermission: {
+          type: 'native-token-stream',
+          data: {
+            justification: 'test justification',
+            initialAmount: toHex(parseUnits('0.5', 18)),
+            amountPerSecond: toHex(parseUnits('0.5', 18)),
+            startTime: mockStartTime,
             maxAmount: getMaxUint256(),
           },
         },

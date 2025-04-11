@@ -26,6 +26,7 @@ import type { UserEventHandler } from '../../userEventDispatcher';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
+  convertValueToHex,
   formatTokenBalance,
   maxAllowanceParser,
   zeroDefaultParser,
@@ -168,6 +169,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           chainId={context.chainId}
           valueFormattedAsCurrency={context.valueFormattedAsCurrency}
           state={context.state}
+          isAdjustmentAllowed={context.isAdjustmentAllowed}
         />
       );
     },
@@ -200,8 +202,31 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       requestedPermission: PermissionTypeMapping['native-token-stream'],
       attenuatedContext: PermissionConfirmationContext<'native-token-stream'>,
     ) => {
-      const { state, expiry: requestedExpiry } = attenuatedContext;
+      const {
+        state,
+        expiry: requestedExpiry,
+        isAdjustmentAllowed,
+      } = attenuatedContext;
 
+      if (!isAdjustmentAllowed) {
+        return {
+          expiry: requestedExpiry,
+          attenuatedPermission: {
+            ...requestedPermission,
+            data: {
+              ...requestedPermission.data,
+              maxAmount: maxAllowanceParser('Unlimited'),
+              amountPerSecond: requestedPermission.data.amountPerSecond,
+              initialAmount:
+                requestedPermission.data.initialAmount ??
+                convertValueToHex('0'),
+              startTime: requestedPermission.data.startTime,
+            },
+          } as PermissionTypeMapping['native-token-stream'],
+        };
+      }
+
+      // If adjustment is not allowed, we need to capture the user's adjusted values
       const attenuatedMaxAmount =
         state[NativeTokenStreamDialogElementNames.MaxAmountInput];
       const period = state[NativeTokenStreamDialogElementNames.PeriodInput];

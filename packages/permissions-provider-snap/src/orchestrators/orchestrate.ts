@@ -74,8 +74,14 @@ export const orchestrate = async <
     tokenPricesService,
     userEventDispatcher,
   } = orchestrateArgs;
-  const { chainId, sessionAccount, origin, expiry, permission } =
-    orchestrateMeta;
+  const {
+    chainId,
+    sessionAccount,
+    origin,
+    expiry,
+    permission,
+    isAdjustmentAllowed,
+  } = orchestrateMeta;
   const chainIdNum = fromHex(chainId, 'number');
   const caipAssetType = orchestrator.getTokenCaipAssetType(
     permission,
@@ -104,6 +110,7 @@ export const orchestrate = async <
     expiry,
     valueFormattedAsCurrency,
     state,
+    isAdjustmentAllowed,
   };
 
   const permissionDialog = orchestrator.buildPermissionConfirmation(uiContext);
@@ -212,6 +219,7 @@ export const orchestrate = async <
       chainId,
       address,
       expiry: attenuatedExpiry,
+      isAdjustmentAllowed,
       signer: {
         type: 'account',
         data: {

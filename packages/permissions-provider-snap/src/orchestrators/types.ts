@@ -67,6 +67,11 @@ export type OrchestrateMeta<TPermissionType extends SupportedPermissionTypes> =
      * @example Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
      */
     expiry: number;
+
+    /**
+     * Whether the permission can be adjusted
+     */
+    isAdjustmentAllowed: boolean;
   };
 
 /**
