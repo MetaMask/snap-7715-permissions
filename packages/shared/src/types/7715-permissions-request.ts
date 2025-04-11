@@ -47,7 +47,7 @@ export const zPermissionRequest = z.object({
   /**
    * Whether the permission can be adjusted
    */
-  isAdjustmentAllowed: z.boolean(),
+  isAdjustmentAllowed: z.boolean().optional(),
 
   /**
    * An account that can be granted with permissions as in ERC-7710

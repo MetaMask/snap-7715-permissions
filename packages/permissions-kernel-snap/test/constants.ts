@@ -32,7 +32,6 @@ export const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
         address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
       },
     },
-    isAdjustmentAllowed: false,
     permission: {
       type: 'native-token-transfer',
       data: {
@@ -47,7 +46,6 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
   {
     chainId: '0x1',
     expiry: 1,
-    isAdjustmentAllowed: false,
     signer: {
       type: 'account',
       data: {
@@ -65,7 +63,6 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
   {
     chainId: '0x1',
     expiry: 1,
-    isAdjustmentAllowed: false,
     signer: {
       type: 'account',
       data: {
@@ -87,7 +84,6 @@ export const MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED: PermissionsRequest = [
   {
     chainId: '0x1',
     expiry: 1,
-    isAdjustmentAllowed: false,
     signer: {
       type: 'account',
       data: {
