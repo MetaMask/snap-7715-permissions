@@ -22,7 +22,7 @@ export const convertTimestampToReadableDate = (timestamp: number) => {
 };
 
 /**
- * Converts a human-readable date format (MM/DD/YYYY) to a unix timestamp (in seconds) at 12:00:00 AM.
+ * Converts a human-readable date (MM/DD/YYYY) to a Unix timestamp at 12:00:00 AM UTC.
  *
  * @param date - The human-readable date string.
  * @returns The unix timestamp in seconds.
@@ -33,8 +33,10 @@ export const convertReadableDateToTimestamp = (date: string) => {
     throw new Error('Invalid date format');
   }
 
-  const parsedDate = new Date(`${year}-${month}-${day}T00:00:00`);
-  return Math.floor(parsedDate.getTime() / 1000);
+  const utcDate = new Date(
+    Date.UTC(Number(year), Number(month) - 1, Number(day), 0, 0, 0),
+  );
+  return Math.floor(utcDate.getTime() / 1000);
 };
 
 /**
@@ -52,26 +54,37 @@ export const isHumanReadableInCorrectFormat = (date: string) => {
 };
 
 /**
- * Returns the Unix timestamp (in seconds) for the start of today (12:00 AM).
+ * Returns the Unix timestamp (in seconds) for the start of today (12:00 AM UTC).
  *
- * @returns Unix timestamp at 12:00:00 AM of today.
+ * @returns Unix timestamp at 12:00:00 AM UTC of today.
  */
-export const getStartOfToday = (): number => {
+export const getStartOfTodayUTC = (): number => {
   const now = new Date();
-  const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-  return Math.floor(startOfToday.getTime() / 1000);
+  const startOfTodayUTC = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    0,
+    0,
+    0,
+  );
+  return Math.floor(startOfTodayUTC / 1000);
 };
 
 /**
- * Returns the Unix timestamp (in seconds) for the start of the next day (12:00 AM).
+ * Returns the Unix timestamp (in seconds) for the start of the next day (12:00 AM UTC).
  *
- * @returns Unix timestamp at 12:00:00 AM of the next day.
+ * @returns Unix timestamp at 12:00:00 AM UTC of the next day.
  */
-export const getStartOfNextDay = (): number => {
+export const getStartOfNextDayUTC = (): number => {
   const now = new Date();
-  const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-  const startOfTomorrow = new Date(
-    startOfToday.getTime() + 24 * 60 * 60 * 1000,
+  const startOfTomorrowUTC = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() + 1,
+    0,
+    0,
+    0,
   );
-  return Math.floor(startOfTomorrow.getTime() / 1000);
+  return Math.floor(startOfTomorrowUTC / 1000);
 };

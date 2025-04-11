@@ -3,7 +3,11 @@ import { Box } from '@metamask/snaps-sdk/jsx';
 import { extractChain } from 'viem';
 import * as ALL_CHAINS from 'viem/chains';
 
-import { getMaxUint256, getStartOfNextDay, getStartOfToday } from '../../utils';
+import {
+  getMaxUint256,
+  getStartOfNextDayUTC,
+  getStartOfTodayUTC,
+} from '../../utils';
 import type {
   AccountDetailsProps,
   ItemDetails,
@@ -117,7 +121,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         validationType: 'timestamp',
         emptyInputValidationError: 'Enter a valid date',
         inputConstraintValidationError: 'Must be today or later',
-        compareValue: getStartOfToday(),
+        compareValue: getStartOfTodayUTC(),
       },
     },
     {
@@ -128,7 +132,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         validationType: 'timestamp',
         emptyInputValidationError: 'Enter a valid date',
         inputConstraintValidationError: 'Must be after start time',
-        compareValue: getStartOfNextDay(),
+        compareValue: getStartOfNextDayUTC(),
       },
     },
   ];

@@ -2,8 +2,8 @@ import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
   isHumanReadableInCorrectFormat,
-  getStartOfToday,
-  getStartOfNextDay,
+  getStartOfTodayUTC,
+  getStartOfNextDayUTC,
 } from '../../src/utils/time';
 
 describe('Time Utility Functions', () => {
@@ -29,13 +29,13 @@ describe('Time Utility Functions', () => {
   describe('convertReadableDateToTimestamp', () => {
     it('should convert MM/DD/YYYY format to Unix timestamp', () => {
       const date = '04/11/2025';
-      const expectedTimestamp = 1744344000;
+      const expectedTimestamp = 1744329600;
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
     });
 
     it('should handle different dates correctly', () => {
-      const date = '04/11/2025';
-      const expectedTimestamp = 1744344000;
+      const date = '04/12/2025';
+      const expectedTimestamp = 1744416000;
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
     });
 
@@ -60,33 +60,42 @@ describe('Time Utility Functions', () => {
     });
   });
 
-  describe('getStartOfToday', () => {
-    it('should return the Unix timestamp for the start of today', () => {
-      const now = new Date();
-      const expectedStartOfToday = new Date(now.setHours(0, 0, 0, 0));
-      const expectedTimestamp = Math.floor(
-        expectedStartOfToday.getTime() / 1000,
-      );
+  describe('getStartOfTodayUTC', () => {
+    beforeEach(() => {
+      // Set a fixed date (May 12, 2025 00:00:00 UTC)
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-05-12T00:00:00Z'));
+    });
 
-      expect(getStartOfToday()).toBe(expectedTimestamp);
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should return the Unix timestamp for the start of today', () => {
+      const expectedTimestamp = 1747008000; // May 12, 2025 00:00:00 UTC
+      expect(getStartOfTodayUTC()).toBe(expectedTimestamp);
     });
   });
 
-  describe('getStartOfNextDay', () => {
-    it('should return the Unix timestamp for the start of the next day', () => {
-      const now = new Date();
-      const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-      const startOfTomorrow = new Date(
-        startOfToday.getTime() + 24 * 60 * 60 * 1000,
-      );
-      const expectedTimestamp = Math.floor(startOfTomorrow.getTime() / 1000);
+  describe('getStartOfNextDayUTC', () => {
+    beforeEach(() => {
+      // Set a fixed date (May 12, 2025 00:00:00 UTC)
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2025-05-12T00:00:00Z'));
+    });
 
-      expect(getStartOfNextDay()).toBe(expectedTimestamp);
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should return the Unix timestamp for the start of the next day', () => {
+      const expectedTimestamp = 1747094400; // May 13, 2025 00:00:00 UTC
+      expect(getStartOfNextDayUTC()).toBe(expectedTimestamp);
     });
 
     it('should be exactly 24 hours after the start of today', () => {
-      const startOfToday = getStartOfToday();
-      const startOfNextDay = getStartOfNextDay();
+      const startOfToday = getStartOfTodayUTC();
+      const startOfNextDay = getStartOfNextDayUTC();
       expect(startOfNextDay - startOfToday).toBe(24 * 60 * 60);
     });
   });
