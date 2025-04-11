@@ -1,7 +1,7 @@
 import {
   createCaveatBuilder,
   getDeleGatorEnvironment,
-} from '@metamask-private/delegator-core-viem';
+} from '@metamask/delegation-toolkit';
 import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import { getAddress, toHex } from 'viem';
@@ -283,9 +283,8 @@ describe('native-token-stream Orchestrator', () => {
     });
 
     it('should return confirmation dialog EventHandlers', async () => {
-      const parsedPermission = await orchestrator.parseAndValidate(
-        mockbasePermission,
-      );
+      const parsedPermission =
+        await orchestrator.parseAndValidate(mockbasePermission);
       const { dialogContentEventHandlers } =
         orchestrator.getConfirmationDialogEventHandlers(
           parsedPermission,

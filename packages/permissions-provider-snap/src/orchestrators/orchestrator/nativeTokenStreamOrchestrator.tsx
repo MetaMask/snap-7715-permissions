@@ -13,7 +13,7 @@ import type { PermissionConfirmationContext } from '../../ui';
 import {
   RulesSelectorElementNames,
   NativeTokenStreamDialogElementNames,
-  TIME_PERIOD_TO_SECOND,
+  TIME_PERIOD_TO_SECONDS,
   TimePeriod,
   handleFormSubmit,
   handleRemoveRuleClicked,
@@ -206,7 +206,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         state[NativeTokenStreamDialogElementNames.MaxAmountInput];
       const period = state[NativeTokenStreamDialogElementNames.PeriodInput];
       const attenuatedAmountPerSecond = toHex(
-        BigInt(attenuatedMaxAmount) / BigInt(TIME_PERIOD_TO_SECOND[period]),
+        BigInt(attenuatedMaxAmount) / BigInt(TIME_PERIOD_TO_SECONDS[period]),
       );
       const attenuatedExpiry =
         state.rules[NativeTokenStreamDialogElementNames.ExpiryRule];

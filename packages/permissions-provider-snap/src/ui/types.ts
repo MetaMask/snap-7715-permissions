@@ -1,4 +1,4 @@
-import type { Delegation } from '@metamask-private/delegator-core-viem';
+import type { Delegation } from '@metamask/delegation-toolkit';
 import type { InterfaceContext } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';

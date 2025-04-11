@@ -2761,45 +2761,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask-private/delegation-abis@npm:^0.8.1":
-  version: 0.8.1
-  resolution: "@metamask-private/delegation-abis@npm:0.8.1"
-  checksum: 460f7ae2e97273bf9ddb90590635a6e5450847469a9c7535a2073d4880b70bdcb41e3424858b695d442b37ea613dc6887e585142f36f49208d40dd471f7bd696
-  languageName: node
-  linkType: hard
-
-"@metamask-private/delegation-deployments@npm:^0.8.1":
-  version: 0.8.1
-  resolution: "@metamask-private/delegation-deployments@npm:0.8.1"
-  checksum: 205419c8e712494ff747e2cb94d07728d3acb71662eef8c7c4ec5a5da3e642f4a26d40f023a54524aa00ad9eda0a34d064bf6e6eced9bcaaa9394a8bc0c677f9
-  languageName: node
-  linkType: hard
-
-"@metamask-private/delegation-utils@npm:^0.8.1":
-  version: 0.8.1
-  resolution: "@metamask-private/delegation-utils@npm:0.8.1"
-  dependencies:
-    "@metamask-private/delegation-abis": ^0.8.1
-    "@metamask-private/delegation-deployments": ^0.8.1
-    buffer: ^6.0.3
-  peerDependencies:
-    viem: ">=2.18.2 <3.0.0"
-  checksum: 718b49b87d8dd80c995a772729ec95cf7dee8191f3f0359861d0c70a41b0588c5c040fb1f5e38541162504184a3ed99e47a3516c100122e4858c7e914f01c7a3
-  languageName: node
-  linkType: hard
-
-"@metamask-private/delegator-core-viem@npm:0.8.1":
-  version: 0.8.1
-  resolution: "@metamask-private/delegator-core-viem@npm:0.8.1"
-  dependencies:
-    "@metamask-private/delegation-utils": ^0.8.1
-    webauthn-p256: ^0.0.5
-  peerDependencies:
-    viem: ">=2.18.2 <3.0.0"
-  checksum: c66a37371344f19fbdf0bd0e3425de957896d6b3907be315c961e6f581112bd691a2ff5de6990264c8054339dd23bbe1b87e384f0a2d4651a207c952d8844ec7
-  languageName: node
-  linkType: hard
-
 "@metamask/7715-permissions-shared@workspace:*, @metamask/7715-permissions-shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "@metamask/7715-permissions-shared@workspace:packages/shared"
@@ -2950,6 +2911,51 @@ __metadata:
   bin:
     create-release-branch: bin/create-release-branch.js
   checksum: 1fa024ae6b6acd99b700f001c48620fe9978b2c75a4fed894e1d128a5f1fe58f3db35a233e3a4ebfc2456ea7a7985c7a88740309c68d2e7330cba391e182cad1
+  languageName: node
+  linkType: hard
+
+"@metamask/delegation-abis@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "@metamask/delegation-abis@npm:0.9.0"
+  dependencies:
+    "@metamask/auto-changelog": ^3.4.4
+  checksum: c9e7481499f8497d6b5c15d286e9992b52c0db5ddbb7933ec918a24e758da447ec4537d383d74826dc440eae836b3f26496a89a79b207203fb0f0c7a7e72f66e
+  languageName: node
+  linkType: hard
+
+"@metamask/delegation-deployments@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "@metamask/delegation-deployments@npm:0.9.0"
+  dependencies:
+    "@metamask/auto-changelog": ^3.4.4
+  checksum: 72736561870d860744bb77f699c2a05d22ae48ba8f1ec5735d5625eecd76638bcb277aedd8bef9f8e3b643c50a8591cb8ec0faa5fd4e9fe3bc2b1748880745c4
+  languageName: node
+  linkType: hard
+
+"@metamask/delegation-toolkit@npm:0.9.0":
+  version: 0.9.0
+  resolution: "@metamask/delegation-toolkit@npm:0.9.0"
+  dependencies:
+    "@metamask/auto-changelog": ^3.4.4
+    "@metamask/delegation-utils": ^0.9.0
+    webauthn-p256: ^0.0.5
+  peerDependencies:
+    viem: ">=2.18.2 <3.0.0"
+  checksum: 86ab3adc0b9a6ddd4b1fc12f05649bcdf01196ab8741992ece6c7b02014cae05edcd7dc5d048863c84a9f4277395f52e450510ec375af347d277103c4a13bcee
+  languageName: node
+  linkType: hard
+
+"@metamask/delegation-utils@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "@metamask/delegation-utils@npm:0.9.0"
+  dependencies:
+    "@metamask/auto-changelog": ^3.4.4
+    "@metamask/delegation-abis": ^0.9.0
+    "@metamask/delegation-deployments": ^0.9.0
+    buffer: ^6.0.3
+  peerDependencies:
+    viem: ">=2.18.2 <3.0.0"
+  checksum: 17c71100bc9665c2551741ede08a3ade35eac05cd18f720ccadf2397ac23b2fbe69194851d957f40d016c394f13682b45bd8d0b47449e73a60199957c2f56127
   languageName: node
   linkType: hard
 
@@ -3113,9 +3119,9 @@ __metadata:
   resolution: "@metamask/gator-permissions@workspace:packages/permissions-provider-snap"
   dependencies:
     "@jest/globals": ^29.5.0
-    "@metamask-private/delegator-core-viem": 0.8.1
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/auto-changelog": ^3.4.4
+    "@metamask/delegation-toolkit": 0.9.0
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
@@ -18327,7 +18333,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask-private/delegator-core-viem": 0.8.1
+    "@metamask/delegation-toolkit": 0.9.0
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-browser": ^12.1.0
     "@metamask/eslint-config-jest": ^12.1.0

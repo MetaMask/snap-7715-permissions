@@ -1,4 +1,4 @@
-import { erc7715ProviderActions } from '@metamask-private/delegator-core-viem/experimental';
+import { erc7715ProviderActions } from '@metamask/delegation-toolkit/experimental';
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import {

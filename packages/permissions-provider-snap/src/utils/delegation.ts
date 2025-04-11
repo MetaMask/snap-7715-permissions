@@ -1,4 +1,4 @@
-import type { DelegationStruct } from '@metamask-private/delegator-core-viem';
+import type { DelegationStruct } from '@metamask/delegation-toolkit';
 import { toHex } from 'viem';
 
 import type { SerializableDelegation } from '../ui/types';

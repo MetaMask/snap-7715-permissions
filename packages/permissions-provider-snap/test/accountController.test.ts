@@ -1,9 +1,9 @@
 import { describe, it, beforeEach } from '@jest/globals';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import {
   createDelegation,
   getDeleGatorEnvironment,
-} from '@metamask-private/delegator-core-viem';
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
+} from '@metamask/delegation-toolkit';
 import { isHex, size } from 'viem';
 import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
@@ -13,7 +13,7 @@ describe('AccountController', () => {
   const entropy =
     '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
   // constant derived via delegator-core-viem
-  const expectedAddress = '0x0fA5946C378FCa9B9Aa97dCb4Bb78F834A170f45';
+  const expectedAddress = '0x70cCc6AF705a54bd31cD9426aF0a2A0B2E4Dfa2D';
   const expectedBalance = '0x1000000000000000000';
   let accountController: AccountController;
   const mockSnapsProvider = createMockSnapsProvider();

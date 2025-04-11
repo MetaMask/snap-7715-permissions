@@ -1,7 +1,7 @@
-import { getDeleGatorEnvironment } from '@metamask-private/delegator-core-viem';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
+import { getDeleGatorEnvironment } from '@metamask/delegation-toolkit';
 import { toHex, getAddress, parseUnits } from 'viem';
 import { sepolia } from 'viem/chains';
 

@@ -45,7 +45,7 @@ export type RulesSelectorProps = JsonObject & {
  * @param ruleMeta - The rule meta to validate against.
  * @returns The validation error if the value is invalid, otherwise undefined.
  */
-const validator = (
+export const validator = (
   inputValue: string,
   ruleMeta: RuleMeta<RuleValidationTypes>,
 ): string | undefined => {
@@ -91,7 +91,7 @@ const validator = (
  * @param activeRuleDropDownValue - The value of the active rule drop down.
  * @returns The JSX element to render the extra dropdown if it exists or null if it does not exist.
  */
-const renderUnlimitedAllowanceDropDown = (
+export const renderUnlimitedAllowanceDropDown = (
   ruleMeta: RuleMeta<RuleValidationTypes>,
   activeRuleDropDownValue: string,
 ) => {
@@ -141,7 +141,7 @@ const renderUnlimitedAllowanceDropDown = (
  * @param ruleMeta - The rule meta to check.
  * @returns True if the input field should be hidden, false otherwise.
  */
-const isInputHidden = (ruleMeta: RuleMeta<RuleValidationTypes>) => {
+export const isInputHidden = (ruleMeta: RuleMeta<RuleValidationTypes>) => {
   const { ruleValidator } = ruleMeta;
   if (ruleValidator.unlimitedAllowanceDropDown) {
     const { dropdownValue } = ruleValidator.unlimitedAllowanceDropDown;
@@ -158,7 +158,7 @@ const isInputHidden = (ruleMeta: RuleMeta<RuleValidationTypes>) => {
  * @param ruleMeta - The rule meta to get the ordered options for.
  * @returns The ordered options for the dropdown.
  */
-const getOrderedOptions = (
+export const getOrderedOptions = (
   dropDownValue: string,
   ruleMeta: RuleMeta<RuleValidationTypes>[],
 ) => {

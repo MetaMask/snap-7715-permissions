@@ -2,7 +2,7 @@ import {
   Implementation,
   type MetaMaskSmartAccount,
   toMetaMaskSmartAccount,
-} from '@metamask-private/delegator-core-viem';
+} from '@metamask/delegation-toolkit';
 import { useEffect, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import type { Chain } from 'viem';
