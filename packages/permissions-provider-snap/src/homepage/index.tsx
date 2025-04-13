@@ -47,11 +47,12 @@ export class HomePage {
     return (
       <Box>
         <Section>
-          <Heading>Welcome!</Heading>
+          <Heading>Welcome to Gator Permissions!</Heading>
           <Text>
-            We've created a special Smart Contract Account for testing
-            permissions. It won't show in MetaMask like other accounts will.
-            This account should only be used on the Sepolia testnet.
+            Thanks for joining our preview phase! We've set up a dedicated Smart
+            Account for you to easily experiment with permissions. This account
+            won't appear alongside your usual MetaMask accounts and should only
+            be used on Sepolia testnet.
           </Text>
           <Box direction="vertical">
             <Link href={`https://sepolia.etherscan.io/address/${address}`}>
@@ -60,19 +61,21 @@ export class HomePage {
           </Box>
           {showDirectionsToHomepage && (
             <Text>
-              You'll be able to find this information by clicking ⋮ &gt; Snaps
-              &gt; Gator Permissions
+              You'll be able to find this screen again by clicking ⋮ &gt; Snaps
+              &gt; Gator Permissions.
             </Text>
           )}
           <Text>
-            Thanks for testing with us! This is a work in progress and we'd love
-            to hear your feedback.
+            We're excited to have you building alongside us as we shape the
+            future of web3 together.
           </Text>
           <Text>
-            Please reach out to us on{' '}
+            This is a work in progress and we'd love to hear your feedback -
+            please reach out to us on{' '}
             <Link href="https://discord.com/invite/consensys">Discord</Link> if
             you have any questions or feedback.
           </Text>
+          <Text fontWeight="bold">LFB!</Text>
         </Section>
       </Box>
     );
