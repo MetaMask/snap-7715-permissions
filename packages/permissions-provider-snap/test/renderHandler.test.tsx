@@ -9,11 +9,13 @@ import type { PermissionConfirmationContext } from '../src/ui';
 import {
   createPermissionConfirmationRenderHandler,
   NativeTokenStreamDialogElementNames,
+  RulesSelectorElementNames,
   TimePeriod,
 } from '../src/ui';
 import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
+import { convertTimestampToReadableDate } from '../src/utils';
 
 jest.mock('../src/userEventDispatcher');
 
@@ -55,16 +57,27 @@ describe('Permission Confirmation Render Handler', () => {
       expiry: 1,
       chainId: 11155111,
       valueFormattedAsCurrency: '$1,000.00',
-      permissionSpecificRules: {
-        maxAllowance: 'Unlimited',
-      },
       state: {
         [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
           false,
         [NativeTokenStreamDialogElementNames.MaxAmountInput]:
           permission.data.maxAmount,
         [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+        [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+        [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+        [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+        rules: {
+          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+          [NativeTokenStreamDialogElementNames.InitialAmountRule]:
+            permission.data.initialAmount ?? null,
+          [NativeTokenStreamDialogElementNames.StartTimeRule]:
+            convertTimestampToReadableDate(permission.data.startTime),
+          [NativeTokenStreamDialogElementNames.ExpiryRule]:
+            convertTimestampToReadableDate(10000000),
+        },
+        [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
       },
+      isAdjustmentAllowed: true,
     };
 
   const mockPage = (
@@ -76,8 +89,8 @@ describe('Permission Confirmation Render Handler', () => {
       expiry={mockContext.expiry}
       chainId={mockContext.chainId}
       valueFormattedAsCurrency={mockContext.valueFormattedAsCurrency}
-      permissionSpecificRules={mockContext.permissionSpecificRules}
       state={mockContext.state}
+      isAdjustmentAllowed={mockContext.isAdjustmentAllowed}
     />
   );
 

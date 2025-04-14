@@ -19,11 +19,13 @@ import type { PermissionsContextBuilder } from '../src/orchestrators/permissions
 import type { TokenPricesService } from '../src/services';
 import {
   NativeTokenStreamDialogElementNames,
+  RulesSelectorElementNames,
   TimePeriod,
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
 } from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
+import { formatTokenBalance } from '../src/utils';
 
 jest.mock('../src/userEventDispatcher');
 
@@ -44,7 +46,7 @@ describe('Orchestrate', () => {
       type: 'native-token-stream',
       data: {
         justification: 'shh...permission 2',
-        initialAmount: '0x1',
+        initialAmount: toHex(parseUnits('1', 18)),
         amountPerSecond: '0x1',
         startTime: 1000,
         maxAmount: toHex(parseUnits('1', 18)),
@@ -83,16 +85,29 @@ describe('Orchestrate', () => {
       expiry: 1,
       chainId: 11155111,
       valueFormattedAsCurrency: '$1,000.00',
-      permissionSpecificRules: {
-        maxAllowance: 'Unlimited',
-      },
       state: {
         [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
           false,
         [NativeTokenStreamDialogElementNames.MaxAmountInput]:
           nativeTokenStreamPermission.data.maxAmount,
         [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+        [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+        [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+        [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+        rules: {
+          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: null,
+          [NativeTokenStreamDialogElementNames.InitialAmountRule]:
+            nativeTokenStreamPermission.data.initialAmount
+              ? formatTokenBalance(
+                  nativeTokenStreamPermission.data.initialAmount,
+                )
+              : null,
+          [NativeTokenStreamDialogElementNames.StartTimeRule]: null,
+          [NativeTokenStreamDialogElementNames.ExpiryRule]: null,
+        },
+        [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
       },
+      isAdjustmentAllowed: true,
     };
 
     const orchestrateArgs: OrchestrateArgs<typeof mockPermissionType> = {
@@ -106,6 +121,7 @@ describe('Orchestrate', () => {
         sessionAccount,
         origin: 'http://localhost:3000',
         expiry: 1,
+        isAdjustmentAllowed: true,
       },
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
@@ -151,14 +167,11 @@ describe('Orchestrate', () => {
       mockAccountController.getEnvironment.mockResolvedValueOnce(
         getDeleGatorEnvironment(sepolia.id),
       );
-      mockSnapsProvider.request.mockResolvedValueOnce({
-        expiry: '1',
-      });
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(3);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(12);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(12);
       expect(res).toStrictEqual({
         success: true,
         response: {
@@ -172,11 +185,12 @@ describe('Orchestrate', () => {
           chainId: '0xaa36a7',
           context: '0x00_some_permission_context',
           expiry: 1,
+          isAdjustmentAllowed: true,
           permission: {
             data: {
               justification: 'shh...permission 2',
               amountPerSecond: '0x180f8a7451f',
-              initialAmount: '0x1',
+              initialAmount: '0xde0b6b3a7640000',
               startTime: 1000,
               maxAmount: '0xde0b6b3a7640000',
             },
@@ -235,8 +249,8 @@ describe('Orchestrate', () => {
 
       const res = await orchestrate(orchestrateArgs);
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(3);
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3);
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(12);
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(12);
       expect(res).toStrictEqual({
         success: false,
         reason: 'User rejected the permissions request',

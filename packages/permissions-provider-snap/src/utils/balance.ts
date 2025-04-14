@@ -30,3 +30,38 @@ export const convertValueToHex = (
 ): Hex => {
   return toHex(parseUnits(value.toString(), tokenDecimal));
 };
+
+/**
+ * Returns the maximum value for a uint256.
+ * @returns The maximum value for a uint256.
+ */
+export const getMaxUint256 = (): Hex => {
+  return `0x${(BigInt(2) ** BigInt(256) - BigInt(1)).toString(16)}`;
+};
+
+/**
+ * Parses a max allowance value.
+ * @param value - The value to parse.
+ * @returns The parsed value.
+ */
+export const maxAllowanceParser = (value: string | null) => {
+  if (value === null) {
+    return null;
+  }
+  if (value === 'Unlimited') {
+    return getMaxUint256();
+  }
+  return convertValueToHex(value);
+};
+
+/**
+ * Parses a zero default value.
+ * @param value - The value to parse.
+ * @returns The parsed value.
+ */
+export const zeroDefaultParser = (value: string | null | undefined) => {
+  if (!value) {
+    return convertValueToHex('0');
+  }
+  return convertValueToHex(value);
+};

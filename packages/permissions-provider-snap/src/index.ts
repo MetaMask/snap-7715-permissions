@@ -24,7 +24,7 @@ const accountController = new AccountController({
   deploymentSalt: '0x',
 });
 
-const userEventDispatcher = new UserEventDispatcher(snap);
+const userEventDispatcher = new UserEventDispatcher();
 
 const permissionConfirmationRenderHandler =
   createPermissionConfirmationRenderHandler({

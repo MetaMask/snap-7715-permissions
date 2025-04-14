@@ -9,44 +9,73 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
-import { formatTokenBalance } from '../../../utils';
-
-type BaseRuleProps = {
+export type TextRuleProps = {
+  textValue: string;
   text: string;
   tooltip: string;
   inputName: string;
   removeRuleButtonName: string;
-};
-
-export type TokenValueRuleProps = BaseRuleProps & {
-  allowance: Hex | 'Unlimited';
-};
-
-export type TimestampRuleProps = BaseRuleProps & {
-  timestamp: number;
+  isAdjustmentAllowed: boolean;
 };
 
 /**
- * Converts a unix timestamp(in seconds) to a human-readable date format (MM/DD/YYYY).
- *
- * @param timestamp - The unix timestamp in seconds.
- * @returns The formatted date string.
+ * The type of validation for a rule.
  */
-const convertTimestampToReadableDate = (timestamp: number) => {
-  const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  };
-  const formattedDate = date.toLocaleDateString('en-US', options);
-  const [month, day, year] = formattedDate.split('/');
-  if (!month || !day || !year) {
-    throw new Error('Invalid date format');
-  }
+export type RuleValidationTypes = 'value' | 'timestamp';
 
-  // Format the date as MM/DD/YYYY
-  return `${month}/${day}/${year}`;
+type RuleValidationInputCheckMapping = {
+  ['value']: Hex;
+  ['timestamp']: number;
+};
+
+/**
+ * The type of the unlimited allowance drop down selector.
+ */
+export type UnlimitedAllowanceDropDownSelector = {
+  dropdownKey: string;
+  dropdownValue: string;
+};
+
+/**
+ * The options for the unlimited allowance drop down selector.
+ */
+export const UNLIMITED_ALLOWANCE_DROP_DOWN_OPTIONS = ['Specify', 'Unlimited'];
+
+/**
+ * The validator for a rule to allow the component to validate the input and display the correct error message.
+ */
+export type RuleValidator<TValidationType extends RuleValidationTypes> = {
+  validationType: TValidationType;
+  emptyInputValidationError: string;
+  inputConstraintValidationError: string;
+  compareValue: RuleValidationInputCheckMapping[TValidationType];
+  unlimitedAllowanceDropDown?: UnlimitedAllowanceDropDownSelector;
+};
+
+/**
+ * The metadata for a rule.
+ */
+export type RuleMeta<TValidationType extends RuleValidationTypes> = {
+  stateKey: string;
+  name: string;
+  placeholder: string;
+  ruleValidator: RuleValidator<TValidationType>;
+};
+
+/**
+ * Filters the rule meta to only include the rules that are not in the active rule state keys.
+ *
+ * @param ruleMeta - The rule meta to filter.
+ * @param activeRuleStateKeys - The keys of the rules in the state.
+ * @returns The filtered rule meta.
+ */
+export const filterNotActiveRuleMeta = (
+  ruleMeta: RuleMeta<RuleValidationTypes>[],
+  activeRuleStateKeys: string[],
+) => {
+  return ruleMeta.filter(
+    (rule) => !activeRuleStateKeys.includes(rule.stateKey),
+  );
 };
 
 /**
@@ -55,12 +84,14 @@ const convertTimestampToReadableDate = (timestamp: number) => {
  * @param text - The text to display.
  * @param tooltip - The tooltip text to display.
  * @param removeRuleButtonName - The name of the remove button.
+ * @param isAdjustmentAllowed - Whether the permission can be adjusted.
  * @returns The JSX element to render.
  */
 const renderRuleItemDetails = (
   text: string,
   tooltip: string,
   removeRuleButtonName: string,
+  isAdjustmentAllowed: boolean,
 ) => (
   <Box direction="horizontal" alignment="space-between">
     <Box direction="horizontal">
@@ -69,39 +100,9 @@ const renderRuleItemDetails = (
         <Icon name="question" size="inherit" color="muted" />
       </Tooltip>
     </Box>
-    <Button name={removeRuleButtonName}>Remove</Button>
-  </Box>
-);
-
-/**
- * Renders a rule item with an allowance input field.
- *
- * @param props - The rule item props.
- * @param props.text - The text to display.
- * @param props.tooltip - The tooltip text to display.
- * @param props.inputName - The name of the input field.
- * @param props.removeRuleButtonName - The name of the remove button.
- * @param props.allowance - The allowance value to display.
- * @returns The JSX element to render.
- */
-export const TokenValueRule: SnapComponent<TokenValueRuleProps> = ({
-  text,
-  tooltip,
-  inputName,
-  removeRuleButtonName,
-  allowance,
-}) => (
-  <Box direction="vertical">
-    {renderRuleItemDetails(text, tooltip, removeRuleButtonName)}
-    <Input
-      name={inputName}
-      type="number"
-      placeholder={
-        allowance === 'Unlimited' ? allowance : formatTokenBalance(allowance)
-      }
-      value={allowance}
-      disabled={true}
-    />
+    {isAdjustmentAllowed ? (
+      <Button name={removeRuleButtonName}>Remove</Button>
+    ) : null}
   </Box>
 );
 
@@ -113,23 +114,30 @@ export const TokenValueRule: SnapComponent<TokenValueRuleProps> = ({
  * @param props.tooltip - The tooltip text to display.
  * @param props.inputName - The name of the input field.
  * @param props.removeRuleButtonName - The name of the remove button.
- * @param props.timestamp - The timestamp value to display.
+ * @param props.textValue - The text value to display.
+ * @param props.isAdjustmentAllowed - Whether the permission can be adjusted.
  * @returns The JSX element to render.
  */
-export const TimestampRule: SnapComponent<TimestampRuleProps> = ({
+export const TextRule: SnapComponent<TextRuleProps> = ({
   text,
   tooltip,
   inputName,
   removeRuleButtonName,
-  timestamp,
+  textValue,
+  isAdjustmentAllowed,
 }) => (
   <Box direction="vertical">
-    {renderRuleItemDetails(text, tooltip, removeRuleButtonName)}
+    {renderRuleItemDetails(
+      text,
+      tooltip,
+      removeRuleButtonName,
+      isAdjustmentAllowed,
+    )}
     <Input
       name={inputName}
       type="text"
-      placeholder={convertTimestampToReadableDate(timestamp)}
-      value={convertTimestampToReadableDate(timestamp)}
+      placeholder={textValue}
+      value={textValue}
       disabled={true}
     />
   </Box>

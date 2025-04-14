@@ -45,6 +45,11 @@ export const zPermissionRequest = z.object({
   expiry: z.number(),
 
   /**
+   * Whether the permission can be adjusted
+   */
+  isAdjustmentAllowed: z.boolean().optional(),
+
+  /**
    * An account that can be granted with permissions as in ERC-7710
    */
   signer: zAccountSigner,
