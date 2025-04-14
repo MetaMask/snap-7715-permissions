@@ -3,26 +3,17 @@ import type {
   Permission,
 } from '@metamask/7715-permissions-shared/types';
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
-import type {
-  ComponentOrElement,
-  UserInputEventType,
-} from '@metamask/snaps-sdk';
+import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { CaipAssetType } from '@metamask/utils';
 import type { Address, Hex, OneOf } from 'viem';
 
 import type { PermissionConfirmationContext, State } from '../ui';
-import type { UserEventHandler } from '../userEventDispatcher';
+import type { DialogContentEventHandlers } from '../userEventDispatcher';
 import type {
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from './orchestrator';
-
-export type DialogContentEventHandlers = {
-  elementName: string;
-  eventType: UserInputEventType;
-  handler: UserEventHandler<UserInputEventType>;
-};
 
 /**
  * The result of orchestrating a permission.

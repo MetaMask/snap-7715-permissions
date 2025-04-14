@@ -13,6 +13,7 @@ import type { SupportedPermissionTypes } from './orchestrators';
 import type { PermissionConfirmationContext } from './ui';
 
 export type DialogContentEventHandlers = {
+  elementName: string;
   eventType: UserInputEventType;
   handler: UserEventHandler<UserInputEventType>;
 };
