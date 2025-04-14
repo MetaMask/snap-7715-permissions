@@ -6,18 +6,13 @@
  */
 export const convertTimestampToReadableDate = (timestamp: number) => {
   const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  };
-  const formattedDate = date.toLocaleDateString('en-US', options);
-  const [month, day, year] = formattedDate.split('/');
-  if (!month || !day || !year) {
-    throw new Error('Invalid date format');
-  }
 
-  // Format the date as MM/DD/YYYY
+  // Get UTC components
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const day = String(date.getUTCDate()).padStart(2, '0');
+
+  // Format the date as MM/DD/YYYY in UTC
   return `${month}/${day}/${year}`;
 };
 

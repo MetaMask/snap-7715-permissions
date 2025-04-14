@@ -89,7 +89,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       name: 'Initial Amount',
       placeholder: '0.00',
       ruleValidator: {
-        validationType: 'value',
+        validationType: 'value-less-than-or-equal-to',
         emptyInputValidationError: 'Please enter a valid initial amount',
         inputConstraintValidationError: 'Not enough ETH available',
         compareValue: toHex(maxUint256), // don't fail validation when the balance is insufficient
@@ -100,7 +100,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       name: 'Max Allowance',
       placeholder: '0.00',
       ruleValidator: {
-        validationType: 'value',
+        validationType: 'value-less-than-or-equal-to',
         emptyInputValidationError: 'Please enter a valid max allowance',
         inputConstraintValidationError: 'Not enough ETH available',
         compareValue: toHex(maxUint256),
@@ -116,7 +116,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       name: 'Start Time',
       placeholder: 'MM/DD/YYYY',
       ruleValidator: {
-        validationType: 'timestamp',
+        validationType: 'timestamp-greater-than-or-equal-to',
         emptyInputValidationError: 'Enter a valid date',
         inputConstraintValidationError: 'Must be today or later',
         compareValue: getStartOfTodayUTC(),
@@ -127,10 +127,10 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       name: 'Expiry',
       placeholder: 'MM/DD/YYYY',
       ruleValidator: {
-        validationType: 'timestamp',
+        validationType: 'timestamp-greater-than-or-equal-to',
         emptyInputValidationError: 'Enter a valid date',
         inputConstraintValidationError: 'Must be after start time',
-        compareValue: getStartOfNextDayUTC(),
+        compareValue: getStartOfNextDayUTC(), // todo: this should actually be the start time, not tomorrow
       },
     },
   ];
