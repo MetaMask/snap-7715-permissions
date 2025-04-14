@@ -7,7 +7,7 @@ import {
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
-import { toHex, type Hex } from 'viem';
+import { maxUint256, toHex, type Hex } from 'viem';
 
 import type { PermissionConfirmationContext } from '../../ui';
 import {
@@ -26,7 +26,6 @@ import type { UserEventHandler } from '../../userEventDispatcher';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
-  convertValueToHex,
   formatTokenBalance,
   maxAllowanceParser,
   zeroDefaultParser,
@@ -48,7 +47,7 @@ declare module './types' {
     'native-token-stream': JsonObject & {
       [RulesSelectorElementNames.AddMoreRulesPageToggle]: boolean;
       [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]: boolean;
-      [NativeTokenStreamDialogElementNames.MaxAmountInput]: Hex;
+      [NativeTokenStreamDialogElementNames.StreamAmountInput]: Hex;
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod;
       rules: {
         [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: string | null;
@@ -208,58 +207,59 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
         isAdjustmentAllowed,
       } = attenuatedContext;
 
+      let attenuatedPermission: PermissionTypeMapping['native-token-stream'];
+
       if (!isAdjustmentAllowed) {
-        return {
-          expiry: requestedExpiry,
-          attenuatedPermission: {
-            ...requestedPermission,
-            data: {
-              ...requestedPermission.data,
-              maxAmount: maxAllowanceParser('Unlimited'),
-              amountPerSecond: requestedPermission.data.amountPerSecond,
-              initialAmount:
-                requestedPermission.data.initialAmount ??
-                convertValueToHex('0'),
-              startTime: requestedPermission.data.startTime,
-            },
-          } as PermissionTypeMapping['native-token-stream'],
-        };
-      }
-
-      // If adjustment is not allowed, we need to capture the user's adjusted values
-      const attenuatedMaxAmount =
-        state[NativeTokenStreamDialogElementNames.MaxAmountInput];
-      const period = state[NativeTokenStreamDialogElementNames.PeriodInput];
-      const attenuatedAmountPerSecond = toHex(
-        BigInt(attenuatedMaxAmount) / BigInt(TIME_PERIOD_TO_SECONDS[period]),
-      );
-      const attenuatedExpiry =
-        state.rules[NativeTokenStreamDialogElementNames.ExpiryRule];
-      const attenuatedInitialAmount =
-        state.rules[NativeTokenStreamDialogElementNames.InitialAmountRule];
-      const attenuatedStartTime =
-        state.rules[NativeTokenStreamDialogElementNames.StartTimeRule];
-      const attenuatedMaxAllowance =
-        state.rules[NativeTokenStreamDialogElementNames.MaxAllowanceRule];
-
-      return {
-        expiry: attenuatedExpiry
-          ? convertReadableDateToTimestamp(attenuatedExpiry)
-          : requestedExpiry,
-        attenuatedPermission: {
-          ...requestedPermission,
+        // no adjustment allowed, just need to add defaults to requested values
+        // todo: do we even need to add defaults here?
+        attenuatedPermission = {
+          type: 'native-token-stream',
           data: {
             ...requestedPermission.data,
-            maxAmount: attenuatedMaxAllowance
-              ? maxAllowanceParser(attenuatedMaxAllowance)
-              : attenuatedMaxAmount,
+            initialAmount: requestedPermission.data.initialAmount || '0x0',
+          },
+          expiry: requestedExpiry,
+        };
+      } else {
+        // If adjustment is allowed, we need to capture the user's adjusted values
+        const attenuatedStreamAmount =
+          state[NativeTokenStreamDialogElementNames.StreamAmountInput];
+        const period = state[NativeTokenStreamDialogElementNames.PeriodInput];
+        const attenuatedAmountPerSecond = toHex(
+          BigInt(attenuatedStreamAmount) /
+            BigInt(TIME_PERIOD_TO_SECONDS[period]),
+        );
+        const attenuatedExpiry =
+          state.rules[NativeTokenStreamDialogElementNames.ExpiryRule];
+        const attenuatedInitialAmount =
+          state.rules[NativeTokenStreamDialogElementNames.InitialAmountRule];
+        const attenuatedStartTime =
+          state.rules[NativeTokenStreamDialogElementNames.StartTimeRule];
+        const attenuatedMaxAllowance =
+          state.rules[NativeTokenStreamDialogElementNames.MaxAllowanceRule];
+
+        attenuatedPermission = {
+          type: 'native-token-stream',
+          data: {
+            maxAmount: maxAllowanceParser(
+              attenuatedMaxAllowance || 'Unlimited',
+            ),
             amountPerSecond: attenuatedAmountPerSecond,
             initialAmount: zeroDefaultParser(attenuatedInitialAmount),
             startTime: attenuatedStartTime
               ? convertReadableDateToTimestamp(attenuatedStartTime)
               : requestedPermission.data.startTime,
+            justification: requestedPermission.data.justification,
           },
-        } as PermissionTypeMapping['native-token-stream'],
+          expiry: attenuatedExpiry
+            ? convertReadableDateToTimestamp(attenuatedExpiry)
+            : requestedExpiry,
+        };
+      }
+
+      return {
+        attenuatedPermission,
+        expiry: requestedExpiry,
       };
     },
     getTokenCaipAssetType(
@@ -273,12 +273,16 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       permission: PermissionTypeMapping['native-token-stream'],
       expiry: number,
     ) => {
+      const streamAmount =
+        BigInt(permission.data.amountPerSecond) *
+        TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY];
+
       return {
         state: {
           [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
             true,
-          [NativeTokenStreamDialogElementNames.MaxAmountInput]:
-            permission.data.maxAmount,
+          [NativeTokenStreamDialogElementNames.StreamAmountInput]:
+            toHex(streamAmount),
           [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
 
           // Rules are in human readable format is state so UI components do not need to convert them
@@ -311,7 +315,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
           // Stream amount input handler
           {
-            elementName: NativeTokenStreamDialogElementNames.MaxAmountInput,
+            elementName: NativeTokenStreamDialogElementNames.StreamAmountInput,
             eventType: UserInputEventType.InputChangeEvent,
             handler:
               handleReplaceValueInput as UserEventHandler<UserInputEventType>,

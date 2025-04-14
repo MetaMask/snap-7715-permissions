@@ -60,7 +60,7 @@ describe('native-token-stream Orchestrator', () => {
     state: {
       [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
         false,
-      [NativeTokenStreamDialogElementNames.MaxAmountInput]:
+      [NativeTokenStreamDialogElementNames.StreamAmountInput]:
         mockbasePermission.data.maxAmount,
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
       [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
@@ -289,9 +289,8 @@ describe('native-token-stream Orchestrator', () => {
     });
 
     it('should return confirmation dialog EventHandlers', async () => {
-      const parsedPermission = await orchestrator.parseAndValidate(
-        mockbasePermission,
-      );
+      const parsedPermission =
+        await orchestrator.parseAndValidate(mockbasePermission);
       const { dialogContentEventHandlers } =
         orchestrator.getConfirmationDialogEventHandlers(
           parsedPermission,
@@ -330,7 +329,7 @@ describe('native-token-stream Orchestrator', () => {
           chainId: 11155111,
           valueFormattedAsCurrency: '$1,000.00',
           state: {
-            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+            [NativeTokenStreamDialogElementNames.StreamAmountInput]: toHex(
               parseUnits('3', 18),
             ),
             [NativeTokenStreamDialogElementNames.PeriodInput]:
@@ -384,7 +383,7 @@ describe('native-token-stream Orchestrator', () => {
           chainId: 11155111,
           valueFormattedAsCurrency: '$1,000.00',
           state: {
-            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+            [NativeTokenStreamDialogElementNames.StreamAmountInput]: toHex(
               parseUnits('3', 18),
             ),
             [NativeTokenStreamDialogElementNames.PeriodInput]:
@@ -426,7 +425,7 @@ describe('native-token-stream Orchestrator', () => {
           chainId: 11155111,
           valueFormattedAsCurrency: '$1,000.00',
           state: {
-            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+            [NativeTokenStreamDialogElementNames.StreamAmountInput]: toHex(
               parseUnits('3', 18),
             ),
             [NativeTokenStreamDialogElementNames.PeriodInput]:
@@ -468,7 +467,7 @@ describe('native-token-stream Orchestrator', () => {
           chainId: 11155111,
           valueFormattedAsCurrency: '$1,000.00',
           state: {
-            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+            [NativeTokenStreamDialogElementNames.StreamAmountInput]: toHex(
               parseUnits('3', 18),
             ),
             [NativeTokenStreamDialogElementNames.PeriodInput]:
@@ -511,7 +510,7 @@ describe('native-token-stream Orchestrator', () => {
           chainId: 11155111,
           valueFormattedAsCurrency: '$1,000.00',
           state: {
-            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+            [NativeTokenStreamDialogElementNames.StreamAmountInput]: toHex(
               parseUnits('1', 18),
             ),
             [NativeTokenStreamDialogElementNames.PeriodInput]:
@@ -560,7 +559,7 @@ describe('native-token-stream Orchestrator', () => {
           chainId: 11155111,
           valueFormattedAsCurrency: '$1,000.00',
           state: {
-            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+            [NativeTokenStreamDialogElementNames.StreamAmountInput]: toHex(
               parseUnits('1', 18),
             ),
             [NativeTokenStreamDialogElementNames.PeriodInput]:
@@ -608,7 +607,7 @@ describe('native-token-stream Orchestrator', () => {
           chainId: 11155111,
           valueFormattedAsCurrency: '$1,000.00',
           state: {
-            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+            [NativeTokenStreamDialogElementNames.StreamAmountInput]: toHex(
               parseUnits('3', 18),
             ),
             [NativeTokenStreamDialogElementNames.PeriodInput]:
@@ -662,7 +661,7 @@ describe('native-token-stream Orchestrator', () => {
           chainId: 11155111,
           valueFormattedAsCurrency: '$1,000.00',
           state: {
-            [NativeTokenStreamDialogElementNames.MaxAmountInput]: toHex(
+            [NativeTokenStreamDialogElementNames.StreamAmountInput]: toHex(
               parseUnits('3', 18),
             ),
             [NativeTokenStreamDialogElementNames.PeriodInput]:

@@ -37,7 +37,7 @@ describe('Confirmation Dialog event handlers', () => {
         state: {
           [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
             false,
-          [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
+          [NativeTokenStreamDialogElementNames.StreamAmountInput]: '0x2',
           [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
           [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
           [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
@@ -143,7 +143,7 @@ describe('Confirmation Dialog event handlers', () => {
         await handleReplaceValueInput({
           event: {
             type: UserInputEventType.InputChangeEvent,
-            name: NativeTokenStreamDialogElementNames.MaxAmountInput,
+            name: NativeTokenStreamDialogElementNames.StreamAmountInput,
             value: newValue,
           },
           attenuatedContext: mockNativeTokenStreamContext,

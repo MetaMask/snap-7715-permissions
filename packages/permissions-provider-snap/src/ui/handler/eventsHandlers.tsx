@@ -8,6 +8,7 @@ import { convertValueToHex } from '../../utils';
 import { RulesSelectorElementNames } from '../components';
 import type { PermissionConfirmationContext } from '../types';
 import { updateInterface } from './renderHandler';
+import { parseEther, toHex } from 'viem';
 
 /**
  * Updates the interface with the new context object.
@@ -85,16 +86,24 @@ export const handleReplaceValueInput: UserEventHandler<
     `Handling handleReplaceValueInput event:`,
     JSON.stringify({ attenuatedContext }, undefined, 2),
   );
-  const eventName = event.name;
-  if (attenuatedContext.state[eventName] === undefined) {
-    throw new Error(`Event name ${eventName} not found in state`);
+
+  const { name: elementName, value } = event;
+
+  if (typeof value !== 'string') {
+    throw new Error('Event value is not a string');
   }
+
+  if (attenuatedContext.state[elementName] === undefined) {
+    throw new Error(`Element name ${elementName} not found in state`);
+  }
+
+  const valueAsHex = toHex(parseEther(value));
 
   await updateInterfaceHandler(permissionType, snap, interfaceId, {
     ...attenuatedContext,
     state: {
       ...attenuatedContext.state,
-      [eventName]: convertValueToHex(event.value as string),
+      [elementName]: valueAsHex,
     },
   });
 };
