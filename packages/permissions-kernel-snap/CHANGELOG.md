@@ -9,10 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0]
 
-### Uncategorized
+### Added
 
-- Update bugs url in package.json files to point to correct repository
-- feat/rules event handling ([#52](https://github.com/MetaMask/snap-7715-permissions/pull/52))
+- Support the option for the user to adjust permissions requested by the DApp ([#52](https://github.com/MetaMask/snap-7715-permissions/pull/52))
 
 ## [0.0.1]
 

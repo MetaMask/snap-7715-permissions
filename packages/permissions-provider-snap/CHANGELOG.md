@@ -9,23 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0]
 
-### Uncategorized
+### Added
 
-- add endowment:page-home for gator snap ([#72](https://github.com/MetaMask/snap-7715-permissions/pull/72))
-- Merge branch 'main' into feat/homepage
-- Update bugs url in package.json files to point to correct repository
-- Update shasum
-- Update tests
-- Make convertTimestampToReadableDate serialize UTC date. Rename rule validation types to be more meaningful.
-- Fix max amount input
-- Fix stream amount. Default isAdjustmentAllowed to true. A couple other minor simplifications and fixes
-- feat/rules event handling ([#52](https://github.com/MetaMask/snap-7715-permissions/pull/52))
-- build gator snap with correct price url
-- fix shasum
-- Replace discord with telegram
-- Update homepage content as per review
-- Merge branch 'main' into feat/homepage
-- Add homepage context. This will show in a dialog when first installing the snap and in the snap homepage.
+- Add Snaps `endowment:page-home` permission to enable a Snaps home page for `@metamask/gator-permissions-snap` ([#72](https://github.com/MetaMask/snap-7715-permissions/pull/72))
+- Support the option for the user to adjust permissions requested by the DApp ([#52](https://github.com/MetaMask/snap-7715-permissions/pull/52))
 
 ## [0.0.1]
 
