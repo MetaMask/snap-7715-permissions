@@ -100,7 +100,7 @@ const validatePermissionData = (
   const bigIntAmountPerSecond = BigInt(amountPerSecond);
   const bigIntMaxAmount = BigInt(maxAmount);
 
-  if (bigIntMaxAmount <= 0n) {
+  if (bigIntMaxAmount === 0n) {
     throw new InvalidParamsError(
       'Invalid maxAmount: must be a positive number',
     );
@@ -108,7 +108,7 @@ const validatePermissionData = (
 
   if (initialAmount) {
     const bigIntInitialAmount = BigInt(initialAmount);
-    if (bigIntInitialAmount <= 0n) {
+    if (bigIntInitialAmount === 0n) {
       throw new InvalidParamsError(
         'Invalid initialAmount: must be greater than zero',
       );
@@ -121,7 +121,7 @@ const validatePermissionData = (
     }
   }
 
-  if (bigIntAmountPerSecond <= 0n) {
+  if (bigIntAmountPerSecond === 0n) {
     throw new InvalidParamsError(
       'Invalid amountPerSecond: must be a positive number',
     );
@@ -287,7 +287,10 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
           // Rules are in human readable format is state so UI components do not need to convert them
           rules: {
-            [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+            [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+              BigInt(permission.data.maxAmount) === maxUint256
+                ? 'Unlimited'
+                : formatTokenBalance(permission.data.maxAmount),
             [NativeTokenStreamDialogElementNames.InitialAmountRule]: permission
               .data.initialAmount
               ? formatTokenBalance(permission.data.initialAmount)

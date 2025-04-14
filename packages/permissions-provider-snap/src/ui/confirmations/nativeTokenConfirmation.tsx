@@ -92,7 +92,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         validationType: 'value',
         emptyInputValidationError: 'Please enter a valid initial amount',
         inputConstraintValidationError: 'Not enough ETH available',
-        compareValue: balance,
+        compareValue: toHex(maxUint256), // don't fail validation when the balance is insufficient
       },
     },
     {
