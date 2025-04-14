@@ -213,13 +213,13 @@ const Index = () => {
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
 
   const chainId = chain.id;
-  const [initialAmount, setInitialAmount] = useState(
+  const [initialAmount, setInitialAmount] = useState<bigint | null>(
     BigInt(toHex(parseUnits('.5', 18))),
   ); // .5 ETH in wei
   const [amountPerSecond, setAmountPerSecond] = useState(
     BigInt(toHex(parseUnits('.5', 18))),
   ); // .5 ETH in wei
-  const [maxAmount, setMaxAmount] = useState(
+  const [maxAmount, setMaxAmount] = useState<bigint | null>(
     BigInt(toHex(parseUnits('2.5', 18))),
   ); // 2.5 ETH in wei
   const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
@@ -242,7 +242,11 @@ const Index = () => {
   const handleInitialAmountChange = ({
     target: { value: inputValue },
   }: React.ChangeEvent<HTMLInputElement>) => {
-    setInitialAmount(BigInt(inputValue));
+    if (inputValue.trim() === '') {
+      setInitialAmount(null);
+    } else {
+      setInitialAmount(BigInt(inputValue));
+    }
   };
 
   const handleAmountPerSecondChange = ({
@@ -254,7 +258,11 @@ const Index = () => {
   const handleMaxAmountChange = ({
     target: { value: inputValue },
   }: React.ChangeEvent<HTMLInputElement>) => {
-    setMaxAmount(BigInt(inputValue));
+    if (inputValue.trim() === '') {
+      setMaxAmount(null);
+    } else {
+      setMaxAmount(BigInt(inputValue));
+    }
   };
 
   const handleStartTimeChange = ({
@@ -513,7 +521,7 @@ const Index = () => {
                   type="text"
                   id="initialAmount"
                   name="initialAmount"
-                  value={initialAmount.toString()}
+                  value={initialAmount?.toString()}
                   onChange={handleInitialAmountChange}
                 />
               </div>
@@ -533,7 +541,7 @@ const Index = () => {
                   type="text"
                   id="maxAmount"
                   name="maxAmount"
-                  value={maxAmount.toString()}
+                  value={maxAmount?.toString()}
                   onChange={handleMaxAmountChange}
                 />
               </div>
