@@ -44,6 +44,7 @@ describe('UserEventDispatcher', () => {
       },
       [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
     },
+    isAdjustmentAllowed: true,
   };
 
   beforeEach(() => {

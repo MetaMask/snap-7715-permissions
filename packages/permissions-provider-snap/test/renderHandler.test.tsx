@@ -77,6 +77,7 @@ describe('Permission Confirmation Render Handler', () => {
         },
         [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
       },
+      isAdjustmentAllowed: true,
     };
 
   const mockPage = (
@@ -89,6 +90,7 @@ describe('Permission Confirmation Render Handler', () => {
       chainId={mockContext.chainId}
       valueFormattedAsCurrency={mockContext.valueFormattedAsCurrency}
       state={mockContext.state}
+      isAdjustmentAllowed={mockContext.isAdjustmentAllowed}
     />
   );
 

@@ -15,6 +15,7 @@ export type TextRuleProps = {
   tooltip: string;
   inputName: string;
   removeRuleButtonName: string;
+  isAdjustmentAllowed: boolean;
 };
 
 /**
@@ -83,12 +84,14 @@ export const filterNotActiveRuleMeta = (
  * @param text - The text to display.
  * @param tooltip - The tooltip text to display.
  * @param removeRuleButtonName - The name of the remove button.
+ * @param isAdjustmentAllowed - Whether the permission can be adjusted.
  * @returns The JSX element to render.
  */
 const renderRuleItemDetails = (
   text: string,
   tooltip: string,
   removeRuleButtonName: string,
+  isAdjustmentAllowed: boolean,
 ) => (
   <Box direction="horizontal" alignment="space-between">
     <Box direction="horizontal">
@@ -97,7 +100,9 @@ const renderRuleItemDetails = (
         <Icon name="question" size="inherit" color="muted" />
       </Tooltip>
     </Box>
-    <Button name={removeRuleButtonName}>Remove</Button>
+    {isAdjustmentAllowed ? (
+      <Button name={removeRuleButtonName}>Remove</Button>
+    ) : null}
   </Box>
 );
 
@@ -110,6 +115,7 @@ const renderRuleItemDetails = (
  * @param props.inputName - The name of the input field.
  * @param props.removeRuleButtonName - The name of the remove button.
  * @param props.textValue - The text value to display.
+ * @param props.isAdjustmentAllowed - Whether the permission can be adjusted.
  * @returns The JSX element to render.
  */
 export const TextRule: SnapComponent<TextRuleProps> = ({
@@ -118,9 +124,15 @@ export const TextRule: SnapComponent<TextRuleProps> = ({
   inputName,
   removeRuleButtonName,
   textValue,
+  isAdjustmentAllowed,
 }) => (
   <Box direction="vertical">
-    {renderRuleItemDetails(text, tooltip, removeRuleButtonName)}
+    {renderRuleItemDetails(
+      text,
+      tooltip,
+      removeRuleButtonName,
+      isAdjustmentAllowed,
+    )}
     <Input
       name={inputName}
       type="text"

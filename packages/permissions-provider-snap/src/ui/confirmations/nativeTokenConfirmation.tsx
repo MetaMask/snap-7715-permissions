@@ -59,6 +59,7 @@ export enum NativeTokenStreamDialogElementNames {
  * @param props.balance - The account balance.
  * @param props.valueFormattedAsCurrency - The account balance formatted as currency that matches the user's preferences.
  * @param props.state - The state of the dynamic components.
+ * @param props.isAdjustmentAllowed - Whether the permission can be adjusted.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamConfirmationPage: SnapComponent<
@@ -71,6 +72,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
   balance,
   valueFormattedAsCurrency,
   state,
+  isAdjustmentAllowed,
 }) => {
   const asset = 'ETH';
   const accountDetailsProps: AccountDetailsProps = {
@@ -233,6 +235,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
         }
         period={state[NativeTokenStreamDialogElementNames.PeriodInput]}
         periodElementName={NativeTokenStreamDialogElementNames.PeriodInput}
+        isAdjustmentAllowed={isAdjustmentAllowed}
       />
 
       {isActiveRulesEmpty && (
@@ -255,12 +258,14 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
           }
           startTimeEventName={NativeTokenStreamDialogElementNames.StartTimeRule}
           expiryEventName={NativeTokenStreamDialogElementNames.ExpiryRule}
+          isAdjustmentAllowed={isAdjustmentAllowed}
         />
       )}
 
       <AddMoreRule
         activeRuleStateKeys={activeRuleStateKeys}
         ruleMeta={ruleMeta}
+        isAdjustmentAllowed={isAdjustmentAllowed}
       />
     </Box>
   );

@@ -107,6 +107,7 @@ describe('Orchestrate', () => {
         },
         [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
       },
+      isAdjustmentAllowed: true,
     };
 
     const orchestrateArgs: OrchestrateArgs<typeof mockPermissionType> = {
@@ -120,6 +121,7 @@ describe('Orchestrate', () => {
         sessionAccount,
         origin: 'http://localhost:3000',
         expiry: 1,
+        isAdjustmentAllowed: true,
       },
       permissionConfirmationRenderHandler:
         mockPermissionConfirmationRenderHandler,
@@ -183,6 +185,7 @@ describe('Orchestrate', () => {
           chainId: '0xaa36a7',
           context: '0x00_some_permission_context',
           expiry: 1,
+          isAdjustmentAllowed: true,
           permission: {
             data: {
               justification: 'shh...permission 2',

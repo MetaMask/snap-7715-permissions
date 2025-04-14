@@ -40,6 +40,7 @@ export type PermissionConfirmationContext<
   readonly balance: Hex;
   readonly valueFormattedAsCurrency: string;
   readonly chainId: number;
+  readonly isAdjustmentAllowed: boolean;
   expiry: number;
   state: State<TPermissionType>;
 };
@@ -60,4 +61,5 @@ export type PermissionConfirmationProps<
     | 'expiry'
     | 'chainId'
     | 'state'
+    | 'isAdjustmentAllowed'
   >;

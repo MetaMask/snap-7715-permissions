@@ -8,6 +8,7 @@ import { RulesSelectorElementNames } from './RulesSelector';
 type RulesSelectorProps = {
   activeRuleStateKeys: string[];
   ruleMeta: RuleMeta<RuleValidationTypes>[];
+  isAdjustmentAllowed: boolean;
 };
 
 /**
@@ -16,14 +17,17 @@ type RulesSelectorProps = {
  * @param props - The rules selector props.
  * @param props.activeRuleStateKeys - The keys of the rules in the state.
  * @param props.ruleMeta - The metadata for the rules.
+ * @param props.isAdjustmentAllowed - Whether the permission can be adjusted.
  * @returns The JSX element to render.
  */
 export const AddMoreRule: SnapComponent<RulesSelectorProps> = ({
   activeRuleStateKeys,
   ruleMeta,
+  isAdjustmentAllowed,
 }) => {
   const isShowAddMorRuleButtonDisabled =
-    filterNotActiveRuleMeta(ruleMeta, activeRuleStateKeys).length === 0;
+    filterNotActiveRuleMeta(ruleMeta, activeRuleStateKeys).length === 0 ||
+    !isAdjustmentAllowed;
 
   return (
     <Box>

@@ -50,6 +50,7 @@ describe('Confirmation Dialog event handlers', () => {
           },
           [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
         },
+        isAdjustmentAllowed: true,
       };
 
     describe('handleToggleBooleanClicked - event', () => {

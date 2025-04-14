@@ -13,6 +13,7 @@ export type NativeTokenStreamRulesProps = {
   maxAllowanceEventName: string;
   startTimeEventName: string;
   expiryEventName: string;
+  isAdjustmentAllowed: boolean;
 };
 
 /**
@@ -27,6 +28,7 @@ export type NativeTokenStreamRulesProps = {
  * @param props.maxAllowanceEventName - The event name for the max allowance .
  * @param props.startTimeEventName - The event name for the start time .
  * @param props.expiryEventName - The event name for the expiry remove.
+ * @param props.isAdjustmentAllowed - Whether the permission can be adjusted.
  * @returns The JSX element to render.
  */
 export const NativeTokenStreamRules: SnapComponent<
@@ -40,6 +42,7 @@ export const NativeTokenStreamRules: SnapComponent<
   maxAllowanceEventName,
   startTimeEventName,
   expiryEventName,
+  isAdjustmentAllowed,
 }) => {
   return (
     <Section>
@@ -50,6 +53,7 @@ export const NativeTokenStreamRules: SnapComponent<
           inputName={`${initialAmountEventName}-input`}
           removeRuleButtonName={initialAmountEventName}
           textValue={initialAmount}
+          isAdjustmentAllowed={isAdjustmentAllowed}
         />
       ) : null}
 
@@ -60,6 +64,7 @@ export const NativeTokenStreamRules: SnapComponent<
           inputName={`${maxAllowanceEventName}-input`}
           removeRuleButtonName={maxAllowanceEventName}
           textValue={maxAllowance}
+          isAdjustmentAllowed={isAdjustmentAllowed}
         />
       ) : null}
 
@@ -70,6 +75,7 @@ export const NativeTokenStreamRules: SnapComponent<
           inputName={`${startTimeEventName}-input`}
           removeRuleButtonName={startTimeEventName}
           textValue={startTime}
+          isAdjustmentAllowed={isAdjustmentAllowed}
         />
       ) : null}
 
@@ -80,6 +86,7 @@ export const NativeTokenStreamRules: SnapComponent<
           inputName={`${expiryEventName}-input`}
           removeRuleButtonName={expiryEventName}
           textValue={expiry}
+          isAdjustmentAllowed={isAdjustmentAllowed}
         />
       ) : null}
     </Section>
