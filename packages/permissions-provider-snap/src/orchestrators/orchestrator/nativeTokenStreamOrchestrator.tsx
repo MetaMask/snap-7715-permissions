@@ -209,18 +209,9 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
 
       let attenuatedPermission: PermissionTypeMapping['native-token-stream'];
 
-      if (!isAdjustmentAllowed) {
-        // no adjustment allowed, just need to add defaults to requested values
-        // todo: do we even need to add defaults here?
-        attenuatedPermission = {
-          type: 'native-token-stream',
-          data: {
-            ...requestedPermission.data,
-            initialAmount: requestedPermission.data.initialAmount || '0x0',
-          },
-          expiry: requestedExpiry,
-        };
-      } else {
+      let expiry: number;
+
+      if (isAdjustmentAllowed) {
         // If adjustment is allowed, we need to capture the user's adjusted values
         const attenuatedStreamAmount =
           state[NativeTokenStreamDialogElementNames.StreamAmountInput];
@@ -251,15 +242,26 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
               : requestedPermission.data.startTime,
             justification: requestedPermission.data.justification,
           },
-          expiry: attenuatedExpiry
-            ? convertReadableDateToTimestamp(attenuatedExpiry)
-            : requestedExpiry,
         };
+        expiry = attenuatedExpiry
+          ? convertReadableDateToTimestamp(attenuatedExpiry)
+          : requestedExpiry;
+      } else {
+        // no adjustment allowed, just need to add defaults to requested values
+        // todo: do we even need to add defaults here?
+        attenuatedPermission = {
+          type: 'native-token-stream',
+          data: {
+            ...requestedPermission.data,
+            initialAmount: requestedPermission.data.initialAmount || '0x0',
+          },
+        };
+        expiry = requestedExpiry;
       }
 
       return {
         attenuatedPermission,
-        expiry: requestedExpiry,
+        expiry,
       };
     },
     getTokenCaipAssetType(

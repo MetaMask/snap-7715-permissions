@@ -4,7 +4,7 @@ import {
   createCaveatBuilder,
   getDeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
-import { getAddress, parseUnits, toHex } from 'viem';
+import { getAddress, maxUint256, parseUnits, toHex } from 'viem';
 import { sepolia } from 'viem/chains';
 
 import type {
@@ -23,8 +23,9 @@ import {
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
-  getMaxUint256,
 } from '../src/utils';
+
+const uint256MaxHex = toHex(maxUint256);
 
 describe('native-token-stream Orchestrator', () => {
   const mockStartTime = 789501501; // Example fixed time (January 7, 1995 5:58:21 PM GMT)
@@ -365,7 +366,7 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(parseUnits('0.5', 18)),
             amountPerSecond: '0x482e9f5cf5d',
             startTime: convertReadableDateToTimestamp('01/01/2025'),
-            maxAmount: getMaxUint256(),
+            maxAmount: uint256MaxHex,
           },
         },
       });
@@ -543,7 +544,7 @@ describe('native-token-stream Orchestrator', () => {
         initialAmount: '0x0',
         amountPerSecond: '0x180f8a7451f',
         startTime: mockStartTime,
-        maxAmount: getMaxUint256(),
+        maxAmount: uint256MaxHex,
       });
     });
 
@@ -643,7 +644,7 @@ describe('native-token-stream Orchestrator', () => {
             initialAmount: toHex(parseUnits('0', 18)),
             amountPerSecond: '0x482e9f5cf5d',
             startTime: convertReadableDateToTimestamp('01/01/2025'),
-            maxAmount: getMaxUint256(),
+            maxAmount: uint256MaxHex,
           },
         },
       });
@@ -693,13 +694,7 @@ describe('native-token-stream Orchestrator', () => {
         expiry: 10000000,
         attenuatedPermission: {
           type: 'native-token-stream',
-          data: {
-            justification: 'test justification',
-            initialAmount: toHex(parseUnits('0.5', 18)),
-            amountPerSecond: toHex(parseUnits('0.5', 18)),
-            startTime: mockStartTime,
-            maxAmount: getMaxUint256(),
-          },
+          data: mockRequestedPermission.data,
         },
       });
     });

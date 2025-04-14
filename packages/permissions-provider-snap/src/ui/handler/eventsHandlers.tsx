@@ -54,16 +54,16 @@ export const handleToggleBooleanClicked: UserEventHandler<
     `Handling handleToggleBooleanClicked event:`,
     JSON.stringify({ attenuatedContext }, undefined, 2),
   );
-  const eventName = event.name ?? '';
-  if (attenuatedContext.state[eventName] === undefined) {
-    throw new Error(`Event name ${eventName} not found in state`);
+  const elementName = event.name ?? '';
+  if (attenuatedContext.state[elementName] === undefined) {
+    throw new Error(`Element name ${elementName} not found in state`);
   }
 
   await updateInterfaceHandler(permissionType, snap, interfaceId, {
     ...attenuatedContext,
     state: {
       ...attenuatedContext.state,
-      [eventName]: !attenuatedContext.state[eventName],
+      [elementName]: !attenuatedContext.state[elementName],
     },
   });
 };
@@ -126,16 +126,16 @@ export const handleReplaceTextInput: UserEventHandler<
     `Handling handleReplaceTextInput event:`,
     JSON.stringify({ attenuatedContext }, undefined, 2),
   );
-  const eventName = event.name;
-  if (attenuatedContext.state[eventName] === undefined) {
-    throw new Error(`Event name ${eventName} not found in state`);
+  const elementName = event.name;
+  if (attenuatedContext.state[elementName] === undefined) {
+    throw new Error(`Element name ${elementName} not found in state`);
   }
 
   await updateInterfaceHandler(permissionType, snap, interfaceId, {
     ...attenuatedContext,
     state: {
       ...attenuatedContext.state,
-      [eventName]: event.value,
+      [elementName]: event.value,
     },
   });
 };

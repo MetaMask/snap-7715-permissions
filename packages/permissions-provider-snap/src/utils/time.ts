@@ -7,6 +7,10 @@
 export const convertTimestampToReadableDate = (timestamp: number) => {
   const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
 
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid date format');
+  }
+
   // Get UTC components
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-indexed

@@ -95,7 +95,7 @@ describe('Orchestrate', () => {
         [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
         [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
         rules: {
-          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: null,
+          [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
           [NativeTokenStreamDialogElementNames.InitialAmountRule]:
             nativeTokenStreamPermission.data.initialAmount
               ? formatTokenBalance(
@@ -192,7 +192,8 @@ describe('Orchestrate', () => {
               amountPerSecond: '0x180f8a7451f',
               initialAmount: '0xde0b6b3a7640000',
               startTime: 1000,
-              maxAmount: '0xde0b6b3a7640000',
+              maxAmount:
+                '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
             },
             type: 'native-token-stream',
           },
