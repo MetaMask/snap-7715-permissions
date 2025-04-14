@@ -11,13 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add Snap homepage context. This will show in a dialog when first installing the snap and in the snap homepage ([#52](https://github.com/MetaMask/snap-7715-permissions/pull/52))
 - Support the option for the user to adjust permissions requested by the DApp ([#52](https://github.com/MetaMask/snap-7715-permissions/pull/52))
+  - Build `@metamask/gator-permissions-snap` with the appropriate `PRICE_API_BASE_URL` environment variable configured.
+- Add Snap homepage context. This will show in a dialog when first installing the snap and in the snap homepage ([#63](https://github.com/MetaMask/snap-7715-permissions/pull/63))
 - Add Snaps `endowment:page-home` permission to enable a Snaps home page for `@metamask/gator-permissions-snap` ([#72](https://github.com/MetaMask/snap-7715-permissions/pull/72))
 
 ### Fixed
 
-- Build `@metamask/gator-permissions-snap` with correct token price url ([#52](https://github.com/MetaMask/snap-7715-permissions/pull/52))
 - Update bugs url in package.json files to point to correct repository ([#70](https://github.com/MetaMask/snap-7715-permissions/pull/70))
 - Fixed various issues with permission data binding and resolving user input data ([#71](https://github.com/MetaMask/snap-7715-permissions/pull/71))
 
