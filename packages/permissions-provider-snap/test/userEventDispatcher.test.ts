@@ -4,10 +4,12 @@ import { getAddress } from 'viem';
 
 import {
   NativeTokenStreamDialogElementNames,
+  RulesSelectorElementNames,
   TimePeriod,
   type PermissionConfirmationContext,
 } from '../src/ui';
 import { UserEventDispatcher } from '../src/userEventDispatcher';
+import { convertTimestampToReadableDate } from '../src/utils';
 
 describe('UserEventDispatcher', () => {
   let userEventDispatcher: UserEventDispatcher;
@@ -24,15 +26,25 @@ describe('UserEventDispatcher', () => {
     expiry: 1,
     chainId: 11155111,
     valueFormattedAsCurrency: '$1,000.00',
-    permissionSpecificRules: {
-      maxAllowance: 'Unlimited',
-    },
     state: {
       [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
         false,
-      [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
+      [NativeTokenStreamDialogElementNames.StreamAmountInput]: '0x2',
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
+      [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
+      [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
+      [NativeTokenStreamDialogElementNames.SelectedRuleInput]: '',
+      rules: {
+        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+        [NativeTokenStreamDialogElementNames.InitialAmountRule]: '0x1',
+        [NativeTokenStreamDialogElementNames.StartTimeRule]:
+          convertTimestampToReadableDate(1222333),
+        [NativeTokenStreamDialogElementNames.ExpiryRule]:
+          convertTimestampToReadableDate(1),
+      },
+      [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
     },
+    isAdjustmentAllowed: true,
   };
 
   beforeEach(() => {

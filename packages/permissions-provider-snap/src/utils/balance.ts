@@ -1,5 +1,5 @@
 import type { Hex } from 'viem';
-import { formatUnits, parseUnits, toHex } from 'viem';
+import { formatUnits, maxUint256, parseUnits, toHex } from 'viem';
 
 /**
  * Formats a token balance to a human-readable string.
@@ -29,4 +29,31 @@ export const convertValueToHex = (
   tokenDecimal = 18,
 ): Hex => {
   return toHex(parseUnits(value.toString(), tokenDecimal));
+};
+
+/**
+ * Parses a max allowance value.
+ * @param value - The value to parse.
+ * @returns The parsed value.
+ */
+export const maxAllowanceParser = (value: string) => {
+  if (value === null) {
+    throw new Error('Invalid max allowance value');
+  }
+  if (value === 'Unlimited') {
+    return toHex(maxUint256);
+  }
+  return convertValueToHex(value);
+};
+
+/**
+ * Parses a zero default value.
+ * @param value - The value to parse.
+ * @returns The parsed value.
+ */
+export const zeroDefaultParser = (value: string | null | undefined) => {
+  if (!value) {
+    return convertValueToHex('0');
+  }
+  return convertValueToHex(value);
 };

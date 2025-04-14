@@ -5,7 +5,6 @@ import type { Hex } from 'viem';
 
 import type {
   PermissionConfirmationStateMapping,
-  PermissionSpecificRulesMapping,
   SupportedPermissionTypes,
 } from '../orchestrators';
 
@@ -35,13 +34,13 @@ export type PermissionConfirmationContext<
   TPermissionType extends SupportedPermissionTypes,
 > = InterfaceContext & {
   readonly permissionType: TPermissionType;
-  permissionSpecificRules: PermissionSpecificRulesMapping[TPermissionType];
   readonly justification: string;
   readonly address: Hex;
   readonly siteOrigin: string;
   readonly balance: Hex;
   readonly valueFormattedAsCurrency: string;
   readonly chainId: number;
+  readonly isAdjustmentAllowed: boolean;
   expiry: number;
   state: State<TPermissionType>;
 };
@@ -61,16 +60,6 @@ export type PermissionConfirmationProps<
     | 'valueFormattedAsCurrency'
     | 'expiry'
     | 'chainId'
-    | 'permissionSpecificRules'
     | 'state'
+    | 'isAdjustmentAllowed'
   >;
-
-/**
- * The props for the permission rules.
- */
-export type PermissionSpecificRulesProps<
-  TPermissionType extends SupportedPermissionTypes,
-> = JsonObject & {
-  permissionSpecificRules: PermissionSpecificRulesMapping[TPermissionType];
-  expiry: number;
-};

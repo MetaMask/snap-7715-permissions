@@ -3,27 +3,17 @@ import type {
   Permission,
 } from '@metamask/7715-permissions-shared/types';
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
-import type {
-  ComponentOrElement,
-  UserInputEventType,
-} from '@metamask/snaps-sdk';
+import type { ComponentOrElement } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { CaipAssetType } from '@metamask/utils';
 import type { Address, Hex, OneOf } from 'viem';
 
 import type { PermissionConfirmationContext, State } from '../ui';
-import type { UserEventHandler } from '../userEventDispatcher';
+import type { DialogContentEventHandlers } from '../userEventDispatcher';
 import type {
-  PermissionSpecificRulesMapping,
   PermissionTypeMapping,
   SupportedPermissionTypes,
 } from './orchestrator';
-
-export type DialogContentEventHandlers = {
-  elementName: string;
-  eventType: UserInputEventType;
-  handler: UserEventHandler<UserInputEventType>;
-};
 
 /**
  * The result of orchestrating a permission.
@@ -68,6 +58,11 @@ export type OrchestrateMeta<TPermissionType extends SupportedPermissionTypes> =
      * @example Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
      */
     expiry: number;
+
+    /**
+     * Whether the permission can be adjusted
+     */
+    isAdjustmentAllowed: boolean;
   };
 
 /**
@@ -129,23 +124,16 @@ export type Orchestrator<TPermissionType extends SupportedPermissionTypes> = {
   }>;
 
   /**
-   * Gets the permission specific rules for the permission type. These are default values depending on the permission type.
-   * @param permission - The permission to get the specific rules for.
-   * @returns The permission specific rules for the permission type.
-   */
-  getPermissionSpecificRules: (
-    permission: PermissionTypeMapping[TPermissionType],
-  ) => PermissionSpecificRulesMapping[TPermissionType];
-
-  /**
    * Returns a set of event handlers for the confirmation dialog specific to the permission type.
    * These event handlers are used to handle user input events in the confirmation dialog.
    *
    * @param permission - The permission for the confirmation dialog.
+   * @param expiry - The expiry of the permission.
    * @returns An array of event handlers for the confirmation dialog.
    */
   getConfirmationDialogEventHandlers: (
     permission: PermissionTypeMapping[TPermissionType],
+    expiry: number,
   ) => {
     state: State<TPermissionType>;
     dialogContentEventHandlers: DialogContentEventHandlers[];

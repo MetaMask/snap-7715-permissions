@@ -18,6 +18,7 @@ type StreamAmountProps = {
   streamAmountElementName: string;
   period: TimePeriod;
   periodElementName: string;
+  isAdjustmentAllowed: boolean;
 };
 
 /**
@@ -88,8 +89,12 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   streamAmountElementName,
   period,
   periodElementName,
+  isAdjustmentAllowed,
 }) => {
   const streamRate = formatStreamRatePerSecond(streamAmount, period);
+
+  const streamAmountFormatted = formatUnits(BigInt(streamAmount), 18);
+
   return (
     <Section>
       {inputDetails(
@@ -100,14 +105,19 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
         name={streamAmountElementName}
         type="number"
         placeholder={formatTokenBalance(streamAmount)}
-        value={streamAmount}
+        value={streamAmountFormatted}
+        disabled={!isAdjustmentAllowed}
       />
 
       {inputDetails(
         'Period',
         'The time period over which the streaming rate is specified. The calculated streaming rate is per second.',
       )}
-      <Dropdown name={periodElementName} value={period}>
+      <Dropdown
+        name={periodElementName}
+        value={period}
+        disabled={!isAdjustmentAllowed}
+      >
         <Option value={TimePeriod.MONTHLY}>{TimePeriod.MONTHLY}</Option>
         <Option value={TimePeriod.WEEKLY}>{TimePeriod.WEEKLY}</Option>
         <Option value={TimePeriod.DAILY}>{TimePeriod.DAILY}</Option>

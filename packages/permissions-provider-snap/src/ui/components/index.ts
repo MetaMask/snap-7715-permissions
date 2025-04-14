@@ -5,3 +5,4 @@ export * from './pagination';
 export * from './confirmation-footer';
 export * from './StreamAmount';
 export * from './Rules';
+export * from './nativeTokenStream';
