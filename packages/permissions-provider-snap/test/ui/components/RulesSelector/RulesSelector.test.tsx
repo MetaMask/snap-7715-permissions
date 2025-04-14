@@ -17,7 +17,7 @@ describe('RulesSelector', () => {
     name: 'Test Rule',
     placeholder: 'Enter value',
     ruleValidator: {
-      validationType: 'value',
+      validationType: 'value-less-than-or-equal-to',
       emptyInputValidationError: 'Value cannot be empty',
       inputConstraintValidationError: 'Value exceeds limit',
       compareValue: toHex(parseUnits('1', 18)),
@@ -44,7 +44,7 @@ describe('RulesSelector', () => {
       const timestampRuleMeta: RuleMeta<RuleValidationTypes> = {
         ...mockRuleMeta,
         ruleValidator: {
-          validationType: 'timestamp',
+          validationType: 'timestamp-greater-than-or-equal-to',
           emptyInputValidationError: 'Date cannot be empty',
           inputConstraintValidationError: 'Date is invalid',
           compareValue: 1744308258, // 04/11/2025
@@ -60,7 +60,7 @@ describe('RulesSelector', () => {
       const timestampRuleMeta: RuleMeta<RuleValidationTypes> = {
         ...mockRuleMeta,
         ruleValidator: {
-          validationType: 'timestamp',
+          validationType: 'timestamp-greater-than-or-equal-to',
           emptyInputValidationError: 'Date cannot be empty',
           inputConstraintValidationError: 'Date is invalid',
           compareValue: 1744308258, // 04/11/2025
@@ -165,7 +165,7 @@ describe('RulesSelector', () => {
         name: 'Second Rule',
         placeholder: 'Enter value',
         ruleValidator: {
-          validationType: 'value',
+          validationType: 'value-less-than-or-equal-to',
           emptyInputValidationError: 'Value cannot be empty',
           inputConstraintValidationError: 'Value exceeds limit',
           compareValue: '0x100' as const,

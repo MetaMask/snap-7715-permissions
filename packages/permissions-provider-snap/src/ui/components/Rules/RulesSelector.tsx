@@ -56,7 +56,7 @@ export const validator = (
   }
 
   switch (validationType) {
-    case 'value':
+    case 'value-less-than-or-equal-to':
       if (
         BigInt(convertValueToHex(inputValue)) >
         BigInt(ruleValidator.compareValue)
@@ -64,16 +64,14 @@ export const validator = (
         return ruleValidator.inputConstraintValidationError;
       }
       break;
-    case 'timestamp':
+    case 'timestamp-greater-than-or-equal-to':
       if (!isHumanReadableInCorrectFormat(inputValue)) {
         return ruleValidator.emptyInputValidationError;
       }
 
       if (
-        !(
-          BigInt(convertReadableDateToTimestamp(inputValue)) >=
-          BigInt(ruleValidator.compareValue)
-        )
+        BigInt(convertReadableDateToTimestamp(inputValue)) <
+        BigInt(ruleValidator.compareValue)
       ) {
         return ruleValidator.inputConstraintValidationError;
       }

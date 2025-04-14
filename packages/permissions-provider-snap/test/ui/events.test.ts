@@ -37,7 +37,7 @@ describe('Confirmation Dialog event handlers', () => {
         state: {
           [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
             false,
-          [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
+          [NativeTokenStreamDialogElementNames.StreamAmountInput]: '0x2',
           [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
           [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
           [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',
@@ -96,7 +96,7 @@ describe('Confirmation Dialog event handlers', () => {
             permissionType: 'native-token-stream',
           }),
         ).rejects.toThrow(
-          'Event name justification-show-more-button-native-token-stream not found in state',
+          'Element name justification-show-more-button-native-token-stream not found in state',
         );
       });
 
@@ -118,7 +118,7 @@ describe('Confirmation Dialog event handlers', () => {
             permissionType: 'native-token-stream',
           }),
         ).rejects.toThrow(
-          'Event name some other event name not found in state',
+          'Element name some other event name not found in state',
         );
       });
 
@@ -133,7 +133,7 @@ describe('Confirmation Dialog event handlers', () => {
             interfaceId: 'mockInterfaceId',
             permissionType: 'native-token-stream',
           }),
-        ).rejects.toThrow('Event name  not found in state');
+        ).rejects.toThrow('Element name  not found in state');
       });
     });
 
@@ -143,7 +143,7 @@ describe('Confirmation Dialog event handlers', () => {
         await handleReplaceValueInput({
           event: {
             type: UserInputEventType.InputChangeEvent,
-            name: NativeTokenStreamDialogElementNames.MaxAmountInput,
+            name: NativeTokenStreamDialogElementNames.StreamAmountInput,
             value: newValue,
           },
           attenuatedContext: mockNativeTokenStreamContext,
@@ -166,7 +166,7 @@ describe('Confirmation Dialog event handlers', () => {
             interfaceId: 'mockInterfaceId',
             permissionType: 'native-token-stream',
           }),
-        ).rejects.toThrow('Event name unknown-input not found in state');
+        ).rejects.toThrow('Element name unknown-input not found in state');
       });
     });
 
@@ -199,7 +199,7 @@ describe('Confirmation Dialog event handlers', () => {
             interfaceId: 'mockInterfaceId',
             permissionType: 'native-token-stream',
           }),
-        ).rejects.toThrow('Event name unknown-input not found in state');
+        ).rejects.toThrow('Element name unknown-input not found in state');
       });
     });
 

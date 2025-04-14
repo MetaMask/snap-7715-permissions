@@ -1,5 +1,5 @@
 import type { Hex } from 'viem';
-import { formatUnits, parseUnits, toHex } from 'viem';
+import { formatUnits, maxUint256, parseUnits, toHex } from 'viem';
 
 /**
  * Formats a token balance to a human-readable string.
@@ -32,24 +32,16 @@ export const convertValueToHex = (
 };
 
 /**
- * Returns the maximum value for a uint256.
- * @returns The maximum value for a uint256.
- */
-export const getMaxUint256 = (): Hex => {
-  return `0x${(BigInt(2) ** BigInt(256) - BigInt(1)).toString(16)}`;
-};
-
-/**
  * Parses a max allowance value.
  * @param value - The value to parse.
  * @returns The parsed value.
  */
-export const maxAllowanceParser = (value: string | null) => {
+export const maxAllowanceParser = (value: string) => {
   if (value === null) {
-    return null;
+    throw new Error('Invalid max allowance value');
   }
   if (value === 'Unlimited') {
-    return getMaxUint256();
+    return toHex(maxUint256);
   }
   return convertValueToHex(value);
 };

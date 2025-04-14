@@ -29,7 +29,7 @@ describe('UserEventDispatcher', () => {
     state: {
       [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
         false,
-      [NativeTokenStreamDialogElementNames.MaxAmountInput]: '0x2',
+      [NativeTokenStreamDialogElementNames.StreamAmountInput]: '0x2',
       [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
       [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
       [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',

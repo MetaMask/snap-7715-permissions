@@ -97,7 +97,7 @@ export function createRpcHandler(config: {
           sessionAccount: firstRequest.signer.data.address,
           origin: siteOrigin,
           expiry: firstRequest.expiry,
-          isAdjustmentAllowed: firstRequest.isAdjustmentAllowed ?? false,
+          isAdjustmentAllowed: firstRequest.isAdjustmentAllowed ?? true,
         },
         permissionConfirmationRenderHandler,
         permissionsContextBuilder,

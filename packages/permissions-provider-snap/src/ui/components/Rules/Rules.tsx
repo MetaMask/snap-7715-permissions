@@ -21,11 +21,13 @@ export type TextRuleProps = {
 /**
  * The type of validation for a rule.
  */
-export type RuleValidationTypes = 'value' | 'timestamp';
+export type RuleValidationTypes =
+  | 'value-less-than-or-equal-to'
+  | 'timestamp-greater-than-or-equal-to';
 
 type RuleValidationInputCheckMapping = {
-  ['value']: Hex;
-  ['timestamp']: number;
+  ['value-less-than-or-equal-to']: Hex;
+  ['timestamp-greater-than-or-equal-to']: number;
 };
 
 /**

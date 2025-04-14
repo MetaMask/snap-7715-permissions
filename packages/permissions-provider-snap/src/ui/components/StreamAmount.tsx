@@ -92,6 +92,9 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
   isAdjustmentAllowed,
 }) => {
   const streamRate = formatStreamRatePerSecond(streamAmount, period);
+
+  const streamAmountFormatted = formatUnits(BigInt(streamAmount), 18);
+
   return (
     <Section>
       {inputDetails(
@@ -102,7 +105,7 @@ export const StreamAmount: SnapComponent<StreamAmountProps> = ({
         name={streamAmountElementName}
         type="number"
         placeholder={formatTokenBalance(streamAmount)}
-        value={streamAmount}
+        value={streamAmountFormatted}
         disabled={!isAdjustmentAllowed}
       />
 

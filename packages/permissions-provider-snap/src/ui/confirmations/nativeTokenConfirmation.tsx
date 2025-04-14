@@ -1,13 +1,9 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Box } from '@metamask/snaps-sdk/jsx';
-import { extractChain } from 'viem';
+import { extractChain, maxUint256, toHex } from 'viem';
 import * as ALL_CHAINS from 'viem/chains';
 
-import {
-  getMaxUint256,
-  getStartOfNextDayUTC,
-  getStartOfTodayUTC,
-} from '../../utils';
+import { getStartOfNextDayUTC, getStartOfTodayUTC } from '../../utils';
 import type {
   AccountDetailsProps,
   ItemDetails,
@@ -34,7 +30,7 @@ import type { PermissionConfirmationProps } from '../types';
  */
 export enum NativeTokenStreamDialogElementNames {
   JustificationShowMoreExpanded = 'justification-show-more-button-native-token-stream',
-  MaxAmountInput = 'max-amount-input-native-token-stream',
+  StreamAmountInput = 'max-amount-input-native-token-stream',
   PeriodInput = 'period-input-native-token-stream',
 
   AddMoreRulesFormSubmit = 'add-more-rules-form-submit-native-token-stream',
@@ -93,10 +89,10 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       name: 'Initial Amount',
       placeholder: '0.00',
       ruleValidator: {
-        validationType: 'value',
+        validationType: 'value-less-than-or-equal-to',
         emptyInputValidationError: 'Please enter a valid initial amount',
         inputConstraintValidationError: 'Not enough ETH available',
-        compareValue: balance,
+        compareValue: toHex(maxUint256), // don't fail validation when the balance is insufficient
       },
     },
     {
@@ -104,10 +100,10 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       name: 'Max Allowance',
       placeholder: '0.00',
       ruleValidator: {
-        validationType: 'value',
+        validationType: 'value-less-than-or-equal-to',
         emptyInputValidationError: 'Please enter a valid max allowance',
         inputConstraintValidationError: 'Not enough ETH available',
-        compareValue: getMaxUint256(),
+        compareValue: toHex(maxUint256),
         unlimitedAllowanceDropDown: {
           dropdownKey: NativeTokenStreamDialogElementNames.MaxAllowanceDropdown,
           dropdownValue:
@@ -120,7 +116,7 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       name: 'Start Time',
       placeholder: 'MM/DD/YYYY',
       ruleValidator: {
-        validationType: 'timestamp',
+        validationType: 'timestamp-greater-than-or-equal-to',
         emptyInputValidationError: 'Enter a valid date',
         inputConstraintValidationError: 'Must be today or later',
         compareValue: getStartOfTodayUTC(),
@@ -131,10 +127,10 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       name: 'Expiry',
       placeholder: 'MM/DD/YYYY',
       ruleValidator: {
-        validationType: 'timestamp',
+        validationType: 'timestamp-greater-than-or-equal-to',
         emptyInputValidationError: 'Enter a valid date',
         inputConstraintValidationError: 'Must be after start time',
-        compareValue: getStartOfNextDayUTC(),
+        compareValue: getStartOfNextDayUTC(), // todo: this should actually be the start time, not tomorrow
       },
     },
   ];
@@ -229,9 +225,11 @@ export const NativeTokenStreamConfirmationPage: SnapComponent<
       />
 
       <StreamAmount
-        streamAmount={state[NativeTokenStreamDialogElementNames.MaxAmountInput]}
+        streamAmount={
+          state[NativeTokenStreamDialogElementNames.StreamAmountInput]
+        }
         streamAmountElementName={
-          NativeTokenStreamDialogElementNames.MaxAmountInput
+          NativeTokenStreamDialogElementNames.StreamAmountInput
         }
         period={state[NativeTokenStreamDialogElementNames.PeriodInput]}
         periodElementName={NativeTokenStreamDialogElementNames.PeriodInput}
