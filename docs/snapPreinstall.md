@@ -31,7 +31,7 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
 
 1. Head back to the wallet repo:
 
-- Update the `package/site/.env.development` `GATSBY_KERNEL_SNAP_ORIGIN=npm:@metamask/permissions-kernel`
+- Update the `package/site/.env.development` `GATSBY_KERNEL_SNAP_ORIGIN=npm:@metamask/permissions-kernel-snap`
 - Run `yarn dev`
 - Navigate to `http://localhost:8000/`
 

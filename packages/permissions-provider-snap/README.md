@@ -1,4 +1,4 @@
-# @metamask/gator-permissions
+# @metamask/gator-permissions-snap
 
 This snap creates a Hybrid DeleGator account and allows the site to request 7715 permissions from those accounts. Users can grant permissions from a custom interactive confirmation dialog rendered by the snap(i.e., permissions picker).
 

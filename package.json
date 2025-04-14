@@ -1,11 +1,11 @@
 {
   "name": "@metamask/snap-7715-permissions-monorepo",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Monorepo for 7715 permissions snaps.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MetaMask/snap-7715-permissions.git"
+    "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "files": [],
   "workspaces": [
