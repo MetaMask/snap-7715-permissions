@@ -37,9 +37,6 @@ export const convertValueToHex = (
  * @returns The parsed value.
  */
 export const maxAllowanceParser = (value: string) => {
-  if (value === null) {
-    throw new Error('Invalid max allowance value');
-  }
   if (value === 'Unlimited') {
     return toHex(maxUint256);
   }

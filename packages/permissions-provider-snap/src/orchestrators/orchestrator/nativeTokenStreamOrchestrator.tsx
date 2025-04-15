@@ -97,13 +97,22 @@ const validatePermissionData = (
 ): true => {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
-  const bigIntAmountPerSecond = BigInt(amountPerSecond);
-  const bigIntMaxAmount = BigInt(maxAmount);
 
-  if (bigIntMaxAmount === 0n) {
-    throw new InvalidParamsError(
-      'Invalid maxAmount: must be a positive number',
-    );
+  if (maxAmount !== undefined) {
+    const bigIntMaxAmount = BigInt(maxAmount);
+
+    if (bigIntMaxAmount === 0n) {
+      throw new InvalidParamsError(
+        'Invalid maxAmount: must be a positive number',
+      );
+    }
+    if (initialAmount) {
+      if (bigIntMaxAmount < BigInt(initialAmount)) {
+        throw new InvalidParamsError(
+          'Invalid maxAmount: must be greater than initialAmount',
+        );
+      }
+    }
   }
 
   if (initialAmount) {
@@ -113,13 +122,9 @@ const validatePermissionData = (
         'Invalid initialAmount: must be greater than zero',
       );
     }
-
-    if (bigIntMaxAmount < bigIntInitialAmount) {
-      throw new InvalidParamsError(
-        'Invalid maxAmount: must be greater than initialAmount',
-      );
-    }
   }
+
+  const bigIntAmountPerSecond = BigInt(amountPerSecond);
 
   if (bigIntAmountPerSecond === 0n) {
     throw new InvalidParamsError(
@@ -183,11 +188,13 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       const intialAmountBigInt =
         initialAmount === undefined ? 0n : BigInt(initialAmount);
 
+      const maxAmountBigInt = maxAmount === undefined ? 0n : BigInt(maxAmount);
+
       caveatBuilder
         .addCaveat(
           'nativeTokenStreaming',
           intialAmountBigInt,
-          BigInt(maxAmount),
+          maxAmountBigInt,
           BigInt(amountPerSecond),
           startTime,
         )
@@ -243,6 +250,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
             justification: requestedPermission.data.justification,
           },
         };
+
         expiry = attenuatedExpiry
           ? convertReadableDateToTimestamp(attenuatedExpiry)
           : requestedExpiry;
@@ -254,6 +262,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           data: {
             ...requestedPermission.data,
             initialAmount: requestedPermission.data.initialAmount || '0x0',
+            maxAmount: requestedPermission.data.maxAmount || '0x0',
           },
         };
         expiry = requestedExpiry;
@@ -290,6 +299,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           // Rules are in human readable format is state so UI components do not need to convert them
           rules: {
             [NativeTokenStreamDialogElementNames.MaxAllowanceRule]:
+              permission.data.maxAmount === undefined ||
               BigInt(permission.data.maxAmount) === maxUint256
                 ? 'Unlimited'
                 : formatTokenBalance(permission.data.maxAmount),

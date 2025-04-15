@@ -41,6 +41,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     `Custom request (origin="${origin}"):`,
     JSON.stringify(request, undefined, 2),
   );
+
+  console.log('onRPCRequest', JSON.stringify(request));
   try {
     switch (request.method) {
       case InternalMethod.WalletGetRegisteredOnchainPermissionOffers: {
