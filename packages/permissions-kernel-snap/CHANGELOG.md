@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0]
+
 ### Uncategorized
 
 - Allow intitialAmount and maxAllowance to be unspecified ([#75](https://github.com/MetaMask/snap-7715-permissions/pull/75))
@@ -33,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add validate logic for native token stream permission data ([#33](https://github.com/MetaMask/snap-7715-permissions/pull/33))
 - Update 7715 types to match mm proposed types ([#30](https://github.com/MetaMask/snap-7715-permissions/pull/30))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.1.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.2.0...HEAD
+[0.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.1.0...@metamask/permissions-kernel-snap@0.2.0
 [0.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.0.1...@metamask/permissions-kernel-snap@0.1.0
 [0.0.1]: https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/permissions-kernel-snap@0.0.1
