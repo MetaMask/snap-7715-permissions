@@ -61,7 +61,7 @@ describe('Permission Confirmation Render Handler', () => {
         [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
           false,
         [NativeTokenStreamDialogElementNames.StreamAmountInput]:
-          permission.data.maxAmount,
+          permission.data.maxAmount || '0x0',
         [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
         [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
         [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',

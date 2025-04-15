@@ -89,7 +89,7 @@ describe('Orchestrate', () => {
         [NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded]:
           false,
         [NativeTokenStreamDialogElementNames.StreamAmountInput]:
-          nativeTokenStreamPermission.data.maxAmount,
+          nativeTokenStreamPermission.data.maxAmount ?? '0x0',
         [NativeTokenStreamDialogElementNames.PeriodInput]: TimePeriod.WEEKLY,
         [RulesSelectorElementNames.AddMoreRulesPageToggle]: false,
         [NativeTokenStreamDialogElementNames.SelectedRuleDropdown]: '',

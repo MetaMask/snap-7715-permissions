@@ -153,7 +153,10 @@ describe('validate utils', () => {
     });
 
     it('should return the permission name even if description is optional', () => {
-      const permissionType = { name: 'identity-read' };
+      const permissionType = {
+        name: 'identity-read',
+        description: 'Read access to user info',
+      };
       const result = extractPermissionName(permissionType);
       expect(result).toBe('identity-read');
     });

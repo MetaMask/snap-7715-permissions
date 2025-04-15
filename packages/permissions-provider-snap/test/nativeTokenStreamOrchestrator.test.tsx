@@ -263,6 +263,47 @@ describe('native-token-stream Orchestrator', () => {
         },
       ]);
     });
+
+    it('should coalesce the expected default values when not specified', async () => {
+      const orchestrator = createPermissionOrchestrator(mockPermissionType);
+
+      const permission = {
+        type: 'native-token-stream',
+        data: {
+          justification: 'shh...permission 2',
+          amountPerSecond: '0x1',
+          startTime: mockStartTime,
+        },
+      } as const;
+
+      const updatedCaveatBuilder = await orchestrator.appendPermissionCaveats({
+        address,
+        sessionAccount,
+        chainId: 11155111,
+        attenuatedPermission: permission,
+        caveatBuilder: createCaveatBuilder(getDeleGatorEnvironment(sepolia.id)),
+      });
+
+      const expectedMaxAmount = maxUint256;
+      const expectedInitialAmount = 0n;
+      const expectedAmountPerSecond = BigInt(permission.data.amountPerSecond);
+      const expectedStartTime = permission.data.startTime;
+
+      const expectedCaveats = createCaveatBuilder(
+        getDeleGatorEnvironment(sepolia.id),
+      )
+        .addCaveat(
+          'nativeTokenStreaming',
+          expectedInitialAmount,
+          expectedMaxAmount,
+          expectedAmountPerSecond,
+          expectedStartTime,
+        )
+        .addCaveat('exactCalldata', '0x')
+        .build();
+
+      expect(updatedCaveatBuilder.build()).toStrictEqual(expectedCaveats);
+    });
   });
 
   describe('getTokenCaipAssetType', () => {
@@ -298,6 +339,34 @@ describe('native-token-stream Orchestrator', () => {
           mockUiContext.expiry,
         );
       expect(dialogContentEventHandlers.length).toStrictEqual(12);
+    });
+
+    it('should coalesce excluded parameters', async () => {
+      const permission = {
+        type: 'native-token-stream',
+        data: {
+          justification: 'shh...permission 2',
+          amountPerSecond: '0x1',
+          startTime: mockStartTime,
+        },
+      } as const;
+
+      const parsedPermission = await orchestrator.parseAndValidate(permission);
+      const {
+        state: { rules },
+      } = orchestrator.getConfirmationDialogEventHandlers(
+        parsedPermission,
+        mockUiContext.expiry,
+      );
+
+      expect(rules).toStrictEqual({
+        [NativeTokenStreamDialogElementNames.MaxAllowanceRule]: 'Unlimited',
+        [NativeTokenStreamDialogElementNames.InitialAmountRule]: null,
+        [NativeTokenStreamDialogElementNames.StartTimeRule]:
+          convertTimestampToReadableDate(mockStartTime),
+        [NativeTokenStreamDialogElementNames.ExpiryRule]:
+          convertTimestampToReadableDate(mockUiContext.expiry),
+      });
     });
   });
 
@@ -695,6 +764,49 @@ describe('native-token-stream Orchestrator', () => {
         attenuatedPermission: {
           type: 'native-token-stream',
           data: mockRequestedPermission.data,
+        },
+      });
+    });
+
+    it('should coalesce excluded parameters when adjustment is not allowed', async () => {
+      const mockAttenuatedContext: PermissionConfirmationContext<'native-token-stream'> =
+        {
+          permissionType: mockPermissionType,
+          justification: 'test justification',
+          address,
+          siteOrigin: 'http://localhost:3000',
+          balance: toHex(parseUnits('100', 18)),
+          expiry: 10000000,
+          chainId: 11155111,
+          valueFormattedAsCurrency: '$1,000.00',
+          state: {} as any,
+          isAdjustmentAllowed: false,
+        };
+
+      const requestedPermission = {
+        type: 'native-token-stream',
+        data: {
+          justification: 'test justification',
+          amountPerSecond: toHex(parseUnits('0.5', 18)),
+          startTime: mockStartTime,
+        },
+      } as const;
+
+      // adjust are added to the state but they are not used
+      const result = await orchestrator.resolveAttenuatedPermission(
+        requestedPermission,
+        mockAttenuatedContext,
+      );
+
+      expect(result).toEqual({
+        expiry: 10000000,
+        attenuatedPermission: {
+          type: 'native-token-stream',
+          data: {
+            ...requestedPermission.data,
+            initialAmount: '0x0',
+            maxAmount: uint256MaxHex,
+          },
         },
       });
     });
