@@ -185,15 +185,16 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
       const { initialAmount, maxAmount, amountPerSecond, startTime } =
         attenuatedPermission.data;
 
-      const intialAmountBigInt =
+      const initialAmountBigInt =
         initialAmount === undefined ? 0n : BigInt(initialAmount);
 
-      const maxAmountBigInt = maxAmount === undefined ? 0n : BigInt(maxAmount);
+      const maxAmountBigInt =
+        maxAmount === undefined ? maxUint256 : BigInt(maxAmount);
 
       caveatBuilder
         .addCaveat(
           'nativeTokenStreaming',
-          intialAmountBigInt,
+          initialAmountBigInt,
           maxAmountBigInt,
           BigInt(amountPerSecond),
           startTime,
@@ -262,7 +263,7 @@ export const nativeTokenStreamPermissionOrchestrator: OrchestratorFactoryFunctio
           data: {
             ...requestedPermission.data,
             initialAmount: requestedPermission.data.initialAmount || '0x0',
-            maxAmount: requestedPermission.data.maxAmount || '0x0',
+            maxAmount: requestedPermission.data.maxAmount || toHex(maxUint256),
           },
         };
         expiry = requestedExpiry;
