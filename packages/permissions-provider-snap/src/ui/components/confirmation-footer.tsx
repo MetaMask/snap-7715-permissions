@@ -1,7 +1,8 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Button, Footer } from '@metamask/snaps-sdk/jsx';
 
-import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';
+export const CANCEL_BUTTON = 'cancel-button';
+export const GRANT_BUTTON = 'grant-button';
 
 export const ConfirmationFooter: SnapComponent = () => {
   return (

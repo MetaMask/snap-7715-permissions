@@ -205,7 +205,6 @@ export const orchestrate = async <
       chainId: chainIdNum,
     });
 
-  // todo: RPC failure attempting to serialize response if accountMeta is undefined
   const accountMetaObject =
     accountMeta.factory && accountMeta.factoryData
       ? {

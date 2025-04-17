@@ -1,0 +1,56 @@
+import { Form } from '@metamask/snaps-sdk/jsx';
+import { AccountDetails } from '../../ui/components/AccountDetails';
+import { NativeTokenStreamContext } from './types';
+import { InputField } from 'src/ui/components/InputField';
+
+export const INITIAL_AMOUNT_ELEMENT = 'initial-amount';
+export const MAX_AMOUNT_ELEMENT = 'max-amount';
+export const START_TIME_ELEMENT = 'start-time';
+export const EXPIRY_ELEMENT = 'expiry';
+
+export const createConfirmationContent = ({
+  accountDetails,
+  permissionDetails,
+  expiry,
+  isAdjustmentAllowed,
+}: NativeTokenStreamContext) => {
+  const areValuesFixed = !isAdjustmentAllowed;
+
+  return (
+    <Form name="native-token-stream-confirmation">
+      <AccountDetails {...accountDetails} />
+      <InputField
+        label="Initial Amount"
+        name={INITIAL_AMOUNT_ELEMENT}
+        tooltip="The initial amount of tokens to stream."
+        type="number"
+        value={permissionDetails.initialAmount}
+        disabled={areValuesFixed}
+      />
+      <InputField
+        label="Max Amount"
+        name={MAX_AMOUNT_ELEMENT}
+        tooltip="The maximum amount of tokens that can be streamed."
+        type="number"
+        value={permissionDetails.maxAmount}
+        disabled={areValuesFixed}
+      />
+      <InputField
+        label="Start Time"
+        name={START_TIME_ELEMENT}
+        tooltip="The start time of the stream."
+        type="text"
+        value={permissionDetails.startTime}
+        disabled={areValuesFixed}
+      />
+      <InputField
+        label="Expiry"
+        name={EXPIRY_ELEMENT}
+        tooltip="The expiry time of the stream."
+        type="text"
+        value={expiry}
+        disabled={areValuesFixed}
+      />
+    </Form>
+  );
+};

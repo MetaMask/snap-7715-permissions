@@ -4,13 +4,9 @@ import type {
   FileUploadEvent,
   FormSubmitEvent,
   InputChangeEvent,
-  InterfaceContext,
   UserInputEvent,
   UserInputEventType,
 } from '@metamask/snaps-sdk';
-
-import type { SupportedPermissionTypes } from './orchestrators';
-import type { PermissionConfirmationContext } from './ui';
 
 export type DialogContentEventHandlers = {
   elementName: string;
@@ -30,8 +26,6 @@ export type UserInputEventByType<
 export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
   (args: {
     event: UserInputEventByType<TUserInputEventType>;
-    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
-    permissionType: SupportedPermissionTypes;
     interfaceId: string;
   }) => void | Promise<void>;
 
@@ -147,9 +141,8 @@ export class UserEventDispatcher {
   public async handleUserInputEvent(args: {
     event: UserInputEvent;
     id: string;
-    context: InterfaceContext | null;
   }): Promise<void> {
-    const { event, id, context } = args;
+    const { event, id } = args;
 
     const eventKey = getUserInputEventKey({
       elementName: event.name ?? '',
@@ -163,17 +156,11 @@ export class UserEventDispatcher {
       return;
     }
 
-    const permissionType = context?.permissionType as SupportedPermissionTypes;
-
     const handlersExecutions = handlers.map(async (handler) => {
       try {
         await handler({
           event,
-          attenuatedContext: context as PermissionConfirmationContext<
-            typeof permissionType
-          >,
           interfaceId: id,
-          permissionType,
         });
       } catch (error) {
         logger.error(

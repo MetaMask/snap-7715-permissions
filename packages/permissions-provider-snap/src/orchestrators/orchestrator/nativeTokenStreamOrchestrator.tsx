@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
 import {
+  NativeTokenStreamPermission,
   zNativeTokenStreamPermission,
-  type Permission,
-} from '@metamask/7715-permissions-shared/types';
+} from '../../permissions/nativeTokenStream/types';
+import { type Permission } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';

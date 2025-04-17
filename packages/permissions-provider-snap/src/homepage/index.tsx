@@ -8,7 +8,7 @@ import {
   Address,
 } from '@metamask/snaps-sdk/jsx';
 
-import { AccountController } from 'src/accountController';
+import { AccountController } from '../accountController';
 import { sepolia } from 'viem/chains';
 
 export class HomePage {

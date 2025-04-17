@@ -12,13 +12,13 @@ import { lineaSepolia, sepolia } from 'viem/chains';
 import { AccountController } from './accountController';
 import { PriceApiClient } from './clients';
 import { HomePage } from './homepage';
-import { createPermissionsContextBuilder } from './orchestrators';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services';
-import { createPermissionConfirmationRenderHandler } from './ui';
 import { UserEventDispatcher } from './userEventDispatcher';
+import { OrchestratorFactory } from './core/orchestratorFactory';
+import { ConfirmationDialogFactory } from './core/confirmation/factory';
 
 // set up dependencies
 const accountController = new AccountController({
@@ -34,22 +34,24 @@ const homepage = new HomePage({
 
 const userEventDispatcher = new UserEventDispatcher();
 
-const permissionConfirmationRenderHandler =
-  createPermissionConfirmationRenderHandler({
-    snapsProvider: snap,
-    userEventDispatcher,
-  });
-
 // eslint-disable-next-line no-restricted-globals
 const priceApiClient = new PriceApiClient(process.env.PRICE_API_BASE_URL ?? '');
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
-const rpcHandler = createRpcHandler({
-  accountController,
-  permissionConfirmationRenderHandler,
-  permissionsContextBuilder: createPermissionsContextBuilder(accountController),
-  tokenPricesService,
+const confirmationDialogFactory = new ConfirmationDialogFactory({
+  snap,
   userEventDispatcher,
+});
+
+const orchestratorFactory = new OrchestratorFactory({
+  accountController,
+  tokenPricesService,
+  confirmationDialogFactory,
+  userEventDispatcher,
+});
+
+const rpcHandler = createRpcHandler({
+  orchestratorFactory,
 });
 
 // configure RPC methods bindings
@@ -91,7 +93,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     throw new Error(`Method ${request.method} not found.`);
   }
 
-  return await handler(request.params);
+  const result = await handler(request.params);
+
+  return result;
 };
 
 /**
@@ -104,7 +108,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  */
 export const onUserInput: OnUserInputHandler = async (args) =>
   userEventDispatcher.handleUserInputEvent(args);
-
 export const onHomePage: OnHomePageHandler = async () => {
   return {
     content: await homepage.buildHomepage(),

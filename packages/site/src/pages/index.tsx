@@ -226,7 +226,9 @@ const Index = () => {
   const [expiry, setExpiry] = useState(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
   );
-  const [justification, setJustification] = useState('Money please!');
+  const [justification, setJustification] = useState(
+    'This is a very important request for streaming allowance for some very important thing',
+  );
   const [permissionType, setPermissionType] = useState('native-token-stream');
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
 

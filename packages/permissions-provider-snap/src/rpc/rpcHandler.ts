@@ -1,22 +1,7 @@
-import {
-  extractPermissionName,
-  logger,
-} from '@metamask/7715-permissions-shared/utils';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { AccountControllerInterface } from '../accountController';
-import type {
-  OrchestrateArgs,
-  PermissionsContextBuilder,
-} from '../orchestrators';
-import {
-  createPermissionOrchestrator,
-  orchestrate,
-  type SupportedPermissionTypes,
-} from '../orchestrators';
-import type { TokenPricesService } from '../services';
-import type { PermissionConfirmationRenderHandler } from '../ui';
-import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { OrchestratorFactory } from '../core/orchestratorFactory';
 import { validatePermissionRequestParam } from '../utils';
 
 /**
@@ -36,27 +21,13 @@ export type RpcHandler = {
  * Creates an RPC handler with methods for handling permission-related RPC requests.
  *
  * @param config - The parameters for creating the RPC handler.
- * @param config.accountController - The account controller interface.
- * @param config.permissionConfirmationRenderHandler - The permission confirmation render handler.
- * @param config.permissionsContextBuilder - The permissions context builder.
- * @param config.tokenPricesService - The token prices service.
- * @param config.userEventDispatcher - The user event dispatcher.
+ * @param config.orchestratorFactory - The factory for creating permission orchestrators.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
-  accountController: AccountControllerInterface;
-  permissionConfirmationRenderHandler: PermissionConfirmationRenderHandler;
-  permissionsContextBuilder: PermissionsContextBuilder;
-  tokenPricesService: TokenPricesService;
-  userEventDispatcher: UserEventDispatcher;
+  orchestratorFactory: OrchestratorFactory;
 }): RpcHandler {
-  const {
-    permissionConfirmationRenderHandler,
-    accountController,
-    permissionsContextBuilder,
-    tokenPricesService,
-    userEventDispatcher,
-  } = config;
+  const { orchestratorFactory } = config;
 
   return {
     /**
@@ -71,47 +42,25 @@ export function createRpcHandler(config: {
       const { permissionsRequest, siteOrigin } =
         validatePermissionRequestParam(params);
 
-      const firstRequest = permissionsRequest[0];
-      if (!firstRequest) {
-        throw new Error('No permission request found');
-      }
+      const responses = await Promise.all(
+        permissionsRequest.map(async (request) => {
+          // todo: we probably need to pass siteOrigin to display it
+          const orchestrator = orchestratorFactory.createOrchestrator(request);
 
-      const permissionType = extractPermissionName(
-        firstRequest.permission.type,
-      ) as SupportedPermissionTypes;
+          const permissionResponse = await orchestrator.orchestrate();
 
-      // create orchestrator
-      const orchestrator = createPermissionOrchestrator(permissionType);
-      const permission = await orchestrator.parseAndValidate(
-        firstRequest.permission,
+          if (!permissionResponse.success) {
+            throw new Error(permissionResponse.reason);
+          }
+
+          return permissionResponse.response;
+        }),
       );
 
-      // process the request
-      const orchestrateArgs: OrchestrateArgs<typeof permissionType> = {
-        permissionType,
-        accountController,
-        orchestrator,
-        orchestrateMeta: {
-          permission,
-          chainId: firstRequest.chainId,
-          sessionAccount: firstRequest.signer.data.address,
-          origin: siteOrigin,
-          expiry: firstRequest.expiry,
-          isAdjustmentAllowed: firstRequest.isAdjustmentAllowed ?? true,
-        },
-        permissionConfirmationRenderHandler,
-        permissionsContextBuilder,
-        tokenPricesService,
-        userEventDispatcher,
-      };
-      const orchestrateRes = await orchestrate(orchestrateArgs);
-      logger.debug('isPermissionGranted', orchestrateRes.success);
+      // todo: type this better
+      const filtered = responses.filter((response) => response !== undefined);
 
-      if (!orchestrateRes.success) {
-        throw new Error(orchestrateRes.reason);
-      }
-
-      return [orchestrateRes.response] as Json[];
+      return filtered as Json[];
     },
   };
 }
