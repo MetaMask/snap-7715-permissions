@@ -4,17 +4,17 @@ import type { UserInputEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { getAddress } from 'viem';
 
-import type { SupportedPermissionTypes } from '../src/orchestrators';
-import type { PermissionConfirmationContext } from '../src/ui';
+import type { SupportedPermissionTypes } from '../src/permissions';
+import type { PermissionConfirmationContext } from '../src/confirmation';
 import {
   createPermissionConfirmationRenderHandler,
   NativeTokenStreamDialogElementNames,
   RulesSelectorElementNames,
   TimePeriod,
-} from '../src/ui';
-import { NativeTokenStreamConfirmationPage } from '../src/ui/confirmations';
-import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/ui/userInputConstant';
-import { UserEventDispatcher } from '../src/userEventDispatcher';
+} from '../src/confirmation';
+import { NativeTokenStreamConfirmationPage } from '../src/confirmation/confirmations';
+import { CANCEL_BUTTON, GRANT_BUTTON } from '../src/confirmation/userInputConstant';
+import { UserEventDispatcher } from '../src/core/userEventDispatcher';
 import { convertTimestampToReadableDate } from '../src/utils';
 
 jest.mock('../src/userEventDispatcher');

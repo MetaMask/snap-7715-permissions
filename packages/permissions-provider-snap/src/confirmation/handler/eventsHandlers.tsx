@@ -1,14 +1,13 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
+import { parseEther, toHex } from 'viem';
 
-import type { SupportedPermissionTypes } from '../../orchestrators';
-import { createPermissionOrchestrator } from '../../orchestrators';
-import type { UserEventHandler } from '../../userEventDispatcher';
-import { convertValueToHex } from '../../utils';
+import type { UserEventHandler } from '../../core';
+import type { SupportedPermissionTypes } from '../../permissions';
+import { createPermissionOrchestrator } from '../../permissions';
 import { RulesSelectorElementNames } from '../components';
 import type { PermissionConfirmationContext } from '../types';
 import { updateInterface } from './renderHandler';
-import { parseEther, toHex } from 'viem';
 
 /**
  * Updates the interface with the new context object.

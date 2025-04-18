@@ -1,3 +1,4 @@
+import { KERNEL_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import {
   type GatorPermission,
   type GetSnapsResponse,
@@ -7,7 +8,7 @@ import {
 import { getIdFor, logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
-import { InternalMethod, KERNEL_SNAP_ID } from './origin';
+import { InternalMethod } from './origin';
 
 type PermissionOfferLibrary = {
   registerPermissionOffer(permissionToOffer: GatorPermission): Promise<boolean>;

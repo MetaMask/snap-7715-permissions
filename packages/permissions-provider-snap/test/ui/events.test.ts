@@ -12,7 +12,7 @@ import {
   RulesSelectorElementNames,
   TimePeriod,
   type PermissionConfirmationContext,
-} from '../../src/ui';
+} from '../../src/confirmation';
 
 describe('Confirmation Dialog event handlers', () => {
   const address = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');

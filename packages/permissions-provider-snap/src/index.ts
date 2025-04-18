@@ -9,16 +9,17 @@ import type {
 } from '@metamask/snaps-sdk';
 import { lineaSepolia, sepolia } from 'viem/chains';
 
-import { AccountController } from './accountController';
-import { PriceApiClient } from './clients';
+import { createPermissionConfirmationRenderHandler } from './confirmation';
+import {
+  isMethodAllowedForOrigin,
+  createRpcHandler,
+  RpcMethod,
+  UserEventDispatcher,
+  AccountController,
+  TokenPricesService,
+  PriceApiClient,
+} from './core';
 import { HomePage } from './homepage';
-import { createPermissionsContextBuilder } from './orchestrators';
-import { isMethodAllowedForOrigin } from './rpc/permissions';
-import { createRpcHandler } from './rpc/rpcHandler';
-import { RpcMethod } from './rpc/rpcMethod';
-import { TokenPricesService } from './services';
-import { createPermissionConfirmationRenderHandler } from './ui';
-import { UserEventDispatcher } from './userEventDispatcher';
 
 // set up dependencies
 const accountController = new AccountController({
@@ -47,7 +48,6 @@ const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 const rpcHandler = createRpcHandler({
   accountController,
   permissionConfirmationRenderHandler,
-  permissionsContextBuilder: createPermissionsContextBuilder(accountController),
   tokenPricesService,
   userEventDispatcher,
 });

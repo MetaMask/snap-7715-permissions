@@ -7,8 +7,8 @@ import {
   RulesSelectorElementNames,
   TimePeriod,
   type PermissionConfirmationContext,
-} from '../src/ui';
-import { UserEventDispatcher } from '../src/userEventDispatcher';
+} from '../src/confirmation';
+import { UserEventDispatcher } from '../src/core/userEventDispatcher';
 import { convertTimestampToReadableDate } from '../src/utils';
 
 describe('UserEventDispatcher', () => {

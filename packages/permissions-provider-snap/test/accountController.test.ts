@@ -7,7 +7,7 @@ import {
 import { isHex, size } from 'viem';
 import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
-import { AccountController } from '../src/accountController';
+import { AccountController } from '../src/core/accountController';
 
 describe('AccountController', () => {
   const entropy =

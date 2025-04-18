@@ -3,13 +3,13 @@ import { parseUnits, toHex } from 'viem';
 import type {
   RuleMeta,
   RuleValidationTypes,
-} from '../../../../src/ui/components/Rules/Rules';
+} from '../../../../src/confirmation/components/Rules/Rules';
 import {
   getOrderedOptions,
   isInputHidden,
   renderUnlimitedAllowanceDropDown,
   validator,
-} from '../../../../src/ui/components/Rules/RulesSelector';
+} from '../../../../src/confirmation/components/Rules/RulesSelector';
 
 describe('RulesSelector', () => {
   const mockRuleMeta: RuleMeta<RuleValidationTypes> = {

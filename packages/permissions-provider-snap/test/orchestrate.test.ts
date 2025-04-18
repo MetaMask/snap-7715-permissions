@@ -5,17 +5,17 @@ import { getDeleGatorEnvironment } from '@metamask/delegation-toolkit';
 import { toHex, getAddress, parseUnits } from 'viem';
 import { sepolia } from 'viem/chains';
 
-import type { AccountControllerInterface } from '../src/accountController';
+import type { AccountControllerInterface } from '../src/core/accountController';
 import type {
   SupportedPermissionTypes,
   PermissionTypeMapping,
   OrchestrateArgs,
-} from '../src/orchestrators';
+} from '../src/permissions';
 import {
   createPermissionOrchestrator,
   orchestrate,
-} from '../src/orchestrators';
-import type { PermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
+} from '../src/permissions';
+import type { PermissionsContextBuilder } from '../src/permissions/permissionsContextBuilder';
 import type { TokenPricesService } from '../src/services';
 import {
   NativeTokenStreamDialogElementNames,
@@ -23,8 +23,8 @@ import {
   TimePeriod,
   type PermissionConfirmationContext,
   type PermissionConfirmationRenderHandler,
-} from '../src/ui';
-import { UserEventDispatcher } from '../src/userEventDispatcher';
+} from '../src/confirmation';
+import { UserEventDispatcher } from '../src/core/userEventDispatcher';
 import { formatTokenBalance } from '../src/utils';
 
 jest.mock('../src/userEventDispatcher');

@@ -6,11 +6,8 @@ import {
 } from '@metamask/snaps-sdk';
 import { Container, type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { SupportedPermissionTypes } from '../../orchestrators';
-import type {
-  UserEventDispatcher,
-  UserEventHandler,
-} from '../../userEventDispatcher';
+import type { UserEventDispatcher, UserEventHandler } from '../../core';
+import type { SupportedPermissionTypes } from '../../permissions';
 import { ConfirmationFooter } from '../components';
 import type { PermissionConfirmationContext } from '../types';
 import { CANCEL_BUTTON, GRANT_BUTTON } from '../userInputConstant';

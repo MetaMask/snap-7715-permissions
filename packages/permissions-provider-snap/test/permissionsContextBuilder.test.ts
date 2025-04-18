@@ -1,8 +1,8 @@
 import type { Caveat, Delegation } from '@metamask/delegation-toolkit';
 import { getAddress } from 'viem';
 
-import type { AccountControllerInterface } from '../src/accountController';
-import { createPermissionsContextBuilder } from '../src/orchestrators/permissionsContextBuilder';
+import type { AccountControllerInterface } from '../src/core/accountController';
+import { createPermissionsContextBuilder } from '../src/permissions/permissionsContextBuilder';
 
 describe('Permissions Context Builder', () => {
   const address = getAddress('0x016562aA41A8697720ce0943F003141f5dEAe008');

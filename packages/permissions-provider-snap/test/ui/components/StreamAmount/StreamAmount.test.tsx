@@ -2,7 +2,7 @@ import { toHex } from 'viem';
 import {
   formatStreamRatePerSecond,
   TimePeriod,
-} from '../../../../src/ui/components/StreamAmount';
+} from '../../../../src/confirmation/components/StreamAmount';
 
 const SECONDS_PER_DAY = 86_400n;
 const ONE_ETH = 1n * 10n ** 18n;

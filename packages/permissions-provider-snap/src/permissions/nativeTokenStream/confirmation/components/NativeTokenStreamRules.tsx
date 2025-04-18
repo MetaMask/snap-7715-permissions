@@ -1,7 +1,7 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Section } from '@metamask/snaps-sdk/jsx';
 
-import { TextRule } from '../Rules';
+import { TextRule } from '../../../../confirmation';
 
 export type NativeTokenStreamRulesProps = {
   initialAmount: string | null;

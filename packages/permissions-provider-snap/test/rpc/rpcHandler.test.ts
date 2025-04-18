@@ -1,11 +1,11 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 
-import type { AccountControllerInterface } from '../../src/accountController';
-import type { PermissionsContextBuilder } from '../../src/orchestrators';
+import type { AccountControllerInterface } from '../../src/core/accountController';
+import type { PermissionsContextBuilder } from '../../src/permissions';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 import type { TokenPricesService } from '../../src/services';
-import type { PermissionConfirmationRenderHandler } from '../../src/ui';
-import { UserEventDispatcher } from '../../src/userEventDispatcher';
+import type { PermissionConfirmationRenderHandler } from '../../src/confirmation';
+import { UserEventDispatcher } from '../../src/core/userEventDispatcher';
 
 jest.mock('../../src/userEventDispatcher');
 

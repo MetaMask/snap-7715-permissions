@@ -1,4 +1,4 @@
-import { PriceApiClient } from '../../src/clients';
+import { PriceApiClient } from '../../src/core/clients';
 
 describe('PriceApiClient', () => {
   const mockFetch = jest.fn();

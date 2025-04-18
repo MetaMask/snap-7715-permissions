@@ -1,5 +1,5 @@
-import type { SupportedPermissionTypes } from '../src/orchestrators';
-import { createPermissionOrchestrator } from '../src/orchestrators';
+import type { SupportedPermissionTypes } from '../src/permissions';
+import { createPermissionOrchestrator } from '../src/permissions';
 
 describe('PermissionOrchestrator Factory', () => {
   it('should return a PermissionOrchestrator when given native-token-stream permission type', () => {

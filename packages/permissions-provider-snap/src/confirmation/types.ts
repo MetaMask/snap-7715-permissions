@@ -1,12 +1,11 @@
 import type { Delegation } from '@metamask/delegation-toolkit';
 import type { InterfaceContext } from '@metamask/snaps-sdk';
-import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
 
 import type {
   PermissionConfirmationStateMapping,
   SupportedPermissionTypes,
-} from '../orchestrators';
+} from '../permissions';
 
 /**
  * The state of the permission dialog components.
@@ -33,7 +32,6 @@ export type SerializableDelegation = Omit<Delegation, 'salt'> & {
 export type PermissionConfirmationContext<
   TPermissionType extends SupportedPermissionTypes,
 > = InterfaceContext & {
-  readonly permissionType: TPermissionType;
   readonly justification: string;
   readonly address: Hex;
   readonly siteOrigin: string;
@@ -44,22 +42,3 @@ export type PermissionConfirmationContext<
   expiry: number;
   state: State<TPermissionType>;
 };
-
-/**
- * The props for specific permission confirmation pages.
- */
-export type PermissionConfirmationProps<
-  TPermissionType extends SupportedPermissionTypes,
-> = JsonObject &
-  Pick<
-    PermissionConfirmationContext<TPermissionType>,
-    | 'justification'
-    | 'address'
-    | 'siteOrigin'
-    | 'balance'
-    | 'valueFormattedAsCurrency'
-    | 'expiry'
-    | 'chainId'
-    | 'state'
-    | 'isAdjustmentAllowed'
-  >;

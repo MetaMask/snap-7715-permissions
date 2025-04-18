@@ -11,15 +11,15 @@ import type {
   Orchestrator,
   PermissionTypeMapping,
   SupportedPermissionTypes,
-} from '../src/orchestrators';
-import { createPermissionOrchestrator } from '../src/orchestrators';
+} from '../src/permissions';
+import { createPermissionOrchestrator } from '../src/permissions';
 import {
   NativeTokenStreamDialogElementNames,
   type PermissionConfirmationContext,
   NativeTokenStreamConfirmationPage,
   TimePeriod,
   RulesSelectorElementNames,
-} from '../src/ui';
+} from '../src/confirmation';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,

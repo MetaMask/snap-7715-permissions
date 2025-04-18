@@ -9,8 +9,8 @@ import type {
   UserInputEventType,
 } from '@metamask/snaps-sdk';
 
-import type { SupportedPermissionTypes } from './orchestrators';
-import type { PermissionConfirmationContext } from './ui';
+import type { PermissionConfirmationContext } from '../confirmation';
+import type { SupportedPermissionTypes } from '../permissions';
 
 export type DialogContentEventHandlers = {
   elementName: string;

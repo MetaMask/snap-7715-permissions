@@ -1,7 +1,7 @@
 import type { DelegationStruct } from '@metamask/delegation-toolkit';
 import { toHex } from 'viem';
 
-import type { SerializableDelegation } from '../ui/types';
+import type { SerializableDelegation } from '../confirmation/types';
 
 /**
  * Converts a delegation struct object to a delegation in transit object.
