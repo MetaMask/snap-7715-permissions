@@ -9,10 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.1]
 
-### Uncategorized
+### Fixed
 
-- fix: update tg link to MetaMask group ([#80](https://github.com/MetaMask/snap-7715-permissions/pull/80))
-- update shasum
+- Switch the tg link out to correct link ([#80](https://github.com/MetaMask/snap-7715-permissions/pull/80))
 
 ## [0.2.0]
 
