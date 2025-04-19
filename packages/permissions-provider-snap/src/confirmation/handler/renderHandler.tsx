@@ -34,6 +34,19 @@ export type PermissionConfirmationRenderHandler = {
     interfaceId: string;
     confirmationResult: Promise<ConfirmationResult>;
   }>;
+
+  /**
+   * Updates the interface of the snap with the given interface ID and dialog content.
+   *
+   * @param interfaceId - The ID of the interface to update.
+   * @param context - The permission confirmation context.
+   * @param dialogContent - The new dialog content to set for the interface.
+   */
+  updateInterface: (
+    interfaceId: string,
+    context: PermissionConfirmationContext<SupportedPermissionTypes>,
+    dialogContent: ComponentOrElement,
+  ) => Promise<void>;
 };
 
 /**
@@ -50,30 +63,6 @@ export const buildConfirmationDialog = (
     <ConfirmationFooter />
   </Container>
 );
-
-/**
- * Updates the interface of the snap with the given interface ID and dialog content.
- *
- * @param snapsProvider - The snaps provider instance.
- * @param interfaceId - The ID of the interface to update.
- * @param dialogContent - The new dialog content to set for the interface.
- * @param context - The permission confirmation context.
- */
-export const updateInterface = async (
-  snapsProvider: SnapsProvider,
-  interfaceId: string,
-  dialogContent: ComponentOrElement,
-  context: PermissionConfirmationContext<SupportedPermissionTypes>,
-) => {
-  await snapsProvider.request({
-    method: 'snap_updateInterface',
-    params: {
-      id: interfaceId,
-      context,
-      ui: buildConfirmationDialog(dialogContent),
-    },
-  });
-};
 
 /**
  * Creates a permission confirmation render handler for a specific permission type.
@@ -189,6 +178,20 @@ export const createPermissionConfirmationRenderHandler = ({
         interfaceId,
         confirmationResult,
       };
+    },
+    updateInterface: async (
+      interfaceId: string,
+      context: PermissionConfirmationContext<SupportedPermissionTypes>,
+      dialogContent: ComponentOrElement,
+    ) => {
+      await snapsProvider.request({
+        method: 'snap_updateInterface',
+        params: {
+          id: interfaceId,
+          context,
+          ui: buildConfirmationDialog(dialogContent),
+        },
+      });
     },
   };
 };

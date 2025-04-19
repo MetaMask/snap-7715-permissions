@@ -8,7 +8,10 @@ import {
   encodeDelegation,
   type CoreCaveatBuilder,
 } from '@metamask/delegation-toolkit';
-import type { ComponentOrElement } from '@metamask/snaps-sdk';
+import type {
+  ComponentOrElement,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
 import type { Address, Hex } from 'viem';
 import { fromHex, toHex } from 'viem';
@@ -23,6 +26,7 @@ import type {
   DialogContentEventHandlers,
   TokenPricesService,
   UserEventDispatcher,
+  UserInputEventByType,
 } from '../core';
 import type {
   OrchestrateArgs,
@@ -76,6 +80,9 @@ export abstract class BaseOrchestrator<
 
   /**
    * Return the CAIP-19 asset type for the given chain ID for the permission type.
+   * @param requestedPermission - The requested permission.
+   * @param chainId - The chain ID.
+   * @returns The CAIP-19 asset type.
    */
   protected abstract getTokenCaipAssetType(
     requestedPermission: PermissionTypeMapping[TPermissionType],
@@ -111,6 +118,12 @@ export abstract class BaseOrchestrator<
     context: PermissionConfirmationContext<TPermissionType>,
   ): ComponentOrElement;
 
+  /**
+   * Resolves the attenuated permission for the permission type.
+   * @param requestedPermission - The requested permission.
+   * @param attenuatedContext - The attenuated context.
+   * @returns The attenuated permission.
+   */
   protected abstract resolveAttenuatedPermission(
     requestedPermission: PermissionTypeMapping[TPermissionType],
     attenuatedContext: PermissionConfirmationContext<TPermissionType>,
@@ -118,6 +131,21 @@ export abstract class BaseOrchestrator<
     expiry: number;
     attenuatedPermission: PermissionTypeMapping[TPermissionType];
   }>;
+
+  /**
+   * Handles the user input event for the permission type.
+   * @param args - The user input event handler args.
+   * @param args.event - The user input event.
+   * @param args.attenuatedContext - The attenuated context.
+   * @param args.interfaceId - The interface ID.
+   */
+  protected abstract handleUserEventHandler<
+    TUserInputEventType extends UserInputEventType,
+  >(args: {
+    event: UserInputEventByType<TUserInputEventType>;
+    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
+    interfaceId: string;
+  }): void | Promise<void>;
 
   /**
    * Returns a set of event handlers for the confirmation dialog specific to the permission type.
@@ -134,8 +162,6 @@ export abstract class BaseOrchestrator<
     state: State<TPermissionType>;
     dialogContentEventHandlers: DialogContentEventHandlers[];
   };
-
-  // Private methods ********************************************************
 
   /**
    * Register event handlers for the confirmation dialog.
@@ -417,5 +443,22 @@ export abstract class BaseOrchestrator<
         this.#unregisterEventHandlers(dialogContentEventHandlers, interfaceId);
       }
     }
+  }
+
+  /**
+   * Updates the active interface.
+   * @param interfaceId - The interface ID.
+   * @param context - The permission confirmation context.
+   */
+  protected async updateActiveInterface(
+    interfaceId: string,
+    context: PermissionConfirmationContext<TPermissionType>,
+  ): Promise<void> {
+    const dialogContent = this.buildPermissionConfirmation(context);
+    await this.#permissionConfirmationRenderHandler.updateInterface(
+      interfaceId,
+      context,
+      dialogContent,
+    );
   }
 }

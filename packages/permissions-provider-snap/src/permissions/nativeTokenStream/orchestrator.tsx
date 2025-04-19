@@ -10,13 +10,14 @@ import {
   RulesSelectorElementNames,
   TIME_PERIOD_TO_SECONDS,
   TimePeriod,
-  handleFormSubmit,
-  handleRemoveRuleClicked,
-  handleReplaceTextInput,
-  handleReplaceValueInput,
+  // TODO: Add these back in
+  // handleFormSubmit,
+  // handleRemoveRuleClicked,
+  // handleReplaceTextInput,
+  // handleReplaceValueInput,
   handleToggleBooleanClicked,
 } from '../../confirmation';
-import type { UserEventHandler } from '../../core';
+import type { UserEventHandler, UserInputEventByType } from '../../core';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -27,17 +28,102 @@ import {
   zeroDefaultParser,
 } from '../../utils';
 import { BaseOrchestrator } from '../baseOrchestrator';
-import type { PermissionContextMeta, PermissionTypeMapping } from '../types';
+import type {
+  PermissionContextMeta,
+  PermissionTypeMapping,
+  SupportedPermissionTypes,
+} from '../types';
 import { NativeTokenStreamConfirmationPage } from './confirmation/content';
 import { NativeTokenStreamDialogElementNames } from './types';
 import { parsePermission, validatePermissionData } from './validation';
 
 /**
- * Factory function to create a permission orchestrator for a native-token-stream permission type.
+ * Orchestrator for a native-token-stream permission type.
  *
  * @returns A permission orchestrator for the native-token-stream permission type.
  */
 export class NativeTokenStreamOrchestrator extends BaseOrchestrator<'native-token-stream'> {
+  readonly #elementNameMapping = [
+    // shared component handlers
+    {
+      elementName:
+        NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
+      eventType: UserInputEventType.ButtonClickEvent,
+    },
+
+    // Stream amount input handler
+    {
+      elementName: NativeTokenStreamDialogElementNames.StreamAmountInput,
+      eventType: UserInputEventType.InputChangeEvent,
+    },
+    {
+      elementName: NativeTokenStreamDialogElementNames.PeriodInput,
+      eventType: UserInputEventType.InputChangeEvent,
+    },
+
+    // Adding Rules form handlers
+    {
+      elementName: RulesSelectorElementNames.AddMoreRulesPageToggle,
+      eventType: UserInputEventType.ButtonClickEvent,
+    },
+    {
+      elementName: NativeTokenStreamDialogElementNames.AddMoreRulesFormSubmit,
+      eventType: UserInputEventType.FormSubmitEvent,
+    },
+    {
+      elementName: NativeTokenStreamDialogElementNames.SelectedRuleDropdown,
+      eventType: UserInputEventType.InputChangeEvent,
+    },
+    {
+      elementName: NativeTokenStreamDialogElementNames.SelectedRuleInput,
+      eventType: UserInputEventType.InputChangeEvent,
+    },
+    {
+      elementName: NativeTokenStreamDialogElementNames.MaxAllowanceDropdown,
+      eventType: UserInputEventType.InputChangeEvent,
+    },
+
+    // Remove Rules handlers
+    {
+      elementName: NativeTokenStreamDialogElementNames.MaxAllowanceRule,
+      eventType: UserInputEventType.ButtonClickEvent,
+    },
+    {
+      elementName: NativeTokenStreamDialogElementNames.InitialAmountRule,
+      eventType: UserInputEventType.ButtonClickEvent,
+    },
+    {
+      elementName: NativeTokenStreamDialogElementNames.StartTimeRule,
+      eventType: UserInputEventType.ButtonClickEvent,
+    },
+    {
+      elementName: NativeTokenStreamDialogElementNames.ExpiryRule,
+      eventType: UserInputEventType.ButtonClickEvent,
+    },
+  ];
+
+  /**
+   * Resolves the event name to a state mutation handler.
+   *
+   * @param attenuatedContext - The attenuated context.
+   * @param elementName - The name of the element that was clicked.
+   * @returns The updated context.
+   */
+  #resolveEventNameToStateMutationHandler(
+    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>,
+    elementName: string,
+  ): PermissionConfirmationContext<SupportedPermissionTypes> {
+    switch (elementName) {
+      case NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded:
+        return handleToggleBooleanClicked({
+          attenuatedContext,
+          elementName,
+        });
+      default:
+        throw new Error(`Unsupported element name: ${elementName}`);
+    }
+  }
+
   protected getPermissionType(): 'native-token-stream' {
     return 'native-token-stream';
   }
@@ -312,6 +398,37 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<'native-toke
     return `eip155:1/slip44:60` as CaipAssetType;
   }
 
+  protected async handleUserEventHandler<
+    TUserInputEventType extends UserInputEventType,
+  >(args: {
+    event: UserInputEventByType<TUserInputEventType>;
+    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
+    interfaceId: string;
+  }): Promise<void> {
+    console.log('handleUserEventHandler in context of orchestrator', args);
+    const { attenuatedContext, interfaceId, event } = args;
+    const elementName = event.name ?? '';
+    const eventType = event.type;
+
+    // call behavior to update state specific to element type and element name
+    let updatedContext: PermissionConfirmationContext<SupportedPermissionTypes> | null =
+      null;
+    switch (eventType) {
+      case UserInputEventType.ButtonClickEvent:
+        updatedContext = this.#resolveEventNameToStateMutationHandler(
+          attenuatedContext,
+          elementName,
+        );
+        break;
+      default:
+        return;
+    }
+
+    if (updatedContext) {
+      await this.updateActiveInterface(interfaceId, updatedContext);
+    }
+  }
+
   protected getConfirmationDialogEventHandlers(
     permission: PermissionTypeMapping['native-token-stream'],
     expiry: number,
@@ -350,88 +467,15 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<'native-toke
         [NativeTokenStreamDialogElementNames.MaxAllowanceDropdown]: '',
       },
 
-      dialogContentEventHandlers: [
-        // shared component handlers
-        {
-          elementName:
-            NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded,
-          eventType: UserInputEventType.ButtonClickEvent,
-          handler:
-            handleToggleBooleanClicked as UserEventHandler<UserInputEventType>,
-        },
-
-        // Stream amount input handler
-        {
-          elementName: NativeTokenStreamDialogElementNames.StreamAmountInput,
-          eventType: UserInputEventType.InputChangeEvent,
-          handler:
-            handleReplaceValueInput as UserEventHandler<UserInputEventType>,
-        },
-        {
-          elementName: NativeTokenStreamDialogElementNames.PeriodInput,
-          eventType: UserInputEventType.InputChangeEvent,
-          handler:
-            handleReplaceTextInput as UserEventHandler<UserInputEventType>,
-        },
-
-        // Adding Rules form handlers
-        {
-          elementName: RulesSelectorElementNames.AddMoreRulesPageToggle,
-          eventType: UserInputEventType.ButtonClickEvent,
-          handler:
-            handleToggleBooleanClicked as UserEventHandler<UserInputEventType>,
-        },
-        {
-          elementName:
-            NativeTokenStreamDialogElementNames.AddMoreRulesFormSubmit,
-          eventType: UserInputEventType.FormSubmitEvent,
-          handler: handleFormSubmit as UserEventHandler<UserInputEventType>,
-        },
-        {
-          elementName: NativeTokenStreamDialogElementNames.SelectedRuleDropdown,
-          eventType: UserInputEventType.InputChangeEvent,
-          handler:
-            handleReplaceTextInput as UserEventHandler<UserInputEventType>,
-        },
-        {
-          elementName: NativeTokenStreamDialogElementNames.SelectedRuleInput,
-          eventType: UserInputEventType.InputChangeEvent,
-          handler:
-            handleReplaceTextInput as UserEventHandler<UserInputEventType>,
-        },
-        {
-          elementName: NativeTokenStreamDialogElementNames.MaxAllowanceDropdown,
-          eventType: UserInputEventType.InputChangeEvent,
-          handler:
-            handleReplaceTextInput as UserEventHandler<UserInputEventType>,
-        },
-
-        // Remove Rules handlers
-        {
-          elementName: NativeTokenStreamDialogElementNames.MaxAllowanceRule,
-          eventType: UserInputEventType.ButtonClickEvent,
-          handler:
-            handleRemoveRuleClicked as UserEventHandler<UserInputEventType>,
-        },
-        {
-          elementName: NativeTokenStreamDialogElementNames.InitialAmountRule,
-          eventType: UserInputEventType.ButtonClickEvent,
-          handler:
-            handleRemoveRuleClicked as UserEventHandler<UserInputEventType>,
-        },
-        {
-          elementName: NativeTokenStreamDialogElementNames.StartTimeRule,
-          eventType: UserInputEventType.ButtonClickEvent,
-          handler:
-            handleRemoveRuleClicked as UserEventHandler<UserInputEventType>,
-        },
-        {
-          elementName: NativeTokenStreamDialogElementNames.ExpiryRule,
-          eventType: UserInputEventType.ButtonClickEvent,
-          handler:
-            handleRemoveRuleClicked as UserEventHandler<UserInputEventType>,
-        },
-      ],
+      dialogContentEventHandlers: this.#elementNameMapping.map(
+        ({ elementName, eventType }) => ({
+          elementName,
+          eventType,
+          handler: this.handleUserEventHandler.bind(
+            this,
+          ) as UserEventHandler<UserInputEventType>,
+        }),
+      ),
     };
   }
 }

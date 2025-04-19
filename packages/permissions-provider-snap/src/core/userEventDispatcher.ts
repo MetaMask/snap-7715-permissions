@@ -31,7 +31,6 @@ export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
   (args: {
     event: UserInputEventByType<TUserInputEventType>;
     attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
-    permissionType: SupportedPermissionTypes;
     interfaceId: string;
   }) => void | Promise<void>;
 
@@ -163,17 +162,13 @@ export class UserEventDispatcher {
       return;
     }
 
-    const permissionType = context?.permissionType as SupportedPermissionTypes;
-
     const handlersExecutions = handlers.map(async (handler) => {
       try {
         await handler({
           event,
-          attenuatedContext: context as PermissionConfirmationContext<
-            typeof permissionType
-          >,
+          attenuatedContext:
+            context as PermissionConfirmationContext<SupportedPermissionTypes>,
           interfaceId: id,
-          permissionType,
         });
       } catch (error) {
         logger.error(
