@@ -10,11 +10,10 @@ import {
   RulesSelectorElementNames,
   TIME_PERIOD_TO_SECONDS,
   TimePeriod,
-  // TODO: Add these back in
-  // handleFormSubmit,
-  // handleRemoveRuleClicked,
-  // handleReplaceTextInput,
-  // handleReplaceValueInput,
+  handleFormSubmit,
+  handleRemoveRuleClicked,
+  handleReplaceTextInput,
+  handleReplaceValueInput,
   handleToggleBooleanClicked,
 } from '../../confirmation';
 import type { UserEventHandler, UserInputEventByType } from '../../core';
@@ -103,24 +102,95 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<'native-toke
   ];
 
   /**
-   * Resolves the event name to a state mutation handler.
+   * Resolves the button click event for the native-token-stream permission type.
    *
    * @param attenuatedContext - The attenuated context.
    * @param elementName - The name of the element that was clicked.
    * @returns The updated context.
    */
-  #resolveEventNameToStateMutationHandler(
+  #resolveButtonClickStateMutationHandler(
     attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>,
     elementName: string,
-  ): PermissionConfirmationContext<SupportedPermissionTypes> {
+  ): PermissionConfirmationContext<SupportedPermissionTypes> | null {
     switch (elementName) {
       case NativeTokenStreamDialogElementNames.JustificationShowMoreExpanded:
+      case RulesSelectorElementNames.AddMoreRulesPageToggle:
         return handleToggleBooleanClicked({
           attenuatedContext,
           elementName,
         });
+      case NativeTokenStreamDialogElementNames.MaxAllowanceRule:
+      case NativeTokenStreamDialogElementNames.InitialAmountRule:
+      case NativeTokenStreamDialogElementNames.StartTimeRule:
+      case NativeTokenStreamDialogElementNames.ExpiryRule:
+        return handleRemoveRuleClicked({
+          attenuatedContext,
+          elementName,
+        });
       default:
-        throw new Error(`Unsupported element name: ${elementName}`);
+        return null;
+    }
+  }
+
+  /**
+   * Resolves the input change event for the native-token-stream permission type.
+   *
+   * @param attenuatedContext - The attenuated context.
+   * @param elementName - The name of the element that was changed.
+   * @param value - The value of the element that was changed.
+   * @returns The updated context.
+   */
+  #resolveInputChangeStateMutationHandler(
+    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>,
+    elementName: string,
+    value: string | boolean,
+  ): PermissionConfirmationContext<SupportedPermissionTypes> | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    switch (elementName) {
+      case NativeTokenStreamDialogElementNames.StreamAmountInput:
+        return handleReplaceValueInput({
+          attenuatedContext,
+          elementName,
+          value,
+        });
+      case NativeTokenStreamDialogElementNames.PeriodInput:
+      case NativeTokenStreamDialogElementNames.SelectedRuleDropdown:
+      case NativeTokenStreamDialogElementNames.SelectedRuleInput:
+      case NativeTokenStreamDialogElementNames.MaxAllowanceDropdown:
+        return handleReplaceTextInput({
+          attenuatedContext,
+          elementName,
+          value,
+        });
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Resolves the form submit event for the native-token-stream permission type.
+   *
+   * @param attenuatedContext - The attenuated context.
+   * @param elementName - The name of the element that was changed.
+   * @param values - The values of the form.
+   * @returns The updated context.
+   */
+  #resolveFormSubmitStateMutationHandler(
+    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>,
+    elementName: string,
+    values: Record<string, any>,
+  ): PermissionConfirmationContext<SupportedPermissionTypes> | null {
+    switch (elementName) {
+      case NativeTokenStreamDialogElementNames.AddMoreRulesFormSubmit:
+        return handleFormSubmit({
+          attenuatedContext,
+          values,
+        });
+      default:
+        return null;
     }
   }
 
@@ -405,7 +475,6 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<'native-toke
     attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
     interfaceId: string;
   }): Promise<void> {
-    console.log('handleUserEventHandler in context of orchestrator', args);
     const { attenuatedContext, interfaceId, event } = args;
     const elementName = event.name ?? '';
     const eventType = event.type;
@@ -415,9 +484,23 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<'native-toke
       null;
     switch (eventType) {
       case UserInputEventType.ButtonClickEvent:
-        updatedContext = this.#resolveEventNameToStateMutationHandler(
+        updatedContext = this.#resolveButtonClickStateMutationHandler(
           attenuatedContext,
           elementName,
+        );
+        break;
+      case UserInputEventType.InputChangeEvent:
+        updatedContext = this.#resolveInputChangeStateMutationHandler(
+          attenuatedContext,
+          elementName,
+          event.value,
+        );
+        break;
+      case UserInputEventType.FormSubmitEvent:
+        updatedContext = this.#resolveFormSubmitStateMutationHandler(
+          attenuatedContext,
+          elementName,
+          event.value,
         );
         break;
       default:

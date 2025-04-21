@@ -1,6 +1,11 @@
-import type { NativeTokenStreamPermission } from '@metamask/7715-permissions-shared/types';
+import {
+  zHexStr,
+  zMetaMaskPermissionData,
+  zPermission,
+} from '@metamask/7715-permissions-shared/types';
 import type { JsonObject } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from 'viem';
+import { z } from 'zod';
 
 import type { RulesSelectorElementNames, TimePeriod } from '../../confirmation';
 
@@ -23,6 +28,23 @@ export enum NativeTokenStreamDialogElementNames {
   ExpiryRule = 'expiry-rule-native-token-stream',
   MaxAllowanceDropdown = 'max-allowance-dropdown-native-token-stream',
 }
+
+export type NativeTokenStreamPermission = z.infer<
+  typeof zNativeTokenStreamPermission
+>;
+
+export const zNativeTokenStreamPermission = zPermission.extend({
+  type: z.literal('native-token-stream'),
+  data: z.intersection(
+    zMetaMaskPermissionData,
+    z.object({
+      initialAmount: zHexStr.optional(),
+      maxAmount: zHexStr.optional(),
+      amountPerSecond: zHexStr,
+      startTime: z.number(),
+    }),
+  ),
+});
 
 declare module '../types' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-shadow
