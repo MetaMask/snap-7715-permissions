@@ -1,5 +1,5 @@
 import type { AccountController } from '../accountController';
-import type { TokenPricesService } from '../services';
+import type { TokenPricesService } from '../services/tokenPricesService';
 import type { ConfirmationDialogFactory } from './confirmation/factory';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import { NativeTokenStreamOrchestrator } from '../permissions/nativeTokenStream/orchestrator';

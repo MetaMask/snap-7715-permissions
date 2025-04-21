@@ -9,7 +9,7 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 import { type Hex } from 'viem';
 
-import { formatTokenBalance } from '../../utils';
+import { formatTokenBalance } from '../../utils/balance';
 
 export type AccountDetailsProps = {
   account: {

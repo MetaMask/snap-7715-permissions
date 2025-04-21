@@ -1,4 +1,4 @@
-import type { TokenPricesService } from '../../services';
+import type { TokenPricesService } from '../../services/tokenPricesService';
 import { BaseOrchestrator, StateChangeHandler } from '../../core/orchestrator';
 import type { AccountController } from '../../accountController';
 import { parseAndValidatePermission } from './validation';

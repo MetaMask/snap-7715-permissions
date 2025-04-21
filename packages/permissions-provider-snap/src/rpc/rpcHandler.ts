@@ -2,7 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { OrchestratorFactory } from '../core/orchestratorFactory';
-import { validatePermissionRequestParam } from '../utils';
+import { validatePermissionRequestParam } from '../utils/validate';
 
 /**
  * Type for the RPC handler methods.

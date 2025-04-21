@@ -1,6 +1,6 @@
 import { formatEther, parseEther, toHex } from 'viem';
 import { AccountController } from 'src/accountController';
-import { TokenPricesService } from '../../services';
+import { TokenPricesService } from '../../services/tokenPricesService';
 import type {
   NativeTokenStreamContext,
   ValidatedNativeTokenStreamPermissionRequest,
@@ -8,7 +8,7 @@ import type {
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
-} from '../../utils';
+} from '../../utils/time';
 
 /**
  * Builds the granted permission based on user adjustments.

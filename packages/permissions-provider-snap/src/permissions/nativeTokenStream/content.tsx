@@ -1,7 +1,7 @@
 import { Form } from '@metamask/snaps-sdk/jsx';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import { NativeTokenStreamContext } from './types';
-import { InputField } from 'src/ui/components/InputField';
+import { InputField } from '../../ui/components/InputField';
 
 export const INITIAL_AMOUNT_ELEMENT = 'initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'max-amount';
