@@ -22,22 +22,23 @@ import {
 /**
  * Props for building the confirmation dialog UI.
  */
-type ConfirmationProps<TContext extends BaseContext> = {
+type ConfirmationProps = {
   title: string;
   justification: string;
-  context: TContext;
   ui: GenericSnapElement;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
 };
 
-export type ConfirmationLifecycleCallback<TContext extends BaseContext> =
-  (args: { dialog: ConfirmationDialog<TContext>; elementId: string }) => void;
+export type ConfirmationLifecycleCallback = (args: {
+  dialog: ConfirmationDialog;
+  elementId: string;
+}) => void;
 
 /**
  * Confirmation dialog implementation that provides standard layout and behavior.
  */
-export class ConfirmationDialog<TContext extends BaseContext> {
+export class ConfirmationDialog {
   readonly #snaps: SnapsProvider;
   readonly #userEventDispatcher: UserEventDispatcher;
   readonly #title: string;
@@ -45,20 +46,17 @@ export class ConfirmationDialog<TContext extends BaseContext> {
 
   #isJustificationCollapsed: boolean = true;
   #ui: GenericSnapElement;
-  #context: TContext;
   #interfaceId: string | undefined;
 
   constructor({
     title,
     justification,
-    context,
     ui,
     snaps,
     userEventDispatcher,
-  }: ConfirmationProps<TContext>) {
+  }: ConfirmationProps) {
     this.#title = title;
     this.#justification = justification;
-    this.#context = context;
     this.#ui = ui;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
@@ -72,7 +70,7 @@ export class ConfirmationDialog<TContext extends BaseContext> {
     this.#interfaceId = await this.#snaps.request({
       method: 'snap_createInterface',
       params: {
-        context: this.#context,
+        context: {},
         ui: this.buildConfirmation(),
       },
     });
@@ -82,7 +80,6 @@ export class ConfirmationDialog<TContext extends BaseContext> {
 
   async awaitUserDecision(): Promise<{
     isConfirmationGranted: boolean;
-    grantedContext: TContext;
   }> {
     if (!this.#interfaceId) {
       throw new Error('Interface not yet created. Call createInterface first.');
@@ -90,37 +87,19 @@ export class ConfirmationDialog<TContext extends BaseContext> {
     const interfaceId = this.#interfaceId;
 
     const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
-      const onButtonClick: UserEventHandler<
-        UserInputEventType.ButtonClickEvent
-      > = ({ event }) => {
-        let isGranted = false;
-
-        switch (event.name) {
-          case GRANT_BUTTON:
-            isGranted = true;
-            break;
-          case CANCEL_BUTTON:
-            isGranted = false;
-            break;
-
-          default:
-            throw new Error(
-              `Unexpected event name. Expected ${GRANT_BUTTON} or ${CANCEL_BUTTON}.`,
-            );
-        }
-
+      const cleanup = async () => {
         this.#userEventDispatcher.off({
           elementName: GRANT_BUTTON,
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId,
-          handler: onButtonClick,
+          handler: onGrantButtonClick,
         });
 
         this.#userEventDispatcher.off({
           elementName: CANCEL_BUTTON,
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId,
-          handler: onButtonClick,
+          handler: onCancelButtonClick,
         });
 
         this.#userEventDispatcher.off({
@@ -130,34 +109,45 @@ export class ConfirmationDialog<TContext extends BaseContext> {
           handler: onShowMoreButtonClickHandler,
         });
 
-        this.#snaps
-          .request({
+        try {
+          await this.#snaps.request({
             method: 'snap_resolveInterface',
             params: {
               id: interfaceId,
               value: {},
             },
-          })
-          .catch((error) => {
-            const reason = error as Error;
-            reject(reason);
           });
+        } catch (error) {
+          reject(error as Error);
+        }
+      };
 
-        resolve(isGranted);
+      const onGrantButtonClick: UserEventHandler<
+        UserInputEventType.ButtonClickEvent
+      > = async () => {
+        await cleanup();
+        resolve(true);
+      };
+
+      const onCancelButtonClick: UserEventHandler<
+        UserInputEventType.ButtonClickEvent
+      > = async () => {
+        await cleanup();
+        resolve(false);
       };
 
       this.#userEventDispatcher.on({
         elementName: GRANT_BUTTON,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
-        handler: onButtonClick,
+        handler: onGrantButtonClick,
       });
 
       this.#userEventDispatcher.on({
         elementName: CANCEL_BUTTON,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
-        handler: onButtonClick,
+        handler: onCancelButtonClick,
       });
 
       const onShowMoreButtonClickHandler = () => {
@@ -186,20 +176,17 @@ export class ConfirmationDialog<TContext extends BaseContext> {
 
     return {
       isConfirmationGranted: await isConfirmationGranted,
-      grantedContext: this.#context,
     };
   }
 
   private toggleShowMoreText() {
     this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
 
-    this.updateContent({ ui: this.#ui, context: this.#context });
+    this.updateContent({ ui: this.#ui });
   }
 
   private buildConfirmation(): JSX.Element {
-    const ui = this.#ui;
-
-    // todo: maybe make request details iterable?
+    // todo: make request details iterable, so that the caller can specify what is displayed
     return (
       <Container>
         <Box>
@@ -226,32 +213,25 @@ export class ConfirmationDialog<TContext extends BaseContext> {
               />
             </Box>
           </Section>
-          {ui}
+          {this.#ui}
         </Box>
         <ConfirmationFooter />
       </Container>
     );
   }
 
-  async updateContent({
-    ui,
-    context,
-  }: {
-    ui: GenericSnapElement;
-    context: TContext;
-  }): Promise<void> {
+  async updateContent({ ui }: { ui: GenericSnapElement }): Promise<void> {
     if (!this.#interfaceId) {
       throw new Error('Cannot update content before dialog is created');
     }
 
     this.#ui = ui;
-    this.#context = context;
 
     await this.#snaps.request({
       method: 'snap_updateInterface',
       params: {
         id: this.#interfaceId,
-        context: this.#context,
+        context: {},
         ui: this.buildConfirmation(),
       },
     });

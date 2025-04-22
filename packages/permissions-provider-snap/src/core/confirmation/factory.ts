@@ -55,18 +55,15 @@ export class ConfirmationDialogFactory {
   createConfirmation<TContext extends BaseContext>({
     title,
     ui,
-    context,
     justification,
   }: {
     title: string;
     justification: string;
     ui: GenericSnapElement;
-    context: TContext;
   }): ConfirmationDialogType<TContext> {
     return new ConfirmationDialog({
       title,
       ui,
-      context,
       justification,
       snaps: this.#snap,
       userEventDispatcher: this.#userEventDispatcher,

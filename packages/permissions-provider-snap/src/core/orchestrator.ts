@@ -53,6 +53,8 @@ export abstract class BaseOrchestrator<
   >;
   protected readonly userEventDispatcher: UserEventDispatcher;
 
+  protected currentContext: TContext | undefined;
+
   constructor({
     accountController,
     permissionRequest,
@@ -118,55 +120,51 @@ export abstract class BaseOrchestrator<
     response?: TPermissionResponse;
     reason?: string;
   }> {
-    // todo: this is a bit janky, having to keep a reference to the context
-    // _and have the snaps system manage it.
-    // I kinda feel like keeping the context locally makes more sense,
-    // as we're just passing it back and forth for no reason.
-    let context = await this.buildPermissionContext();
+    this.currentContext = await this.buildPermissionContext();
 
     const confirmationDialog =
-      this.confirmationDialogFactory.createConfirmation({
+      this.confirmationDialogFactory.createConfrmation({
         title: this.title,
         justification: this.permissionRequest.permission.data.justification,
-        ui: await this.createUi(context),
-        context,
+        ui: await this.createUi(this.currentContext),
       });
 
     const interfaceId = await confirmationDialog.createInterface();
 
     const handlerUnbinders = this.stateChangeHandlers.map(
       (stateChangeHandler) => {
-        const handler = async ({ event }: { event: InputChangeEvent }) => {
+        const handler: UserEventHandler<
+          UserInputEventType.InputChangeEvent
+        > = async ({ event }: { event: InputChangeEvent }) => {
+          if (!this.currentContext) {
+            throw new Error('Current context is undefined');
+          }
+
           const value = stateChangeHandler.valueMapper
             ? stateChangeHandler.valueMapper(event)
             : (event.value as string);
 
-          context = stateChangeHandler.contextMapper(context, value);
+          this.currentContext = 
+            stateChangeHandler.contextMapper(this.currentContext, value),
+          ;
 
           confirmationDialog.updateContent({
-            ui: await this.createUi(context),
-            context,
+            ui: await this.createUi(this.currentContext),
+            context: this.currentContext,
           });
         };
 
-        this.userEventDispatcher.on({
+        const eventMetadata = {
           eventType: UserInputEventType.InputChangeEvent,
           interfaceId,
           elementName: stateChangeHandler.elementName,
-          // todo: fix this
-          handler:
-            handler as UserEventHandler<UserInputEventType.InputChangeEvent>,
-        });
+          handler,
+        } as const;
+
+        this.userEventDispatcher.on(eventMetadata);
 
         return () => {
-          this.userEventDispatcher.off({
-            eventType: UserInputEventType.InputChangeEvent,
-            interfaceId,
-            elementName: stateChangeHandler.elementName,
-            // todo: fix this
-            handler:
-              handler as UserEventHandler<UserInputEventType.InputChangeEvent>,
-          });
+          this.userEventDispatcher.off(eventMetadata);
         };
       },
     );
