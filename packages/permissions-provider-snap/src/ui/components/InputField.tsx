@@ -7,6 +7,7 @@ export type InputFieldParams = {
   value: string;
   type: 'text' | 'number';
   disabled?: boolean;
+  errorMessage?: string | undefined;
 };
 
 export const InputField = ({
@@ -16,11 +17,16 @@ export const InputField = ({
   type,
   value,
   disabled,
+  errorMessage,
 }: InputFieldParams) => {
   const tooltipElement = tooltip ? (
     <Tooltip content={<Text>{tooltip}</Text>}>
       <Icon name="question" size="inherit" color="muted" />
     </Tooltip>
+  ) : null;
+
+  const errorElement = errorMessage ? (
+    <Text color="error">{errorMessage}</Text>
   ) : null;
 
   return (
@@ -35,6 +41,7 @@ export const InputField = ({
         value={value}
         disabled={disabled || false}
       />
+      {errorElement}
     </Box>
   );
 };

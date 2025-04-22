@@ -30,11 +30,6 @@ type ConfirmationProps = {
   userEventDispatcher: UserEventDispatcher;
 };
 
-export type ConfirmationLifecycleCallback = (args: {
-  dialog: ConfirmationDialog;
-  elementId: string;
-}) => void;
-
 /**
  * Confirmation dialog implementation that provides standard layout and behavior.
  */
@@ -126,6 +121,7 @@ export class ConfirmationDialog {
         UserInputEventType.ButtonClickEvent
       > = async () => {
         await cleanup();
+
         resolve(true);
       };
 
@@ -133,6 +129,7 @@ export class ConfirmationDialog {
         UserInputEventType.ButtonClickEvent
       > = async () => {
         await cleanup();
+
         resolve(false);
       };
 

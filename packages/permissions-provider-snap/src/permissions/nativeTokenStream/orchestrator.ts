@@ -6,11 +6,13 @@ import { appendCaveats } from './caveats';
 import {
   contextToPermissionRequest,
   permissionRequestToContext,
+  createContextMetadata,
 } from './context';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamPermissionRequest,
   ValidatedNativeTokenStreamPermissionRequest,
+  NativeTokenStreamMetadata,
 } from './types';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
 import {
@@ -31,7 +33,8 @@ import { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   ValidatedNativeTokenStreamPermissionRequest,
   PermissionResponse,
-  NativeTokenStreamContext
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata
 > {
   readonly #tokenPricesService: TokenPricesService;
 
@@ -65,8 +68,19 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     return 'Native token stream';
   }
 
-  async createUi(context: NativeTokenStreamContext) {
-    return createConfirmationContent(context);
+  async createUi(args: {
+    context: NativeTokenStreamContext;
+    metadata: NativeTokenStreamMetadata;
+  }) {
+    return createConfirmationContent(args);
+  }
+
+  async createContextMetadata(
+    context: NativeTokenStreamContext,
+  ): Promise<NativeTokenStreamMetadata> {
+    return createContextMetadata({
+      context,
+    });
   }
 
   async buildPermissionContext(): Promise<NativeTokenStreamContext> {

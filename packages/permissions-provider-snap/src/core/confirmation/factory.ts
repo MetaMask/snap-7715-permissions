@@ -1,29 +1,24 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import type { BaseContext } from '../types';
 import { UserEventDispatcher } from '../../userEventDispatcher';
-import {
-  ConfirmationDialog,
-  ConfirmationLifecycleCallback,
-} from './confirmation';
+import { ConfirmationDialog } from './confirmation';
 import { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 /**
  * Interface for a confirmation dialog that can be presented to the user.
  */
-export type ConfirmationDialogType<TContext extends BaseContext> = {
+export type ConfirmationDialogType = {
   /**
    * Awaits the user's decision on the confirmation dialog.
-   * @returns A promise that resolves with the user's decision and any context modifications.
+   * @returns A promise that resolves with the user's decision.
    */
   awaitUserDecision(): Promise<{
     isConfirmationGranted: boolean;
-    grantedContext: TContext;
   }>;
 
   /**
    * Updates the content of the confirmation dialog.
    * @param content - The new content to display.
    */
-  updateContent(args: { ui: any; context: TContext }): void;
+  updateContent(args: { ui: any }): void;
 
   createInterface(): Promise<string>;
 };
@@ -52,7 +47,7 @@ export class ConfirmationDialogFactory {
    * @param onDestroy - Callback when the dialog is destroyed.
    * @returns A promise that resolves with the confirmation dialog.
    */
-  createConfirmation<TContext extends BaseContext>({
+  createConfirmation({
     title,
     ui,
     justification,
@@ -60,7 +55,7 @@ export class ConfirmationDialogFactory {
     title: string;
     justification: string;
     ui: GenericSnapElement;
-  }): ConfirmationDialogType<TContext> {
+  }): ConfirmationDialogType {
     return new ConfirmationDialog({
       title,
       ui,

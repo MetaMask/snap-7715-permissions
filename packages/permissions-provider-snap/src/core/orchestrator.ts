@@ -44,6 +44,7 @@ export abstract class BaseOrchestrator<
     ValidatedPermissionRequest = ValidatedPermissionRequest,
   TPermissionResponse extends PermissionResponse = PermissionResponse,
   TContext extends BaseContext = BaseContext,
+  TMetadata extends object = {},
 > {
   protected readonly accountController: AccountController;
   protected readonly permissionRequest: TPermissionRequest;
@@ -90,7 +91,12 @@ export abstract class BaseOrchestrator<
 
   abstract get stateChangeHandlers(): StateChangeHandler<TContext>[];
 
-  abstract createUi(context: TContext): Promise<GenericSnapElement>;
+  abstract createUi(args: {
+    context: TContext;
+    metadata: TMetadata;
+  }): Promise<GenericSnapElement>;
+
+  abstract createContextMetadata(context: TContext): Promise<TMetadata>;
 
   abstract buildPermissionContext(): Promise<TContext>;
 
@@ -122,11 +128,16 @@ export abstract class BaseOrchestrator<
   }> {
     this.currentContext = await this.buildPermissionContext();
 
+    const metadata = await this.createContextMetadata(this.currentContext);
+
     const confirmationDialog =
-      this.confirmationDialogFactory.createConfrmation({
+      this.confirmationDialogFactory.createConfirmation({
         title: this.title,
         justification: this.permissionRequest.permission.data.justification,
-        ui: await this.createUi(this.currentContext),
+        ui: await this.createUi({
+          context: this.currentContext,
+          metadata,
+        }),
       });
 
     const interfaceId = await confirmationDialog.createInterface();
@@ -144,13 +155,20 @@ export abstract class BaseOrchestrator<
             ? stateChangeHandler.valueMapper(event)
             : (event.value as string);
 
-          this.currentContext = 
-            stateChangeHandler.contextMapper(this.currentContext, value),
-          ;
+          this.currentContext = stateChangeHandler.contextMapper(
+            this.currentContext,
+            value,
+          );
+
+          const metadata = await this.createContextMetadata(
+            this.currentContext,
+          );
 
           confirmationDialog.updateContent({
-            ui: await this.createUi(this.currentContext),
-            context: this.currentContext,
+            ui: await this.createUi({
+              context: this.currentContext,
+              metadata,
+            }),
           });
         };
 
@@ -169,7 +187,7 @@ export abstract class BaseOrchestrator<
       },
     );
 
-    const { isConfirmationGranted, grantedContext } =
+    const { isConfirmationGranted } =
       await confirmationDialog.awaitUserDecision();
 
     // unbind handlers
@@ -183,7 +201,7 @@ export abstract class BaseOrchestrator<
     }
 
     const grantedPermissionRequest = this.permissionRequest.isAdjustmentAllowed
-      ? await this.resolvePermissionRequest(grantedContext)
+      ? await this.resolvePermissionRequest(this.currentContext)
       : this.permissionRequest;
 
     const [address, accountMeta, delegationManager] =

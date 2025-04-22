@@ -8,6 +8,16 @@ import { TypedPermissionRequest } from '../../core/types';
 import { AccountDetailsProps } from '../../ui/components/AccountDetails';
 import { BaseContext } from '../../core/types';
 
+export type NativeTokenStreamMetadata = {
+  validationErrors: {
+    initialAmountError?: string;
+    maxAmountError?: string;
+    amountPerSecondError?: string;
+    startTimeError?: string;
+    expiryError?: string;
+  };
+};
+
 export type NativeTokenStreamContext = BaseContext & {
   accountDetails: AccountDetailsProps;
   permissionDetails: {

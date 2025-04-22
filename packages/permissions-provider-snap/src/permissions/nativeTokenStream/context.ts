@@ -4,6 +4,7 @@ import { TokenPricesService } from '../../services/tokenPricesService';
 import type {
   NativeTokenStreamContext,
   ValidatedNativeTokenStreamPermissionRequest,
+  NativeTokenStreamMetadata,
 } from './types';
 import {
   convertReadableDateToTimestamp,
@@ -53,9 +54,6 @@ export async function permissionRequestToContext({
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
 }): Promise<NativeTokenStreamContext> {
-  //todo: let's figure out how to make the async stuff deferred
-  // maybe put placceholders in and have functions within the orchestrator
-  // that resolve them asyncronously.
   const chainId = Number(permissionRequest.chainId);
 
   const address = await accountController.getAccountAddress({
@@ -73,9 +71,11 @@ export async function permissionRequestToContext({
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
+  // todo: do better handling of maximum / undefined
   const initialAmount = formatEther(
     BigInt(permissionRequest.permission.data.initialAmount),
   );
+
   const maxAmount = formatEther(
     BigInt(permissionRequest.permission.data.maxAmount),
   );
@@ -106,5 +106,54 @@ export async function permissionRequestToContext({
       amountPerSecond,
       startTime,
     },
+  };
+}
+
+export async function createContextMetadata({
+  context,
+}: {
+  context: NativeTokenStreamContext;
+}): Promise<NativeTokenStreamMetadata> {
+  const { permissionDetails, expiry } = context;
+
+  // todo: we could do some better validation here.
+  const validationErrors: NativeTokenStreamMetadata['validationErrors'] = {};
+
+  let maxAmountBigInt: bigint | undefined;
+  let initialAmountBigInt: bigint | undefined;
+
+  try {
+    maxAmountBigInt = parseEther(permissionDetails.maxAmount);
+  } catch (error) {
+    validationErrors.maxAmountError = 'Invalid max amount';
+  }
+
+  try {
+    initialAmountBigInt = parseEther(permissionDetails.initialAmount);
+  } catch (error) {
+    validationErrors.initialAmountError = 'Invalid initial amount';
+  }
+
+  try {
+    convertReadableDateToTimestamp(permissionDetails.startTime);
+  } catch (error) {
+    validationErrors.startTimeError = 'Invalid start time';
+  }
+
+  try {
+    convertReadableDateToTimestamp(expiry);
+  } catch (error) {
+    validationErrors.expiryError = 'Invalid expiry';
+  }
+
+  if (maxAmountBigInt !== undefined && initialAmountBigInt !== undefined) {
+    if (maxAmountBigInt < initialAmountBigInt) {
+      validationErrors.maxAmountError =
+        'Max amount must be greater than initial amount';
+    }
+  }
+
+  return {
+    validationErrors,
   };
 }

@@ -106,8 +106,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  * @param args.event - The user input event.
  * @returns Resolves once any registered event handlers have completed.
  */
-export const onUserInput: OnUserInputHandler = async (args) =>
-  userEventDispatcher.handleUserInputEvent(args);
+export const onUserInput: OnUserInputHandler =
+  userEventDispatcher.createUserInputEventHandler();
+
 export const onHomePage: OnHomePageHandler = async () => {
   return {
     content: await homepage.buildHomepage(),

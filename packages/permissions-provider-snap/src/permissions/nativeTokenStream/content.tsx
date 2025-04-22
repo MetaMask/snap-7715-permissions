@@ -1,19 +1,21 @@
 import { Form } from '@metamask/snaps-sdk/jsx';
 import { AccountDetails } from '../../ui/components/AccountDetails';
-import { NativeTokenStreamContext } from './types';
+import { NativeTokenStreamContext, NativeTokenStreamMetadata } from './types';
 import { InputField } from '../../ui/components/InputField';
 
 export const INITIAL_AMOUNT_ELEMENT = 'initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'max-amount';
 export const START_TIME_ELEMENT = 'start-time';
 export const EXPIRY_ELEMENT = 'expiry';
+export const AMOUNT_PER_SECOND_ELEMENT = 'amount-per-second';
 
 export const createConfirmationContent = ({
-  accountDetails,
-  permissionDetails,
-  expiry,
-  isAdjustmentAllowed,
-}: NativeTokenStreamContext) => {
+  context: { accountDetails, permissionDetails, expiry, isAdjustmentAllowed },
+  metadata: { validationErrors },
+}: {
+  context: NativeTokenStreamContext;
+  metadata: NativeTokenStreamMetadata;
+}) => {
   const areValuesFixed = !isAdjustmentAllowed;
 
   return (
@@ -26,6 +28,16 @@ export const createConfirmationContent = ({
         type="number"
         value={permissionDetails.initialAmount}
         disabled={areValuesFixed}
+        errorMessage={validationErrors.initialAmountError}
+      />
+      <InputField
+        label="Amount per second"
+        name={AMOUNT_PER_SECOND_ELEMENT}
+        tooltip="The amount of tokens to stream per second."
+        type="number"
+        value={permissionDetails.amountPerSecond}
+        disabled={areValuesFixed}
+        errorMessage={validationErrors.amountPerSecondError}
       />
       <InputField
         label="Max Amount"
@@ -34,6 +46,7 @@ export const createConfirmationContent = ({
         type="number"
         value={permissionDetails.maxAmount}
         disabled={areValuesFixed}
+        errorMessage={validationErrors.maxAmountError}
       />
       <InputField
         label="Start Time"
@@ -42,6 +55,7 @@ export const createConfirmationContent = ({
         type="text"
         value={permissionDetails.startTime}
         disabled={areValuesFixed}
+        errorMessage={validationErrors.startTimeError}
       />
       <InputField
         label="Expiry"
@@ -50,6 +64,7 @@ export const createConfirmationContent = ({
         type="text"
         value={expiry}
         disabled={areValuesFixed}
+        errorMessage={validationErrors.expiryError}
       />
     </Form>
   );
