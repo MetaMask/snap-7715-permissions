@@ -14,6 +14,7 @@ import {
   orchestrate,
   type SupportedPermissionTypes,
 } from '../orchestrators';
+import type { ProfileSyncManager } from '../profileSync';
 import type { TokenPricesService } from '../services';
 import type { PermissionConfirmationRenderHandler } from '../ui';
 import type { UserEventDispatcher } from '../userEventDispatcher';
@@ -41,6 +42,7 @@ export type RpcHandler = {
  * @param config.permissionsContextBuilder - The permissions context builder.
  * @param config.tokenPricesService - The token prices service.
  * @param config.userEventDispatcher - The user event dispatcher.
+ * @param config.profileSyncManager - The profile sync manager.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
@@ -49,6 +51,7 @@ export function createRpcHandler(config: {
   permissionsContextBuilder: PermissionsContextBuilder;
   tokenPricesService: TokenPricesService;
   userEventDispatcher: UserEventDispatcher;
+  profileSyncManager: ProfileSyncManager;
 }): RpcHandler {
   const {
     permissionConfirmationRenderHandler,
@@ -56,6 +59,7 @@ export function createRpcHandler(config: {
     permissionsContextBuilder,
     tokenPricesService,
     userEventDispatcher,
+    profileSyncManager,
   } = config;
 
   return {
@@ -110,6 +114,10 @@ export function createRpcHandler(config: {
       if (!orchestrateRes.success) {
         throw new Error(orchestrateRes.reason);
       }
+
+      // TODO: Store the granted permission with profile sync
+      const userProfile = await profileSyncManager.getUserProfile();
+      console.log('userProfile:', userProfile);
 
       return [orchestrateRes.response] as Json[];
     },

@@ -13,10 +13,12 @@ import { AccountController } from './accountController';
 import { PriceApiClient } from './clients';
 import { HomePage } from './homepage';
 import { createPermissionsContextBuilder } from './orchestrators';
+import { createProfileSyncManager } from './profileSync';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services';
+import { createStateManager } from './stateManagement';
 import { createPermissionConfirmationRenderHandler } from './ui';
 import { UserEventDispatcher } from './userEventDispatcher';
 
@@ -44,12 +46,18 @@ const permissionConfirmationRenderHandler =
 const priceApiClient = new PriceApiClient(process.env.PRICE_API_BASE_URL ?? '');
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
+const stateManager = createStateManager(snap);
+const profileSyncManager = createProfileSyncManager({
+  stateManager,
+});
+
 const rpcHandler = createRpcHandler({
   accountController,
   permissionConfirmationRenderHandler,
   permissionsContextBuilder: createPermissionsContextBuilder(accountController),
   tokenPricesService,
   userEventDispatcher,
+  profileSyncManager,
 });
 
 // configure RPC methods bindings
