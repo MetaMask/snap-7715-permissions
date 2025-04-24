@@ -4,7 +4,7 @@
 
 This document will provide an overview of the `@metamask/gator-permissions-snap` internal process for storing and retrieving a user's permissions.
 
-The `@metamask/gator-permissions-snap` will automatically store granted permissions using MetaMask Profile Sync,
+The `@metamask/gator-permissions-snap` will automatically store granted permissions using MetaMask Profile Sync.
 
 Pending `@metamask/gator-permissions-snap` reaching preinstall status, we will provide the user with the option to view the persisted permissions in the MetaMask extension to revoke them in the future via interaction with MetaMask Profile Sync in the extension codebase.
 

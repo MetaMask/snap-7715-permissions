@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
   AuthSigningOptions,
@@ -64,7 +66,7 @@ export function createProfileSyncManager(
         const signature: string = (await snap.request({
           method: 'wallet_invokeSnap',
           params: {
-            snapId: 'npm:@metamask/message-signing-snap',
+            snapId: MESSAGE_SIGNING_SNAP_ID,
             request: {
               method: 'signMessage',
               params: {
@@ -84,7 +86,7 @@ export function createProfileSyncManager(
         const publicKey: string = (await snap.request({
           method: 'wallet_invokeSnap',
           params: {
-            snapId: 'npm:@metamask/message-signing-snap',
+            snapId: MESSAGE_SIGNING_SNAP_ID,
             request: {
               method: 'getPublicKey',
               params: {},

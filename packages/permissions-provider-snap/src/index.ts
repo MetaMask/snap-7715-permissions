@@ -1,3 +1,4 @@
+import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
   OnHomePageHandler,
@@ -120,5 +121,30 @@ export const onHomePage: OnHomePageHandler = async () => {
 };
 
 export const onInstall: OnInstallHandler = async () => {
+  /**
+   * Local Development Only
+   *
+   * The message signing snap must be installed and the gator permissions snap must
+   * have permission to communicate with the message signing snap, or the request is rejected.
+   *
+   * Since the message signing snap is preinstalled in production, and has
+   * initialConnections configured to automatically connect to the gator snap, this is not needed in production.
+   */
+  // eslint-disable-next-line no-restricted-globals
+  if (process.env.SNAP_ENV === 'local') {
+    const installedSnaps = (await snap.request({
+      method: 'wallet_getSnaps',
+    })) as unknown as any;
+    if (!installedSnaps[MESSAGE_SIGNING_SNAP_ID]) {
+      logger.debug('Installing local message signing snap');
+      await snap.request({
+        method: 'wallet_requestSnaps',
+        params: {
+          [MESSAGE_SIGNING_SNAP_ID]: {},
+        },
+      });
+    }
+  }
+
   await homepage.showWelcomeScreen();
 };
