@@ -13,7 +13,7 @@ import type { AccountController, FactoryArgs } from '../accountController';
 import { ConfirmationDialogFactory } from './confirmation/factory';
 
 import { BaseContext } from './types';
-import { Hex } from 'viem';
+import { extractChain, Hex } from 'viem';
 import {
   UserEventDispatcher,
   UserEventHandler,
@@ -21,6 +21,7 @@ import {
 } from '../userEventDispatcher';
 import { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { InputChangeEvent, UserInputEventType } from '@metamask/snaps-sdk';
+import { sepolia } from 'viem/chains';
 
 // todo make this actually a validated permission request
 type ValidatedPermissionRequest = PermissionRequest & {
@@ -89,6 +90,8 @@ export abstract class BaseOrchestrator<
 
   abstract get title(): string;
 
+  abstract get token(): string;
+
   abstract get stateChangeHandlers(): StateChangeHandler<TContext>[];
 
   abstract createUi(args: {
@@ -121,7 +124,7 @@ export abstract class BaseOrchestrator<
    * Main orchestration method that coordinates the permission request flow.
    * This method should not be overridden by subclasses.
    */
-  async orchestrate(): Promise<{
+  async orchestrate({ origin }: { origin: string }): Promise<{
     success: boolean;
     response?: TPermissionResponse;
     reason?: string;
@@ -130,10 +133,22 @@ export abstract class BaseOrchestrator<
 
     const metadata = await this.createContextMetadata(this.currentContext);
 
+    const chain = extractChain({
+      chains: [sepolia],
+      id: Number(this.permissionRequest.chainId) as any,
+    });
+
+    if (!chain) {
+      throw new Error('Chain not found');
+    }
+
     const confirmationDialog =
       this.confirmationDialogFactory.createConfirmation({
         title: this.title,
         justification: this.permissionRequest.permission.data.justification,
+        origin: origin,
+        network: chain.name,
+        token: this.token,
         ui: await this.createUi({
           context: this.currentContext,
           metadata,

@@ -9,22 +9,33 @@ import { AccountDetailsProps } from '../../ui/components/AccountDetails';
 import { BaseContext } from '../../core/types';
 
 export type NativeTokenStreamMetadata = {
+  amountPerSecond: string;
   validationErrors: {
     initialAmountError?: string;
     maxAmountError?: string;
-    amountPerSecondError?: string;
+    amountPerPeriodError?: string;
     startTimeError?: string;
     expiryError?: string;
   };
 };
+
+/**
+ * An enum representing the time periods for which the stream rate can be calculated.
+ */
+export enum TimePeriod {
+  DAILY = 'Daily',
+  WEEKLY = 'Weekly',
+  MONTHLY = 'Monthly',
+}
 
 export type NativeTokenStreamContext = BaseContext & {
   accountDetails: AccountDetailsProps;
   permissionDetails: {
     initialAmount: string;
     maxAmount: string;
-    amountPerSecond: string;
+    timePeriod: TimePeriod;
     startTime: string;
+    amountPerPeriod: string;
   };
 };
 

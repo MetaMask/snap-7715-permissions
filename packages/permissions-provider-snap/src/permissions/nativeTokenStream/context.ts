@@ -10,7 +10,7 @@ import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
 } from '../../utils/time';
-
+import { TimePeriod } from './types';
 /**
  * Builds the granted permission based on user adjustments.
  */
@@ -22,7 +22,9 @@ export function contextToPermissionRequest({
   permissionRequest: ValidatedNativeTokenStreamPermissionRequest;
 }): ValidatedNativeTokenStreamPermissionRequest {
   const maxAmount = parseEther(context.permissionDetails.maxAmount);
-  const amountPerSecond = parseEther(context.permissionDetails.amountPerSecond);
+  const amountPerSecond =
+    parseEther(context.permissionDetails.amountPerPeriod) /
+    TIME_PERIOD_TO_SECONDS[context.permissionDetails.timePeriod];
   const initialAmount = parseEther(context.permissionDetails.initialAmount);
   const startTime = convertReadableDateToTimestamp(
     context.permissionDetails.startTime,
@@ -44,6 +46,17 @@ export function contextToPermissionRequest({
     },
   };
 }
+
+/**
+ * A mapping of time periods to their equivalent seconds.
+ */
+export const TIME_PERIOD_TO_SECONDS: Record<TimePeriod, bigint> = {
+  [TimePeriod.DAILY]: 60n * 60n * 24n, // 86,400(seconds)
+  [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800(seconds)
+  // Monthly is difficult because months are not consistent in length.
+  // We approximate by calculating the number of seconds in 1/12th of a year.
+  [TimePeriod.MONTHLY]: (60n * 60n * 24n * 365n) / 12n, // 2,629,760(seconds)
+};
 
 export async function permissionRequestToContext({
   permissionRequest,
@@ -79,9 +92,19 @@ export async function permissionRequestToContext({
   const maxAmount = formatEther(
     BigInt(permissionRequest.permission.data.maxAmount),
   );
-  const amountPerSecond = formatEther(
-    BigInt(permissionRequest.permission.data.amountPerSecond),
+
+  const timePeriod = TimePeriod.WEEKLY;
+
+  const amountPerSecond = BigInt(
+    permissionRequest.permission.data.amountPerSecond,
   );
+
+  // It may seem strange to convert the amount per second to amount per period, format, and then convert back to amount per second.
+  // The user is inputting amount per period, and we derive amount per second, so it makes sense for the context to contain the amount per period.
+  const amountPerPeriod = formatEther(
+    amountPerSecond * TIME_PERIOD_TO_SECONDS[timePeriod],
+  );
+
   const startTime = convertTimestampToReadableDate(
     permissionRequest.permission.data.startTime,
   );
@@ -103,8 +126,9 @@ export async function permissionRequestToContext({
     permissionDetails: {
       initialAmount,
       maxAmount,
-      amountPerSecond,
+      timePeriod,
       startTime,
+      amountPerPeriod,
     },
   };
 }
@@ -134,6 +158,13 @@ export async function createContextMetadata({
     validationErrors.initialAmountError = 'Invalid initial amount';
   }
 
+  let amountPerSecondBigInt: bigint;
+  try {
+    amountPerSecondBigInt = parseEther(permissionDetails.amountPerPeriod);
+  } catch (error) {
+    validationErrors.amountPerPeriodError = 'Invalid amount per period';
+  }
+
   try {
     convertReadableDateToTimestamp(permissionDetails.startTime);
   } catch (error) {
@@ -153,7 +184,13 @@ export async function createContextMetadata({
     }
   }
 
+  const amountPerSecond = formatEther(
+    amountPerSecondBigInt /
+      TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
+  );
+
   return {
+    amountPerSecond,
     validationErrors,
   };
 }

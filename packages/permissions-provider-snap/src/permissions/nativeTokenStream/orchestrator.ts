@@ -13,14 +13,17 @@ import type {
   NativeTokenStreamPermissionRequest,
   ValidatedNativeTokenStreamPermissionRequest,
   NativeTokenStreamMetadata,
+  TimePeriod,
 } from './types';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
 import {
+  AMOUNT_PER_PERIOD_ELEMENT,
   createConfirmationContent,
   EXPIRY_ELEMENT,
   INITIAL_AMOUNT_ELEMENT,
   MAX_AMOUNT_ELEMENT,
   START_TIME_ELEMENT,
+  TIME_PERIOD_ELEMENT,
 } from './content';
 import type { ConfirmationDialogFactory } from '../../core/confirmation/factory';
 import { CaveatBuilder } from '@metamask/delegation-toolkit';
@@ -66,6 +69,10 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
 
   get title(): string {
     return 'Native token stream';
+  }
+
+  get token(): string {
+    return 'ETH';
   }
 
   async createUi(args: {
@@ -147,6 +154,26 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
         contextMapper: (context, value) => ({
           ...context,
           expiry: value as string,
+        }),
+      },
+      {
+        elementName: AMOUNT_PER_PERIOD_ELEMENT,
+        contextMapper: (context, value) => ({
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            amountPerPeriod: value as string,
+          },
+        }),
+      },
+      {
+        elementName: TIME_PERIOD_ELEMENT,
+        contextMapper: (context, value) => ({
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            timePeriod: value as TimePeriod,
+          },
         }),
       },
     ];

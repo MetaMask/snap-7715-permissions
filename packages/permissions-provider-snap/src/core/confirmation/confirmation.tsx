@@ -4,10 +4,9 @@ import {
   CANCEL_BUTTON,
 } from '../../ui/components/confirmation-footer';
 import { RequestHeader } from '../../ui/components/RequestHeader';
-import { type BaseContext } from '../types';
+import { ShowMoreText } from '../../ui/components/ShowMoreText';
 import {
   Box,
-  Button,
   Container,
   GenericSnapElement,
   Section,
@@ -19,25 +18,25 @@ import {
   UserEventHandler,
 } from '../../userEventDispatcher';
 
-/**
- * Props for building the confirmation dialog UI.
- */
 type ConfirmationProps = {
   title: string;
   justification: string;
   ui: GenericSnapElement;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
+  origin: string;
+  network: string;
+  token: string;
 };
 
-/**
- * Confirmation dialog implementation that provides standard layout and behavior.
- */
 export class ConfirmationDialog {
   readonly #snaps: SnapsProvider;
   readonly #userEventDispatcher: UserEventDispatcher;
   readonly #title: string;
   readonly #justification: string;
+  readonly #origin: string;
+  readonly #network: string;
+  readonly #token: string;
 
   #isJustificationCollapsed: boolean = true;
   #ui: GenericSnapElement;
@@ -46,11 +45,17 @@ export class ConfirmationDialog {
   constructor({
     title,
     justification,
+    origin,
+    network,
+    token,
     ui,
     snaps,
     userEventDispatcher,
   }: ConfirmationProps) {
     this.#title = title;
+    this.#origin = origin;
+    this.#network = network;
+    this.#token = token;
     this.#justification = justification;
     this.#ui = ui;
     this.#snaps = snaps;
@@ -191,15 +196,15 @@ export class ConfirmationDialog {
           <Section>
             <Box direction="horizontal" alignment="space-between">
               <Text>Recipient</Text>
-              <Text>Steve</Text>
+              <Text>{this.#origin}</Text>
             </Box>
             <Box direction="horizontal" alignment="space-between">
               <Text>Network</Text>
-              <Text>Ethereum</Text>
+              <Text>{this.#network}</Text>
             </Box>
             <Box direction="horizontal" alignment="space-between">
               <Text>Token</Text>
-              <Text>ETH</Text>
+              <Text>{this.#token}</Text>
             </Box>
             <Box direction="horizontal" alignment="space-between">
               <Text>Reason</Text>
@@ -234,25 +239,3 @@ export class ConfirmationDialog {
     });
   }
 }
-
-//todo: move to ui components
-const ShowMoreText = ({
-  text,
-  buttonName,
-  isCollapsed,
-}: {
-  text: string;
-  buttonName: string;
-  isCollapsed: boolean;
-}) => {
-  const displayText =
-    text.length > 12 && isCollapsed ? `${text.slice(0, 12)}...` : text;
-  const buttonText = isCollapsed ? 'Show' : 'Hide';
-
-  return (
-    <Box direction={isCollapsed ? 'horizontal' : 'vertical'}>
-      <Text color="muted">{displayText}</Text>
-      <Button name={buttonName}>{buttonText}</Button>
-    </Box>
-  );
-};

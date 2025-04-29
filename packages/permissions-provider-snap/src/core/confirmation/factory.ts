@@ -51,15 +51,24 @@ export class ConfirmationDialogFactory {
     title,
     ui,
     justification,
+    origin,
+    network,
+    token,
   }: {
     title: string;
     justification: string;
     ui: GenericSnapElement;
+    origin: string;
+    network: string;
+    token: string;
   }): ConfirmationDialogType {
     return new ConfirmationDialog({
       title,
       ui,
       justification,
+      origin,
+      network,
+      token,
       snaps: this.#snap,
       userEventDispatcher: this.#userEventDispatcher,
     });

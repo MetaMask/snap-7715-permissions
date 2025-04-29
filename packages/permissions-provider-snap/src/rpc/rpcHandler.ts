@@ -47,7 +47,9 @@ export function createRpcHandler(config: {
           // todo: we probably need to pass siteOrigin to display it
           const orchestrator = orchestratorFactory.createOrchestrator(request);
 
-          const permissionResponse = await orchestrator.orchestrate();
+          const permissionResponse = await orchestrator.orchestrate({
+            origin: siteOrigin,
+          });
 
           if (!permissionResponse.success) {
             throw new Error(permissionResponse.reason);
