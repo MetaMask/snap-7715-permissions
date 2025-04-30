@@ -12,7 +12,7 @@ import {
 import type { AccountController, FactoryArgs } from '../accountController';
 import { ConfirmationDialogFactory } from './confirmation/factory';
 
-import { BaseContext } from './types';
+import { BaseContext, HydratedPermissionRequest } from './types';
 import { extractChain, Hex } from 'viem';
 import {
   UserEventDispatcher,
@@ -22,11 +22,6 @@ import {
 import { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { InputChangeEvent, UserInputEventType } from '@metamask/snaps-sdk';
 import { sepolia } from 'viem/chains';
-
-// todo make this actually a validated permission request
-type ValidatedPermissionRequest = PermissionRequest & {
-  isAdjustmentAllowed: boolean;
-};
 
 export type StateChangeHandler<TContext> = {
   elementName: string;
@@ -41,11 +36,12 @@ export type StateChangeHandler<TContext> = {
  * Subclasses must implement specific methods to handle UI, validation, and permission context.
  */
 export abstract class BaseOrchestrator<
-  TPermissionRequest extends
-    ValidatedPermissionRequest = ValidatedPermissionRequest,
+  TPermissionRequest extends PermissionRequest = PermissionRequest,
   TPermissionResponse extends PermissionResponse = PermissionResponse,
   TContext extends BaseContext = BaseContext,
   TMetadata extends object = {},
+  THydratedPermissionRequest extends
+    HydratedPermissionRequest<TPermissionRequest> = HydratedPermissionRequest<TPermissionRequest>,
 > {
   protected readonly accountController: AccountController;
   protected readonly permissionRequest: TPermissionRequest;
@@ -55,7 +51,7 @@ export abstract class BaseOrchestrator<
   >;
   protected readonly userEventDispatcher: UserEventDispatcher;
 
-  protected currentContext: TContext | undefined;
+  #currentContext: TContext | undefined;
 
   constructor({
     accountController,
@@ -88,35 +84,44 @@ export abstract class BaseOrchestrator<
     ]);
   }
 
-  abstract get title(): string;
+  protected abstract get title(): string;
 
-  abstract get token(): string;
+  protected abstract get token(): string;
 
-  abstract get stateChangeHandlers(): StateChangeHandler<TContext>[];
+  protected abstract get stateChangeHandlers(): StateChangeHandler<TContext>[];
 
-  abstract createUi(args: {
+  protected abstract createUi(args: {
     context: TContext;
     metadata: TMetadata;
   }): Promise<GenericSnapElement>;
 
-  abstract createContextMetadata(context: TContext): Promise<TMetadata>;
+  protected abstract createContextMetadata(
+    context: TContext,
+  ): Promise<TMetadata>;
 
-  abstract buildPermissionContext(): Promise<TContext>;
+  protected abstract buildPermissionContext(): Promise<TContext>;
 
   /**
    * Resolve the permission request based on the granted context.
-   * Subclasses must implement this to handle their specific permission types.
    */
-  protected abstract resolvePermissionRequest(
-    context: TContext,
-  ): Promise<TPermissionRequest>;
+  protected abstract resolvePermissionRequest(args: {
+    context: TContext;
+    originalRequest: TPermissionRequest;
+  }): Promise<TPermissionRequest>;
+
+  /**
+   * Resolve any optional properties of the permission request.
+   */
+  protected abstract hydratePermissionRequest(args: {
+    permissionRequest: TPermissionRequest;
+  }): Promise<THydratedPermissionRequest>;
 
   /**
    * Append permission-specific caveats to the caveat builder.
    * Subclasses must implement this to add their specific caveats.
    */
   protected abstract appendCaveats(
-    permissionRequest: TPermissionRequest,
+    permissionRequest: THydratedPermissionRequest,
     caveatBuilder: CaveatBuilder,
   ): Promise<CaveatBuilder>;
 
@@ -129,9 +134,9 @@ export abstract class BaseOrchestrator<
     response?: TPermissionResponse;
     reason?: string;
   }> {
-    this.currentContext = await this.buildPermissionContext();
+    this.#currentContext = await this.buildPermissionContext();
 
-    const metadata = await this.createContextMetadata(this.currentContext);
+    const metadata = await this.createContextMetadata(this.#currentContext);
 
     const chain = extractChain({
       chains: [sepolia],
@@ -150,7 +155,7 @@ export abstract class BaseOrchestrator<
         network: chain.name,
         token: this.token,
         ui: await this.createUi({
-          context: this.currentContext,
+          context: this.#currentContext,
           metadata,
         }),
       });
@@ -162,7 +167,7 @@ export abstract class BaseOrchestrator<
         const handler: UserEventHandler<
           UserInputEventType.InputChangeEvent
         > = async ({ event }: { event: InputChangeEvent }) => {
-          if (!this.currentContext) {
+          if (!this.#currentContext) {
             throw new Error('Current context is undefined');
           }
 
@@ -170,18 +175,18 @@ export abstract class BaseOrchestrator<
             ? stateChangeHandler.valueMapper(event)
             : (event.value as string);
 
-          this.currentContext = stateChangeHandler.contextMapper(
-            this.currentContext,
+          this.#currentContext = stateChangeHandler.contextMapper(
+            this.#currentContext,
             value,
           );
 
           const metadata = await this.createContextMetadata(
-            this.currentContext,
+            this.#currentContext,
           );
 
           confirmationDialog.updateContent({
             ui: await this.createUi({
-              context: this.currentContext,
+              context: this.#currentContext,
               metadata,
             }),
           });
@@ -215,14 +220,23 @@ export abstract class BaseOrchestrator<
       };
     }
 
-    const grantedPermissionRequest = this.permissionRequest.isAdjustmentAllowed
-      ? await this.resolvePermissionRequest(this.currentContext)
-      : this.permissionRequest;
+    const resolvedPermissionRequest =
+      (this.permissionRequest.isAdjustmentAllowed ?? true)
+        ? await this.resolvePermissionRequest({
+            context: this.#currentContext,
+            originalRequest: this.permissionRequest,
+          })
+        : this.permissionRequest;
+
+    const grantedPermissionRequest = await this.hydratePermissionRequest({
+      permissionRequest: resolvedPermissionRequest,
+    });
 
     const [address, accountMeta, delegationManager] =
       await this.accountDataPromise;
 
     const chainId = Number(grantedPermissionRequest.chainId);
+
     const environment = await this.accountController.getEnvironment({
       chainId,
     });

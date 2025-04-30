@@ -1,5 +1,5 @@
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
-import type { ValidatedNativeTokenStreamPermissionRequest } from './types';
+import type { HydratedNativeTokenStreamPermissionRequest } from './types';
 
 /**
  * Appends permission-specific caveats to the caveat builder.
@@ -8,7 +8,7 @@ export function appendCaveats({
   permissionRequest,
   caveatBuilder,
 }: {
-  permissionRequest: ValidatedNativeTokenStreamPermissionRequest;
+  permissionRequest: HydratedNativeTokenStreamPermissionRequest;
   caveatBuilder: CoreCaveatBuilder;
 }): CoreCaveatBuilder {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =

@@ -29,3 +29,22 @@ export type BasePermission = {
   };
   rules?: Record<string, any>;
 };
+
+/**
+ * Makes all properties in an object type required recursively.
+ * This includes nested objects and arrays.
+ */
+export type DeepRequired<TParent> = TParent extends (infer U)[]
+  ? DeepRequired<U>[]
+  : TParent extends object
+    ? {
+        [P in keyof TParent]-?: DeepRequired<TParent[P]>;
+      }
+    : TParent;
+
+export type HydratedPermissionRequest<
+  TPermissionRequest extends PermissionRequest,
+> = TPermissionRequest & {
+  isAdjustmentAllowed: boolean;
+  permission: DeepRequired<TPermissionRequest['permission']>;
+};

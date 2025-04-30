@@ -44,7 +44,6 @@ export function createRpcHandler(config: {
 
       const responses = await Promise.all(
         permissionsRequest.map(async (request) => {
-          // todo: we probably need to pass siteOrigin to display it
           const orchestrator = orchestratorFactory.createOrchestrator(request);
 
           const permissionResponse = await orchestrator.orchestrate({
@@ -62,7 +61,7 @@ export function createRpcHandler(config: {
       // todo: type this better
       const filtered = responses.filter((response) => response !== undefined);
 
-      return filtered as Json[];
+      return filtered as any as Json[];
     },
   };
 }

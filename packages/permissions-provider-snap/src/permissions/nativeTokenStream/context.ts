@@ -1,48 +1,82 @@
-import { formatEther, parseEther, toHex } from 'viem';
+import { formatEther, maxUint256, parseEther, toHex } from 'viem';
 import { AccountController } from 'src/accountController';
 import { TokenPricesService } from '../../services/tokenPricesService';
 import type {
   NativeTokenStreamContext,
-  ValidatedNativeTokenStreamPermissionRequest,
+  NativeTokenStreamPermissionRequest,
   NativeTokenStreamMetadata,
+  HydratedNativeTokenStreamPermissionRequest,
 } from './types';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
+  getStartOfTodayUTC,
 } from '../../utils/time';
+import { formatEtherFromString } from '../../utils/balance';
 import { TimePeriod } from './types';
+
+const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
+const DEFAULT_INITIAL_AMOUNT = '0x0';
+
 /**
- * Builds the granted permission based on user adjustments.
+ * Construct an amended HydratedNativeTokenStreamPermissionRequest, based on the specified request,
+ * with the changes made by the specified context.
  */
 export function contextToPermissionRequest({
-  permissionRequest,
   context,
+  originalRequest,
 }: {
   context: NativeTokenStreamContext;
-  permissionRequest: ValidatedNativeTokenStreamPermissionRequest;
-}): ValidatedNativeTokenStreamPermissionRequest {
-  const maxAmount = parseEther(context.permissionDetails.maxAmount);
-  const amountPerSecond =
-    parseEther(context.permissionDetails.amountPerPeriod) /
-    TIME_PERIOD_TO_SECONDS[context.permissionDetails.timePeriod];
-  const initialAmount = parseEther(context.permissionDetails.initialAmount);
-  const startTime = convertReadableDateToTimestamp(
-    context.permissionDetails.startTime,
-  );
+  originalRequest: NativeTokenStreamPermissionRequest;
+}): NativeTokenStreamPermissionRequest {
+  const { permissionDetails } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
+  const permissionData = {
+    maxAmount: permissionDetails.maxAmount
+      ? toHex(parseEther(permissionDetails.maxAmount))
+      : undefined,
+    initialAmount: permissionDetails.initialAmount
+      ? toHex(parseEther(permissionDetails.initialAmount))
+      : undefined,
+    amountPerSecond: toHex(
+      parseEther(permissionDetails.amountPerPeriod) /
+        TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
+    ),
+    startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
+    justification: originalRequest.permission.data.justification,
+  };
+
   return {
-    ...permissionRequest,
-    expiry: expiry,
+    ...originalRequest,
+    expiry,
     permission: {
       type: 'native-token-stream',
+      data: permissionData,
+      rules: originalRequest.permission.rules || {},
+    },
+  };
+}
+
+export function hydratePermissionRequest({
+  permissionRequest,
+}: {
+  permissionRequest: NativeTokenStreamPermissionRequest;
+}): HydratedNativeTokenStreamPermissionRequest {
+  return {
+    ...permissionRequest,
+    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
+    permission: {
+      ...permissionRequest.permission,
       data: {
-        maxAmount: toHex(maxAmount),
-        amountPerSecond: toHex(amountPerSecond),
-        initialAmount: toHex(initialAmount),
-        startTime,
-        justification: permissionRequest.permission.data.justification,
+        ...permissionRequest.permission.data,
+        initialAmount:
+          permissionRequest.permission.data.initialAmount ??
+          DEFAULT_INITIAL_AMOUNT,
+        maxAmount:
+          permissionRequest.permission.data.maxAmount ?? DEFAULT_MAX_AMOUNT,
       },
+      rules: permissionRequest.permission.rules ?? {},
     },
   };
 }
@@ -63,7 +97,7 @@ export async function permissionRequestToContext({
   tokenPricesService,
   accountController,
 }: {
-  permissionRequest: ValidatedNativeTokenStreamPermissionRequest;
+  permissionRequest: NativeTokenStreamPermissionRequest;
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
 }): Promise<NativeTokenStreamContext> {
@@ -84,13 +118,14 @@ export async function permissionRequestToContext({
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  // todo: do better handling of maximum / undefined
-  const initialAmount = formatEther(
-    BigInt(permissionRequest.permission.data.initialAmount),
+  const initialAmount = formatEtherFromString(
+    permissionRequest.permission.data.initialAmount,
+    true,
   );
 
-  const maxAmount = formatEther(
-    BigInt(permissionRequest.permission.data.maxAmount),
+  const maxAmount = formatEtherFromString(
+    permissionRequest.permission.data.maxAmount,
+    true,
   );
 
   const timePeriod = TimePeriod.WEEKLY;
@@ -111,7 +146,7 @@ export async function permissionRequestToContext({
 
   return {
     expiry,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed,
+    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     accountDetails: {
       account: {
         address,
@@ -140,39 +175,70 @@ export async function createContextMetadata({
 }): Promise<NativeTokenStreamMetadata> {
   const { permissionDetails, expiry } = context;
 
-  // todo: we could do some better validation here.
   const validationErrors: NativeTokenStreamMetadata['validationErrors'] = {};
 
   let maxAmountBigInt: bigint | undefined;
   let initialAmountBigInt: bigint | undefined;
 
-  try {
-    maxAmountBigInt = parseEther(permissionDetails.maxAmount);
-  } catch (error) {
-    validationErrors.maxAmountError = 'Invalid max amount';
+  if (permissionDetails.maxAmount) {
+    try {
+      maxAmountBigInt = parseEther(permissionDetails.maxAmount);
+      if (maxAmountBigInt < 0n) {
+        validationErrors.maxAmountError = 'Max amount must be greater than 0';
+      }
+    } catch (error) {
+      validationErrors.maxAmountError = 'Invalid max amount';
+    }
   }
 
-  try {
-    initialAmountBigInt = parseEther(permissionDetails.initialAmount);
-  } catch (error) {
-    validationErrors.initialAmountError = 'Invalid initial amount';
+  if (permissionDetails.initialAmount) {
+    try {
+      initialAmountBigInt = parseEther(permissionDetails.initialAmount);
+      if (initialAmountBigInt < 0n) {
+        validationErrors.initialAmountError =
+          'Initial amount must be greater than 0';
+      }
+    } catch (error) {
+      validationErrors.initialAmountError = 'Invalid initial amount';
+    }
   }
 
   let amountPerSecondBigInt: bigint;
+  let amountPerSecond: string = 'Unknown';
   try {
     amountPerSecondBigInt = parseEther(permissionDetails.amountPerPeriod);
+    if (amountPerSecondBigInt <= 0n) {
+      validationErrors.amountPerPeriodError =
+        'Amount per period must be greater than 0';
+    } else {
+      amountPerSecond = formatEther(
+        amountPerSecondBigInt /
+          TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
+      );
+    }
   } catch (error) {
     validationErrors.amountPerPeriodError = 'Invalid amount per period';
   }
 
   try {
-    convertReadableDateToTimestamp(permissionDetails.startTime);
+    const startTimeDate = convertReadableDateToTimestamp(
+      permissionDetails.startTime,
+    );
+
+    if (startTimeDate < getStartOfTodayUTC()) {
+      validationErrors.startTimeError = 'Start time must be today or later';
+    }
   } catch (error) {
     validationErrors.startTimeError = 'Invalid start time';
   }
 
   try {
-    convertReadableDateToTimestamp(expiry);
+    const expiryDate = convertReadableDateToTimestamp(expiry);
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    if (expiryDate < nowSeconds) {
+      validationErrors.expiryError = 'Expiry must be in the future';
+    }
   } catch (error) {
     validationErrors.expiryError = 'Invalid expiry';
   }
@@ -183,11 +249,6 @@ export async function createContextMetadata({
         'Max amount must be greater than initial amount';
     }
   }
-
-  const amountPerSecond = formatEther(
-    amountPerSecondBigInt /
-      TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
-  );
 
   return {
     amountPerSecond,

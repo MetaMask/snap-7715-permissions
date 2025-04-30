@@ -1,10 +1,8 @@
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
-import { maxUint256, toHex } from 'viem';
 import {
   NativeTokenStreamPermission,
   NativeTokenStreamPermissionRequest,
-  ValidatedNativeTokenStreamPermissionRequest,
   zNativeTokenStreamPermission,
 } from './types';
 
@@ -64,9 +62,7 @@ function validatePermissionData(permission: NativeTokenStreamPermission): true {
  */
 export function parseAndValidatePermission(
   permissionRequest: NativeTokenStreamPermissionRequest,
-): ValidatedNativeTokenStreamPermissionRequest {
-  console.log('Attempting to validate permission');
-
+): NativeTokenStreamPermissionRequest {
   const {
     data: validationResult,
     error: validationError,
@@ -81,13 +77,13 @@ export function parseAndValidatePermission(
 
   return {
     ...permissionRequest,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
+    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed,
     permission: {
       ...validationResult,
       data: {
         ...validationResult.data,
-        initialAmount: validationResult.data.initialAmount ?? '0x',
-        maxAmount: validationResult.data.maxAmount ?? toHex(maxUint256),
+        initialAmount: validationResult.data.initialAmount,
+        maxAmount: validationResult.data.maxAmount,
       },
     },
   };

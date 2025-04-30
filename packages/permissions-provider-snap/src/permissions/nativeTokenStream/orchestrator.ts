@@ -7,11 +7,12 @@ import {
   contextToPermissionRequest,
   permissionRequestToContext,
   createContextMetadata,
+  hydratePermissionRequest,
 } from './context';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamPermissionRequest,
-  ValidatedNativeTokenStreamPermissionRequest,
+  HydratedNativeTokenStreamPermissionRequest,
   NativeTokenStreamMetadata,
   TimePeriod,
 } from './types';
@@ -34,7 +35,7 @@ import { PermissionResponse } from '@metamask/7715-permissions-shared/types';
  * Coordinates the permission-specific validation, UI, and caveat logic.
  */
 export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
-  ValidatedNativeTokenStreamPermissionRequest,
+  NativeTokenStreamPermissionRequest,
   PermissionResponse,
   NativeTokenStreamContext,
   NativeTokenStreamMetadata
@@ -98,17 +99,21 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     });
   }
 
-  protected async resolvePermissionRequest(
-    context: NativeTokenStreamContext,
-  ): Promise<ValidatedNativeTokenStreamPermissionRequest> {
-    return contextToPermissionRequest({
-      permissionRequest: this.permissionRequest,
-      context,
-    });
+  protected async resolvePermissionRequest(args: {
+    context: NativeTokenStreamContext;
+    originalRequest: NativeTokenStreamPermissionRequest;
+  }): Promise<NativeTokenStreamPermissionRequest> {
+    return await contextToPermissionRequest(args);
+  }
+
+  protected async hydratePermissionRequest(args: {
+    permissionRequest: NativeTokenStreamPermissionRequest;
+  }): Promise<HydratedNativeTokenStreamPermissionRequest> {
+    return await hydratePermissionRequest(args);
   }
 
   protected async appendCaveats(
-    permissionRequest: ValidatedNativeTokenStreamPermissionRequest,
+    permissionRequest: HydratedNativeTokenStreamPermissionRequest,
     caveatBuilder: CaveatBuilder,
   ): Promise<CaveatBuilder> {
     return appendCaveats({

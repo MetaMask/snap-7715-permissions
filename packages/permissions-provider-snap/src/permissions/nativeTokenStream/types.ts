@@ -4,7 +4,10 @@ import {
   zPermission,
   zMetaMaskPermissionData,
 } from '@metamask/7715-permissions-shared/types';
-import { TypedPermissionRequest } from '../../core/types';
+import {
+  HydratedPermissionRequest,
+  TypedPermissionRequest,
+} from '../../core/types';
 import { AccountDetailsProps } from '../../ui/components/AccountDetails';
 import { BaseContext } from '../../core/types';
 
@@ -31,8 +34,8 @@ export enum TimePeriod {
 export type NativeTokenStreamContext = BaseContext & {
   accountDetails: AccountDetailsProps;
   permissionDetails: {
-    initialAmount: string;
-    maxAmount: string;
+    initialAmount: string | undefined;
+    maxAmount: string | undefined;
     timePeriod: TimePeriod;
     startTime: string;
     amountPerPeriod: string;
@@ -56,21 +59,8 @@ export type NativeTokenStreamPermission = z.infer<
   typeof zNativeTokenStreamPermission
 >;
 
-type NativeTokenStreamData = NativeTokenStreamPermission['data'];
-
-type ValidatedNativeTokenStreamData = {
-  [K in keyof NativeTokenStreamData]-?: NonNullable<NativeTokenStreamData[K]>;
-};
-
-export type ValidatedNativeTokenStreamPermission =
-  NativeTokenStreamPermission & {
-    data: ValidatedNativeTokenStreamData;
-  };
-
 export type NativeTokenStreamPermissionRequest =
   TypedPermissionRequest<NativeTokenStreamPermission>;
 
-export type ValidatedNativeTokenStreamPermissionRequest =
-  TypedPermissionRequest<ValidatedNativeTokenStreamPermission> & {
-    isAdjustmentAllowed: boolean;
-  };
+export type HydratedNativeTokenStreamPermissionRequest =
+  HydratedPermissionRequest<NativeTokenStreamPermissionRequest>;

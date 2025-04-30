@@ -53,7 +53,7 @@ export class OrchestratorFactory {
           tokenPricesService: this.#tokenPricesService,
           confirmationDialogFactory: this.#confirmationDialogFactory,
           userEventDispatcher: this.#userEventDispatcher,
-        }) as any as BaseOrchestrator; // todo: fix this
+        }) as any as BaseOrchestrator; // todo: NativeTokenstreamOrchestrator should fulfil the requirement of BaseOrchestrator type
       default:
         throw new Error(`Unsupported permission type: ${type}`);
     }
