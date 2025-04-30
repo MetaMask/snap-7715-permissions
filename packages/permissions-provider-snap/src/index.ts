@@ -11,14 +11,14 @@ import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
 import { PriceApiClient } from './clients/priceApiClient';
+import { ConfirmationDialogFactory } from './core/confirmation/factory';
+import { OrchestratorFactory } from './core/orchestratorFactory';
 import { HomePage } from './homepage';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
 import { UserEventDispatcher } from './userEventDispatcher';
-import { OrchestratorFactory } from './core/orchestratorFactory';
-import { ConfirmationDialogFactory } from './core/confirmation/factory';
 
 // set up dependencies
 const accountController = new AccountController({

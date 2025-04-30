@@ -1,26 +1,33 @@
+import type { AccountController } from 'src/accountController';
 import { formatEther, maxUint256, parseEther, toHex } from 'viem';
-import { AccountController } from 'src/accountController';
-import { TokenPricesService } from '../../services/tokenPricesService';
-import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamPermissionRequest,
-  NativeTokenStreamMetadata,
-  HydratedNativeTokenStreamPermissionRequest,
-} from './types';
+
+import { TimePeriod } from '../../core/types';
+import type { TokenPricesService } from '../../services/tokenPricesService';
+import { formatEtherFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
   getStartOfTodayUTC,
+  TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
-import { formatEtherFromString } from '../../utils/balance';
-import { TimePeriod } from './types';
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamPermissionRequest,
+  NativeTokenStreamMetadata,
+  HydratedNativeTokenStreamPermission,
+  NativeTokenStreamPermission,
+} from './types';
 
 const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
 const DEFAULT_INITIAL_AMOUNT = '0x0';
 
 /**
- * Construct an amended HydratedNativeTokenStreamPermissionRequest, based on the specified request,
+ * Construct an amended NativeTokenStreamPermissionRequest, based on the specified request,
  * with the changes made by the specified context.
+ * @param options0 - The options object containing the context and original request.
+ * @param options0.context - The native token stream context containing the updated permission details.
+ * @param options0.originalRequest - The original permission request to be amended.
+ * @returns A new permission request with the context changes applied.
  */
 export function contextToPermissionRequest({
   context,
@@ -53,45 +60,42 @@ export function contextToPermissionRequest({
     permission: {
       type: 'native-token-stream',
       data: permissionData,
-      rules: originalRequest.permission.rules || {},
-    },
-  };
-}
-
-export function hydratePermissionRequest({
-  permissionRequest,
-}: {
-  permissionRequest: NativeTokenStreamPermissionRequest;
-}): HydratedNativeTokenStreamPermissionRequest {
-  return {
-    ...permissionRequest,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    permission: {
-      ...permissionRequest.permission,
-      data: {
-        ...permissionRequest.permission.data,
-        initialAmount:
-          permissionRequest.permission.data.initialAmount ??
-          DEFAULT_INITIAL_AMOUNT,
-        maxAmount:
-          permissionRequest.permission.data.maxAmount ?? DEFAULT_MAX_AMOUNT,
-      },
-      rules: permissionRequest.permission.rules ?? {},
+      rules: originalRequest.permission.rules ?? {},
     },
   };
 }
 
 /**
- * A mapping of time periods to their equivalent seconds.
+ * Hydrates a native token stream permission by filling in default values for optional fields.
+ * @param options0 - The options object containing the permission to hydrate.
+ * @param options0.permission - The native token stream permission to hydrate with default values.
+ * @returns A hydrated native token stream permission with all required fields populated.
  */
-export const TIME_PERIOD_TO_SECONDS: Record<TimePeriod, bigint> = {
-  [TimePeriod.DAILY]: 60n * 60n * 24n, // 86,400(seconds)
-  [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800(seconds)
-  // Monthly is difficult because months are not consistent in length.
-  // We approximate by calculating the number of seconds in 1/12th of a year.
-  [TimePeriod.MONTHLY]: (60n * 60n * 24n * 365n) / 12n, // 2,629,760(seconds)
-};
+export function hydratePermission({
+  permission,
+}: {
+  permission: NativeTokenStreamPermission;
+}): HydratedNativeTokenStreamPermission {
+  return {
+    ...permission,
+    data: {
+      ...permission.data,
+      initialAmount: permission.data.initialAmount ?? DEFAULT_INITIAL_AMOUNT,
+      maxAmount: permission.data.maxAmount ?? DEFAULT_MAX_AMOUNT,
+    },
+    rules: permission.rules ?? {},
+  };
+}
 
+/**
+ * Converts a permission request into a context object that can be used to render the UI
+ * and manage the permission state.
+ * @param options0 - The options object containing the request and required services.
+ * @param options0.permissionRequest - The native token stream permission request to convert.
+ * @param options0.tokenPricesService - Service for fetching token price information.
+ * @param options0.accountController - Controller for managing account operations.
+ * @returns A context object containing the formatted permission details and account information.
+ */
 export async function permissionRequestToContext({
   permissionRequest,
   tokenPricesService,
@@ -168,6 +172,12 @@ export async function permissionRequestToContext({
   };
 }
 
+/**
+ * Creates metadata for the native token stream context, including validation of amounts and timestamps.
+ * @param options0 - The options object containing the context to create metadata for.
+ * @param options0.context - The native token stream context to validate and create metadata from.
+ * @returns Metadata object containing derived values and validation errors.
+ */
 export async function createContextMetadata({
   context,
 }: {
@@ -204,7 +214,7 @@ export async function createContextMetadata({
   }
 
   let amountPerSecondBigInt: bigint;
-  let amountPerSecond: string = 'Unknown';
+  let amountPerSecond = 'Unknown';
   try {
     amountPerSecondBigInt = parseEther(permissionDetails.amountPerPeriod);
     if (amountPerSecondBigInt <= 0n) {

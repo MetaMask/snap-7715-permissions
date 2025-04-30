@@ -3,11 +3,8 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
 import type { Hex } from 'viem';
 
-import {
-  type PriceApiClient,
-  VsCurrencyParam,
-} from '../clients/priceApiClient';
-
+import type { VsCurrencyParam } from '../clients/priceApiClient';
+import { type PriceApiClient } from '../clients/priceApiClient';
 import {
   FALLBACK_PREFERENCE,
   formatAsCurrency,

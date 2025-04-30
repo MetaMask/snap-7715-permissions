@@ -1,7 +1,10 @@
-import {
+import type {
   PermissionRequest,
   Permission,
 } from '@metamask/7715-permissions-shared/types';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
+import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import type { UserEventDispatcher } from 'src/userEventDispatcher';
 
 export type TypedPermissionRequest<TPermission extends Permission> =
   PermissionRequest & {
@@ -33,18 +36,44 @@ export type BasePermission = {
 /**
  * Makes all properties in an object type required recursively.
  * This includes nested objects and arrays.
+ * Also removes undefined from union types.
  */
 export type DeepRequired<TParent> = TParent extends (infer U)[]
   ? DeepRequired<U>[]
   : TParent extends object
     ? {
-        [P in keyof TParent]-?: DeepRequired<TParent[P]>;
+        [P in keyof TParent]-?: DeepRequired<Exclude<TParent[P], undefined>>;
       }
-    : TParent;
+    : Exclude<TParent, undefined>;
 
 export type HydratedPermissionRequest<
   TPermissionRequest extends PermissionRequest,
 > = TPermissionRequest & {
   isAdjustmentAllowed: boolean;
   permission: DeepRequired<TPermissionRequest['permission']>;
+};
+
+/**
+ * An enum representing the time periods for which the stream rate can be calculated.
+ */
+export enum TimePeriod {
+  DAILY = 'Daily',
+  WEEKLY = 'Weekly',
+  MONTHLY = 'Monthly',
+}
+
+export type AdditionalField = {
+  label: string;
+  value: string;
+};
+
+export type ConfirmationProps = {
+  title: string;
+  justification: string;
+  origin: string;
+  network: string;
+  ui: GenericSnapElement;
+  snaps: SnapsProvider;
+  userEventDispatcher: UserEventDispatcher;
+  additionalFields?: AdditionalField[];
 };

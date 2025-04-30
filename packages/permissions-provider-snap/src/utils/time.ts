@@ -1,3 +1,5 @@
+import { TimePeriod } from '../core/types';
+
 /**
  * Converts a unix timestamp(in seconds) to a human-readable date format (MM/DD/YYYY).
  *
@@ -86,4 +88,15 @@ export const getStartOfNextDayUTC = (): number => {
     0,
   );
   return Math.floor(startOfTomorrowUTC / 1000);
+};
+
+/**
+ * A mapping of time periods to their equivalent seconds.
+ */
+export const TIME_PERIOD_TO_SECONDS: Record<TimePeriod, bigint> = {
+  [TimePeriod.DAILY]: 60n * 60n * 24n, // 86,400(seconds)
+  [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800(seconds)
+  // Monthly is difficult because months are not consistent in length.
+  // We approximate by calculating the number of seconds in 1/12th of a year.
+  [TimePeriod.MONTHLY]: (60n * 60n * 24n * 365n) / 12n, // 2,629,760(seconds)
 };

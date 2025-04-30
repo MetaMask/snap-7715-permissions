@@ -1,13 +1,17 @@
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
-import {
+
+import type {
   NativeTokenStreamPermission,
   NativeTokenStreamPermissionRequest,
-  zNativeTokenStreamPermission,
 } from './types';
+import { zNativeTokenStreamPermission } from './types';
 
 /**
  * Validates a permission object data specific to the permission type.
+ * @param permission - The native token stream permission object to validate.
+ * @returns True if the permission data is valid, throws an error otherwise.
+ * @throws {InvalidParamsError} If any validation check fails.
  */
 function validatePermissionData(permission: NativeTokenStreamPermission): true {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
@@ -58,7 +62,10 @@ function validatePermissionData(permission: NativeTokenStreamPermission): true {
 }
 
 /**
- * Parses and validates a permission request.
+ * Parses and validates a permission request for native token streaming.
+ * @param permissionRequest - The permission request object to validate.
+ * @returns A validated permission request object.
+ * @throws {InvalidParamsError} If the permission request is invalid.
  */
 export function parseAndValidatePermission(
   permissionRequest: NativeTokenStreamPermissionRequest,

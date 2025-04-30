@@ -1,22 +1,13 @@
-import type { TokenPricesService } from '../../services/tokenPricesService';
-import { BaseOrchestrator, StateChangeHandler } from '../../core/orchestrator';
+import type { CaveatBuilder } from '@metamask/delegation-toolkit';
+
 import type { AccountController } from '../../accountController';
-import { parseAndValidatePermission } from './validation';
-import { appendCaveats } from './caveats';
-import {
-  contextToPermissionRequest,
-  permissionRequestToContext,
-  createContextMetadata,
-  hydratePermissionRequest,
-} from './context';
-import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamPermissionRequest,
-  HydratedNativeTokenStreamPermissionRequest,
-  NativeTokenStreamMetadata,
-  TimePeriod,
-} from './types';
+import type { ConfirmationDialogFactory } from '../../core/confirmation/factory';
+import type { StateChangeHandler } from '../../core/orchestrator';
+import { BaseOrchestrator } from '../../core/orchestrator';
+import type { AdditionalField, TimePeriod } from '../../core/types';
+import type { TokenPricesService } from '../../services/tokenPricesService';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
+import { appendCaveats } from './caveats';
 import {
   AMOUNT_PER_PERIOD_ELEMENT,
   createConfirmationContent,
@@ -26,9 +17,20 @@ import {
   START_TIME_ELEMENT,
   TIME_PERIOD_ELEMENT,
 } from './content';
-import type { ConfirmationDialogFactory } from '../../core/confirmation/factory';
-import { CaveatBuilder } from '@metamask/delegation-toolkit';
-import { PermissionResponse } from '@metamask/7715-permissions-shared/types';
+import {
+  contextToPermissionRequest,
+  permissionRequestToContext,
+  createContextMetadata,
+  hydratePermission,
+} from './context';
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamPermissionRequest,
+  HydratedNativeTokenStreamPermission,
+  NativeTokenStreamMetadata,
+  NativeTokenStreamPermission,
+} from './types';
+import { parseAndValidatePermission } from './validation';
 
 /**
  * Orchestrator for native token stream permissions.
@@ -36,7 +38,6 @@ import { PermissionResponse } from '@metamask/7715-permissions-shared/types';
  */
 export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   NativeTokenStreamPermissionRequest,
-  PermissionResponse,
   NativeTokenStreamContext,
   NativeTokenStreamMetadata
 > {
@@ -72,11 +73,11 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     return 'Native token stream';
   }
 
-  get token(): string {
-    return 'ETH';
+  get additionalFields(): AdditionalField[] {
+    return [{ label: 'Token', value: 'ETH' }];
   }
 
-  async createUi(args: {
+  async createUiContent(args: {
     context: NativeTokenStreamContext;
     metadata: NativeTokenStreamMetadata;
   }) {
@@ -91,9 +92,13 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     });
   }
 
-  async buildPermissionContext(): Promise<NativeTokenStreamContext> {
+  async buildPermissionContext({
+    permissionRequest,
+  }: {
+    permissionRequest: NativeTokenStreamPermissionRequest;
+  }): Promise<NativeTokenStreamContext> {
     return permissionRequestToContext({
-      permissionRequest: this.permissionRequest,
+      permissionRequest,
       tokenPricesService: this.#tokenPricesService,
       accountController: this.accountController,
     });
@@ -103,21 +108,21 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     context: NativeTokenStreamContext;
     originalRequest: NativeTokenStreamPermissionRequest;
   }): Promise<NativeTokenStreamPermissionRequest> {
-    return await contextToPermissionRequest(args);
+    return contextToPermissionRequest(args);
   }
 
-  protected async hydratePermissionRequest(args: {
-    permissionRequest: NativeTokenStreamPermissionRequest;
-  }): Promise<HydratedNativeTokenStreamPermissionRequest> {
-    return await hydratePermissionRequest(args);
+  protected async hydratePermission(args: {
+    permission: NativeTokenStreamPermission;
+  }): Promise<HydratedNativeTokenStreamPermission> {
+    return hydratePermission(args);
   }
 
   protected async appendCaveats(
-    permissionRequest: HydratedNativeTokenStreamPermissionRequest,
+    permission: HydratedNativeTokenStreamPermission,
     caveatBuilder: CaveatBuilder,
   ): Promise<CaveatBuilder> {
     return appendCaveats({
-      permissionRequest,
+      permission,
       caveatBuilder,
     });
   }

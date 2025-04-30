@@ -1,13 +1,10 @@
 import { Box, Section } from '@metamask/snaps-sdk/jsx';
 import { AccountDetails } from '../../ui/components/AccountDetails';
-import {
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata,
-  TimePeriod,
-} from './types';
+import { NativeTokenStreamContext, NativeTokenStreamMetadata } from './types';
 import { InputField } from '../../ui/components/InputField';
 import { DropdownField } from '../../ui/components/DropdownField';
 import { TextField } from '../../ui/components/TextField';
+import { TimePeriod } from '../../core/types';
 
 export const INITIAL_AMOUNT_ELEMENT = 'initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'max-amount';

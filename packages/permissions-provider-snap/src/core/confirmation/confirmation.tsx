@@ -17,17 +17,8 @@ import {
   UserEventDispatcher,
   UserEventHandler,
 } from '../../userEventDispatcher';
-
-type ConfirmationProps = {
-  title: string;
-  justification: string;
-  ui: GenericSnapElement;
-  snaps: SnapsProvider;
-  userEventDispatcher: UserEventDispatcher;
-  origin: string;
-  network: string;
-  token: string;
-};
+import { AdditionalField } from '../types';
+import { ConfirmationProps } from '../types';
 
 export class ConfirmationDialog {
   readonly #snaps: SnapsProvider;
@@ -36,7 +27,7 @@ export class ConfirmationDialog {
   readonly #justification: string;
   readonly #origin: string;
   readonly #network: string;
-  readonly #token: string;
+  readonly #additionalFields: AdditionalField[];
 
   #isJustificationCollapsed: boolean = true;
   #ui: GenericSnapElement;
@@ -47,19 +38,19 @@ export class ConfirmationDialog {
     justification,
     origin,
     network,
-    token,
     ui,
     snaps,
     userEventDispatcher,
+    additionalFields = [],
   }: ConfirmationProps) {
     this.#title = title;
     this.#origin = origin;
     this.#network = network;
-    this.#token = token;
     this.#justification = justification;
     this.#ui = ui;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#additionalFields = additionalFields;
   }
 
   async createInterface(): Promise<string> {
@@ -188,7 +179,14 @@ export class ConfirmationDialog {
   }
 
   private buildConfirmation(): JSX.Element {
-    // todo: make request details iterable, so that the caller can specify what is displayed
+    const additionalFields = this.#additionalFields.map(({ label, value }) => {
+      return (
+        <Box direction="horizontal" alignment="space-between">
+          <Text>{label}</Text>
+          <Text>{value}</Text>
+        </Box>
+      );
+    });
     return (
       <Container>
         <Box>
@@ -202,10 +200,7 @@ export class ConfirmationDialog {
               <Text>Network</Text>
               <Text>{this.#network}</Text>
             </Box>
-            <Box direction="horizontal" alignment="space-between">
-              <Text>Token</Text>
-              <Text>{this.#token}</Text>
-            </Box>
+            {additionalFields}
             <Box direction="horizontal" alignment="space-between">
               <Text>Reason</Text>
               <ShowMoreText
