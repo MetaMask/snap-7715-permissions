@@ -101,7 +101,7 @@ export abstract class BaseOrchestrator<
   /**
    * Additional fields to display in the confirmation dialog.
    */
-  protected abstract get additionalFields(): AdditionalField[];
+  protected abstract get additionalDetailsFields(): AdditionalField[];
 
   /**
    * Build the permission context from the permission request..
@@ -172,7 +172,7 @@ export abstract class BaseOrchestrator<
         justification: this.#permissionRequest.permission.data.justification,
         origin,
         network: chainName,
-        additionalFields: this.additionalFields,
+        additionalFields: this.additionalDetailsFields,
         ui: await this.createUiContent({
           context: this.#currentContext,
           metadata: await this.createContextMetadata(this.#currentContext),

@@ -7,6 +7,7 @@ import { BaseOrchestrator } from '../../core/orchestrator';
 import type { AdditionalField, TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
+import { IconUrls } from '../../ui/iconConstant';
 import { appendCaveats } from './caveats';
 import {
   AMOUNT_PER_PERIOD_ELEMENT,
@@ -73,8 +74,14 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     return 'Native token stream';
   }
 
-  get additionalFields(): AdditionalField[] {
-    return [{ label: 'Token', value: 'ETH' }];
+  get additionalDetailsFields(): AdditionalField[] {
+    return [
+      {
+        label: 'Token',
+        value: 'ETH',
+        iconUrl: IconUrls.ethereum.token,
+      },
+    ];
   }
 
   async createUiContent(args: {

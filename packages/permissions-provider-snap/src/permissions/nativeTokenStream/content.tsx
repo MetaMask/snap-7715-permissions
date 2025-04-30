@@ -54,7 +54,7 @@ export const createConfirmationContent = ({
           name={INITIAL_AMOUNT_ELEMENT}
           tooltip="The initial amount of tokens to stream."
           type="number"
-          value={permissionDetails.initialAmount}
+          value={permissionDetails.initialAmount ?? ''} // todo: this should not be shown if undefined
           disabled={areValuesFixed}
           errorMessage={validationErrors.initialAmountError}
         />
@@ -63,7 +63,7 @@ export const createConfirmationContent = ({
           name={MAX_AMOUNT_ELEMENT}
           tooltip="The maximum amount of tokens that can be streamed."
           type="number"
-          value={permissionDetails.maxAmount}
+          value={permissionDetails.maxAmount ?? ''} // todo: this should not be shown if undefined
           disabled={areValuesFixed}
           errorMessage={validationErrors.maxAmountError}
         />

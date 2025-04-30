@@ -65,6 +65,8 @@ export enum TimePeriod {
 export type AdditionalField = {
   label: string;
   value: string;
+  tooltip?: string;
+  iconUrl?: string;
 };
 
 export type ConfirmationProps = {

@@ -11,6 +11,9 @@ import {
   GenericSnapElement,
   Section,
   Text,
+  Image,
+  Tooltip,
+  Icon,
 } from '@metamask/snaps-sdk/jsx';
 import { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
 import {
@@ -179,35 +182,73 @@ export class ConfirmationDialog {
   }
 
   private buildConfirmation(): JSX.Element {
-    const additionalFields = this.#additionalFields.map(({ label, value }) => {
-      return (
-        <Box direction="horizontal" alignment="space-between">
-          <Text>{label}</Text>
-          <Text>{value}</Text>
-        </Box>
-      );
-    });
+    const fields: AdditionalField[] = [
+      {
+        label: 'Recipient',
+        value: this.#origin,
+        tooltip: 'The site requesting the permission',
+      },
+      {
+        label: 'Network',
+        value: this.#network,
+        tooltip: 'The network on which the permission is being requested',
+      },
+      ...this.#additionalFields,
+    ];
+
+    const requestDetailsFields = fields.map(
+      ({ label, value, iconUrl, tooltip }) => {
+        const iconElement = iconUrl ? (
+          <Image src={iconUrl} alt={value} />
+        ) : null;
+
+        const tooltipElement = tooltip ? (
+          <Tooltip content={<Text>{tooltip}</Text>}>
+            <Icon name="question" size="inherit" color="muted" />
+          </Tooltip>
+        ) : null;
+
+        return (
+          <Box direction="horizontal" alignment="space-between">
+            <Box direction="horizontal">
+              <Text>{label}</Text>
+              {tooltipElement}
+            </Box>
+            <Box direction="horizontal">
+              {iconElement}
+              <Text>{value}</Text>
+            </Box>
+          </Box>
+        );
+      },
+    );
     return (
       <Container>
         <Box>
           <RequestHeader title={this.#title} />
           <Section>
+            {requestDetailsFields}
             <Box direction="horizontal" alignment="space-between">
-              <Text>Recipient</Text>
-              <Text>{this.#origin}</Text>
-            </Box>
-            <Box direction="horizontal" alignment="space-between">
-              <Text>Network</Text>
-              <Text>{this.#network}</Text>
-            </Box>
-            {additionalFields}
-            <Box direction="horizontal" alignment="space-between">
-              <Text>Reason</Text>
-              <ShowMoreText
-                text={this.#justification}
-                buttonName="show-more-button"
-                isCollapsed={this.#isJustificationCollapsed}
-              />
+              <Box direction="horizontal">
+                <Text>Reason</Text>
+                <Tooltip
+                  content={
+                    <Text>
+                      Reason given by the recipient for requesting this token
+                      stream allowance.
+                    </Text>
+                  }
+                >
+                  <Icon name="question" size="inherit" color="muted" />
+                </Tooltip>
+              </Box>
+              <Box direction="horizontal">
+                <ShowMoreText
+                  text={this.#justification}
+                  buttonName="show-more-button"
+                  isCollapsed={this.#isJustificationCollapsed}
+                />
+              </Box>
             </Box>
           </Section>
           {this.#ui}
