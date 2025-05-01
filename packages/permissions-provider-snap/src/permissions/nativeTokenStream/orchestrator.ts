@@ -2,7 +2,7 @@ import type { CaveatBuilder } from '@metamask/delegation-toolkit';
 
 import type { AccountController } from '../../accountController';
 import type { ConfirmationDialogFactory } from '../../core/confirmation/factory';
-import type { StateChangeHandler } from '../../core/orchestrator';
+import type { StateChangeHandler } from '../../core/types';
 import { BaseOrchestrator } from '../../core/orchestrator';
 import type { AdditionalField, TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
@@ -33,6 +33,26 @@ import type {
 } from './types';
 import { parseAndValidatePermission } from './validation';
 
+export type NativeTokenStreamDependencies = {
+  parseAndValidatePermission: typeof parseAndValidatePermission;
+  createConfirmationContent: typeof createConfirmationContent;
+  contextToPermissionRequest: typeof contextToPermissionRequest;
+  permissionRequestToContext: typeof permissionRequestToContext;
+  createContextMetadata: typeof createContextMetadata;
+  hydratePermission: typeof hydratePermission;
+  appendCaveats: typeof appendCaveats;
+};
+
+const defaultDependencies: NativeTokenStreamDependencies = {
+  parseAndValidatePermission,
+  createConfirmationContent,
+  contextToPermissionRequest,
+  permissionRequestToContext,
+  createContextMetadata,
+  hydratePermission,
+  appendCaveats,
+};
+
 /**
  * Orchestrator for native token stream permissions.
  * Coordinates the permission-specific validation, UI, and caveat logic.
@@ -43,22 +63,26 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   NativeTokenStreamMetadata
 > {
   readonly #tokenPricesService: TokenPricesService;
+  readonly #dependencies: NativeTokenStreamDependencies;
 
-  constructor({
-    permissionRequest,
-    accountController,
-    tokenPricesService,
-    confirmationDialogFactory,
-    userEventDispatcher,
-  }: {
-    permissionRequest: NativeTokenStreamPermissionRequest;
-    accountController: AccountController;
-    tokenPricesService: TokenPricesService;
-    confirmationDialogFactory: ConfirmationDialogFactory;
-    userEventDispatcher: UserEventDispatcher;
-  }) {
+  constructor(
+    {
+      permissionRequest,
+      accountController,
+      tokenPricesService,
+      confirmationDialogFactory,
+      userEventDispatcher,
+    }: {
+      permissionRequest: NativeTokenStreamPermissionRequest;
+      accountController: AccountController;
+      tokenPricesService: TokenPricesService;
+      confirmationDialogFactory: ConfirmationDialogFactory;
+      userEventDispatcher: UserEventDispatcher;
+    },
+    dependencies: NativeTokenStreamDependencies = defaultDependencies,
+  ) {
     const validatedPermissionRequest =
-      parseAndValidatePermission(permissionRequest);
+      dependencies.parseAndValidatePermission(permissionRequest);
 
     super({
       accountController,
@@ -68,6 +92,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     });
 
     this.#tokenPricesService = tokenPricesService;
+    this.#dependencies = dependencies;
   }
 
   get title(): string {
@@ -88,13 +113,13 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     context: NativeTokenStreamContext;
     metadata: NativeTokenStreamMetadata;
   }) {
-    return createConfirmationContent(args);
+    return this.#dependencies.createConfirmationContent(args);
   }
 
   async createContextMetadata(
     context: NativeTokenStreamContext,
   ): Promise<NativeTokenStreamMetadata> {
-    return createContextMetadata({
+    return this.#dependencies.createContextMetadata({
       context,
     });
   }
@@ -104,7 +129,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   }: {
     permissionRequest: NativeTokenStreamPermissionRequest;
   }): Promise<NativeTokenStreamContext> {
-    return permissionRequestToContext({
+    return this.#dependencies.permissionRequestToContext({
       permissionRequest,
       tokenPricesService: this.#tokenPricesService,
       accountController: this.accountController,
@@ -115,20 +140,20 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     context: NativeTokenStreamContext;
     originalRequest: NativeTokenStreamPermissionRequest;
   }): Promise<NativeTokenStreamPermissionRequest> {
-    return contextToPermissionRequest(args);
+    return this.#dependencies.contextToPermissionRequest(args);
   }
 
   protected async hydratePermission(args: {
     permission: NativeTokenStreamPermission;
   }): Promise<HydratedNativeTokenStreamPermission> {
-    return hydratePermission(args);
+    return this.#dependencies.hydratePermission(args);
   }
 
   protected async appendCaveats(
     permission: HydratedNativeTokenStreamPermission,
     caveatBuilder: CaveatBuilder,
   ): Promise<CaveatBuilder> {
-    return appendCaveats({
+    return this.#dependencies.appendCaveats({
       permission,
       caveatBuilder,
     });
@@ -138,54 +163,72 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     return [
       {
         elementName: INITIAL_AMOUNT_ELEMENT,
-        contextMapper: (context, value) => ({
+        contextMapper: (
+          context: NativeTokenStreamContext,
+          value: string | boolean,
+        ) => ({
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            initialAmount: value as string,
+            initialAmount: String(value),
           },
         }),
       },
       {
         elementName: MAX_AMOUNT_ELEMENT,
-        contextMapper: (context, value) => ({
+        contextMapper: (
+          context: NativeTokenStreamContext,
+          value: string | boolean,
+        ) => ({
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            maxAmount: value as string,
+            maxAmount: String(value),
           },
         }),
       },
       {
         elementName: START_TIME_ELEMENT,
-        contextMapper: (context, value) => ({
+        contextMapper: (
+          context: NativeTokenStreamContext,
+          value: string | boolean,
+        ) => ({
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            startTime: value as string,
+            startTime: String(value),
           },
         }),
       },
       {
         elementName: EXPIRY_ELEMENT,
-        contextMapper: (context, value) => ({
+        contextMapper: (
+          context: NativeTokenStreamContext,
+          value: string | boolean,
+        ) => ({
           ...context,
-          expiry: value as string,
+          expiry: String(value),
         }),
       },
       {
         elementName: AMOUNT_PER_PERIOD_ELEMENT,
-        contextMapper: (context, value) => ({
+        contextMapper: (
+          context: NativeTokenStreamContext,
+          value: string | boolean,
+        ) => ({
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            amountPerPeriod: value as string,
+            amountPerPeriod: String(value),
           },
         }),
       },
       {
         elementName: TIME_PERIOD_ELEMENT,
-        contextMapper: (context, value) => ({
+        contextMapper: (
+          context: NativeTokenStreamContext,
+          value: string | boolean,
+        ) => ({
           ...context,
           permissionDetails: {
             ...context.permissionDetails,

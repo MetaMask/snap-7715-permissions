@@ -10,7 +10,7 @@ export const INITIAL_AMOUNT_ELEMENT = 'initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'max-amount';
 export const START_TIME_ELEMENT = 'start-time';
 export const EXPIRY_ELEMENT = 'expiry';
-export const AMOUNT_PER_PERIOD_ELEMENT = 'amount-per-second';
+export const AMOUNT_PER_PERIOD_ELEMENT = 'amount-per-period';
 export const TIME_PERIOD_ELEMENT = 'time-period';
 
 export const createConfirmationContent = ({

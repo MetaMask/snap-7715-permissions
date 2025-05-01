@@ -180,7 +180,7 @@ exports[`nativeTokenStream:content createConfirmationContent() should handle dif
                     "key": null,
                     "props": {
                       "disabled": false,
-                      "name": "amount-per-second",
+                      "name": "amount-per-period",
                       "type": "number",
                       "value": "302400",
                     },
@@ -1386,7 +1386,7 @@ exports[`nativeTokenStream:content createConfirmationContent() should handle mis
                     "key": null,
                     "props": {
                       "disabled": false,
-                      "name": "amount-per-second",
+                      "name": "amount-per-period",
                       "type": "number",
                       "value": "302400",
                     },
@@ -2013,7 +2013,7 @@ exports[`nativeTokenStream:content createConfirmationContent() should render con
                     "key": null,
                     "props": {
                       "disabled": false,
-                      "name": "amount-per-second",
+                      "name": "amount-per-period",
                       "type": "number",
                       "value": "302400",
                     },
@@ -2640,7 +2640,7 @@ exports[`nativeTokenStream:content createConfirmationContent() should render con
                     "key": null,
                     "props": {
                       "disabled": false,
-                      "name": "amount-per-second",
+                      "name": "amount-per-period",
                       "type": "number",
                       "value": "302400",
                     },
