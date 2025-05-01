@@ -2,7 +2,7 @@ import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import { OrchestratorFactory } from '../../src/core/orchestratorFactory';
 import type { AccountController } from '../../src/accountController';
 import type { TokenPricesService } from '../../src/services/tokenPricesService';
-import type { ConfirmationDialogFactory } from '../../src/core/confirmation/factory';
+import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 import { NativeTokenStreamOrchestrator } from '../../src/permissions/nativeTokenStream/orchestrator';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';

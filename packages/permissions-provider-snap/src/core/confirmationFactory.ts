@@ -1,29 +1,9 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { UserEventDispatcher } from '../../userEventDispatcher';
-import type { AdditionalField } from '../types';
+import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { AdditionalField } from './types';
 import { ConfirmationDialog } from './confirmation';
-/**
- * Interface for a confirmation dialog that can be presented to the user.
- */
-export type ConfirmationDialogType = {
-  /**
-   * Awaits the user's decision on the confirmation dialog.
-   * @returns A promise that resolves with the user's decision.
-   */
-  awaitUserDecision(): Promise<{
-    isConfirmationGranted: boolean;
-  }>;
-
-  /**
-   * Updates the content of the confirmation dialog.
-   * @param content - The new content to display.
-   */
-  updateContent(args: { ui: any }): void;
-
-  createInterface(): Promise<string>;
-};
 
 /**
  * Factory for creating confirmation dialogs.
@@ -70,7 +50,7 @@ export class ConfirmationDialogFactory {
     origin: string;
     network: string;
     additionalFields?: AdditionalField[];
-  }): ConfirmationDialogType {
+  }) {
     return new ConfirmationDialog({
       title,
       ui,

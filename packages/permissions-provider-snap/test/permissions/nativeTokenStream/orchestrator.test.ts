@@ -5,7 +5,7 @@ import {
 } from '../../../src/permissions/nativeTokenStream/orchestrator';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import type { AccountController } from '../../../src/accountController';
-import type { ConfirmationDialogFactory } from '../../../src/core/confirmation/factory';
+import type { ConfirmationDialogFactory } from '../../../src/core/confirmationFactory';
 import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
 import type {
   NativeTokenStreamPermissionRequest,

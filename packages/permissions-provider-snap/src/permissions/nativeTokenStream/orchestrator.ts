@@ -1,7 +1,7 @@
 import type { CaveatBuilder } from '@metamask/delegation-toolkit';
 
 import type { AccountController } from '../../accountController';
-import type { ConfirmationDialogFactory } from '../../core/confirmation/factory';
+import type { ConfirmationDialogFactory } from '../../core/confirmationFactory';
 import type { StateChangeHandler } from '../../core/types';
 import { BaseOrchestrator } from '../../core/orchestrator';
 import type { AdditionalField, TimePeriod } from '../../core/types';

@@ -2,10 +2,10 @@ import {
   ConfirmationFooter,
   GRANT_BUTTON,
   CANCEL_BUTTON,
-} from '../../ui/components/ConfirmationFooter';
-import { RequestHeader } from '../../ui/components/RequestHeader';
-import { ShowMoreText } from '../../ui/components/ShowMoreText';
-import { TooltipIcon } from '../../ui/components/TooltipIcon';
+} from '../ui/components/ConfirmationFooter';
+import { RequestHeader } from '../ui/components/RequestHeader';
+import { ShowMoreText } from '../ui/components/ShowMoreText';
+import { TooltipIcon } from '../ui/components/TooltipIcon';
 import {
   Box,
   Container,
@@ -15,12 +15,9 @@ import {
   Image,
 } from '@metamask/snaps-sdk/jsx';
 import { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
-import {
-  UserEventDispatcher,
-  UserEventHandler,
-} from '../../userEventDispatcher';
-import { AdditionalField } from '../types';
-import { ConfirmationProps } from '../types';
+import { UserEventDispatcher, UserEventHandler } from '../userEventDispatcher';
+import { AdditionalField } from './types';
+import { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
   readonly #snaps: SnapsProvider;

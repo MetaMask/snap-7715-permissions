@@ -11,7 +11,7 @@ import { lineaSepolia, sepolia } from 'viem/chains';
 
 import { AccountController } from './accountController';
 import { PriceApiClient } from './clients/priceApiClient';
-import { ConfirmationDialogFactory } from './core/confirmation/factory';
+import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { OrchestratorFactory } from './core/orchestratorFactory';
 import { HomePage } from './homepage';
 import { isMethodAllowedForOrigin } from './rpc/permissions';

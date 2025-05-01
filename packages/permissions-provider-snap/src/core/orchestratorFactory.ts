@@ -6,7 +6,7 @@ import type { AccountController } from '../accountController';
 import { NativeTokenStreamOrchestrator } from '../permissions/nativeTokenStream/orchestrator';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
-import type { ConfirmationDialogFactory } from './confirmation/factory';
+import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type { Orchestrator } from './types';
 
 /**
