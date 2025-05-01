@@ -1,8 +1,8 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { parseUnits, toHex } from 'viem';
 
-import type { PriceApiClient } from '../../src/clients';
-import { TokenPricesService } from '../../src/services';
+import type { PriceApiClient } from '../../src/clients/priceApiClient';
+import { TokenPricesService } from '../../src/services/tokenPricesService';
 
 describe('TokenPricesService', () => {
   const mockSnapsProvider = createMockSnapsProvider();

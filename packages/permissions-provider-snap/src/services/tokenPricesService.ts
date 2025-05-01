@@ -9,7 +9,7 @@ import {
   FALLBACK_PREFERENCE,
   formatAsCurrency,
   type Preferences,
-} from '../locale/locale';
+} from '../utils/locale';
 import { formatTokenBalance } from '../utils/balance';
 
 /**
