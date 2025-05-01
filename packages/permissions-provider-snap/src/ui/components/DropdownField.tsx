@@ -1,11 +1,6 @@
-import {
-  Icon,
-  Box,
-  Text,
-  Tooltip,
-  Dropdown,
-  Option,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Text, Dropdown, Option } from '@metamask/snaps-sdk/jsx';
+import { TooltipIcon } from './TooltipIcon';
+import { TextField } from './TextField';
 
 export type DropdownFieldParams = {
   label: string;
@@ -26,11 +21,11 @@ export const DropdownField = ({
   disabled,
   errorMessage,
 }: DropdownFieldParams) => {
-  const tooltipElement = tooltip ? (
-    <Tooltip content={<Text>{tooltip}</Text>}>
-      <Icon name="question" size="inherit" color="muted" />
-    </Tooltip>
-  ) : null;
+  if (disabled) {
+    return <TextField label={label} value={value} tooltip={tooltip} />;
+  }
+
+  const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
 
   const errorElement = errorMessage ? (
     <Text color="error">{errorMessage}</Text>
@@ -44,7 +39,7 @@ export const DropdownField = ({
           {tooltipElement}
         </Box>
       </Box>
-      <Dropdown name={name} value={value} disabled={disabled || false}>
+      <Dropdown name={name} value={value}>
         {options.map((option) => (
           <Option key={option} value={option}>
             {option}

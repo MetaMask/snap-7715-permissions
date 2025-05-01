@@ -1,13 +1,7 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import {
-  Text,
-  Icon,
-  Box,
-  Tooltip,
-  Section,
-  Avatar,
-} from '@metamask/snaps-sdk/jsx';
+import { Text, Box, Section, Avatar } from '@metamask/snaps-sdk/jsx';
 import { type Hex } from 'viem';
+import { TooltipIcon } from './TooltipIcon';
 
 import { formatTokenBalance } from '../../utils/balance';
 
@@ -35,9 +29,7 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
         <Box direction="horizontal" alignment="space-between">
           <Box direction="horizontal">
             <Text>{title}</Text>
-            <Tooltip content={<Text>{tooltip}</Text>}>
-              <Icon name="question" size="inherit" color="muted" />
-            </Tooltip>
+            <TooltipIcon tooltip={tooltip} />
           </Box>
 
           <Box direction="horizontal">

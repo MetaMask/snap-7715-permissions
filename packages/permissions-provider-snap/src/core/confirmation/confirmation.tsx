@@ -2,9 +2,10 @@ import {
   ConfirmationFooter,
   GRANT_BUTTON,
   CANCEL_BUTTON,
-} from '../../ui/components/confirmation-footer';
+} from '../../ui/components/ConfirmationFooter';
 import { RequestHeader } from '../../ui/components/RequestHeader';
 import { ShowMoreText } from '../../ui/components/ShowMoreText';
+import { TooltipIcon } from '../../ui/components/TooltipIcon';
 import {
   Box,
   Container,
@@ -12,8 +13,6 @@ import {
   Section,
   Text,
   Image,
-  Tooltip,
-  Icon,
 } from '@metamask/snaps-sdk/jsx';
 import { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
 import {
@@ -203,9 +202,7 @@ export class ConfirmationDialog {
         ) : null;
 
         const tooltipElement = tooltip ? (
-          <Tooltip content={<Text>{tooltip}</Text>}>
-            <Icon name="question" size="inherit" color="muted" />
-          </Tooltip>
+          <TooltipIcon tooltip={tooltip} />
         ) : null;
 
         return (
@@ -231,16 +228,7 @@ export class ConfirmationDialog {
             <Box direction="horizontal" alignment="space-between">
               <Box direction="horizontal">
                 <Text>Reason</Text>
-                <Tooltip
-                  content={
-                    <Text>
-                      Reason given by the recipient for requesting this token
-                      stream allowance.
-                    </Text>
-                  }
-                >
-                  <Icon name="question" size="inherit" color="muted" />
-                </Tooltip>
+                <TooltipIcon tooltip="Reason given by the recipient for requesting this token stream allowance." />
               </Box>
               <Box direction="horizontal">
                 <ShowMoreText

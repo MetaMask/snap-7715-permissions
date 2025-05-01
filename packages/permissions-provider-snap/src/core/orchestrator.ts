@@ -237,7 +237,6 @@ export abstract class BaseOrchestrator<
 
     const isAdjustmentAllowed =
       this.#permissionRequest.isAdjustmentAllowed ?? true;
-
     const resolvedPermissionRequest = isAdjustmentAllowed
       ? await this.resolvePermissionRequest({
           context: this.#currentContext,

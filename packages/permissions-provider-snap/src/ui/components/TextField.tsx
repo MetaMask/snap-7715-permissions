@@ -1,4 +1,5 @@
-import { Icon, Box, Text, Tooltip } from '@metamask/snaps-sdk/jsx';
+import { Box, Text } from '@metamask/snaps-sdk/jsx';
+import { TooltipIcon } from './TooltipIcon';
 
 export type TextFieldParams = {
   label: string;
@@ -7,11 +8,7 @@ export type TextFieldParams = {
 };
 
 export const TextField = ({ label, value, tooltip }: TextFieldParams) => {
-  const tooltipElement = tooltip ? (
-    <Tooltip content={<Text>{tooltip}</Text>}>
-      <Icon name="question" size="inherit" color="muted" />
-    </Tooltip>
-  ) : null;
+  const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
 
   return (
     <Box direction="vertical">

@@ -2922,30 +2922,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-toolkit@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@metamask/delegation-toolkit@npm:0.9.0"
+"@metamask/delegation-toolkit@npm:latest":
+  version: 0.10.2
+  resolution: "@metamask/delegation-toolkit@npm:0.10.2"
   dependencies:
-    "@metamask/auto-changelog": ^3.4.4
-    "@metamask/delegation-utils": ^0.9.0
+    "@metamask/delegation-utils": ^0.10.0
     webauthn-p256: ^0.0.5
   peerDependencies:
     viem: ">=2.18.2 <3.0.0"
-  checksum: 86ab3adc0b9a6ddd4b1fc12f05649bcdf01196ab8741992ece6c7b02014cae05edcd7dc5d048863c84a9f4277395f52e450510ec375af347d277103c4a13bcee
+  checksum: 08e80512faf6f26f6a2142d6f25f9850cb79690e7fd583e9d06902d4e22b3b65d27fc552a5bf5ead5de5ba8b39cd397841d3f11e151332aa0592c2dfe77fdce4
   languageName: node
   linkType: hard
 
-"@metamask/delegation-utils@npm:^0.9.0":
-  version: 0.9.0
-  resolution: "@metamask/delegation-utils@npm:0.9.0"
+"@metamask/delegation-utils@npm:^0.10.0":
+  version: 0.10.0
+  resolution: "@metamask/delegation-utils@npm:0.10.0"
   dependencies:
-    "@metamask/auto-changelog": ^3.4.4
     "@metamask/delegation-abis": ^0.9.0
     "@metamask/delegation-deployments": ^0.9.0
     buffer: ^6.0.3
   peerDependencies:
     viem: ">=2.18.2 <3.0.0"
-  checksum: 17c71100bc9665c2551741ede08a3ade35eac05cd18f720ccadf2397ac23b2fbe69194851d957f40d016c394f13682b45bd8d0b47449e73a60199957c2f56127
+  checksum: a7386bb23c3145d7f887afecac659ef0ee3377ddc9bff999ed278e0970b9ae3eb50e1e46e21cdc6cac58047ac3129b7b4099dc39e04975746d59e0f2f5102f35
   languageName: node
   linkType: hard
 
@@ -3098,7 +3096,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/auto-changelog": ^3.4.4
-    "@metamask/delegation-toolkit": 0.9.0
+    "@metamask/delegation-toolkit": latest
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
@@ -17891,7 +17889,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask/delegation-toolkit": 0.9.0
+    "@metamask/delegation-toolkit": latest
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-browser": ^12.1.0
     "@metamask/eslint-config-jest": ^12.1.0

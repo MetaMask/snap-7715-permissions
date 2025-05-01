@@ -40,6 +40,7 @@ export const createConfirmationContent = ({
           name={TIME_PERIOD_ELEMENT}
           options={Object.values(TimePeriod)}
           tooltip="The period of the stream."
+          disabled={areValuesFixed}
           value={permissionDetails.timePeriod}
         />
         <TextField

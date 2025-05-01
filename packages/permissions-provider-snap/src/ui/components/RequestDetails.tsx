@@ -1,13 +1,6 @@
 import type { JsonObject, SnapComponent } from '@metamask/snaps-sdk/jsx';
-import {
-  Text,
-  Section,
-  Box,
-  Tooltip,
-  Icon,
-  Image,
-  Button,
-} from '@metamask/snaps-sdk/jsx';
+import { Text, Section, Box, Image, Button } from '@metamask/snaps-sdk/jsx';
+import { TooltipIcon } from './TooltipIcon';
 
 type RequestDetailsProps = JsonObject & {
   itemDetails: ItemDetails[];
@@ -33,11 +26,7 @@ const renderTooltip = (tooltipText?: string) => {
     return null;
   }
 
-  return (
-    <Tooltip content={<Text>{tooltipText}</Text>}>
-      <Icon name="question" size="inherit" color="muted" />
-    </Tooltip>
-  );
+  return <TooltipIcon tooltip={tooltipText} />;
 };
 
 /**

@@ -1,5 +1,6 @@
-import { Icon, Box, Text, Tooltip, Input } from '@metamask/snaps-sdk/jsx';
+import { Box, Text, Input } from '@metamask/snaps-sdk/jsx';
 import { TextField } from './TextField';
+import { TooltipIcon } from './TooltipIcon';
 
 export type InputFieldParams = {
   label: string;
@@ -24,11 +25,7 @@ export const InputField = ({
     return <TextField label={label} value={value} tooltip={tooltip} />;
   }
 
-  const tooltipElement = tooltip ? (
-    <Tooltip content={<Text>{tooltip}</Text>}>
-      <Icon name="question" size="inherit" color="muted" />
-    </Tooltip>
-  ) : null;
+  const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
 
   const errorElement = errorMessage ? (
     <Text color="error">{errorMessage}</Text>
