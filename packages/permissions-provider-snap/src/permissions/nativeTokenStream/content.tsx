@@ -24,7 +24,11 @@ export const createConfirmationContent = ({
 
   return (
     <Box direction="vertical">
-      <AccountDetails {...accountDetails} />
+      <AccountDetails
+        account={accountDetails}
+        title="Stream from"
+        tooltip="The account that the token stream comes from."
+      />
       <Section>
         <InputField
           label="Stream Amount"

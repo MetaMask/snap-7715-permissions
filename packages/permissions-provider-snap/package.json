@@ -51,7 +51,7 @@
     "@metamask/snaps-sdk": "^6.17.1",
     "@metamask/utils": "^11.3.0",
     "viem": "^2.21.29",
-    "zod": "^3.24.3"
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

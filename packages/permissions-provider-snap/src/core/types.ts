@@ -8,7 +8,7 @@ import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import type {
   UserEventDispatcher,
   UserInputEventByType,
-} from 'src/userEventDispatcher';
+} from '../userEventDispatcher';
 
 export type TypedPermissionRequest<TPermission extends Permission> =
   PermissionRequest & {

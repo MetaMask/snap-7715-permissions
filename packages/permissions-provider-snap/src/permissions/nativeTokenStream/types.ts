@@ -4,14 +4,13 @@ import {
   zMetaMaskPermissionData,
 } from '@metamask/7715-permissions-shared/types';
 import { z } from 'zod';
-
+import { type Hex } from 'viem';
 import type {
   DeepRequired,
   TimePeriod,
   TypedPermissionRequest,
   BaseContext,
 } from '../../core/types';
-import type { AccountDetailsProps } from '../../ui/components/AccountDetails';
 
 export type NativeTokenStreamMetadata = {
   amountPerSecond: string;
@@ -25,7 +24,11 @@ export type NativeTokenStreamMetadata = {
 };
 
 export type NativeTokenStreamContext = BaseContext & {
-  accountDetails: AccountDetailsProps;
+  accountDetails: {
+    address: Hex;
+    balanceFormattedAsCurrency: string;
+    balance: string;
+  };
   permissionDetails: {
     initialAmount: string | undefined;
     maxAmount: string | undefined;

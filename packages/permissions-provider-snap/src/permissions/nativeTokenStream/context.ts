@@ -1,4 +1,4 @@
-import type { AccountController } from 'src/accountController';
+import type { AccountController } from '../../accountController';
 import { formatEther, maxUint256, parseEther, toHex } from 'viem';
 
 import { TimePeriod } from '../../core/types';
@@ -152,15 +152,9 @@ export async function permissionRequestToContext({
     expiry,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     accountDetails: {
-      account: {
-        address,
-        balance,
-        valueFormattedAsCurrency: balanceFormatted,
-      },
-      senderDetails: {
-        title: 'Stream from',
-        tooltip: 'The account that the token stream comes from.',
-      },
+      address,
+      balance,
+      balanceFormattedAsCurrency: balanceFormatted,
     },
     permissionDetails: {
       initialAmount,
@@ -189,12 +183,14 @@ export async function createContextMetadata({
 
   let maxAmountBigInt: bigint | undefined;
   let initialAmountBigInt: bigint | undefined;
-
+  let amountPerSecondBigInt: bigint | undefined;
+  let amountPerSecond = 'Unknown';
   if (permissionDetails.maxAmount) {
     try {
       maxAmountBigInt = parseEther(permissionDetails.maxAmount);
       if (maxAmountBigInt < 0n) {
         validationErrors.maxAmountError = 'Max amount must be greater than 0';
+        maxAmountBigInt = undefined;
       }
     } catch (error) {
       validationErrors.maxAmountError = 'Invalid max amount';
@@ -207,19 +203,19 @@ export async function createContextMetadata({
       if (initialAmountBigInt < 0n) {
         validationErrors.initialAmountError =
           'Initial amount must be greater than 0';
+        initialAmountBigInt = undefined;
       }
     } catch (error) {
       validationErrors.initialAmountError = 'Invalid initial amount';
     }
   }
 
-  let amountPerSecondBigInt: bigint;
-  let amountPerSecond = 'Unknown';
   try {
     amountPerSecondBigInt = parseEther(permissionDetails.amountPerPeriod);
     if (amountPerSecondBigInt <= 0n) {
       validationErrors.amountPerPeriodError =
         'Amount per period must be greater than 0';
+      amountPerSecondBigInt = undefined;
     } else {
       amountPerSecond = formatEther(
         amountPerSecondBigInt /
@@ -253,11 +249,13 @@ export async function createContextMetadata({
     validationErrors.expiryError = 'Invalid expiry';
   }
 
-  if (maxAmountBigInt !== undefined && initialAmountBigInt !== undefined) {
-    if (maxAmountBigInt < initialAmountBigInt) {
-      validationErrors.maxAmountError =
-        'Max amount must be greater than initial amount';
-    }
+  if (
+    maxAmountBigInt !== undefined &&
+    initialAmountBigInt !== undefined &&
+    maxAmountBigInt < initialAmountBigInt
+  ) {
+    validationErrors.maxAmountError =
+      'Max amount must be greater than initial amount';
   }
 
   return {
