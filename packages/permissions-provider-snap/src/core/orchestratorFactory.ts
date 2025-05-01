@@ -7,7 +7,7 @@ import { NativeTokenStreamOrchestrator } from '../permissions/nativeTokenStream/
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { ConfirmationDialogFactory } from './confirmation/factory';
-import type { BaseOrchestrator } from './orchestrator';
+import type { Orchestrator } from './orchestrator';
 
 /**
  * Factory for creating permission-specific orchestrators.
@@ -45,7 +45,7 @@ export class OrchestratorFactory {
    * @returns The permission orchestrator.
    * @throws If the permission type is not supported.
    */
-  createOrchestrator(permissionRequest: PermissionRequest): BaseOrchestrator {
+  createOrchestrator(permissionRequest: PermissionRequest): Orchestrator {
     const type = extractPermissionName(permissionRequest.permission.type);
 
     const baseDependencies = {
@@ -61,8 +61,7 @@ export class OrchestratorFactory {
         return new NativeTokenStreamOrchestrator({
           ...baseDependencies,
           tokenPricesService: this.#tokenPricesService,
-        }) as any as BaseOrchestrator;
-      // todo: resolve this type conflict without type assertion
+        });
       default:
         throw new Error(`Unsupported permission type: ${type}`);
     }

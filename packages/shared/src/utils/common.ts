@@ -74,6 +74,7 @@ const ALL_CHAINS = Object.values(chains);
  * @returns The chain name, or throws if the chain is not found.
  */
 export function getChainName(chainId: number): string {
+  // @ts-expect-error - extractChain does not work well with dynamic `chains`
   const chain = extractChain({
     chains: ALL_CHAINS,
     // we need to do this type assertion because extractChain doesn't work well with dynamic chains

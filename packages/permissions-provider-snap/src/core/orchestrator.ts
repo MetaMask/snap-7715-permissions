@@ -17,18 +17,15 @@ import type { AccountController, FactoryArgs } from '../accountController';
 import type {
   UserEventDispatcher,
   UserEventHandler,
-  UserInputEventByType,
 } from '../userEventDispatcher';
 import type { ConfirmationDialogFactory } from './confirmation/factory';
-import type { BaseContext, DeepRequired, AdditionalField } from './types';
-
-export type StateChangeHandler<TContext> = {
-  elementName: string;
-  valueMapper?: (
-    event: UserInputEventByType<UserInputEventType.InputChangeEvent>,
-  ) => string | boolean;
-  contextMapper: (context: TContext, value: string | boolean) => TContext;
-};
+import type {
+  BaseContext,
+  DeepRequired,
+  AdditionalField,
+  Orchestrator,
+  StateChangeHandler,
+} from './types';
 
 /**
  * Base class for permission orchestrators that handle the core flow of permission requests.
@@ -41,7 +38,8 @@ export abstract class BaseOrchestrator<
   THydratedPermission extends DeepRequired<
     TPermissionRequest['permission']
   > = DeepRequired<TPermissionRequest['permission']>,
-> {
+> implements Orchestrator
+{
   protected readonly accountController: AccountController;
 
   protected readonly confirmationDialogFactory: ConfirmationDialogFactory;

@@ -1,10 +1,14 @@
 import type {
   PermissionRequest,
   Permission,
+  PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
+import type { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import type { UserEventDispatcher } from 'src/userEventDispatcher';
+import type {
+  UserEventDispatcher,
+  UserInputEventByType,
+} from 'src/userEventDispatcher';
 
 export type TypedPermissionRequest<TPermission extends Permission> =
   PermissionRequest & {
@@ -78,4 +82,20 @@ export type ConfirmationProps = {
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
   additionalFields?: AdditionalField[];
+};
+
+export type StateChangeHandler<TContext> = {
+  elementName: string;
+  valueMapper?: (
+    event: UserInputEventByType<UserInputEventType.InputChangeEvent>,
+  ) => string | boolean;
+  contextMapper: (context: TContext, value: string | boolean) => TContext;
+};
+
+export type Orchestrator = {
+  orchestrate: (args: { origin: string }) => Promise<{
+    success: boolean;
+    response?: PermissionResponse;
+    reason?: string;
+  }>;
 };
