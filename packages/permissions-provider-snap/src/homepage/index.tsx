@@ -72,7 +72,7 @@ export class HomePage {
           <Text>
             This is a work in progress and we'd love to hear your feedback -
             please reach out to us on{' '}
-            <Link href="https://t.me/1883939594/983">Telegram</Link> if you have
+            <Link href="https://t.me/+I2dliwXiqqYyYjMx">Telegram</Link> if you have
             any questions or feedback.
           </Text>
           <Text fontWeight="bold">LFB!</Text>

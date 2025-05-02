@@ -8,7 +8,7 @@ export const zTypeDescriptor = z.union([
   z.string(),
   z.object({
     name: z.string(),
-    description: z.string().optional(),
+    description: z.string(),
   }),
 ]);
 export type TypeDescriptor = z.infer<typeof zTypeDescriptor>;
