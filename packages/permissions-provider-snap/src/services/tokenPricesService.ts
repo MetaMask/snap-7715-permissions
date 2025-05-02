@@ -5,12 +5,12 @@ import type { Hex } from 'viem';
 
 import type { VsCurrencyParam } from '../clients/priceApiClient';
 import { type PriceApiClient } from '../clients/priceApiClient';
+import { formatTokenBalance } from '../utils/balance';
 import {
   FALLBACK_PREFERENCE,
   formatAsCurrency,
   type Preferences,
 } from '../utils/locale';
-import { formatTokenBalance } from '../utils/balance';
 
 /**
  * Class responsible for fetching token prices and calculating the value of token balances.

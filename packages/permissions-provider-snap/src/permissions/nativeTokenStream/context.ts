@@ -1,6 +1,6 @@
-import type { AccountController } from '../../accountController';
 import { formatEther, maxUint256, parseEther, toHex } from 'viem';
 
+import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import { formatEtherFromString } from '../../utils/balance';

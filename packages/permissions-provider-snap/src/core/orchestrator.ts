@@ -197,7 +197,7 @@ export abstract class BaseOrchestrator<
             value,
           );
 
-          confirmationDialog.updateContent({
+          await confirmationDialog.updateContent({
             ui: await this.createUiContent({
               context: this.#currentContext,
               metadata: await this.createContextMetadata(this.#currentContext),
@@ -279,7 +279,7 @@ export abstract class BaseOrchestrator<
       }),
     });
 
-    const permissionsContext = await encodeDelegation([signedDelegation]);
+    const permissionsContext = encodeDelegation([signedDelegation]);
 
     const accountMetaObj =
       accountMeta.factory && accountMeta.factoryData

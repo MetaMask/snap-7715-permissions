@@ -1,13 +1,14 @@
 import { describe, expect, it } from '@jest/globals';
-import { InvalidParamsError } from '@metamask/snaps-sdk';
-import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenStream/validation';
-import type { NativeTokenStreamPermissionRequest } from '../../../src/permissions/nativeTokenStream/types';
 import { toHex, parseUnits } from 'viem/utils';
+
+import type { NativeTokenStreamPermissionRequest } from '../../../src/permissions/nativeTokenStream/types';
+import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenStream/validation';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 
 const validPermissionRequest: NativeTokenStreamPermissionRequest = {
   chainId: '0x1',
   expiry: convertReadableDateToTimestamp('05/01/2024'),
+  isAdjustmentAllowed: true,
   signer: {
     type: 'account',
     data: {
@@ -17,9 +18,9 @@ const validPermissionRequest: NativeTokenStreamPermissionRequest = {
   permission: {
     type: 'native-token-stream',
     data: {
-      initialAmount: toHex(parseUnits('1', 18)) as `0x${string}`, // 1 ETH
-      maxAmount: toHex(parseUnits('10', 18)) as `0x${string}`, // 10 ETH
-      amountPerSecond: toHex(parseUnits('.5', 18)) as `0x${string}`, // 0.5 ETH per second
+      initialAmount: toHex(parseUnits('1', 18)), // 1 ETH
+      maxAmount: toHex(parseUnits('10', 18)), // 10 ETH
+      amountPerSecond: toHex(parseUnits('.5', 18)), // 0.5 ETH per second
       startTime: convertReadableDateToTimestamp('10/26/2024'),
       justification: 'test',
     },
@@ -35,7 +36,7 @@ describe('nativeTokenStream:validation', () => {
       ).not.toThrow();
 
       const result = parseAndValidatePermission(validPermissionRequest);
-      expect(result).toEqual(validPermissionRequest);
+      expect(result).toStrictEqual(validPermissionRequest);
     });
 
     it('should throw for invalid permission type', () => {
@@ -49,7 +50,9 @@ describe('nativeTokenStream:validation', () => {
 
       expect(() =>
         parseAndValidatePermission(invalidTypeRequest as any),
-      ).toThrow(InvalidParamsError);
+      ).toThrow(
+        'Failed type validation: type: Invalid literal value, expected "native-token-stream"',
+      );
     });
 
     describe('maxAmount validation', () => {
@@ -77,8 +80,8 @@ describe('nativeTokenStream:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              maxAmount: toHex(parseUnits('0.5', 18)) as `0x${string}`, // 0.5 ETH
-              initialAmount: toHex(parseUnits('1', 18)) as `0x${string}`, // 1 ETH
+              maxAmount: toHex(parseUnits('0.5', 18)), // 0.5 ETH
+              initialAmount: toHex(parseUnits('1', 18)), // 1 ETH
             },
           },
         };

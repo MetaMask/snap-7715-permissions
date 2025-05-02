@@ -2,12 +2,15 @@ import type { CaveatBuilder } from '@metamask/delegation-toolkit';
 
 import type { AccountController } from '../../accountController';
 import type { ConfirmationDialogFactory } from '../../core/confirmationFactory';
-import type { StateChangeHandler } from '../../core/types';
 import { BaseOrchestrator } from '../../core/orchestrator';
-import type { AdditionalField, TimePeriod } from '../../core/types';
+import type {
+  StateChangeHandler,
+  AdditionalField,
+  TimePeriod,
+} from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import type { UserEventDispatcher } from '../../userEventDispatcher';
 import { IconUrls } from '../../ui/iconConstant';
+import type { UserEventDispatcher } from '../../userEventDispatcher';
 import { appendCaveats } from './caveats';
 import {
   AMOUNT_PER_PERIOD_ELEMENT,
@@ -63,6 +66,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   NativeTokenStreamMetadata
 > {
   readonly #tokenPricesService: TokenPricesService;
+
   readonly #dependencies: NativeTokenStreamDependencies;
 
   constructor(

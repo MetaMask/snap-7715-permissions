@@ -3,8 +3,9 @@ import {
   zPermission,
   zMetaMaskPermissionData,
 } from '@metamask/7715-permissions-shared/types';
-import { z } from 'zod';
 import { type Hex } from 'viem';
+import { z } from 'zod';
+
 import type {
   DeepRequired,
   TimePeriod,

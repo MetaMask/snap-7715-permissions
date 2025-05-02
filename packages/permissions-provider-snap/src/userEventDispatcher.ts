@@ -138,8 +138,8 @@ export class UserEventDispatcher {
    * Creates a user input event handler function that can only be retrieved once.
    * This ensures that only one component (the ConfirmationDialogFactory) can handle user input events.
    *
-   * @returns A function that handles user input events
-   * @throws If the handler has already been created
+   * @returns A function that handles user input events.
+   * @throws If the handler has already been created.
    */
   public createUserInputEventHandler(): (args: {
     event: UserInputEvent;

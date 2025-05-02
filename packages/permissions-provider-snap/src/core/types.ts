@@ -5,6 +5,7 @@ import type {
 } from '@metamask/7715-permissions-shared/types';
 import type { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+
 import type {
   UserEventDispatcher,
   UserInputEventByType,

@@ -1,20 +1,21 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import type {
-  NativeTokenStreamPermission,
-  NativeTokenStreamPermissionRequest,
-} from '../../../src/permissions/nativeTokenStream/types';
+import { maxUint256 } from 'viem';
+import { toHex, parseUnits } from 'viem/utils';
+
+import type { AccountController } from '../../../src/accountController';
+import { TimePeriod } from '../../../src/core/types';
 import {
   hydratePermission,
   permissionRequestToContext,
   createContextMetadata,
   contextToPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/context';
-import { maxUint256 } from 'viem';
-import { toHex, parseUnits } from 'viem/utils';
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamPermission,
+  NativeTokenStreamPermissionRequest,
+} from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
-import type { AccountController } from '../../../src/accountController';
-import type { NativeTokenStreamContext } from '../../../src/permissions/nativeTokenStream/types';
-import { TimePeriod } from '../../../src/core/types';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
@@ -77,7 +78,7 @@ describe('nativeTokenStream:context', () => {
         permission: alreadyHydratedPermission,
       });
 
-      expect(hydratedPermission).toEqual(alreadyHydratedPermission);
+      expect(hydratedPermission).toStrictEqual(alreadyHydratedPermission);
     });
 
     it('should add defaults to a permission', () => {
@@ -85,7 +86,7 @@ describe('nativeTokenStream:context', () => {
         permission: permissionWithoutOptionals,
       });
 
-      expect(hydratedPermission).toEqual({
+      expect(hydratedPermission).toStrictEqual({
         ...permissionWithoutOptionals,
         data: {
           ...permissionWithoutOptionals.data,
@@ -113,7 +114,7 @@ describe('nativeTokenStream:context', () => {
 
       const hydratedPermission = hydratePermission({ permission });
 
-      expect(hydratedPermission).toEqual(permission);
+      expect(hydratedPermission).toStrictEqual(permission);
     });
   });
 
@@ -146,7 +147,7 @@ describe('nativeTokenStream:context', () => {
         accountController: mockAccountController,
       });
 
-      expect(context).toEqual(alreadyHydratedContext);
+      expect(context).toStrictEqual(alreadyHydratedContext);
 
       expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
         chainId: Number(alreadyHydratedPermissionRequest.chainId),
@@ -180,7 +181,7 @@ describe('nativeTokenStream:context', () => {
         context,
       });
 
-      expect(metadata).toEqual({
+      expect(metadata).toStrictEqual({
         amountPerSecond: '0.5',
         validationErrors: {},
       });
@@ -202,7 +203,7 @@ describe('nativeTokenStream:context', () => {
             context: contextWithInvalidInitialAmount,
           });
 
-          expect(metadata.validationErrors).toEqual({
+          expect(metadata.validationErrors).toStrictEqual({
             initialAmountError: 'Invalid initial amount',
           });
         },
@@ -221,7 +222,7 @@ describe('nativeTokenStream:context', () => {
           context: contextWithNegativeInitialAmount,
         });
 
-        expect(metadata.validationErrors).toEqual({
+        expect(metadata.validationErrors).toStrictEqual({
           initialAmountError: 'Initial amount must be greater than 0',
         });
       });
@@ -242,7 +243,7 @@ describe('nativeTokenStream:context', () => {
           context: contextWithInitialAmountGreaterThanMaxAmount,
         });
 
-        expect(metadata.validationErrors).toEqual({
+        expect(metadata.validationErrors).toStrictEqual({
           maxAmountError: 'Max amount must be greater than initial amount',
         });
       });
@@ -262,7 +263,7 @@ describe('nativeTokenStream:context', () => {
             context: contextWithInvalidMaxAmount,
           });
 
-          expect(metadata.validationErrors).toEqual({
+          expect(metadata.validationErrors).toStrictEqual({
             maxAmountError: 'Invalid max amount',
           });
         },
@@ -281,7 +282,7 @@ describe('nativeTokenStream:context', () => {
           context: contextWithNegativeMaxAmount,
         });
 
-        expect(metadata.validationErrors).toEqual({
+        expect(metadata.validationErrors).toStrictEqual({
           maxAmountError: 'Max amount must be greater than 0',
         });
       });
@@ -303,7 +304,7 @@ describe('nativeTokenStream:context', () => {
             context: contextWithInvalidAmountPerPeriod,
           });
 
-          expect(metadata.validationErrors).toEqual({
+          expect(metadata.validationErrors).toStrictEqual({
             amountPerPeriodError: 'Invalid amount per period',
           });
         },
@@ -322,7 +323,7 @@ describe('nativeTokenStream:context', () => {
           context: contextWithNegativeAmountPerPeriod,
         });
 
-        expect(metadata.validationErrors).toEqual({
+        expect(metadata.validationErrors).toStrictEqual({
           amountPerPeriodError: 'Amount per period must be greater than 0',
         });
       });
@@ -341,7 +342,7 @@ describe('nativeTokenStream:context', () => {
             context: contextWithStartTimeInThePast,
           });
 
-          expect(metadata.validationErrors).toEqual({
+          expect(metadata.validationErrors).toStrictEqual({
             startTimeError: 'Start time must be today or later',
           });
         });
@@ -361,7 +362,7 @@ describe('nativeTokenStream:context', () => {
               context: contextWithInvalidStartTime,
             });
 
-            expect(metadata.validationErrors).toEqual({
+            expect(metadata.validationErrors).toStrictEqual({
               startTimeError: 'Invalid start time',
             });
           },
@@ -383,7 +384,7 @@ describe('nativeTokenStream:context', () => {
           context: contextWithExpiryInThePast,
         });
 
-        expect(metadata.validationErrors).toEqual({
+        expect(metadata.validationErrors).toStrictEqual({
           expiryError: 'Expiry must be in the future',
         });
       });
@@ -403,7 +404,7 @@ describe('nativeTokenStream:context', () => {
             context: contextWithInvalidExpiry,
           });
 
-          expect(metadata.validationErrors).toEqual({
+          expect(metadata.validationErrors).toStrictEqual({
             expiryError: 'Invalid expiry',
           });
         },
@@ -417,7 +418,9 @@ describe('nativeTokenStream:context', () => {
           originalRequest: alreadyHydratedPermissionRequest,
         });
 
-        expect(permissionRequest).toEqual(alreadyHydratedPermissionRequest);
+        expect(permissionRequest).toStrictEqual(
+          alreadyHydratedPermissionRequest,
+        );
       });
     });
   });

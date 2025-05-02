@@ -1,22 +1,21 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import {
-  NativeTokenStreamDependencies,
-  NativeTokenStreamOrchestrator,
-} from '../../../src/permissions/nativeTokenStream/orchestrator';
-import type { TokenPricesService } from '../../../src/services/tokenPricesService';
+import { toHex, parseUnits } from 'viem/utils';
+
 import type { AccountController } from '../../../src/accountController';
 import type { ConfirmationDialogFactory } from '../../../src/core/confirmationFactory';
-import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
+import { TimePeriod } from '../../../src/core/types';
+import type { NativeTokenStreamDependencies } from '../../../src/permissions/nativeTokenStream/orchestrator';
+import { NativeTokenStreamOrchestrator } from '../../../src/permissions/nativeTokenStream/orchestrator';
 import type {
   NativeTokenStreamPermissionRequest,
   NativeTokenStreamContext,
   HydratedNativeTokenStreamPermission,
   NativeTokenStreamMetadata,
 } from '../../../src/permissions/nativeTokenStream/types';
-import { toHex, parseUnits } from 'viem/utils';
-import { TimePeriod } from '../../../src/core/types';
-import { convertReadableDateToTimestamp } from '../../../src/utils/time';
+import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import { IconUrls } from '../../../src/ui/iconConstant';
+import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
+import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 
 const mockPermissionRequest: NativeTokenStreamPermissionRequest = {
   chainId: '0x1',
@@ -157,7 +156,7 @@ describe('NativeTokenStreamOrchestrator', () => {
 
   describe('additionalDetailsFields', () => {
     it('should return the correct additional details fields', () => {
-      expect(orchestrator.additionalDetailsFields).toEqual([
+      expect(orchestrator.additionalDetailsFields).toStrictEqual([
         {
           label: 'Token',
           value: 'ETH',
@@ -170,7 +169,7 @@ describe('NativeTokenStreamOrchestrator', () => {
   describe('stateChangeHandlers', () => {
     it('should return all required handlers', () => {
       const handlers = orchestrator.stateChangeHandlers;
-      const handlerNames = handlers.map((handler) => handler.elementName);
+      const handlerNames = handlers.map((_handler) => _handler.elementName);
 
       const expectedHandlerNames = [
         'initial-amount',
@@ -181,17 +180,17 @@ describe('NativeTokenStreamOrchestrator', () => {
         'time-period',
       ];
 
-      expect(handlerNames).toEqual(expectedHandlerNames);
+      expect(handlerNames).toStrictEqual(expectedHandlerNames);
     });
 
     it('should properly map initial amount updates', () => {
       const handler = orchestrator.stateChangeHandlers.find(
-        (h) => h.elementName === 'initial-amount',
+        (_handler) => _handler.elementName === 'initial-amount',
       );
       expect(handler).toBeDefined();
 
       const result = handler?.contextMapper(mockContext, '2');
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
           ...mockContext.permissionDetails,
@@ -202,12 +201,12 @@ describe('NativeTokenStreamOrchestrator', () => {
 
     it('should properly map max amount updates', () => {
       const handler = orchestrator.stateChangeHandlers.find(
-        (h) => h.elementName === 'max-amount',
+        (_handler) => _handler.elementName === 'max-amount',
       );
       expect(handler).toBeDefined();
 
       const result = handler?.contextMapper(mockContext, '20');
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
           ...mockContext.permissionDetails,
@@ -218,12 +217,12 @@ describe('NativeTokenStreamOrchestrator', () => {
 
     it('should properly map start time updates', () => {
       const handler = orchestrator.stateChangeHandlers.find(
-        (h) => h.elementName === 'start-time',
+        (_handler) => _handler.elementName === 'start-time',
       );
       expect(handler).toBeDefined();
 
       const result = handler?.contextMapper(mockContext, '06/01/2024');
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
           ...mockContext.permissionDetails,
@@ -234,12 +233,12 @@ describe('NativeTokenStreamOrchestrator', () => {
 
     it('should properly map expiry updates', () => {
       const handler = orchestrator.stateChangeHandlers.find(
-        (h) => h.elementName === 'expiry',
+        (_handler) => _handler.elementName === 'expiry',
       );
       expect(handler).toBeDefined();
 
       const result = handler?.contextMapper(mockContext, '07/01/2024');
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         ...mockContext,
         expiry: '07/01/2024',
       });
@@ -247,12 +246,12 @@ describe('NativeTokenStreamOrchestrator', () => {
 
     it('should properly map amount per period updates', () => {
       const handler = orchestrator.stateChangeHandlers.find(
-        (h) => h.elementName === 'amount-per-period',
+        (_handler) => _handler.elementName === 'amount-per-period',
       );
       expect(handler).toBeDefined();
 
       const result = handler?.contextMapper(mockContext, '500000');
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
           ...mockContext.permissionDetails,
@@ -263,12 +262,12 @@ describe('NativeTokenStreamOrchestrator', () => {
 
     it('should properly map time period updates', () => {
       const handler = orchestrator.stateChangeHandlers.find(
-        (h) => h.elementName === 'time-period',
+        (_handler) => _handler.elementName === 'time-period',
       );
       expect(handler).toBeDefined();
 
       const result = handler?.contextMapper(mockContext, TimePeriod.DAILY);
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
           ...mockContext.permissionDetails,
@@ -333,7 +332,7 @@ describe('NativeTokenStreamOrchestrator', () => {
 
   describe('hydratePermission', () => {
     it('should use the provided permission hydrator', async () => {
-      const permission = mockPermissionRequest.permission;
+      const { permission } = mockPermissionRequest;
       await (orchestrator as any).hydratePermission({ permission });
 
       expect(mockDependencies.hydratePermission).toHaveBeenCalledWith({

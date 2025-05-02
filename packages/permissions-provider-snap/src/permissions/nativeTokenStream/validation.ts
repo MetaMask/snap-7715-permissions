@@ -1,5 +1,4 @@
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
-import { InvalidParamsError } from '@metamask/snaps-sdk';
 
 import type {
   NativeTokenStreamPermission,
@@ -11,7 +10,7 @@ import { zNativeTokenStreamPermission } from './types';
  * Validates a permission object data specific to the permission type.
  * @param permission - The native token stream permission object to validate.
  * @returns True if the permission data is valid, throws an error otherwise.
- * @throws {InvalidParamsError} If any validation check fails.
+ * @throws {Error} If any validation check fails.
  */
 function validatePermissionData(permission: NativeTokenStreamPermission): true {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
@@ -20,22 +19,18 @@ function validatePermissionData(permission: NativeTokenStreamPermission): true {
 
   if (maxAmount) {
     if (BigInt(maxAmount) === 0n) {
-      throw new InvalidParamsError(
-        'Invalid maxAmount: must be a positive number',
-      );
+      throw new Error('Invalid maxAmount: must be a positive number');
     }
   }
 
   if (initialAmount) {
     const bigIntInitialAmount = BigInt(initialAmount);
     if (bigIntInitialAmount === 0n) {
-      throw new InvalidParamsError(
-        'Invalid initialAmount: must be greater than zero',
-      );
+      throw new Error('Invalid initialAmount: must be greater than zero');
     }
     if (maxAmount) {
       if (BigInt(maxAmount) < bigIntInitialAmount) {
-        throw new InvalidParamsError(
+        throw new Error(
           'Invalid maxAmount: must be greater than initialAmount',
         );
       }
@@ -43,19 +38,15 @@ function validatePermissionData(permission: NativeTokenStreamPermission): true {
   }
 
   if (bigIntAmountPerSecond === 0n) {
-    throw new InvalidParamsError(
-      'Invalid amountPerSecond: must be a positive number',
-    );
+    throw new Error('Invalid amountPerSecond: must be a positive number');
   }
 
   if (startTime <= 0) {
-    throw new InvalidParamsError(
-      'Invalid startTime: must be a positive number',
-    );
+    throw new Error('Invalid startTime: must be a positive number');
   }
 
   if (startTime !== Math.floor(startTime)) {
-    throw new InvalidParamsError('Invalid startTime: must be an integer');
+    throw new Error('Invalid startTime: must be an integer');
   }
 
   return true;
@@ -65,7 +56,7 @@ function validatePermissionData(permission: NativeTokenStreamPermission): true {
  * Parses and validates a permission request for native token streaming.
  * @param permissionRequest - The permission request object to validate.
  * @returns A validated permission request object.
- * @throws {InvalidParamsError} If the permission request is invalid.
+ * @throws {Error} If the permission request is invalid.
  */
 export function parseAndValidatePermission(
   permissionRequest: NativeTokenStreamPermissionRequest,
@@ -77,14 +68,14 @@ export function parseAndValidatePermission(
   } = zNativeTokenStreamPermission.safeParse(permissionRequest.permission);
 
   if (!success) {
-    throw new InvalidParamsError(extractZodError(validationError.errors));
+    throw new Error(extractZodError(validationError.errors));
   }
 
   validatePermissionData(validationResult);
 
   return {
     ...permissionRequest,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed,
+    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     permission: {
       ...validationResult,
       data: {

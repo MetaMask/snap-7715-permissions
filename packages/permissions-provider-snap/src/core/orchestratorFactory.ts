@@ -1,9 +1,9 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
-import type { NativeTokenStreamPermissionRequest } from '../permissions/nativeTokenStream/types';
 
 import type { AccountController } from '../accountController';
 import { NativeTokenStreamOrchestrator } from '../permissions/nativeTokenStream/orchestrator';
+import type { NativeTokenStreamPermissionRequest } from '../permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { ConfirmationDialogFactory } from './confirmationFactory';

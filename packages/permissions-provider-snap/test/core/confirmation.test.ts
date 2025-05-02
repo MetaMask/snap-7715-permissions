@@ -1,14 +1,15 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
-import { ConfirmationDialog } from '../../src/core/confirmation';
 import { UserInputEventType } from '@metamask/snaps-sdk';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
+import { type GenericSnapElement, Text } from '@metamask/snaps-sdk/jsx';
+
+import { ConfirmationDialog } from '../../src/core/confirmation';
+import type { AdditionalField } from '../../src/core/types';
 import {
   GRANT_BUTTON,
   CANCEL_BUTTON,
 } from '../../src/ui/components/ConfirmationFooter';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { UserEventDispatcher } from '../../src/userEventDispatcher';
-import type { AdditionalField } from '../../src/core/types';
-import { type GenericSnapElement, Text } from '@metamask/snaps-sdk/jsx';
+import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 describe('ConfirmationDialog', () => {
   let mockSnaps: jest.Mocked<SnapsProvider>;
@@ -37,7 +38,7 @@ describe('ConfirmationDialog', () => {
 
   beforeEach(() => {
     mockSnaps = {
-      request: jest.fn().mockImplementation(() => Promise.resolve()),
+      request: jest.fn().mockImplementation(async () => Promise.resolve()),
     } as unknown as jest.Mocked<SnapsProvider>;
 
     mockUserEventDispatcher = {
@@ -105,52 +106,52 @@ describe('ConfirmationDialog', () => {
     it('should resolve with true when grant button clicked', async () => {
       const awaitingUserDecision = confirmationDialog.awaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (c) => c[0].elementName === GRANT_BUTTON,
+        (call) => call[0].elementName === GRANT_BUTTON,
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
         throw new Error('Grant button handler is undefined');
       }
 
-      grantButtonHandler({
+      await grantButtonHandler({
         event: { type: UserInputEventType.ButtonClickEvent },
         interfaceId: mockInterfaceId,
       });
 
       const result = await awaitingUserDecision;
-      expect(result).toEqual({ isConfirmationGranted: true });
+      expect(result).toStrictEqual({ isConfirmationGranted: true });
     });
 
     it('should resolve with false when cancel button clicked', async () => {
       const awaitingUserDecision = confirmationDialog.awaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (c) => c[0].elementName === CANCEL_BUTTON,
+        (call) => call[0].elementName === CANCEL_BUTTON,
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
         throw new Error('Grant button handler is undefined');
       }
 
-      grantButtonHandler({
+      await grantButtonHandler({
         event: { type: UserInputEventType.ButtonClickEvent },
         interfaceId: mockInterfaceId,
       });
 
       const result = await awaitingUserDecision;
-      expect(result).toEqual({ isConfirmationGranted: false });
+      expect(result).toStrictEqual({ isConfirmationGranted: false });
     });
 
     it('should clean up event listeners after decision', async () => {
       const awaitingUserDecision = confirmationDialog.awaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (c) => c[0].elementName === GRANT_BUTTON,
+        (call) => call[0].elementName === GRANT_BUTTON,
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
         throw new Error('Grant button handler is undefined');
       }
 
-      grantButtonHandler({
+      await grantButtonHandler({
         event: { type: UserInputEventType.ButtonClickEvent },
         interfaceId: mockInterfaceId,
       });

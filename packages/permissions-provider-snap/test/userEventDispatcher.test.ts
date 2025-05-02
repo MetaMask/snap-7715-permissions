@@ -157,15 +157,14 @@ describe('UserEventDispatcher', () => {
       });
 
       const handleEvent = userEventDispatcher.createUserInputEventHandler();
-      await expect(
-        handleEvent({
-          event: {
-            type: eventType,
-            name: elementName,
-          },
-          id: interfaceId,
-        }),
-      ).resolves.not.toThrow();
+
+      await handleEvent({
+        event: {
+          type: eventType,
+          name: elementName,
+        },
+        id: interfaceId,
+      });
     });
 
     it('should gracefully handle errors in async event handlers', async () => {
@@ -179,15 +178,14 @@ describe('UserEventDispatcher', () => {
       });
 
       const handleEvent = userEventDispatcher.createUserInputEventHandler();
-      await expect(
-        handleEvent({
-          event: {
-            type: eventType,
-            name: elementName,
-          },
-          id: interfaceId,
-        }),
-      ).resolves.not.toThrow();
+
+      await handleEvent({
+        event: {
+          type: eventType,
+          name: elementName,
+        },
+        id: interfaceId,
+      });
     });
   });
 
@@ -290,15 +288,15 @@ describe('UserEventDispatcher', () => {
     it('should do nothing when no handlers are registered', async () => {
       const handleEvent = userEventDispatcher.createUserInputEventHandler();
 
-      await expect(
-        handleEvent({
+      expect(
+        await handleEvent({
           event: {
             type: eventType,
             name: elementName,
           },
           id: interfaceId,
         }),
-      ).resolves.toBeUndefined();
+      ).toBeUndefined();
     });
   });
 });

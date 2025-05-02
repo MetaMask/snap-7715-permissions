@@ -1,11 +1,12 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
-import { OrchestratorFactory } from '../../src/core/orchestratorFactory';
-import type { AccountController } from '../../src/accountController';
-import type { TokenPricesService } from '../../src/services/tokenPricesService';
-import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
-import type { UserEventDispatcher } from '../../src/userEventDispatcher';
-import { NativeTokenStreamOrchestrator } from '../../src/permissions/nativeTokenStream/orchestrator';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+
+import type { AccountController } from '../../src/accountController';
+import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
+import { OrchestratorFactory } from '../../src/core/orchestratorFactory';
+import { NativeTokenStreamOrchestrator } from '../../src/permissions/nativeTokenStream/orchestrator';
+import type { TokenPricesService } from '../../src/services/tokenPricesService';
+import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 describe('OrchestratorFactory', () => {
   let orchestratorFactory: OrchestratorFactory;
@@ -119,7 +120,7 @@ describe('OrchestratorFactory', () => {
 
       const result = await orchestrator.orchestrate({ origin: 'test-origin' });
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
     });
   });
 });

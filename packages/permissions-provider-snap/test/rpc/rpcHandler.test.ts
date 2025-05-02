@@ -1,11 +1,12 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
-import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
-import type { OrchestratorFactory } from '../../src/core/orchestratorFactory';
 import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import type { Json } from '@metamask/snaps-sdk';
+
+import type { OrchestratorFactory } from '../../src/core/orchestratorFactory';
+import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 
 type OrchestrateFunction = (args: { origin: string }) => Promise<{
   success: boolean;
@@ -105,7 +106,7 @@ describe('RpcHandler', () => {
         origin: TEST_SITE_ORIGIN,
       });
 
-      expect(result).toEqual([VALID_PERMISSION_RESPONSE]);
+      expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE]);
     });
 
     it('should throw an error if no parameters are provided', async () => {
@@ -132,12 +133,12 @@ describe('RpcHandler', () => {
     });
 
     it('should resolve to an empty response if permissionsRequest is empty array', async () => {
-      await expect(
-        handler.grantPermission({
+      expect(
+        await handler.grantPermission({
           permissionsRequest: [],
           siteOrigin: TEST_SITE_ORIGIN,
         } as unknown as Json),
-      ).resolves.toEqual([]);
+      ).toStrictEqual([]);
     });
 
     it('should handle multiple permission requests in parallel', async () => {
@@ -183,7 +184,7 @@ describe('RpcHandler', () => {
         origin: TEST_SITE_ORIGIN,
       });
 
-      expect(result).toEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
+      expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
     });
 
     it('should handle mixed success/failure responses for multiple requests', async () => {
@@ -252,7 +253,7 @@ describe('RpcHandler', () => {
       );
 
       const result = await handler.grantPermission(VALID_REQUEST);
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
 
     it('should handle permission requests with optional fields missing', async () => {
@@ -271,7 +272,7 @@ describe('RpcHandler', () => {
       );
 
       const result = await handler.grantPermission(request);
-      expect(result).toEqual([VALID_PERMISSION_RESPONSE]);
+      expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE]);
     });
 
     it('should handle permission requests with all optional fields present', async () => {
@@ -291,7 +292,7 @@ describe('RpcHandler', () => {
       );
 
       const result = await handler.grantPermission(request);
-      expect(result).toEqual([VALID_PERMISSION_RESPONSE]);
+      expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE]);
     });
 
     it('should handle requests with different permission types', async () => {
@@ -326,7 +327,7 @@ describe('RpcHandler', () => {
       }));
 
       const result = await handler.grantPermission(request);
-      expect(result).toEqual([differentResponse]);
+      expect(result).toStrictEqual([differentResponse]);
     });
 
     // Response processing tests
@@ -352,7 +353,7 @@ describe('RpcHandler', () => {
         .mockImplementationOnce(async () => MOCK_SUCCESS_RESPONSE);
 
       const result = await handler.grantPermission(request);
-      expect(result).toEqual([VALID_PERMISSION_RESPONSE]);
+      expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE]);
     });
 
     it('should maintain response order matching request order', async () => {
@@ -377,7 +378,7 @@ describe('RpcHandler', () => {
       // Simulate async responses resolving in reverse order
       mockOrchestrator.orchestrate
         .mockImplementationOnce(
-          () =>
+          async () =>
             new Promise((resolve) =>
               setTimeout(() => resolve(MOCK_SUCCESS_RESPONSE), 100),
             ),
@@ -388,7 +389,7 @@ describe('RpcHandler', () => {
         }));
 
       const result = await handler.grantPermission(request);
-      expect(result).toEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
+      expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
     });
   });
 });

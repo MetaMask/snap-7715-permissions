@@ -2,8 +2,8 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { UserEventDispatcher } from '../userEventDispatcher';
-import type { AdditionalField } from './types';
 import { ConfirmationDialog } from './confirmation';
+import type { AdditionalField } from './types';
 
 /**
  * Factory for creating confirmation dialogs.
@@ -26,14 +26,13 @@ export class ConfirmationDialogFactory {
 
   /**
    * Creates a confirmation dialog with the specified content.
-   * @param title.title - The title text to display in the confirmation dialog.
-   * @param title.justification - The justification text explaining the reason for the confirmation.
-   * @param title.ui - The UI elements to be displayed in the confirmation dialog.
-   * @param title.origin - The origin of the request requiring confirmation.
-   * @param title.network - The network context for the confirmation.
-   * @param title.additionalFields - Optional additional fields to be included in the confirmation dialog.
-   * @param onCreate - Callback when the dialog is created.
-   * @param onDestroy - Callback when the dialog is destroyed.
+   * @param params - The parameters for creating a confirmation dialog.
+   * @param params.title - The title text to display in the confirmation dialog.
+   * @param params.justification - The justification text explaining the reason for the confirmation.
+   * @param params.ui - The UI elements to be displayed in the confirmation dialog.
+   * @param params.origin - The origin of the request requiring confirmation.
+   * @param params.network - The network context for the confirmation.
+   * @param params.additionalFields - Optional additional fields to be included in the confirmation dialog.
    * @returns A promise that resolves with the confirmation dialog.
    */
   createConfirmation({

@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import { toHex, parseUnits } from 'viem/utils';
+
 import { appendCaveats } from '../../../src/permissions/nativeTokenStream/caveats';
 import type { HydratedNativeTokenStreamPermission } from '../../../src/permissions/nativeTokenStream/types';
 
