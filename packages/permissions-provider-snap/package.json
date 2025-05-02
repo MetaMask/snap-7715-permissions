@@ -47,7 +47,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@metamask/delegation-toolkit": "latest",
+    "@metamask/delegation-toolkit": "0.10.2",
     "@metamask/snaps-sdk": "^6.17.1",
     "@metamask/utils": "^11.3.0",
     "viem": "^2.21.29",

@@ -2922,7 +2922,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-toolkit@npm:latest":
+"@metamask/delegation-toolkit@npm:0.10.2":
   version: 0.10.2
   resolution: "@metamask/delegation-toolkit@npm:0.10.2"
   dependencies:
@@ -3096,7 +3096,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/auto-changelog": ^3.4.4
-    "@metamask/delegation-toolkit": latest
+    "@metamask/delegation-toolkit": 0.10.2
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
@@ -17889,7 +17889,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask/delegation-toolkit": latest
+    "@metamask/delegation-toolkit": 0.10.2
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-browser": ^12.1.0
     "@metamask/eslint-config-jest": ^12.1.0
