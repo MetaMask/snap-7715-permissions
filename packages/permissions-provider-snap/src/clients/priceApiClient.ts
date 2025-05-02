@@ -3,8 +3,6 @@ import type { CaipAssetType } from '@metamask/utils';
 
 import type { SpotPricesRes, VsCurrencyParam } from './types';
 
-export type { VsCurrencyParam };
-
 /**
  * Class responsible for fetching price data from the Price API.
  */
