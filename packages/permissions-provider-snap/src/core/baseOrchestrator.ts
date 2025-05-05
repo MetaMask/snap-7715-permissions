@@ -179,52 +179,20 @@ export abstract class BaseOrchestrator<
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    const handlerUnbinders = this.stateChangeHandlers.map(
-      (stateChangeHandler) => {
-        const handler: UserEventHandler<
-          UserInputEventType.InputChangeEvent
-        > = async ({ event }: { event: InputChangeEvent }) => {
-          if (!this.#currentContext) {
-            throw new Error('Current context is undefined');
-          }
-
-          const value = stateChangeHandler.valueMapper
-            ? stateChangeHandler.valueMapper(event)
-            : (event.value as string);
-
-          this.#currentContext = stateChangeHandler.contextMapper(
-            this.#currentContext,
-            value,
-          );
-
-          await confirmationDialog.updateContent({
-            ui: await this.createUiContent({
-              context: this.#currentContext,
-              metadata: await this.createContextMetadata(this.#currentContext),
-            }),
-          });
-        };
-
-        const eventMetadata = {
-          eventType: UserInputEventType.InputChangeEvent,
-          interfaceId,
-          elementName: stateChangeHandler.elementName,
-          handler,
-        } as const;
-
-        this.userEventDispatcher.on(eventMetadata);
-
-        return () => {
-          this.userEventDispatcher.off(eventMetadata);
-        };
+    const unbindStateChangeHandlers = bindStateChangeHandlers({
+      stateChangeHandlers: this.stateChangeHandlers,
+      onContextChanged: (context) => {
+        this.#currentContext = context;
       },
-    );
+      getContext: () => this.#currentContext,
+      interfaceId,
+      userEventDispatcher: this.userEventDispatcher,
+    });
 
     const { isConfirmationGranted } =
       await confirmationDialog.awaitUserDecision();
 
-    // unbind handlers
-    handlerUnbinders.forEach((unbinder) => unbinder());
+    unbindStateChangeHandlers();
 
     if (!isConfirmationGranted) {
       return {
@@ -307,3 +275,53 @@ export abstract class BaseOrchestrator<
     };
   }
 }
+
+const bindStateChangeHandlers = <TContext extends BaseContext>({
+  stateChangeHandlers,
+  onContextChanged,
+  getContext,
+  interfaceId,
+  userEventDispatcher,
+}: {
+  stateChangeHandlers: StateChangeHandler<TContext>[];
+  onContextChanged: (context: TContext) => void;
+  getContext: () => TContext | undefined;
+  interfaceId: string;
+  userEventDispatcher: UserEventDispatcher;
+}) => {
+  const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
+    const handler: UserEventHandler<
+      UserInputEventType.InputChangeEvent
+    > = async ({ event }: { event: InputChangeEvent }) => {
+      let context = getContext();
+
+      if (!context) {
+        throw new Error('Current context is undefined');
+      }
+
+      const value = stateChangeHandler.valueMapper
+        ? stateChangeHandler.valueMapper(event)
+        : (event.value as string | boolean);
+
+      context = stateChangeHandler.contextMapper(context, value);
+      onContextChanged(context);
+    };
+
+    const eventMetadata = {
+      eventType: UserInputEventType.InputChangeEvent,
+      interfaceId,
+      elementName: stateChangeHandler.elementName,
+      handler,
+    } as const;
+
+    userEventDispatcher.on(eventMetadata);
+
+    return () => {
+      userEventDispatcher.off(eventMetadata);
+    };
+  });
+
+  return () => {
+    handlerUnbinders.forEach((unbinder) => unbinder());
+  };
+};
