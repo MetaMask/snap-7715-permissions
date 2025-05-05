@@ -67,22 +67,10 @@ export enum TimePeriod {
   MONTHLY = 'Monthly',
 }
 
-export type AdditionalField = {
-  label: string;
-  value: string;
-  tooltip?: string;
-  iconUrl?: string;
-};
-
 export type ConfirmationProps = {
-  title: string;
-  justification: string;
-  origin: string;
-  network: string;
   ui: GenericSnapElement;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
-  additionalFields?: AdditionalField[];
 };
 
 export type StateChangeHandler<

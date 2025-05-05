@@ -2,7 +2,6 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import { getChainName } from '@metamask/7715-permissions-shared/utils';
 import type { CaveatBuilder } from '@metamask/delegation-toolkit';
 import {
   createCaveatBuilder,
@@ -26,7 +25,6 @@ import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
   BaseContext,
   DeepRequired,
-  AdditionalField,
   StateChangeHandler,
   Orchestrator,
 } from './types';
@@ -91,19 +89,9 @@ export abstract class BaseOrchestrator<
   }
 
   /**
-   * The title of the permission.
-   */
-  protected abstract get title(): string;
-
-  /**
    * The state change handlers for the permission request.
    */
   protected abstract get stateChangeHandlers(): StateChangeHandler<TContext>[];
-
-  /**
-   * Additional fields to display in the confirmation dialog.
-   */
-  protected abstract get additionalDetailsFields(): AdditionalField[];
 
   /**
    * Build the permission context from the permission request..
@@ -133,6 +121,8 @@ export abstract class BaseOrchestrator<
   protected abstract createUiContent(args: {
     context: TContext;
     metadata: TMetadata;
+    origin: string;
+    chainId: number;
   }): Promise<GenericSnapElement>;
 
   /**
@@ -166,18 +156,14 @@ export abstract class BaseOrchestrator<
     });
 
     const chainId = Number(this.#permissionRequest.chainId);
-    const chainName = getChainName(chainId);
 
     const confirmationDialog =
       this.confirmationDialogFactory.createConfirmation({
-        title: this.title,
-        justification: this.#permissionRequest.permission.data.justification,
-        origin,
-        network: chainName,
-        additionalFields: this.additionalDetailsFields,
         ui: await this.createUiContent({
           context: this.#currentContext,
           metadata: await this.createContextMetadata(this.#currentContext),
+          origin,
+          chainId,
         }),
       });
 
@@ -193,6 +179,8 @@ export abstract class BaseOrchestrator<
         ui: await this.createUiContent({
           context: this.#currentContext,
           metadata,
+          origin,
+          chainId,
         }),
       });
     };

@@ -1,13 +1,10 @@
 import type { CaveatBuilder } from '@metamask/delegation-toolkit';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../../accountController';
 import type { ConfirmationDialogFactory } from '../../core/confirmationFactory';
 import { BaseOrchestrator } from '../../core/baseOrchestrator';
-import type {
-  StateChangeHandler,
-  AdditionalField,
-  TimePeriod,
-} from '../../core/types';
+import type { StateChangeHandler, TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import { IconUrls } from '../../ui/iconConstant';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
@@ -17,6 +14,7 @@ import {
   createConfirmationContent,
   EXPIRY_ELEMENT,
   INITIAL_AMOUNT_ELEMENT,
+  JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
   MAX_AMOUNT_ELEMENT,
   REMOVE_INITIAL_AMOUNT_BUTTON,
   REMOVE_MAX_AMOUNT_BUTTON,
@@ -37,7 +35,6 @@ import type {
   NativeTokenStreamPermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
-import { UserInputEventType } from '@metamask/snaps-sdk';
 
 export type NativeTokenStreamDependencies = {
   parseAndValidatePermission: typeof parseAndValidatePermission;
@@ -69,8 +66,8 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   NativeTokenStreamMetadata
 > {
   readonly #tokenPricesService: TokenPricesService;
-
   readonly #dependencies: NativeTokenStreamDependencies;
+  #isJustificationCollapsed: boolean = true;
 
   constructor(
     {
@@ -102,25 +99,16 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     this.#dependencies = dependencies;
   }
 
-  get title(): string {
-    return 'Native token stream';
-  }
-
-  get additionalDetailsFields(): AdditionalField[] {
-    return [
-      {
-        label: 'Token',
-        value: 'ETH',
-        iconUrl: IconUrls.ethereum.token,
-      },
-    ];
-  }
-
   async createUiContent(args: {
     context: NativeTokenStreamContext;
     metadata: NativeTokenStreamMetadata;
+    origin: string;
+    chainId: number;
   }) {
-    return this.#dependencies.createConfirmationContent(args);
+    return this.#dependencies.createConfirmationContent({
+      ...args,
+      isJustificationCollapsed: this.#isJustificationCollapsed,
+    });
   }
 
   async createContextMetadata(
@@ -270,6 +258,14 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
             timePeriod: value as TimePeriod,
           },
         }),
+      },
+      {
+        eventType: UserInputEventType.ButtonClickEvent,
+        elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
+        contextMapper: (context: NativeTokenStreamContext) => {
+          this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
+          return context;
+        },
       },
     ];
   }

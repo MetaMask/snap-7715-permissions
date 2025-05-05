@@ -3,7 +3,6 @@ import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import { ConfirmationDialog } from './confirmation';
-import type { AdditionalField } from './types';
 
 /**
  * Factory for creating confirmation dialogs.
@@ -35,30 +34,11 @@ export class ConfirmationDialogFactory {
    * @param params.additionalFields - Optional additional fields to be included in the confirmation dialog.
    * @returns A promise that resolves with the confirmation dialog.
    */
-  createConfirmation({
-    title,
-    ui,
-    justification,
-    origin,
-    network,
-    additionalFields = [],
-  }: {
-    title: string;
-    justification: string;
-    ui: GenericSnapElement;
-    origin: string;
-    network: string;
-    additionalFields?: AdditionalField[];
-  }) {
+  createConfirmation({ ui }: { ui: GenericSnapElement }) {
     return new ConfirmationDialog({
-      title,
       ui,
-      justification,
-      origin,
-      network,
       snaps: this.#snap,
       userEventDispatcher: this.#userEventDispatcher,
-      additionalFields,
     });
   }
 }

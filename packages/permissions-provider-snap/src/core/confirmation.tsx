@@ -3,53 +3,23 @@ import {
   GRANT_BUTTON,
   CANCEL_BUTTON,
 } from '../ui/components/ConfirmationFooter';
-import { RequestHeader } from '../ui/components/RequestHeader';
-import { ShowMoreText } from '../ui/components/ShowMoreText';
-import { TooltipIcon } from '../ui/components/TooltipIcon';
-import {
-  Box,
-  Container,
-  GenericSnapElement,
-  Section,
-  Text,
-  Image,
-} from '@metamask/snaps-sdk/jsx';
+import { Container, GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
 import { UserEventDispatcher, UserEventHandler } from '../userEventDispatcher';
-import { AdditionalField } from './types';
 import { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
   readonly #snaps: SnapsProvider;
   readonly #userEventDispatcher: UserEventDispatcher;
-  readonly #title: string;
-  readonly #justification: string;
-  readonly #origin: string;
-  readonly #network: string;
-  readonly #additionalFields: AdditionalField[];
 
   #isJustificationCollapsed: boolean = true;
   #ui: GenericSnapElement;
   #interfaceId: string | undefined;
 
-  constructor({
-    title,
-    justification,
-    origin,
-    network,
-    ui,
-    snaps,
-    userEventDispatcher,
-    additionalFields = [],
-  }: ConfirmationProps) {
-    this.#title = title;
-    this.#origin = origin;
-    this.#network = network;
-    this.#justification = justification;
+  constructor({ ui, snaps, userEventDispatcher }: ConfirmationProps) {
     this.#ui = ui;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
-    this.#additionalFields = additionalFields;
   }
 
   async createInterface(): Promise<string> {
@@ -178,66 +148,9 @@ export class ConfirmationDialog {
   }
 
   private buildConfirmation(): JSX.Element {
-    const fields: AdditionalField[] = [
-      {
-        label: 'Recipient',
-        value: this.#origin,
-        tooltip: 'The site requesting the permission',
-      },
-      {
-        label: 'Network',
-        value: this.#network,
-        tooltip: 'The network on which the permission is being requested',
-      },
-      ...this.#additionalFields,
-    ];
-
-    const requestDetailsFields = fields.map(
-      ({ label, value, iconUrl, tooltip }) => {
-        const iconElement = iconUrl ? (
-          <Image src={iconUrl} alt={value} />
-        ) : null;
-
-        const tooltipElement = tooltip ? (
-          <TooltipIcon tooltip={tooltip} />
-        ) : null;
-
-        return (
-          <Box direction="horizontal" alignment="space-between">
-            <Box direction="horizontal">
-              <Text>{label}</Text>
-              {tooltipElement}
-            </Box>
-            <Box direction="horizontal">
-              {iconElement}
-              <Text>{value}</Text>
-            </Box>
-          </Box>
-        );
-      },
-    );
     return (
       <Container>
-        <Box>
-          <RequestHeader title={this.#title} />
-          <Section>
-            {requestDetailsFields}
-            <Box direction="horizontal" alignment="space-between">
-              <Box direction="horizontal">
-                <Text>Reason</Text>
-                <TooltipIcon tooltip="Reason given by the recipient for requesting this token stream allowance." />
-              </Box>
-              <Box direction="horizontal">
-                <ShowMoreText
-                  text={this.#justification}
-                  buttonName="show-more-button"
-                  isCollapsed={this.#isJustificationCollapsed}
-                />
-              </Box>
-            </Box>
-          </Section>
-          {this.#ui}
-        </Box>
+        {this.#ui}
         <ConfirmationFooter />
       </Container>
     );
