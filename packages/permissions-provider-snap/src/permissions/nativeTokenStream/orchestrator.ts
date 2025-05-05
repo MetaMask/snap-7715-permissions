@@ -1,5 +1,9 @@
 import type { CaveatBuilder } from '@metamask/delegation-toolkit';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import {
+  FormSubmitEvent,
+  InputChangeEvent,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../../accountController';
 import type { ConfirmationDialogFactory } from '../../core/confirmationFactory';
@@ -13,6 +17,8 @@ import {
   TOGGLE_ADD_MORE_RULES_BUTTON,
   JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
   ADD_MORE_RULES_FORM,
+  NEW_RULE_VALUE_ELEMENT,
+  SELECT_NEW_RULE_DROPDOWN,
 } from './content';
 import {
   contextToPermissionRequest,
@@ -72,6 +78,8 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   readonly #dependencies: NativeTokenStreamDependencies;
   #isJustificationCollapsed = true;
   #isAddRuleShown = false;
+  #addNewRuleSelectedIndex = 0;
+  #addNewRuleValue: string | undefined;
 
   constructor(
     {
@@ -103,16 +111,64 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     this.#dependencies = dependencies;
   }
 
+  async getRuleValidationMessage({
+    context,
+    metadata,
+  }: {
+    context: NativeTokenStreamContext;
+    metadata: NativeTokenStreamMetadata;
+  }) {
+    const rule = metadata.rulesToAdd[this.#addNewRuleSelectedIndex];
+
+    if (rule !== undefined) {
+      if (rule === 'Initial amount') {
+        const updatedContext = {
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            initialAmount: this.#addNewRuleValue,
+          },
+        };
+
+        const updatedMetadata =
+          await this.createContextMetadata(updatedContext);
+
+        return updatedMetadata.validationErrors.initialAmountError;
+      } else if (rule === 'Max amount') {
+        const updatedContext = {
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            maxAmount: this.#addNewRuleValue,
+          },
+        };
+
+        const updatedMetadata =
+          await this.createContextMetadata(updatedContext);
+
+        return updatedMetadata.validationErrors.maxAmountError;
+      } else {
+        throw new Error(`Unknown rule: ${rule}`);
+      }
+    }
+  }
+
   async createUiContent(args: {
     context: NativeTokenStreamContext;
     metadata: NativeTokenStreamMetadata;
     origin: string;
     chainId: number;
   }) {
+    const addRuleValidationMessage = await this.getRuleValidationMessage({
+      context: args.context,
+      metadata: args.metadata,
+    });
+
     return this.#dependencies.createConfirmationContent({
       ...args,
       isJustificationCollapsed: this.#isJustificationCollapsed,
       isAddRuleShown: this.#isAddRuleShown,
+      addRuleValidationMessage,
     });
   }
 
@@ -161,6 +217,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
 
   get stateChangeHandlers(): StateChangeHandler<
     NativeTokenStreamContext,
+    NativeTokenStreamMetadata,
     UserInputEventType
   >[] {
     // Plain handlers that directly access class instance variables
@@ -170,19 +227,63 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     > = {
       eventType: UserInputEventType.ButtonClickEvent,
       elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
-      contextMapper: (context: NativeTokenStreamContext) => {
+      contextMapper: ({ context }: { context: NativeTokenStreamContext }) => {
         this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
+        return context;
+      },
+    };
+
+    // todo: these are all related to add-new-rules features. This should be
+    // abstracted out of the orchestrator and into a Rules component
+
+    const selectNewRuleHandler: StateChangeHandler<
+      NativeTokenStreamContext,
+      NativeTokenStreamMetadata,
+      UserInputEventType.InputChangeEvent
+    > = {
+      eventType: UserInputEventType.InputChangeEvent,
+      elementName: SELECT_NEW_RULE_DROPDOWN,
+      contextMapper: ({
+        context,
+        event,
+      }: {
+        context: NativeTokenStreamContext;
+        event: InputChangeEvent;
+      }) => {
+        this.#addNewRuleSelectedIndex = parseInt(event.value as string);
+        return context;
+      },
+    };
+
+    const addNewRuleValueHandler: StateChangeHandler<
+      NativeTokenStreamContext,
+      NativeTokenStreamMetadata,
+      UserInputEventType.InputChangeEvent
+    > = {
+      eventType: UserInputEventType.InputChangeEvent,
+      elementName: NEW_RULE_VALUE_ELEMENT,
+      contextMapper: ({
+        context,
+        event,
+      }: {
+        context: NativeTokenStreamContext;
+        event: InputChangeEvent;
+      }) => {
+        this.#addNewRuleValue = event.value as string;
+
         return context;
       },
     };
 
     const toggleAddMoreRulesHandler: StateChangeHandler<
       NativeTokenStreamContext,
+      NativeTokenStreamMetadata,
       UserInputEventType.ButtonClickEvent
     > = {
       eventType: UserInputEventType.ButtonClickEvent,
       elementName: TOGGLE_ADD_MORE_RULES_BUTTON,
-      contextMapper: (context: NativeTokenStreamContext) => {
+      contextMapper: ({ context }: { context: NativeTokenStreamContext }) => {
+        this.#addNewRuleSelectedIndex = 0;
         this.#isAddRuleShown = !this.#isAddRuleShown;
         return context;
       },
@@ -190,13 +291,40 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
 
     const addMoreRulesFormHandler: StateChangeHandler<
       NativeTokenStreamContext,
+      NativeTokenStreamMetadata,
       UserInputEventType.FormSubmitEvent
     > = {
       eventType: UserInputEventType.FormSubmitEvent,
       elementName: ADD_MORE_RULES_FORM,
-      contextMapper: (context: NativeTokenStreamContext) => {
+      contextMapper: ({
+        context,
+        event,
+        metadata,
+      }: {
+        context: NativeTokenStreamContext;
+        event: FormSubmitEvent;
+        metadata: NativeTokenStreamMetadata;
+      }) => {
+        const permissionDetails = { ...context.permissionDetails };
+
+        const ruleIndex = parseInt(
+          event.value[SELECT_NEW_RULE_DROPDOWN] as string,
+        );
+        const value = event.value[NEW_RULE_VALUE_ELEMENT] as string;
+
+        const rule = metadata.rulesToAdd[ruleIndex];
+
+        if (rule === 'Initial amount') {
+          permissionDetails.initialAmount = value;
+        } else if (rule === 'Max amount') {
+          permissionDetails.maxAmount = value;
+        } else {
+          throw new Error(`Unknown form field: ${rule}`);
+        }
+
         this.#isAddRuleShown = false;
-        return context;
+
+        return { ...context, permissionDetails };
       },
     };
 
@@ -214,6 +342,12 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
       justificationShowMoreHandler,
       toggleAddMoreRulesHandler,
       addMoreRulesFormHandler,
-    ] as StateChangeHandler<NativeTokenStreamContext, UserInputEventType>[];
+      selectNewRuleHandler,
+      addNewRuleValueHandler,
+    ] as StateChangeHandler<
+      NativeTokenStreamContext,
+      NativeTokenStreamMetadata,
+      UserInputEventType
+    >[];
   }
 }

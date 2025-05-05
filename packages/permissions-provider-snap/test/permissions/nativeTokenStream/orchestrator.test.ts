@@ -13,9 +13,9 @@ import type {
   NativeTokenStreamMetadata,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
-import { IconUrls } from '../../../src/ui/iconConstant';
 import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
 const mockPermissionRequest: NativeTokenStreamPermissionRequest = {
   chainId: '0x1',
@@ -59,6 +59,7 @@ const mockContext: NativeTokenStreamContext = {
 const mockMetadata: NativeTokenStreamMetadata = {
   amountPerSecond: '0.5',
   validationErrors: {},
+  rulesToAdd: [],
 };
 
 // Mock services that are used in the constructor
@@ -148,24 +149,6 @@ describe('NativeTokenStreamOrchestrator', () => {
     });
   });
 
-  describe('title', () => {
-    it('should return the correct title', () => {
-      expect(orchestrator.title).toBe('Native token stream');
-    });
-  });
-
-  describe('additionalDetailsFields', () => {
-    it('should return the correct additional details fields', () => {
-      expect(orchestrator.additionalDetailsFields).toStrictEqual([
-        {
-          label: 'Token',
-          value: 'ETH',
-          iconUrl: IconUrls.ethereum.token,
-        },
-      ]);
-    });
-  });
-
   describe('stateChangeHandlers', () => {
     it('should return all required handlers', () => {
       const handlers = orchestrator.stateChangeHandlers;
@@ -173,11 +156,18 @@ describe('NativeTokenStreamOrchestrator', () => {
 
       const expectedHandlerNames = [
         'initial-amount',
+        'remove-initial-amount',
         'max-amount',
+        'remove-max-amount',
         'start-time',
         'expiry',
         'amount-per-period',
         'time-period',
+        'justification-show-more',
+        'add-more-rules',
+        'add-more-rules-form',
+        'select-new-rule',
+        'new-rule-value',
       ];
 
       expect(handlerNames).toStrictEqual(expectedHandlerNames);
@@ -189,7 +179,15 @@ describe('NativeTokenStreamOrchestrator', () => {
       );
       expect(handler).toBeDefined();
 
-      const result = handler?.contextMapper(mockContext, '2');
+      const result = handler?.contextMapper({
+        context: mockContext,
+        event: {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'initial-amount',
+          value: '2',
+        },
+        metadata: mockMetadata,
+      });
       expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
@@ -205,7 +203,15 @@ describe('NativeTokenStreamOrchestrator', () => {
       );
       expect(handler).toBeDefined();
 
-      const result = handler?.contextMapper(mockContext, '20');
+      const result = handler?.contextMapper({
+        context: mockContext,
+        event: {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'max-amount',
+          value: '20',
+        },
+        metadata: mockMetadata,
+      });
       expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
@@ -221,7 +227,15 @@ describe('NativeTokenStreamOrchestrator', () => {
       );
       expect(handler).toBeDefined();
 
-      const result = handler?.contextMapper(mockContext, '06/01/2024');
+      const result = handler?.contextMapper({
+        context: mockContext,
+        event: {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'start-time',
+          value: '06/01/2024',
+        },
+        metadata: mockMetadata,
+      });
       expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
@@ -237,7 +251,15 @@ describe('NativeTokenStreamOrchestrator', () => {
       );
       expect(handler).toBeDefined();
 
-      const result = handler?.contextMapper(mockContext, '07/01/2024');
+      const result = handler?.contextMapper({
+        context: mockContext,
+        event: {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'expiry',
+          value: '07/01/2024',
+        },
+        metadata: mockMetadata,
+      });
       expect(result).toStrictEqual({
         ...mockContext,
         expiry: '07/01/2024',
@@ -250,7 +272,15 @@ describe('NativeTokenStreamOrchestrator', () => {
       );
       expect(handler).toBeDefined();
 
-      const result = handler?.contextMapper(mockContext, '500000');
+      const result = handler?.contextMapper({
+        context: mockContext,
+        event: {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'amount-per-period',
+          value: '500000',
+        },
+        metadata: mockMetadata,
+      });
       expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
@@ -266,7 +296,15 @@ describe('NativeTokenStreamOrchestrator', () => {
       );
       expect(handler).toBeDefined();
 
-      const result = handler?.contextMapper(mockContext, TimePeriod.DAILY);
+      const result = handler?.contextMapper({
+        context: mockContext,
+        event: {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'time-period',
+          value: TimePeriod.DAILY,
+        },
+        metadata: mockMetadata,
+      });
       expect(result).toStrictEqual({
         ...mockContext,
         permissionDetails: {
@@ -282,11 +320,18 @@ describe('NativeTokenStreamOrchestrator', () => {
       await orchestrator.createUiContent({
         context: mockContext,
         metadata: mockMetadata,
+        origin: 'https://example.com',
+        chainId: 1,
       });
 
       expect(mockDependencies.createConfirmationContent).toHaveBeenCalledWith({
         context: mockContext,
         metadata: mockMetadata,
+        origin: 'https://example.com',
+        chainId: 1,
+        isJustificationCollapsed: true,
+        isAddRuleShown: false,
+        addRuleValidationMessage: undefined,
       });
     });
   });

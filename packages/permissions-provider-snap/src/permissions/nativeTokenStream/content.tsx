@@ -9,6 +9,7 @@ import {
   Option,
   Icon,
   Form,
+  Field,
 } from '@metamask/snaps-sdk/jsx';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import { RequestHeader } from '../../ui/components/RequestHeader';
@@ -46,6 +47,7 @@ export const createConfirmationContent = ({
   isAddRuleShown,
   origin,
   chainId,
+  addRuleValidationMessage,
 }: {
   context: NativeTokenStreamContext;
   metadata: NativeTokenStreamMetadata;
@@ -53,6 +55,7 @@ export const createConfirmationContent = ({
   isAddRuleShown: boolean;
   origin: string;
   chainId: number;
+  addRuleValidationMessage: string | undefined;
 }) => {
   if (isAddRuleShown) {
     return (
@@ -73,13 +76,18 @@ export const createConfirmationContent = ({
         <Text>Create additional rules that this token stream must follow.</Text>
         <Form name={ADD_MORE_RULES_FORM}>
           <Dropdown name={SELECT_NEW_RULE_DROPDOWN}>
-            {rulesToAdd.map((rule) => (
-              <Option value={rule}>{rule}</Option>
+            {rulesToAdd.map((rule, index) => (
+              <Option value={index.toString()}>{rule}</Option>
             ))}
           </Dropdown>
-
-          <Input name={NEW_RULE_VALUE_ELEMENT} type="number" />
-          <Button type="submit" name={SAVE_NEW_RULE_BUTTON}>
+          <Field error={addRuleValidationMessage}>
+            <Input name={NEW_RULE_VALUE_ELEMENT} type="number" />
+          </Field>
+          <Button
+            type="submit"
+            name={SAVE_NEW_RULE_BUTTON}
+            disabled={addRuleValidationMessage !== undefined}
+          >
             Save
           </Button>
         </Form>

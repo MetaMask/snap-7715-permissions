@@ -92,7 +92,10 @@ export abstract class BaseOrchestrator<
   /**
    * The state change handlers for the permission request.
    */
-  protected abstract get stateChangeHandlers(): StateChangeHandler<TContext>[];
+  protected abstract get stateChangeHandlers(): StateChangeHandler<
+    TContext,
+    TMetadata
+  >[];
 
   /**
    * Build the permission context from the permission request..
@@ -174,8 +177,6 @@ export abstract class BaseOrchestrator<
       this.#currentContext = context;
       const metadata = await this.createContextMetadata(this.#currentContext);
 
-      console.log({ metadata, context: this.#currentContext });
-
       await confirmationDialog.updateContent({
         ui: await this.createUiContent({
           context: this.#currentContext,
@@ -190,6 +191,12 @@ export abstract class BaseOrchestrator<
       stateChangeHandlers: this.stateChangeHandlers,
       onContextChanged,
       getContext: () => this.#currentContext,
+      getMetadata: async () => {
+        if (this.#currentContext === undefined) {
+          throw new Error('Current context is undefined');
+        }
+        return this.createContextMetadata(this.#currentContext);
+      },
       interfaceId,
       userEventDispatcher: this.userEventDispatcher,
     });
@@ -281,16 +288,21 @@ export abstract class BaseOrchestrator<
   }
 }
 
-const bindStateChangeHandlers = <TContext extends BaseContext>({
+const bindStateChangeHandlers = <
+  TContext extends BaseContext,
+  TMetadata extends object,
+>({
   stateChangeHandlers,
   onContextChanged,
   getContext,
+  getMetadata,
   interfaceId,
   userEventDispatcher,
 }: {
-  stateChangeHandlers: StateChangeHandler<TContext>[];
+  stateChangeHandlers: StateChangeHandler<TContext, TMetadata>[];
   onContextChanged: (context: TContext) => void;
   getContext: () => TContext | undefined;
+  getMetadata: () => Promise<TMetadata>;
   interfaceId: string;
   userEventDispatcher: UserEventDispatcher;
 }) => {
@@ -301,12 +313,16 @@ const bindStateChangeHandlers = <TContext extends BaseContext>({
       event: UserInputEventByType<UserInputEventType>;
     }) => {
       let context = getContext();
-
+      let metadata = await getMetadata();
       if (!context) {
         throw new Error('Current context is undefined');
       }
 
-      context = stateChangeHandler.contextMapper(context, event);
+      if (!metadata) {
+        throw new Error('Current metadata is undefined');
+      }
+
+      context = stateChangeHandler.contextMapper({ context, metadata, event });
       onContextChanged(context);
     };
 

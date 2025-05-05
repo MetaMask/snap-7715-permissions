@@ -4,7 +4,6 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { type GenericSnapElement, Text } from '@metamask/snaps-sdk/jsx';
 
 import { ConfirmationDialog } from '../../src/core/confirmation';
-import type { AdditionalField } from '../../src/core/types';
 import {
   GRANT_BUTTON,
   CANCEL_BUTTON,
@@ -22,18 +21,7 @@ describe('ConfirmationDialog', () => {
   }) as GenericSnapElement;
 
   const defaultProps = {
-    title: 'Test Title',
-    justification: 'Test Justification',
-    origin: 'test-origin',
-    network: 'test-network',
     ui: mockUi,
-    additionalFields: [
-      {
-        label: 'Test Field',
-        value: 'Test Value',
-        tooltip: 'Test Tooltip',
-      },
-    ] as AdditionalField[],
   };
 
   beforeEach(() => {

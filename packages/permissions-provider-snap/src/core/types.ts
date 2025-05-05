@@ -75,13 +75,18 @@ export type ConfirmationProps = {
 
 export type StateChangeHandler<
   TContext,
-  TUserInputEventType extends UserInputEventType,
+  TMetadata,
+  TUserInputEventType extends UserInputEventType = UserInputEventType,
   TEvent extends
     UserInputEventByType<TUserInputEventType> = UserInputEventByType<TUserInputEventType>,
 > = {
   elementName: string;
   eventType: TUserInputEventType;
-  contextMapper: (context: TContext, event: TEvent) => TContext;
+  contextMapper: (args: {
+    context: TContext;
+    event: TEvent;
+    metadata: TMetadata;
+  }) => TContext;
 };
 
 export type Orchestrator = {

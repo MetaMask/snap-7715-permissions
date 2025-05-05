@@ -1,7 +1,10 @@
 import { InputChangeEvent, UserInputEventType } from '@metamask/snaps-sdk';
 import type { StateChangeHandler } from '../../core/types';
 import { TimePeriod } from '../../core/types';
-import type { NativeTokenStreamContext } from './types';
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
+} from './types';
 import {
   AMOUNT_PER_PERIOD_ELEMENT,
   EXPIRY_ELEMENT,
@@ -18,14 +21,18 @@ import {
  */
 export const initialAmountHandler: StateChangeHandler<
   NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
   UserInputEventType.InputChangeEvent
 > = {
   eventType: UserInputEventType.InputChangeEvent,
   elementName: INITIAL_AMOUNT_ELEMENT,
-  contextMapper: (
-    context: NativeTokenStreamContext,
-    event: InputChangeEvent,
-  ) => {
+  contextMapper: ({
+    context,
+    event,
+  }: {
+    context: NativeTokenStreamContext;
+    event: InputChangeEvent;
+  }) => {
     return {
       ...context,
       permissionDetails: {
@@ -41,11 +48,12 @@ export const initialAmountHandler: StateChangeHandler<
  */
 export const removeInitialAmountHandler: StateChangeHandler<
   NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
   UserInputEventType.ButtonClickEvent
 > = {
   eventType: UserInputEventType.ButtonClickEvent,
   elementName: REMOVE_INITIAL_AMOUNT_BUTTON,
-  contextMapper: (context: NativeTokenStreamContext) => {
+  contextMapper: ({ context }: { context: NativeTokenStreamContext }) => {
     return {
       ...context,
       permissionDetails: {
@@ -61,14 +69,18 @@ export const removeInitialAmountHandler: StateChangeHandler<
  */
 export const maxAmountHandler: StateChangeHandler<
   NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
   UserInputEventType.InputChangeEvent
 > = {
   eventType: UserInputEventType.InputChangeEvent,
   elementName: MAX_AMOUNT_ELEMENT,
-  contextMapper: (
-    context: NativeTokenStreamContext,
-    event: InputChangeEvent,
-  ) => {
+  contextMapper: ({
+    context,
+    event,
+  }: {
+    context: NativeTokenStreamContext;
+    event: InputChangeEvent;
+  }) => {
     return {
       ...context,
       permissionDetails: {
@@ -84,11 +96,12 @@ export const maxAmountHandler: StateChangeHandler<
  */
 export const removeMaxAmountHandler: StateChangeHandler<
   NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
   UserInputEventType.ButtonClickEvent
 > = {
   eventType: UserInputEventType.ButtonClickEvent,
   elementName: REMOVE_MAX_AMOUNT_BUTTON,
-  contextMapper: (context: NativeTokenStreamContext) => {
+  contextMapper: ({ context }: { context: NativeTokenStreamContext }) => {
     return {
       ...context,
       permissionDetails: {
@@ -104,14 +117,18 @@ export const removeMaxAmountHandler: StateChangeHandler<
  */
 export const startTimeHandler: StateChangeHandler<
   NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
   UserInputEventType.InputChangeEvent
 > = {
   eventType: UserInputEventType.InputChangeEvent,
   elementName: START_TIME_ELEMENT,
-  contextMapper: (
-    context: NativeTokenStreamContext,
-    event: InputChangeEvent,
-  ) => {
+  contextMapper: ({
+    context,
+    event,
+  }: {
+    context: NativeTokenStreamContext;
+    event: InputChangeEvent;
+  }) => {
     return {
       ...context,
       permissionDetails: {
@@ -127,14 +144,18 @@ export const startTimeHandler: StateChangeHandler<
  */
 export const expiryHandler: StateChangeHandler<
   NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
   UserInputEventType.InputChangeEvent
 > = {
   eventType: UserInputEventType.InputChangeEvent,
   elementName: EXPIRY_ELEMENT,
-  contextMapper: (
-    context: NativeTokenStreamContext,
-    event: InputChangeEvent,
-  ) => {
+  contextMapper: ({
+    context,
+    event,
+  }: {
+    context: NativeTokenStreamContext;
+    event: InputChangeEvent;
+  }) => {
     return {
       ...context,
       expiry: String(event.value),
@@ -147,14 +168,18 @@ export const expiryHandler: StateChangeHandler<
  */
 export const amountPerPeriodHandler: StateChangeHandler<
   NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
   UserInputEventType.InputChangeEvent
 > = {
   eventType: UserInputEventType.InputChangeEvent,
   elementName: AMOUNT_PER_PERIOD_ELEMENT,
-  contextMapper: (
-    context: NativeTokenStreamContext,
-    event: InputChangeEvent,
-  ) => {
+  contextMapper: ({
+    context,
+    event,
+  }: {
+    context: NativeTokenStreamContext;
+    event: InputChangeEvent;
+  }) => {
     return {
       ...context,
       permissionDetails: {
@@ -170,14 +195,18 @@ export const amountPerPeriodHandler: StateChangeHandler<
  */
 export const timePeriodHandler: StateChangeHandler<
   NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
   UserInputEventType.InputChangeEvent
 > = {
   eventType: UserInputEventType.InputChangeEvent,
   elementName: TIME_PERIOD_ELEMENT,
-  contextMapper: (
-    context: NativeTokenStreamContext,
-    event: InputChangeEvent,
-  ) => {
+  contextMapper: ({
+    context,
+    event,
+  }: {
+    context: NativeTokenStreamContext;
+    event: InputChangeEvent;
+  }) => {
     return {
       ...context,
       permissionDetails: {
