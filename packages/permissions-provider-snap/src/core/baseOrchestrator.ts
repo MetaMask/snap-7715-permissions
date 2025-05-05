@@ -9,7 +9,11 @@ import {
   createDelegation,
   encodeDelegation,
 } from '@metamask/delegation-toolkit';
-import { type InputChangeEvent, UserInputEventType } from '@metamask/snaps-sdk';
+import {
+  ButtonClickEvent,
+  type InputChangeEvent,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { toHex, type Hex } from 'viem';
 
@@ -179,11 +183,23 @@ export abstract class BaseOrchestrator<
 
     const interfaceId = await confirmationDialog.createInterface();
 
+    const onContextChanged = async (context: TContext) => {
+      this.#currentContext = context;
+      const metadata = await this.createContextMetadata(this.#currentContext);
+
+      console.log({ metadata, context: this.#currentContext });
+
+      await confirmationDialog.updateContent({
+        ui: await this.createUiContent({
+          context: this.#currentContext,
+          metadata,
+        }),
+      });
+    };
+
     const unbindStateChangeHandlers = bindStateChangeHandlers({
       stateChangeHandlers: this.stateChangeHandlers,
-      onContextChanged: (context) => {
-        this.#currentContext = context;
-      },
+      onContextChanged,
       getContext: () => this.#currentContext,
       interfaceId,
       userEventDispatcher: this.userEventDispatcher,
@@ -291,8 +307,8 @@ const bindStateChangeHandlers = <TContext extends BaseContext>({
 }) => {
   const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
     const handler: UserEventHandler<
-      UserInputEventType.InputChangeEvent
-    > = async ({ event }: { event: InputChangeEvent }) => {
+      UserInputEventType.InputChangeEvent | UserInputEventType.ButtonClickEvent
+    > = async ({ event }: { event: InputChangeEvent | ButtonClickEvent }) => {
       let context = getContext();
 
       if (!context) {
@@ -301,14 +317,17 @@ const bindStateChangeHandlers = <TContext extends BaseContext>({
 
       const value = stateChangeHandler.valueMapper
         ? stateChangeHandler.valueMapper(event)
-        : (event.value as string | boolean);
+        : ((event as Pick<InputChangeEvent, 'value'>).value as
+            | string
+            | boolean
+            | undefined);
 
       context = stateChangeHandler.contextMapper(context, value);
       onContextChanged(context);
     };
 
     const eventMetadata = {
-      eventType: UserInputEventType.InputChangeEvent,
+      eventType: stateChangeHandler.eventType,
       interfaceId,
       elementName: stateChangeHandler.elementName,
       handler,

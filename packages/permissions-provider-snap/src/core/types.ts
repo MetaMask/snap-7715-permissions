@@ -85,12 +85,19 @@ export type ConfirmationProps = {
   additionalFields?: AdditionalField[];
 };
 
-export type StateChangeHandler<TContext> = {
+export type StateChangeHandler<
+  TContext,
+  TUserInputEventType extends
+    | UserInputEventType.ButtonClickEvent
+    | UserInputEventType.InputChangeEvent =
+    | UserInputEventType.ButtonClickEvent
+    | UserInputEventType.InputChangeEvent,
+  TValue extends any = any,
+> = {
   elementName: string;
-  valueMapper?: (
-    event: UserInputEventByType<UserInputEventType.InputChangeEvent>,
-  ) => string | boolean;
-  contextMapper: (context: TContext, value: string | boolean) => TContext;
+  eventType: TUserInputEventType;
+  valueMapper?: (event: UserInputEventByType<TUserInputEventType>) => TValue;
+  contextMapper: (context: TContext, value: TValue) => TContext;
 };
 
 export type Orchestrator = {

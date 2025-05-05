@@ -22,6 +22,7 @@ export type NativeTokenStreamMetadata = {
     startTimeError?: string;
     expiryError?: string;
   };
+  rulesToAdd: string[];
 };
 
 export type NativeTokenStreamContext = BaseContext & {

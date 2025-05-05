@@ -18,6 +18,8 @@ import {
   EXPIRY_ELEMENT,
   INITIAL_AMOUNT_ELEMENT,
   MAX_AMOUNT_ELEMENT,
+  REMOVE_INITIAL_AMOUNT_BUTTON,
+  REMOVE_MAX_AMOUNT_BUTTON,
   START_TIME_ELEMENT,
   TIME_PERIOD_ELEMENT,
 } from './content';
@@ -35,6 +37,7 @@ import type {
   NativeTokenStreamPermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
 export type NativeTokenStreamDependencies = {
   parseAndValidatePermission: typeof parseAndValidatePermission;
@@ -166,6 +169,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   get stateChangeHandlers(): StateChangeHandler<NativeTokenStreamContext>[] {
     return [
       {
+        eventType: UserInputEventType.InputChangeEvent,
         elementName: INITIAL_AMOUNT_ELEMENT,
         contextMapper: (
           context: NativeTokenStreamContext,
@@ -179,6 +183,18 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
         }),
       },
       {
+        eventType: UserInputEventType.ButtonClickEvent,
+        elementName: REMOVE_INITIAL_AMOUNT_BUTTON,
+        contextMapper: (context: NativeTokenStreamContext) => ({
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            initialAmount: undefined,
+          },
+        }),
+      },
+      {
+        eventType: UserInputEventType.InputChangeEvent,
         elementName: MAX_AMOUNT_ELEMENT,
         contextMapper: (
           context: NativeTokenStreamContext,
@@ -192,6 +208,18 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
         }),
       },
       {
+        eventType: UserInputEventType.ButtonClickEvent,
+        elementName: REMOVE_MAX_AMOUNT_BUTTON,
+        contextMapper: (context: NativeTokenStreamContext) => ({
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            maxAmount: undefined,
+          },
+        }),
+      },
+      {
+        eventType: UserInputEventType.InputChangeEvent,
         elementName: START_TIME_ELEMENT,
         contextMapper: (
           context: NativeTokenStreamContext,
@@ -205,6 +233,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
         }),
       },
       {
+        eventType: UserInputEventType.InputChangeEvent,
         elementName: EXPIRY_ELEMENT,
         contextMapper: (
           context: NativeTokenStreamContext,
@@ -215,6 +244,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
         }),
       },
       {
+        eventType: UserInputEventType.InputChangeEvent,
         elementName: AMOUNT_PER_PERIOD_ELEMENT,
         contextMapper: (
           context: NativeTokenStreamContext,
@@ -228,6 +258,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
         }),
       },
       {
+        eventType: UserInputEventType.InputChangeEvent,
         elementName: TIME_PERIOD_ELEMENT,
         contextMapper: (
           context: NativeTokenStreamContext,
