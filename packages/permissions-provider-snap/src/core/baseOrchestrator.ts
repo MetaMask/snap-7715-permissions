@@ -20,6 +20,7 @@ import type { AccountController, FactoryArgs } from '../accountController';
 import type {
   UserEventDispatcher,
   UserEventHandler,
+  UserInputEventByType,
 } from '../userEventDispatcher';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
@@ -294,23 +295,18 @@ const bindStateChangeHandlers = <TContext extends BaseContext>({
   userEventDispatcher: UserEventDispatcher;
 }) => {
   const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
-    const handler: UserEventHandler<
-      UserInputEventType.InputChangeEvent | UserInputEventType.ButtonClickEvent
-    > = async ({ event }: { event: InputChangeEvent | ButtonClickEvent }) => {
+    const handler: UserEventHandler<UserInputEventType> = async ({
+      event,
+    }: {
+      event: UserInputEventByType<UserInputEventType>;
+    }) => {
       let context = getContext();
 
       if (!context) {
         throw new Error('Current context is undefined');
       }
 
-      const value = stateChangeHandler.valueMapper
-        ? stateChangeHandler.valueMapper(event)
-        : ((event as Pick<InputChangeEvent, 'value'>).value as
-            | string
-            | boolean
-            | undefined);
-
-      context = stateChangeHandler.contextMapper(context, value);
+      context = stateChangeHandler.contextMapper(context, event);
       onContextChanged(context);
     };
 

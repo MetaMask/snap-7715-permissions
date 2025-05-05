@@ -75,17 +75,13 @@ export type ConfirmationProps = {
 
 export type StateChangeHandler<
   TContext,
-  TUserInputEventType extends
-    | UserInputEventType.ButtonClickEvent
-    | UserInputEventType.InputChangeEvent =
-    | UserInputEventType.ButtonClickEvent
-    | UserInputEventType.InputChangeEvent,
-  TValue extends any = any,
+  TUserInputEventType extends UserInputEventType,
+  TEvent extends
+    UserInputEventByType<TUserInputEventType> = UserInputEventByType<TUserInputEventType>,
 > = {
   elementName: string;
   eventType: TUserInputEventType;
-  valueMapper?: (event: UserInputEventByType<TUserInputEventType>) => TValue;
-  contextMapper: (context: TContext, value: TValue) => TContext;
+  contextMapper: (context: TContext, event: TEvent) => TContext;
 };
 
 export type Orchestrator = {

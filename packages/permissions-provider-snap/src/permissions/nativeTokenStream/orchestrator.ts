@@ -4,22 +4,15 @@ import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { AccountController } from '../../accountController';
 import type { ConfirmationDialogFactory } from '../../core/confirmationFactory';
 import { BaseOrchestrator } from '../../core/baseOrchestrator';
-import type { StateChangeHandler, TimePeriod } from '../../core/types';
+import type { StateChangeHandler } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { IconUrls } from '../../ui/iconConstant';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
 import { appendCaveats } from './caveats';
 import {
-  AMOUNT_PER_PERIOD_ELEMENT,
   createConfirmationContent,
-  EXPIRY_ELEMENT,
-  INITIAL_AMOUNT_ELEMENT,
+  TOGGLE_ADD_MORE_RULES_BUTTON,
   JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
-  MAX_AMOUNT_ELEMENT,
-  REMOVE_INITIAL_AMOUNT_BUTTON,
-  REMOVE_MAX_AMOUNT_BUTTON,
-  START_TIME_ELEMENT,
-  TIME_PERIOD_ELEMENT,
+  ADD_MORE_RULES_FORM,
 } from './content';
 import {
   contextToPermissionRequest,
@@ -27,6 +20,16 @@ import {
   createContextMetadata,
   hydratePermission,
 } from './context';
+import {
+  initialAmountHandler,
+  removeInitialAmountHandler,
+  maxAmountHandler,
+  removeMaxAmountHandler,
+  startTimeHandler,
+  expiryHandler,
+  amountPerPeriodHandler,
+  timePeriodHandler,
+} from './stateChangeHandlers';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamPermissionRequest,
@@ -67,7 +70,8 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
 > {
   readonly #tokenPricesService: TokenPricesService;
   readonly #dependencies: NativeTokenStreamDependencies;
-  #isJustificationCollapsed: boolean = true;
+  #isJustificationCollapsed = true;
+  #isAddRuleShown = false;
 
   constructor(
     {
@@ -108,6 +112,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     return this.#dependencies.createConfirmationContent({
       ...args,
       isJustificationCollapsed: this.#isJustificationCollapsed,
+      isAddRuleShown: this.#isAddRuleShown,
     });
   }
 
@@ -154,119 +159,61 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     });
   }
 
-  get stateChangeHandlers(): StateChangeHandler<NativeTokenStreamContext>[] {
+  get stateChangeHandlers(): StateChangeHandler<
+    NativeTokenStreamContext,
+    UserInputEventType
+  >[] {
+    // Plain handlers that directly access class instance variables
+    const justificationShowMoreHandler: StateChangeHandler<
+      NativeTokenStreamContext,
+      UserInputEventType.ButtonClickEvent
+    > = {
+      eventType: UserInputEventType.ButtonClickEvent,
+      elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
+      contextMapper: (context: NativeTokenStreamContext) => {
+        this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
+        return context;
+      },
+    };
+
+    const toggleAddMoreRulesHandler: StateChangeHandler<
+      NativeTokenStreamContext,
+      UserInputEventType.ButtonClickEvent
+    > = {
+      eventType: UserInputEventType.ButtonClickEvent,
+      elementName: TOGGLE_ADD_MORE_RULES_BUTTON,
+      contextMapper: (context: NativeTokenStreamContext) => {
+        this.#isAddRuleShown = !this.#isAddRuleShown;
+        return context;
+      },
+    };
+
+    const addMoreRulesFormHandler: StateChangeHandler<
+      NativeTokenStreamContext,
+      UserInputEventType.FormSubmitEvent
+    > = {
+      eventType: UserInputEventType.FormSubmitEvent,
+      elementName: ADD_MORE_RULES_FORM,
+      contextMapper: (context: NativeTokenStreamContext) => {
+        this.#isAddRuleShown = false;
+        return context;
+      },
+    };
+
+    // This type assertion is necessary because we need to allow different event types
+    // in the array, but StateChangeHandler requires a specific event type.
     return [
-      {
-        eventType: UserInputEventType.InputChangeEvent,
-        elementName: INITIAL_AMOUNT_ELEMENT,
-        contextMapper: (
-          context: NativeTokenStreamContext,
-          value: string | boolean,
-        ) => ({
-          ...context,
-          permissionDetails: {
-            ...context.permissionDetails,
-            initialAmount: String(value),
-          },
-        }),
-      },
-      {
-        eventType: UserInputEventType.ButtonClickEvent,
-        elementName: REMOVE_INITIAL_AMOUNT_BUTTON,
-        contextMapper: (context: NativeTokenStreamContext) => ({
-          ...context,
-          permissionDetails: {
-            ...context.permissionDetails,
-            initialAmount: undefined,
-          },
-        }),
-      },
-      {
-        eventType: UserInputEventType.InputChangeEvent,
-        elementName: MAX_AMOUNT_ELEMENT,
-        contextMapper: (
-          context: NativeTokenStreamContext,
-          value: string | boolean,
-        ) => ({
-          ...context,
-          permissionDetails: {
-            ...context.permissionDetails,
-            maxAmount: String(value),
-          },
-        }),
-      },
-      {
-        eventType: UserInputEventType.ButtonClickEvent,
-        elementName: REMOVE_MAX_AMOUNT_BUTTON,
-        contextMapper: (context: NativeTokenStreamContext) => ({
-          ...context,
-          permissionDetails: {
-            ...context.permissionDetails,
-            maxAmount: undefined,
-          },
-        }),
-      },
-      {
-        eventType: UserInputEventType.InputChangeEvent,
-        elementName: START_TIME_ELEMENT,
-        contextMapper: (
-          context: NativeTokenStreamContext,
-          value: string | boolean,
-        ) => ({
-          ...context,
-          permissionDetails: {
-            ...context.permissionDetails,
-            startTime: String(value),
-          },
-        }),
-      },
-      {
-        eventType: UserInputEventType.InputChangeEvent,
-        elementName: EXPIRY_ELEMENT,
-        contextMapper: (
-          context: NativeTokenStreamContext,
-          value: string | boolean,
-        ) => ({
-          ...context,
-          expiry: String(value),
-        }),
-      },
-      {
-        eventType: UserInputEventType.InputChangeEvent,
-        elementName: AMOUNT_PER_PERIOD_ELEMENT,
-        contextMapper: (
-          context: NativeTokenStreamContext,
-          value: string | boolean,
-        ) => ({
-          ...context,
-          permissionDetails: {
-            ...context.permissionDetails,
-            amountPerPeriod: String(value),
-          },
-        }),
-      },
-      {
-        eventType: UserInputEventType.InputChangeEvent,
-        elementName: TIME_PERIOD_ELEMENT,
-        contextMapper: (
-          context: NativeTokenStreamContext,
-          value: string | boolean,
-        ) => ({
-          ...context,
-          permissionDetails: {
-            ...context.permissionDetails,
-            timePeriod: value as TimePeriod,
-          },
-        }),
-      },
-      {
-        eventType: UserInputEventType.ButtonClickEvent,
-        elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
-        contextMapper: (context: NativeTokenStreamContext) => {
-          this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
-          return context;
-        },
-      },
-    ];
+      initialAmountHandler,
+      removeInitialAmountHandler,
+      maxAmountHandler,
+      removeMaxAmountHandler,
+      startTimeHandler,
+      expiryHandler,
+      amountPerPeriodHandler,
+      timePeriodHandler,
+      justificationShowMoreHandler,
+      toggleAddMoreRulesHandler,
+      addMoreRulesFormHandler,
+    ] as StateChangeHandler<NativeTokenStreamContext, UserInputEventType>[];
   }
 }

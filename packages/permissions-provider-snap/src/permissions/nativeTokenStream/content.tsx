@@ -1,4 +1,15 @@
-import { Box, Button, Section } from '@metamask/snaps-sdk/jsx';
+import {
+  Bold,
+  Box,
+  Button,
+  Input,
+  Section,
+  Text,
+  Dropdown,
+  Option,
+  Icon,
+  Form,
+} from '@metamask/snaps-sdk/jsx';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import { RequestHeader } from '../../ui/components/RequestHeader';
 import { NativeTokenStreamContext, NativeTokenStreamMetadata } from './types';
@@ -21,27 +32,66 @@ export const START_TIME_ELEMENT = 'start-time';
 export const EXPIRY_ELEMENT = 'expiry';
 export const AMOUNT_PER_PERIOD_ELEMENT = 'amount-per-period';
 export const TIME_PERIOD_ELEMENT = 'time-period';
-export const ADD_MORE_RULES_BUTTON = 'add-more-rules';
+export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'justification-show-more';
+export const SELECT_NEW_RULE_DROPDOWN = 'select-new-rule';
+export const NEW_RULE_VALUE_ELEMENT = 'new-rule-value';
+export const SAVE_NEW_RULE_BUTTON = 'save-new-rule';
+export const ADD_MORE_RULES_FORM = 'add-more-rules-form';
 
 export const createConfirmationContent = ({
   context: { accountDetails, permissionDetails, expiry, isAdjustmentAllowed },
   metadata: { validationErrors, amountPerSecond, rulesToAdd },
   isJustificationCollapsed,
+  isAddRuleShown,
   origin,
   chainId,
 }: {
   context: NativeTokenStreamContext;
   metadata: NativeTokenStreamMetadata;
   isJustificationCollapsed: boolean;
+  isAddRuleShown: boolean;
   origin: string;
   chainId: number;
 }) => {
+  if (isAddRuleShown) {
+    return (
+      <Section>
+        <Box direction="horizontal" alignment="space-between">
+          <Text>{''}</Text>
+          <Box direction="horizontal" alignment="center">
+            <Text>
+              <Bold>Add more rules</Bold>
+            </Text>
+          </Box>
+          <Box direction="horizontal" alignment="end">
+            <Button name={TOGGLE_ADD_MORE_RULES_BUTTON}>
+              <Icon name="close" size="inherit" color="primary" />
+            </Button>
+          </Box>
+        </Box>
+        <Text>Create additional rules that this token stream must follow.</Text>
+        <Form name={ADD_MORE_RULES_FORM}>
+          <Dropdown name={SELECT_NEW_RULE_DROPDOWN}>
+            {rulesToAdd.map((rule) => (
+              <Option value={rule}>{rule}</Option>
+            ))}
+          </Dropdown>
+
+          <Input name={NEW_RULE_VALUE_ELEMENT} type="number" />
+          <Button type="submit" name={SAVE_NEW_RULE_BUTTON}>
+            Save
+          </Button>
+        </Form>
+      </Section>
+    );
+  }
+
   const areValuesFixed = !isAdjustmentAllowed;
 
   const rulesToAddButton =
     rulesToAdd.length > 0 ? (
-      <Button name={ADD_MORE_RULES_BUTTON}>Add more rules</Button>
+      <Button name={TOGGLE_ADD_MORE_RULES_BUTTON}>Add more rules</Button>
     ) : null;
 
   const networkName = getChainName(chainId);
