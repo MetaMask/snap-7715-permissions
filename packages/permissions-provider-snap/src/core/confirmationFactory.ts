@@ -26,12 +26,7 @@ export class ConfirmationDialogFactory {
   /**
    * Creates a confirmation dialog with the specified content.
    * @param params - The parameters for creating a confirmation dialog.
-   * @param params.title - The title text to display in the confirmation dialog.
-   * @param params.justification - The justification text explaining the reason for the confirmation.
    * @param params.ui - The UI elements to be displayed in the confirmation dialog.
-   * @param params.origin - The origin of the request requiring confirmation.
-   * @param params.network - The network context for the confirmation.
-   * @param params.additionalFields - Optional additional fields to be included in the confirmation dialog.
    * @returns A promise that resolves with the confirmation dialog.
    */
   createConfirmation({ ui }: { ui: GenericSnapElement }) {

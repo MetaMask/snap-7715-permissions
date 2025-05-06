@@ -1,4 +1,5 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 import { toHex, parseUnits } from 'viem/utils';
 
 import type { AccountController } from '../../../src/accountController';
@@ -15,7 +16,6 @@ import type {
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
-import { UserInputEventType } from '@metamask/snaps-sdk';
 
 const mockPermissionRequest: NativeTokenStreamPermissionRequest = {
   chainId: '0x1',

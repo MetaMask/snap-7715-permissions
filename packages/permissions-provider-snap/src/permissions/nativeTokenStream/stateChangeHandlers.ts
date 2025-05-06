@@ -1,10 +1,7 @@
-import { InputChangeEvent, UserInputEventType } from '@metamask/snaps-sdk';
-import type { StateChangeHandler } from '../../core/types';
-import { TimePeriod } from '../../core/types';
-import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata,
-} from './types';
+import type { InputChangeEvent } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
+
+import type { StateChangeHandler, TimePeriod } from '../../core/types';
 import {
   AMOUNT_PER_PERIOD_ELEMENT,
   EXPIRY_ELEMENT,
@@ -15,6 +12,10 @@ import {
   START_TIME_ELEMENT,
   TIME_PERIOD_ELEMENT,
 } from './content';
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
+} from './types';
 
 /**
  * Handler for updating the initial amount value in the context

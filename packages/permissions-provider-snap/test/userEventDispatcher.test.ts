@@ -147,13 +147,17 @@ describe('UserEventDispatcher', () => {
     });
 
     it('should gracefully handle errors in event handlers', async () => {
+      const handler = jest.fn<() => void>();
+
+      handler.mockImplementation(() => {
+        throw new Error('Test error');
+      });
+
       userEventDispatcher.on({
         elementName,
         eventType,
         interfaceId,
-        handler: () => {
-          throw new Error('Test error');
-        },
+        handler,
       });
 
       const handleEvent = userEventDispatcher.createUserInputEventHandler();
@@ -165,16 +169,22 @@ describe('UserEventDispatcher', () => {
         },
         id: interfaceId,
       });
+
+      expect(handler).toHaveBeenCalled();
     });
 
     it('should gracefully handle errors in async event handlers', async () => {
+      const handler = createAsyncHandlerMock();
+
+      handler.mockImplementation(async () => {
+        throw new Error('Test error');
+      });
+
       userEventDispatcher.on({
         elementName,
         eventType,
         interfaceId,
-        handler: async () => {
-          throw new Error('Test error');
-        },
+        handler,
       });
 
       const handleEvent = userEventDispatcher.createUserInputEventHandler();
@@ -186,6 +196,8 @@ describe('UserEventDispatcher', () => {
         },
         id: interfaceId,
       });
+
+      expect(handler).toHaveBeenCalled();
     });
   });
 

@@ -1,13 +1,10 @@
 import type { CaveatBuilder } from '@metamask/delegation-toolkit';
-import {
-  FormSubmitEvent,
-  InputChangeEvent,
-  UserInputEventType,
-} from '@metamask/snaps-sdk';
+import type { FormSubmitEvent, InputChangeEvent } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../../accountController';
-import type { ConfirmationDialogFactory } from '../../core/confirmationFactory';
 import { BaseOrchestrator } from '../../core/baseOrchestrator';
+import type { ConfirmationDialogFactory } from '../../core/confirmationFactory';
 import type { StateChangeHandler } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
@@ -75,10 +72,15 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
   NativeTokenStreamMetadata
 > {
   readonly #tokenPricesService: TokenPricesService;
+
   readonly #dependencies: NativeTokenStreamDependencies;
+
   #isJustificationCollapsed = true;
+
   #isAddRuleShown = false;
+
   #addNewRuleSelectedIndex = 0;
+
   #addNewRuleValue: string | undefined;
 
   constructor(
@@ -147,10 +149,11 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
           await this.createContextMetadata(updatedContext);
 
         return updatedMetadata.validationErrors.maxAmountError;
-      } else {
-        throw new Error(`Unknown rule: ${rule}`);
       }
+      throw new Error(`Unknown rule: ${rule}`);
     }
+
+    return undefined;
   }
 
   async createUiContent(args: {
@@ -217,8 +220,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
 
   get stateChangeHandlers(): StateChangeHandler<
     NativeTokenStreamContext,
-    NativeTokenStreamMetadata,
-    UserInputEventType
+    NativeTokenStreamMetadata
   >[] {
     // Plain handlers that directly access class instance variables
     const justificationShowMoreHandler: StateChangeHandler<
@@ -250,7 +252,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
         context: NativeTokenStreamContext;
         event: InputChangeEvent;
       }) => {
-        this.#addNewRuleSelectedIndex = parseInt(event.value as string);
+        this.#addNewRuleSelectedIndex = parseInt(event.value as string, 10);
         return context;
       },
     };
@@ -309,6 +311,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
 
         const ruleIndex = parseInt(
           event.value[SELECT_NEW_RULE_DROPDOWN] as string,
+          10,
         );
         const value = event.value[NEW_RULE_VALUE_ELEMENT] as string;
 
@@ -319,7 +322,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
         } else if (rule === 'Max amount') {
           permissionDetails.maxAmount = value;
         } else {
-          throw new Error(`Unknown form field: ${rule}`);
+          throw new Error(`Unknown form field: ${rule ?? 'undefined'}`);
         }
 
         this.#isAddRuleShown = false;
@@ -346,8 +349,7 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
       addNewRuleValueHandler,
     ] as StateChangeHandler<
       NativeTokenStreamContext,
-      NativeTokenStreamMetadata,
-      UserInputEventType
+      NativeTokenStreamMetadata
     >[];
   }
 }

@@ -8,11 +8,7 @@ import {
   createDelegation,
   encodeDelegation,
 } from '@metamask/delegation-toolkit';
-import {
-  ButtonClickEvent,
-  type InputChangeEvent,
-  UserInputEventType,
-} from '@metamask/snaps-sdk';
+import type { UserInputEventType } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { toHex, type Hex } from 'viem';
 
@@ -29,6 +25,63 @@ import type {
   StateChangeHandler,
   Orchestrator,
 } from './types';
+
+const bindStateChangeHandlers = <
+  TContext extends BaseContext,
+  TMetadata extends object,
+>({
+  stateChangeHandlers,
+  onContextChanged,
+  getContext,
+  getMetadata,
+  interfaceId,
+  userEventDispatcher,
+}: {
+  stateChangeHandlers: StateChangeHandler<TContext, TMetadata>[];
+  onContextChanged: (context: TContext) => void | Promise<void>;
+  getContext: () => TContext | undefined;
+  getMetadata: () => Promise<TMetadata>;
+  interfaceId: string;
+  userEventDispatcher: UserEventDispatcher;
+}) => {
+  const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
+    const handler: UserEventHandler<UserInputEventType> = async ({
+      event,
+    }: {
+      event: UserInputEventByType<UserInputEventType>;
+    }) => {
+      let context = getContext();
+      const metadata = await getMetadata();
+      if (!context) {
+        throw new Error('Current context is undefined');
+      }
+
+      if (!metadata) {
+        throw new Error('Current metadata is undefined');
+      }
+
+      context = stateChangeHandler.contextMapper({ context, metadata, event });
+      await onContextChanged(context);
+    };
+
+    const eventMetadata = {
+      eventType: stateChangeHandler.eventType,
+      interfaceId,
+      elementName: stateChangeHandler.elementName,
+      handler,
+    } as const;
+
+    userEventDispatcher.on(eventMetadata);
+
+    return () => {
+      userEventDispatcher.off(eventMetadata);
+    };
+  });
+
+  return () => {
+    handlerUnbinders.forEach((unbinder) => unbinder());
+  };
+};
 
 /**
  * Base class for permission orchestrators that handle the core flow of permission requests.
@@ -287,60 +340,3 @@ export abstract class BaseOrchestrator<
     };
   }
 }
-
-const bindStateChangeHandlers = <
-  TContext extends BaseContext,
-  TMetadata extends object,
->({
-  stateChangeHandlers,
-  onContextChanged,
-  getContext,
-  getMetadata,
-  interfaceId,
-  userEventDispatcher,
-}: {
-  stateChangeHandlers: StateChangeHandler<TContext, TMetadata>[];
-  onContextChanged: (context: TContext) => void;
-  getContext: () => TContext | undefined;
-  getMetadata: () => Promise<TMetadata>;
-  interfaceId: string;
-  userEventDispatcher: UserEventDispatcher;
-}) => {
-  const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
-    const handler: UserEventHandler<UserInputEventType> = async ({
-      event,
-    }: {
-      event: UserInputEventByType<UserInputEventType>;
-    }) => {
-      let context = getContext();
-      let metadata = await getMetadata();
-      if (!context) {
-        throw new Error('Current context is undefined');
-      }
-
-      if (!metadata) {
-        throw new Error('Current metadata is undefined');
-      }
-
-      context = stateChangeHandler.contextMapper({ context, metadata, event });
-      onContextChanged(context);
-    };
-
-    const eventMetadata = {
-      eventType: stateChangeHandler.eventType,
-      interfaceId,
-      elementName: stateChangeHandler.elementName,
-      handler,
-    } as const;
-
-    userEventDispatcher.on(eventMetadata);
-
-    return () => {
-      userEventDispatcher.off(eventMetadata);
-    };
-  });
-
-  return () => {
-    handlerUnbinders.forEach((unbinder) => unbinder());
-  };
-};
