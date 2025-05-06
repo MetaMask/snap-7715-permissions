@@ -12,21 +12,13 @@ In the meantime(i.e., while `@metamask/gator-permissions-snap` is still a manual
 
 **Useful links:**
 
-- [@metamask/message-signing-snap](https://github.com/MetaMask/message-signing-snap) (its preinstalled in mobile or extension)
+- [@metamask/message-signing-snap](https://github.com/MetaMask/message-signing-snap) (its preinstalled in mobile and extension)
 - [Profile sync SDK(i.e ProfileSyncController)](https://www.npmjs.com/package/@metamask/profile-sync-controller)
 
 ## Profile Sync SDK: OAuth 2.0 Authentication flow
 
 - **IdentifierID**: We will use `SRP` identifier that uses the message signing snap to derived a public key.
 - **Identifier Secret**: Using SRP as the identifier, we will derive the private key from the automatic message signing snap. The private key is used to signs a authentication message to allow the user to prove ownership of the `SRP` identifier.
-- Snap Endowments: The `@metamask/gator-permissions-snap` `wallet_snap` is updated to allow communication with `@metamask/message-signing-snap`
-
-```json
-"wallet_snap": {
-    "npm:@metamask/message-signing-snap": {},
-    "npm:@metamask/permissions-kernel-snap": {}
-}
-```
 
 ```mermaid
 sequenceDiagram

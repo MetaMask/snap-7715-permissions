@@ -29,4 +29,4 @@ export const gatorSnapOrigin =
 export const messageSigningSnapOrigin =
   // eslint-disable-next-line no-restricted-globals
   process.env.GATSBY_MESSAGE_SIGNING_SNAP_ORIGIN ??
-  `local:http://localhost:8082`;
+  `npm:@metamask/message-signing-snap`;

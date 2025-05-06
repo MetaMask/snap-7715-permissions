@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "oHqka6QaOWovzW/q1m4bA5DXPozXjE21FQQT1Ru2e3Q=",
+    "shasum": "RbGw4KO/5z2puDf83uSmO1nzy8TbosMM/W7h2yxmCbA=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -18,7 +18,7 @@
     }
   },
   "initialConnections": {
-    "local:http://localhost:8081": {},
+    "local:http://localhost:8082": {},
     "npm:@metamask/gator-permissions-snap": {}
   },
   "initialPermissions": {

@@ -84,11 +84,17 @@ export function createRpcHandler(config: {
         firstRequest.permission.type,
       ) as SupportedPermissionTypes;
 
-      // create orchestrator
+      // create orchestrator and get user profile
       const orchestrator = createPermissionOrchestrator(permissionType);
-      const permission = await orchestrator.parseAndValidate(
-        firstRequest.permission,
-      );
+      const [permission, userProfile] = await Promise.all([
+        orchestrator.parseAndValidate(firstRequest.permission),
+        profileSyncManager.getUserProfile(),
+      ]);
+      console.log('userProfile:', userProfile);
+
+      if (!userProfile) {
+        throw new Error('Failed to get user profile');
+      }
 
       // process the request
       const orchestrateArgs: OrchestrateArgs<typeof permissionType> = {
@@ -116,8 +122,6 @@ export function createRpcHandler(config: {
       }
 
       // TODO: Store the granted permission with profile sync
-      const userProfile = await profileSyncManager.getUserProfile();
-      console.log('userProfile:', userProfile);
 
       return [orchestrateRes.response] as Json[];
     },

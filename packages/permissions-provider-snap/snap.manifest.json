@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "Bc0Rtd+8iRLAnxghiXLlrGZOZvWLgqVn21udccYk4Yk=",
+    "shasum": "O7p7rGIs5CjsPDN5C33rKPzJn+tDza6jTZ7ttJc6sVM=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -18,7 +18,7 @@
     }
   },
   "initialConnections": {
-    "local:http://localhost:8080": {},
+    "local:http://localhost:8081": {},
     "npm:@metamask/permissions-kernel-snap": {}
   },
   "initialPermissions": {

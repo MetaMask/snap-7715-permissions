@@ -53,9 +53,6 @@ export function createProfileSyncManager(
     },
   };
 
-  // TODO: Request to message signing snap to sign messages is failing.
-  // We need to update the message signing snap `endowment:rpc` to allow
-  // request from the gator snap: https://github.com/MetaMask/message-signing-snap/blob/main/snap.manifest.json#L30
   /**
    * Custom signing implementation for profile sync.
    * Uses the message signing snap to sign messages.
