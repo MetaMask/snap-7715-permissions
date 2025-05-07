@@ -24,21 +24,25 @@ import { getSdkEnv } from './config';
 
 export type ProfileSyncManager = {
   getUserProfile: () => Promise<UserProfile | null>;
-  getAllGrantedPermissions: () => Promise<PermissionResponse[]>;
+  getAllGrantedPermissions: () => Promise<StoredGrantedPermission[]>;
   getGrantedPermission: (
     permissionContext: Hex,
-  ) => Promise<PermissionResponse | null>;
+  ) => Promise<StoredGrantedPermission | null>;
   storeGrantedPermission: (
-    permissionResponse: PermissionResponse,
+    storedGrantedPermission: StoredGrantedPermission,
   ) => Promise<void>;
   storeGrantedPermissionBatch: (
-    permissionResponses: PermissionResponse[],
+    storedGrantedPermission: StoredGrantedPermission[],
   ) => Promise<void>;
-  revokeGrantedPermission: (permissionContext: Hex) => Promise<void>;
 };
 
 export type ProfileSyncManagerConfig = {
   stateManager: StateManager;
+};
+
+export type StoredGrantedPermission = {
+  permissionResponse: PermissionResponse;
+  siteOrigin: string;
 };
 
 /**
@@ -185,11 +189,13 @@ export function createProfileSyncManager(
    *
    * @returns All granted permissions.
    */
-  async function getAllGrantedPermissions(): Promise<PermissionResponse[]> {
+  async function getAllGrantedPermissions(): Promise<
+    StoredGrantedPermission[]
+  > {
     try {
       const items = await userStorage.getAllFeatureItems(FEATURE);
       return items
-        ? items.map((item) => JSON.parse(item) as PermissionResponse)
+        ? items.map((item) => JSON.parse(item) as StoredGrantedPermission)
         : [];
     } catch (error) {
       logger.error('Error fetching all granted permissions:', error);
@@ -206,12 +212,14 @@ export function createProfileSyncManager(
    */
   async function getGrantedPermission(
     permissionContext: Hex,
-  ): Promise<PermissionResponse | null> {
+  ): Promise<StoredGrantedPermission | null> {
     try {
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${permissionContext}`;
       const permission = await userStorage.getItem(path);
 
-      return permission ? (JSON.parse(permission) as PermissionResponse) : null;
+      return permission
+        ? (JSON.parse(permission) as StoredGrantedPermission)
+        : null;
     } catch (error) {
       logger.error('Error fetching granted permissions:', error);
       return null;
@@ -227,14 +235,14 @@ export function createProfileSyncManager(
    * will result in PUT /api/v1/userstorage/gator_7715_permissions/Hash(<storage_key+<permissionContext>">)
    * VALUE: encrypted(JSONstringifyPermission, storage_key).
    *
-   * @param permissionResponse - The permission response to store.
+   * @param storedGrantedPermission - The permission response to store.
    */
   async function storeGrantedPermission(
-    permissionResponse: PermissionResponse,
+    storedGrantedPermission: StoredGrantedPermission,
   ): Promise<void> {
     try {
-      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${permissionResponse.context}`;
-      await userStorage.setItem(path, JSON.stringify(permissionResponse));
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${storedGrantedPermission.permissionResponse.context}`;
+      await userStorage.setItem(path, JSON.stringify(storedGrantedPermission));
     } catch (error) {
       logger.error('Error storing granted permission:', error);
     }
@@ -249,40 +257,21 @@ export function createProfileSyncManager(
    * will result in PUT /api/v1/userstorage/gator_7715_permissions/
    * VALUES: encrypted( "JSONstringifyPermission1", storage_key), encrypted("JSONstringifyPermission2", storage_key).
    *
-   * @param permissionResponses - The permission responses to store.
+   * @param storedGrantedPermissions - The permission responses to store.
    */
   async function storeGrantedPermissionBatch(
-    permissionResponses: PermissionResponse[],
+    storedGrantedPermissions: StoredGrantedPermission[],
   ): Promise<void> {
     try {
       await userStorage.batchSetItems(
         FEATURE,
-        permissionResponses.map((permissionResponse) => [
-          permissionResponse.context, // key
-          JSON.stringify(permissionResponse), // value
+        storedGrantedPermissions.map((storedGrantedPermission) => [
+          storedGrantedPermission.permissionResponse.context, // key
+          JSON.stringify(storedGrantedPermission), // value
         ]),
       );
     } catch (error) {
       logger.error('Error storing granted permission:', error);
-    }
-  }
-
-  /**
-   * Revoke a granted permission by context.
-   *
-   * Delete "<permissionContext>" key from the "gator_7715_permissions" feature
-   * will result in DELETE /api/v1/userstorage/notifications/Hash(<storage_key+<permissionContext>>).
-   *
-   * @param permissionContext - The context of the granted permission.
-   */
-  async function revokeGrantedPermission(
-    permissionContext: Hex,
-  ): Promise<void> {
-    try {
-      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${permissionContext}`;
-      await userStorage.deleteItem(path);
-    } catch (error) {
-      logger.error('Error revoking granted permission:', error);
     }
   }
 
@@ -292,6 +281,5 @@ export function createProfileSyncManager(
     getGrantedPermission,
     storeGrantedPermission,
     storeGrantedPermissionBatch,
-    revokeGrantedPermission,
   };
 }

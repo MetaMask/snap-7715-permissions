@@ -121,7 +121,10 @@ export function createRpcHandler(config: {
       }
 
       // Store the granted permission with profile sync
-      await profileSyncManager.storeGrantedPermission(orchestrateRes.response);
+      await profileSyncManager.storeGrantedPermission({
+        permissionResponse: orchestrateRes.response,
+        siteOrigin,
+      });
 
       return [orchestrateRes.response] as Json[];
     },

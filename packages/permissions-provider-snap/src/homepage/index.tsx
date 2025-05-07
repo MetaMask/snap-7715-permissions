@@ -1,3 +1,4 @@
+import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import {
   Text,
@@ -6,12 +7,16 @@ import {
   Heading,
   Link,
   Address,
+  Row,
   Divider,
 } from '@metamask/snaps-sdk/jsx';
 import { sepolia } from 'viem/chains';
 
 import type { AccountController } from '../accountController';
-import type { ProfileSyncManager } from '../profileSync';
+import type {
+  ProfileSyncManager,
+  StoredGrantedPermission,
+} from '../profileSync';
 
 export class HomePage {
   #accountController: AccountController;
@@ -96,7 +101,26 @@ export class HomePage {
               You have {grantedPermissions.length.toString()} permissions
               granted.
             </Text>
-            <Divider />
+
+            <Box direction="vertical" alignment="center">
+              {grantedPermissions.map(
+                (item: StoredGrantedPermission, index: number) => (
+                  <Box direction="vertical" alignment="start">
+                    <Row label="Type">
+                      <Text>
+                        {extractPermissionName(
+                          item.permissionResponse.permission.type,
+                        )}
+                      </Text>
+                    </Row>
+                    <Row label="Site origin">
+                      <Text>{item.siteOrigin}</Text>
+                    </Row>
+                    {index !== grantedPermissions.length - 1 && <Divider />}
+                  </Box>
+                ),
+              )}
+            </Box>
           </Section>
         )}
       </Box>
