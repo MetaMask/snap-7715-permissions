@@ -1,23 +1,40 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-restricted-globals */
 import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
+import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
   AuthSigningOptions,
   AuthStorageOptions,
   LoginResponse,
+  StorageOptions,
   UserProfile,
+  UserStorageGenericPathWithFeatureAndKey,
 } from '@metamask/profile-sync-controller/sdk';
 import {
   AuthType,
   JwtBearerAuth,
   Platform,
+  UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
+import type { Hex } from 'viem';
 
 import type { StateManager } from '../stateManagement';
 import { getSdkEnv } from './config';
 
 export type ProfileSyncManager = {
   getUserProfile: () => Promise<UserProfile | null>;
+  getAllGrantedPermissions: () => Promise<PermissionResponse[]>;
+  getGrantedPermission: (
+    permissionContext: Hex,
+  ) => Promise<PermissionResponse | null>;
+  storeGrantedPermission: (
+    permissionResponse: PermissionResponse,
+  ) => Promise<void>;
+  storeGrantedPermissionBatch: (
+    permissionResponses: PermissionResponse[],
+  ) => Promise<void>;
+  revokeGrantedPermission: (permissionContext: Hex) => Promise<void>;
 };
 
 export type ProfileSyncManagerConfig = {
@@ -34,12 +51,13 @@ export function createProfileSyncManager(
   config: ProfileSyncManagerConfig,
 ): ProfileSyncManager {
   const { stateManager } = config;
+  const FEATURE = 'gator_7715_permissions';
 
   /**
-   * Session storage for profile sync authentication session.
+   * Auth storage for profile sync authentication session.
    * Uses snap storage to persist authentication session information.
    */
-  const sessionStorage: AuthStorageOptions = {
+  const authStorage: AuthStorageOptions = {
     getLoginResponse: async () => {
       const state = await stateManager.getState();
       return state.profileSyncAuthenticationSession;
@@ -49,6 +67,24 @@ export function createProfileSyncManager(
       await stateManager.setState({
         ...state,
         profileSyncAuthenticationSession: val,
+      });
+    },
+  };
+
+  /**
+   * storage key for profile sync.
+   * Uses snap storage to persist persist storage key
+   */
+  const keyStorage: StorageOptions = {
+    getStorageKey: async () => {
+      const state = await stateManager.getState();
+      return state.profileSyncUserStorageKey;
+    },
+    setStorageKey: async (val: string) => {
+      const state = await stateManager.getState();
+      await stateManager.setState({
+        ...state,
+        profileSyncUserStorageKey: val,
       });
     },
   };
@@ -109,8 +145,21 @@ export function createProfileSyncManager(
       env: getSdkEnv(),
     },
     {
-      storage: sessionStorage, // set session storage
+      storage: authStorage, // set session storage
       signing: customSigning, // set signing override,
+    },
+  );
+
+  // initialize user storage
+  const userStorage = new UserStorage(
+    {
+      auth,
+      env: getSdkEnv(),
+    },
+    {
+      // override how to store the storage key to use snap storage
+      // by default, the storage key is stored in memory.
+      storage: keyStorage,
     },
   );
 
@@ -130,5 +179,119 @@ export function createProfileSyncManager(
     }
   }
 
-  return { getUserProfile };
+  /**
+   * Retrieve all granted permission items under the "7715_permissions" feature will result in GET /api/v1/userstorage/7715_permissions
+   * VALUES: decrypted({ is_compact: false }, storage_key), decrypted(["0x123", "0x456"], storage_key).
+   *
+   * @returns All granted permissions.
+   */
+  async function getAllGrantedPermissions(): Promise<PermissionResponse[]> {
+    try {
+      const items = await userStorage.getAllFeatureItems(FEATURE);
+      return items
+        ? items.map((item) => JSON.parse(item) as PermissionResponse)
+        : [];
+    } catch (error) {
+      logger.error('Error fetching all granted permissions:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Retrieve a granted permission by context using query "<permissionContext>" key from the "7715_permissions" feature will result in GET /api/v1/userstorage/7715_permissions/Hash(<storage_key+<permissionContext>>)
+   * VALUE: decrypted({ is_compact: false }, storage_key).
+   *
+   * @param permissionContext - The context of the granted permission.
+   * @returns The granted permission or null if the permission is not found.
+   */
+  async function getGrantedPermission(
+    permissionContext: Hex,
+  ): Promise<PermissionResponse | null> {
+    try {
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${permissionContext}`;
+      const permission = await userStorage.getItem(path);
+
+      return permission ? (JSON.parse(permission) as PermissionResponse) : null;
+    } catch (error) {
+      logger.error('Error fetching granted permissions:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Store the granted permission in profile sync.
+   *
+   * Persisting "<permissionContext>" key under "gator_7715_permissions" feature
+   * value has to be serialized to string and does not exceed 400kb
+   * it is up to the SDK consumer to enforce proper schema management
+   * will result in PUT /api/v1/userstorage/gator_7715_permissions/Hash(<storage_key+<permissionContext>">)
+   * VALUE: encrypted(JSONstringifyPermission, storage_key).
+   *
+   * @param permissionResponse - The permission response to store.
+   */
+  async function storeGrantedPermission(
+    permissionResponse: PermissionResponse,
+  ): Promise<void> {
+    try {
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${permissionResponse.context}`;
+      await userStorage.setItem(path, JSON.stringify(permissionResponse));
+    } catch (error) {
+      logger.error('Error storing granted permission:', error);
+    }
+  }
+
+  /**
+   * Store multiple granted permissions in profile sync.
+   *
+   * Batch set multiple items under the "gator_7715_permissions" feature
+   * values have to be serialized to string and does not exceed 400kb
+   * it is up to the SDK consumer to enforce proper schema management
+   * will result in PUT /api/v1/userstorage/gator_7715_permissions/
+   * VALUES: encrypted( "JSONstringifyPermission1", storage_key), encrypted("JSONstringifyPermission2", storage_key).
+   *
+   * @param permissionResponses - The permission responses to store.
+   */
+  async function storeGrantedPermissionBatch(
+    permissionResponses: PermissionResponse[],
+  ): Promise<void> {
+    try {
+      await userStorage.batchSetItems(
+        FEATURE,
+        permissionResponses.map((permissionResponse) => [
+          permissionResponse.context, // key
+          JSON.stringify(permissionResponse), // value
+        ]),
+      );
+    } catch (error) {
+      logger.error('Error storing granted permission:', error);
+    }
+  }
+
+  /**
+   * Revoke a granted permission by context.
+   *
+   * Delete "<permissionContext>" key from the "gator_7715_permissions" feature
+   * will result in DELETE /api/v1/userstorage/notifications/Hash(<storage_key+<permissionContext>>).
+   *
+   * @param permissionContext - The context of the granted permission.
+   */
+  async function revokeGrantedPermission(
+    permissionContext: Hex,
+  ): Promise<void> {
+    try {
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${permissionContext}`;
+      await userStorage.deleteItem(path);
+    } catch (error) {
+      logger.error('Error revoking granted permission:', error);
+    }
+  }
+
+  return {
+    getUserProfile,
+    getAllGrantedPermissions,
+    getGrantedPermission,
+    storeGrantedPermission,
+    storeGrantedPermissionBatch,
+    revokeGrantedPermission,
+  };
 }

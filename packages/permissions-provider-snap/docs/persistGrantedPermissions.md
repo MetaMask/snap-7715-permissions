@@ -17,8 +17,8 @@ In the meantime(i.e., while `@metamask/gator-permissions-snap` is still a manual
 
 ## Profile Sync SDK: OAuth 2.0 Authentication flow
 
-- **IdentifierID**: We will use `SRP` identifier that uses the message signing snap to derived a public key.
-- **Identifier Secret**: Using SRP as the identifier, we will derive the private key from the automatic message signing snap. The private key is used to signs a authentication message to allow the user to prove ownership of the `SRP` identifier.
+- **IdentifierID**: We will use the `SRP` identifier that uses the message signing snap to derive a public key.
+- **Identifier Secret**: We will derive the private key from the automatic message signing snap using SRP as the identifier. The private key is used to sign an authentication message to allow the user to prove ownership of the `SRP` identifier
 
 ```mermaid
 sequenceDiagram
@@ -38,6 +38,10 @@ sequenceDiagram
 
 ## Granted permissions store flow
 
+- **feature**: Is the namespace for grouping related object keys. We will reserve a namespace of `gator_7715_permissions` as the feature name to store all of the user's granted permissions.
+- **object key**: This serves as a distinctive identifier for accessing or modifying the granted permission value. We will use the `permissionContext` (i.e., the encoded signed delegation) as the unique identifier for each item stored under the `gator_7715_permissions` feature name.
+- **object value**: The actual granted permission data stored as a serialized JSON string that **should not exceed 400KB**.
+
 The Granted permissions storage flow diagram shows the path an granted permission takes to during the permission request fulfill process to automatically storage permission encrypted by the user SRP.
 
 ```mermaid
@@ -50,11 +54,15 @@ sequenceDiagram
 Note over onRpcRequest: RPC entrypoint(incoming RPC permission request)
 Note over onRpcRequest: RPC entrypoint(post fulfillment of a granted permission)
 
+onRpcRequest->>rpcHandler: Receives a permission request
+rpcHandler->>profileSyncModule: Kicks of auth ceremony by calling getUserProfile()
+rpcHandler->>profileSyncModule: Calls storeGrantedPermission the store the granted permission in profile sync
+rpcHandler->>onRpcRequest: Return granted permission result back to dApp
 ```
 
 ## Granted permissions retrieval flow(view)
 
-TBD
+The user can view the granted permission fetched from profile sync on the `@metamask/gator-permissions-snap` homepage.
 
 ```mermaid
 sequenceDiagram
@@ -62,7 +70,9 @@ sequenceDiagram
  participant onHomePage
  participant profileSyncModule
 
-Note over onHomePage: Custom JSX component that gives the user the ability to view granted permissions with CTA to revoke
+Note over onHomePage: Custom JSX component that gives the user the ability to view granted permissions
+onHomePage->>profileSyncModule: Fetch all permission for SRP profile stored under the `gator_7715_permissions` feature namespace
+onHomePage->>onHomePage: Render UI to show granted permission details
 ```
 
 ## Granted permissions revocation flow

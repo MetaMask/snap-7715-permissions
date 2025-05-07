@@ -30,9 +30,15 @@ const accountController = new AccountController({
   deploymentSalt: '0x',
 });
 
+const stateManager = createStateManager(snap);
+const profileSyncManager = createProfileSyncManager({
+  stateManager,
+});
+
 const homepage = new HomePage({
   accountController,
   snapsProvider: snap,
+  profileSyncManager,
 });
 
 const userEventDispatcher = new UserEventDispatcher();
@@ -46,11 +52,6 @@ const permissionConfirmationRenderHandler =
 // eslint-disable-next-line no-restricted-globals
 const priceApiClient = new PriceApiClient(process.env.PRICE_API_BASE_URL ?? '');
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
-
-const stateManager = createStateManager(snap);
-const profileSyncManager = createProfileSyncManager({
-  stateManager,
-});
 
 const rpcHandler = createRpcHandler({
   accountController,

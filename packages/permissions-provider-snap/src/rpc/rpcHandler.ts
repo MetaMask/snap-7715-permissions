@@ -90,7 +90,6 @@ export function createRpcHandler(config: {
         orchestrator.parseAndValidate(firstRequest.permission),
         profileSyncManager.getUserProfile(),
       ]);
-      console.log('userProfile:', userProfile);
 
       if (!userProfile) {
         throw new Error('Failed to get user profile');
@@ -121,7 +120,8 @@ export function createRpcHandler(config: {
         throw new Error(orchestrateRes.reason);
       }
 
-      // TODO: Store the granted permission with profile sync
+      // Store the granted permission with profile sync
+      await profileSyncManager.storeGrantedPermission(orchestrateRes.response);
 
       return [orchestrateRes.response] as Json[];
     },

@@ -2,6 +2,7 @@ import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 
 import type { AccountControllerInterface } from '../../src/accountController';
 import type { PermissionsContextBuilder } from '../../src/orchestrators';
+import type { ProfileSyncManager } from '../../src/profileSync';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 import type { TokenPricesService } from '../../src/services';
 import type { PermissionConfirmationRenderHandler } from '../../src/ui';
@@ -29,6 +30,14 @@ describe('RpcHandler', () => {
     getCryptoToFiatConversion: jest.fn(),
   } as unknown as jest.Mocked<TokenPricesService>;
   const mockUserEventDispatcher = new UserEventDispatcher();
+  const mockProfileSyncManager = {
+    revokeGrantedPermission: jest.fn(),
+    storeGrantedPermission: jest.fn(),
+    storeGrantedPermissionBatch: jest.fn(),
+    getGrantedPermission: jest.fn(),
+    getAllGrantedPermissions: jest.fn(),
+    getUserProfile: jest.fn(),
+  } as unknown as jest.Mocked<ProfileSyncManager>;
 
   (mockUserEventDispatcher.off as jest.Mock).mockImplementation(
     () => mockUserEventDispatcher,
@@ -47,6 +56,7 @@ describe('RpcHandler', () => {
       permissionsContextBuilder: mockPermissionsContextBuilder,
       tokenPricesService: mockTokenPricesService,
       userEventDispatcher: mockUserEventDispatcher,
+      profileSyncManager: mockProfileSyncManager,
     });
   });
 

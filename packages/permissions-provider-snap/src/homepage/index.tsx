@@ -1,4 +1,4 @@
-import { SnapsProvider } from '@metamask/snaps-sdk';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
 import {
   Text,
   Box,
@@ -6,24 +6,32 @@ import {
   Heading,
   Link,
   Address,
+  Divider,
 } from '@metamask/snaps-sdk/jsx';
-
-import { AccountController } from 'src/accountController';
 import { sepolia } from 'viem/chains';
+
+import type { AccountController } from '../accountController';
+import type { ProfileSyncManager } from '../profileSync';
 
 export class HomePage {
   #accountController: AccountController;
+
   #snapsProvider: SnapsProvider;
+
+  #profileSyncManager: ProfileSyncManager;
 
   constructor({
     accountController,
     snapsProvider,
+    profileSyncManager,
   }: {
     accountController: AccountController;
     snapsProvider: SnapsProvider;
+    profileSyncManager: ProfileSyncManager;
   }) {
     this.#accountController = accountController;
     this.#snapsProvider = snapsProvider;
+    this.#profileSyncManager = profileSyncManager;
   }
 
   public async buildHomepage() {
@@ -43,6 +51,9 @@ export class HomePage {
       // this chainId actually doesn't matter here, because we're only using it to infer the address
       chainId: sepolia.id,
     });
+
+    const grantedPermissions =
+      await this.#profileSyncManager.getAllGrantedPermissions();
 
     return (
       <Box>
@@ -72,11 +83,22 @@ export class HomePage {
           <Text>
             This is a work in progress and we'd love to hear your feedback -
             please reach out to us on{' '}
-            <Link href="https://t.me/+I2dliwXiqqYyYjMx">Telegram</Link> if you have
-            any questions or feedback.
+            <Link href="https://t.me/+I2dliwXiqqYyYjMx">Telegram</Link> if you
+            have any questions or feedback.
           </Text>
           <Text fontWeight="bold">LFB!</Text>
         </Section>
+
+        {grantedPermissions.length > 0 && (
+          <Section>
+            <Heading>Permissions</Heading>
+            <Text>
+              You have {grantedPermissions.length.toString()} permissions
+              granted.
+            </Text>
+            <Divider />
+          </Section>
+        )}
       </Box>
     );
   }

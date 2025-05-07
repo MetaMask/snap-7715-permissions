@@ -4,6 +4,7 @@ import { ManageStateOperation, SnapError } from '@metamask/snaps-sdk';
 
 export type GatorPermissionsState = {
   profileSyncAuthenticationSession: LoginResponse | null;
+  profileSyncUserStorageKey: string | null;
 };
 
 export type StateManager = {
@@ -37,6 +38,7 @@ export function createStateManager(
       if (!state) {
         return {
           profileSyncAuthenticationSession: null,
+          profileSyncUserStorageKey: null,
         };
       }
 
