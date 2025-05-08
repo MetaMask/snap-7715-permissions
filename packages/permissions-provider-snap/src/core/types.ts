@@ -51,13 +51,6 @@ export type DeepRequired<TParent> = TParent extends (infer U)[]
       }
     : Exclude<TParent, undefined>;
 
-export type HydratedPermissionRequest<
-  TPermissionRequest extends PermissionRequest,
-> = TPermissionRequest & {
-  isAdjustmentAllowed: boolean;
-  permission: DeepRequired<TPermissionRequest['permission']>;
-};
-
 /**
  * An enum representing the time periods for which the stream rate can be calculated.
  */

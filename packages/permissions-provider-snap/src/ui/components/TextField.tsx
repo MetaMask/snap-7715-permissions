@@ -11,14 +11,14 @@ export const TextField = ({ label, value, tooltip }: TextFieldParams) => {
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
 
   return (
-    <Box direction="vertical">
-      <Box direction="horizontal" alignment="space-between">
-        <Box direction="horizontal">
-          <Text>{label}</Text>
-          {tooltipElement}
-        </Box>
+    <Box direction="horizontal" alignment="space-between">
+      <Box direction="horizontal">
+        <Text>{label}</Text>
+        {tooltipElement}
       </Box>
-      <Text>{value}</Text>
+      <Box direction="horizontal">
+        <Text>{value}</Text>
+      </Box>
     </Box>
   );
 };

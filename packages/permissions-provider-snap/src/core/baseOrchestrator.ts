@@ -10,9 +10,9 @@ import {
 } from '@metamask/delegation-toolkit';
 import type { UserInputEventType } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { toHex, type Hex } from 'viem';
+import { toHex } from 'viem';
 
-import type { AccountController, FactoryArgs } from '../accountController';
+import type { AccountController } from '../accountController';
 import type {
   UserEventDispatcher,
   UserEventHandler,
@@ -21,67 +21,10 @@ import type {
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
   BaseContext,
-  DeepRequired,
   StateChangeHandler,
   Orchestrator,
+  DeepRequired,
 } from './types';
-
-const bindStateChangeHandlers = <
-  TContext extends BaseContext,
-  TMetadata extends object,
->({
-  stateChangeHandlers,
-  onContextChanged,
-  getContext,
-  getMetadata,
-  interfaceId,
-  userEventDispatcher,
-}: {
-  stateChangeHandlers: StateChangeHandler<TContext, TMetadata>[];
-  onContextChanged: (context: TContext) => void | Promise<void>;
-  getContext: () => TContext | undefined;
-  getMetadata: () => Promise<TMetadata>;
-  interfaceId: string;
-  userEventDispatcher: UserEventDispatcher;
-}) => {
-  const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
-    const handler: UserEventHandler<UserInputEventType> = async ({
-      event,
-    }: {
-      event: UserInputEventByType<UserInputEventType>;
-    }) => {
-      let context = getContext();
-      const metadata = await getMetadata();
-      if (!context) {
-        throw new Error('Current context is undefined');
-      }
-
-      if (!metadata) {
-        throw new Error('Current metadata is undefined');
-      }
-
-      context = stateChangeHandler.contextMapper({ context, metadata, event });
-      await onContextChanged(context);
-    };
-
-    const eventMetadata = {
-      eventType: stateChangeHandler.eventType,
-      interfaceId,
-      elementName: stateChangeHandler.elementName,
-      handler,
-    } as const;
-
-    userEventDispatcher.on(eventMetadata);
-
-    return () => {
-      userEventDispatcher.off(eventMetadata);
-    };
-  });
-
-  return () => {
-    handlerUnbinders.forEach((unbinder) => unbinder());
-  };
-};
 
 /**
  * Base class for permission orchestrators that handle the core flow of permission requests.
@@ -99,10 +42,6 @@ export abstract class BaseOrchestrator<
   protected readonly accountController: AccountController;
 
   protected readonly confirmationDialogFactory: ConfirmationDialogFactory;
-
-  protected readonly accountDataPromise: Promise<
-    [address: Hex, metadata: FactoryArgs, delegationManager: Hex]
-  >;
 
   protected readonly userEventDispatcher: UserEventDispatcher;
 
@@ -126,20 +65,6 @@ export abstract class BaseOrchestrator<
     this.userEventDispatcher = userEventDispatcher;
 
     this.#permissionRequest = permissionRequest;
-
-    const chainId = Number(permissionRequest.chainId);
-
-    this.accountDataPromise = Promise.all([
-      this.accountController.getAccountAddress({
-        chainId,
-      }),
-      this.accountController.getAccountMetadata({
-        chainId,
-      }),
-      this.accountController.getDelegationManager({
-        chainId,
-      }),
-    ]);
   }
 
   /**
@@ -240,7 +165,7 @@ export abstract class BaseOrchestrator<
       });
     };
 
-    const unbindStateChangeHandlers = bindStateChangeHandlers({
+    const unbindStateChangeHandlers = this.bindStateChangeHandlers({
       stateChangeHandlers: this.stateChangeHandlers,
       onContextChanged,
       getContext: () => this.#currentContext,
@@ -254,16 +179,18 @@ export abstract class BaseOrchestrator<
       userEventDispatcher: this.userEventDispatcher,
     });
 
-    const { isConfirmationGranted } =
-      await confirmationDialog.awaitUserDecision();
+    try {
+      const { isConfirmationGranted } =
+        await confirmationDialog.awaitUserDecision();
 
-    unbindStateChangeHandlers();
-
-    if (!isConfirmationGranted) {
-      return {
-        success: false,
-        reason: 'User rejected the permissions request',
-      };
+      if (!isConfirmationGranted) {
+        return {
+          success: false,
+          reason: 'User rejected the permissions request',
+        };
+      }
+    } finally {
+      unbindStateChangeHandlers();
     }
 
     const isAdjustmentAllowed =
@@ -285,8 +212,17 @@ export abstract class BaseOrchestrator<
       isAdjustmentAllowed,
     };
 
-    const [address, accountMeta, delegationManager] =
-      await this.accountDataPromise;
+    const [address, accountMeta, delegationManager] = await Promise.all([
+      this.accountController.getAccountAddress({
+        chainId,
+      }),
+      this.accountController.getAccountMetadata({
+        chainId,
+      }),
+      this.accountController.getDelegationManager({
+        chainId,
+      }),
+    ]);
 
     const environment = await this.accountController.getEnvironment({
       chainId,
@@ -339,4 +275,62 @@ export abstract class BaseOrchestrator<
       response,
     };
   }
+
+  private bindStateChangeHandlers = ({
+    stateChangeHandlers,
+    onContextChanged,
+    getContext,
+    getMetadata,
+    interfaceId,
+    userEventDispatcher,
+  }: {
+    stateChangeHandlers: StateChangeHandler<TContext, TMetadata>[];
+    onContextChanged: (context: TContext) => void | Promise<void>;
+    getContext: () => TContext | undefined;
+    getMetadata: () => Promise<TMetadata>;
+    interfaceId: string;
+    userEventDispatcher: UserEventDispatcher;
+  }) => {
+    const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
+      const handler: UserEventHandler<UserInputEventType> = async ({
+        event,
+      }: {
+        event: UserInputEventByType<UserInputEventType>;
+      }) => {
+        let context = getContext();
+        const metadata = await getMetadata();
+        if (!context) {
+          throw new Error('Current context is undefined');
+        }
+
+        if (!metadata) {
+          throw new Error('Current metadata is undefined');
+        }
+
+        context = stateChangeHandler.contextMapper({
+          context,
+          metadata,
+          event,
+        });
+        await onContextChanged(context);
+      };
+
+      const eventMetadata = {
+        eventType: stateChangeHandler.eventType,
+        interfaceId,
+        elementName: stateChangeHandler.elementName,
+        handler,
+      } as const;
+
+      userEventDispatcher.on(eventMetadata);
+
+      return () => {
+        userEventDispatcher.off(eventMetadata);
+      };
+    });
+
+    return () => {
+      handlerUnbinders.forEach((unbinder) => unbinder());
+    };
+  };
 }

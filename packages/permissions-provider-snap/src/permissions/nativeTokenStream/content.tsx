@@ -16,7 +16,6 @@ import { RequestHeader } from '../../ui/components/RequestHeader';
 import { NativeTokenStreamContext, NativeTokenStreamMetadata } from './types';
 import { InputField } from '../../ui/components/InputField';
 import { DropdownField } from '../../ui/components/DropdownField';
-import { TextField } from '../../ui/components/TextField';
 import { TimePeriod } from '../../core/types';
 import { IconUrls } from '../../ui/iconConstant';
 import {
@@ -24,6 +23,7 @@ import {
   RequestDetails,
 } from '../../ui/components/RequestDetails';
 import { getChainName } from '../../../../shared/src/utils/common';
+import { TooltipIcon } from '../../ui/components/TooltipIcon';
 
 export const INITIAL_AMOUNT_ELEMENT = 'initial-amount';
 export const REMOVE_INITIAL_AMOUNT_BUTTON = 'remove-initial-amount';
@@ -155,12 +155,23 @@ export const createConfirmationContent = ({
             disabled={areValuesFixed}
             value={permissionDetails.timePeriod}
           />
-          <TextField
-            label="Stream rate"
-            tooltip="The amount of tokens to stream per second."
-            value={`${amountPerSecond} per second`}
-          />
+
+          <Box direction="vertical">
+            <Box direction="horizontal" alignment="space-between">
+              <Box direction="horizontal">
+                <Text>Stream rate</Text>
+                <TooltipIcon tooltip="The amount of tokens to stream per second." />
+              </Box>
+            </Box>
+            <Input
+              name="stream-rate"
+              type="text"
+              value={`${amountPerSecond} ETH/sec`}
+              disabled={true}
+            />
+          </Box>
         </Section>
+
         <Section>
           {permissionDetails.initialAmount !== undefined ? (
             <InputField
