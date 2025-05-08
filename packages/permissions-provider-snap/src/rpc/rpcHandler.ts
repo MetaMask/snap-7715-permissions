@@ -86,14 +86,9 @@ export function createRpcHandler(config: {
 
       // create orchestrator and get user profile
       const orchestrator = createPermissionOrchestrator(permissionType);
-      const [permission, userProfile] = await Promise.all([
-        orchestrator.parseAndValidate(firstRequest.permission),
-        profileSyncManager.getUserProfile(),
-      ]);
-
-      if (!userProfile) {
-        throw new Error('Failed to get user profile');
-      }
+      const permission = await orchestrator.parseAndValidate(
+        firstRequest.permission,
+      );
 
       // process the request
       const orchestrateArgs: OrchestrateArgs<typeof permissionType> = {
@@ -121,10 +116,20 @@ export function createRpcHandler(config: {
       }
 
       // Store the granted permission with profile sync
-      await profileSyncManager.storeGrantedPermission({
-        permissionResponse: orchestrateRes.response,
-        siteOrigin,
-      });
+      // Feature flag to only enable for local development until
+      // message-signing-snap v1.1.2 released in MM 12.18: https://github.com/MetaMask/metamask-extension/pull/32521
+      // eslint-disable-next-line no-restricted-globals
+      if (process.env.SNAP_ENV === 'local') {
+        const userProfile = await profileSyncManager.getUserProfile();
+        if (!userProfile) {
+          throw new Error('Failed to get user profile');
+        }
+
+        await profileSyncManager.storeGrantedPermission({
+          permissionResponse: orchestrateRes.response,
+          siteOrigin,
+        });
+      }
 
       return [orchestrateRes.response] as Json[];
     },
