@@ -1,26 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-restricted-globals */
-import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
-  AuthSigningOptions,
-  AuthStorageOptions,
-  LoginResponse,
-  StorageOptions,
   UserProfile,
   UserStorageGenericPathWithFeatureAndKey,
-} from '@metamask/profile-sync-controller/sdk';
-import {
-  AuthType,
   JwtBearerAuth,
-  Platform,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 import type { Hex } from 'viem';
-
-import type { StateManager } from '../stateManagement';
-import { getSdkEnv } from './config';
 
 export type ProfileSyncManager = {
   getUserProfile: () => Promise<UserProfile | null>;
@@ -36,13 +24,14 @@ export type ProfileSyncManager = {
   ) => Promise<void>;
 };
 
-export type ProfileSyncManagerConfig = {
-  stateManager: StateManager;
-};
-
 export type StoredGrantedPermission = {
   permissionResponse: PermissionResponse;
   siteOrigin: string;
+};
+
+export type ProfileSyncManagerConfig = {
+  auth: JwtBearerAuth;
+  userStorage: UserStorage;
 };
 
 /**
@@ -54,118 +43,8 @@ export type StoredGrantedPermission = {
 export function createProfileSyncManager(
   config: ProfileSyncManagerConfig,
 ): ProfileSyncManager {
-  const { stateManager } = config;
   const FEATURE = 'gator_7715_permissions';
-
-  /**
-   * Auth storage for profile sync authentication session.
-   * Uses snap storage to persist authentication session information.
-   */
-  const authStorage: AuthStorageOptions = {
-    getLoginResponse: async () => {
-      const state = await stateManager.getState();
-      return state.profileSyncAuthenticationSession;
-    },
-    setLoginResponse: async (val: LoginResponse) => {
-      const state = await stateManager.getState();
-      await stateManager.setState({
-        ...state,
-        profileSyncAuthenticationSession: val,
-      });
-    },
-  };
-
-  /**
-   * storage key for profile sync.
-   * Uses snap storage to persist persist storage key
-   */
-  const keyStorage: StorageOptions = {
-    getStorageKey: async () => {
-      const state = await stateManager.getState();
-      return state.profileSyncUserStorageKey;
-    },
-    setStorageKey: async (val: string) => {
-      const state = await stateManager.getState();
-      await stateManager.setState({
-        ...state,
-        profileSyncUserStorageKey: val,
-      });
-    },
-  };
-
-  /**
-   * Custom signing implementation for profile sync.
-   * Uses the message signing snap to sign messages.
-   */
-  const customSigning: AuthSigningOptions = {
-    async signMessage(message: string): Promise<string> {
-      try {
-        const signature: string = (await snap.request({
-          method: 'wallet_invokeSnap',
-          params: {
-            snapId: MESSAGE_SIGNING_SNAP_ID,
-            request: {
-              method: 'signMessage',
-              params: {
-                message,
-              },
-            },
-          },
-        })) as string;
-        return signature;
-      } catch (error: any) {
-        logger.error('Error getting identifier:', error);
-        return '';
-      }
-    },
-    async getIdentifier(): Promise<string> {
-      try {
-        const publicKey: string = (await snap.request({
-          method: 'wallet_invokeSnap',
-          params: {
-            snapId: MESSAGE_SIGNING_SNAP_ID,
-            request: {
-              method: 'getPublicKey',
-              params: {},
-            },
-          },
-        })) as string;
-        return publicKey;
-      } catch (error: any) {
-        logger.error('Error getting identifier:', error);
-        return '';
-      }
-    },
-  };
-
-  /**
-   * Creates a new JwtBearerAuth instance.
-   * Uses the session storage and custom signing implementation.
-   */
-  const auth = new JwtBearerAuth(
-    {
-      type: AuthType.SRP,
-      platform: Platform.EXTENSION,
-      env: getSdkEnv(),
-    },
-    {
-      storage: authStorage, // set session storage
-      signing: customSigning, // set signing override,
-    },
-  );
-
-  // initialize user storage
-  const userStorage = new UserStorage(
-    {
-      auth,
-      env: getSdkEnv(),
-    },
-    {
-      // override how to store the storage key to use snap storage
-      // by default, the storage key is stored in memory.
-      storage: keyStorage,
-    },
-  );
+  const { auth, userStorage } = config;
 
   /**
    * Retrieves the user profile.

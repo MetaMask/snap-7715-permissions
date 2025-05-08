@@ -6,7 +6,7 @@ import { Env } from '@metamask/profile-sync-controller/sdk';
  *
  * @returns The environment for the Profile Sync SDK.
  */
-export function getSdkEnv(): Env {
+export function getProfileSyncSdkEnv(): Env {
   if (process.env.SNAP_ENV === 'local') {
     return Env.DEV;
   }

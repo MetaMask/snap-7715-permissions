@@ -1,5 +1,11 @@
 import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  AuthType,
+  JwtBearerAuth,
+  Platform,
+  UserStorage,
+} from '@metamask/profile-sync-controller/sdk';
 import type {
   OnHomePageHandler,
   OnInstallHandler,
@@ -14,7 +20,11 @@ import { AccountController } from './accountController';
 import { PriceApiClient } from './clients';
 import { HomePage } from './homepage';
 import { createPermissionsContextBuilder } from './orchestrators';
-import { createProfileSyncManager } from './profileSync';
+import {
+  createProfileSyncManager,
+  createProfileSyncOptions,
+  getProfileSyncSdkEnv,
+} from './profileSync';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
@@ -31,8 +41,31 @@ const accountController = new AccountController({
 });
 
 const stateManager = createStateManager(snap);
+const profileSyncOptions = createProfileSyncOptions(stateManager, snap);
+
+const auth = new JwtBearerAuth(
+  {
+    type: AuthType.SRP,
+    platform: Platform.EXTENSION,
+    env: getProfileSyncSdkEnv(),
+  },
+  {
+    storage: profileSyncOptions.authStorageOptions,
+    signing: profileSyncOptions.authSigningOptions,
+  },
+);
+
 const profileSyncManager = createProfileSyncManager({
-  stateManager,
+  auth,
+  userStorage: new UserStorage(
+    {
+      auth,
+      env: getProfileSyncSdkEnv(),
+    },
+    {
+      storage: profileSyncOptions.keyStorageOptions,
+    },
+  ),
 });
 
 const homepage = new HomePage({
