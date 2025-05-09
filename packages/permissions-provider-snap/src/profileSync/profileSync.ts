@@ -64,7 +64,7 @@ export function createProfileSyncManager(
 
   /**
    * Retrieve all granted permission items under the "7715_permissions" feature will result in GET /api/v1/userstorage/7715_permissions
-   * VALUES: decrypted({ is_compact: false }, storage_key), decrypted(["0x123", "0x456"], storage_key).
+   * VALUES: decrypted("JSONstringifyPermission1", storage_key), decrypted("JSONstringifyPermission2", storage_key).
    *
    * @returns All granted permissions.
    */
@@ -84,7 +84,7 @@ export function createProfileSyncManager(
 
   /**
    * Retrieve a granted permission by context using query "<permissionContext>" key from the "7715_permissions" feature will result in GET /api/v1/userstorage/7715_permissions/Hash(<storage_key+<permissionContext>>)
-   * VALUE: decrypted({ is_compact: false }, storage_key).
+   * VALUE: decrypted("JSONstringifyPermission", storage_key).
    *
    * @param permissionContext - The context of the granted permission.
    * @returns The granted permission or null if the permission is not found.
@@ -112,7 +112,7 @@ export function createProfileSyncManager(
    * value has to be serialized to string and does not exceed 400kb
    * it is up to the SDK consumer to enforce proper schema management
    * will result in PUT /api/v1/userstorage/gator_7715_permissions/Hash(<storage_key+<permissionContext>">)
-   * VALUE: encrypted(JSONstringifyPermission, storage_key).
+   * VALUE: encrypted("JSONstringifyPermission", storage_key).
    *
    * @param storedGrantedPermission - The permission response to store.
    */
@@ -124,6 +124,7 @@ export function createProfileSyncManager(
       await userStorage.setItem(path, JSON.stringify(storedGrantedPermission));
     } catch (error) {
       logger.error('Error storing granted permission:', error);
+      throw error;
     }
   }
 
@@ -134,7 +135,7 @@ export function createProfileSyncManager(
    * values have to be serialized to string and does not exceed 400kb
    * it is up to the SDK consumer to enforce proper schema management
    * will result in PUT /api/v1/userstorage/gator_7715_permissions/
-   * VALUES: encrypted( "JSONstringifyPermission1", storage_key), encrypted("JSONstringifyPermission2", storage_key).
+   * VALUES: encrypted("JSONstringifyPermission1", storage_key), encrypted("JSONstringifyPermission2", storage_key).
    *
    * @param storedGrantedPermissions - The permission responses to store.
    */
@@ -151,6 +152,7 @@ export function createProfileSyncManager(
       );
     } catch (error) {
       logger.error('Error storing granted permission:', error);
+      throw error;
     }
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
@@ -47,7 +48,7 @@ const auth = new JwtBearerAuth(
   {
     type: AuthType.SRP,
     platform: Platform.EXTENSION,
-    env: getProfileSyncSdkEnv(),
+    env: getProfileSyncSdkEnv(process.env.SNAP_ENV),
   },
   {
     storage: profileSyncOptions.authStorageOptions,
@@ -60,7 +61,7 @@ const profileSyncManager = createProfileSyncManager({
   userStorage: new UserStorage(
     {
       auth,
-      env: getProfileSyncSdkEnv(),
+      env: getProfileSyncSdkEnv(process.env.SNAP_ENV),
     },
     {
       storage: profileSyncOptions.keyStorageOptions,

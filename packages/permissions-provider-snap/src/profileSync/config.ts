@@ -1,15 +1,22 @@
-/* eslint-disable no-restricted-globals */
 import { Env } from '@metamask/profile-sync-controller/sdk';
 
 /**
  * Get the environment for the Profile Sync SDK.
  *
+ * @param snapEnv - The environment of the snap.
  * @returns The environment for the Profile Sync SDK.
  */
-export function getProfileSyncSdkEnv(): Env {
-  if (process.env.SNAP_ENV === 'local') {
+export function getProfileSyncSdkEnv(snapEnv: string | undefined): Env {
+  if (!snapEnv) {
     return Env.DEV;
   }
 
-  return Env.PRD;
+  switch (snapEnv) {
+    case 'production':
+      return Env.PRD;
+    case 'local':
+      return Env.DEV;
+    default:
+      return Env.DEV;
+  }
 }
