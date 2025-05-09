@@ -644,62 +644,65 @@ describe('nativeTokenStream:content', () => {
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
                     "children": [
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
+                          "alignment": "space-between",
                           "children": {
                             "key": null,
                             "props": {
-                              "children": "0.5 per second",
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream rate",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens to stream per second.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            "type": "Text",
+                            "type": "Box",
                           },
                           "direction": "horizontal",
                         },
                         "type": "Box",
                       },
+                      {
+                        "key": null,
+                        "props": {
+                          "disabled": true,
+                          "name": "stream-rate",
+                          "type": "text",
+                          "value": "0.5 ETH/sec",
+                        },
+                        "type": "Input",
+                      },
                     ],
-                    "direction": "horizontal",
+                    "direction": "vertical",
                   },
                   "type": "Box",
                 },
@@ -1639,62 +1642,65 @@ describe('nativeTokenStream:content', () => {
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
                     "children": [
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
+                          "alignment": "space-between",
                           "children": {
                             "key": null,
                             "props": {
-                              "children": "0.5 per second",
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream rate",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens to stream per second.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            "type": "Text",
+                            "type": "Box",
                           },
                           "direction": "horizontal",
                         },
                         "type": "Box",
                       },
+                      {
+                        "key": null,
+                        "props": {
+                          "disabled": true,
+                          "name": "stream-rate",
+                          "type": "text",
+                          "value": "0.5 ETH/sec",
+                        },
+                        "type": "Input",
+                      },
                     ],
-                    "direction": "horizontal",
+                    "direction": "vertical",
                   },
                   "type": "Box",
                 },
@@ -2597,62 +2603,65 @@ describe('nativeTokenStream:content', () => {
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
                     "children": [
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
+                          "alignment": "space-between",
                           "children": {
                             "key": null,
                             "props": {
-                              "children": "0.5 per second",
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream rate",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens to stream per second.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            "type": "Text",
+                            "type": "Box",
                           },
                           "direction": "horizontal",
                         },
                         "type": "Box",
                       },
+                      {
+                        "key": null,
+                        "props": {
+                          "disabled": true,
+                          "name": "stream-rate",
+                          "type": "text",
+                          "value": "0.5 ETH/sec",
+                        },
+                        "type": "Input",
+                      },
                     ],
-                    "direction": "horizontal",
+                    "direction": "vertical",
                   },
                   "type": "Box",
                 },
@@ -3549,62 +3558,65 @@ describe('nativeTokenStream:content', () => {
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
                     "children": [
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
+                          "alignment": "space-between",
                           "children": {
                             "key": null,
                             "props": {
-                              "children": "0.5 per second",
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream rate",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens to stream per second.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            "type": "Text",
+                            "type": "Box",
                           },
                           "direction": "horizontal",
                         },
                         "type": "Box",
                       },
+                      {
+                        "key": null,
+                        "props": {
+                          "disabled": true,
+                          "name": "stream-rate",
+                          "type": "text",
+                          "value": "0.5 ETH/sec",
+                        },
+                        "type": "Input",
+                      },
                     ],
-                    "direction": "horizontal",
+                    "direction": "vertical",
                   },
                   "type": "Box",
                 },
@@ -4397,62 +4409,65 @@ describe('nativeTokenStream:content', () => {
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
                     "children": [
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
+                          "alignment": "space-between",
                           "children": {
                             "key": null,
                             "props": {
-                              "children": "0.5 per second",
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream rate",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens to stream per second.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            "type": "Text",
+                            "type": "Box",
                           },
                           "direction": "horizontal",
                         },
                         "type": "Box",
                       },
+                      {
+                        "key": null,
+                        "props": {
+                          "disabled": true,
+                          "name": "stream-rate",
+                          "type": "text",
+                          "value": "0.5 ETH/sec",
+                        },
+                        "type": "Input",
+                      },
                     ],
-                    "direction": "horizontal",
+                    "direction": "vertical",
                   },
                   "type": "Box",
                 },

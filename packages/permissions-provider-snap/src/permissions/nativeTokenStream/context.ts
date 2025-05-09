@@ -14,7 +14,7 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamPermissionRequest,
   NativeTokenStreamMetadata,
-  CompleteNativeTokenStreamPermission,
+  PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
 
@@ -66,16 +66,16 @@ export function contextToPermissionRequest({
 }
 
 /**
- * Hydrates a native token stream permission by filling in default values for optional fields.
- * @param options0 - The options object containing the permission to hydrate.
- * @param options0.permission - The native token stream permission to hydrate with default values.
- * @returns A hydrated native token stream permission with all required fields populated.
+ * Populate a native token stream permission by filling in default values for optional fields.
+ * @param options0 - The options object containing the permission to populate.
+ * @param options0.permission - The native token stream permission to populate with default values.
+ * @returns A populated native token stream permission with all required fields populated.
  */
-export function hydratePermission({
+export function populatePermission({
   permission,
 }: {
   permission: NativeTokenStreamPermission;
-}): CompleteNativeTokenStreamPermission {
+}): PopulatedNativeTokenStreamPermission {
   return {
     ...permission,
     data: {

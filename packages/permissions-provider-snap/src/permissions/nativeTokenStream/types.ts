@@ -60,5 +60,5 @@ export type NativeTokenStreamPermission = z.infer<
 export type NativeTokenStreamPermissionRequest =
   TypedPermissionRequest<NativeTokenStreamPermission>;
 
-export type CompleteNativeTokenStreamPermission =
+export type PopulatedNativeTokenStreamPermission =
   DeepRequired<NativeTokenStreamPermission>;

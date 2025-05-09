@@ -34,7 +34,7 @@ export abstract class BaseOrchestrator<
   TPermissionRequest extends PermissionRequest = PermissionRequest,
   TContext extends BaseContext = BaseContext,
   TMetadata extends object = object,
-  THydratedPermission extends DeepRequired<
+  TCompletePermission extends DeepRequired<
     TPermissionRequest['permission']
   > = DeepRequired<TPermissionRequest['permission']>,
 > implements Orchestrator
@@ -108,17 +108,17 @@ export abstract class BaseOrchestrator<
   }): Promise<GenericSnapElement>;
 
   /**
-   * Hydrate the permission, resolving any default values.
+   * Populate any default values in the permission.
    */
-  protected abstract hydratePermission(args: {
+  protected abstract populatePermission(args: {
     permission: TPermissionRequest['permission'];
-  }): Promise<THydratedPermission>;
+  }): Promise<TCompletePermission>;
 
   /**
    * Append permission-specific caveats to the caveat builder.
    */
   protected abstract appendCaveats(
-    permissionRequest: THydratedPermission,
+    permissionRequest: TCompletePermission,
     caveatBuilder: CaveatBuilder,
   ): Promise<CaveatBuilder>;
 
@@ -202,7 +202,7 @@ export abstract class BaseOrchestrator<
         })
       : this.#permissionRequest;
 
-    const grantedPermission = await this.hydratePermission({
+    const grantedPermission = await this.populatePermission({
       permission: resolvedPermissionRequest.permission,
     });
 

@@ -5,7 +5,7 @@ import { toHex, parseUnits } from 'viem/utils';
 import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
 import {
-  hydratePermission,
+  populatePermission,
   permissionRequestToContext,
   createContextMetadata,
   contextToPermissionRequest,
@@ -30,7 +30,7 @@ const permissionWithoutOptionals: NativeTokenStreamPermission = {
   },
 };
 
-const alreadyHydratedPermission: NativeTokenStreamPermission = {
+const alreadyPopulatedPermission: NativeTokenStreamPermission = {
   ...permissionWithoutOptionals,
   data: {
     ...permissionWithoutOptionals.data,
@@ -42,7 +42,7 @@ const alreadyHydratedPermission: NativeTokenStreamPermission = {
   rules: {},
 };
 
-const alreadyHydratedPermissionRequest: NativeTokenStreamPermissionRequest = {
+const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
   chainId: '0x1',
   expiry: convertReadableDateToTimestamp('05/01/2024'),
   signer: {
@@ -51,10 +51,10 @@ const alreadyHydratedPermissionRequest: NativeTokenStreamPermissionRequest = {
       address: '0x1',
     },
   },
-  permission: alreadyHydratedPermission,
+  permission: alreadyPopulatedPermission,
 };
 
-const alreadyHydratedContext: NativeTokenStreamContext = {
+const alreadyPopulatedContext: NativeTokenStreamContext = {
   expiry: '05/01/2024',
   isAdjustmentAllowed: true,
   accountDetails: {
@@ -72,21 +72,21 @@ const alreadyHydratedContext: NativeTokenStreamContext = {
 } as const;
 
 describe('nativeTokenStream:context', () => {
-  describe('hydratePermission()', () => {
-    it('should return the permission unchanged if it is already hydrated', () => {
-      const hydratedPermission = hydratePermission({
-        permission: alreadyHydratedPermission,
+  describe('populatePermission()', () => {
+    it('should return the permission unchanged if it is already populated', () => {
+      const populatedPermission = populatePermission({
+        permission: alreadyPopulatedPermission,
       });
 
-      expect(hydratedPermission).toStrictEqual(alreadyHydratedPermission);
+      expect(populatedPermission).toStrictEqual(alreadyPopulatedPermission);
     });
 
     it('should add defaults to a permission', () => {
-      const hydratedPermission = hydratePermission({
+      const populatedPermission = populatePermission({
         permission: permissionWithoutOptionals,
       });
 
-      expect(hydratedPermission).toStrictEqual({
+      expect(populatedPermission).toStrictEqual({
         ...permissionWithoutOptionals,
         data: {
           ...permissionWithoutOptionals.data,
@@ -112,9 +112,9 @@ describe('nativeTokenStream:context', () => {
         },
       };
 
-      const hydratedPermission = hydratePermission({ permission });
+      const populatedPermission = populatePermission({ permission });
 
-      expect(hydratedPermission).toStrictEqual(permission);
+      expect(populatedPermission).toStrictEqual(permission);
     });
   });
 
@@ -126,52 +126,52 @@ describe('nativeTokenStream:context', () => {
       mockTokenPricesService = {
         getCryptoToFiatConversion: jest.fn(
           () =>
-            alreadyHydratedContext.accountDetails.balanceFormattedAsCurrency,
+            alreadyPopulatedContext.accountDetails.balanceFormattedAsCurrency,
         ),
       } as unknown as jest.Mocked<TokenPricesService>;
 
       mockAccountController = {
         getAccountAddress: jest.fn(
-          () => alreadyHydratedContext.accountDetails.address,
+          () => alreadyPopulatedContext.accountDetails.address,
         ),
         getAccountBalance: jest.fn(
-          () => alreadyHydratedContext.accountDetails.balance,
+          () => alreadyPopulatedContext.accountDetails.balance,
         ),
       } as unknown as jest.Mocked<AccountController>;
     });
 
     it('should create a context from a permission request', async () => {
       const context = await permissionRequestToContext({
-        permissionRequest: alreadyHydratedPermissionRequest,
+        permissionRequest: alreadyPopulatedPermissionRequest,
         tokenPricesService: mockTokenPricesService,
         accountController: mockAccountController,
       });
 
-      expect(context).toStrictEqual(alreadyHydratedContext);
+      expect(context).toStrictEqual(alreadyPopulatedContext);
 
       expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
-        chainId: Number(alreadyHydratedPermissionRequest.chainId),
+        chainId: Number(alreadyPopulatedPermissionRequest.chainId),
       });
 
       expect(mockAccountController.getAccountBalance).toHaveBeenCalledWith({
-        chainId: Number(alreadyHydratedPermissionRequest.chainId),
+        chainId: Number(alreadyPopulatedPermissionRequest.chainId),
       });
 
       expect(
         mockTokenPricesService.getCryptoToFiatConversion,
       ).toHaveBeenCalledWith(
         `eip155:1/slip44:60`,
-        alreadyHydratedContext.accountDetails.balance,
+        alreadyPopulatedContext.accountDetails.balance,
       );
     });
   });
 
   describe('createContextMetadata()', () => {
     const context = {
-      ...alreadyHydratedContext,
+      ...alreadyPopulatedContext,
       expiry: convertTimestampToReadableDate(Date.now()),
       permissionDetails: {
-        ...alreadyHydratedContext.permissionDetails,
+        ...alreadyPopulatedContext.permissionDetails,
         startTime: convertTimestampToReadableDate(Date.now() / 1000),
       },
     };
@@ -415,12 +415,12 @@ describe('nativeTokenStream:context', () => {
     describe('contextToPermissionRequest()', () => {
       it('should convert a context to a permission request', () => {
         const permissionRequest = contextToPermissionRequest({
-          context: alreadyHydratedContext,
-          originalRequest: alreadyHydratedPermissionRequest,
+          context: alreadyPopulatedContext,
+          originalRequest: alreadyPopulatedPermissionRequest,
         });
 
         expect(permissionRequest).toStrictEqual(
-          alreadyHydratedPermissionRequest,
+          alreadyPopulatedPermissionRequest,
         );
       });
     });

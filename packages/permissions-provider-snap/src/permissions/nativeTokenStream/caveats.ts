@@ -1,11 +1,11 @@
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 
-import type { HydratedNativeTokenStreamPermission } from './types';
+import type { PopulatedNativeTokenStreamPermission } from './types';
 
 /**
  * Appends permission-specific caveats to the caveat builder.
  * @param options0 - The options object containing the permission and caveat builder.
- * @param options0.permission - The hydrated native token stream permission containing stream parameters.
+ * @param options0.permission - The complete native token stream permission containing stream parameters.
  * @param options0.caveatBuilder - The core caveat builder to append caveats to.
  * @returns The modified caveat builder with appended native token stream caveats.
  */
@@ -13,7 +13,7 @@ export function appendCaveats({
   permission,
   caveatBuilder,
 }: {
-  permission: HydratedNativeTokenStreamPermission;
+  permission: PopulatedNativeTokenStreamPermission;
   caveatBuilder: CoreCaveatBuilder;
 }): CoreCaveatBuilder {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =

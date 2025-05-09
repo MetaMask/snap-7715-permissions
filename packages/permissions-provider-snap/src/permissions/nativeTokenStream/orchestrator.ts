@@ -21,7 +21,7 @@ import {
   contextToPermissionRequest,
   permissionRequestToContext,
   createContextMetadata,
-  hydratePermission,
+  populatePermission,
 } from './context';
 import {
   initialAmountHandler,
@@ -36,7 +36,7 @@ import {
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamPermissionRequest,
-  CompleteNativeTokenStreamPermission,
+  PopulatedNativeTokenStreamPermission,
   NativeTokenStreamMetadata,
   NativeTokenStreamPermission,
 } from './types';
@@ -48,7 +48,7 @@ export type NativeTokenStreamDependencies = {
   contextToPermissionRequest: typeof contextToPermissionRequest;
   permissionRequestToContext: typeof permissionRequestToContext;
   createContextMetadata: typeof createContextMetadata;
-  hydratePermission: typeof hydratePermission;
+  populatePermission: typeof populatePermission;
   appendCaveats: typeof appendCaveats;
 };
 
@@ -58,7 +58,7 @@ const defaultDependencies: NativeTokenStreamDependencies = {
   contextToPermissionRequest,
   permissionRequestToContext,
   createContextMetadata,
-  hydratePermission,
+  populatePermission,
   appendCaveats,
 };
 
@@ -202,14 +202,14 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
     return this.#dependencies.contextToPermissionRequest(args);
   }
 
-  protected async hydratePermission(args: {
+  protected async populatePermission(args: {
     permission: NativeTokenStreamPermission;
-  }): Promise<CompleteNativeTokenStreamPermission> {
-    return this.#dependencies.hydratePermission(args);
+  }): Promise<PopulatedNativeTokenStreamPermission> {
+    return this.#dependencies.populatePermission(args);
   }
 
   protected async appendCaveats(
-    permission: CompleteNativeTokenStreamPermission,
+    permission: PopulatedNativeTokenStreamPermission,
     caveatBuilder: CaveatBuilder,
   ): Promise<CaveatBuilder> {
     return this.#dependencies.appendCaveats({

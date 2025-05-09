@@ -10,7 +10,7 @@ import { NativeTokenStreamOrchestrator } from '../../../src/permissions/nativeTo
 import type {
   NativeTokenStreamPermissionRequest,
   NativeTokenStreamContext,
-  CompleteNativeTokenStreamPermission,
+  PopulatedNativeTokenStreamPermission,
   NativeTokenStreamMetadata,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
@@ -89,7 +89,7 @@ describe('NativeTokenStreamOrchestrator', () => {
     contextToPermissionRequest: jest.fn(),
     permissionRequestToContext: jest.fn(),
     createContextMetadata: jest.fn(),
-    hydratePermission: jest.fn(),
+    populatePermission: jest.fn(),
     appendCaveats: jest.fn(),
   };
 
@@ -109,7 +109,7 @@ describe('NativeTokenStreamOrchestrator', () => {
     );
     mockDependencies.permissionRequestToContext.mockResolvedValue(mockContext);
     mockDependencies.createContextMetadata.mockResolvedValue(mockMetadata);
-    mockDependencies.hydratePermission.mockReturnValue(
+    mockDependencies.populatePermission.mockReturnValue(
       mockPermissionRequest.permission as any,
     );
     mockDependencies.appendCaveats.mockImplementation(
@@ -375,12 +375,12 @@ describe('NativeTokenStreamOrchestrator', () => {
     });
   });
 
-  describe('hydratePermission', () => {
-    it('should use the provided permission hydrator', async () => {
+  describe('populatePermission', () => {
+    it('should use the provided permission populator', async () => {
       const { permission } = mockPermissionRequest;
-      await (orchestrator as any).hydratePermission({ permission });
+      await (orchestrator as any).populatePermission({ permission });
 
-      expect(mockDependencies.hydratePermission).toHaveBeenCalledWith({
+      expect(mockDependencies.populatePermission).toHaveBeenCalledWith({
         permission,
       });
     });
@@ -389,7 +389,7 @@ describe('NativeTokenStreamOrchestrator', () => {
   describe('appendCaveats', () => {
     it('should use the provided caveat appender', async () => {
       const permission =
-        mockPermissionRequest.permission as CompleteNativeTokenStreamPermission;
+        mockPermissionRequest.permission as PopulatedNativeTokenStreamPermission;
       const mockCaveatBuilder = { addCaveat: jest.fn().mockReturnThis() };
 
       await (orchestrator as any).appendCaveats(permission, mockCaveatBuilder);
