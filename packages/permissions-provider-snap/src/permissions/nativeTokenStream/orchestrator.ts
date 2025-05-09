@@ -36,7 +36,7 @@ import {
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamPermissionRequest,
-  HydratedNativeTokenStreamPermission,
+  CompleteNativeTokenStreamPermission,
   NativeTokenStreamMetadata,
   NativeTokenStreamPermission,
 } from './types';
@@ -204,12 +204,12 @@ export class NativeTokenStreamOrchestrator extends BaseOrchestrator<
 
   protected async hydratePermission(args: {
     permission: NativeTokenStreamPermission;
-  }): Promise<HydratedNativeTokenStreamPermission> {
+  }): Promise<CompleteNativeTokenStreamPermission> {
     return this.#dependencies.hydratePermission(args);
   }
 
   protected async appendCaveats(
-    permission: HydratedNativeTokenStreamPermission,
+    permission: CompleteNativeTokenStreamPermission,
     caveatBuilder: CaveatBuilder,
   ): Promise<CaveatBuilder> {
     return this.#dependencies.appendCaveats({

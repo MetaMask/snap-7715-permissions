@@ -3,7 +3,7 @@ import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import { toHex, parseUnits } from 'viem/utils';
 
 import { appendCaveats } from '../../../src/permissions/nativeTokenStream/caveats';
-import type { HydratedNativeTokenStreamPermission } from '../../../src/permissions/nativeTokenStream/types';
+import type { CompleteNativeTokenStreamPermission } from '../../../src/permissions/nativeTokenStream/types';
 
 describe('nativeTokenStream:caveats', () => {
   describe('appendCaveats()', () => {
@@ -12,7 +12,7 @@ describe('nativeTokenStream:caveats', () => {
     const amountPerSecond = toHex(parseUnits('.5', 18));
     const startTime = 1714531200;
 
-    const mockPermission: HydratedNativeTokenStreamPermission = {
+    const mockPermission: CompleteNativeTokenStreamPermission = {
       type: 'native-token-stream',
       data: {
         initialAmount,

@@ -10,7 +10,7 @@ import { NativeTokenStreamOrchestrator } from '../../../src/permissions/nativeTo
 import type {
   NativeTokenStreamPermissionRequest,
   NativeTokenStreamContext,
-  HydratedNativeTokenStreamPermission,
+  CompleteNativeTokenStreamPermission,
   NativeTokenStreamMetadata,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
@@ -389,7 +389,7 @@ describe('NativeTokenStreamOrchestrator', () => {
   describe('appendCaveats', () => {
     it('should use the provided caveat appender', async () => {
       const permission =
-        mockPermissionRequest.permission as HydratedNativeTokenStreamPermission;
+        mockPermissionRequest.permission as CompleteNativeTokenStreamPermission;
       const mockCaveatBuilder = { addCaveat: jest.fn().mockReturnThis() };
 
       await (orchestrator as any).appendCaveats(permission, mockCaveatBuilder);

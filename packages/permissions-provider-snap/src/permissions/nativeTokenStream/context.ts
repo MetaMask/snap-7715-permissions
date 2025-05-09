@@ -14,7 +14,7 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamPermissionRequest,
   NativeTokenStreamMetadata,
-  HydratedNativeTokenStreamPermission,
+  CompleteNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
 
@@ -75,7 +75,7 @@ export function hydratePermission({
   permission,
 }: {
   permission: NativeTokenStreamPermission;
-}): HydratedNativeTokenStreamPermission {
+}): CompleteNativeTokenStreamPermission {
   return {
     ...permission,
     data: {
