@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-restricted-globals */
-import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type {
   AuthSigningOptions,
@@ -23,11 +20,13 @@ export type ProfileSyncOptions = {
  *
  * @param stateManager - The state manager.
  * @param snapsProvider - The snaps provider.
+ * @param messageSigningSnapId - The message signing snap id.
  * @returns The profile sync options.
  */
 export const createProfileSyncOptions = (
   stateManager: StateManager,
   snapsProvider: SnapsProvider,
+  messageSigningSnapId: string,
 ): ProfileSyncOptions => {
   /**
    * Auth storage for profile sync authentication session.
@@ -38,11 +37,11 @@ export const createProfileSyncOptions = (
       const state = await stateManager.getState();
       return state.profileSyncAuthenticationSession;
     },
-    setLoginResponse: async (val: LoginResponse) => {
+    setLoginResponse: async (response: LoginResponse) => {
       const state = await stateManager.getState();
       await stateManager.setState({
         ...state,
-        profileSyncAuthenticationSession: val,
+        profileSyncAuthenticationSession: response,
       });
     },
   };
@@ -72,10 +71,10 @@ export const createProfileSyncOptions = (
   const authSigningOptions: AuthSigningOptions = {
     async signMessage(message: string): Promise<string> {
       try {
-        const signature: string = (await snapsProvider.request({
+        const signature = (await snapsProvider.request({
           method: 'wallet_invokeSnap',
           params: {
-            snapId: MESSAGE_SIGNING_SNAP_ID,
+            snapId: messageSigningSnapId,
             request: {
               method: 'signMessage',
               params: {
@@ -87,7 +86,7 @@ export const createProfileSyncOptions = (
         return signature;
       } catch (error: any) {
         logger.error('Error getting identifier:', error);
-        return '';
+        throw error;
       }
     },
     async getIdentifier(): Promise<string> {
@@ -95,7 +94,7 @@ export const createProfileSyncOptions = (
         const publicKey: string = (await snapsProvider.request({
           method: 'wallet_invokeSnap',
           params: {
-            snapId: MESSAGE_SIGNING_SNAP_ID,
+            snapId: messageSigningSnapId,
             request: {
               method: 'getPublicKey',
               params: {},
@@ -105,7 +104,7 @@ export const createProfileSyncOptions = (
         return publicKey;
       } catch (error: any) {
         logger.error('Error getting identifier:', error);
-        return '';
+        throw error;
       }
     },
   };

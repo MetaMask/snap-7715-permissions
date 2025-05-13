@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
+import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
   AuthType,
@@ -42,13 +43,18 @@ const accountController = new AccountController({
 });
 
 const stateManager = createStateManager(snap);
-const profileSyncOptions = createProfileSyncOptions(stateManager, snap);
+const profileSyncOptions = createProfileSyncOptions(
+  stateManager,
+  snap,
+  MESSAGE_SIGNING_SNAP_ID,
+);
+const profileSyncSdkEnv = getProfileSyncSdkEnv(process.env.SNAP_ENV);
 
 const auth = new JwtBearerAuth(
   {
     type: AuthType.SRP,
     platform: Platform.EXTENSION,
-    env: getProfileSyncSdkEnv(process.env.SNAP_ENV),
+    env: profileSyncSdkEnv,
   },
   {
     storage: profileSyncOptions.authStorageOptions,
@@ -57,11 +63,12 @@ const auth = new JwtBearerAuth(
 );
 
 const profileSyncManager = createProfileSyncManager({
+  snapEnv: process.env.SNAP_ENV,
   auth,
   userStorage: new UserStorage(
     {
       auth,
-      env: getProfileSyncSdkEnv(process.env.SNAP_ENV),
+      env: profileSyncSdkEnv,
     },
     {
       storage: profileSyncOptions.keyStorageOptions,
@@ -169,7 +176,7 @@ export const onInstall: OnInstallHandler = async () => {
   if (process.env.SNAP_ENV === 'local') {
     const installedSnaps = (await snap.request({
       method: 'wallet_getSnaps',
-    })) as unknown as any;
+    })) as unknown as GetSnapsResponse;
     if (!installedSnaps[MESSAGE_SIGNING_SNAP_ID]) {
       logger.debug('Installing local message signing snap');
       await snap.request({

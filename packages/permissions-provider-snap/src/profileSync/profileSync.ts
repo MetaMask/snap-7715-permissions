@@ -11,7 +11,6 @@ import type {
 import type { Hex } from 'viem';
 
 export type ProfileSyncManager = {
-  getUserProfile: () => Promise<UserProfile | null>;
   getAllGrantedPermissions: () => Promise<StoredGrantedPermission[]>;
   getGrantedPermission: (
     permissionContext: Hex,
@@ -32,6 +31,7 @@ export type StoredGrantedPermission = {
 export type ProfileSyncManagerConfig = {
   auth: JwtBearerAuth;
   userStorage: UserStorage;
+  snapEnv: string | undefined;
 };
 
 /**
@@ -44,21 +44,35 @@ export function createProfileSyncManager(
   config: ProfileSyncManagerConfig,
 ): ProfileSyncManager {
   const FEATURE = 'gator_7715_permissions';
-  const { auth, userStorage } = config;
+  const { auth, userStorage, snapEnv } = config;
+
+  /**
+   * Feature flag to only enable for local development until
+   * message-signing-snap v1.1.2 released in MM 12.18: https://github.com/MetaMask/metamask-extension/pull/32521.
+   *
+   * @returns True if the feature is enabled, false otherwise.
+   */
+  function isFeatureEnabled(): boolean {
+    return snapEnv === 'local';
+  }
 
   /**
    * Retrieves the user profile.
    *
    * @returns The user profile.
    */
-  async function getUserProfile(): Promise<UserProfile | null> {
+  async function getUserProfile(): Promise<UserProfile> {
     try {
+      if (!isFeatureEnabled()) {
+        throw new Error('Feature is not enabled');
+      }
+
       await auth.getAccessToken();
       const profile = await auth.getUserProfile(); // retrieve the user profile information
       return profile;
     } catch (error) {
       logger.error('Error fetching access token:', error);
-      return null;
+      throw error;
     }
   }
 
@@ -72,13 +86,20 @@ export function createProfileSyncManager(
     StoredGrantedPermission[]
   > {
     try {
+      if (!isFeatureEnabled()) {
+        throw new Error('Feature is not enabled');
+      }
+
+      // Authenticate the user
+      await getUserProfile();
+
       const items = await userStorage.getAllFeatureItems(FEATURE);
-      return items
-        ? items.map((item) => JSON.parse(item) as StoredGrantedPermission)
-        : [];
+      return (
+        items?.map((item) => JSON.parse(item) as StoredGrantedPermission) ?? []
+      );
     } catch (error) {
       logger.error('Error fetching all granted permissions:', error);
-      return [];
+      throw error;
     }
   }
 
@@ -93,6 +114,13 @@ export function createProfileSyncManager(
     permissionContext: Hex,
   ): Promise<StoredGrantedPermission | null> {
     try {
+      if (!isFeatureEnabled()) {
+        throw new Error('Feature is not enabled');
+      }
+
+      // Authenticate the user
+      await getUserProfile();
+
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${permissionContext}`;
       const permission = await userStorage.getItem(path);
 
@@ -101,7 +129,7 @@ export function createProfileSyncManager(
         : null;
     } catch (error) {
       logger.error('Error fetching granted permissions:', error);
-      return null;
+      throw error;
     }
   }
 
@@ -120,6 +148,13 @@ export function createProfileSyncManager(
     storedGrantedPermission: StoredGrantedPermission,
   ): Promise<void> {
     try {
+      if (!isFeatureEnabled()) {
+        throw new Error('Feature is not enabled');
+      }
+
+      // Authenticate the user
+      await getUserProfile();
+
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${storedGrantedPermission.permissionResponse.context}`;
       await userStorage.setItem(path, JSON.stringify(storedGrantedPermission));
     } catch (error) {
@@ -143,6 +178,13 @@ export function createProfileSyncManager(
     storedGrantedPermissions: StoredGrantedPermission[],
   ): Promise<void> {
     try {
+      if (!isFeatureEnabled()) {
+        throw new Error('Feature is not enabled');
+      }
+
+      // Authenticate the user
+      await getUserProfile();
+
       await userStorage.batchSetItems(
         FEATURE,
         storedGrantedPermissions.map((storedGrantedPermission) => [
@@ -157,7 +199,6 @@ export function createProfileSyncManager(
   }
 
   return {
-    getUserProfile,
     getAllGrantedPermissions,
     getGrantedPermission,
     storeGrantedPermission,

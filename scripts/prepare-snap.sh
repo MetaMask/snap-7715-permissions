@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# Check if the submodule directory exists
-if [ ! -d "./external/message-signing-snap" ]; then
-  echo "Submodule not found. Initializing..."
-  git submodule update --init --recursive
-else
-  echo "Submodule already present. Skipping initialization."
-fi
+# Initialize the submodule
+git submodule update --init --recursive
 
 # Use the correct node version
 export NVM_DIR="$HOME/.nvm"

@@ -61,165 +61,234 @@ describe('profileSync', () => {
     },
     siteOrigin: 'https://example.com',
   };
-
-  beforeEach(() => {
-    profileSyncManager = createProfileSyncManager({
-      auth: jwtBearerAuthMock,
-      userStorage: userStorageMock,
+  const mockPassAuth = () => {
+    jwtBearerAuthMock.getAccessToken.mockResolvedValueOnce('aaa.bbb.ccc');
+    jwtBearerAuthMock.getUserProfile.mockResolvedValueOnce({
+      identifierId: '0x00_some_permission_context',
+      profileId: '0x456',
+      metaMetricsId: '0x789',
     });
-  });
+  };
+  const mockFailAuth = () => {
+    jwtBearerAuthMock.getAccessToken.mockRejectedValue(
+      new Error('Failed to fetch access token'),
+    );
+  };
 
-  describe('getUserProfile', () => {
-    it('should return the user profile if the user pass auth', async () => {
-      jwtBearerAuthMock.getAccessToken.mockResolvedValueOnce('aaa.bbb.ccc');
-      jwtBearerAuthMock.getUserProfile.mockResolvedValueOnce({
-        identifierId: '0x00_some_permission_context',
-        profileId: '0x456',
-        metaMetricsId: '0x789',
+  describe('Profile Sync feature enabled', () => {
+    beforeEach(() => {
+      profileSyncManager = createProfileSyncManager({
+        snapEnv: 'local',
+        auth: jwtBearerAuthMock,
+        userStorage: userStorageMock,
       });
-      const userProfile = await profileSyncManager.getUserProfile();
-
-      expect(userProfile).toBeDefined();
     });
 
-    it('should return null if it fails to fetch access token(ie, user fails auth)', async () => {
-      jwtBearerAuthMock.getAccessToken.mockRejectedValue(
-        new Error('Failed to fetch access token'),
-      );
+    describe('getAllGrantedPermissions', () => {
+      it('should return all granted permissions when items exist', async () => {
+        const mockStoredGrantedPermissions = [mockStoredGrantedPermission];
+        userStorageMock.getAllFeatureItems.mockResolvedValueOnce(
+          mockStoredGrantedPermissions.map((permission) =>
+            JSON.stringify(permission),
+          ),
+        );
+        mockPassAuth();
 
-      const userProfile = await profileSyncManager.getUserProfile();
-      expect(userProfile).toBeNull();
-    });
-  });
+        const res = await profileSyncManager.getAllGrantedPermissions();
+        expect(res).toStrictEqual(mockStoredGrantedPermissions);
+        expect(userStorageMock.getAllFeatureItems).toHaveBeenCalledWith(
+          'gator_7715_permissions',
+        );
+      });
 
-  describe('getAllGrantedPermissions', () => {
-    it('should return all granted permissions when items exist', async () => {
-      const mockStoredGrantedPermissions = [mockStoredGrantedPermission];
-      userStorageMock.getAllFeatureItems.mockResolvedValueOnce(
-        mockStoredGrantedPermissions.map((permission) =>
-          JSON.stringify(permission),
-        ),
-      );
+      it('should return empty array when no items exist', async () => {
+        userStorageMock.getAllFeatureItems.mockResolvedValueOnce(null);
+        mockPassAuth();
 
-      const res = await profileSyncManager.getAllGrantedPermissions();
-      expect(res).toStrictEqual(mockStoredGrantedPermissions);
-      expect(userStorageMock.getAllFeatureItems).toHaveBeenCalledWith(
-        'gator_7715_permissions',
-      );
-    });
+        const permissions = await profileSyncManager.getAllGrantedPermissions();
+        expect(permissions).toStrictEqual([]);
+      });
 
-    it('should return empty array when no items exist', async () => {
-      userStorageMock.getAllFeatureItems.mockResolvedValueOnce(null);
+      it('should return empty array when storage throws error', async () => {
+        userStorageMock.getAllFeatureItems.mockRejectedValueOnce(
+          new Error('Storage error'),
+        );
+        mockPassAuth();
 
-      const permissions = await profileSyncManager.getAllGrantedPermissions();
-      expect(permissions).toStrictEqual([]);
-    });
+        await expect(
+          profileSyncManager.getAllGrantedPermissions(),
+        ).rejects.toThrow('Storage error');
+      });
 
-    it('should return empty array when storage throws error', async () => {
-      userStorageMock.getAllFeatureItems.mockRejectedValueOnce(
-        new Error('Storage error'),
-      );
+      it('should return null if it fails to fetch access token(ie, user fails auth)', async () => {
+        mockFailAuth();
 
-      const permissions = await profileSyncManager.getAllGrantedPermissions();
-      expect(permissions).toStrictEqual([]);
-    });
-  });
-
-  describe('getGrantedPermission', () => {
-    it('should return granted permission when it exists in profile sync', async () => {
-      userStorageMock.getItem.mockResolvedValueOnce(
-        JSON.stringify(mockStoredGrantedPermission),
-      );
-
-      const res = await profileSyncManager.getGrantedPermission(
-        '0x00_some_permission_context' as Hex,
-      );
-      expect(res).toStrictEqual(mockStoredGrantedPermission);
-      expect(userStorageMock.getItem).toHaveBeenCalledWith(
-        'gator_7715_permissions.0x00_some_permission_context',
-      );
+        await expect(
+          profileSyncManager.getAllGrantedPermissions(),
+        ).rejects.toThrow('Failed to fetch access token');
+      });
     });
 
-    it('should return null when granted permission does not exist in profile sync', async () => {
-      userStorageMock.getItem.mockResolvedValueOnce(null);
+    describe('getGrantedPermission', () => {
+      it('should return granted permission when it exists in profile sync', async () => {
+        userStorageMock.getItem.mockResolvedValueOnce(
+          JSON.stringify(mockStoredGrantedPermission),
+        );
+        mockPassAuth();
 
-      const permission = await profileSyncManager.getGrantedPermission(
-        '0x00_some_permission_context' as Hex,
-      );
-      expect(permission).toBeNull();
+        const res = await profileSyncManager.getGrantedPermission(
+          '0x00_some_permission_context' as Hex,
+        );
+        expect(res).toStrictEqual(mockStoredGrantedPermission);
+        expect(userStorageMock.getItem).toHaveBeenCalledWith(
+          'gator_7715_permissions.0x00_some_permission_context',
+        );
+      });
+
+      it('should return null when granted permission does not exist in profile sync', async () => {
+        userStorageMock.getItem.mockResolvedValueOnce(null);
+        mockPassAuth();
+
+        const permission = await profileSyncManager.getGrantedPermission(
+          '0x00_some_permission_context' as Hex,
+        );
+        expect(permission).toBeNull();
+      });
+
+      it('should throw error when profile sync storage throws error', async () => {
+        userStorageMock.getItem.mockRejectedValueOnce(
+          new Error('Storage error'),
+        );
+        mockPassAuth();
+
+        await expect(
+          profileSyncManager.getGrantedPermission(
+            '0x00_some_permission_context' as Hex,
+          ),
+        ).rejects.toThrow('Storage error');
+      });
     });
 
-    it('should return null when profile sync storage throws error', async () => {
-      userStorageMock.getItem.mockRejectedValueOnce(new Error('Storage error'));
+    describe('storeGrantedPermission', () => {
+      it('should store granted permission successfully in profile sync', async () => {
+        await profileSyncManager.storeGrantedPermission(
+          mockStoredGrantedPermission,
+        );
+        mockPassAuth();
 
-      const permission = await profileSyncManager.getGrantedPermission(
-        '0x00_some_permission_context' as Hex,
-      );
-      expect(permission).toBeNull();
+        expect(userStorageMock.setItem).toHaveBeenCalledWith(
+          'gator_7715_permissions.0x00_some_permission_context',
+          JSON.stringify(mockStoredGrantedPermission),
+        );
+      });
+
+      it('should throw error when profile sync storage throws error', async () => {
+        userStorageMock.setItem.mockRejectedValueOnce(
+          new Error('Storage error'),
+        );
+        mockPassAuth();
+
+        await expect(
+          profileSyncManager.storeGrantedPermission(
+            mockStoredGrantedPermission,
+          ),
+        ).rejects.toThrow('Storage error');
+      });
     });
-  });
 
-  describe('storeGrantedPermission', () => {
-    it('should store granted permission successfully in profile sync', async () => {
-      await profileSyncManager.storeGrantedPermission(
-        mockStoredGrantedPermission,
-      );
-      expect(userStorageMock.setItem).toHaveBeenCalledWith(
-        'gator_7715_permissions.0x00_some_permission_context',
-        JSON.stringify(mockStoredGrantedPermission),
-      );
-    });
-
-    it('should handle profile sync storage errors gracefully', async () => {
-      userStorageMock.setItem.mockRejectedValueOnce(new Error('Storage error'));
-
-      await expect(
-        profileSyncManager.storeGrantedPermission(mockStoredGrantedPermission),
-      ).rejects.toThrow('Storage error');
-    });
-  });
-
-  describe('storeGrantedPermissionBatch', () => {
-    it('should store multiple granted permissions successfully in profile sync', async () => {
-      const mockStoredGrantedPermissions = [
-        mockStoredGrantedPermission,
-        {
-          permissionResponse: {
-            ...mockStoredGrantedPermission.permissionResponse,
-            context: '0x00_some_permission_context2' as Hex,
+    describe('storeGrantedPermissionBatch', () => {
+      it('should store multiple granted permissions successfully in profile sync', async () => {
+        const mockStoredGrantedPermissions = [
+          mockStoredGrantedPermission,
+          {
+            permissionResponse: {
+              ...mockStoredGrantedPermission.permissionResponse,
+              context: '0x00_some_permission_context2' as Hex,
+            },
+            siteOrigin: 'https://example2.com',
           },
-          siteOrigin: 'https://example2.com',
-        },
-      ];
+        ];
+        mockPassAuth();
 
-      await profileSyncManager.storeGrantedPermissionBatch(
-        mockStoredGrantedPermissions,
-      );
-      expect(userStorageMock.batchSetItems).toHaveBeenCalledWith(
-        'gator_7715_permissions',
-        [
+        await profileSyncManager.storeGrantedPermissionBatch(
+          mockStoredGrantedPermissions,
+        );
+        expect(userStorageMock.batchSetItems).toHaveBeenCalledWith(
+          'gator_7715_permissions',
           [
-            '0x00_some_permission_context',
-            JSON.stringify(mockStoredGrantedPermissions[0]),
+            [
+              '0x00_some_permission_context',
+              JSON.stringify(mockStoredGrantedPermissions[0]),
+            ],
+            [
+              '0x00_some_permission_context2',
+              JSON.stringify(mockStoredGrantedPermissions[1]),
+            ],
           ],
-          [
-            '0x00_some_permission_context2',
-            JSON.stringify(mockStoredGrantedPermissions[1]),
-          ],
-        ],
-      );
+        );
+      });
+
+      it('should throw error when profile sync storage throws error', async () => {
+        const mockStoredGrantedPermissions = [mockStoredGrantedPermission];
+        userStorageMock.batchSetItems.mockRejectedValueOnce(
+          new Error('Storage error'),
+        );
+
+        mockPassAuth();
+
+        const promise = profileSyncManager.storeGrantedPermissionBatch(
+          mockStoredGrantedPermissions,
+        );
+        await expect(promise).rejects.toThrow('Storage error');
+      });
+    });
+  });
+
+  describe('Profile Sync feature disabled', () => {
+    beforeEach(() => {
+      profileSyncManager = createProfileSyncManager({
+        snapEnv: 'production',
+        auth: jwtBearerAuthMock,
+        userStorage: userStorageMock,
+      });
     });
 
-    it('should handle profile sync storage errors gracefully', async () => {
-      const mockStoredGrantedPermissions = [mockStoredGrantedPermission];
-      userStorageMock.batchSetItems.mockRejectedValueOnce(
-        new Error('Storage error'),
-      );
+    describe('getAllGrantedPermissions', () => {
+      it('should throw error when profile sync feature is disabled', async () => {
+        await expect(
+          profileSyncManager.getAllGrantedPermissions(),
+        ).rejects.toThrow('Feature is not enabled');
+      });
+    });
 
-      const promise = profileSyncManager.storeGrantedPermissionBatch(
-        mockStoredGrantedPermissions,
-      );
-      await expect(promise).rejects.toThrow('Storage error');
+    describe('getGrantedPermission', () => {
+      it('should throw error when profile sync feature is disabled', async () => {
+        await expect(
+          profileSyncManager.getGrantedPermission(
+            '0x00_some_permission_context' as Hex,
+          ),
+        ).rejects.toThrow('Feature is not enabled');
+      });
+    });
+
+    describe('storeGrantedPermission', () => {
+      it('should throw error when profile sync feature is disabled', async () => {
+        await expect(
+          profileSyncManager.storeGrantedPermission(
+            mockStoredGrantedPermission,
+          ),
+        ).rejects.toThrow('Feature is not enabled');
+      });
+    });
+
+    describe('storeGrantedPermissionBatch', () => {
+      it('should throw error when profile sync feature is disabled', async () => {
+        await expect(
+          profileSyncManager.storeGrantedPermissionBatch([
+            mockStoredGrantedPermission,
+          ]),
+        ).rejects.toThrow('Feature is not enabled');
+      });
     });
   });
 });

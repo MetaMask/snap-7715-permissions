@@ -57,14 +57,8 @@ export class HomePage {
       chainId: sepolia.id,
     });
 
-    // Feature flag to only enable for local development until
-    // message-signing-snap v1.1.2 released in MM 12.18: https://github.com/MetaMask/metamask-extension/pull/32521
-    let grantedPermissions: StoredGrantedPermission[] = [];
-    // eslint-disable-next-line no-restricted-globals
-    if (process.env.SNAP_ENV === 'local') {
-      grantedPermissions =
-        await this.#profileSyncManager.getAllGrantedPermissions();
-    }
+    const grantedPermissions: StoredGrantedPermission[] =
+      await this.#profileSyncManager.getAllGrantedPermissions();
 
     return (
       <Box>

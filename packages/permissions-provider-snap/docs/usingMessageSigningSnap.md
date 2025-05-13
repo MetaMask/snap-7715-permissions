@@ -10,4 +10,4 @@ Since the `@metamask/message-signing-snap` is preinstalled in production, and ha
 
 **onInstall()**
 
-The `@metamask/gator-permissions-snap` will attempt to install a the `@metamask/message-signing-snap` at `local:http://localhost:8080` only when the `SNAP_ENV=local`
+The `@metamask/gator-permissions-snap` will attempt to install the `@metamask/message-signing-snap` at `local:http://localhost:8080` only when the `SNAP_ENV=local`
