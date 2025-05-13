@@ -34,7 +34,7 @@ export abstract class BaseOrchestrator<
   TPermissionRequest extends PermissionRequest = PermissionRequest,
   TContext extends BaseContext = BaseContext,
   TMetadata extends object = object,
-  TCompletePermission extends DeepRequired<
+  TPopulatedPermission extends DeepRequired<
     TPermissionRequest['permission']
   > = DeepRequired<TPermissionRequest['permission']>,
 > implements Orchestrator
@@ -112,13 +112,13 @@ export abstract class BaseOrchestrator<
    */
   protected abstract populatePermission(args: {
     permission: TPermissionRequest['permission'];
-  }): Promise<TCompletePermission>;
+  }): Promise<TPopulatedPermission>;
 
   /**
    * Append permission-specific caveats to the caveat builder.
    */
   protected abstract appendCaveats(
-    permissionRequest: TCompletePermission,
+    permissionRequest: TPopulatedPermission,
     caveatBuilder: CaveatBuilder,
   ): Promise<CaveatBuilder>;
 
@@ -165,7 +165,7 @@ export abstract class BaseOrchestrator<
       });
     };
 
-    const unbindStateChangeHandlers = this.bindStateChangeHandlers({
+    const unbindStateChangeHandlers = this.#bindStateChangeHandlers({
       stateChangeHandlers: this.stateChangeHandlers,
       onContextChanged,
       getContext: () => this.#currentContext,
@@ -276,7 +276,7 @@ export abstract class BaseOrchestrator<
     };
   }
 
-  private bindStateChangeHandlers = ({
+  #bindStateChangeHandlers({
     stateChangeHandlers,
     onContextChanged,
     getContext,
@@ -290,7 +290,7 @@ export abstract class BaseOrchestrator<
     getMetadata: () => Promise<TMetadata>;
     interfaceId: string;
     userEventDispatcher: UserEventDispatcher;
-  }) => {
+  }) {
     const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
       const handler: UserEventHandler<UserInputEventType> = async ({
         event,
@@ -332,5 +332,5 @@ export abstract class BaseOrchestrator<
     return () => {
       handlerUnbinders.forEach((unbinder) => unbinder());
     };
-  };
+  }
 }
