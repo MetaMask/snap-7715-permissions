@@ -1,0 +1,91 @@
+import type {
+  PermissionRequest,
+  Permission,
+  PermissionResponse,
+} from '@metamask/7715-permissions-shared/types';
+import type { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
+import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+
+import type {
+  UserEventDispatcher,
+  UserInputEventByType,
+} from '../userEventDispatcher';
+
+export type TypedPermissionRequest<TPermission extends Permission> =
+  PermissionRequest & {
+    permission: TPermission;
+  };
+
+/**
+ * Base interface for all context objects used in confirmation dialogs.
+ * Each permission type will extend this with their specific context needs.
+ */
+export type BaseContext = {
+  expiry: string;
+  isAdjustmentAllowed: boolean;
+};
+
+/**
+ * Base interface for all permission objects.
+ * Each permission type will extend this with their specific permission data.
+ */
+export type BasePermission = {
+  type: string;
+  data: {
+    justification: string;
+    [key: string]: any;
+  };
+  rules?: Record<string, any>;
+};
+
+/**
+ * Makes all properties in an object type required recursively.
+ * This includes nested objects and arrays.
+ * Also removes undefined from union types.
+ */
+export type DeepRequired<TParent> = TParent extends (infer U)[]
+  ? DeepRequired<U>[]
+  : TParent extends object
+    ? {
+        [P in keyof TParent]-?: DeepRequired<Exclude<TParent[P], undefined>>;
+      }
+    : Exclude<TParent, undefined>;
+
+/**
+ * An enum representing the time periods for which the stream rate can be calculated.
+ */
+export enum TimePeriod {
+  DAILY = 'Daily',
+  WEEKLY = 'Weekly',
+  MONTHLY = 'Monthly',
+}
+
+export type ConfirmationProps = {
+  ui: GenericSnapElement;
+  snaps: SnapsProvider;
+  userEventDispatcher: UserEventDispatcher;
+};
+
+export type StateChangeHandler<
+  TContext,
+  TMetadata,
+  TUserInputEventType extends UserInputEventType = UserInputEventType,
+  TEvent extends
+    UserInputEventByType<TUserInputEventType> = UserInputEventByType<TUserInputEventType>,
+> = {
+  elementName: string;
+  eventType: TUserInputEventType;
+  contextMapper: (args: {
+    context: TContext;
+    event: TEvent;
+    metadata: TMetadata;
+  }) => TContext;
+};
+
+export type Orchestrator = {
+  orchestrate: (args: { origin: string }) => Promise<{
+    success: boolean;
+    response?: PermissionResponse;
+    reason?: string;
+  }>;
+};

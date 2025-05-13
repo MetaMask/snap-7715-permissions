@@ -1,43 +1,33 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import {
-  Text,
-  Icon,
-  Box,
-  Tooltip,
-  Section,
-  Avatar,
-} from '@metamask/snaps-sdk/jsx';
+import { Text, Box, Section, Avatar } from '@metamask/snaps-sdk/jsx';
 import { type Hex } from 'viem';
+import { TooltipIcon } from './TooltipIcon';
 
-import { formatTokenBalance } from '../../utils';
+import { formatTokenBalance } from '../../utils/balance';
 
 export type AccountDetailsProps = {
   account: {
     address: Hex;
-    valueFormattedAsCurrency: string;
+    balanceFormattedAsCurrency: string;
     balance: string;
   };
-  senderDetails: {
-    title: string;
-    tooltip: string;
-  };
+  title: string;
+  tooltip: string;
 };
 
 export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
   account,
-  senderDetails,
+  title,
+  tooltip,
 }) => {
-  const { address, balance, valueFormattedAsCurrency } = account;
-  const { title, tooltip } = senderDetails;
+  const { address, balance, balanceFormattedAsCurrency } = account;
   return (
     <Section>
       <Box direction="vertical">
         <Box direction="horizontal" alignment="space-between">
           <Box direction="horizontal">
             <Text>{title}</Text>
-            <Tooltip content={<Text>{tooltip}</Text>}>
-              <Icon name="question" size="inherit" color="muted" />
-            </Tooltip>
+            <TooltipIcon tooltip={tooltip} />
           </Box>
 
           <Box direction="horizontal">
@@ -47,7 +37,7 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
         </Box>
 
         <Box direction="horizontal" alignment="end">
-          <Text color="muted">{valueFormattedAsCurrency}</Text>
+          <Text color="muted">{balanceFormattedAsCurrency}</Text>
           <Text color="alternative">
             {`${formatTokenBalance(balance)}`} available
           </Text>

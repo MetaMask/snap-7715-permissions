@@ -1,5 +1,5 @@
 import type { Hex } from 'viem';
-import { formatUnits, maxUint256, parseUnits, toHex } from 'viem';
+import { formatEther, formatUnits, maxUint256, parseUnits, toHex } from 'viem';
 
 /**
  * Formats a token balance to a human-readable string.
@@ -50,4 +50,27 @@ export const zeroDefaultParser = (value: string | null | undefined) => {
     return convertValueToHex('0');
   }
   return convertValueToHex(value);
+};
+
+/**
+ * Formats a string value to a hex string.
+ * @param value - The value to format.
+ * @param allowUndefined - Whether to allow undefined values.
+ * @returns The formatted value.
+ */
+export const formatEtherFromString = <TAllowUndefined extends boolean>(
+  value: TAllowUndefined extends true ? string | undefined : string,
+  allowUndefined: TAllowUndefined,
+): TAllowUndefined extends true ? string | undefined : string => {
+  if (value === undefined) {
+    if (allowUndefined) {
+      return undefined as TAllowUndefined extends true
+        ? string | undefined
+        : string;
+    }
+
+    throw new Error('Value is undefined');
+  }
+
+  return formatEther(BigInt(value));
 };

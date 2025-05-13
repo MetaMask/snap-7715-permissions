@@ -226,7 +226,9 @@ const Index = () => {
   const [expiry, setExpiry] = useState(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
   );
-  const [justification, setJustification] = useState('Money please!');
+  const [justification, setJustification] = useState(
+    'This is a very important request for streaming allowance for some very important thing',
+  );
   const [permissionType, setPermissionType] = useState('native-token-stream');
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
 
@@ -238,6 +240,7 @@ const Index = () => {
   const [receipt, setReceipt] = useState<UserOperationReceipt | null>(null);
 
   const [isWorking, setIsWorking] = useState(false);
+  const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
 
   const handleInitialAmountChange = ({
     target: { value: inputValue },
@@ -369,6 +372,7 @@ const Index = () => {
             address: delegateAccount.address,
           },
         },
+        isAdjustmentAllowed,
         permission: {
           type: permissionType,
           data: {
@@ -573,6 +577,17 @@ const Index = () => {
                   name="expiry"
                   value={expiry}
                   onChange={handleExpiryChange}
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
+                <input
+                  type="checkbox"
+                  id="isAdjustmentAllowed"
+                  name="isAdjustmentAllowed"
+                  checked={isAdjustmentAllowed}
+                  onChange={(e) => setIsAdjustmentAllowed(e.target.checked)}
+                  style={{ width: 'auto', marginLeft: '1rem' }}
                 />
               </div>
             </StyledForm>
