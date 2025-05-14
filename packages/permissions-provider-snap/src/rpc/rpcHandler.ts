@@ -56,20 +56,19 @@ export function createRpcHandler(config: {
             throw new Error(permissionResponse.reason);
           }
 
+          if (permissionResponse.response) {
+            await profileSyncManager.storeGrantedPermission({
+              permissionResponse: permissionResponse.response,
+              siteOrigin,
+            });
+          }
+
           return permissionResponse.response;
         }),
       );
 
       // todo: type this better
       const filtered = responses.filter((response) => response !== undefined);
-
-      // Store the granted permission with profile sync
-      await profileSyncManager.storeGrantedPermissionBatch(
-        filtered.map((response) => ({
-          permissionResponse: response,
-          siteOrigin,
-        })),
-      );
 
       return filtered as any as Json[];
     },

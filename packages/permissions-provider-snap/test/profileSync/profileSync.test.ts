@@ -1,6 +1,6 @@
+import type { Delegation } from '@metamask/delegation-toolkit';
 import {
   createDelegation,
-  Delegation,
   encodeDelegation,
   getDelegationHashOffchain,
 } from '@metamask/delegation-toolkit';
@@ -41,7 +41,7 @@ describe('profileSync', () => {
       caveats: [],
     }),
     signature: '0x',
-  }
+  };
 
   const mockDelegationHash = getDelegationHashOffchain(mockDelegation);
 
@@ -167,7 +167,7 @@ describe('profileSync', () => {
         mockPassAuth();
 
         const permission = await profileSyncManager.getGrantedPermission(
-          '0x00_some_permission_context' as Hex,
+          mockStoredGrantedPermission.permissionResponse.context,
         );
         expect(permission).toBeNull();
       });
@@ -271,11 +271,11 @@ describe('profileSync', () => {
           'gator_7715_permissions',
           [
             [
-              `gator_7715_permissions.${mockDelegationHash}`,
+              mockDelegationHash,
               JSON.stringify(mockStoredGrantedPermissions[0]),
             ],
             [
-              `gator_7715_permissions.${mockDelegationHashTwo}`,
+              mockDelegationHashTwo,
               JSON.stringify(mockStoredGrantedPermissions[1]),
             ],
           ],

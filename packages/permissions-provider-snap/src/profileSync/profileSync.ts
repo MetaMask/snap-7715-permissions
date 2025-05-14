@@ -6,17 +6,15 @@ import type {
   Delegation,
   DelegationStruct,
 } from '@metamask/delegation-toolkit';
-import {
-  DELEGATION_ABI_TYPE_COMPONENTS,
-  getDelegationHashOffchain,
-} from '@metamask/delegation-toolkit';
+import { getDelegationHashOffchain } from '@metamask/delegation-toolkit';
 import type {
   UserProfile,
   UserStorageGenericPathWithFeatureAndKey,
   JwtBearerAuth,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
-import { decodeAbiParameters, toHex, type Hex } from 'viem';
+import { ethers } from 'ethers';
+import { getAddress, toHex, type Hex } from 'viem';
 
 export type ProfileSyncManager = {
   getAllGrantedPermissions: () => Promise<StoredGrantedPermission[]>;
@@ -52,9 +50,18 @@ export type ProfileSyncManagerConfig = {
 const convertToDelegation = (
   delegationStruct: DelegationStruct,
 ): Delegation => {
+  const caveats = delegationStruct.caveats.map((caveat) => ({
+    enforcer: getAddress(caveat.enforcer),
+    terms: caveat.terms,
+    args: caveat.args,
+  }));
   return {
-    ...delegationStruct,
+    delegate: getAddress(delegationStruct.delegate),
+    delegator: getAddress(delegationStruct.delegator),
+    authority: delegationStruct.authority,
+    caveats,
     salt: toHex(delegationStruct.salt),
+    signature: delegationStruct.signature,
   };
 };
 
@@ -65,14 +72,27 @@ const convertToDelegation = (
  * @returns The decoded delegations.
  */
 const decodeDelegation = (permissionsContext: Hex): Delegation[] => {
-  const [decodedDelegationStructs] = decodeAbiParameters(
-    [
-      {
-        components: DELEGATION_ABI_TYPE_COMPONENTS,
-        name: 'delegations',
-        type: 'tuple[]',
-      },
-    ],
+  // TODO: Viem throws error: during test: Expected 0 arguments, but got 2.
+  // Using ethers to decode the delegation.
+  // const [decodedDelegationStructs] = decodeAbiParameters(
+  //   [
+  //     {
+  //       components: DELEGATION_ABI_TYPE_COMPONENTS,
+  //       name: 'delegations',
+  //       type: 'tuple[]',
+  //     },
+  //   ],
+  //   permissionsContext,
+  // );
+
+  const abiType = [
+    'tuple(address delegate, address delegator, bytes32 authority, ' +
+      'tuple(address enforcer, bytes terms, bytes args)[] caveats, ' +
+      'uint256 salt, bytes signature)[]',
+  ];
+
+  const [decodedDelegationStructs] = ethers.utils.defaultAbiCoder.decode(
+    abiType,
     permissionsContext,
   );
 
