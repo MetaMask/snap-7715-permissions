@@ -8,7 +8,6 @@ import type {
 } from '@metamask/delegation-toolkit';
 import { getDelegationHashOffchain } from '@metamask/delegation-toolkit';
 import type {
-  UserProfile,
   UserStorageGenericPathWithFeatureAndKey,
   JwtBearerAuth,
   UserStorage,
@@ -117,42 +116,39 @@ export function createProfileSyncManager(
    * Generates an object key for the permission response stored in profile sync.
    *
    * @param permissionContext - The encoded delegation(ie. permissions context).
-   * @returns The object key.
+   * @returns The object key by concatenating the delegation hashes.
    */
   function generateObjectKey(permissionContext: Hex): Hex {
     const delegations = decodeDelegation(permissionContext);
-    const delegation = delegations[0];
-    if (!delegation) {
-      throw new Error('No delegation found');
-    }
 
-    return getDelegationHashOffchain(delegation);
+    const concatenatedDelegationHashes = delegations.reduce(
+      (acc, delegation) => acc + getDelegationHashOffchain(delegation),
+      '',
+    );
+
+    return concatenatedDelegationHashes as Hex;
   }
 
   /**
    * Feature flag to only enable for local development until
    * message-signing-snap v1.1.2 released in MM 12.18: https://github.com/MetaMask/metamask-extension/pull/32521.
    *
-   * @returns True if the feature is enabled, false otherwise.
+   * @throws If the feature is not enabled.
    */
-  function isFeatureEnabled(): boolean {
-    return snapEnv === 'local';
+  function assertFeatureEnabled() {
+    if (snapEnv !== 'local') {
+      throw new Error('Feature is not enabled');
+    }
   }
 
   /**
-   * Retrieves the user profile.
+   * Authenticates the user with profile sync.
    *
-   * @returns The user profile.
    */
-  async function getUserProfile(): Promise<UserProfile> {
+  async function authenticate(): Promise<void> {
     try {
-      if (!isFeatureEnabled()) {
-        throw new Error('Feature is not enabled');
-      }
-
+      assertFeatureEnabled();
       await auth.getAccessToken();
-      const profile = await auth.getUserProfile(); // retrieve the user profile information
-      return profile;
     } catch (error) {
       logger.error('Error fetching access token:', error);
       throw error;
@@ -169,12 +165,8 @@ export function createProfileSyncManager(
     StoredGrantedPermission[]
   > {
     try {
-      if (!isFeatureEnabled()) {
-        throw new Error('Feature is not enabled');
-      }
-
-      // Authenticate the user
-      await getUserProfile();
+      assertFeatureEnabled();
+      await authenticate();
 
       const items = await userStorage.getAllFeatureItems(FEATURE);
       return (
@@ -197,12 +189,8 @@ export function createProfileSyncManager(
     permissionContext: Hex,
   ): Promise<StoredGrantedPermission | null> {
     try {
-      if (!isFeatureEnabled()) {
-        throw new Error('Feature is not enabled');
-      }
-
-      // Authenticate the user
-      await getUserProfile();
+      assertFeatureEnabled();
+      await authenticate();
 
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(permissionContext)}`;
       const permission = await userStorage.getItem(path);
@@ -231,12 +219,8 @@ export function createProfileSyncManager(
     storedGrantedPermission: StoredGrantedPermission,
   ): Promise<void> {
     try {
-      if (!isFeatureEnabled()) {
-        throw new Error('Feature is not enabled');
-      }
-
-      // Authenticate the user
-      await getUserProfile();
+      assertFeatureEnabled();
+      await authenticate();
 
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(storedGrantedPermission.permissionResponse.context)}`;
       await userStorage.setItem(path, JSON.stringify(storedGrantedPermission));
@@ -261,12 +245,8 @@ export function createProfileSyncManager(
     storedGrantedPermissions: StoredGrantedPermission[],
   ): Promise<void> {
     try {
-      if (!isFeatureEnabled()) {
-        throw new Error('Feature is not enabled');
-      }
-
-      // Authenticate the user
-      await getUserProfile();
+      assertFeatureEnabled();
+      await authenticate();
 
       await userStorage.batchSetItems(
         FEATURE,

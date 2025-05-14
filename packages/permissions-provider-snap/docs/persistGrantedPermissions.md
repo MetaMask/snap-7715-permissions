@@ -55,7 +55,7 @@ Note over onRpcRequest: RPC entrypoint(incoming RPC permission request)
 Note over onRpcRequest: RPC entrypoint(post fulfillment of a granted permission)
 
 onRpcRequest->>rpcHandler: Receives a permission request
-rpcHandler->>profileSyncModule: Kicks of auth ceremony by calling getUserProfile()
+rpcHandler->>profileSyncModule: Kicks of auth ceremony by calling getAccessToken()
 rpcHandler->>profileSyncModule: Calls storeGrantedPermission the store the granted permission in profile sync
 rpcHandler->>onRpcRequest: Return granted permission result back to dApp
 ```

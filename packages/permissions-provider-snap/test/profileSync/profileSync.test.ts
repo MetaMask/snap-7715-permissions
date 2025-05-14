@@ -19,6 +19,7 @@ import {
 
 describe('profileSync', () => {
   const address = getAddress('0x1234567890123456789012345678901234567890');
+  const addressTwo = getAddress('0x1234567890123456789012345678901234567891');
   const sessionAccount = getAddress(
     '0x1234567890123456789012345678901234567890',
   );
@@ -40,10 +41,20 @@ describe('profileSync', () => {
       from: address,
       caveats: [],
     }),
-    signature: '0x',
+    signature: '0x1',
+  };
+
+  const mockDelegationTwo: Delegation = {
+    ...createDelegation({
+      to: sessionAccount,
+      from: addressTwo,
+      caveats: [],
+    }),
+    signature: '0x2',
   };
 
   const mockDelegationHash = getDelegationHashOffchain(mockDelegation);
+  const mockDelegationHashTwo = getDelegationHashOffchain(mockDelegationTwo);
 
   const mockStoredGrantedPermission: StoredGrantedPermission = {
     permissionResponse: {
@@ -199,6 +210,25 @@ describe('profileSync', () => {
         );
       });
 
+      it('should concatenate all delegation hashes together when store granted permission that has multiple delegations in profile sync', async () => {
+        const mockStoredGrantedPermissionWithMultipleDelegations = {
+          ...mockStoredGrantedPermission,
+          permissionResponse: {
+            ...mockStoredGrantedPermission.permissionResponse,
+            context: encodeDelegation([mockDelegation, mockDelegationTwo]),
+          },
+        };
+        await profileSyncManager.storeGrantedPermission(
+          mockStoredGrantedPermissionWithMultipleDelegations,
+        );
+        mockPassAuth();
+
+        expect(userStorageMock.setItem).toHaveBeenCalledWith(
+          `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo}`,
+          JSON.stringify(mockStoredGrantedPermissionWithMultipleDelegations),
+        );
+      });
+
       it('should throw error when profile sync storage throws error', async () => {
         userStorageMock.setItem.mockRejectedValueOnce(
           new Error('Storage error'),
@@ -215,17 +245,6 @@ describe('profileSync', () => {
 
     describe('storeGrantedPermissionBatch', () => {
       it('should store multiple granted permissions successfully in profile sync', async () => {
-        const addressTwo = getAddress(
-          '0x1234567890123456789012345678901234567891',
-        );
-        const mockDelegationTwo = createDelegation({
-          to: sessionAccount,
-          from: addressTwo,
-          caveats: [],
-        });
-        const mockDelegationHashTwo =
-          getDelegationHashOffchain(mockDelegationTwo);
-
         const mockStoredGrantedPermissions: StoredGrantedPermission[] = [
           mockStoredGrantedPermission,
           {
