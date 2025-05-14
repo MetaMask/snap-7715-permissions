@@ -3051,7 +3051,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^14.0.0
-    "@metamask/eslint-config-jest": ^12.1.0
+    "@metamask/eslint-config-jest": ^14.0.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/snaps-cli": ^6.6.0
@@ -3243,14 +3243,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/eslint-config-jest@npm:^12.1.0":
-  version: 12.1.0
-  resolution: "@metamask/eslint-config-jest@npm:12.1.0"
+"@metamask/eslint-config-jest@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "@metamask/eslint-config-jest@npm:14.0.0"
+  dependencies:
+    "@eslint/js": ^9.11.0
+    globals: ^15.9.0
   peerDependencies:
-    "@metamask/eslint-config": ^12.0.0
-    eslint: ^8.27.0
-    eslint-plugin-jest: ^27.1.5
-  checksum: 98f60234412051d429237dbf32b147a648a0e3b6adacafda24999ec9eb8096155c8000c62204415100c97980cc3bfe0a0fe19e4c318b8bb529eaf57e9f96e680
+    "@metamask/eslint-config": ^14.0.0
+    eslint: ^9.11.0
+    eslint-plugin-jest: ^28.8.3
+  checksum: e7c4f14ff8eae8c1311cd1a941217c39bacf249650b1953138a958472af609a8396722e7b1a0c86386d07f92d7570c3e29754335fe4ef8608a9abf03c7aff6fb
   languageName: node
   linkType: hard
 
@@ -3387,7 +3390,7 @@ __metadata:
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/delegation-toolkit": 0.10.2
     "@metamask/eslint-config": ^14.0.0
-    "@metamask/eslint-config-jest": ^12.1.0
+    "@metamask/eslint-config-jest": ^14.0.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/snaps-cli": ^6.6.0
@@ -3461,7 +3464,7 @@ __metadata:
   dependencies:
     "@jest/globals": ^29.5.0
     "@metamask/eslint-config": ^14.0.0
-    "@metamask/eslint-config-jest": ^12.1.0
+    "@metamask/eslint-config-jest": ^14.0.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/snaps-cli": ^6.6.0
@@ -3538,7 +3541,7 @@ __metadata:
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^14.0.0
-    "@metamask/eslint-config-jest": ^12.1.0
+    "@metamask/eslint-config-jest": ^14.0.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/snaps-cli": ^6.6.0
@@ -3664,7 +3667,7 @@ __metadata:
     "@lavamoat/preinstall-always-fail": ^2.0.0
     "@metamask/create-release-branch": ^4.1.1
     "@metamask/eslint-config": ^14.0.0
-    "@metamask/eslint-config-jest": ^12.1.0
+    "@metamask/eslint-config-jest": ^14.0.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@typescript-eslint/eslint-plugin": ^5.42.1
@@ -18466,7 +18469,7 @@ __metadata:
     "@metamask/delegation-toolkit": 0.10.2
     "@metamask/eslint-config": ^14.0.0
     "@metamask/eslint-config-browser": ^14.0.0
-    "@metamask/eslint-config-jest": ^12.1.0
+    "@metamask/eslint-config-jest": ^14.0.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/providers": ^21.0.0
