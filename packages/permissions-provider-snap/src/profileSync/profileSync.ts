@@ -2,16 +2,21 @@
 /* eslint-disable no-restricted-globals */
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { getDelegationHashOffchain } from '@metamask/delegation-toolkit';
+import type {
+  Delegation,
+  DelegationStruct,
+} from '@metamask/delegation-toolkit';
+import {
+  DELEGATION_ABI_TYPE_COMPONENTS,
+  getDelegationHashOffchain,
+} from '@metamask/delegation-toolkit';
 import type {
   UserProfile,
   UserStorageGenericPathWithFeatureAndKey,
   JwtBearerAuth,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
-import type { Hex } from 'viem';
-
-import { decodeDelegation } from '../utils';
+import { decodeAbiParameters, toHex, type Hex } from 'viem';
 
 export type ProfileSyncManager = {
   getAllGrantedPermissions: () => Promise<StoredGrantedPermission[]>;
@@ -35,6 +40,43 @@ export type ProfileSyncManagerConfig = {
   auth: JwtBearerAuth;
   userStorage: UserStorage;
   snapEnv: string | undefined;
+};
+
+/**
+ * Converts a DelegationStruct to a Delegation.
+ * The DelegationStruct is the format used in the Delegation Framework.
+ *
+ * @param delegationStruct - The delegation struct to format.
+ * @returns The delegation.
+ */
+const convertToDelegation = (
+  delegationStruct: DelegationStruct,
+): Delegation => {
+  return {
+    ...delegationStruct,
+    salt: toHex(delegationStruct.salt),
+  };
+};
+
+/**
+ * ABI Decodes a permissions context.
+ *
+ * @param data - The encoded delegation(ie. permissions context).
+ * @returns The decoded delegations.
+ */
+const decodeDelegation = (data: Hex): Delegation[] => {
+  const [decodedDelegationStructs] = decodeAbiParameters(
+    [
+      {
+        components: DELEGATION_ABI_TYPE_COMPONENTS,
+        name: 'delegations',
+        type: 'tuple[]',
+      },
+    ],
+    data,
+  ) as [DelegationStruct[]];
+
+  return decodedDelegationStructs.map(convertToDelegation);
 };
 
 /**

@@ -3,13 +3,14 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
 import type { Hex } from 'viem';
 
-import { type PriceApiClient, type VsCurrencyParam } from '../clients';
+import { type PriceApiClient } from '../clients/priceApiClient';
+import type { VsCurrencyParam } from '../clients/types';
+import { formatTokenBalance } from '../utils/balance';
 import {
   FALLBACK_PREFERENCE,
   formatAsCurrency,
   type Preferences,
-} from '../locale';
-import { formatTokenBalance } from '../utils';
+} from '../utils/locale';
 
 /**
  * Class responsible for fetching token prices and calculating the value of token balances.

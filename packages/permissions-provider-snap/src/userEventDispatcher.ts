@@ -4,13 +4,9 @@ import type {
   FileUploadEvent,
   FormSubmitEvent,
   InputChangeEvent,
-  InterfaceContext,
   UserInputEvent,
   UserInputEventType,
 } from '@metamask/snaps-sdk';
-
-import type { SupportedPermissionTypes } from './orchestrators';
-import type { PermissionConfirmationContext } from './ui';
 
 export type DialogContentEventHandlers = {
   elementName: string;
@@ -30,8 +26,6 @@ export type UserInputEventByType<
 export type UserEventHandler<TUserInputEventType extends UserInputEventType> =
   (args: {
     event: UserInputEventByType<TUserInputEventType>;
-    attenuatedContext: PermissionConfirmationContext<SupportedPermissionTypes>;
-    permissionType: SupportedPermissionTypes;
     interfaceId: string;
   }) => void | Promise<void>;
 
@@ -56,6 +50,11 @@ export class UserEventDispatcher {
   readonly #eventHandlers = {} as {
     [userInputEventKey: string]: UserEventHandler<UserInputEventType>[];
   };
+
+  /**
+   * Flag to ensure only one component can get the event handler
+   */
+  #hasEventHandler = false;
 
   /**
    * Register an event handler for a specific event type.
@@ -136,53 +135,51 @@ export class UserEventDispatcher {
   }
 
   /**
-   * Process a user input event and trigger all registered handlers for that event type.
-   * Handlers are responsible for filtering by event name if needed.
+   * Creates a user input event handler function that can only be retrieved once.
+   * This ensures that only one component (the ConfirmationDialogFactory) can handle user input events.
    *
-   * @param args - The event handler arguments as object.
-   * @param args.event - The event object containing type and name information.
-   * @param args.id - The id of the interface.
-   * @param args.context - The interface context object that can be modified by handlers.
+   * @returns A function that handles user input events.
+   * @throws If the handler has already been created.
    */
-  public async handleUserInputEvent(args: {
+  public createUserInputEventHandler(): (args: {
     event: UserInputEvent;
     id: string;
-    context: InterfaceContext | null;
-  }): Promise<void> {
-    const { event, id, context } = args;
-
-    const eventKey = getUserInputEventKey({
-      elementName: event.name ?? '',
-      eventType: event.type,
-      interfaceId: id,
-    });
-
-    const handlers = this.#eventHandlers[eventKey];
-
-    if (!handlers?.length) {
-      return;
+  }) => Promise<void> {
+    if (this.#hasEventHandler) {
+      throw new Error('User input event handler has already been created');
     }
+    this.#hasEventHandler = true;
 
-    const permissionType = context?.permissionType as SupportedPermissionTypes;
+    return async (args: { event: UserInputEvent; id: string }) => {
+      const { event, id } = args;
 
-    const handlersExecutions = handlers.map(async (handler) => {
-      try {
-        await handler({
-          event,
-          attenuatedContext: context as PermissionConfirmationContext<
-            typeof permissionType
-          >,
-          interfaceId: id,
-          permissionType,
-        });
-      } catch (error) {
-        logger.error(
-          `Error in event handler for event type ${event.type} and interface id ${id}:`,
-          error,
-        );
+      const eventKey = getUserInputEventKey({
+        elementName: event.name ?? '',
+        eventType: event.type,
+        interfaceId: id,
+      });
+
+      const handlers = this.#eventHandlers[eventKey];
+
+      if (!handlers?.length) {
+        return;
       }
-    });
 
-    await Promise.all(handlersExecutions);
+      const handlersExecutions = handlers.map(async (handler) => {
+        try {
+          await handler({
+            event,
+            interfaceId: id,
+          });
+        } catch (error) {
+          logger.error(
+            `Error in event handler for event type ${event.type} and interface id ${id}:`,
+            error,
+          );
+        }
+      });
+
+      await Promise.all(handlersExecutions);
+    };
   }
 }

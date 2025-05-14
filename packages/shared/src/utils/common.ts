@@ -1,4 +1,5 @@
-import type { Address, Hex } from 'viem';
+import { extractChain, type Address, type Hex } from 'viem';
+import * as chains from 'viem/chains';
 
 import type { PermissionRequestIteratorItem } from '../iterator';
 import type { TypeDescriptor } from '../types';
@@ -63,4 +64,26 @@ export function updateAccountsOrder(
     }
   }
   return accountsUpdated;
+}
+
+const ALL_CHAINS = Object.values(chains);
+
+/**
+ * Gets the chain name for a given chain ID.
+ * @param chainId - The chain ID to get the name for.
+ * @returns The chain name, or throws if the chain is not found.
+ */
+export function getChainName(chainId: number): string {
+  // @ts-expect-error - extractChain does not work well with dynamic `chains`
+  const chain = extractChain({
+    chains: ALL_CHAINS,
+    // we need to do this type assertion because extractChain doesn't work well with dynamic chains
+    id: chainId as any,
+  });
+
+  if (!chain) {
+    throw new Error('Chain not found');
+  }
+
+  return chain.name;
 }

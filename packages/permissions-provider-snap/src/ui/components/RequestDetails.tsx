@@ -1,113 +1,66 @@
-import type { JsonObject, SnapComponent } from '@metamask/snaps-sdk/jsx';
-import {
-  Text,
-  Section,
-  Box,
-  Tooltip,
-  Icon,
-  Image,
-  Button,
-} from '@metamask/snaps-sdk/jsx';
+import { Text, Section, Box, Image } from '@metamask/snaps-sdk/jsx';
+import { TooltipIcon } from './TooltipIcon';
+import { ShowMoreText } from './ShowMoreText';
 
-type RequestDetailsProps = JsonObject & {
+type RequestDetailsProps = {
   itemDetails: ItemDetails[];
-  isJustificationShowMoreExpanded: boolean;
-  justificationShowMoreExpandedElementName: string;
+  justification: string;
+  isJustificationShowMoreCollapsed: boolean;
+  justificationShowMoreElementName: string;
 };
 
 export type ItemDetails = {
   label: string;
   text: string;
-  tooltipText?: string;
-  iconUrl?: string;
+  tooltipText?: string | undefined;
+  iconUrl?: string | undefined;
 };
 
-/**
- * Renders a tooltip with the given text.
- *
- * @param tooltipText - The text to display in the tooltip.
- * @returns A tooltip component or null if no tooltip text is specified.
- */
-const renderTooltip = (tooltipText?: string) => {
-  if (!tooltipText) {
-    return null;
-  }
-
-  return (
-    <Tooltip content={<Text>{tooltipText}</Text>}>
-      <Icon name="question" size="inherit" color="muted" />
-    </Tooltip>
-  );
-};
-
-/**
- * Renders an icon with the given URL.
- *
- * @param iconUrl - The URL of the icon to display.
- * @returns An image component null if no icon url is specified.
- */
-const renderIconAsImage = (iconUrl?: string) => {
-  if (!iconUrl) {
-    return null;
-  }
-
-  return <Image src={iconUrl} />;
-};
-
-/**
- * Renders a text component or a text component with a button to show more.
- *
- * @param text - The text to display.
- * @param elementName - Element name for the toggle button.
- * @param isHideable - Whether the text is isHideable.
- * @returns A text component or a text component with a button to show more.
- */
-const renderShowMoreText = (
-  text: string,
-  elementName: string,
-  isHideable: boolean,
-) => {
-  if (!isHideable) {
-    return <Text>{text}</Text>;
-  }
-
-  return (
-    <Box direction="horizontal">
-      {isHideable ? (
-        <Text color="muted">{`${text.slice(0, 12)}...`}</Text>
-      ) : (
-        <Text color="muted">text</Text>
-      )}
-      <Button name={elementName}>Show</Button>
-    </Box>
-  );
-};
-
-export const RequestDetails: SnapComponent<RequestDetailsProps> = ({
+export const RequestDetails = ({
   itemDetails,
-  isJustificationShowMoreExpanded,
-  justificationShowMoreExpandedElementName,
-}) => {
-  const itemsDisplay = itemDetails.map((item) => (
-    <Box direction="horizontal" alignment="space-between">
-      <Box direction="horizontal">
-        <Text>{item.label}</Text>
-        {renderTooltip(item.tooltipText)}
-      </Box>
-      <Box direction="horizontal">
-        {renderIconAsImage(item.iconUrl)}
-        {item.label === 'Reason' ? (
-          renderShowMoreText(
-            item.text,
-            justificationShowMoreExpandedElementName,
-            isJustificationShowMoreExpanded,
-          )
-        ) : (
-          <Text>{item.text}</Text>
-        )}
-      </Box>
-    </Box>
-  ));
+  justification,
+  isJustificationShowMoreCollapsed,
+  justificationShowMoreElementName,
+}: RequestDetailsProps) => {
+  const requestDetailsFields = itemDetails.map(
+    ({ label, text, iconUrl, tooltipText }) => {
+      const iconElement = iconUrl ? <Image src={iconUrl} alt={text} /> : null;
 
-  return <Section>{itemsDisplay}</Section>;
+      const tooltipElement = tooltipText ? (
+        <TooltipIcon tooltip={tooltipText} />
+      ) : null;
+
+      return (
+        <Box direction="horizontal" alignment="space-between">
+          <Box direction="horizontal">
+            <Text>{label}</Text>
+            {tooltipElement}
+          </Box>
+          <Box direction="horizontal">
+            {iconElement}
+            <Text>{text}</Text>
+          </Box>
+        </Box>
+      );
+    },
+  );
+
+  return (
+    <Section>
+      {requestDetailsFields}
+      <Box direction="horizontal" alignment="space-between">
+        <Box direction="horizontal">
+          <Text>Reason</Text>
+          <TooltipIcon tooltip="Reason given by the recipient for requesting this token stream allowance." />
+        </Box>
+        <Box direction="horizontal">
+          <ShowMoreText
+            text={justification}
+            buttonName={justificationShowMoreElementName}
+            isCollapsed={isJustificationShowMoreCollapsed}
+          />
+        </Box>
+      </Box>
+    </Section>
+  );
 };

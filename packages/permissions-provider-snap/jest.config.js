@@ -1,4 +1,5 @@
 module.exports = {
+  prettierPath: null,
   preset: '@metamask/snaps-jest',
   transform: {
     '^.+\\.(t|j)sx?$': 'ts-jest',

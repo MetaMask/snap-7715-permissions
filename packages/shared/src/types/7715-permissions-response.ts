@@ -29,6 +29,7 @@ export const zGrantedPermission = z.object({
    */
   signerMeta: z.object({
     userOpBuilder: zAddress.optional(),
+
     delegationManager: zAddress.optional(),
   }),
 });
@@ -36,7 +37,6 @@ export const zGrantedPermissions = z.array(zGrantedPermission);
 
 export type GrantedPermission = z.infer<typeof zGrantedPermission>;
 export type GrantedPermissions = z.infer<typeof zGrantedPermissions>;
-
 /**
  * The response contains all of the parameters of the original request
  * and it is not guaranteed that the values received are equivalent to those requested.
