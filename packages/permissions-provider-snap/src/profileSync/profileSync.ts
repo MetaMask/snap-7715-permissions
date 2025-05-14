@@ -61,10 +61,10 @@ const convertToDelegation = (
 /**
  * ABI Decodes a permissions context.
  *
- * @param data - The encoded delegation(ie. permissions context).
+ * @param permissionsContext - The encoded delegation(ie. permissions context).
  * @returns The decoded delegations.
  */
-const decodeDelegation = (data: Hex): Delegation[] => {
+const decodeDelegation = (permissionsContext: Hex): Delegation[] => {
   const [decodedDelegationStructs] = decodeAbiParameters(
     [
       {
@@ -73,10 +73,12 @@ const decodeDelegation = (data: Hex): Delegation[] => {
         type: 'tuple[]',
       },
     ],
-    data,
-  ) as [DelegationStruct[]];
+    permissionsContext,
+  );
 
-  return decodedDelegationStructs.map(convertToDelegation);
+  return (decodedDelegationStructs as DelegationStruct[]).map(
+    convertToDelegation,
+  );
 };
 
 /**

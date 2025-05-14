@@ -1,5 +1,6 @@
 import {
   createDelegation,
+  Delegation,
   encodeDelegation,
   getDelegationHashOffchain,
 } from '@metamask/delegation-toolkit';
@@ -33,11 +34,14 @@ describe('profileSync', () => {
     batchSetItems: jest.fn(),
   } as unknown as jest.Mocked<UserStorage>;
 
-  const mockDelegation = createDelegation({
-    to: sessionAccount,
-    from: address,
-    caveats: [],
-  });
+  const mockDelegation: Delegation = {
+    ...createDelegation({
+      to: sessionAccount,
+      from: address,
+      caveats: [],
+    }),
+    signature: '0x',
+  }
 
   const mockDelegationHash = getDelegationHashOffchain(mockDelegation);
 

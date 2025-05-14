@@ -23,10 +23,16 @@ import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { OrchestratorFactory } from './core/orchestratorFactory';
 import { HomePage } from './homepage';
+import {
+  createProfileSyncOptions,
+  getProfileSyncSdkEnv,
+  createProfileSyncManager,
+} from './profileSync';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
+import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
 
 // set up dependencies
@@ -85,7 +91,6 @@ const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 const confirmationDialogFactory = new ConfirmationDialogFactory({
   snap,
   userEventDispatcher,
-  profileSyncManager,
 });
 
 const orchestratorFactory = new OrchestratorFactory({
@@ -97,6 +102,7 @@ const orchestratorFactory = new OrchestratorFactory({
 
 const rpcHandler = createRpcHandler({
   orchestratorFactory,
+  profileSyncManager,
 });
 
 // configure RPC methods bindings
