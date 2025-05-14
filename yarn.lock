@@ -3230,16 +3230,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/eslint-config-browser@npm:^14.0.0":
-  version: 14.0.0
-  resolution: "@metamask/eslint-config-browser@npm:14.0.0"
-  dependencies:
-    "@eslint/js": ^9.11.0
-    globals: ^15.9.0
+"@metamask/eslint-config-browser@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "@metamask/eslint-config-browser@npm:12.1.0"
   peerDependencies:
-    "@metamask/eslint-config": ^14.0.0
-    eslint: ^9.11.0
-  checksum: 22f628799d6d2d6a537ffbb72ecf777632b1824ff87e81edcce77f1793b4617f20e185012c45020a75df308e895d5d88f125444ad7e6cb419d90e14368ca145a
+    "@metamask/eslint-config": ^12.0.0
+    eslint: ^8.27.0
+  checksum: a1d3035b0dd82aa66397e9c8916c45e1dc2d339c13dac385f7c90de09df943c313801538c0d955c2abf44a57008100874f8615d70f19188d8893b653cfe15485
+  languageName: node
+  linkType: hard
+
+"@metamask/eslint-config-jest@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "@metamask/eslint-config-jest@npm:12.1.0"
+  peerDependencies:
+    "@metamask/eslint-config": ^12.0.0
+    eslint: ^8.27.0
+    eslint-plugin-jest: ^27.1.5
+  checksum: 98f60234412051d429237dbf32b147a648a0e3b6adacafda24999ec9eb8096155c8000c62204415100c97980cc3bfe0a0fe19e4c318b8bb529eaf57e9f96e680
   languageName: node
   linkType: hard
 
@@ -3278,6 +3286,21 @@ __metadata:
     eslint: ^8.27.0
     typescript: ~4.8.4 || ~5.0 || ~5.1
   checksum: a854574e4c2ca7b036d0a2a454aecb93ba538d1b92c1615878dfe06a14972df6af2fcdd5e2911ef369b3b2eeb04b8c6879bd037c618a35f6cb98950cdab84d50
+  languageName: node
+  linkType: hard
+
+"@metamask/eslint-config@npm:^12.1.0":
+  version: 12.2.0
+  resolution: "@metamask/eslint-config@npm:12.2.0"
+  peerDependencies:
+    eslint: ^8.27.0
+    eslint-config-prettier: ^8.5.0
+    eslint-plugin-import: ~2.26.0
+    eslint-plugin-jsdoc: ^39.6.2 || ^41 || ^43.0.7
+    eslint-plugin-prettier: ^4.2.1
+    eslint-plugin-promise: ^6.1.1
+    prettier: ^2.7.1
+  checksum: dfd913a712a81db528c662dc2d2d97edf8c34b2053b77c7060f9c117a4f9057d66f2fc87634b5d8860c9ab22c690ad79f40d399bda1e1b9863b0f4d198592a09
   languageName: node
   linkType: hard
 
@@ -3666,8 +3689,8 @@ __metadata:
     "@lavamoat/allow-scripts": ^3.0.0
     "@lavamoat/preinstall-always-fail": ^2.0.0
     "@metamask/create-release-branch": ^4.1.1
-    "@metamask/eslint-config": ^14.0.0
-    "@metamask/eslint-config-jest": ^14.0.0
+    "@metamask/eslint-config": ^12.1.0
+    "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@typescript-eslint/eslint-plugin": ^5.42.1
@@ -18467,9 +18490,9 @@ __metadata:
   resolution: "site@workspace:packages/site"
   dependencies:
     "@metamask/delegation-toolkit": 0.10.2
-    "@metamask/eslint-config": ^14.0.0
-    "@metamask/eslint-config-browser": ^14.0.0
-    "@metamask/eslint-config-jest": ^14.0.0
+    "@metamask/eslint-config": ^12.1.0
+    "@metamask/eslint-config-browser": ^12.1.0
+    "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
     "@metamask/providers": ^21.0.0
