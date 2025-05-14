@@ -7,15 +7,15 @@ import {
 import { isHex, size } from 'viem';
 import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
-import { AccountController } from '../src/accountController';
+import { SmartAccountController } from '../../src/accountController';
 
-describe('AccountController', () => {
+describe('SmartAccountController', () => {
   const entropy =
     '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
   // constant derived via delegator-core-viem
   const expectedAddress = '0x70cCc6AF705a54bd31cD9426aF0a2A0B2E4Dfa2D';
   const expectedBalance = '0x1000000000000000000';
-  let accountController: AccountController;
+  let accountController: SmartAccountController;
   const mockSnapsProvider = createMockSnapsProvider();
 
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe('AccountController', () => {
       return null;
     });
 
-    accountController = new AccountController({
+    accountController = new SmartAccountController({
       snapsProvider: mockSnapsProvider,
       supportedChains: [sepolia],
       deploymentSalt: '0x1234',
@@ -58,7 +58,7 @@ describe('AccountController', () => {
     it('should throw if no supported chains are specified', () => {
       expect(
         () =>
-          new AccountController({
+          new SmartAccountController({
             snapsProvider: mockSnapsProvider,
             supportedChains: [],
             deploymentSalt: '0x1234',
@@ -69,7 +69,7 @@ describe('AccountController', () => {
     it('should throw if an unsupported chain is specified', () => {
       expect(
         () =>
-          new AccountController({
+          new SmartAccountController({
             snapsProvider: mockSnapsProvider,
             supportedChains: [oneWorld] as any,
             deploymentSalt: '0x1234',
@@ -80,7 +80,7 @@ describe('AccountController', () => {
     it('should not throw if supported chains are not specified', () => {
       expect(
         () =>
-          new AccountController({
+          new SmartAccountController({
             snapsProvider: mockSnapsProvider,
             deploymentSalt: '0x1234',
           }),
@@ -134,7 +134,7 @@ describe('AccountController', () => {
     });
 
     it('should accept one of mmultiple accepted chains', async () => {
-      const controller = new AccountController({
+      const controller = new SmartAccountController({
         snapsProvider: mockSnapsProvider,
         deploymentSalt: '0x1234',
         supportedChains: [sepolia, lineaSepolia],

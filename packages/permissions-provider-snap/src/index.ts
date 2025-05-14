@@ -9,7 +9,7 @@ import type {
 } from '@metamask/snaps-sdk';
 import { lineaSepolia, sepolia } from 'viem/chains';
 
-import { AccountController } from './accountController';
+import { SmartAccountController } from './accountController';
 import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { OrchestratorFactory } from './core/orchestratorFactory';
@@ -21,7 +21,7 @@ import { TokenPricesService } from './services/tokenPricesService';
 import { UserEventDispatcher } from './userEventDispatcher';
 
 // set up dependencies
-const accountController = new AccountController({
+const accountController = new SmartAccountController({
   snapsProvider: snap,
   supportedChains: [sepolia, lineaSepolia],
   deploymentSalt: '0x',

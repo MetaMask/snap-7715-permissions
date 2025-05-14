@@ -17,6 +17,12 @@ import {
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import * as chains from 'viem/chains';
+import type {
+  AccountController,
+  AccountOptionsBase,
+  SignDelegationOptions,
+  FactoryArgs,
+} from './types';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
@@ -37,45 +43,9 @@ const ALL_SUPPORTED_CHAINS: SupportedChains = Object.keys(chains)
   ) as SupportedChains;
 
 /**
- * Factory arguments for smart account deployment.
- */
-export type FactoryArgs = {
-  factory: Hex | undefined;
-  factoryData: Hex | undefined;
-};
-
-/**
- * Base options required for account operations.
- */
-export type AccountOptionsBase = {
-  // really this needs to be of type SupportedChainId, but it makes it hard for callers to validate
-  chainId: number;
-};
-
-/**
- * Options for signing a delegation.
- */
-export type SignDelegationOptions = AccountOptionsBase & {
-  delegation: Omit<Delegation, 'signature'>;
-};
-
-/**
- * Public interface of the AccountController class.
- */
-export type AccountControllerInterface = Pick<
-  AccountController,
-  | 'getAccountAddress'
-  | 'signDelegation'
-  | 'getAccountMetadata'
-  | 'getAccountBalance'
-  | 'getDelegationManager'
-  | 'getEnvironment'
->;
-
-/**
  * Controls smart account operations including creation, delegation signing, and balance queries.
  */
-export class AccountController {
+export class SmartAccountController implements AccountController {
   #snapsProvider: SnapsProvider;
 
   #supportedChains: SupportedChains;
@@ -90,7 +60,7 @@ export class AccountController {
   > = {};
 
   /**
-   * Initializes a new AccountController instance.
+   * Initializes a new SmartAccountController instance.
    *
    * @param config - The configuration object.
    * @param config.snapsProvider - The provider for interacting with snaps.
