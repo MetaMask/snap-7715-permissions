@@ -1,3 +1,8 @@
+import {
+  createDelegation,
+  encodeDelegation,
+  getDelegationHashOffchain,
+} from '@metamask/delegation-toolkit';
 import type {
   JwtBearerAuth,
   UserStorage,
@@ -28,6 +33,14 @@ describe('profileSync', () => {
     batchSetItems: jest.fn(),
   } as unknown as jest.Mocked<UserStorage>;
 
+  const mockDelegation = createDelegation({
+    to: sessionAccount,
+    from: address,
+    caveats: [],
+  });
+
+  const mockDelegationHash = getDelegationHashOffchain(mockDelegation);
+
   const mockStoredGrantedPermission: StoredGrantedPermission = {
     permissionResponse: {
       address,
@@ -38,7 +51,7 @@ describe('profileSync', () => {
         },
       ],
       chainId: '0xaa36a7',
-      context: '0x00_some_permission_context',
+      context: encodeDelegation([mockDelegation]),
       expiry: 1,
       isAdjustmentAllowed: true,
       permission: {
@@ -137,11 +150,11 @@ describe('profileSync', () => {
         mockPassAuth();
 
         const res = await profileSyncManager.getGrantedPermission(
-          '0x00_some_permission_context' as Hex,
+          mockStoredGrantedPermission.permissionResponse.context,
         );
         expect(res).toStrictEqual(mockStoredGrantedPermission);
         expect(userStorageMock.getItem).toHaveBeenCalledWith(
-          'gator_7715_permissions.0x00_some_permission_context',
+          `gator_7715_permissions.${mockDelegationHash}`,
         );
       });
 
@@ -163,7 +176,7 @@ describe('profileSync', () => {
 
         await expect(
           profileSyncManager.getGrantedPermission(
-            '0x00_some_permission_context' as Hex,
+            mockStoredGrantedPermission.permissionResponse.context,
           ),
         ).rejects.toThrow('Storage error');
       });
@@ -177,7 +190,7 @@ describe('profileSync', () => {
         mockPassAuth();
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
-          'gator_7715_permissions.0x00_some_permission_context',
+          `gator_7715_permissions.${mockDelegationHash}`,
           JSON.stringify(mockStoredGrantedPermission),
         );
       });
@@ -198,14 +211,51 @@ describe('profileSync', () => {
 
     describe('storeGrantedPermissionBatch', () => {
       it('should store multiple granted permissions successfully in profile sync', async () => {
-        const mockStoredGrantedPermissions = [
+        const addressTwo = getAddress(
+          '0x1234567890123456789012345678901234567891',
+        );
+        const mockDelegationTwo = createDelegation({
+          to: sessionAccount,
+          from: addressTwo,
+          caveats: [],
+        });
+        const mockDelegationHashTwo =
+          getDelegationHashOffchain(mockDelegationTwo);
+
+        const mockStoredGrantedPermissions: StoredGrantedPermission[] = [
           mockStoredGrantedPermission,
           {
             permissionResponse: {
-              ...mockStoredGrantedPermission.permissionResponse,
-              context: '0x00_some_permission_context2' as Hex,
+              address: addressTwo,
+              accountMeta: [
+                {
+                  factory: '0x1234567890123456789012345678901234567890',
+                  factoryData: '0x000000000000000000000000000000_factory_data',
+                },
+              ],
+              chainId: '0xaa36a7',
+              context: encodeDelegation([mockDelegationTwo]),
+              expiry: 1,
+              isAdjustmentAllowed: true,
+              permission: {
+                data: {
+                  justification: 'shh...permission',
+                  amountPerSecond: '0x180f8a7451f',
+                  initialAmount: '0xde0b6b3a7640000',
+                  startTime: 1000,
+                  maxAmount:
+                    '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+                },
+                type: 'native-token-stream',
+              },
+
+              signer: {
+                data: { address: sessionAccount },
+                type: 'account',
+              },
+              signerMeta: { delegationManager: '0x000000_delegation_manager' },
             },
-            siteOrigin: 'https://example2.com',
+            siteOrigin: 'https://example.com',
           },
         ];
         mockPassAuth();
@@ -217,11 +267,11 @@ describe('profileSync', () => {
           'gator_7715_permissions',
           [
             [
-              '0x00_some_permission_context',
+              `gator_7715_permissions.${mockDelegationHash}`,
               JSON.stringify(mockStoredGrantedPermissions[0]),
             ],
             [
-              '0x00_some_permission_context2',
+              `gator_7715_permissions.${mockDelegationHashTwo}`,
               JSON.stringify(mockStoredGrantedPermissions[1]),
             ],
           ],

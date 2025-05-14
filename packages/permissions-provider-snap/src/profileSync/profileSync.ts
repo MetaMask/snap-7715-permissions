@@ -2,6 +2,7 @@
 /* eslint-disable no-restricted-globals */
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import { getDelegationHashOffchain } from '@metamask/delegation-toolkit';
 import type {
   UserProfile,
   UserStorageGenericPathWithFeatureAndKey,
@@ -9,6 +10,8 @@ import type {
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 import type { Hex } from 'viem';
+
+import { decodeDelegation } from '../utils';
 
 export type ProfileSyncManager = {
   getAllGrantedPermissions: () => Promise<StoredGrantedPermission[]>;
@@ -45,6 +48,22 @@ export function createProfileSyncManager(
 ): ProfileSyncManager {
   const FEATURE = 'gator_7715_permissions';
   const { auth, userStorage, snapEnv } = config;
+
+  /**
+   * Generates an object key for the permission response stored in profile sync.
+   *
+   * @param permissionContext - The encoded delegation(ie. permissions context).
+   * @returns The object key.
+   */
+  function generateObjectKey(permissionContext: Hex): Hex {
+    const delegations = decodeDelegation(permissionContext);
+    const delegation = delegations[0];
+    if (!delegation) {
+      throw new Error('No delegation found');
+    }
+
+    return getDelegationHashOffchain(delegation);
+  }
 
   /**
    * Feature flag to only enable for local development until
@@ -121,7 +140,7 @@ export function createProfileSyncManager(
       // Authenticate the user
       await getUserProfile();
 
-      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${permissionContext}`;
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(permissionContext)}`;
       const permission = await userStorage.getItem(path);
 
       return permission
@@ -155,7 +174,7 @@ export function createProfileSyncManager(
       // Authenticate the user
       await getUserProfile();
 
-      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${storedGrantedPermission.permissionResponse.context}`;
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(storedGrantedPermission.permissionResponse.context)}`;
       await userStorage.setItem(path, JSON.stringify(storedGrantedPermission));
     } catch (error) {
       logger.error('Error storing granted permission:', error);
@@ -188,7 +207,7 @@ export function createProfileSyncManager(
       await userStorage.batchSetItems(
         FEATURE,
         storedGrantedPermissions.map((storedGrantedPermission) => [
-          storedGrantedPermission.permissionResponse.context, // key
+          generateObjectKey(storedGrantedPermission.permissionResponse.context), // key
           JSON.stringify(storedGrantedPermission), // value
         ]),
       );

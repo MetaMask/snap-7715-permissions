@@ -1,5 +1,10 @@
-import type { DelegationStruct } from '@metamask/delegation-toolkit';
-import { toHex } from 'viem';
+import {
+  DELEGATION_ABI_TYPE_COMPONENTS,
+  type Delegation,
+  type DelegationStruct,
+} from '@metamask/delegation-toolkit';
+import type { Hex } from 'viem';
+import { decodeAbiParameters, toHex } from 'viem';
 
 import type { SerializableDelegation } from '../ui/types';
 
@@ -28,3 +33,40 @@ export const convertToDelegationStruct = (
   ...delegation,
   salt: BigInt(delegation.salt),
 });
+
+/**
+ * Converts a DelegationStruct to a Delegation.
+ * The DelegationStruct is the format used in the Delegation Framework.
+ *
+ * @param delegationStruct - The delegation struct to format.
+ * @returns The delegation.
+ */
+export const convertToDelegation = (
+  delegationStruct: DelegationStruct,
+): Delegation => {
+  return {
+    ...delegationStruct,
+    salt: toHex(delegationStruct.salt),
+  };
+};
+
+/**
+ * ABI Decodes a permissions context.
+ *
+ * @param data - The encoded delegation(ie. permissions context).
+ * @returns The decoded delegations.
+ */
+export const decodeDelegation = (data: Hex): Delegation[] => {
+  const [decodedDelegationStructs] = decodeAbiParameters(
+    [
+      {
+        components: DELEGATION_ABI_TYPE_COMPONENTS,
+        name: 'delegations',
+        type: 'tuple[]',
+      },
+    ],
+    data,
+  ) as [DelegationStruct[]];
+
+  return decodedDelegationStructs.map(convertToDelegation);
+};

@@ -8,7 +8,7 @@
  */
 export const kernelSnapOrigin =
   // eslint-disable-next-line no-restricted-globals
-  process.env.GATSBY_KERNEL_SNAP_ORIGIN ?? `local:http://localhost:8080`;
+  process.env.GATSBY_KERNEL_SNAP_ORIGIN ?? `local:http://localhost:8081`;
 
 /**
  * The gator snap origin to use.
@@ -20,7 +20,7 @@ export const kernelSnapOrigin =
  */
 export const gatorSnapOrigin =
   // eslint-disable-next-line no-restricted-globals
-  process.env.GATSBY_GATOR_SNAP_ORIGIN ?? `local:http://localhost:8081`;
+  process.env.GATSBY_GATOR_SNAP_ORIGIN ?? `local:http://localhost:8082`;
 
 /**
  * The message signing snap origin to use.
