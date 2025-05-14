@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@metamask/delegation-toolkit": "0.10.2",
-    "@metamask/providers": "^16.0.0",
+    "@metamask/providers": "^21.0.0",
     "dotenv": "^16.4.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@metamask/eslint-config": "^14.0.0",
-    "@metamask/eslint-config-browser": "^12.1.0",
+    "@metamask/eslint-config-browser": "^14.0.0",
     "@metamask/eslint-config-jest": "^12.1.0",
     "@metamask/eslint-config-nodejs": "^12.1.0",
     "@metamask/eslint-config-typescript": "^12.1.0",
