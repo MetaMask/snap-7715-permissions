@@ -2,6 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { OrchestratorFactory } from '../core/orchestratorFactory';
+import type { ProfileSyncManager } from '../profileSync';
 import { validatePermissionRequestParam } from '../utils/validate';
 
 /**
@@ -22,12 +23,14 @@ export type RpcHandler = {
  *
  * @param config - The parameters for creating the RPC handler.
  * @param config.orchestratorFactory - The factory for creating permission orchestrators.
+ * @param config.profileSyncManager - The profile sync manager.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
   orchestratorFactory: OrchestratorFactory;
+  profileSyncManager: ProfileSyncManager;
 }): RpcHandler {
-  const { orchestratorFactory } = config;
+  const { orchestratorFactory, profileSyncManager } = config;
 
   return {
     /**
@@ -51,6 +54,13 @@ export function createRpcHandler(config: {
 
           if (!permissionResponse.success) {
             throw new Error(permissionResponse.reason);
+          }
+
+          if (permissionResponse.response) {
+            await profileSyncManager.storeGrantedPermission({
+              permissionResponse: permissionResponse.response,
+              siteOrigin,
+            });
           }
 
           return permissionResponse.response;

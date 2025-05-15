@@ -38,13 +38,23 @@ Clone the [snap-7715-permissions repository](https://github.com/MetaMask/snap-77
    - `./packages/permissions-kernel-snap/.env`
    - `./packages/permissions-provider-snap/.env`
 2. Set `PRICE_API_BASE_URL=http://localhost:8003` in `./packages/permissions-provider-snap/.env` to fetch spot prices from mock price API running locally.
-3. Install and start up snaps with development site
+3. Install and start up snaps with development site. Yarn `prepare:snap` will handle running yarn install
 
 ```shell
-yarn install && yarn start
+# Install dependencies and sets up submodule 
+yarn prepare:snap
+
+# Starts local @metamask/message-signing-snap
+yarn start:message-signing-snap
+
+# Starts local @metamask/permissions-kernel-snap and @metamask/gator-permissions-snap
+yarn start
 ```
 
 The development site will start up on `http://localhost:8000/`
+- `@metamask/message-signing-snap` is served from `local:http://localhost:8080`
+- `@metamask/permissions-kernel-snap`is served from `local:http://localhost:8081`
+- `@metamask/gator-permissions-snap` is served from `local:http://localhost:8082`
 
 ## Contributing
 

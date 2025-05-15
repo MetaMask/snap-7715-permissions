@@ -6,6 +6,7 @@ import type {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { OrchestratorFactory } from '../../src/core/orchestratorFactory';
+import type { ProfileSyncManager } from '../../src/profileSync';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 
 type OrchestrateFunction = (args: { origin: string }) => Promise<{
@@ -79,9 +80,18 @@ describe('RpcHandler', () => {
     mockOrchestratorFactory = {
       createOrchestrator: jest.fn().mockReturnValue(mockOrchestrator),
     } as unknown as jest.Mocked<OrchestratorFactory>;
+    const mockProfileSyncManager = {
+      revokeGrantedPermission: jest.fn(),
+      storeGrantedPermission: jest.fn(),
+      storeGrantedPermissionBatch: jest.fn(),
+      getGrantedPermission: jest.fn(),
+      getAllGrantedPermissions: jest.fn(),
+      getUserProfile: jest.fn(),
+    } as unknown as jest.Mocked<ProfileSyncManager>;
 
     handler = createRpcHandler({
       orchestratorFactory: mockOrchestratorFactory,
+      profileSyncManager: mockProfileSyncManager,
     });
   });
 
