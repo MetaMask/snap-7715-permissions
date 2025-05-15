@@ -15,16 +15,15 @@ import {
   type Address,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
+
+import type { SupportedChains } from './baseAccountController';
+import { BaseAccountController } from './baseAccountController';
 import type {
   AccountController,
   AccountOptionsBase,
   SignDelegationOptions,
   FactoryArgs,
 } from './types';
-import {
-  BaseAccountController,
-  SupportedChains,
-} from './baseAccountController';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;

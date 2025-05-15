@@ -1,7 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import { CHAIN_ID as ChainsWithDelegatorDeployed } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import * as chains from 'viem/chains';
-import { CHAIN_ID as ChainsWithDelegatorDeployed } from '@metamask/delegation-toolkit';
 
 export type SupportedChains =
   (typeof chains)[keyof typeof ChainsWithDelegatorDeployed &
@@ -23,6 +23,7 @@ const ALL_SUPPORTED_CHAINS: SupportedChains = Object.keys(chains)
  */
 export abstract class BaseAccountController {
   #snapsProvider: SnapsProvider;
+
   protected supportedChains: SupportedChains;
 
   /**
@@ -140,6 +141,7 @@ export abstract class BaseAccountController {
 
   /**
    * Gets the snaps provider.
+   * @returns The snaps provider instance.
    */
   protected get snapsProvider(): SnapsProvider {
     return this.#snapsProvider;

@@ -29,7 +29,7 @@ describe('EoaAccountController', () => {
     };
 
     mockEthereumProvider.request.mockImplementation(async (req) => {
-      const { method, params } = req;
+      const { method } = req;
 
       switch (method) {
         case 'eth_requestAccounts':

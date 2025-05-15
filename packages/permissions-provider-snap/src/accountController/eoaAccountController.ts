@@ -1,21 +1,20 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { type Address, type Hex } from 'viem';
 import {
   getDeleGatorEnvironment,
   type Delegation,
   type DeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
+import { type Address, type Hex } from 'viem';
+
+import type { SupportedChains } from './baseAccountController';
+import { BaseAccountController } from './baseAccountController';
 import type {
   AccountController,
   AccountOptionsBase,
   SignDelegationOptions,
   FactoryArgs,
 } from './types';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
-import {
-  BaseAccountController,
-  SupportedChains,
-} from './baseAccountController';
 
 export type EthereumProvider = {
   request: (args: { method: string; params?: any[] }) => Promise<any>;
@@ -29,10 +28,15 @@ export class EoaAccountController
   implements AccountController
 {
   #accountAddress: Address | null = null;
+
   #ethereumProvider: EthereumProvider;
 
   /**
    * Initializes a new EoaAccountController instance.
+   * @param config - The configuration object for the controller.
+   * @param config.snapsProvider - The provider for interacting with snaps.
+   * @param config.ethereumProvider - The provider for interacting with Ethereum.
+   * @param config.supportedChains - Optional list of supported blockchain chains.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
@@ -45,6 +49,7 @@ export class EoaAccountController
 
   /**
    * Gets the connected account address, requesting access if needed.
+   * @returns The account address.
    */
   async #getAccountAddress(): Promise<Address> {
     logger.debug('eoaAccountController:#getAccountAddress()');
@@ -67,6 +72,9 @@ export class EoaAccountController
 
   /**
    * Retrieves the account address for the current account.
+   * @param options0 - The options object containing chain information.
+   * @param options0.chainId - The ID of the blockchain chain.
+   * @returns The account address.
    */
   public async getAccountAddress({
     chainId,
@@ -80,6 +88,8 @@ export class EoaAccountController
 
   /**
    * Signs a delegation using the EOA account.
+   * @param options - The options object containing delegation information.
+   * @returns The signed delegation.
    */
   public async signDelegation(
     options: SignDelegationOptions,
@@ -135,7 +145,7 @@ export class EoaAccountController
     logger.debug('eoaAccountController:#getSignDelegationArgs()');
 
     const domain = {
-      chainId: chainId,
+      chainId,
       name: 'DelegationManager',
       version: '1',
       verifyingContract: delegationManager,
@@ -171,6 +181,9 @@ export class EoaAccountController
   /**
    * Retrieves the metadata for deploying a smart account.
    * Not applicable for EOA accounts.
+   * @param options0 - The options object containing chain information.
+   * @param options0.chainId - The ID of the blockchain chain.
+   * @returns The factory arguments (undefined for EOA accounts).
    */
   public async getAccountMetadata({
     chainId,
@@ -187,6 +200,8 @@ export class EoaAccountController
 
   /**
    * Retrieves the balance of the EOA account.
+   * @param options - The options object containing chain information.
+   * @returns The account balance in hex format.
    */
   public async getAccountBalance(options: AccountOptionsBase): Promise<Hex> {
     logger.debug('eoaAccountController:getAccountBalance()');
@@ -209,7 +224,8 @@ export class EoaAccountController
 
   /**
    * Retrieves the delegation manager address.
-   * Not applicable for EOA accounts.
+   * @param options - The options object containing chain information.
+   * @returns The delegation manager address.
    */
   public async getDelegationManager(
     options: AccountOptionsBase,
@@ -223,7 +239,9 @@ export class EoaAccountController
 
   /**
    * Retrieves the environment for the current account.
-   * Not applicable for EOA accounts.
+   * @param options0 - The options object containing chain information.
+   * @param options0.chainId - The ID of the blockchain chain.
+   * @returns The DeleGator environment configuration.
    */
   public async getEnvironment({
     chainId,

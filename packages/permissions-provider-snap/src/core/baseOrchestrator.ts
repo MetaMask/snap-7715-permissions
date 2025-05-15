@@ -240,7 +240,10 @@ export abstract class BaseOrchestrator<
     );
 
     // use a random salt to ensure unique delegation
-    const saltBytes = crypto.getRandomValues(new Uint8Array(32));
+    const saltBytes = new Uint8Array(32);
+    for (let i = 0; i < 32; i++) {
+      saltBytes[i] = Math.floor(Math.random() * 256);
+    }
     const salt = bytesToHex(saltBytes);
 
     // todo: createDelegation helper should accept salt as an argument

@@ -1,8 +1,8 @@
-import type { Address, Hex } from 'viem';
 import type {
   Delegation,
   DeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
+import type { Address, Hex } from 'viem';
 
 /**
  * Base options required for account operations.
