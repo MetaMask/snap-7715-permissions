@@ -26,6 +26,7 @@ const config: SnapConfig = {
   environment: {
     SNAP_ENV: process.env.SNAP_ENV,
     PRICE_API_BASE_URL: process.env.PRICE_API_BASE_URL,
+    USE_EOA_ACCOUNT: process.env.USE_EOA_ACCOUNT,
   },
 };
 

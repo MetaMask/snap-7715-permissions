@@ -22,4 +22,5 @@ module.exports = {
   coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   coverageReporters: ['html', 'json-summary', 'text'],
+  maxWorkers: 1,
 };

@@ -10,7 +10,7 @@ import {
 } from '@metamask/delegation-toolkit';
 import type { UserInputEventType } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { toHex } from 'viem';
+import { bytesToHex, toHex } from 'viem';
 
 import type { AccountController } from '../accountController';
 import type {
@@ -239,13 +239,23 @@ export abstract class BaseOrchestrator<
       caveatBuilder,
     );
 
-    const signedDelegation = await this.accountController.signDelegation({
-      chainId,
-      delegation: createDelegation({
+    // use a random salt to ensure unique delegation
+    const saltBytes = crypto.getRandomValues(new Uint8Array(32));
+    const salt = bytesToHex(saltBytes);
+
+    // todo: createDelegation helper should accept salt as an argument
+    const delegation = {
+      ...createDelegation({
         to: this.#permissionRequest.signer.data.address,
         from: address,
         caveats: appendedCaveatBuilder,
       }),
+      salt,
+    } as const;
+
+    const signedDelegation = await this.accountController.signDelegation({
+      chainId,
+      delegation,
     });
 
     const permissionsContext = encodeDelegation([signedDelegation]);

@@ -1,6 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
-  CHAIN_ID as ChainsWithDelegatorDeployed,
   Implementation,
   toMetaMaskSmartAccount,
   type Delegation,
@@ -16,40 +15,29 @@ import {
   type Address,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import * as chains from 'viem/chains';
 import type {
   AccountController,
   AccountOptionsBase,
   SignDelegationOptions,
   FactoryArgs,
 } from './types';
+import {
+  BaseAccountController,
+  SupportedChains,
+} from './baseAccountController';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
 
-type SupportedChains =
-  (typeof chains)[keyof typeof ChainsWithDelegatorDeployed &
-    keyof typeof chains][];
-
-// all of the chainIds that have delegator contracts deployed
 type SupportedChainId = SupportedChains[number]['id'];
-
-// default for `supportedChains` configuration option
-const ALL_SUPPORTED_CHAINS: SupportedChains = Object.keys(chains)
-  .filter((name) => Object.keys(ChainsWithDelegatorDeployed).includes(name))
-  .map(
-    // we assert to any here due to the inability to infer the namespace of the global import
-    (name) => (chains as any)[name as keyof typeof chains],
-  ) as SupportedChains;
 
 /**
  * Controls smart account operations including creation, delegation signing, and balance queries.
  */
-export class SmartAccountController implements AccountController {
-  #snapsProvider: SnapsProvider;
-
-  #supportedChains: SupportedChains;
-
+export class SmartAccountController
+  extends BaseAccountController
+  implements AccountController
+{
   #deploymentSalt: Hex;
 
   #metaMaskSmartAccountByChainId: Partial<
@@ -72,47 +60,8 @@ export class SmartAccountController implements AccountController {
     supportedChains?: SupportedChains;
     deploymentSalt: Hex;
   }) {
-    // only validate if supportedChains is specified, as it will default to ALL_SUPPORTED_CHAINS
-    if (config.supportedChains) {
-      this.#validateSupportedChains(config.supportedChains);
-    }
-
-    this.#snapsProvider = config.snapsProvider;
-    this.#supportedChains = config.supportedChains ?? ALL_SUPPORTED_CHAINS;
+    super(config);
     this.#deploymentSalt = config.deploymentSalt;
-  }
-
-  #validateSupportedChains(supportedChains: SupportedChains) {
-    if (supportedChains.length === 0) {
-      logger.error('No supported chains specified');
-      throw new Error('No supported chains specified');
-    }
-
-    // Get chain names from config and check if they're supported by delegator
-    const configuredChains = Object.keys(chains)
-      .filter((name) => {
-        // assert chains to any here due to the inability to infer the namespace of the global import
-        const chain = (chains as any)[name as keyof typeof chains];
-        return supportedChains.some(
-          (supportedChain) => supportedChain.id === chain.id,
-        );
-      })
-      .map((name) => name.toLowerCase());
-
-    const chainsWithDelegatorDeployed = Object.keys(
-      ChainsWithDelegatorDeployed,
-    ).map((name) => name.toLowerCase());
-
-    const unsupportedChains = configuredChains.filter(
-      (chain) => !chainsWithDelegatorDeployed.includes(chain),
-    );
-
-    if (unsupportedChains.length > 0) {
-      logger.error('Unsupported chains specified', unsupportedChains);
-      throw new Error(
-        `Unsupported chains specified: ${unsupportedChains.join(', ')}`,
-      );
-    }
   }
 
   /**
@@ -130,7 +79,7 @@ export class SmartAccountController implements AccountController {
 
     const { chainId } = options;
 
-    this.#assertIsSupportedChainId(chainId);
+    this.assertIsSupportedChainId(chainId);
 
     let smartAccount = this.#metaMaskSmartAccountByChainId[chainId];
 
@@ -146,7 +95,7 @@ export class SmartAccountController implements AccountController {
 
       // @ts-expect-error - extractChain does not work well with dynamic `chains`
       const chain = extractChain({
-        chains: this.#supportedChains,
+        chains: this.supportedChains,
         id: chainId,
       });
 
@@ -159,7 +108,7 @@ export class SmartAccountController implements AccountController {
         throw new Error(`Chain not supported: ${chainId}`);
       }
 
-      const provider = this.#createExperimentalProviderRequestProvider(chainId);
+      const provider = this.createExperimentalProviderRequestProvider(chainId);
 
       const client = createClient({
         transport: custom(provider),
@@ -167,7 +116,7 @@ export class SmartAccountController implements AccountController {
       });
 
       smartAccount = (async () => {
-        const entropy = await this.#snapsProvider.request({
+        const entropy = await this.snapsProvider.request({
           method: 'snap_getEntropy',
           params: { version: 1, salt: GET_ENTROPY_SALT },
         });
@@ -193,53 +142,6 @@ export class SmartAccountController implements AccountController {
     }
 
     return smartAccount;
-  }
-
-  #assertIsSupportedChainId(
-    chainId: number,
-  ): asserts chainId is SupportedChainId {
-    if (!this.#supportedChains.some((chain) => chain.id === chainId)) {
-      logger.error(
-        'accountController:assertIsSupportedChainId() - unsupported chainId',
-        {
-          chainId,
-        },
-      );
-      throw new Error(`Unsupported ChainId: ${chainId}`);
-    }
-  }
-
-  /**
-   * Creates a provider that handles experimental provider requests.
-   *
-   * @param chainId - The chain ID for the provider.
-   * @returns A provider object with a request method.
-   * @private
-   */
-  #createExperimentalProviderRequestProvider(chainId: SupportedChainId) {
-    return {
-      request: async (request: { method: string; params?: unknown[] }) => {
-        logger.debug(
-          'accountController:createExperimentalProviderRequestProvider() - provider.request()',
-          request,
-        );
-
-        // we can just pass the request to the snapsProvider, because
-        // snap_experimentalProviderRequest enforcesan allowlist of methods.
-        const result = await this.#snapsProvider.request({
-          // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-          method: 'snap_experimentalProviderRequest',
-          params: {
-            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-            chainId: `eip155:${chainId}`,
-            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-            request,
-          },
-        });
-
-        return result;
-      },
-    };
   }
 
   /**
@@ -323,9 +225,9 @@ export class SmartAccountController implements AccountController {
       smartAccount,
     );
 
-    this.#assertIsSupportedChainId(chainId);
+    this.assertIsSupportedChainId(chainId);
 
-    const provider = this.#createExperimentalProviderRequestProvider(chainId);
+    const provider = this.createExperimentalProviderRequestProvider(chainId);
 
     const accountAddress = await smartAccount.getAddress();
 

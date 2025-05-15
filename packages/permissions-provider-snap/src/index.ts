@@ -9,7 +9,6 @@ import type {
 } from '@metamask/snaps-sdk';
 import { lineaSepolia, sepolia } from 'viem/chains';
 
-import { SmartAccountController } from './accountController';
 import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { OrchestratorFactory } from './core/orchestratorFactory';
@@ -19,13 +18,26 @@ import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
 import { UserEventDispatcher } from './userEventDispatcher';
+import {
+  EoaAccountController,
+  SmartAccountController,
+  type AccountController,
+} from './accountController';
 
-// set up dependencies
-const accountController = new SmartAccountController({
-  snapsProvider: snap,
-  supportedChains: [sepolia, lineaSepolia],
-  deploymentSalt: '0x',
-});
+// eslint-disable-next-line no-restricted-globals
+const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
+
+const accountController: AccountController = useEoaAccountController
+  ? new EoaAccountController({
+      snapsProvider: snap,
+      supportedChains: [sepolia, lineaSepolia],
+      ethereumProvider: ethereum,
+    })
+  : new SmartAccountController({
+      snapsProvider: snap,
+      supportedChains: [sepolia, lineaSepolia],
+      deploymentSalt: '0x',
+    });
 
 const homepage = new HomePage({
   accountController,
