@@ -224,7 +224,7 @@ describe('profileSync', () => {
         mockPassAuth();
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
-          `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo}`,
+          `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo.slice(2)}`,
           JSON.stringify(mockStoredGrantedPermissionWithMultipleDelegations),
         );
       });

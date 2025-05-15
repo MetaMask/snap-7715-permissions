@@ -13,7 +13,7 @@ import type {
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 import { ethers } from 'ethers';
-import { getAddress, toHex, type Hex } from 'viem';
+import { concat, getAddress, toHex, type Hex } from 'viem';
 
 export type ProfileSyncManager = {
   getAllGrantedPermissions: () => Promise<StoredGrantedPermission[]>;
@@ -120,13 +120,7 @@ export function createProfileSyncManager(
    */
   function generateObjectKey(permissionContext: Hex): Hex {
     const delegations = decodeDelegation(permissionContext);
-
-    const concatenatedDelegationHashes = delegations.reduce(
-      (acc, delegation) => acc + getDelegationHashOffchain(delegation),
-      '',
-    );
-
-    return concatenatedDelegationHashes as Hex;
+    return concat(delegations.map(getDelegationHashOffchain));
   }
 
   /**
