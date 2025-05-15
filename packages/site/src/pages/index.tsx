@@ -20,14 +20,21 @@ import {
   Card,
   Title,
 } from '../components';
-import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
+import {
+  kernelSnapOrigin,
+  gatorSnapOrigin,
+  messageSigningSnapOrigin,
+} from '../config';
 import {
   useMetaMask,
   useMetaMaskContext,
   useRequestSnap,
   useDelegateAccount,
   useBundlerClient,
+  useInvokeSnap,
+  useRequest,
 } from '../hooks';
+import type { GetSnapsResponse } from '../types';
 import { isLocalSnap } from '../utils';
 
 /* eslint-disable no-restricted-globals */
@@ -178,8 +185,8 @@ const Index = () => {
   const [permissionResponseError, setPermissionResponseError] =
     useState<Error | null>(null);
 
-  const errors = [metaMaskContextError, permissionResponseError].filter(
-    (e) => !!e,
+  const errors = [metaMaskContextError, permissionResponseError].filter((e) =>
+    Boolean(e),
   );
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
@@ -211,6 +218,9 @@ const Index = () => {
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
+  const isMessageSigningSnapReady = Boolean(
+    installedSnaps[messageSigningSnapOrigin],
+  );
 
   const chainId = chain.id;
   const [initialAmount, setInitialAmount] = useState<bigint | null>(
@@ -241,6 +251,18 @@ const Index = () => {
 
   const [isWorking, setIsWorking] = useState(false);
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
+
+  const request = useRequest();
+  const requestMessageSigningSnap = useRequestSnap(messageSigningSnapOrigin);
+  const invokeMessageSigningSnap = useInvokeSnap(messageSigningSnapOrigin);
+  const [
+    messageSigningSnapPublicKeyResponse,
+    setMessageSigningSnapPublicKeyResponse,
+  ] = useState<string | null>(null);
+  const [
+    messageSigningSnapSignMessageResponse,
+    setMessageSigningSnapSignMessageResponse,
+  ] = useState<string | null>(null);
 
   const handleInitialAmountChange = ({
     target: { value: inputValue },
@@ -414,6 +436,40 @@ const Index = () => {
           console.error('Failed to copy: ', clipboardError);
         });
     }
+  };
+
+  const handleGetPublicKey = async () => {
+    setMessageSigningSnapPublicKeyResponse(null);
+    const connectedSnaps = (await request({
+      method: 'wallet_getSnaps',
+    })) as GetSnapsResponse;
+    if (!connectedSnaps[messageSigningSnapOrigin]) {
+      await requestMessageSigningSnap();
+    }
+
+    const publicKey = await invokeMessageSigningSnap({
+      method: 'getPublicKey',
+      params: {},
+    });
+    setMessageSigningSnapPublicKeyResponse(publicKey as string);
+  };
+
+  const handleSignMessage = async () => {
+    setMessageSigningSnapSignMessageResponse(null);
+    const connectedSnaps = (await request({
+      method: 'wallet_getSnaps',
+    })) as GetSnapsResponse;
+    if (!connectedSnaps[messageSigningSnapOrigin]) {
+      await requestMessageSigningSnap();
+    }
+
+    const signature = await invokeMessageSigningSnap({
+      method: 'signMessage',
+      params: {
+        message: 'metamask: gator snap permission request',
+      },
+    });
+    setMessageSigningSnapSignMessageResponse(signature as string);
   };
 
   return (
@@ -594,6 +650,48 @@ const Index = () => {
             <CustomMessageButton
               text="Grant Permission"
               onClick={handleGrantPermissions}
+              disabled={isWorking}
+            />
+          </Box>
+        )}
+
+        {metaMaskClient && !isLocalSnap(messageSigningSnapOrigin) && (
+          <Box style={{ position: 'relative' }}>
+            <ResponseContainer>
+              <Title>Message Signing Snap(Get Public Key)</Title>
+              <pre>
+                Get Public Key Result:{' '}
+                {messageSigningSnapPublicKeyResponse
+                  ? JSON.stringify(messageSigningSnapPublicKeyResponse, null, 2)
+                  : ''}
+              </pre>
+            </ResponseContainer>
+
+            <CustomMessageButton
+              text="Get Public Key"
+              onClick={handleGetPublicKey}
+              disabled={isWorking}
+            />
+          </Box>
+        )}
+        {metaMaskClient && !isLocalSnap(messageSigningSnapOrigin) && (
+          <Box style={{ position: 'relative' }}>
+            <ResponseContainer>
+              <Title>Message Signing Snap(Sign Message )</Title>
+              <pre>
+                Sign Message Result:{' '}
+                {messageSigningSnapSignMessageResponse
+                  ? JSON.stringify(
+                      messageSigningSnapSignMessageResponse,
+                      null,
+                      2,
+                    )
+                  : ''}
+              </pre>
+            </ResponseContainer>
+            <CustomMessageButton
+              text="Sign Message"
+              onClick={handleSignMessage}
               disabled={isWorking}
             />
           </Box>
