@@ -6,6 +6,7 @@ on:
 env:
   SNAP_ENV: production
   PRICE_API_BASE_URL: ${{ secrets.PRICE_API_BASE_URL }}
+  STORE_PERMISSIONS_ENABLED: ${{ secrets.STORE_PERMISSIONS_ENABLED }}
 
 jobs:
   prepare:
