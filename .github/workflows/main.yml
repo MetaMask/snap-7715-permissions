@@ -60,6 +60,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       PRICE_API_BASE_URL: ${{ secrets.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ secrets.STORE_PERMISSIONS_ENABLED }}
 
   all-jobs-completed:
     name: All jobs completed

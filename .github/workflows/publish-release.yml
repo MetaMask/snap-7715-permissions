@@ -9,6 +9,8 @@ on:
         required: true
       PRICE_API_BASE_URL:
         required: true
+      STORE_PERMISSIONS_ENABLED:
+        required: true
 
 env:
   SNAP_ENV: production
