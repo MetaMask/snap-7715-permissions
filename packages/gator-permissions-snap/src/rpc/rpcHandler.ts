@@ -56,7 +56,10 @@ export function createRpcHandler(config: {
             throw new Error(permissionResponse.reason);
           }
 
-          if (permissionResponse.response) {
+          if (
+            permissionResponse.response &&
+            profileSyncManager.isFeatureEnabled
+          ) {
             await profileSyncManager.storeGrantedPermission({
               permissionResponse: permissionResponse.response,
               siteOrigin,

@@ -70,8 +70,8 @@ SNAP_ENV=local
 # The base URL for the price API used to fetch realtime token spot prices.
 PRICE_API_BASE_URL=http://localhost:8003
 
-# Set `AUTO_STORE_PERMISSIONS=true` to enable profile sync storage features. This is needed when testing something related to storage otherwise leave `AUTO_STORE_PERMISSIONS=false` of remove for `.env`.
-AUTO_STORE_PERMISSIONS=false
+# Set `STORE_PERMISSIONS_ENABLED=true` to enable profile sync storage features. This is needed when testing something related to storage otherwise leave `STORE_PERMISSIONS_ENABLED=false`
+STORE_PERMISSIONS_ENABLED=false
 ```
 
 ### Running snaps
@@ -82,7 +82,7 @@ Ensure the appropriate environment variables values are set:
 - `./packages/gator-permissions-snap/.env`
 - `./packages/site/.env`
 
-#### `AUTO_STORE_PERMISSIONS=false` or removed from `.env`
+#### `STORE_PERMISSIONS_ENABLED=false` or removed from `.env`
 
 ```shell
 # Install dependencies and sets up submodule
@@ -97,7 +97,7 @@ The development site will start up on `http://localhost:8000/`
 - `@metamask/permissions-kernel-snap`is served from `local:http://localhost:8081`
 - `@metamask/gator-permissions-snap` is served from `local:http://localhost:8082`
 
-#### `AUTO_STORE_PERMISSIONS=true` to test storage features
+#### `STORE_PERMISSIONS_ENABLED=true` to test storage features
 
 ```shell
 # Install dependencies and sets up submodule

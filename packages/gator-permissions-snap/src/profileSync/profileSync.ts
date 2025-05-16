@@ -26,6 +26,7 @@ export type ProfileSyncManager = {
   storeGrantedPermissionBatch: (
     storedGrantedPermission: StoredGrantedPermission[],
   ) => Promise<void>;
+  isFeatureEnabled: boolean;
 };
 
 export type StoredGrantedPermission = {
@@ -36,7 +37,7 @@ export type StoredGrantedPermission = {
 export type ProfileSyncManagerConfig = {
   auth: JwtBearerAuth;
   userStorage: UserStorage;
-  snapEnv: string | undefined;
+  isFeatureEnabled: boolean;
 };
 
 /**
@@ -110,7 +111,7 @@ export function createProfileSyncManager(
   config: ProfileSyncManagerConfig,
 ): ProfileSyncManager {
   const FEATURE = 'gator_7715_permissions';
-  const { auth, userStorage, snapEnv } = config;
+  const { auth, userStorage, isFeatureEnabled } = config;
 
   /**
    * Generates an object key for the permission response stored in profile sync.
@@ -130,7 +131,7 @@ export function createProfileSyncManager(
    * @throws If the feature is not enabled.
    */
   function assertFeatureEnabled() {
-    if (snapEnv !== 'local') {
+    if (!isFeatureEnabled) {
       throw new Error('Feature is not enabled');
     }
   }
@@ -256,6 +257,7 @@ export function createProfileSyncManager(
   }
 
   return {
+    isFeatureEnabled,
     getAllGrantedPermissions,
     getGrantedPermission,
     storeGrantedPermission,

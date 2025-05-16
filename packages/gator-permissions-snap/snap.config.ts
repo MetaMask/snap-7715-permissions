@@ -13,17 +13,17 @@ if (!process.env.PRICE_API_BASE_URL) {
   throw new Error('PRICE_API_BASE_URL must be set as an environment variable.');
 }
 
-if (!process.env.AUTO_STORE_PERMISSIONS) {
+if (!process.env.STORE_PERMISSIONS_ENABLED) {
   throw new Error(
-    'AUTO_STORE_PERMISSIONS must be set as an environment variable.',
+    'STORE_PERMISSIONS_ENABLED must be set as an environment variable.',
   );
 }
 
 if (
-  process.env.AUTO_STORE_PERMISSIONS !== 'true' &&
-  process.env.AUTO_STORE_PERMISSIONS !== 'false'
+  process.env.STORE_PERMISSIONS_ENABLED !== 'true' &&
+  process.env.STORE_PERMISSIONS_ENABLED !== 'false'
 ) {
-  throw new Error('AUTO_STORE_PERMISSIONS must be set to true or false.');
+  throw new Error('STORE_PERMISSIONS_ENABLED must be set to true or false.');
 }
 
 const config: SnapConfig = {
@@ -39,7 +39,7 @@ const config: SnapConfig = {
   environment: {
     SNAP_ENV: process.env.SNAP_ENV,
     PRICE_API_BASE_URL: process.env.PRICE_API_BASE_URL,
-    AUTO_STORE_PERMISSIONS: process.env.AUTO_STORE_PERMISSIONS,
+    STORE_PERMISSIONS_ENABLED: process.env.STORE_PERMISSIONS_ENABLED,
   },
 };
 

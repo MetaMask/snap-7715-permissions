@@ -106,9 +106,15 @@ describe('profileSync', () => {
   describe('Profile Sync feature enabled', () => {
     beforeEach(() => {
       profileSyncManager = createProfileSyncManager({
-        snapEnv: 'local',
+        isFeatureEnabled: true,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
+      });
+    });
+
+    describe('isFeatureEnabled', () => {
+      it('should return true', () => {
+        expect(profileSyncManager.isFeatureEnabled).toBe(true);
       });
     });
 
@@ -320,9 +326,15 @@ describe('profileSync', () => {
   describe('Profile Sync feature disabled', () => {
     beforeEach(() => {
       profileSyncManager = createProfileSyncManager({
-        snapEnv: 'production',
+        isFeatureEnabled: false,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
+      });
+    });
+
+    describe('isFeatureEnabled', () => {
+      it('should return false', () => {
+        expect(profileSyncManager.isFeatureEnabled).toBe(false);
       });
     });
 
