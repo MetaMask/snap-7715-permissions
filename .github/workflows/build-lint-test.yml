@@ -72,7 +72,7 @@ jobs:
       - name: Cache gator-permissions snap build
         uses: actions/cache@v4
         with:
-          path: ./packages/permissions-provider-snap/dist
+          path: ./packages/gator-permissions-snap/dist
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
       - name: Require clean working directory
         shell: bash
@@ -126,7 +126,7 @@ jobs:
       - name: Restore gator-permissions snap build cache
         uses: actions/cache@v4
         with:
-          path: ./packages/permissions-provider-snap/dist
+          path: ./packages/gator-permissions-snap/dist
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
       - name: Run e2e tests
         run: yarn test

@@ -1,62 +1,120 @@
 # 7715 Permissions Snap Monorepo
 
-This mono-repository contains the `kernel` and `gator` snaps that implement ERC-7715 and the Permissions registry.
-dApps send request the permissions request to the exposed JSON-RPC interface.
+### Getting Started
+
+1. **Fork the repository**:
+
+   - Click the "Fork" button at the top right of the repository page.
+
+2. **Clone your fork**:
+   ```shell
+   git clone https://github.com/<your-username>/snap-7715-permissions.git
+   ```
+3. **Create Working Branch**:
+   ```shell
+   git checkout -b feat/example-branch
+   ```
+
+## Overview
+
+This mono-repository contains the `@metamask/permissions-kernel-snap` and `@metamask/gator-permissions-snap` snaps that implement ERC-7715 and the Permissions registry. dApps send request the permissions request to the exposed JSON-RPC interface.
+
 A user can grant granular permissions as cryptographic capabilities to allow dApps to execute transactions on their behalf.
 
-## Prerequisites
+### @metamask/permissions-kernel-snap
 
-- [MetaMask Flask](https://consensyssoftware.atlassian.net/wiki/x/IQCOB10)
+This Snap manages a `permissions offer registry`, which lists all the permissions a user is willing to grant via a [ERC-7715](https://eip.tools/eip/7715) permissions request. When a dApp makes a 7715 request to the kernel, the kernel forwards it to a permissions provider Snap for user review and attenuation. If the dApp requests any permission not listed in the registry, the kernel automatically rejects the request.
+
+### @metamask/gator-permissions-snap
+
+This Snap creates a [DeleGator account](https://github.com/MetaMask/delegation-framework) and enables the site to request [ERC-7715](https://eip.tools/eip/7715) permissions from that account. Users can review and adjust the granted permissions through a custom interactive confirmation dialog rendered by the Snap.
+
+[Read more on "@metamask/gator-permissions-snap" ->](/packages/gator-permissions-snap/ARCHITECTURE.md)
+
+## Development
+
+**Prerequisites**
+
+- [MetaMask Flask >= 12.14.2](https://consensyssoftware.atlassian.net/wiki/x/IQCOB10)
 - Nodejs `20.0.0` (specified in `.nvmrc`)
 - yarn 3.2.1
 
-## Environment variables
+### Environment variables
 
-### site
+#### site
 
-The snap origin to use(defaults to local if not defined):
+The snap origin to use(defaults to local if not defined): `./packages/site/.env`
 
 ```bash
-GATSBY_KERNEL_SNAP_ORIGIN=local:http://localhost:8080
-GATSBY_GATOR_SNAP_ORIGIN=local:http://localhost:8081
+GATSBY_KERNEL_SNAP_ORIGIN=local:http://localhost:8081
+GATSBY_GATOR_SNAP_ORIGIN=local:http://localhost:8082
 ```
 
-### permissions-kernel-snap
+#### @metamask/permissions-kernel-snap
 
-- SNAP_ENV: The snap uses `SNAP_ENV` to dynamically map permission provider snapId to registered offers in the `PermissionOfferRegistry`. Please make use `SNAP_ENV=local` before building the snap.
+The snap will throw errors during build process if values are not defined: `./packages/permissions-kernel-snap/.env`
 
-### permissions-provider-snap
+```bash
+# The snap uses `SNAP_ENV` to dynamically map permission provider snapId to registered offers in the `PermissionOfferRegistry`. Please make use `SNAP_ENV=local` before building the snap.
+SNAP_ENV=local
+```
 
-- SNAP_ENV: The snap uses `SNAP_ENV` to dynamically set the kernel snap snapId
-- PRICE_API_BASE_URL: The base URL for the price API used to fetch realtime token spot prices.
+#### @metamask/gator-permissions-snap
 
-## Getting Started
+The snap will throw errors during build process if values are not defined: `./packages/gator-permissions-snap/.env`
 
-Clone the [snap-7715-permissions repository](https://github.com/MetaMask/snap-7715-permissions) and set up the development environment:
+```bash
+# The snap uses `SNAP_ENV` to dynamically set the kernel snap snapId
+SNAP_ENV=local
 
-1. Set the .env `SNAP_ENV=local` in:
-   - `./packages/permissions-kernel-snap/.env`
-   - `./packages/permissions-provider-snap/.env`
-2. Set `PRICE_API_BASE_URL=http://localhost:8003` in `./packages/permissions-provider-snap/.env` to fetch spot prices from mock price API running locally.
-3. Install and start up snaps with development site. Yarn `prepare:snap` will handle running yarn install
+# The base URL for the price API used to fetch realtime token spot prices.
+PRICE_API_BASE_URL=http://localhost:8003
+
+# Set `AUTO_STORE_PERMISSIONS=true` to enable profile sync storage features. This is needed when testing something related to storage otherwise leave `AUTO_STORE_PERMISSIONS=false` of remove for `.env`.
+AUTO_STORE_PERMISSIONS=false
+```
+
+### Running snaps
+
+Ensure the appropriate environment variables values are set:
+
+- `./packages/permissions-kernel-snap/.env`
+- `./packages/gator-permissions-snap/.env`
+- `./packages/site/.env`
+
+#### `AUTO_STORE_PERMISSIONS=false` or removed from `.env`
 
 ```shell
-# Install dependencies and sets up submodule 
+# Install dependencies and sets up submodule
 yarn prepare:snap
-
-# Starts local @metamask/message-signing-snap
-yarn start:message-signing-snap
 
 # Starts local @metamask/permissions-kernel-snap and @metamask/gator-permissions-snap
 yarn start
 ```
 
 The development site will start up on `http://localhost:8000/`
-- `@metamask/message-signing-snap` is served from `local:http://localhost:8080`
+
 - `@metamask/permissions-kernel-snap`is served from `local:http://localhost:8081`
 - `@metamask/gator-permissions-snap` is served from `local:http://localhost:8082`
 
-## Contributing
+#### `AUTO_STORE_PERMISSIONS=true` to test storage features
+
+```shell
+# Install dependencies and sets up submodule
+yarn prepare:snap
+
+# Starts local @metamask/message-signing-snap
+yarn start:message-signing-snap
+
+# In new terminal window starts local @metamask/permissions-kernel-snap and @metamask/gator-permissions-snap
+yarn start
+```
+
+The development site will start up on `http://localhost:8000/`
+
+- `@metamask/message-signing-snap` is served from `local:http://localhost:8080`
+- `@metamask/permissions-kernel-snap`is served from `local:http://localhost:8081`
+- `@metamask/gator-permissions-snap` is served from `local:http://localhost:8082`
 
 ### Testing
 
@@ -68,17 +126,30 @@ The development site will start up on `http://localhost:8000/`
 > Right now it's not possible to use `@metamask/snaps-jest` with a snap that
 > isn't built.
 
-1. Set the .env `SNAP_ENV=local` in:
-   - `./packages/permissions-kernel-snap/.env`
-   - `./packages/permissions-provider-snap/.env`
-2. Set `PRICE_API_BASE_URL=http://localhost:8003` in `./packages/permissions-provider-snap/.env` to fetch spot prices from mock price API running locally.
-3. Run `yarn build`
-4. Run `yarn test` to run the tests once.
+Ensure the appropriate environment variables values are set:
+
+- `./packages/permissions-kernel-snap/.env`
+- `./packages/gator-permissions-snap/.env`
+
+```bash
+yarn build
+
+yarn test
+```
 
 ### Linting
 
-Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and
-fix any automatically fixable issues.
+To run the linter.
+
+```bash
+yarn lint
+```
+
+To run the linter and fix any automatically fixable issues.
+
+```bash
+yarn lint:fix
+```
 
 ### Using NPM packages with scripts
 
@@ -89,3 +160,7 @@ script in the `lavamoat.allowScripts` section of `package.json`.
 See the documentation for [@lavamoat/allow-scripts](https://github.com/LavaMoat/LavaMoat/tree/main/packages/allow-scripts)
 for more information.
 
+## Relevant Documents
+
+- [ERC-7715](https://eip.tools/eip/7715)
+- [ERC-7710](https://eip.tools/eip/7710)
