@@ -2,7 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { OrchestratorFactory } from '../core/orchestratorFactory';
-import type { ProfileSyncManager } from '../profileSync';
+import { ProfileSyncError, type ProfileSyncManager } from '../profileSync';
 import { validatePermissionRequestParam } from '../utils/validate';
 
 /**
@@ -56,14 +56,21 @@ export function createRpcHandler(config: {
             throw new Error(permissionResponse.reason);
           }
 
-          if (
-            permissionResponse.response &&
-            profileSyncManager.isFeatureEnabled
-          ) {
-            await profileSyncManager.storeGrantedPermission({
-              permissionResponse: permissionResponse.response,
-              siteOrigin,
-            });
+          if (permissionResponse.response) {
+            try {
+              await profileSyncManager.storeGrantedPermission({
+                permissionResponse: permissionResponse.response,
+                siteOrigin,
+              });
+            } catch (error: any) {
+              if (error.message === ProfileSyncError.FeatureNotEnabled) {
+                logger.warn(
+                  'Feature is not enabled, skipping permission storage',
+                );
+              } else {
+                throw error;
+              }
+            }
           }
 
           return permissionResponse.response;

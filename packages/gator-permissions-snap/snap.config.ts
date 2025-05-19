@@ -20,10 +20,13 @@ if (!process.env.STORE_PERMISSIONS_ENABLED) {
 }
 
 if (
-  process.env.STORE_PERMISSIONS_ENABLED !== 'true' &&
-  process.env.STORE_PERMISSIONS_ENABLED !== 'false'
+  !process.env.STORE_PERMISSIONS_ENABLED ||
+  (process.env.STORE_PERMISSIONS_ENABLED !== 'true' &&
+    process.env.STORE_PERMISSIONS_ENABLED !== 'false')
 ) {
-  throw new Error('STORE_PERMISSIONS_ENABLED must be set to true or false.');
+  throw new Error(
+    'STORE_PERMISSIONS_ENABLED must be set as an environment variable and must be set to "true" or "false".',
+  );
 }
 
 const config: SnapConfig = {

@@ -57,10 +57,8 @@ export class HomePage {
       chainId: sepolia.id,
     });
 
-    const grantedPermissions: StoredGrantedPermission[] = this
-      .#profileSyncManager.isFeatureEnabled
-      ? await this.#profileSyncManager.getAllGrantedPermissions()
-      : [];
+    const grantedPermissions: StoredGrantedPermission[] =
+      await this.#profileSyncManager.getAllGrantedPermissions().catch(() => []);
 
     return (
       <Box>

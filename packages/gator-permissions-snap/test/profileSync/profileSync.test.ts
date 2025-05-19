@@ -112,12 +112,6 @@ describe('profileSync', () => {
       });
     });
 
-    describe('isFeatureEnabled', () => {
-      it('should return true', () => {
-        expect(profileSyncManager.isFeatureEnabled).toBe(true);
-      });
-    });
-
     describe('getAllGrantedPermissions', () => {
       it('should return all granted permissions when items exist', async () => {
         const mockStoredGrantedPermissions = [mockStoredGrantedPermission];
@@ -329,12 +323,6 @@ describe('profileSync', () => {
         isFeatureEnabled: false,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
-      });
-    });
-
-    describe('isFeatureEnabled', () => {
-      it('should return false', () => {
-        expect(profileSyncManager.isFeatureEnabled).toBe(false);
       });
     });
 

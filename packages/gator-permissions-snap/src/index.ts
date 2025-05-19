@@ -35,6 +35,9 @@ import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
 
+const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
+const snapEnv = process.env.SNAP_ENV;
+
 // set up dependencies
 const accountController = new AccountController({
   snapsProvider: snap,
@@ -48,7 +51,7 @@ const profileSyncOptions = createProfileSyncOptions(
   snap,
   MESSAGE_SIGNING_SNAP_ID,
 );
-const profileSyncSdkEnv = getProfileSyncSdkEnv(process.env.SNAP_ENV);
+const profileSyncSdkEnv = getProfileSyncSdkEnv(snapEnv);
 
 const auth = new JwtBearerAuth(
   {
@@ -63,7 +66,7 @@ const auth = new JwtBearerAuth(
 );
 
 const profileSyncManager = createProfileSyncManager({
-  isFeatureEnabled: process.env.STORE_PERMISSIONS_ENABLED === 'true',
+  isFeatureEnabled,
   auth,
   userStorage: new UserStorage(
     {
@@ -177,10 +180,7 @@ export const onInstall: OnInstallHandler = async () => {
    * initialConnections configured to automatically connect to the gator snap, this is not needed in production.
    */
   // eslint-disable-next-line no-restricted-globals
-  if (
-    process.env.SNAP_ENV === 'local' &&
-    process.env.STORE_PERMISSIONS_ENABLED === 'true'
-  ) {
+  if (snapEnv === 'local' && isFeatureEnabled) {
     const installedSnaps = (await snap.request({
       method: 'wallet_getSnaps',
     })) as unknown as GetSnapsResponse;

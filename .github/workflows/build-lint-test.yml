@@ -5,8 +5,8 @@ on:
 
 env:
   SNAP_ENV: production
-  PRICE_API_BASE_URL: ${{ secrets.PRICE_API_BASE_URL }}
-  STORE_PERMISSIONS_ENABLED: ${{ secrets.STORE_PERMISSIONS_ENABLED }}
+  PRICE_API_BASE_URL: https://price.api.cx.metamask.io
+  STORE_PERMISSIONS_ENABLED: false
 
 jobs:
   prepare:

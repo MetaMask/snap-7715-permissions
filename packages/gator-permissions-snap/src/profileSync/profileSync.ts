@@ -26,7 +26,6 @@ export type ProfileSyncManager = {
   storeGrantedPermissionBatch: (
     storedGrantedPermission: StoredGrantedPermission[],
   ) => Promise<void>;
-  isFeatureEnabled: boolean;
 };
 
 export type StoredGrantedPermission = {
@@ -39,6 +38,10 @@ export type ProfileSyncManagerConfig = {
   userStorage: UserStorage;
   isFeatureEnabled: boolean;
 };
+
+export enum ProfileSyncError {
+  FeatureNotEnabled = 'Feature is not enabled',
+}
 
 /**
  * Converts a DelegationStruct to a Delegation.
@@ -132,7 +135,7 @@ export function createProfileSyncManager(
    */
   function assertFeatureEnabled() {
     if (!isFeatureEnabled) {
-      throw new Error('Feature is not enabled');
+      throw new Error(ProfileSyncError.FeatureNotEnabled);
     }
   }
 
@@ -257,7 +260,6 @@ export function createProfileSyncManager(
   }
 
   return {
-    isFeatureEnabled,
     getAllGrantedPermissions,
     getGrantedPermission,
     storeGrantedPermission,

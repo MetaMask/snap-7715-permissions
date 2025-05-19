@@ -17,9 +17,7 @@
 
 ## Overview
 
-This mono-repository contains the `@metamask/permissions-kernel-snap` and `@metamask/gator-permissions-snap` snaps that implement ERC-7715 and the Permissions registry. dApps send request the permissions request to the exposed JSON-RPC interface.
-
-A user can grant granular permissions as cryptographic capabilities to allow dApps to execute transactions on their behalf.
+This mono-repository contains the `@metamask/permissions-kernel-snap` and `@metamask/gator-permissions-snap` that implement ERC-7715 and the Permissions registry. dApps may request a permission via the exposed JSON-RPC interface. A user can grant granular permissions as cryptographic capabilities to allow dApps to execute transactions on their behalf.
 
 ### @metamask/permissions-kernel-snap
 
@@ -35,7 +33,7 @@ This Snap creates a [DeleGator account](https://github.com/MetaMask/delegation-f
 
 **Prerequisites**
 
-- [MetaMask Flask >= 12.14.2](https://consensyssoftware.atlassian.net/wiki/x/IQCOB10)
+- [MetaMask Flask >= 12.14.2](https://docs.metamask.io/snaps/get-started/install-flask/)
 - Nodejs `20.0.0` (specified in `.nvmrc`)
 - yarn 3.2.1
 
@@ -43,36 +41,16 @@ This Snap creates a [DeleGator account](https://github.com/MetaMask/delegation-f
 
 #### site
 
-The snap origin to use(defaults to local if not defined): `./packages/site/.env`
-
-```bash
-GATSBY_KERNEL_SNAP_ORIGIN=local:http://localhost:8081
-GATSBY_GATOR_SNAP_ORIGIN=local:http://localhost:8082
-```
+The snap origin to use(defaults to local if not defined): `./packages/site/.env`. Local development values can be found in [.env.development.example](/packages/site/.env.development.example).
 
 #### @metamask/permissions-kernel-snap
 
-The snap will throw errors during build process if values are not defined: `./packages/permissions-kernel-snap/.env`
+The snap will throw errors during build process if values are not defined: `./packages/permissions-kernel-snap/.env`. Development values can be found in [.env.development.example](/packages/permissions-kernel-snap/.env.development.example).
 
-```bash
-# The snap uses `SNAP_ENV` to dynamically map permission provider snapId to registered offers in the `PermissionOfferRegistry`. Please make use `SNAP_ENV=local` before building the snap.
-SNAP_ENV=local
-```
 
 #### @metamask/gator-permissions-snap
 
-The snap will throw errors during build process if values are not defined: `./packages/gator-permissions-snap/.env`
-
-```bash
-# The snap uses `SNAP_ENV` to dynamically set the kernel snap snapId
-SNAP_ENV=local
-
-# The base URL for the price API used to fetch realtime token spot prices.
-PRICE_API_BASE_URL=http://localhost:8003
-
-# Set `STORE_PERMISSIONS_ENABLED=true` to enable profile sync storage features. This is needed when testing something related to storage otherwise leave `STORE_PERMISSIONS_ENABLED=false`
-STORE_PERMISSIONS_ENABLED=false
-```
+The snap will throw errors during build process if values are not defined: `./packages/gator-permissions-snap/.env`. Development values can be found in [.env.development.example](/packages/gator-permissions-snap/.env.development.example).
 
 ### Running snaps
 
@@ -106,7 +84,7 @@ yarn prepare:snap
 # Starts local @metamask/message-signing-snap
 yarn start:message-signing-snap
 
-# In new terminal window starts local @metamask/permissions-kernel-snap and @metamask/gator-permissions-snap
+# In new terminal window, start local @metamask/permissions-kernel-snap and @metamask/gator-permissions-snap
 yarn start
 ```
 
