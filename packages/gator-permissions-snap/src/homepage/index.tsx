@@ -58,7 +58,7 @@ export class HomePage {
     });
 
     const grantedPermissions: StoredGrantedPermission[] =
-      await this.#profileSyncManager.getAllGrantedPermissions().catch(() => []);
+      await this.#profileSyncManager.getAllGrantedPermissions();
 
     return (
       <Box>

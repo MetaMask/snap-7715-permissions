@@ -317,7 +317,7 @@ describe('profileSync', () => {
     });
   });
 
-  describe('Profile Sync feature disabled', () => {
+  describe('Profile Sync feature disabled using unconfigured profile sync manager', () => {
     beforeEach(() => {
       profileSyncManager = createProfileSyncManager({
         isFeatureEnabled: false,
@@ -327,10 +327,9 @@ describe('profileSync', () => {
     });
 
     describe('getAllGrantedPermissions', () => {
-      it('should throw error when profile sync feature is disabled', async () => {
-        await expect(
-          profileSyncManager.getAllGrantedPermissions(),
-        ).rejects.toThrow('Feature is not enabled');
+      it('should return empty array when profile sync feature is disabled', async () => {
+        const res = await profileSyncManager.getAllGrantedPermissions();
+        expect(res).toStrictEqual([]);
       });
     });
 
@@ -340,27 +339,27 @@ describe('profileSync', () => {
           profileSyncManager.getGrantedPermission(
             '0x00_some_permission_context' as Hex,
           ),
-        ).rejects.toThrow('Feature is not enabled');
+        ).rejects.toThrow(
+          'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
+        );
       });
     });
 
     describe('storeGrantedPermission', () => {
-      it('should throw error when profile sync feature is disabled', async () => {
-        await expect(
-          profileSyncManager.storeGrantedPermission(
-            mockStoredGrantedPermission,
-          ),
-        ).rejects.toThrow('Feature is not enabled');
+      it('should not store granted permission when profile sync feature is disabled', async () => {
+        await profileSyncManager.storeGrantedPermission(
+          mockStoredGrantedPermission,
+        );
+        expect(userStorageMock.setItem).not.toHaveBeenCalled();
       });
     });
 
     describe('storeGrantedPermissionBatch', () => {
-      it('should throw error when profile sync feature is disabled', async () => {
-        await expect(
-          profileSyncManager.storeGrantedPermissionBatch([
-            mockStoredGrantedPermission,
-          ]),
-        ).rejects.toThrow('Feature is not enabled');
+      it('should not store granted permissions when profile sync feature is disabled', async () => {
+        await profileSyncManager.storeGrantedPermissionBatch([
+          mockStoredGrantedPermission,
+        ]);
+        expect(userStorageMock.batchSetItems).not.toHaveBeenCalled();
       });
     });
   });

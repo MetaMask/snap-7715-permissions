@@ -39,71 +39,6 @@ export type ProfileSyncManagerConfig = {
   isFeatureEnabled: boolean;
 };
 
-export enum ProfileSyncError {
-  FeatureNotEnabled = 'Feature is not enabled',
-}
-
-/**
- * Converts a DelegationStruct to a Delegation.
- * The DelegationStruct is the format used in the Delegation Framework.
- *
- * @param delegationStruct - The delegation struct to format.
- * @returns The delegation.
- */
-const convertToDelegation = (
-  delegationStruct: DelegationStruct,
-): Delegation => {
-  const caveats = delegationStruct.caveats.map((caveat) => ({
-    enforcer: getAddress(caveat.enforcer),
-    terms: caveat.terms,
-    args: caveat.args,
-  }));
-  return {
-    delegate: getAddress(delegationStruct.delegate),
-    delegator: getAddress(delegationStruct.delegator),
-    authority: delegationStruct.authority,
-    caveats,
-    salt: toHex(delegationStruct.salt),
-    signature: delegationStruct.signature,
-  };
-};
-
-/**
- * ABI Decodes a permissions context.
- *
- * @param permissionsContext - The encoded delegation(ie. permissions context).
- * @returns The decoded delegations.
- */
-const decodeDelegation = (permissionsContext: Hex): Delegation[] => {
-  // TODO: Viem throws error: during test: Expected 0 arguments, but got 2.
-  // Using ethers to decode the delegation.
-  // const [decodedDelegationStructs] = decodeAbiParameters(
-  //   [
-  //     {
-  //       components: DELEGATION_ABI_TYPE_COMPONENTS,
-  //       name: 'delegations',
-  //       type: 'tuple[]',
-  //     },
-  //   ],
-  //   permissionsContext,
-  // );
-
-  const abiType = [
-    'tuple(address delegate, address delegator, bytes32 authority, ' +
-      'tuple(address enforcer, bytes terms, bytes args)[] caveats, ' +
-      'uint256 salt, bytes signature)[]',
-  ];
-
-  const [decodedDelegationStructs] = ethers.utils.defaultAbiCoder.decode(
-    abiType,
-    permissionsContext,
-  );
-
-  return (decodedDelegationStructs as DelegationStruct[]).map(
-    convertToDelegation,
-  );
-};
-
 /**
  * Creates a profile sync manager.
  *
@@ -115,6 +50,86 @@ export function createProfileSyncManager(
 ): ProfileSyncManager {
   const FEATURE = 'gator_7715_permissions';
   const { auth, userStorage, isFeatureEnabled } = config;
+  const unConfiguredProfileSyncManager = {
+    getAllGrantedPermissions: async () => {
+      logger.debug('unConfiguredProfileSyncManager.getAllGrantedPermissions()');
+      return [];
+    },
+    getGrantedPermission: async (_: Hex) => {
+      throw new Error(
+        'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
+      );
+    },
+    storeGrantedPermission: async (_: StoredGrantedPermission) => {
+      logger.debug(
+        'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
+      );
+    },
+    storeGrantedPermissionBatch: async (_: StoredGrantedPermission[]) => {
+      logger.debug(
+        'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
+      );
+    },
+  };
+
+  /**
+   * Converts a DelegationStruct to a Delegation.
+   * The DelegationStruct is the format used in the Delegation Framework.
+   *
+   * @param delegationStruct - The delegation struct to format.
+   * @returns The delegation.
+   */
+  function convertToDelegation(delegationStruct: DelegationStruct): Delegation {
+    const caveats = delegationStruct.caveats.map((caveat) => ({
+      enforcer: getAddress(caveat.enforcer),
+      terms: caveat.terms,
+      args: caveat.args,
+    }));
+    return {
+      delegate: getAddress(delegationStruct.delegate),
+      delegator: getAddress(delegationStruct.delegator),
+      authority: delegationStruct.authority,
+      caveats,
+      salt: toHex(delegationStruct.salt),
+      signature: delegationStruct.signature,
+    };
+  }
+
+  /**
+   * ABI Decodes a permissions context.
+   *
+   * @param permissionsContext - The encoded delegation(ie. permissions context).
+   * @returns The decoded delegations.
+   */
+  function decodeDelegation(permissionsContext: Hex): Delegation[] {
+    // TODO: Viem throws error: during test: Expected 0 arguments, but got 2.
+    // Using ethers to decode the delegation.
+    // const [decodedDelegationStructs] = decodeAbiParameters(
+    //   [
+    //     {
+    //       components: DELEGATION_ABI_TYPE_COMPONENTS,
+    //       name: 'delegations',
+    //       type: 'tuple[]',
+    //     },
+    //   ],
+    //   permissionsContext,
+    // );
+
+    const abiType = [
+      'tuple(address delegate, address delegator, bytes32 authority, ' +
+        'tuple(address enforcer, bytes terms, bytes args)[] caveats, ' +
+        'uint256 salt, bytes signature)[]',
+    ];
+
+    const [decodedDelegationStructs] = ethers.utils.defaultAbiCoder.decode(
+      abiType,
+      permissionsContext,
+    );
+
+    return (decodedDelegationStructs as DelegationStruct[]).map(
+      convertToDelegation,
+    );
+  }
 
   /**
    * Generates an object key for the permission response stored in profile sync.
@@ -128,24 +143,11 @@ export function createProfileSyncManager(
   }
 
   /**
-   * Feature flag to only enable for local development until
-   * message-signing-snap v1.1.2 released in MM 12.18: https://github.com/MetaMask/metamask-extension/pull/32521.
-   *
-   * @throws If the feature is not enabled.
-   */
-  function assertFeatureEnabled() {
-    if (!isFeatureEnabled) {
-      throw new Error(ProfileSyncError.FeatureNotEnabled);
-    }
-  }
-
-  /**
    * Authenticates the user with profile sync.
    *
    */
   async function authenticate(): Promise<void> {
     try {
-      assertFeatureEnabled();
       await auth.getAccessToken();
     } catch (error) {
       logger.error('Error fetching access token:', error);
@@ -163,7 +165,6 @@ export function createProfileSyncManager(
     StoredGrantedPermission[]
   > {
     try {
-      assertFeatureEnabled();
       await authenticate();
 
       const items = await userStorage.getAllFeatureItems(FEATURE);
@@ -187,7 +188,6 @@ export function createProfileSyncManager(
     permissionContext: Hex,
   ): Promise<StoredGrantedPermission | null> {
     try {
-      assertFeatureEnabled();
       await authenticate();
 
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(permissionContext)}`;
@@ -217,7 +217,6 @@ export function createProfileSyncManager(
     storedGrantedPermission: StoredGrantedPermission,
   ): Promise<void> {
     try {
-      assertFeatureEnabled();
       await authenticate();
 
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(storedGrantedPermission.permissionResponse.context)}`;
@@ -243,7 +242,6 @@ export function createProfileSyncManager(
     storedGrantedPermissions: StoredGrantedPermission[],
   ): Promise<void> {
     try {
-      assertFeatureEnabled();
       await authenticate();
 
       await userStorage.batchSetItems(
@@ -259,10 +257,15 @@ export function createProfileSyncManager(
     }
   }
 
-  return {
-    getAllGrantedPermissions,
-    getGrantedPermission,
-    storeGrantedPermission,
-    storeGrantedPermissionBatch,
-  };
+  /**
+   * Feature flag to disable profile sync feature until message-signing-snap v1.1.2 released in MM 12.18: https://github.com/MetaMask/metamask-extension/pull/32521.
+   */
+  return isFeatureEnabled
+    ? {
+        getAllGrantedPermissions,
+        getGrantedPermission,
+        storeGrantedPermission,
+        storeGrantedPermissionBatch,
+      }
+    : unConfiguredProfileSyncManager;
 }
