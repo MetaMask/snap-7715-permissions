@@ -8,6 +8,10 @@ jobs:
     name: Prepare
     runs-on: ubuntu-latest
     environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
     strategy:
       matrix:
         node-version: [21.x]
@@ -29,6 +33,10 @@ jobs:
     name: Validate changelog
     runs-on: ubuntu-latest
     environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
     needs:
       - prepare
     strategy:
@@ -52,6 +60,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
     needs:
       - prepare
     strategy:
@@ -85,6 +97,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
     needs:
       - prepare
     strategy:
@@ -108,6 +124,10 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
     needs:
       - prepare
       - build
