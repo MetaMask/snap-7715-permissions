@@ -6,8 +6,8 @@ When CI runs, it will use the `SNAP_ENV=production` value. If this value is chan
 
 1. Set the .env to production values for `@metamask/permissions-kernel-snap` and `@metamask/gator-permissions-snap`:
 2. `./packages/permissions-kernel-snap/.env`
-   - Production values can be found in [.env.production.example](/packages/permissions-kernel-snap/.env.production.example)
+   - Production values can be found in [.env.example](/packages/permissions-kernel-snap/..env.example)
 3. `./packages/gator-permissions-snap/.env`
-   - Production values can be found in [.env.production.example](/packages/gator-permissions-snap/.env.production.example)
+   - Production values can be found in [.env.example](/packages/gator-permissions-snap/..env.example)
 4. Building the snaps with `yarn build` should update the shasum if applicable.
 5. Push changes to your remote branch.

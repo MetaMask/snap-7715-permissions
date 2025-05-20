@@ -8,13 +8,10 @@ on:
       SLACK_WEBHOOK_URL:
         required: true
 
-env:
-  SNAP_ENV: production
-  PRICE_API_BASE_URL: https://price.api.cx.metamask.io
-  STORE_PERMISSIONS_ENABLED: false
-
 jobs:
   publish-release:
+    name: Publish GitHub Release
+    environment: snap-production
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -40,6 +37,7 @@ jobs:
 
   publish-npm-dry-run:
     name: Dry run publish to NPM
+    environment: snap-production
     runs-on: ubuntu-latest
     needs: publish-release
     steps:

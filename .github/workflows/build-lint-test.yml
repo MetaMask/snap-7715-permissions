@@ -3,15 +3,11 @@ name: Build, Lint, and Test
 on:
   workflow_call:
 
-env:
-  SNAP_ENV: production
-  PRICE_API_BASE_URL: https://price.api.cx.metamask.io
-  STORE_PERMISSIONS_ENABLED: false
-
 jobs:
   prepare:
     name: Prepare
     runs-on: ubuntu-latest
+    environment: snap-production
     strategy:
       matrix:
         node-version: [21.x]
@@ -32,6 +28,7 @@ jobs:
   validate-changelog:
     name: Validate changelog
     runs-on: ubuntu-latest
+    environment: snap-production
     needs:
       - prepare
     strategy:
@@ -54,6 +51,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    environment: snap-production
     needs:
       - prepare
     strategy:
@@ -86,6 +84,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    environment: snap-production
     needs:
       - prepare
     strategy:
@@ -108,6 +107,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    environment: snap-production
     needs:
       - prepare
       - build

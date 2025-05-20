@@ -41,16 +41,16 @@ This Snap creates a [DeleGator account](https://github.com/MetaMask/delegation-f
 
 #### site
 
-The snap origin to use(defaults to local if not defined): `./packages/site/.env`. Local development values can be found in [.env.development.example](/packages/site/.env.development.example).
+The snap origin to use(defaults to local if not defined): `./packages/site/.env`. Local development values can be found in [./packages/site/.env.example](/packages/site/.env.example).
 
 #### @metamask/permissions-kernel-snap
 
-The snap will throw errors during build process if values are not defined: `./packages/permissions-kernel-snap/.env`. Development values can be found in [.env.development.example](/packages/permissions-kernel-snap/.env.development.example).
+The snap will throw errors during build process if values are not defined: `./packages/permissions-kernel-snap/.env`. Development values can be found in [./packages/permissions-kernel-snap/.env.example](/packages/permissions-kernel-snap/.env.example).
 
 
 #### @metamask/gator-permissions-snap
 
-The snap will throw errors during build process if values are not defined: `./packages/gator-permissions-snap/.env`. Development values can be found in [.env.development.example](/packages/gator-permissions-snap/.env.development.example).
+The snap will throw errors during build process if values are not defined: `./packages/gator-permissions-snap/.env`. Development values can be found in [./packages/gator-permissions-snap/.env.example](/packages/gator-permissions-snap/.env.example).
 
 ### Running snaps
 
