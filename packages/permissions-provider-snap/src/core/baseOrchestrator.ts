@@ -1,336 +1,261 @@
-import type {
-  PermissionRequest,
-  PermissionResponse,
-} from '@metamask/7715-permissions-shared/types';
-import type { CaveatBuilder } from '@metamask/delegation-toolkit';
 import {
+  CoreCaveatBuilder,
   createCaveatBuilder,
   createDelegation,
   encodeDelegation,
 } from '@metamask/delegation-toolkit';
-import type { UserInputEventType } from '@metamask/snaps-sdk';
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import type {
+  PermissionRequest,
+  PermissionResponse,
+} from '@metamask/7715-permissions-shared/types';
+import type { AccountController } from '../accountController';
+import type { ConfirmationDialogFactory } from './confirmationFactory';
+import { BaseContext, DeepRequired } from './types';
+import { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { toHex } from 'viem';
 
-import type { AccountController } from '../accountController';
-import type {
-  UserEventDispatcher,
-  UserEventHandler,
-  UserInputEventByType,
-} from '../userEventDispatcher';
-import type { ConfirmationDialogFactory } from './confirmationFactory';
-import type {
-  BaseContext,
-  StateChangeHandler,
-  Orchestrator,
-  DeepRequired,
-} from './types';
+export type PermissionRequestResult =
+  | { approved: true; response: PermissionResponse }
+  | { approved: false; reason: string };
 
-/**
- * Base class for permission orchestrators that handle the core flow of permission requests.
- * Subclasses must implement specific methods to handle UI, validation, and permission context.
- */
-export abstract class BaseOrchestrator<
-  TPermissionRequest extends PermissionRequest = PermissionRequest,
-  TContext extends BaseContext = BaseContext,
-  TMetadata extends object = object,
-  TPopulatedPermission extends DeepRequired<
-    TPermissionRequest['permission']
-  > = DeepRequired<TPermissionRequest['permission']>,
-> implements Orchestrator
-{
-  protected readonly accountController: AccountController;
-
-  protected readonly confirmationDialogFactory: ConfirmationDialogFactory;
-
-  protected readonly userEventDispatcher: UserEventDispatcher;
-
-  #currentContext: TContext | undefined;
-
-  readonly #permissionRequest: TPermissionRequest;
-
-  constructor({
-    accountController,
-    permissionRequest,
-    confirmationDialogFactory,
-    userEventDispatcher,
-  }: {
-    accountController: AccountController;
-    permissionRequest: TPermissionRequest;
-    confirmationDialogFactory: ConfirmationDialogFactory;
-    userEventDispatcher: UserEventDispatcher;
-  }) {
-    this.accountController = accountController;
-    this.confirmationDialogFactory = confirmationDialogFactory;
-    this.userEventDispatcher = userEventDispatcher;
-
-    this.#permissionRequest = permissionRequest;
-  }
-
-  /**
-   * The state change handlers for the permission request.
-   */
-  protected abstract get stateChangeHandlers(): StateChangeHandler<
-    TContext,
-    TMetadata
-  >[];
-
-  /**
-   * Build the permission context from the permission request..
-   */
-  protected abstract buildPermissionContext(args: {
-    permissionRequest: TPermissionRequest;
-  }): Promise<TContext>;
-
-  /**
-   * Create the derived metadata for the permission context.
-   */
-  protected abstract createContextMetadata(
-    context: TContext,
-  ): Promise<TMetadata>;
-
-  /**
-   * Resolve the permission request, applying the state from the provided context.
-   */
-  protected abstract resolvePermissionRequest(args: {
-    context: TContext;
-    originalRequest: TPermissionRequest;
-  }): Promise<TPermissionRequest>;
-
-  /**
-   * Create the UI content for the permission confirmation.
-   */
-  protected abstract createUiContent(args: {
+export type LifecycleOrchestrationHandlers<
+  TRequest extends PermissionRequest,
+  TContext extends BaseContext,
+  TMetadata extends object,
+  TPermission extends TRequest['permission'],
+  TPopulatedPermission extends DeepRequired<TPermission>,
+> = {
+  validateRequest: (request: TRequest) => TRequest;
+  buildContext: (request: TRequest) => Promise<TContext>;
+  deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
+  createConfirmationContent: (args: {
     context: TContext;
     metadata: TMetadata;
     origin: string;
     chainId: number;
-  }): Promise<GenericSnapElement>;
+  }) => Promise<GenericSnapElement>;
+  applyContext: (args: {
+    context: TContext;
+    originalRequest: TRequest;
+  }) => Promise<TRequest>;
+  populatePermission: (args: {
+    permission: TPermission;
+  }) => Promise<TPopulatedPermission>;
+  appendCaveats: (args: {
+    permission: TPopulatedPermission;
+    caveatBuilder: CoreCaveatBuilder;
+  }) => Promise<CoreCaveatBuilder>;
 
   /**
-   * Populate any default values in the permission.
+   * Optional callback that is invoked when a confirmation dialog is created.
+   * @param confirmationCreatedArgs - Arguments containing the interface ID and a function to update the context
    */
-  protected abstract populatePermission(args: {
-    permission: TPermissionRequest['permission'];
-  }): Promise<TPopulatedPermission>;
+  onConfirmationCreated?: (confirmationCreatedArgs: {
+    interfaceId: string;
+    initialContext: TContext;
+    updateContext: (updateContextArgs: {
+      updatedContext: TContext;
+    }) => Promise<void>;
+  }) => void;
 
   /**
-   * Append permission-specific caveats to the caveat builder.
+   * Optional callback that is invoked when a confirmation dialog is resolved.
    */
-  protected abstract appendCaveats(
-    permissionRequest: TPopulatedPermission,
-    caveatBuilder: CaveatBuilder,
-  ): Promise<CaveatBuilder>;
+  onConfirmationResolved?: () => void;
+};
+
+/**
+ * Orchestrator for permission requests.
+ * Coordinates the flow of permission requests, confirmation dialogs, and delegation creation.
+ */
+export class PermissionRequestLifecycleOrchestrator {
+  readonly #accountController: AccountController;
+  readonly #confirmationDialogFactory: ConfirmationDialogFactory;
+
+  constructor({
+    accountController,
+    confirmationDialogFactory,
+  }: {
+    accountController: AccountController;
+    confirmationDialogFactory: ConfirmationDialogFactory;
+  }) {
+    this.#accountController = accountController;
+    this.#confirmationDialogFactory = confirmationDialogFactory;
+  }
 
   /**
-   * Main orchestration method that coordinates the permission request flow.
-   * @param options0 - The options object containing orchestration parameters.
-   * @param options0.origin - The origin of the permission request.
-   * @returns A promise that resolves to an object containing the success status, optional response, and optional failure reason.
+   * Orchestrates the permission request lifecycle.
+   *
+   * @param origin - The origin of the permission request
+   * @param permissionRequest - The permission request to orchestrate
+   * @param lifecycleHandlers - The lifecycle handlers to call during orchestration
+   * @returns The permission response
    */
-  async orchestrate({ origin }: { origin: string }): Promise<{
-    success: boolean;
-    response?: PermissionResponse;
-    reason?: string;
-  }> {
-    this.#currentContext = await this.buildPermissionContext({
-      permissionRequest: this.#permissionRequest,
-    });
+  async orchestrate<
+    TRequest extends PermissionRequest,
+    TContext extends BaseContext,
+    TMetadata extends object,
+    TPermission extends TRequest['permission'],
+    TPopulatedPermission extends DeepRequired<TPermission>,
+  >(
+    origin: string,
+    permissionRequest: TRequest,
+    lifecycleHandlers: LifecycleOrchestrationHandlers<
+      TRequest,
+      TContext,
+      TMetadata,
+      TPermission,
+      TPopulatedPermission
+    >,
+  ): Promise<PermissionRequestResult> {
+    const isAdjustmentAllowed = permissionRequest.isAdjustmentAllowed ?? true;
 
-    const chainId = Number(this.#permissionRequest.chainId);
+    const validatedPermissionRequest =
+      lifecycleHandlers.validateRequest(permissionRequest);
+
+    const chainId = parseInt(permissionRequest.chainId, 16);
+
+    let context = await lifecycleHandlers.buildContext(
+      validatedPermissionRequest,
+    );
+
+    const createUiContent = async () => {
+      const metadata = await lifecycleHandlers.deriveMetadata({ context });
+
+      return await lifecycleHandlers.createConfirmationContent({
+        context,
+        metadata,
+        origin,
+        chainId,
+      });
+    };
 
     const confirmationDialog =
-      this.confirmationDialogFactory.createConfirmation({
-        ui: await this.createUiContent({
-          context: this.#currentContext,
-          metadata: await this.createContextMetadata(this.#currentContext),
-          origin,
-          chainId,
-        }),
+      this.#confirmationDialogFactory.createConfirmation({
+        ui: await createUiContent(),
       });
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    const onContextChanged = async (context: TContext) => {
-      this.#currentContext = context;
-      const metadata = await this.createContextMetadata(this.#currentContext);
-
-      await confirmationDialog.updateContent({
-        ui: await this.createUiContent({
-          context: this.#currentContext,
-          metadata,
-          origin,
-          chainId,
-        }),
-      });
-    };
-
-    const unbindStateChangeHandlers = this.#bindStateChangeHandlers({
-      stateChangeHandlers: this.stateChangeHandlers,
-      onContextChanged,
-      getContext: () => this.#currentContext,
-      getMetadata: async () => {
-        if (this.#currentContext === undefined) {
-          throw new Error('Current context is undefined');
+    if (lifecycleHandlers.onConfirmationCreated) {
+      const updateContext = async ({
+        updatedContext,
+      }: {
+        updatedContext: TContext;
+      }) => {
+        if (!isAdjustmentAllowed) {
+          throw new Error('Adjustment is not allowed');
         }
-        return this.createContextMetadata(this.#currentContext);
-      },
-      interfaceId,
-      userEventDispatcher: this.userEventDispatcher,
-    });
 
-    try {
-      const { isConfirmationGranted } =
-        await confirmationDialog.awaitUserDecision();
+        context = updatedContext;
 
-      if (!isConfirmationGranted) {
-        return {
-          success: false,
-          reason: 'User rejected the permissions request',
-        };
-      }
-    } finally {
-      unbindStateChangeHandlers();
+        confirmationDialog.updateContent({ ui: await createUiContent() });
+      };
+
+      lifecycleHandlers.onConfirmationCreated({
+        interfaceId,
+        updateContext,
+        initialContext: context,
+      });
     }
 
-    const isAdjustmentAllowed =
-      this.#permissionRequest.isAdjustmentAllowed ?? true;
-    const resolvedPermissionRequest = isAdjustmentAllowed
-      ? await this.resolvePermissionRequest({
-          context: this.#currentContext,
-          originalRequest: this.#permissionRequest,
-        })
-      : this.#permissionRequest;
+    try {
+      const decision = await confirmationDialog.awaitUserDecision();
 
-    const grantedPermission = await this.populatePermission({
-      permission: resolvedPermissionRequest.permission,
-    });
-
-    const grantedPermissionRequest = {
-      ...resolvedPermissionRequest,
-      permission: grantedPermission,
-      isAdjustmentAllowed,
-    };
-
-    const [address, accountMeta, delegationManager] = await Promise.all([
-      this.accountController.getAccountAddress({
-        chainId,
-      }),
-      this.accountController.getAccountMetadata({
-        chainId,
-      }),
-      this.accountController.getDelegationManager({
-        chainId,
-      }),
-    ]);
-
-    const environment = await this.accountController.getEnvironment({
-      chainId,
-    });
-
-    const caveatBuilder = createCaveatBuilder(environment).addCaveat(
-      'timestamp',
-      0, // timestampAfter
-      grantedPermissionRequest.expiry, // timestampBefore
-    );
-
-    const appendedCaveatBuilder = await this.appendCaveats(
-      grantedPermission,
-      caveatBuilder,
-    );
-
-    const signedDelegation = await this.accountController.signDelegation({
-      chainId,
-      delegation: createDelegation({
-        to: this.#permissionRequest.signer.data.address,
-        from: address,
-        caveats: appendedCaveatBuilder,
-      }),
-    });
-
-    const permissionsContext = encodeDelegation([signedDelegation]);
-
-    const accountMetaObj =
-      accountMeta.factory && accountMeta.factoryData
-        ? {
-            factory: accountMeta.factory,
-            factoryData: accountMeta.factoryData,
-          }
-        : {};
-
-    const response: PermissionResponse = {
-      ...grantedPermissionRequest,
-      chainId: toHex(chainId),
-      address,
-      isAdjustmentAllowed,
-      context: permissionsContext,
-      ...accountMetaObj,
-      signerMeta: {
-        delegationManager,
-      },
-    };
-
-    return {
-      success: true,
-      response,
-    };
-  }
-
-  #bindStateChangeHandlers({
-    stateChangeHandlers,
-    onContextChanged,
-    getContext,
-    getMetadata,
-    interfaceId,
-    userEventDispatcher,
-  }: {
-    stateChangeHandlers: StateChangeHandler<TContext, TMetadata>[];
-    onContextChanged: (context: TContext) => void | Promise<void>;
-    getContext: () => TContext | undefined;
-    getMetadata: () => Promise<TMetadata>;
-    interfaceId: string;
-    userEventDispatcher: UserEventDispatcher;
-  }) {
-    const handlerUnbinders = stateChangeHandlers.map((stateChangeHandler) => {
-      const handler: UserEventHandler<UserInputEventType> = async ({
-        event,
-      }: {
-        event: UserInputEventByType<UserInputEventType>;
-      }) => {
-        let context = getContext();
-        const metadata = await getMetadata();
-        if (!context) {
-          throw new Error('Current context is undefined');
-        }
-
-        if (!metadata) {
-          throw new Error('Current metadata is undefined');
-        }
-
-        context = stateChangeHandler.contextMapper({
+      if (decision.isConfirmationGranted) {
+        // apply the changes made to the context to the request
+        const resolvedRequest = await lifecycleHandlers.applyContext({
           context,
-          metadata,
-          event,
+          originalRequest: validatedPermissionRequest,
         });
-        await onContextChanged(context);
+
+        // populate optional values of the permission
+        const populatedPermission = await lifecycleHandlers.populatePermission({
+          permission: resolvedRequest.permission as TPermission,
+        });
+
+        // the actual permission being granted
+        const grantedPermissionRequest = {
+          ...resolvedRequest,
+          permission: populatedPermission,
+        };
+
+        const [address, accountMeta, delegationManager] = await Promise.all([
+          this.#accountController.getAccountAddress({
+            chainId,
+          }),
+          this.#accountController.getAccountMetadata({
+            chainId,
+          }),
+          this.#accountController.getDelegationManager({
+            chainId,
+          }),
+        ]);
+
+        const environment = await this.#accountController.getEnvironment({
+          chainId,
+        });
+
+        // todo: can we decompose assembling the response into a separate function that can be tested independently?
+        const caveatBuilder = await lifecycleHandlers.appendCaveats({
+          permission: populatedPermission,
+          caveatBuilder: createCaveatBuilder(environment),
+        });
+
+        const valueAfter = 0;
+        const valueBefore = grantedPermissionRequest.expiry;
+
+        const finalCaveatBuilder = caveatBuilder.addCaveat(
+          'timestamp',
+          valueAfter,
+          valueBefore,
+        );
+
+        const signedDelegation = await this.#accountController.signDelegation({
+          chainId,
+          delegation: createDelegation({
+            to: grantedPermissionRequest.signer.data.address,
+            from: address,
+            caveats: finalCaveatBuilder,
+          }),
+        });
+        const permissionsContext = encodeDelegation([signedDelegation]);
+
+        // we do this because we cannot have undefined properties set on the response
+        const accountMetaObject =
+          accountMeta.factory && accountMeta.factoryData
+            ? {
+                factory: accountMeta.factory,
+                factoryData: accountMeta.factoryData,
+              }
+            : {};
+
+        const response: PermissionResponse = {
+          ...grantedPermissionRequest,
+          chainId: toHex(chainId),
+          address,
+          isAdjustmentAllowed,
+          context: permissionsContext,
+          ...accountMetaObject,
+          signerMeta: {
+            delegationManager,
+          },
+        };
+
+        return {
+          approved: true,
+          response,
+        };
+      }
+
+      return {
+        approved: false,
+        reason: 'Permission request denied',
       };
-
-      const eventMetadata = {
-        eventType: stateChangeHandler.eventType,
-        interfaceId,
-        elementName: stateChangeHandler.elementName,
-        handler,
-      } as const;
-
-      userEventDispatcher.on(eventMetadata);
-
-      return () => {
-        userEventDispatcher.off(eventMetadata);
-      };
-    });
-
-    return () => {
-      handlerUnbinders.forEach((unbinder) => unbinder());
-    };
+    } finally {
+      if (lifecycleHandlers.onConfirmationResolved) {
+        lifecycleHandlers.onConfirmationResolved();
+      }
+    }
   }
 }

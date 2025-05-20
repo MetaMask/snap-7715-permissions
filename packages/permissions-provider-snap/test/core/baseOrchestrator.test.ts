@@ -12,7 +12,7 @@ import { decodeAbiParameters } from 'viem';
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
 
 import type { AccountController } from '../../src/accountController';
-import { BaseOrchestrator } from '../../src/core/baseOrchestrator';
+import { PermissionRequestLifecycleOrchestrator } from '../../src/core/baseOrchestrator';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import type { StateChangeHandler, DeepRequired } from '../../src/core/types';
@@ -131,7 +131,7 @@ type TestOrchestratorMocks = {
 };
 
 // Test implementation of BaseOrchestrator
-class TestOrchestrator extends BaseOrchestrator {
+class TestOrchestrator extends PermissionRequestLifecycleOrchestrator {
   readonly #mocks: TestOrchestratorMocks;
 
   constructor(mocks: TestOrchestratorMocks) {

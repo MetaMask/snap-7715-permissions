@@ -29,13 +29,13 @@ const DEFAULT_INITIAL_AMOUNT = '0x0';
  * @param options0.originalRequest - The original permission request to be amended.
  * @returns A new permission request with the context changes applied.
  */
-export function contextToPermissionRequest({
+export async function contextToPermissionRequest({
   context,
   originalRequest,
 }: {
   context: NativeTokenStreamContext;
   originalRequest: NativeTokenStreamPermissionRequest;
-}): NativeTokenStreamPermissionRequest {
+}): Promise<NativeTokenStreamPermissionRequest> {
   const { permissionDetails } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
@@ -71,11 +71,11 @@ export function contextToPermissionRequest({
  * @param options0.permission - The native token stream permission to populate with default values.
  * @returns A populated native token stream permission with all required fields populated.
  */
-export function populatePermission({
+export async function populatePermission({
   permission,
 }: {
   permission: NativeTokenStreamPermission;
-}): PopulatedNativeTokenStreamPermission {
+}): Promise<PopulatedNativeTokenStreamPermission> {
   return {
     ...permission,
     data: {

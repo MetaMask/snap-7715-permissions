@@ -34,6 +34,7 @@ import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
+import { PermissionRequestLifecycleOrchestrator } from './core/baseOrchestrator';
 
 // set up dependencies
 const accountController = new AccountController({
@@ -93,11 +94,17 @@ const confirmationDialogFactory = new ConfirmationDialogFactory({
   userEventDispatcher,
 });
 
+const orchestrator = new PermissionRequestLifecycleOrchestrator({
+  accountController,
+  confirmationDialogFactory,
+});
+
 const orchestratorFactory = new OrchestratorFactory({
   accountController,
   tokenPricesService,
   confirmationDialogFactory,
   userEventDispatcher,
+  orchestrator,
 });
 
 const rpcHandler = createRpcHandler({

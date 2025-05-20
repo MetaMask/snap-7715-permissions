@@ -46,13 +46,12 @@ export function createRpcHandler(config: {
 
       const responses = await Promise.all(
         permissionsRequest.map(async (request) => {
-          const orchestrator = orchestratorFactory.createOrchestrator(request);
+          const handler = orchestratorFactory.createOrchestrator(request);
 
-          const permissionResponse = await orchestrator.orchestrate({
-            origin: siteOrigin,
-          });
+          const permissionResponse =
+            await handler.handlePermissionRequest(siteOrigin);
 
-          if (!permissionResponse.success) {
+          if (!permissionResponse.approved) {
             throw new Error(permissionResponse.reason);
           }
 
@@ -67,10 +66,7 @@ export function createRpcHandler(config: {
         }),
       );
 
-      // todo: type this better
-      const filtered = responses.filter((response) => response !== undefined);
-
-      return filtered as any as Json[];
+      return responses as any as Json[];
     },
   };
 }

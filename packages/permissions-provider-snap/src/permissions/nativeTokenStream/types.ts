@@ -41,7 +41,13 @@ export type NativeTokenStreamContext = BaseContext & {
 };
 
 export const zNativeTokenStreamPermission = zPermission.extend({
-  type: z.literal('native-token-stream'),
+  type: z.union([
+    z.literal('native-token-stream'),
+    z.object({
+      name: z.literal('native-token-stream'),
+      description: z.string(),
+    }),
+  ]),
   data: z.intersection(
     zMetaMaskPermissionData,
     z.object({

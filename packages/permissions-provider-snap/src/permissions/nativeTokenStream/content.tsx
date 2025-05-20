@@ -14,9 +14,6 @@ import {
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import { RequestHeader } from '../../ui/components/RequestHeader';
 import { NativeTokenStreamContext, NativeTokenStreamMetadata } from './types';
-import { InputField } from '../../ui/components/InputField';
-import { DropdownField } from '../../ui/components/DropdownField';
-import { TimePeriod } from '../../core/types';
 import { IconUrls } from '../../ui/iconConstant';
 import {
   ItemDetails,
@@ -24,25 +21,27 @@ import {
 } from '../../ui/components/RequestDetails';
 import { getChainName } from '../../../../shared/src/utils/common';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
+import { renderRules } from '../rules';
+import {
+  initialAmountRule,
+  maxAmountRule,
+  startTimeRule,
+  expiryRule,
+  streamAmountPerPeriodRule,
+  streamPeriodRule,
+} from './rules';
 
-export const INITIAL_AMOUNT_ELEMENT = 'initial-amount';
-export const REMOVE_INITIAL_AMOUNT_BUTTON = 'remove-initial-amount';
-export const MAX_AMOUNT_ELEMENT = 'max-amount';
-export const REMOVE_MAX_AMOUNT_BUTTON = 'remove-max-amount';
-export const START_TIME_ELEMENT = 'start-time';
-export const EXPIRY_ELEMENT = 'expiry';
-export const AMOUNT_PER_PERIOD_ELEMENT = 'amount-per-period';
-export const TIME_PERIOD_ELEMENT = 'time-period';
-export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'justification-show-more';
+
+export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 export const SELECT_NEW_RULE_DROPDOWN = 'select-new-rule';
 export const NEW_RULE_VALUE_ELEMENT = 'new-rule-value';
 export const SAVE_NEW_RULE_BUTTON = 'save-new-rule';
 export const ADD_MORE_RULES_FORM = 'add-more-rules-form';
 
 export const createConfirmationContent = ({
-  context: { accountDetails, permissionDetails, expiry, isAdjustmentAllowed },
-  metadata: { validationErrors, amountPerSecond, rulesToAdd },
+  context,
+  metadata,
   isJustificationCollapsed,
   isAddRuleShown,
   origin,
@@ -57,6 +56,7 @@ export const createConfirmationContent = ({
   chainId: number;
   addRuleValidationMessage: string | undefined;
 }) => {
+  const { amountPerSecond, rulesToAdd } = metadata;
   if (isAddRuleShown) {
     return (
       <Section>
@@ -95,8 +95,6 @@ export const createConfirmationContent = ({
     );
   }
 
-  const areValuesFixed = !isAdjustmentAllowed;
-
   const rulesToAddButton =
     rulesToAdd.length > 0 ? (
       <Button name={TOGGLE_ADD_MORE_RULES_BUTTON}>Add more rules</Button>
@@ -133,28 +131,16 @@ export const createConfirmationContent = ({
           justificationShowMoreElementName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
         />
         <AccountDetails
-          account={accountDetails}
+          account={context.accountDetails}
           title="Stream from"
           tooltip="The account that the token stream comes from."
         />
         <Section>
-          <InputField
-            label="Stream Amount"
-            name={AMOUNT_PER_PERIOD_ELEMENT}
-            tooltip="The amount of tokens to stream per period."
-            type="number"
-            value={permissionDetails.amountPerPeriod}
-            disabled={areValuesFixed}
-            errorMessage={validationErrors.amountPerPeriodError}
-          />
-          <DropdownField
-            label="Period"
-            name={TIME_PERIOD_ELEMENT}
-            options={Object.values(TimePeriod)}
-            tooltip="The period of the stream."
-            disabled={areValuesFixed}
-            value={permissionDetails.timePeriod}
-          />
+          {renderRules(
+            [streamAmountPerPeriodRule, streamPeriodRule],
+            context,
+            metadata,
+          )}
 
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
@@ -173,48 +159,11 @@ export const createConfirmationContent = ({
         </Section>
 
         <Section>
-          {permissionDetails.initialAmount !== undefined ? (
-            <InputField
-              label="Initial Amount"
-              name={INITIAL_AMOUNT_ELEMENT}
-              removeButtonName={REMOVE_INITIAL_AMOUNT_BUTTON}
-              tooltip="The initial amount of tokens to stream."
-              type="number"
-              value={permissionDetails.initialAmount}
-              disabled={areValuesFixed}
-              errorMessage={validationErrors.initialAmountError}
-            />
-          ) : null}
-          {permissionDetails.maxAmount !== undefined ? (
-            <InputField
-              label="Max Amount"
-              name={MAX_AMOUNT_ELEMENT}
-              removeButtonName={REMOVE_MAX_AMOUNT_BUTTON}
-              tooltip="The maximum amount of tokens that can be streamed."
-              type="number"
-              value={permissionDetails.maxAmount}
-              disabled={areValuesFixed}
-              errorMessage={validationErrors.maxAmountError}
-            />
-          ) : null}
-          <InputField
-            label="Start Time"
-            name={START_TIME_ELEMENT}
-            tooltip="The start time of the stream."
-            type="text"
-            value={permissionDetails.startTime}
-            disabled={areValuesFixed}
-            errorMessage={validationErrors.startTimeError}
-          />
-          <InputField
-            label="Expiry"
-            name={EXPIRY_ELEMENT}
-            tooltip="The expiry time of the stream."
-            type="text"
-            value={expiry}
-            disabled={areValuesFixed}
-            errorMessage={validationErrors.expiryError}
-          />
+          {renderRules(
+            [initialAmountRule, maxAmountRule, startTimeRule, expiryRule],
+            context,
+            metadata,
+          )}
         </Section>
         {rulesToAddButton}
       </Box>
