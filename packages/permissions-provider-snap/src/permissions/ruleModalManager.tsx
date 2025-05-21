@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   Text,
-  Form,
   Field,
   Section,
   Bold,
@@ -21,7 +20,6 @@ export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 export const SELECT_NEW_RULE_DROPDOWN = 'select-new-rule';
 export const NEW_RULE_VALUE_ELEMENT = 'new-rule-value';
 export const SAVE_NEW_RULE_BUTTON = 'save-new-rule';
-export const ADD_MORE_RULES_FORM = 'add-more-rules-form';
 
 export class RuleModalManager<
   TContext extends BaseContext,
@@ -103,24 +101,22 @@ export class RuleModalManager<
             </Button>
           </Box>
         </Box>
-        <Text>Create additional rules that this token stream must follow.</Text>
-        <Form name={ADD_MORE_RULES_FORM}>
-          <Dropdown name={SELECT_NEW_RULE_DROPDOWN}>
-            {rulesToAdd.map((rule, ruleIndex) => (
-              <Option value={ruleIndex.toString()}>{rule}</Option>
-            ))}
-          </Dropdown>
-          <Field error={validationMessage}>
-            <Input name={NEW_RULE_VALUE_ELEMENT} type="number" />
-          </Field>
-          <Button
-            type="submit"
-            name={SAVE_NEW_RULE_BUTTON}
-            disabled={validationMessage !== undefined}
-          >
-            Save
-          </Button>
-        </Form>
+        <Text>Create additional rules that this permission must follow.</Text>
+        <Dropdown name={SELECT_NEW_RULE_DROPDOWN}>
+          {rulesToAdd.map((rule, ruleIndex) => (
+            <Option value={ruleIndex.toString()}>{rule}</Option>
+          ))}
+        </Dropdown>
+        <Field error={validationMessage}>
+          <Input name={NEW_RULE_VALUE_ELEMENT} type="number" />
+        </Field>
+        <Button
+          type="submit"
+          name={SAVE_NEW_RULE_BUTTON}
+          disabled={validationMessage !== undefined}
+        >
+          Save
+        </Button>
       </Section>
     );
   }
@@ -132,20 +128,6 @@ export class RuleModalManager<
       this.#isAddRuleShown = !this.#isAddRuleShown;
       this.#onModalChange();
     };
-
-    this.#userEventDispatcher.on({
-      elementName: TOGGLE_ADD_MORE_RULES_BUTTON,
-      eventType: UserInputEventType.ButtonClickEvent,
-      interfaceId: this.#interfaceId,
-      handler: addMoreRulesButtonClickHandler,
-    });
-
-    this.handlers.push({
-      elementName: TOGGLE_ADD_MORE_RULES_BUTTON,
-      eventType: UserInputEventType.ButtonClickEvent,
-      handler:
-        addMoreRulesButtonClickHandler as UserEventHandler<UserInputEventType>,
-    });
 
     const dropdownChangeHandler: UserEventHandler<
       UserInputEventType.InputChangeEvent
@@ -193,44 +175,38 @@ export class RuleModalManager<
       }
     };
 
-    this.#userEventDispatcher.on({
-      elementName: SELECT_NEW_RULE_DROPDOWN,
-      eventType: UserInputEventType.InputChangeEvent,
-      interfaceId: this.#interfaceId,
-      handler: dropdownChangeHandler,
-    });
+    this.handlers = [
+      {
+        elementName: TOGGLE_ADD_MORE_RULES_BUTTON,
+        eventType: UserInputEventType.ButtonClickEvent,
+        handler:
+          addMoreRulesButtonClickHandler as UserEventHandler<UserInputEventType>,
+      },
+      {
+        elementName: SELECT_NEW_RULE_DROPDOWN,
+        eventType: UserInputEventType.InputChangeEvent,
+        handler: dropdownChangeHandler as UserEventHandler<UserInputEventType>,
+      },
+      {
+        elementName: NEW_RULE_VALUE_ELEMENT,
+        eventType: UserInputEventType.InputChangeEvent,
+        handler: ruleValueChangeHandler as UserEventHandler<UserInputEventType>,
+      },
+      {
+        elementName: SAVE_NEW_RULE_BUTTON,
+        eventType: UserInputEventType.ButtonClickEvent,
+        handler: saveButtonHandler as UserEventHandler<UserInputEventType>,
+      },
+    ];
 
-    this.handlers.push({
-      elementName: SELECT_NEW_RULE_DROPDOWN,
-      eventType: UserInputEventType.InputChangeEvent,
-      handler: dropdownChangeHandler as UserEventHandler<UserInputEventType>,
-    });
-
-    this.#userEventDispatcher.on({
-      elementName: NEW_RULE_VALUE_ELEMENT,
-      eventType: UserInputEventType.InputChangeEvent,
-      interfaceId: this.#interfaceId,
-      handler: ruleValueChangeHandler,
-    });
-
-    this.handlers.push({
-      elementName: NEW_RULE_VALUE_ELEMENT,
-      eventType: UserInputEventType.InputChangeEvent,
-      handler: ruleValueChangeHandler as UserEventHandler<UserInputEventType>,
-    });
-
-    this.#userEventDispatcher.on({
-      elementName: ADD_MORE_RULES_FORM,
-      eventType: UserInputEventType.FormSubmitEvent,
-      interfaceId: this.#interfaceId,
-      handler: saveButtonHandler,
-    });
-
-    this.handlers.push({
-      elementName: ADD_MORE_RULES_FORM,
-      eventType: UserInputEventType.FormSubmitEvent,
-      handler: saveButtonHandler as UserEventHandler<UserInputEventType>,
-    });
+    this.handlers.forEach((handler) =>
+      this.#userEventDispatcher.on({
+        elementName: handler.elementName,
+        eventType: handler.eventType,
+        interfaceId: this.#interfaceId,
+        handler: handler.handler,
+      }),
+    );
   }
 
   unbindHandlers(): void {
