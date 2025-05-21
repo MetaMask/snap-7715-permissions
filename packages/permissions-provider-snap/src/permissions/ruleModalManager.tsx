@@ -34,8 +34,8 @@ export class RuleModalManager<
   readonly #userEventDispatcher: UserEventDispatcher;
   readonly #interfaceId: string;
   readonly #rules: RuleDefinition<TContext, TMetadata>[];
-  readonly #onModalChange: () => void;
-  readonly #onContextChange: (args: { context: TContext }) => void;
+  readonly #onModalChange: () => Promise<void>;
+  readonly #onContextChange: (args: { context: TContext }) => Promise<void>;
   readonly #getContext: () => TContext;
   readonly #deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
 
@@ -57,9 +57,9 @@ export class RuleModalManager<
     userEventDispatcher: UserEventDispatcher;
     interfaceId: string;
     rules: RuleDefinition<TContext, TMetadata>[];
-    onModalChange: () => void;
+    onModalChange: () => Promise<void>;
     getContext: () => TContext;
-    onContextChange: (args: { context: TContext }) => void;
+    onContextChange: (args: { context: TContext }) => Promise<void>;
     deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   }) {
     this.#userEventDispatcher = userEventDispatcher;

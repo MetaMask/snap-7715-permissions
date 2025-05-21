@@ -22,6 +22,7 @@ import { AccountController } from './accountController';
 import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
+import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
 import { HomePage } from './homepage';
 import {
   createProfileSyncOptions,
@@ -34,7 +35,6 @@ import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
-import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
 
 // set up dependencies
 const accountController = new AccountController({

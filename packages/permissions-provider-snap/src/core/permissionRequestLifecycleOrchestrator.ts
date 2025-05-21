@@ -1,22 +1,22 @@
-import {
-  CoreCaveatBuilder,
-  createCaveatBuilder,
-  createDelegation,
-  encodeDelegation,
-} from '@metamask/delegation-toolkit';
 import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
+import {
+  createCaveatBuilder,
+  createDelegation,
+  encodeDelegation,
+} from '@metamask/delegation-toolkit';
+import { toHex } from 'viem';
+
 import type { AccountController } from '../accountController';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
-import {
+import type {
   BaseContext,
   DeepRequired,
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
-import { toHex } from 'viem';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -24,6 +24,7 @@ import { toHex } from 'viem';
  */
 export class PermissionRequestLifecycleOrchestrator {
   readonly #accountController: AccountController;
+
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
   constructor({
@@ -40,10 +41,10 @@ export class PermissionRequestLifecycleOrchestrator {
   /**
    * Orchestrates the permission request lifecycle.
    *
-   * @param origin - The origin of the permission request
-   * @param permissionRequest - The permission request to orchestrate
-   * @param lifecycleHandlers - The lifecycle handlers to call during orchestration
-   * @returns The permission response
+   * @param origin - The origin of the permission request.
+   * @param permissionRequest - The permission request to orchestrate.
+   * @param lifecycleHandlers - The lifecycle handlers to call during orchestration.
+   * @returns The permission response.
    */
   async orchestrate<
     TRequest extends PermissionRequest,
@@ -103,7 +104,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
         context = updatedContext;
 
-        confirmationDialog.updateContent({ ui: await createUiContent() });
+        await confirmationDialog.updateContent({ ui: await createUiContent() });
       };
 
       lifecycleHandlers.onConfirmationCreated({
@@ -145,27 +146,19 @@ export class PermissionRequestLifecycleOrchestrator {
   /**
    * Resolves a permission request into a final permission response.
    *
-   * This method:
-   * 1. Applies context changes to the original request
-   * 2. Populates any optional values in the permission
-   * 3. Retrieves account information (address, metadata, delegation manager)
-   * 4. Builds and applies caveats, including an expiry timestamp
-   * 5. Signs the delegation with the account
-   * 6. Assembles and returns the final permission response
-   *
    * @private
    * @template TRequest - Type of permission request
-   * @template TContext - Type of context for the permission request
-   * @template TMetadata - Type of metadata associated with the permission request
-   * @template TPermission - Type of permission being requested
-   * @template TPopulatedPermission - Type of fully populated permission with all required fields
-   * @param {object} params - Parameters for resolving the response
-   * @param {TRequest} params.originalRequest - The original unmodified permission request
-   * @param {TContext} params.modifiedContext - The possibly modified context after user interaction
-   * @param {LifecycleOrchestrationHandlers<TRequest, TContext, TMetadata, TPermission, TPopulatedPermission>} params.lifecycleHandlers - Handlers for the permission lifecycle
-   * @param {boolean} params.isAdjustmentAllowed - Whether the permission can be adjusted
-   * @param {number} params.chainId - The chain ID for the permission
-   * @returns {Promise<PermissionResponse>} The resolved permission response
+   * @template TContext - Type of context for the permission request.
+   * @template TMetadata - Type of metadata associated with the permission request.
+   * @template TPermission - Type of permission being requested.
+   * @template TPopulatedPermission - Type of fully populated permission with all required fields.
+   * @param params - Parameters for resolving the response.
+   * @param params.originalRequest - The original unmodified permission request.
+   * @param params.modifiedContext - The possibly modified context after user interaction.
+   * @param params.lifecycleHandlers - Handlers for the permission lifecycle.
+   * @param params.isAdjustmentAllowed - Whether the permission can be adjusted.
+   * @param params.chainId - The chain ID for the permission.
+   * @returns The resolved permission response.
    */
   async #resolveResponse<
     TRequest extends PermissionRequest,

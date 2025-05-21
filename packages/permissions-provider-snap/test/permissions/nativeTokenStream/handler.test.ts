@@ -1,9 +1,7 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import { UserInputEventType } from '@metamask/snaps-sdk';
 import { toHex, parseUnits } from 'viem/utils';
 
 import type { AccountController } from '../../../src/accountController';
-import type { ConfirmationDialogFactory } from '../../../src/core/confirmationFactory';
 import type { PermissionRequestLifecycleOrchestrator } from '../../../src/core/permissionRequestLifecycleOrchestrator';
 import { TimePeriod } from '../../../src/core/types';
 import type { PermissionRequestResult } from '../../../src/core/types';
@@ -12,7 +10,6 @@ import { NativeTokenStreamHandler } from '../../../src/permissions/nativeTokenSt
 import type {
   NativeTokenStreamPermissionRequest,
   NativeTokenStreamContext,
-  PopulatedNativeTokenStreamPermission,
   NativeTokenStreamMetadata,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
@@ -151,7 +148,7 @@ describe('NativeTokenStreamHandler', () => {
 
     // Setup orchestrator mock to capture the handlers
     mockOrchestrator.orchestrate.mockImplementation(
-      (_origin, _request, handlers) => {
+      async (_origin, _request, handlers) => {
         // Store the handlers for later inspection
         mockLifecycleHandlers = handlers;
         return Promise.resolve({

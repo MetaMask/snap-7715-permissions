@@ -109,7 +109,7 @@ export function bindRuleHandlers<
   userEventDispatcher: UserEventDispatcher;
   interfaceId: string;
   getContext: () => TContext;
-  onContextChange: (context: TContext) => void;
+  onContextChange: (args: { context: TContext }) => Promise<void>;
 }): () => void {
   const handlers = rules.reduce(
     (acc, rule) => {
@@ -120,7 +120,7 @@ export function bindRuleHandlers<
           getContext(),
           (event as InputChangeEvent).value as string,
         );
-        onContextChange(updatedContext);
+        onContextChange({ context: updatedContext });
       };
       userEventDispatcher.on({
         elementName: rule.name,
@@ -140,7 +140,7 @@ export function bindRuleHandlers<
           UserInputEventType.ButtonClickEvent
         > = (_) => {
           const updatedContext = rule.updateContext(getContext(), undefined);
-          onContextChange(updatedContext);
+          onContextChange({ context: updatedContext });
         };
         userEventDispatcher.on({
           elementName: `${rule.name}_removeButton`,

@@ -1,12 +1,19 @@
+import { UserInputEventType } from '@metamask/snaps-sdk';
+
 import type { AccountController } from '../../accountController';
-import { PermissionRequestLifecycleOrchestrator } from '../../core/permissionRequestLifecycleOrchestrator';
-import type { LifecycleOrchestrationHandlers } from '../../core/types';
-import type { PermissionHandler } from '../types';
+import type { PermissionRequestLifecycleOrchestrator } from '../../core/permissionRequestLifecycleOrchestrator';
+import type {
+  LifecycleOrchestrationHandlers,
+  PermissionRequestResult,
+} from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../../userEventDispatcher';
+import { RuleModalManager } from '../ruleModalManager';
+import { bindRuleHandlers } from '../rules';
+import type { PermissionHandler } from '../types';
 import { appendCaveats } from './caveats';
 import {
   createConfirmationContent,
@@ -18,6 +25,7 @@ import {
   createContextMetadata,
   populatePermission,
 } from './context';
+import { allRules } from './rules';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamPermissionRequest,
@@ -26,11 +34,6 @@ import type {
   PopulatedNativeTokenStreamPermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
-import { bindRuleHandlers } from '../rules';
-import { RuleModalManager } from '../ruleModalManager';
-import { allRules } from './rules';
-import type { PermissionRequestResult } from '../../core/types';
-import { UserInputEventType } from '@metamask/snaps-sdk';
 
 export type NativeTokenStreamDependencies = {
   validateRequest: typeof parseAndValidatePermission;
@@ -46,10 +49,10 @@ const defaultDependencies: NativeTokenStreamDependencies = {
   validateRequest: parseAndValidatePermission,
   buildContext: permissionRequestToContext,
   deriveMetadata: createContextMetadata,
-  createConfirmationContent: createConfirmationContent,
+  createConfirmationContent,
   applyContext: contextToPermissionRequest,
-  populatePermission: populatePermission,
-  appendCaveats: appendCaveats,
+  populatePermission,
+  appendCaveats,
 };
 
 /**
@@ -58,9 +61,13 @@ const defaultDependencies: NativeTokenStreamDependencies = {
  */
 export class NativeTokenStreamHandler implements PermissionHandler {
   readonly #tokenPricesService: TokenPricesService;
+
   readonly #accountController: AccountController;
+
   readonly #userEventDispatcher: UserEventDispatcher;
+
   readonly #dependencies: NativeTokenStreamDependencies;
+
   readonly #orchestrator: PermissionRequestLifecycleOrchestrator;
 
   readonly #permissionRequest: NativeTokenStreamPermissionRequest;
@@ -101,9 +108,8 @@ export class NativeTokenStreamHandler implements PermissionHandler {
 
   /**
    * Orchestrates the token stream permission request.
-   * @param origin - The request origin
-   * @param permissionRequest - The permission request
-   * @returns The permission response
+   * @param origin - The request origin.
+   * @returns The permission response.
    */
   async handlePermissionRequest(
     origin: string,
@@ -125,6 +131,7 @@ export class NativeTokenStreamHandler implements PermissionHandler {
 
   /**
    * Returns the lifecycle handlers for the orchestrator.
+   * @returns The lifecycle handlers.
    */
   #getLifecycleHandlers(): LifecycleOrchestrationHandlers<
     NativeTokenStreamPermissionRequest,
@@ -133,15 +140,7 @@ export class NativeTokenStreamHandler implements PermissionHandler {
     NativeTokenStreamPermission,
     PopulatedNativeTokenStreamPermission
   > {
-    const {
-      validateRequest,
-      applyContext,
-      populatePermission,
-      appendCaveats,
-      deriveMetadata,
-    } = this.#dependencies;
-
-    const buildContext = async (
+    const buildContextHandler = async (
       request: NativeTokenStreamPermissionRequest,
     ) => {
       return this.#dependencies.buildContext({
@@ -151,7 +150,7 @@ export class NativeTokenStreamHandler implements PermissionHandler {
       });
     };
 
-    const createConfirmationContent = async (args: {
+    const createConfirmationContentHandler = async (args: {
       context: NativeTokenStreamContext;
       metadata: NativeTokenStreamMetadata;
       origin: string;
@@ -173,7 +172,7 @@ export class NativeTokenStreamHandler implements PermissionHandler {
       });
     };
 
-    const onConfirmationCreated = ({
+    const onConfirmationCreatedHandler = ({
       interfaceId,
       initialContext,
       updateContext,
@@ -185,7 +184,8 @@ export class NativeTokenStreamHandler implements PermissionHandler {
       }) => Promise<void>;
     }) => {
       let currentContext = initialContext;
-      const rerender = () => updateContext({ updatedContext: currentContext });
+      const rerender = async () =>
+        await updateContext({ updatedContext: currentContext });
 
       this.#addMoreRulesModal = new RuleModalManager({
         userEventDispatcher: this.#userEventDispatcher,
@@ -193,19 +193,19 @@ export class NativeTokenStreamHandler implements PermissionHandler {
         rules: allRules,
         onModalChange: rerender,
         getContext: () => currentContext,
-        deriveMetadata: deriveMetadata,
-        onContextChange: ({ context }) => {
+        deriveMetadata: this.#dependencies.deriveMetadata,
+        onContextChange: async ({ context }) => {
           currentContext = context;
-          rerender();
+          await rerender();
         },
       });
       this.#addMoreRulesModal.bindHandlers();
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
-      > = () => {
+      > = async () => {
         this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
-        rerender();
+        await rerender();
       };
 
       this.#userEventDispatcher.on({
@@ -220,9 +220,9 @@ export class NativeTokenStreamHandler implements PermissionHandler {
         userEventDispatcher: this.#userEventDispatcher,
         interfaceId,
         getContext: () => currentContext,
-        onContextChange: (context) => {
+        onContextChange: async ({ context }) => {
           currentContext = context;
-          rerender();
+          await rerender();
         },
       });
 
@@ -237,20 +237,20 @@ export class NativeTokenStreamHandler implements PermissionHandler {
       };
     };
 
-    const onConfirmationResolved = () => {
+    const onConfirmationResolvedHandler = () => {
       this.#deregisterHandlers?.();
     };
 
     return {
-      validateRequest,
-      applyContext,
-      populatePermission,
-      appendCaveats,
-      deriveMetadata,
-      buildContext,
-      createConfirmationContent,
-      onConfirmationCreated,
-      onConfirmationResolved,
+      validateRequest: this.#dependencies.validateRequest,
+      applyContext: this.#dependencies.applyContext,
+      populatePermission: this.#dependencies.populatePermission,
+      appendCaveats: this.#dependencies.appendCaveats,
+      deriveMetadata: this.#dependencies.deriveMetadata,
+      buildContext: buildContextHandler,
+      createConfirmationContent: createConfirmationContentHandler,
+      onConfirmationCreated: onConfirmationCreatedHandler,
+      onConfirmationResolved: onConfirmationResolvedHandler,
     };
   }
 }

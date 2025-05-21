@@ -2,7 +2,6 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import {
   DELEGATION_ABI_TYPE_COMPONENTS,
   ROOT_AUTHORITY,
-  type Caveat,
   type DeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
@@ -10,21 +9,14 @@ import { decodeAbiParameters, toHex } from 'viem';
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
 
 import type { AccountController } from '../../src/accountController';
-import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
+import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 
 const randomAddress = () => privateKeyToAddress(generatePrivateKey());
 
 const mockSignature = '0x1234';
 const mockInterfaceId = 'test-interface-id';
-const mockCaveats = [
-  {
-    enforcer: randomAddress(),
-    args: '0x',
-    terms: '0x1234',
-  },
-] as Caveat[];
 
 const mockContext = {
   expiry: '2024-12-31',
@@ -129,6 +121,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       createConfirmationContent: jest.fn().mockResolvedValue(mockUiContent),
       applyContext: jest.fn().mockResolvedValue(mockResolvedPermissionRequest),
       populatePermission: jest.fn().mockResolvedValue(mockPopulatedPermission),
+      onConfirmationCreated: jest.fn(),
+      onConfirmationResolved: jest.fn(),
       appendCaveats: jest
         .fn()
         .mockImplementation(({ caveatBuilder }) => caveatBuilder),
@@ -220,7 +214,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(result.approved).toBe(true);
         if (!result.approved) {
-          fail('Expected the permission request to be approved');
+          throw new Error('Expected the permission request to be approved');
         }
 
         // delegationsArray is a 2 dimensional array with a single element [ [ delegation ] ]
@@ -274,14 +268,15 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
 
         let capturedParams: any;
-        lifecycleHandlerMocks.onConfirmationCreated = jest
-          .fn()
-          .mockImplementation((params) => {
+
+        lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+          (params) => {
             capturedParams = params;
-          });
+          },
+        );
 
         let resolveUserDecision: (decision: boolean) => void = (_) => {
-          throw new Error();
+          throw new Error('resolveUserDecision not set');
         };
         mockConfirmationDialog.awaitUserDecision.mockImplementation(
           async () => {
@@ -301,12 +296,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
             lifecycleHandlerMocks,
           );
 
-        await new Promise(process.nextTick);
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         expect(lifecycleHandlerMocks.onConfirmationCreated).toHaveBeenCalled();
         expect(capturedParams).toBeDefined();
         expect(capturedParams.interfaceId).toBe(mockInterfaceId);
-        expect(capturedParams.initialContext).toEqual(initialContext);
+        expect(capturedParams.initialContext).toStrictEqual(initialContext);
         expect(typeof capturedParams.updateContext).toBe('function');
 
         await capturedParams.updateContext({ updatedContext: modifiedContext });
@@ -338,11 +333,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
 
         let updateContextHandler: any;
-        lifecycleHandlerMocks.onConfirmationCreated = jest
-          .fn()
-          .mockImplementation(({ updateContext }) => {
+        expect(lifecycleHandlerMocks.onConfirmationCreated).toBeDefined();
+        lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+          ({ updateContext }) => {
             updateContextHandler = updateContext;
-          });
+          },
+        );
 
         const orchestrationPromise =
           permissionRequestLifecycleOrchestrator.orchestrate(
@@ -351,7 +347,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
             lifecycleHandlerMocks,
           );
 
-        await new Promise(process.nextTick);
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         await expect(
           updateContextHandler({

@@ -1,6 +1,9 @@
 import { TimePeriod } from '../../core/types';
-import { RuleDefinition } from '../rules';
-import { NativeTokenStreamContext, NativeTokenStreamMetadata } from './types';
+import type { RuleDefinition } from '../rules';
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
+} from './types';
 
 export const INITIAL_AMOUNT_ELEMENT = 'native-token-stream-initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'native-token-stream-max-amount';

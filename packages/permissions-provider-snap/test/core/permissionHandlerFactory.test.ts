@@ -4,7 +4,7 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import type { AccountController } from '../../src/accountController';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
-import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
+import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import { NativeTokenStreamHandler } from '../../src/permissions/nativeTokenStream/handler';
 import type { TokenPricesService } from '../../src/services/tokenPricesService';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';

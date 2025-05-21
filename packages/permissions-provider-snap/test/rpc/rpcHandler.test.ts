@@ -6,9 +6,9 @@ import type {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
+import type { PermissionHandler } from '../../src/permissions/types';
 import type { ProfileSyncManager } from '../../src/profileSync';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
-import { PermissionHandler } from '../../src/permissions/types';
 
 const TEST_ADDRESS = '0x1234567890123456789012345678901234567890' as const;
 const TEST_SITE_ORIGIN = 'https://example.com';

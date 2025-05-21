@@ -1,4 +1,4 @@
-import { PermissionRequestResult } from '../core/types';
+import type { PermissionRequestResult } from '../core/types';
 
 /**
  * Generic interface for permission handlers.

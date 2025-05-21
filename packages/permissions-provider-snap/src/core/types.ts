@@ -3,7 +3,7 @@ import type {
   Permission,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
+import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
