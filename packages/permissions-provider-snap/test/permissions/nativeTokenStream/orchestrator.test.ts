@@ -4,9 +4,11 @@ import { toHex, parseUnits } from 'viem/utils';
 
 import type { AccountController } from '../../../src/accountController';
 import type { ConfirmationDialogFactory } from '../../../src/core/confirmationFactory';
+import type { PermissionRequestLifecycleOrchestrator } from '../../../src/core/permissionRequestLifecycleOrchestrator';
 import { TimePeriod } from '../../../src/core/types';
-import type { NativeTokenStreamDependencies } from '../../../src/permissions/nativeTokenStream/orchestrator';
-import { NativeTokenStreamOrchestrator } from '../../../src/permissions/nativeTokenStream/orchestrator';
+import type { PermissionRequestResult } from '../../../src/core/types';
+import type { NativeTokenStreamDependencies } from '../../../src/permissions/nativeTokenStream/handler';
+import { NativeTokenStreamHandler } from '../../../src/permissions/nativeTokenStream/handler';
 import type {
   NativeTokenStreamPermissionRequest,
   NativeTokenStreamContext,
@@ -80,40 +82,45 @@ const mockConfirmationDialogFactory: jest.Mocked<ConfirmationDialogFactory> = {
 
 const mockUserEventDispatcher: jest.Mocked<UserEventDispatcher> = {
   dispatch: jest.fn(),
+  on: jest.fn(),
+  off: jest.fn(),
 } as unknown as jest.Mocked<UserEventDispatcher>;
 
-describe('NativeTokenStreamOrchestrator', () => {
+const mockOrchestrator: jest.Mocked<PermissionRequestLifecycleOrchestrator> = {
+  orchestrate: jest.fn(),
+} as unknown as jest.Mocked<PermissionRequestLifecycleOrchestrator>;
+
+describe('NativeTokenStreamHandler', () => {
   const mockDependencies: jest.Mocked<NativeTokenStreamDependencies> = {
-    parseAndValidatePermission: jest.fn(),
+    validateRequest: jest.fn(),
+    buildContext: jest.fn(),
+    deriveMetadata: jest.fn(),
     createConfirmationContent: jest.fn(),
-    contextToPermissionRequest: jest.fn(),
-    permissionRequestToContext: jest.fn(),
-    createContextMetadata: jest.fn(),
+    applyContext: jest.fn(),
     populatePermission: jest.fn(),
     appendCaveats: jest.fn(),
   };
 
-  let orchestrator: NativeTokenStreamOrchestrator;
+  let handler: NativeTokenStreamHandler;
+  let mockLifecycleHandlers: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockDependencies.parseAndValidatePermission.mockReturnValue(
-      mockPermissionRequest,
-    );
+    mockDependencies.validateRequest.mockReturnValue(mockPermissionRequest);
     mockDependencies.createConfirmationContent.mockReturnValue({
       content: 'mocked content',
     } as any); // we have to type assert this, as it's really a Snaps jsx component
-    mockDependencies.contextToPermissionRequest.mockReturnValue(
-      mockPermissionRequest,
+    mockDependencies.applyContext.mockReturnValue(
+      Promise.resolve(mockPermissionRequest),
     );
-    mockDependencies.permissionRequestToContext.mockResolvedValue(mockContext);
-    mockDependencies.createContextMetadata.mockResolvedValue(mockMetadata);
-    mockDependencies.populatePermission.mockReturnValue(
+    mockDependencies.buildContext.mockResolvedValue(mockContext);
+    mockDependencies.deriveMetadata.mockResolvedValue(mockMetadata);
+    mockDependencies.populatePermission.mockResolvedValue(
       mockPermissionRequest.permission as any,
     );
-    mockDependencies.appendCaveats.mockImplementation(
-      (args) => args.caveatBuilder,
+    mockDependencies.appendCaveats.mockResolvedValue(
+      {} as any, // Mock resolved promise of CoreCaveatBuilder
     );
     mockAccountController.getAccountAddress.mockResolvedValue(
       '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
@@ -129,275 +136,156 @@ describe('NativeTokenStreamOrchestrator', () => {
       '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     );
 
-    orchestrator = new NativeTokenStreamOrchestrator(
+    mockOrchestrator.orchestrate.mockResolvedValue({
+      approved: true,
+      response: {} as any,
+    } as PermissionRequestResult);
+
+    // Create a mock for the lifecycle handlers that gets passed to the orchestrator
+    mockLifecycleHandlers = {
+      validateRequest: jest.fn(),
+      buildContext: jest.fn(),
+      deriveMetadata: jest.fn(),
+      createConfirmationContent: jest.fn(),
+      applyContext: jest.fn(),
+      populatePermission: jest.fn(),
+      appendCaveats: jest.fn(),
+      onConfirmationCreated: jest.fn(),
+      onConfirmationResolved: jest.fn(),
+    };
+
+    // Setup orchestrator mock to capture the handlers
+    mockOrchestrator.orchestrate.mockImplementation(
+      (_origin, _request, handlers) => {
+        // Store the handlers for later inspection
+        mockLifecycleHandlers = handlers;
+        return Promise.resolve({
+          approved: true,
+          response: {} as any,
+        } as PermissionRequestResult);
+      },
+    );
+
+    handler = new NativeTokenStreamHandler(
       {
-        permissionRequest: mockPermissionRequest,
         accountController: mockAccountController,
         tokenPricesService: mockTokenPricesService,
-        confirmationDialogFactory: mockConfirmationDialogFactory,
         userEventDispatcher: mockUserEventDispatcher,
+        orchestrator: mockOrchestrator,
+        permissionRequest: mockPermissionRequest,
       },
       mockDependencies,
     );
   });
 
-  describe('constructor', () => {
-    it('should validate the permission request using the provided validator', () => {
-      expect(mockDependencies.parseAndValidatePermission).toHaveBeenCalledWith(
+  describe('handlePermissionRequest', () => {
+    it('should orchestrate the permission request using the orchestrator', async () => {
+      const origin = 'https://example.com';
+      await handler.handlePermissionRequest(origin);
+
+      expect(mockOrchestrator.orchestrate).toHaveBeenCalledWith(
+        origin,
         mockPermissionRequest,
+        expect.any(Object),
+      );
+    });
+
+    it('should throw error if permission request is handled twice', async () => {
+      const origin = 'https://example.com';
+      await handler.handlePermissionRequest(origin);
+
+      await expect(handler.handlePermissionRequest(origin)).rejects.toThrow(
+        'Permission request already handled',
       );
     });
   });
 
-  describe('stateChangeHandlers', () => {
-    it('should return all required handlers', () => {
-      const handlers = orchestrator.stateChangeHandlers;
-      const handlerNames = handlers.map((_handler) => _handler.elementName);
+  describe('lifecycle handlers', () => {
+    it('should pass the correct handlers to the orchestrator', async () => {
+      const origin = 'https://example.com';
+      await handler.handlePermissionRequest(origin);
 
-      const expectedHandlerNames = [
-        'initial-amount',
-        'remove-initial-amount',
-        'max-amount',
-        'remove-max-amount',
-        'start-time',
-        'expiry',
-        'amount-per-period',
-        'time-period',
-        'justification-show-more',
-        'add-more-rules',
-        'add-more-rules-form',
-        'select-new-rule',
-        'new-rule-value',
-      ];
-
-      expect(handlerNames).toStrictEqual(expectedHandlerNames);
+      // Verify all required handlers are present
+      expect(mockLifecycleHandlers).toHaveProperty('validateRequest');
+      expect(mockLifecycleHandlers).toHaveProperty('buildContext');
+      expect(mockLifecycleHandlers).toHaveProperty('deriveMetadata');
+      expect(mockLifecycleHandlers).toHaveProperty('createConfirmationContent');
+      expect(mockLifecycleHandlers).toHaveProperty('applyContext');
+      expect(mockLifecycleHandlers).toHaveProperty('populatePermission');
+      expect(mockLifecycleHandlers).toHaveProperty('appendCaveats');
+      expect(mockLifecycleHandlers).toHaveProperty('onConfirmationCreated');
+      expect(mockLifecycleHandlers).toHaveProperty('onConfirmationResolved');
     });
 
-    it('should properly map initial amount updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'initial-amount',
-      );
-      expect(handler).toBeDefined();
+    it('should use the buildContext handler with services', async () => {
+      const origin = 'https://example.com';
+      await handler.handlePermissionRequest(origin);
 
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'initial-amount',
-          value: '2',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          initialAmount: '2',
-        },
-      });
-    });
+      // Call the buildContext handler directly
+      await mockLifecycleHandlers.buildContext(mockPermissionRequest);
 
-    it('should properly map max amount updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'max-amount',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'max-amount',
-          value: '20',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          maxAmount: '20',
-        },
-      });
-    });
-
-    it('should properly map start time updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'start-time',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'start-time',
-          value: '06/01/2024',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          startTime: '06/01/2024',
-        },
-      });
-    });
-
-    it('should properly map expiry updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'expiry',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'expiry',
-          value: '07/01/2024',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        expiry: '07/01/2024',
-      });
-    });
-
-    it('should properly map amount per period updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'amount-per-period',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'amount-per-period',
-          value: '500000',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          amountPerPeriod: '500000',
-        },
-      });
-    });
-
-    it('should properly map time period updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'time-period',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'time-period',
-          value: TimePeriod.DAILY,
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          timePeriod: TimePeriod.DAILY,
-        },
-      });
-    });
-  });
-
-  describe('createUiContent', () => {
-    it('should use the provided content creator', async () => {
-      await orchestrator.createUiContent({
-        context: mockContext,
-        metadata: mockMetadata,
-        origin: 'https://example.com',
-        chainId: 1,
-      });
-
-      expect(mockDependencies.createConfirmationContent).toHaveBeenCalledWith({
-        context: mockContext,
-        metadata: mockMetadata,
-        origin: 'https://example.com',
-        chainId: 1,
-        isJustificationCollapsed: true,
-        isAddRuleShown: false,
-        addRuleValidationMessage: undefined,
-      });
-    });
-  });
-
-  describe('createContextMetadata', () => {
-    it('should use the provided metadata creator', async () => {
-      await orchestrator.createContextMetadata(mockContext);
-
-      expect(mockDependencies.createContextMetadata).toHaveBeenCalledWith({
-        context: mockContext,
-      });
-    });
-  });
-
-  describe('buildPermissionContext', () => {
-    it('should use the provided context builder with services', async () => {
-      await orchestrator.buildPermissionContext({
-        permissionRequest: mockPermissionRequest,
-      });
-
-      expect(mockDependencies.permissionRequestToContext).toHaveBeenCalledWith({
+      expect(mockDependencies.buildContext).toHaveBeenCalledWith({
         permissionRequest: mockPermissionRequest,
         tokenPricesService: mockTokenPricesService,
         accountController: mockAccountController,
       });
     });
-  });
 
-  describe('resolvePermissionRequest', () => {
-    it('should use the provided request resolver', async () => {
+    it('should use the createConfirmationContent handler with UI state', async () => {
+      const origin = 'https://example.com';
+      await handler.handlePermissionRequest(origin);
+
       const args = {
         context: mockContext,
-        originalRequest: mockPermissionRequest,
+        metadata: mockMetadata,
+        origin: 'https://example.com',
+        chainId: 1,
       };
 
-      await (orchestrator as any).resolvePermissionRequest(args);
+      await mockLifecycleHandlers.createConfirmationContent(args);
 
-      expect(mockDependencies.contextToPermissionRequest).toHaveBeenCalledWith(
-        args,
-      );
-    });
-  });
-
-  describe('populatePermission', () => {
-    it('should use the provided permission populator', async () => {
-      const { permission } = mockPermissionRequest;
-      await (orchestrator as any).populatePermission({ permission });
-
-      expect(mockDependencies.populatePermission).toHaveBeenCalledWith({
-        permission,
+      expect(mockDependencies.createConfirmationContent).toHaveBeenCalledWith({
+        ...args,
+        isJustificationCollapsed: true,
+        isAddRuleShown: false,
+        addRuleValidationMessage: '',
       });
     });
-  });
 
-  describe('appendCaveats', () => {
-    it('should use the provided caveat appender', async () => {
-      const permission =
-        mockPermissionRequest.permission as PopulatedNativeTokenStreamPermission;
-      const mockCaveatBuilder = { addCaveat: jest.fn().mockReturnThis() };
+    it('should register event handlers in onConfirmationCreated', async () => {
+      const origin = 'https://example.com';
+      await handler.handlePermissionRequest(origin);
 
-      await (orchestrator as any).appendCaveats(permission, mockCaveatBuilder);
+      const updateContext = jest.fn();
 
-      expect(mockDependencies.appendCaveats).toHaveBeenCalledWith({
-        permission,
-        caveatBuilder: mockCaveatBuilder,
+      // Call the onConfirmationCreated handler directly
+      mockLifecycleHandlers.onConfirmationCreated({
+        interfaceId: 'test-interface',
+        initialContext: mockContext,
+        updateContext,
       });
+
+      // Verify user event handlers are registered
+      expect(mockUserEventDispatcher.on).toHaveBeenCalled();
+    });
+
+    it('should deregister event handlers in onConfirmationResolved', async () => {
+      const origin = 'https://example.com';
+      await handler.handlePermissionRequest(origin);
+
+      const updateContext = jest.fn();
+
+      // First register handlers
+      mockLifecycleHandlers.onConfirmationCreated({
+        interfaceId: 'test-interface',
+        initialContext: mockContext,
+        updateContext,
+      });
+
+      // Then resolve and check they're deregistered
+      mockLifecycleHandlers.onConfirmationResolved();
+
+      expect(mockUserEventDispatcher.off).toHaveBeenCalled();
     });
   });
 });

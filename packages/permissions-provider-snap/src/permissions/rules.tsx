@@ -7,8 +7,8 @@ import { InputChangeEvent, UserInputEventType } from '@metamask/snaps-sdk';
 export type RuleType = 'number' | 'text' | 'dropdown';
 
 export type RuleDefinition<
-  TContext extends BaseContext = BaseContext,
-  TMetadata extends object = object,
+  TContext extends BaseContext,
+  TMetadata extends object,
 > = {
   label: string;
   name: string;
@@ -84,10 +84,13 @@ export function renderRule<
   }
 }
 
-export function renderRules(
-  rules: RuleDefinition[],
-  context: BaseContext,
-  metadata: object,
+export function renderRules<
+  TContext extends BaseContext,
+  TMetadata extends object,
+>(
+  rules: RuleDefinition<TContext, TMetadata>[],
+  context: TContext,
+  metadata: TMetadata,
 ) {
   return rules.map((rule) => renderRule({ rule, context, metadata }));
 }

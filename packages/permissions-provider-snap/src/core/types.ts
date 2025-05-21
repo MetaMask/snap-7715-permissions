@@ -3,13 +3,15 @@ import type {
   Permission,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import type { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
+import { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type {
-  UserEventDispatcher,
-  UserInputEventByType,
-} from '../userEventDispatcher';
+import type { UserEventDispatcher } from '../userEventDispatcher';
+
+export type PermissionRequestResult =
+  | { approved: true; response: PermissionResponse }
+  | { approved: false; reason: string };
 
 export type TypedPermissionRequest<TPermission extends Permission> =
   PermissionRequest & {
@@ -66,26 +68,49 @@ export type ConfirmationProps = {
   userEventDispatcher: UserEventDispatcher;
 };
 
-export type StateChangeHandler<
-  TContext,
-  TMetadata,
-  TUserInputEventType extends UserInputEventType = UserInputEventType,
-  TEvent extends
-    UserInputEventByType<TUserInputEventType> = UserInputEventByType<TUserInputEventType>,
+export type LifecycleOrchestrationHandlers<
+  TRequest extends PermissionRequest,
+  TContext extends BaseContext,
+  TMetadata extends object,
+  TPermission extends TRequest['permission'],
+  TPopulatedPermission extends DeepRequired<TPermission>,
 > = {
-  elementName: string;
-  eventType: TUserInputEventType;
-  contextMapper: (args: {
+  validateRequest: (request: TRequest) => TRequest;
+  buildContext: (request: TRequest) => Promise<TContext>;
+  deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
+  createConfirmationContent: (args: {
     context: TContext;
-    event: TEvent;
     metadata: TMetadata;
-  }) => TContext;
-};
+    origin: string;
+    chainId: number;
+  }) => Promise<GenericSnapElement>;
+  applyContext: (args: {
+    context: TContext;
+    originalRequest: TRequest;
+  }) => Promise<TRequest>;
+  populatePermission: (args: {
+    permission: TPermission;
+  }) => Promise<TPopulatedPermission>;
+  appendCaveats: (args: {
+    permission: TPopulatedPermission;
+    caveatBuilder: CoreCaveatBuilder;
+  }) => Promise<CoreCaveatBuilder>;
 
-export type Orchestrator = {
-  orchestrate: (args: { origin: string }) => Promise<{
-    success: boolean;
-    response?: PermissionResponse;
-    reason?: string;
-  }>;
+  /**
+   * Optional callback that is invoked when a confirmation dialog is created.
+   * @param confirmationCreatedArgs - Arguments containing the interface ID and a function to update the context
+   */
+  onConfirmationCreated?: (confirmationCreatedArgs: {
+    interfaceId: string;
+    initialContext: TContext;
+    updateContext: (updateContextArgs: {
+      updatedContext: TContext;
+    }) => Promise<void>;
+  }) => void;
+
+  /**
+   * Optional callback that is invoked when a confirmation dialog is resolved.
+   * Can be used to clean up any resources or state.
+   */
+  onConfirmationResolved?: () => void;
 };

@@ -50,12 +50,12 @@ describe('nativeTokenStream:caveats', () => {
       expect(mockCaveatBuilder.addCaveat).toHaveBeenCalledTimes(2);
     });
 
-    it('should return the modified caveat builder', () => {
+    it('should return the modified caveat builder', async () => {
       const mockCaveatBuilder = {
         addCaveat: jest.fn().mockReturnThis(),
       } as unknown as jest.Mocked<CoreCaveatBuilder>;
 
-      const result = appendCaveats({
+      const result = await appendCaveats({
         permission: mockPermission,
         caveatBuilder: mockCaveatBuilder,
       });

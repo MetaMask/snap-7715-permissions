@@ -50,9 +50,7 @@ describe('nativeTokenStream:validation', () => {
 
       expect(() =>
         parseAndValidatePermission(invalidTypeRequest as any),
-      ).toThrow(
-        'Failed type validation: type: Invalid literal value, expected "native-token-stream"',
-      );
+      ).toThrow('Failed type validation: type: Invalid input');
     });
 
     describe('maxAmount validation', () => {

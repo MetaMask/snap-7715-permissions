@@ -21,7 +21,7 @@ import { lineaSepolia, sepolia } from 'viem/chains';
 import { AccountController } from './accountController';
 import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
-import { OrchestratorFactory } from './core/orchestratorFactory';
+import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { HomePage } from './homepage';
 import {
   createProfileSyncOptions,
@@ -34,7 +34,7 @@ import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
-import { PermissionRequestLifecycleOrchestrator } from './core/baseOrchestrator';
+import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
 
 // set up dependencies
 const accountController = new AccountController({
@@ -99,7 +99,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   confirmationDialogFactory,
 });
 
-const orchestratorFactory = new OrchestratorFactory({
+const permissionHandlerFactory = new PermissionHandlerFactory({
   accountController,
   tokenPricesService,
   confirmationDialogFactory,
@@ -108,7 +108,7 @@ const orchestratorFactory = new OrchestratorFactory({
 });
 
 const rpcHandler = createRpcHandler({
-  orchestratorFactory,
+  permissionHandlerFactory,
   profileSyncManager,
 });
 

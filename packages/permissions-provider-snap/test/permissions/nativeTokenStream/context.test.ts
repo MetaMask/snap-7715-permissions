@@ -73,16 +73,16 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
 
 describe('nativeTokenStream:context', () => {
   describe('populatePermission()', () => {
-    it('should return the permission unchanged if it is already populated', () => {
-      const populatedPermission = populatePermission({
+    it('should return the permission unchanged if it is already populated', async () => {
+      const populatedPermission = await populatePermission({
         permission: alreadyPopulatedPermission,
       });
 
       expect(populatedPermission).toStrictEqual(alreadyPopulatedPermission);
     });
 
-    it('should add defaults to a permission', () => {
-      const populatedPermission = populatePermission({
+    it('should add defaults to a permission', async () => {
+      const populatedPermission = await populatePermission({
         permission: permissionWithoutOptionals,
       });
 
@@ -97,7 +97,7 @@ describe('nativeTokenStream:context', () => {
       });
     });
 
-    it('should not override existing rules', () => {
+    it('should not override existing rules', async () => {
       const permission: NativeTokenStreamPermission = {
         type: 'native-token-stream',
         data: {
@@ -112,7 +112,7 @@ describe('nativeTokenStream:context', () => {
         },
       };
 
-      const populatedPermission = populatePermission({ permission });
+      const populatedPermission = await populatePermission({ permission });
 
       expect(populatedPermission).toStrictEqual(permission);
     });
@@ -413,8 +413,8 @@ describe('nativeTokenStream:context', () => {
     });
 
     describe('contextToPermissionRequest()', () => {
-      it('should convert a context to a permission request', () => {
-        const permissionRequest = contextToPermissionRequest({
+      it('should convert a context to a permission request', async () => {
+        const permissionRequest = await contextToPermissionRequest({
           context: alreadyPopulatedContext,
           originalRequest: alreadyPopulatedPermissionRequest,
         });

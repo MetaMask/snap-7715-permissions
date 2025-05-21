@@ -1,9 +1,7 @@
 import type { AccountController } from '../../accountController';
-import {
-  PermissionRequestLifecycleOrchestrator,
-  LifecycleOrchestrationHandlers,
-  PermissionRequestResult,
-} from '../../core/baseOrchestrator';
+import { PermissionRequestLifecycleOrchestrator } from '../../core/permissionRequestLifecycleOrchestrator';
+import type { LifecycleOrchestrationHandlers } from '../../core/types';
+import type { PermissionHandler } from '../types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import type {
   UserEventDispatcher,
@@ -30,6 +28,7 @@ import type {
 import { parseAndValidatePermission } from './validation';
 import { bindRuleHandlers } from '../rules';
 import { allRules } from './rules';
+import type { PermissionRequestResult } from '../../core/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 // Update dependencies to match LifecycleOrchestrationHandlers
@@ -51,30 +50,6 @@ const defaultDependencies: NativeTokenStreamDependencies = {
   applyContext: contextToPermissionRequest,
   populatePermission: populatePermission,
   appendCaveats: appendCaveats,
-};
-
-/**
- * Generic interface for permission handlers.
- *
- * Permission handlers are responsible for:
- * 1. Handling permission-specific validation
- * 2. Managing permission-specific UI interaction
- * 3. Providing lifecycle hook implementations
- * 4. Converting between request/context/metadata formats
- *
- * @template TRequest - The specific permission request type
- * @template TContext - The context type used for this permission
- * @template TMetadata - The metadata type used for this permission
- */
-export type PermissionHandler = {
-  /**
-   * Handles a permission request, orchestrating the full lifecycle from request to response.
-   *
-   * @param origin - The origin of the permission request
-   * @param permissionRequest - The permission request to handle
-   * @returns A permission response object
-   */
-  handlePermissionRequest(origin: string): Promise<PermissionRequestResult>;
 };
 
 /**

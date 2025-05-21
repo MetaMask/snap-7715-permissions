@@ -2,22 +2,19 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 
 import type { AccountController } from '../accountController';
-import {
-  NativeTokenStreamHandler,
-  PermissionHandler,
-} from '../permissions/nativeTokenStream/orchestrator';
+import { NativeTokenStreamHandler } from '../permissions/nativeTokenStream/handler';
 import type { NativeTokenStreamPermissionRequest } from '../permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
-import type { Orchestrator } from './types';
-import { PermissionRequestLifecycleOrchestrator } from './baseOrchestrator';
+import { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
+import type { PermissionHandler } from '../permissions/types';
 
 /**
  * Factory for creating permission-specific orchestrators.
  * Each permission type has its own orchestrator that handles the specific logic for that permission.
  */
-export class OrchestratorFactory {
+export class PermissionHandlerFactory {
   readonly #accountController: AccountController;
 
   readonly #tokenPricesService: TokenPricesService;
@@ -54,7 +51,9 @@ export class OrchestratorFactory {
    * @returns The permission orchestrator.
    * @throws If the permission type is not supported.
    */
-  createOrchestrator(permissionRequest: PermissionRequest): PermissionHandler {
+  createPermissionHandler(
+    permissionRequest: PermissionRequest,
+  ): PermissionHandler {
     const type = extractPermissionName(permissionRequest.permission.type);
 
     const baseDependencies = {
