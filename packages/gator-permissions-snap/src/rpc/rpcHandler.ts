@@ -2,7 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { OrchestratorFactory } from '../core/orchestratorFactory';
-import type { ProfileSyncManager } from '../profileSync';
+import { type ProfileSyncManager } from '../profileSync';
 import { validatePermissionRequestParam } from '../utils/validate';
 
 /**

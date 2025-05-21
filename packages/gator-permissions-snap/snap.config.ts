@@ -13,6 +13,22 @@ if (!process.env.PRICE_API_BASE_URL) {
   throw new Error('PRICE_API_BASE_URL must be set as an environment variable.');
 }
 
+if (!process.env.STORE_PERMISSIONS_ENABLED) {
+  throw new Error(
+    'STORE_PERMISSIONS_ENABLED must be set as an environment variable.',
+  );
+}
+
+if (
+  !process.env.STORE_PERMISSIONS_ENABLED ||
+  (process.env.STORE_PERMISSIONS_ENABLED !== 'true' &&
+    process.env.STORE_PERMISSIONS_ENABLED !== 'false')
+) {
+  throw new Error(
+    'STORE_PERMISSIONS_ENABLED must be set as an environment variable and must be set to "true" or "false".',
+  );
+}
+
 const config: SnapConfig = {
   bundler: 'webpack',
   input: resolve(__dirname, 'src/index.ts'),
@@ -26,6 +42,7 @@ const config: SnapConfig = {
   environment: {
     SNAP_ENV: process.env.SNAP_ENV,
     PRICE_API_BASE_URL: process.env.PRICE_API_BASE_URL,
+    STORE_PERMISSIONS_ENABLED: process.env.STORE_PERMISSIONS_ENABLED,
   },
 };
 
