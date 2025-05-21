@@ -19,7 +19,7 @@ export type RuleDefinition<
   error?: (metadata: TMetadata) => string | undefined;
   options?: string[];
   // todo: it would be nice if we could make the value type more specific
-  updateContext: (context: TContext, value: any) => void;
+  updateContext: (context: TContext, value: any) => TContext;
 };
 
 export function renderRule<
@@ -116,12 +116,11 @@ export function bindRuleHandlers<
       const handleInputChange: UserEventHandler<
         UserInputEventType.InputChangeEvent
       > = ({ event }) => {
-        const context = getContext();
-        rule.updateContext(
-          context,
+        const updatedContext = rule.updateContext(
+          getContext(),
           (event as InputChangeEvent).value as string,
         );
-        onContextChange(context);
+        onContextChange(updatedContext);
       };
       userEventDispatcher.on({
         elementName: rule.name,
@@ -140,9 +139,8 @@ export function bindRuleHandlers<
         const handleRemoveButtonClick: UserEventHandler<
           UserInputEventType.ButtonClickEvent
         > = (_) => {
-          const context = getContext();
-          rule.updateContext(context, undefined);
-          onContextChange(context);
+          const updatedContext = rule.updateContext(getContext(), undefined);
+          onContextChange(updatedContext);
         };
         userEventDispatcher.on({
           elementName: `${rule.name}_removeButton`,

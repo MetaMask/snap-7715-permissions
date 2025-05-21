@@ -26,7 +26,13 @@ export const initialAmountRule: RuleDefinition<
     context: NativeTokenStreamContext,
     value: string | undefined,
   ) => {
-    context.permissionDetails.initialAmount = value;
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        initialAmount: value,
+      },
+    };
   },
 };
 
@@ -46,7 +52,13 @@ export const maxAmountRule: RuleDefinition<
     context: NativeTokenStreamContext,
     value: string | undefined,
   ) => {
-    context.permissionDetails.maxAmount = value;
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        maxAmount: value,
+      },
+    };
   },
 };
 
@@ -62,7 +74,13 @@ export const startTimeRule: RuleDefinition<
   error: (metadata: NativeTokenStreamMetadata) =>
     metadata.validationErrors.startTimeError,
   updateContext: (context: NativeTokenStreamContext, value: string) => {
-    context.permissionDetails.startTime = value;
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        startTime: value,
+      },
+    };
   },
 };
 
@@ -77,7 +95,10 @@ export const expiryRule: RuleDefinition<
   error: (metadata: NativeTokenStreamMetadata) =>
     metadata.validationErrors.expiryError,
   updateContext: (context: NativeTokenStreamContext, value: string) => {
-    context.expiry = value;
+    return {
+      ...context,
+      expiry: value,
+    };
   },
 };
 
@@ -93,7 +114,13 @@ export const streamAmountPerPeriodRule: RuleDefinition<
   error: (metadata: NativeTokenStreamMetadata) =>
     metadata.validationErrors.amountPerPeriodError,
   updateContext: (context: NativeTokenStreamContext, value: string) => {
-    context.permissionDetails.amountPerPeriod = value;
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        amountPerPeriod: value,
+      },
+    };
   },
 };
 
@@ -108,7 +135,13 @@ export const streamPeriodRule: RuleDefinition<
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.timePeriod,
   updateContext: (context: NativeTokenStreamContext, value: TimePeriod) => {
-    context.permissionDetails.timePeriod = value;
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        timePeriod: value,
+      },
+    };
   },
 };
 

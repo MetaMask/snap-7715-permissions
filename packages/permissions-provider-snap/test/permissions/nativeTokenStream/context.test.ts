@@ -184,7 +184,6 @@ describe('nativeTokenStream:context', () => {
       expect(metadata).toStrictEqual({
         amountPerSecond: '0.5',
         validationErrors: {},
-        rulesToAdd: [],
       });
     });
 

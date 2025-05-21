@@ -180,7 +180,6 @@ export async function createContextMetadata({
   const { permissionDetails, expiry } = context;
 
   const validationErrors: NativeTokenStreamMetadata['validationErrors'] = {};
-  const rulesToAdd: string[] = [];
 
   let maxAmountBigInt: bigint | undefined;
   let initialAmountBigInt: bigint | undefined;
@@ -196,8 +195,6 @@ export async function createContextMetadata({
     } catch (error) {
       validationErrors.maxAmountError = 'Invalid max amount';
     }
-  } else {
-    rulesToAdd.push('Max amount');
   }
 
   if (permissionDetails.initialAmount) {
@@ -211,8 +208,6 @@ export async function createContextMetadata({
     } catch (error) {
       validationErrors.initialAmountError = 'Invalid initial amount';
     }
-  } else {
-    rulesToAdd.push('Initial amount');
   }
 
   try {
@@ -266,6 +261,5 @@ export async function createContextMetadata({
   return {
     amountPerSecond,
     validationErrors,
-    rulesToAdd,
   };
 }

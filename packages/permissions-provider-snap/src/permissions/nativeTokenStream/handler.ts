@@ -27,11 +27,11 @@ import type {
 } from './types';
 import { parseAndValidatePermission } from './validation';
 import { bindRuleHandlers } from '../rules';
+import { RuleModalManager } from '../ruleModalManager';
 import { allRules } from './rules';
 import type { PermissionRequestResult } from '../../core/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
-// Update dependencies to match LifecycleOrchestrationHandlers
 export type NativeTokenStreamDependencies = {
   validateRequest: typeof parseAndValidatePermission;
   buildContext: typeof permissionRequestToContext;
@@ -65,10 +65,11 @@ export class NativeTokenStreamHandler implements PermissionHandler {
 
   readonly #permissionRequest: NativeTokenStreamPermissionRequest;
 
+  #addMoreRulesModal:
+    | RuleModalManager<NativeTokenStreamContext, NativeTokenStreamMetadata>
+    | undefined;
+
   #isJustificationCollapsed = true;
-  #isAddRuleShown = false;
-  #addNewRuleSelectedIndex = 0;
-  #addNewRuleValue: string | undefined;
 
   #deregisterHandlers: (() => void) | undefined;
 
@@ -156,11 +157,19 @@ export class NativeTokenStreamHandler implements PermissionHandler {
       origin: string;
       chainId: number;
     }) => {
+      if (this.#addMoreRulesModal?.isModalVisible()) {
+        return await this.#addMoreRulesModal.renderModal();
+      }
+
+      const showAddMoreRulesButton =
+        this.#addMoreRulesModal?.hasRulesToAdd({
+          context: args.context,
+        }) ?? false;
+
       return this.#dependencies.createConfirmationContent({
         ...args,
         isJustificationCollapsed: this.#isJustificationCollapsed,
-        isAddRuleShown: this.#isAddRuleShown,
-        addRuleValidationMessage: '',
+        showAddMoreRulesButton,
       });
     };
 
@@ -176,12 +185,27 @@ export class NativeTokenStreamHandler implements PermissionHandler {
       }) => Promise<void>;
     }) => {
       let currentContext = initialContext;
+      const rerender = () => updateContext({ updatedContext: currentContext });
+
+      this.#addMoreRulesModal = new RuleModalManager({
+        userEventDispatcher: this.#userEventDispatcher,
+        interfaceId,
+        rules: allRules,
+        onModalChange: rerender,
+        getContext: () => currentContext,
+        deriveMetadata: deriveMetadata,
+        onContextChange: ({ context }) => {
+          currentContext = context;
+          rerender();
+        },
+      });
+      this.#addMoreRulesModal.bindHandlers();
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
       > = () => {
         this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
-        updateContext({ updatedContext: currentContext });
+        rerender();
       };
 
       this.#userEventDispatcher.on({
@@ -198,7 +222,7 @@ export class NativeTokenStreamHandler implements PermissionHandler {
         getContext: () => currentContext,
         onContextChange: (context) => {
           currentContext = context;
-          updateContext({ updatedContext: currentContext });
+          rerender();
         },
       });
 

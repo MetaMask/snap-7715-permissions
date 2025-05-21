@@ -61,7 +61,6 @@ const mockContext: NativeTokenStreamContext = {
 const mockMetadata: NativeTokenStreamMetadata = {
   amountPerSecond: '0.5',
   validationErrors: {},
-  rulesToAdd: [],
 };
 
 // Mock services that are used in the constructor
@@ -75,10 +74,6 @@ const mockAccountController: jest.Mocked<AccountController> = {
   getAccountMetadata: jest.fn(),
   getDelegationManager: jest.fn(),
 } as unknown as jest.Mocked<AccountController>;
-
-const mockConfirmationDialogFactory: jest.Mocked<ConfirmationDialogFactory> = {
-  create: jest.fn(),
-} as unknown as jest.Mocked<ConfirmationDialogFactory>;
 
 const mockUserEventDispatcher: jest.Mocked<UserEventDispatcher> = {
   dispatch: jest.fn(),
@@ -247,8 +242,7 @@ describe('NativeTokenStreamHandler', () => {
       expect(mockDependencies.createConfirmationContent).toHaveBeenCalledWith({
         ...args,
         isJustificationCollapsed: true,
-        isAddRuleShown: false,
-        addRuleValidationMessage: '',
+        showAddMoreRulesButton: false,
       });
     });
 

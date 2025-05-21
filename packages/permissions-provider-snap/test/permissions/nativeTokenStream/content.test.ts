@@ -28,7 +28,6 @@ const mockContext: NativeTokenStreamContext = {
 const mockMetadata: NativeTokenStreamMetadata = {
   amountPerSecond: '0.5',
   validationErrors: {},
-  rulesToAdd: [],
 };
 
 describe('nativeTokenStream:content', () => {
@@ -38,10 +37,9 @@ describe('nativeTokenStream:content', () => {
         context: mockContext,
         metadata: mockMetadata,
         isJustificationCollapsed: true,
-        isAddRuleShown: false,
         origin: 'https://example.com',
         chainId: 1,
-        addRuleValidationMessage: undefined,
+        showAddMoreRulesButton: false,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -882,7 +880,7 @@ describe('nativeTokenStream:content', () => {
             },
             "type": "Section",
           },
-          null,
+          false,
         ],
         "direction": "vertical",
       },
@@ -905,10 +903,9 @@ describe('nativeTokenStream:content', () => {
           },
         },
         isJustificationCollapsed: true,
-        isAddRuleShown: false,
         origin: 'https://example.com',
         chainId: 1,
-        addRuleValidationMessage: undefined,
+        showAddMoreRulesButton: false,
       });
 
       expect(contentWithErrors).toMatchInlineSnapshot(`
@@ -1763,7 +1760,7 @@ describe('nativeTokenStream:content', () => {
             },
             "type": "Section",
           },
-          null,
+          false,
         ],
         "direction": "vertical",
       },
@@ -1783,10 +1780,9 @@ describe('nativeTokenStream:content', () => {
         },
         metadata: mockMetadata,
         isJustificationCollapsed: true,
-        isAddRuleShown: false,
         origin: 'https://example.com',
         chainId: 1,
-        addRuleValidationMessage: undefined,
+        showAddMoreRulesButton: false,
       });
 
       expect(contentWithoutAdjustment).toMatchInlineSnapshot(`
@@ -2553,7 +2549,7 @@ describe('nativeTokenStream:content', () => {
             },
             "type": "Section",
           },
-          null,
+          false,
         ],
         "direction": "vertical",
       },
@@ -2575,15 +2571,11 @@ describe('nativeTokenStream:content', () => {
             maxAmount: undefined,
           },
         },
-        metadata: {
-          ...mockMetadata,
-          rulesToAdd: ['Initial amount', 'Max amount'],
-        },
+        metadata: mockMetadata,
         isJustificationCollapsed: true,
-        isAddRuleShown: false,
         origin: 'https://example.com',
         chainId: 1,
-        addRuleValidationMessage: undefined,
+        showAddMoreRulesButton: false,
       });
 
       expect(contentWithMissingFields).toMatchInlineSnapshot(`
@@ -3316,14 +3308,7 @@ describe('nativeTokenStream:content', () => {
             },
             "type": "Section",
           },
-          {
-            "key": null,
-            "props": {
-              "children": "Add more rules",
-              "name": "add-more-rules",
-            },
-            "type": "Button",
-          },
+          false,
         ],
         "direction": "vertical",
       },
@@ -3344,15 +3329,11 @@ describe('nativeTokenStream:content', () => {
             timePeriod: TimePeriod.DAILY,
           },
         },
-        metadata: {
-          ...mockMetadata,
-          rulesToAdd: ['Initial amount', 'Max amount'],
-        },
+        metadata: mockMetadata,
         isJustificationCollapsed: true,
-        isAddRuleShown: false,
         origin: 'https://example.com',
         chainId: 1,
-        addRuleValidationMessage: undefined,
+        showAddMoreRulesButton: false,
       });
 
       expect(contentWithDailyPeriod).toMatchInlineSnapshot(`
@@ -4193,14 +4174,7 @@ describe('nativeTokenStream:content', () => {
             },
             "type": "Section",
           },
-          {
-            "key": null,
-            "props": {
-              "children": "Add more rules",
-              "name": "add-more-rules",
-            },
-            "type": "Button",
-          },
+          false,
         ],
         "direction": "vertical",
       },
