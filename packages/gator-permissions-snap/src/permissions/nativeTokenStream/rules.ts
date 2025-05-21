@@ -28,15 +28,13 @@ export const initialAmountRule: RuleDefinition<
   updateContext: (
     context: NativeTokenStreamContext,
     value: string | undefined,
-  ) => {
-    return {
-      ...context,
-      permissionDetails: {
-        ...context.permissionDetails,
-        initialAmount: value,
-      },
-    };
-  },
+  ) => ({
+    ...context,
+    permissionDetails: {
+      ...context.permissionDetails,
+      initialAmount: value,
+    },
+  }),
 };
 
 export const maxAmountRule: RuleDefinition<
@@ -54,15 +52,13 @@ export const maxAmountRule: RuleDefinition<
   updateContext: (
     context: NativeTokenStreamContext,
     value: string | undefined,
-  ) => {
-    return {
-      ...context,
-      permissionDetails: {
-        ...context.permissionDetails,
-        maxAmount: value,
-      },
-    };
-  },
+  ) => ({
+    ...context,
+    permissionDetails: {
+      ...context.permissionDetails,
+      maxAmount: value,
+    },
+  }),
 };
 
 export const startTimeRule: RuleDefinition<
@@ -76,15 +72,13 @@ export const startTimeRule: RuleDefinition<
     context.permissionDetails.startTime,
   error: (metadata: NativeTokenStreamMetadata) =>
     metadata.validationErrors.startTimeError,
-  updateContext: (context: NativeTokenStreamContext, value: string) => {
-    return {
-      ...context,
-      permissionDetails: {
-        ...context.permissionDetails,
-        startTime: value,
-      },
-    };
-  },
+  updateContext: (context: NativeTokenStreamContext, value: string) => ({
+    ...context,
+    permissionDetails: {
+      ...context.permissionDetails,
+      startTime: value,
+    },
+  }),
 };
 
 export const expiryRule: RuleDefinition<
@@ -97,12 +91,10 @@ export const expiryRule: RuleDefinition<
   value: (context: NativeTokenStreamContext) => context.expiry,
   error: (metadata: NativeTokenStreamMetadata) =>
     metadata.validationErrors.expiryError,
-  updateContext: (context: NativeTokenStreamContext, value: string) => {
-    return {
-      ...context,
-      expiry: value,
-    };
-  },
+  updateContext: (context: NativeTokenStreamContext, value: string) => ({
+    ...context,
+    expiry: value,
+  }),
 };
 
 export const streamAmountPerPeriodRule: RuleDefinition<
@@ -116,15 +108,13 @@ export const streamAmountPerPeriodRule: RuleDefinition<
     context.permissionDetails.amountPerPeriod,
   error: (metadata: NativeTokenStreamMetadata) =>
     metadata.validationErrors.amountPerPeriodError,
-  updateContext: (context: NativeTokenStreamContext, value: string) => {
-    return {
-      ...context,
-      permissionDetails: {
-        ...context.permissionDetails,
-        amountPerPeriod: value,
-      },
-    };
-  },
+  updateContext: (context: NativeTokenStreamContext, value: string) => ({
+    ...context,
+    permissionDetails: {
+      ...context.permissionDetails,
+      amountPerPeriod: value,
+    },
+  }),
 };
 
 export const streamPeriodRule: RuleDefinition<
@@ -137,15 +127,13 @@ export const streamPeriodRule: RuleDefinition<
   options: Object.values(TimePeriod),
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.timePeriod,
-  updateContext: (context: NativeTokenStreamContext, value: TimePeriod) => {
-    return {
-      ...context,
-      permissionDetails: {
-        ...context.permissionDetails,
-        timePeriod: value,
-      },
-    };
-  },
+  updateContext: (context: NativeTokenStreamContext, value: TimePeriod) => ({
+    ...context,
+    permissionDetails: {
+      ...context.permissionDetails,
+      timePeriod: value,
+    },
+  }),
 };
 
 export const allRules = [

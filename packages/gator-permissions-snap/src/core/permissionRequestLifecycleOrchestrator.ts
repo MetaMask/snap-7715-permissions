@@ -219,19 +219,18 @@ export class PermissionRequestLifecycleOrchestrator {
       chainId,
     });
 
-    // todo: can we decompose assembling the response into a separate function that can be tested independently?
     const caveatBuilder = await lifecycleHandlers.appendCaveats({
       permission: populatedPermission,
       caveatBuilder: createCaveatBuilder(environment),
     });
 
-    const valueAfter = 0;
-    const valueBefore = grantedPermissionRequest.expiry;
+    const validAfter = 0;
+    const validBefore = grantedPermissionRequest.expiry;
 
     const finalCaveatBuilder = caveatBuilder.addCaveat(
       'timestamp',
-      valueAfter,
-      valueBefore,
+      validAfter,
+      validBefore,
     );
 
     const signedDelegation = await this.#accountController.signDelegation({

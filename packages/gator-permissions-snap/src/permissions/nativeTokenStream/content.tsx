@@ -44,10 +44,9 @@ export const createConfirmationContent = ({
 }) => {
   const { amountPerSecond } = metadata;
 
-  // todo: only show this if there are rules to add
-  const rulesToAddButton = (
+  const rulesToAddButton = showAddMoreRulesButton ? (
     <Button name={TOGGLE_ADD_MORE_RULES_BUTTON}>Add more rules</Button>
-  );
+  ) : null;
 
   const networkName = getChainName(chainId);
 
@@ -114,7 +113,7 @@ export const createConfirmationContent = ({
             metadata,
           )}
         </Section>
-        {showAddMoreRulesButton && rulesToAddButton}
+        {rulesToAddButton}
       </Box>
     </Box>
   );

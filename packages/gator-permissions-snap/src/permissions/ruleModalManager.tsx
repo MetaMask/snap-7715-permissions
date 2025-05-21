@@ -25,7 +25,9 @@ export class RuleModalManager<
   TContext extends BaseContext,
   TMetadata extends object,
 > {
-  #isAddRuleShown = false;
+  #isModalVisible = false;
+
+  // selected rule index is the index of the rule _within the array of visible options_.
   #selectedRuleIndex = 0;
   #ruleValue = '';
 
@@ -125,14 +127,13 @@ export class RuleModalManager<
     const addMoreRulesButtonClickHandler: UserEventHandler<
       UserInputEventType.ButtonClickEvent
     > = () => {
-      this.#isAddRuleShown = !this.#isAddRuleShown;
+      this.#isModalVisible = !this.#isModalVisible;
       this.#onModalChange();
     };
 
     const dropdownChangeHandler: UserEventHandler<
       UserInputEventType.InputChangeEvent
     > = async ({ event }) => {
-      // selected rule index is the index of the rule _within the array of options_.
       this.#selectedRuleIndex = parseInt(event.value as string);
 
       this.#onModalChange();
@@ -168,7 +169,7 @@ export class RuleModalManager<
         this.#onContextChange({ context: updatedContext });
 
         this.#ruleValue = '';
-        this.#isAddRuleShown = false;
+        this.#isModalVisible = false;
         this.#selectedRuleIndex = 0;
 
         this.#onModalChange();
@@ -247,6 +248,6 @@ export class RuleModalManager<
   }
 
   isModalVisible(): boolean {
-    return this.#isAddRuleShown;
+    return this.#isModalVisible;
   }
 }
