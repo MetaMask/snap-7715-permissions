@@ -12,6 +12,7 @@ jobs:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
       STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      USE_EOA_ACCOUNT: ${{ vars.USE_EOA_ACCOUNT }}
     strategy:
       matrix:
         node-version: [21.x]
@@ -37,6 +38,7 @@ jobs:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
       STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      USE_EOA_ACCOUNT: ${{ vars.USE_EOA_ACCOUNT }}
     needs:
       - prepare
     strategy:
@@ -64,6 +66,7 @@ jobs:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
       STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      USE_EOA_ACCOUNT: ${{ vars.USE_EOA_ACCOUNT }}
     needs:
       - prepare
     strategy:
@@ -128,6 +131,7 @@ jobs:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
       STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      USE_EOA_ACCOUNT: ${{ vars.USE_EOA_ACCOUNT }}
     needs:
       - prepare
       - build
