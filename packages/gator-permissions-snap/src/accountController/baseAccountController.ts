@@ -10,14 +10,6 @@ export type SupportedChains =
 // all of the chainIds that have delegator contracts deployed
 type SupportedChainId = SupportedChains[number]['id'];
 
-// default for `supportedChains` configuration option
-const ALL_SUPPORTED_CHAINS: SupportedChains = Object.keys(chains)
-  .filter((name) => Object.keys(ChainsWithDelegatorDeployed).includes(name))
-  .map(
-    // we assert to any here due to the inability to infer the namespace of the global import
-    (name) => (chains as any)[name as keyof typeof chains],
-  ) as SupportedChains;
-
 /**
  * Base class for account controllers that provides common functionality.
  */
@@ -25,6 +17,14 @@ export abstract class BaseAccountController {
   #snapsProvider: SnapsProvider;
 
   protected supportedChains: SupportedChains;
+
+  // the intersection between chains supported by viem, and chains supported by the delegator contracts
+  // chains is asserted to any here due to the inability to infer the namespace of the global import
+  static #allSupportedChains = Object.keys(chains)
+    .filter((name) => name in ChainsWithDelegatorDeployed)
+    .map(
+      (name) => (chains as any)[name as keyof typeof chains],
+    ) as SupportedChains;
 
   /**
    * Initializes a new BaseAccountController instance.
@@ -43,7 +43,8 @@ export abstract class BaseAccountController {
     }
 
     this.#snapsProvider = config.snapsProvider;
-    this.supportedChains = config.supportedChains ?? ALL_SUPPORTED_CHAINS;
+    this.supportedChains =
+      config.supportedChains ?? BaseAccountController.#allSupportedChains;
   }
 
   /**
