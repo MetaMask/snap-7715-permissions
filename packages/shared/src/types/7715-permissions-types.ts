@@ -1,5 +1,6 @@
 import { any, z } from 'zod';
 
+import { zPromisedOutcomes } from './7715-promised-outcomes';
 import { zAddress, zHexStr } from './common';
 
 // Rather than only define permissions by name,
@@ -22,6 +23,11 @@ export const zPermission = z.object({
   data: z.record(any()),
 
   rules: z.record(any()).optional(),
+
+  /**
+   * The promised outcomes of the permission made by the dApp.
+   */
+  promisedOutcomes: z.array(zPromisedOutcomes).optional(),
 });
 
 export const zMetaMaskPermissionData = z.object({
