@@ -6,7 +6,7 @@ export const PERMISSIONS_PROVIDER_SNAP_ID =
   // eslint-disable-next-line no-restricted-globals
   process.env.SNAP_ENV === 'production'
     ? 'npm:@metamask/gator-permissions-snap'
-    : 'local:http://localhost:8081';
+    : 'local:http://localhost:8082';
 
 export enum InternalMethod {
   /**

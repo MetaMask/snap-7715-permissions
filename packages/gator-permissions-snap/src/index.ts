@@ -1,4 +1,13 @@
+/* eslint-disable no-restricted-globals */
+import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
+import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  AuthType,
+  JwtBearerAuth,
+  Platform,
+  UserStorage,
+} from '@metamask/profile-sync-controller/sdk';
 import type {
   OnHomePageHandler,
   OnInstallHandler,
@@ -18,11 +27,19 @@ import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { OrchestratorFactory } from './core/orchestratorFactory';
 import { HomePage } from './homepage';
+import {
+  createProfileSyncOptions,
+  getProfileSyncSdkEnv,
+  createProfileSyncManager,
+} from './profileSync';
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
+import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
+
+// set up dependencies
 
 // eslint-disable-next-line no-restricted-globals
 const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
@@ -38,10 +55,47 @@ const accountController: AccountController = useEoaAccountController
       supportedChains: [sepolia, lineaSepolia],
       deploymentSalt: '0x',
     });
+const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
+const snapEnv = process.env.SNAP_ENV;
+
+const stateManager = createStateManager(snap);
+const profileSyncOptions = createProfileSyncOptions(
+  stateManager,
+  snap,
+  MESSAGE_SIGNING_SNAP_ID,
+);
+const profileSyncSdkEnv = getProfileSyncSdkEnv(snapEnv);
+
+const auth = new JwtBearerAuth(
+  {
+    type: AuthType.SRP,
+    platform: Platform.EXTENSION,
+    env: profileSyncSdkEnv,
+  },
+  {
+    storage: profileSyncOptions.authStorageOptions,
+    signing: profileSyncOptions.authSigningOptions,
+  },
+);
+
+const profileSyncManager = createProfileSyncManager({
+  isFeatureEnabled,
+  auth,
+  userStorage: new UserStorage(
+    {
+      auth,
+      env: profileSyncSdkEnv,
+    },
+    {
+      storage: profileSyncOptions.keyStorageOptions,
+    },
+  ),
+});
 
 const homepage = new HomePage({
   accountController,
   snapsProvider: snap,
+  profileSyncManager,
 });
 
 const userEventDispatcher = new UserEventDispatcher();
@@ -64,6 +118,7 @@ const orchestratorFactory = new OrchestratorFactory({
 
 const rpcHandler = createRpcHandler({
   orchestratorFactory,
+  profileSyncManager,
 });
 
 // configure RPC methods bindings
@@ -128,5 +183,30 @@ export const onHomePage: OnHomePageHandler = async () => {
 };
 
 export const onInstall: OnInstallHandler = async () => {
+  /**
+   * Local Development Only
+   *
+   * The message signing snap must be installed and the gator permissions snap must
+   * have permission to communicate with the message signing snap, or the request is rejected.
+   *
+   * Since the message signing snap is preinstalled in production, and has
+   * initialConnections configured to automatically connect to the gator snap, this is not needed in production.
+   */
+  // eslint-disable-next-line no-restricted-globals
+  if (snapEnv === 'local' && isFeatureEnabled) {
+    const installedSnaps = (await snap.request({
+      method: 'wallet_getSnaps',
+    })) as unknown as GetSnapsResponse;
+    if (!installedSnaps[MESSAGE_SIGNING_SNAP_ID]) {
+      logger.debug('Installing local message signing snap');
+      await snap.request({
+        method: 'wallet_requestSnaps',
+        params: {
+          [MESSAGE_SIGNING_SNAP_ID]: {},
+        },
+      });
+    }
+  }
+
   await homepage.showWelcomeScreen();
 };

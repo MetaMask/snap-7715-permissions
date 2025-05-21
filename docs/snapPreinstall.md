@@ -6,8 +6,8 @@ The tarball will allow us to test preinstall on the public [metamask-extension b
 
 1. Update the .env `SNAP_ENV=prod` in:
    - `./packages/permissions-kernel-snap/.env`
-   - `./packages/permissions-provider-snap/.env`
-2. Set `PRICE_API_BASE_URL=http://localhost:8003` in `./packages/permissions-provider-snap/.env` to fetch spot prices from mock price API running locally.
+   - `./packages/gator-permissions-snap/.env`
+2. Set `PRICE_API_BASE_URL=http://localhost:8003` in `./packages/gator-permissions-snap/.env` to fetch spot prices from mock price API running locally.
 3. From root of repo run the following:
 
 ```bash
