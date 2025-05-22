@@ -175,7 +175,7 @@ export const createConfirmationContent = ({
         </Section>
 
         <Section>
-          {permissionDetails.initialAmount !== undefined ? (
+          {permissionDetails.initialAmount === undefined ? null : (
             <InputField
               label="Initial Amount"
               name={INITIAL_AMOUNT_ELEMENT}
@@ -186,8 +186,8 @@ export const createConfirmationContent = ({
               disabled={areValuesFixed}
               errorMessage={validationErrors.initialAmountError}
             />
-          ) : null}
-          {permissionDetails.maxAmount !== undefined ? (
+          )}
+          {permissionDetails.maxAmount === undefined ? null : (
             <InputField
               label="Max Amount"
               name={MAX_AMOUNT_ELEMENT}
@@ -198,7 +198,7 @@ export const createConfirmationContent = ({
               disabled={areValuesFixed}
               errorMessage={validationErrors.maxAmountError}
             />
-          ) : null}
+          )}
           <InputField
             label="Start Time"
             name={START_TIME_ELEMENT}
