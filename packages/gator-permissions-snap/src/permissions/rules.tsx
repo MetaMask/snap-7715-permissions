@@ -36,7 +36,7 @@ export function renderRule<
 }) {
   const value = rule.value(context);
 
-  if (!value) {
+  if (value === undefined) {
     // If the value is not set, don't render the rule
     return null;
   }

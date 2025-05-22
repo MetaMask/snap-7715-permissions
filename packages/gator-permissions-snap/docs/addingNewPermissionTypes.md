@@ -276,6 +276,25 @@ switch (type) {
 }
 ```
 
+9. Add your permission type to the permission registry 
+
+Update the `DEFAULT_OFFERS` array to include your new permission type:
+
+```
+export const DEFAULT_OFFERS: GatorPermission[] = [
+  {
+    type: 'native-token-stream',
+    proposedName: 'Native Token Stream',
+  },
++  {
++    type: 'new-permission-type',
++    proposedName: 'New Permission Type',
++  },
+];
+```
+
+note: in the future this step will not be necessary, as the gator-permissions-snap will automatically register supported permissions.
+
 ## Understanding the Handler-Orchestrator Relationship
 
 The relationship between `NewPermissionTypeHandler` and `PermissionRequestLifecycleOrchestrator` is a key architectural pattern in the permission system:
