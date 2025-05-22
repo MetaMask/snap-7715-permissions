@@ -1,19 +1,28 @@
+import type { SnapsProvider } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
+import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import { Container } from '@metamask/snaps-sdk/jsx';
+
 import {
   ConfirmationFooter,
   GRANT_BUTTON,
   CANCEL_BUTTON,
 } from '../ui/components/ConfirmationFooter';
-import { Container, GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { SnapsProvider, UserInputEventType } from '@metamask/snaps-sdk';
-import { UserEventDispatcher, UserEventHandler } from '../userEventDispatcher';
-import { ConfirmationProps } from './types';
+import type {
+  UserEventDispatcher,
+  UserEventHandler,
+} from '../userEventDispatcher';
+import type { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
   readonly #snaps: SnapsProvider;
+
   readonly #userEventDispatcher: UserEventDispatcher;
 
-  #isJustificationCollapsed: boolean = true;
+  #isJustificationCollapsed = true;
+
   #ui: GenericSnapElement;
+
   #interfaceId: string | undefined;
 
   constructor({ ui, snaps, userEventDispatcher }: ConfirmationProps) {

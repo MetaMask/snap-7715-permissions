@@ -1,4 +1,5 @@
 import { Box, Text } from '@metamask/snaps-sdk/jsx';
+
 import { TooltipIcon } from './TooltipIcon';
 
 export type TextFieldParams = {

@@ -1,9 +1,9 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Text, Box, Section, Avatar } from '@metamask/snaps-sdk/jsx';
 import { type Hex } from 'viem';
-import { TooltipIcon } from './TooltipIcon';
 
 import { formatTokenBalance } from '../../utils/balance';
+import { TooltipIcon } from './TooltipIcon';
 
 export type AccountDetailsProps = {
   account: {

@@ -1,4 +1,5 @@
 import { Box, Text, Input, Button } from '@metamask/snaps-sdk/jsx';
+
 import { TextField } from './TextField';
 import { TooltipIcon } from './TooltipIcon';
 
