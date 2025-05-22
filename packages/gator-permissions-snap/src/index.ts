@@ -18,7 +18,11 @@ import type {
 } from '@metamask/snaps-sdk';
 import { lineaSepolia, sepolia } from 'viem/chains';
 
-import { AccountController } from './accountController';
+import {
+  EoaAccountController,
+  SmartAccountController,
+  type AccountController,
+} from './accountController';
 import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { OrchestratorFactory } from './core/orchestratorFactory';
@@ -35,15 +39,24 @@ import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
 
+// set up dependencies
+
+// eslint-disable-next-line no-restricted-globals
+const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
+
+const accountController: AccountController = useEoaAccountController
+  ? new EoaAccountController({
+      snapsProvider: snap,
+      supportedChains: [sepolia, lineaSepolia],
+      ethereumProvider: ethereum,
+    })
+  : new SmartAccountController({
+      snapsProvider: snap,
+      supportedChains: [sepolia, lineaSepolia],
+      deploymentSalt: '0x',
+    });
 const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
 const snapEnv = process.env.SNAP_ENV;
-
-// set up dependencies
-const accountController = new AccountController({
-  snapsProvider: snap,
-  supportedChains: [sepolia, lineaSepolia],
-  deploymentSalt: '0x',
-});
 
 const stateManager = createStateManager(snap);
 const profileSyncOptions = createProfileSyncOptions(

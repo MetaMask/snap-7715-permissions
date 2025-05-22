@@ -22,4 +22,8 @@ module.exports = {
   coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   coverageReporters: ['html', 'json-summary', 'text'],
+  // workaround for serialization of bigints in jest v29
+  // https://github.com/jestjs/jest/issues/11617
+  // this is resolved in jest v30.0.0-alpha.6
+  maxWorkers: 1,
 };

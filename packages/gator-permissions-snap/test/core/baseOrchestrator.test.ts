@@ -306,11 +306,16 @@ describe('BaseOrchestrator', () => {
           delegator: grantingAccountAddress,
           authority: ROOT_AUTHORITY,
           caveats: mockCaveats,
-          salt: 0n,
+          salt: expect.any(BigInt),
           signature: mockSignature,
         };
 
         expect(delegation).toStrictEqual(expectedDelegation);
+
+        // Salt should be a random 32 byte value - it doesn't explicitly exclude
+        // 0n, but it's exceptionally unlikely. The value of the assertion is
+        // ensuring that the salt is set to a value and not defaulting to 0n.
+        expect(delegation.salt).toBeGreaterThan(0n);
       });
 
       it('should reflect changes from a stateChangeHandler', async () => {
