@@ -1,8 +1,8 @@
 import { Icon, Text, Tooltip } from '@metamask/snaps-sdk/jsx';
 
-interface TooltipIconProps {
+type TooltipIconProps = {
   tooltip: string;
-}
+};
 
 /**
  * A reusable component that displays a question mark icon with a tooltip.

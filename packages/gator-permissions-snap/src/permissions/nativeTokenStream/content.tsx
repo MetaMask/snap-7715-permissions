@@ -11,19 +11,21 @@ import {
   Form,
   Field,
 } from '@metamask/snaps-sdk/jsx';
-import { AccountDetails } from '../../ui/components/AccountDetails';
-import { RequestHeader } from '../../ui/components/RequestHeader';
-import { NativeTokenStreamContext, NativeTokenStreamMetadata } from './types';
-import { InputField } from '../../ui/components/InputField';
-import { DropdownField } from '../../ui/components/DropdownField';
-import { TimePeriod } from '../../core/types';
-import { IconUrls } from '../../ui/iconConstant';
-import {
-  ItemDetails,
-  RequestDetails,
-} from '../../ui/components/RequestDetails';
+
 import { getChainName } from '../../../../shared/src/utils/common';
+import { TimePeriod } from '../../core/types';
+import { AccountDetails } from '../../ui/components/AccountDetails';
+import { DropdownField } from '../../ui/components/DropdownField';
+import { InputField } from '../../ui/components/InputField';
+import type { ItemDetails } from '../../ui/components/RequestDetails';
+import { RequestDetails } from '../../ui/components/RequestDetails';
+import { RequestHeader } from '../../ui/components/RequestHeader';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
+import { IconUrls } from '../../ui/iconConstant';
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
+} from './types';
 
 export const INITIAL_AMOUNT_ELEMENT = 'initial-amount';
 export const REMOVE_INITIAL_AMOUNT_BUTTON = 'remove-initial-amount';
@@ -173,7 +175,7 @@ export const createConfirmationContent = ({
         </Section>
 
         <Section>
-          {permissionDetails.initialAmount !== undefined ? (
+          {permissionDetails.initialAmount === undefined ? null : (
             <InputField
               label="Initial Amount"
               name={INITIAL_AMOUNT_ELEMENT}
@@ -184,8 +186,8 @@ export const createConfirmationContent = ({
               disabled={areValuesFixed}
               errorMessage={validationErrors.initialAmountError}
             />
-          ) : null}
-          {permissionDetails.maxAmount !== undefined ? (
+          )}
+          {permissionDetails.maxAmount === undefined ? null : (
             <InputField
               label="Max Amount"
               name={MAX_AMOUNT_ELEMENT}
@@ -196,7 +198,7 @@ export const createConfirmationContent = ({
               disabled={areValuesFixed}
               errorMessage={validationErrors.maxAmountError}
             />
-          ) : null}
+          )}
           <InputField
             label="Start Time"
             name={START_TIME_ELEMENT}

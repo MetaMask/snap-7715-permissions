@@ -1,6 +1,7 @@
 import { Box, Text, Dropdown, Option } from '@metamask/snaps-sdk/jsx';
-import { TooltipIcon } from './TooltipIcon';
+
 import { TextField } from './TextField';
+import { TooltipIcon } from './TooltipIcon';
 
 export type DropdownFieldParams = {
   label: string;

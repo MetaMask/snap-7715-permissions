@@ -1,6 +1,7 @@
 import { Text, Section, Box, Image } from '@metamask/snaps-sdk/jsx';
-import { TooltipIcon } from './TooltipIcon';
+
 import { ShowMoreText } from './ShowMoreText';
+import { TooltipIcon } from './TooltipIcon';
 
 type RequestDetailsProps = {
   itemDetails: ItemDetails[];
