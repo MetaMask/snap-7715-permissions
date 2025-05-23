@@ -133,7 +133,7 @@ export function renderRules<
  * @param options0.userEventDispatcher - The user event dispatcher to bind handlers to.
  * @param options0.interfaceId - The interface ID for the event handlers.
  * @param options0.getContext - Function to get the current context state.
- * @param options0.onContextChange - Function called when context changes.
+ * @param options0.onContextChanged - Function called when context changes.
  * @returns A function that unbinds the handlers when called.
  */
 export function bindRuleHandlers<
@@ -144,13 +144,13 @@ export function bindRuleHandlers<
   userEventDispatcher,
   interfaceId,
   getContext,
-  onContextChange,
+  onContextChanged,
 }: {
   rules: RuleDefinition<TContext, TMetadata>[];
   userEventDispatcher: UserEventDispatcher;
   interfaceId: string;
   getContext: () => TContext;
-  onContextChange: (args: { context: TContext }) => Promise<void>;
+  onContextChanged: (args: { context: TContext }) => Promise<void>;
 }): () => void {
   const handlers = rules.reduce<
     {
@@ -166,7 +166,7 @@ export function bindRuleHandlers<
         getContext(),
         event.value as string,
       );
-      await onContextChange({ context: updatedContext });
+      await onContextChanged({ context: updatedContext });
     };
     userEventDispatcher.on({
       elementName: rule.name,
@@ -186,7 +186,7 @@ export function bindRuleHandlers<
         UserInputEventType.ButtonClickEvent
       > = async (_) => {
         const updatedContext = rule.updateContext(getContext(), undefined);
-        await onContextChange({ context: updatedContext });
+        await onContextChanged({ context: updatedContext });
       };
       userEventDispatcher.on({
         elementName: `${rule.name}_removeButton`,

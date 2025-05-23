@@ -36,7 +36,7 @@ export class RuleModalManager<
 
   readonly #onModalChanged: () => Promise<void>;
 
-  readonly #onContextChange: (args: { context: TContext }) => Promise<void>;
+  readonly #onContextChanged: (args: { context: TContext }) => Promise<void>;
 
   readonly #getContext: () => TContext;
 
@@ -58,24 +58,24 @@ export class RuleModalManager<
     userEventDispatcher,
     interfaceId,
     rules,
-    onModalChange,
+    onModalChanged,
     getContext,
-    onContextChange,
+    onContextChanged,
     deriveMetadata,
   }: {
     userEventDispatcher: UserEventDispatcher;
     interfaceId: string;
     rules: RuleDefinition<TContext, TMetadata>[];
-    onModalChange: () => Promise<void>;
+    onModalChanged: () => Promise<void>;
     getContext: () => TContext;
-    onContextChange: (args: { context: TContext }) => Promise<void>;
+    onContextChanged: (args: { context: TContext }) => Promise<void>;
     deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   }) {
     this.#userEventDispatcher = userEventDispatcher;
     this.#interfaceId = interfaceId;
     this.#rules = rules;
-    this.#onModalChanged = onModalChange;
-    this.#onContextChange = onContextChange;
+    this.#onModalChanged = onModalChanged;
+    this.#onContextChanged = onContextChanged;
     this.#getContext = getContext;
     this.#deriveMetadata = deriveMetadata;
   }
@@ -180,7 +180,7 @@ export class RuleModalManager<
         this.#isModalVisible = false;
         this.#selectedRuleIndex = 0;
 
-        await this.#onContextChange({ context: updatedContext });
+        await this.#onContextChanged({ context: updatedContext });
       }
     };
 

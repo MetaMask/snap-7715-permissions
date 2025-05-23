@@ -200,7 +200,8 @@ export abstract class BaseOrchestrator<
       await rerenderModal(getContext());
     };
 
-    const getMetadata = async (args?: { context?: TContext }) => {
+    // derives metadata from either the provided context or the current context if none is specified
+    const deriveMetadata = async (args?: { context: TContext }) => {
       return this.createContextMetadata(args?.context ?? getContext());
     };
 
@@ -210,17 +211,17 @@ export abstract class BaseOrchestrator<
       interfaceId,
       onContextChanged,
       getContext,
-      getMetadata,
+      deriveMetadata,
     });
 
     ruleModalManager = new RuleModalManager<TContext, TMetadata>({
       userEventDispatcher: this.userEventDispatcher,
       interfaceId,
       rules: this.rules,
-      onModalChange: async () => onContextChanged({}),
+      onModalChanged: async () => onContextChanged({}),
       getContext,
-      onContextChange: onContextChanged,
-      deriveMetadata: getMetadata,
+      onContextChanged,
+      deriveMetadata,
     });
 
     ruleModalManager.bindHandlers();
@@ -230,7 +231,7 @@ export abstract class BaseOrchestrator<
       interfaceId,
       rules: this.rules,
       getContext,
-      onContextChange: onContextChanged,
+      onContextChanged,
     });
 
     try {
@@ -350,14 +351,14 @@ export abstract class BaseOrchestrator<
     stateChangeHandlers,
     onContextChanged,
     getContext,
-    getMetadata,
+    deriveMetadata,
     interfaceId,
     userEventDispatcher,
   }: {
     stateChangeHandlers: StateChangeHandler<TContext, TMetadata>[];
     onContextChanged: (args: { context?: TContext }) => void | Promise<void>;
     getContext: () => TContext | undefined;
-    getMetadata: () => Promise<TMetadata>;
+    deriveMetadata: () => Promise<TMetadata>;
     interfaceId: string;
     userEventDispatcher: UserEventDispatcher;
   }) {
@@ -368,7 +369,7 @@ export abstract class BaseOrchestrator<
         event: UserInputEventByType<UserInputEventType>;
       }) => {
         let context = getContext();
-        const metadata = await getMetadata();
+        const metadata = await deriveMetadata();
         if (!context) {
           throw new Error('Current context is undefined');
         }
