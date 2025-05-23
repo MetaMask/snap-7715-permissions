@@ -13,6 +13,9 @@ import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { bytesToHex, toHex } from 'viem';
 
 import type { AccountController } from '../accountController';
+import { RuleModalManager } from '../permissions/ruleModalManager';
+import type { RuleDefinition } from '../permissions/rules';
+import { bindRuleHandlers } from '../permissions/rules';
 import type {
   UserEventDispatcher,
   UserEventHandler,
@@ -47,6 +50,8 @@ export abstract class BaseOrchestrator<
 
   #currentContext: TContext | undefined;
 
+  protected readonly rules: RuleDefinition<TContext, TMetadata>[];
+
   readonly #permissionRequest: TPermissionRequest;
 
   constructor({
@@ -54,17 +59,19 @@ export abstract class BaseOrchestrator<
     permissionRequest,
     confirmationDialogFactory,
     userEventDispatcher,
+    rules,
   }: {
     accountController: AccountController;
     permissionRequest: TPermissionRequest;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
+    rules: RuleDefinition<TContext, TMetadata>[];
   }) {
     this.accountController = accountController;
     this.confirmationDialogFactory = confirmationDialogFactory;
     this.userEventDispatcher = userEventDispatcher;
-
     this.#permissionRequest = permissionRequest;
+    this.rules = rules;
   }
 
   /**
@@ -105,6 +112,7 @@ export abstract class BaseOrchestrator<
     metadata: TMetadata;
     origin: string;
     chainId: number;
+    showAddMoreRulesButton: boolean;
   }): Promise<GenericSnapElement>;
 
   /**
@@ -146,37 +154,83 @@ export abstract class BaseOrchestrator<
           metadata: await this.createContextMetadata(this.#currentContext),
           origin,
           chainId,
+          showAddMoreRulesButton: false,
         }),
       });
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    const onContextChanged = async (context: TContext) => {
-      this.#currentContext = context;
-      const metadata = await this.createContextMetadata(this.#currentContext);
+    // we need to declare the ruleModalManager here so that it can be accessed
+    // in the onContextChanged handler we could make the instantiation of the
+    // ruleModalManager and binding of it two steps, but we plan to move the
+    // rule modal manager out of here anyways
+    // eslint-disable-next-line prefer-const
+    let ruleModalManager: RuleModalManager<TContext, TMetadata>;
+
+    const rerenderModal = async (context: TContext) => {
+      const metadata = await this.createContextMetadata(context);
+
+      const ui = ruleModalManager.isModalVisible()
+        ? await ruleModalManager.renderModal()
+        : await this.createUiContent({
+            context,
+            metadata,
+            origin,
+            chainId,
+            showAddMoreRulesButton: ruleModalManager.hasRulesToAdd({ context }),
+          });
 
       await confirmationDialog.updateContent({
-        ui: await this.createUiContent({
-          context: this.#currentContext,
-          metadata,
-          origin,
-          chainId,
-        }),
+        ui,
       });
     };
 
+    const getContext = () => {
+      if (this.#currentContext === undefined) {
+        throw new Error('Current context is undefined');
+      }
+      return this.#currentContext;
+    };
+
+    const onContextChanged = async ({ context }: { context?: TContext }) => {
+      if (context) {
+        this.#currentContext = context;
+      }
+
+      await rerenderModal(getContext());
+    };
+
+    const getMetadata = async (args?: { context?: TContext }) => {
+      return this.createContextMetadata(args?.context ?? getContext());
+    };
+
     const unbindStateChangeHandlers = this.#bindStateChangeHandlers({
-      stateChangeHandlers: this.stateChangeHandlers,
-      onContextChanged,
-      getContext: () => this.#currentContext,
-      getMetadata: async () => {
-        if (this.#currentContext === undefined) {
-          throw new Error('Current context is undefined');
-        }
-        return this.createContextMetadata(this.#currentContext);
-      },
-      interfaceId,
       userEventDispatcher: this.userEventDispatcher,
+      stateChangeHandlers: this.stateChangeHandlers,
+      interfaceId,
+      onContextChanged,
+      getContext,
+      getMetadata,
+    });
+
+    ruleModalManager = new RuleModalManager<TContext, TMetadata>({
+      userEventDispatcher: this.userEventDispatcher,
+      interfaceId,
+      rules: this.rules,
+      onModalChange: async () => onContextChanged({}),
+      getContext,
+      onContextChange: onContextChanged,
+      deriveMetadata: getMetadata,
+    });
+
+    ruleModalManager.bindHandlers();
+
+    const unbindRuleHandlers = bindRuleHandlers({
+      userEventDispatcher: this.userEventDispatcher,
+      interfaceId,
+      rules: this.rules,
+      getContext,
+      onContextChange: onContextChanged,
     });
 
     try {
@@ -190,11 +244,14 @@ export abstract class BaseOrchestrator<
         };
       }
     } finally {
+      unbindRuleHandlers();
+      ruleModalManager.unbindHandlers();
       unbindStateChangeHandlers();
     }
 
     const isAdjustmentAllowed =
       this.#permissionRequest.isAdjustmentAllowed ?? true;
+
     const resolvedPermissionRequest = isAdjustmentAllowed
       ? await this.resolvePermissionRequest({
           context: this.#currentContext,
@@ -298,7 +355,7 @@ export abstract class BaseOrchestrator<
     userEventDispatcher,
   }: {
     stateChangeHandlers: StateChangeHandler<TContext, TMetadata>[];
-    onContextChanged: (context: TContext) => void | Promise<void>;
+    onContextChanged: (args: { context?: TContext }) => void | Promise<void>;
     getContext: () => TContext | undefined;
     getMetadata: () => Promise<TMetadata>;
     interfaceId: string;
@@ -325,7 +382,7 @@ export abstract class BaseOrchestrator<
           metadata,
           event,
         });
-        await onContextChanged(context);
+        await onContextChanged({ context });
       };
 
       const eventMetadata = {
