@@ -21,6 +21,7 @@ export const initialAmountRule: RuleDefinition<
   name: INITIAL_AMOUNT_ELEMENT,
   type: 'number',
   isOptional: true,
+  tooltip: 'The initial amount of tokens that can be streamed.',
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.initialAmount,
   error: (metadata: NativeTokenStreamMetadata) =>
@@ -43,6 +44,7 @@ export const maxAmountRule: RuleDefinition<
 > = {
   label: 'Max Amount',
   name: MAX_AMOUNT_ELEMENT,
+  tooltip: 'The maximum amount of tokens that can be streamed.',
   type: 'number',
   isOptional: true,
   value: (context: NativeTokenStreamContext) =>
@@ -68,6 +70,7 @@ export const startTimeRule: RuleDefinition<
   label: 'Start Time',
   name: START_TIME_ELEMENT,
   type: 'text',
+  tooltip: 'The start time of the stream.',
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.startTime,
   error: (metadata: NativeTokenStreamMetadata) =>
@@ -88,6 +91,7 @@ export const expiryRule: RuleDefinition<
   label: 'Expiry',
   name: EXPIRY_ELEMENT,
   type: 'text',
+  tooltip: 'The expiry date of the stream.',
   value: (context: NativeTokenStreamContext) => context.expiry,
   error: (metadata: NativeTokenStreamMetadata) =>
     metadata.validationErrors.expiryError,
@@ -104,6 +108,7 @@ export const streamAmountPerPeriodRule: RuleDefinition<
   label: 'Stream Amount',
   name: AMOUNT_PER_PERIOD_ELEMENT,
   type: 'number',
+  tooltip: 'The amount of tokens that can be streamed per period.',
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.amountPerPeriod,
   error: (metadata: NativeTokenStreamMetadata) =>
@@ -124,6 +129,7 @@ export const streamPeriodRule: RuleDefinition<
   label: 'Stream Period',
   name: TIME_PERIOD_ELEMENT,
   type: 'dropdown',
+  tooltip: 'The period of the stream.',
   options: Object.values(TimePeriod),
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.timePeriod,

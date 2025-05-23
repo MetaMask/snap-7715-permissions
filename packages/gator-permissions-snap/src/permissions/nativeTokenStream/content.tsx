@@ -23,10 +23,6 @@ import type {
 } from './types';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'justification-show-more';
-export const SELECT_NEW_RULE_DROPDOWN = 'select-new-rule';
-export const NEW_RULE_VALUE_ELEMENT = 'new-rule-value';
-export const SAVE_NEW_RULE_BUTTON = 'save-new-rule';
-export const ADD_MORE_RULES_FORM = 'add-more-rules-form';
 
 export const createConfirmationContent = ({
   context,

@@ -152,166 +152,16 @@ describe('NativeTokenStreamOrchestrator', () => {
   describe('stateChangeHandlers', () => {
     it('should return all required handlers', () => {
       const handlers = orchestrator.stateChangeHandlers;
-      const handlerNames = handlers.map((_handler) => _handler.elementName);
+      expect(handlers).toHaveLength(1);
+      if (handlers[0] === undefined) {
+        throw new Error('No handlers found');
+      }
 
-      const expectedHandlerNames = [
-        'initial-amount',
-        'remove-initial-amount',
-        'max-amount',
-        'remove-max-amount',
-        'start-time',
-        'expiry',
-        'amount-per-period',
-        'time-period',
-        'justification-show-more',
-        'add-more-rules',
-        'add-more-rules-form',
-        'select-new-rule',
-        'new-rule-value',
-      ];
+      const { elementName, eventType, contextMapper } = handlers[0];
 
-      expect(handlerNames).toStrictEqual(expectedHandlerNames);
-    });
-
-    it('should properly map initial amount updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'initial-amount',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'initial-amount',
-          value: '2',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          initialAmount: '2',
-        },
-      });
-    });
-
-    it('should properly map max amount updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'max-amount',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'max-amount',
-          value: '20',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          maxAmount: '20',
-        },
-      });
-    });
-
-    it('should properly map start time updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'start-time',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'start-time',
-          value: '06/01/2024',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          startTime: '06/01/2024',
-        },
-      });
-    });
-
-    it('should properly map expiry updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'expiry',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'expiry',
-          value: '07/01/2024',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        expiry: '07/01/2024',
-      });
-    });
-
-    it('should properly map amount per period updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'amount-per-period',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'amount-per-period',
-          value: '500000',
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          amountPerPeriod: '500000',
-        },
-      });
-    });
-
-    it('should properly map time period updates', () => {
-      const handler = orchestrator.stateChangeHandlers.find(
-        (_handler) => _handler.elementName === 'time-period',
-      );
-      expect(handler).toBeDefined();
-
-      const result = handler?.contextMapper({
-        context: mockContext,
-        event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'time-period',
-          value: TimePeriod.DAILY,
-        },
-        metadata: mockMetadata,
-      });
-      expect(result).toStrictEqual({
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          timePeriod: TimePeriod.DAILY,
-        },
-      });
+      expect(elementName).toBe('justification-show-more');
+      expect(eventType).toBe(UserInputEventType.ButtonClickEvent);
+      expect(contextMapper).toBeDefined();
     });
   });
 
@@ -322,6 +172,7 @@ describe('NativeTokenStreamOrchestrator', () => {
         metadata: mockMetadata,
         origin: 'https://example.com',
         chainId: 1,
+        showAddMoreRulesButton: false,
       });
 
       expect(mockDependencies.createConfirmationContent).toHaveBeenCalledWith({
@@ -330,8 +181,7 @@ describe('NativeTokenStreamOrchestrator', () => {
         origin: 'https://example.com',
         chainId: 1,
         isJustificationCollapsed: true,
-        isAddRuleShown: false,
-        addRuleValidationMessage: undefined,
+        showAddMoreRulesButton: false,
       });
     });
   });
