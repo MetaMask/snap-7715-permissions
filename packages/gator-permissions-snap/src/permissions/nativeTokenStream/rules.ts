@@ -4,19 +4,21 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
+import { createExpiryRule } from '../sharedRules';
 
 export const INITIAL_AMOUNT_ELEMENT = 'native-token-stream-initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'native-token-stream-max-amount';
 export const START_TIME_ELEMENT = 'native-token-stream-start-time';
-export const EXPIRY_ELEMENT = 'native-token-stream-expiry';
 export const AMOUNT_PER_PERIOD_ELEMENT =
   'native-token-stream-amount-per-period';
 export const TIME_PERIOD_ELEMENT = 'native-token-stream-time-period';
 
-export const initialAmountRule: RuleDefinition<
+type NativeTokenStreamRuleDefinition = RuleDefinition<
   NativeTokenStreamContext,
   NativeTokenStreamMetadata
-> = {
+>;
+
+export const initialAmountRule: NativeTokenStreamRuleDefinition = {
   label: 'Initial Amount',
   name: INITIAL_AMOUNT_ELEMENT,
   type: 'number',
@@ -38,10 +40,7 @@ export const initialAmountRule: RuleDefinition<
   }),
 };
 
-export const maxAmountRule: RuleDefinition<
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata
-> = {
+export const maxAmountRule: NativeTokenStreamRuleDefinition = {
   label: 'Max Amount',
   name: MAX_AMOUNT_ELEMENT,
   tooltip: 'The maximum amount of tokens that can be streamed.',
@@ -63,10 +62,7 @@ export const maxAmountRule: RuleDefinition<
   }),
 };
 
-export const startTimeRule: RuleDefinition<
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata
-> = {
+export const startTimeRule: NativeTokenStreamRuleDefinition = {
   label: 'Start Time',
   name: START_TIME_ELEMENT,
   type: 'text',
@@ -84,27 +80,7 @@ export const startTimeRule: RuleDefinition<
   }),
 };
 
-export const expiryRule: RuleDefinition<
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata
-> = {
-  label: 'Expiry',
-  name: EXPIRY_ELEMENT,
-  type: 'text',
-  tooltip: 'The expiry date of the stream.',
-  value: (context: NativeTokenStreamContext) => context.expiry,
-  error: (metadata: NativeTokenStreamMetadata) =>
-    metadata.validationErrors.expiryError,
-  updateContext: (context: NativeTokenStreamContext, value: string) => ({
-    ...context,
-    expiry: value,
-  }),
-};
-
-export const streamAmountPerPeriodRule: RuleDefinition<
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata
-> = {
+export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
   label: 'Stream Amount',
   name: AMOUNT_PER_PERIOD_ELEMENT,
   type: 'number',
@@ -122,10 +98,7 @@ export const streamAmountPerPeriodRule: RuleDefinition<
   }),
 };
 
-export const streamPeriodRule: RuleDefinition<
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata
-> = {
+export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
   label: 'Stream Period',
   name: TIME_PERIOD_ELEMENT,
   type: 'dropdown',
@@ -141,6 +114,11 @@ export const streamPeriodRule: RuleDefinition<
     },
   }),
 };
+
+export const expiryRule = createExpiryRule<
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata
+>();
 
 export const allRules = [
   initialAmountRule,

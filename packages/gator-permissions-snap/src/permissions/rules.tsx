@@ -12,8 +12,8 @@ import type {
 export type RuleType = 'number' | 'text' | 'dropdown';
 
 export type RuleDefinition<
-  TContext extends BaseContext,
-  TMetadata extends object,
+  TContext extends BaseContext = BaseContext,
+  TMetadata extends object = object,
 > = {
   label: string;
   name: string;

@@ -970,7 +970,7 @@ describe('nativeTokenStream:content', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The expiry date of the stream.",
+                                          "children": "The expiry date of the permission.",
                                         },
                                         "type": "Text",
                                       },
@@ -991,7 +991,7 @@ describe('nativeTokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-stream-expiry",
+                          "name": "permission-expiry",
                           "type": "text",
                           "value": "05/01/2024",
                         },
@@ -1976,7 +1976,7 @@ describe('nativeTokenStream:content', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The expiry date of the stream.",
+                                          "children": "The expiry date of the permission.",
                                         },
                                         "type": "Text",
                                       },
@@ -1997,7 +1997,7 @@ describe('nativeTokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-stream-expiry",
+                          "name": "permission-expiry",
                           "type": "text",
                           "value": "05/01/2024",
                         },
@@ -2893,7 +2893,7 @@ describe('nativeTokenStream:content', () => {
                                 "content": {
                                   "key": null,
                                   "props": {
-                                    "children": "The expiry date of the stream.",
+                                    "children": "The expiry date of the permission.",
                                   },
                                   "type": "Text",
                                 },
@@ -3737,7 +3737,7 @@ describe('nativeTokenStream:content', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The expiry date of the stream.",
+                                          "children": "The expiry date of the permission.",
                                         },
                                         "type": "Text",
                                       },
@@ -3758,7 +3758,7 @@ describe('nativeTokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-stream-expiry",
+                          "name": "permission-expiry",
                           "type": "text",
                           "value": "05/01/2024",
                         },
@@ -4732,7 +4732,7 @@ describe('nativeTokenStream:content', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The expiry date of the stream.",
+                                          "children": "The expiry date of the permission.",
                                         },
                                         "type": "Text",
                                       },
@@ -4753,7 +4753,7 @@ describe('nativeTokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-stream-expiry",
+                          "name": "permission-expiry",
                           "type": "text",
                           "value": "05/01/2024",
                         },
