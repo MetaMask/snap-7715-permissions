@@ -1,5 +1,5 @@
-import { BaseContext } from 'src/core/types';
-import { RuleDefinition } from './rules';
+import type { BaseContext } from '../core/types';
+import type { RuleDefinition } from './rules';
 
 const EXPIRY_ELEMENT = 'permission-expiry';
 

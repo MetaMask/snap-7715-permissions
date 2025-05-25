@@ -1,10 +1,10 @@
 import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../rules';
+import { createExpiryRule } from '../sharedRules';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
-import { createExpiryRule } from '../sharedRules';
 
 export const INITIAL_AMOUNT_ELEMENT = 'native-token-stream-initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'native-token-stream-max-amount';

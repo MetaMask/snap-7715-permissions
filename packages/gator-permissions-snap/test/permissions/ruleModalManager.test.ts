@@ -722,7 +722,7 @@ describe('RuleModalManager', () => {
   });
 
   describe('isModalVisible()', () => {
-    it('should return current modal visibility state', () => {
+    it('should return current modal visibility state', async () => {
       expect(ruleModalManager.isModalVisible()).toBe(false);
 
       // Change visibility through handler
@@ -733,7 +733,7 @@ describe('RuleModalManager', () => {
       const handler = onCall?.[0]
         .handler as UserEventHandler<UserInputEventType.ButtonClickEvent>;
 
-      handler({
+      await handler({
         interfaceId: 'test-interface',
         event: {
           type: UserInputEventType.ButtonClickEvent,

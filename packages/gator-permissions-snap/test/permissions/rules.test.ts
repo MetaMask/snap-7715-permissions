@@ -612,7 +612,7 @@ describe('rules', () => {
         metadata: mockMetadata,
       });
 
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
   });
 
