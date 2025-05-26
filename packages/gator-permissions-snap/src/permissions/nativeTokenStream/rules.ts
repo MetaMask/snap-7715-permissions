@@ -114,7 +114,8 @@ export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
     },
   }),
 };
-export const expiryRule = {
+
+export const expiryRule: NativeTokenStreamRuleDefinition = {
   label: 'Expiry',
   name: EXPIRY_ELEMENT,
   type: 'text',

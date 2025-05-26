@@ -991,7 +991,7 @@ describe('nativeTokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "permission-expiry",
+                          "name": "native-token-stream-expiry",
                           "type": "text",
                           "value": "05/01/2024",
                         },
@@ -1997,7 +1997,7 @@ describe('nativeTokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "permission-expiry",
+                          "name": "native-token-stream-expiry",
                           "type": "text",
                           "value": "05/01/2024",
                         },
@@ -3758,7 +3758,7 @@ describe('nativeTokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "permission-expiry",
+                          "name": "native-token-stream-expiry",
                           "type": "text",
                           "value": "05/01/2024",
                         },
@@ -4753,7 +4753,7 @@ describe('nativeTokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "permission-expiry",
+                          "name": "native-token-stream-expiry",
                           "type": "text",
                           "value": "05/01/2024",
                         },
