@@ -19,8 +19,6 @@ export class ConfirmationDialog {
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
-  #isJustificationCollapsed = true;
-
   #ui: GenericSnapElement;
 
   #interfaceId: string | undefined;
@@ -95,13 +93,6 @@ export class ConfirmationDialog {
           handler: onCancelButtonClick,
         });
 
-        this.#userEventDispatcher.off({
-          elementName: 'show-more-button',
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: onShowMoreButtonClickHandler,
-        });
-
         try {
           await this.#snaps.request({
             method: 'snap_resolveInterface',
@@ -130,13 +121,6 @@ export class ConfirmationDialog {
         handler: onCancelButtonClick,
       });
 
-      this.#userEventDispatcher.on({
-        elementName: 'show-more-button',
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId,
-        handler: onShowMoreButtonClickHandler,
-      });
-
       this.#snaps
         .request({
           method: 'snap_dialog',
@@ -153,12 +137,6 @@ export class ConfirmationDialog {
     return {
       isConfirmationGranted: await isConfirmationGranted,
     };
-  }
-
-  async #toggleShowMoreText(): Promise<void> {
-    this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
-
-    await this.updateContent({ ui: this.#ui });
   }
 
   #buildConfirmation(): JSX.Element {

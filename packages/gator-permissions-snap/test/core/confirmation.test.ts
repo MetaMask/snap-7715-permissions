@@ -146,7 +146,7 @@ describe('ConfirmationDialog', () => {
 
       await awaitingUserDecision;
 
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3); // Grant, Cancel, and Show More buttons
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(2); // Grant, Cancel
       expect(mockSnaps.request).toHaveBeenCalledWith({
         method: 'snap_resolveInterface',
         params: {
