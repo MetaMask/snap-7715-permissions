@@ -6,9 +6,9 @@ import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
 import {
   populatePermission,
-  permissionRequestToContext,
-  createContextMetadata,
-  contextToPermissionRequest,
+  buildContext,
+  deriveMetadata,
+  applyContext,
 } from '../../../src/permissions/nativeTokenStream/context';
 import type {
   NativeTokenStreamContext,
@@ -73,16 +73,16 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
 
 describe('nativeTokenStream:context', () => {
   describe('populatePermission()', () => {
-    it('should return the permission unchanged if it is already populated', () => {
-      const populatedPermission = populatePermission({
+    it('should return the permission unchanged if it is already populated', async () => {
+      const populatedPermission = await populatePermission({
         permission: alreadyPopulatedPermission,
       });
 
       expect(populatedPermission).toStrictEqual(alreadyPopulatedPermission);
     });
 
-    it('should add defaults to a permission', () => {
-      const populatedPermission = populatePermission({
+    it('should add defaults to a permission', async () => {
+      const populatedPermission = await populatePermission({
         permission: permissionWithoutOptionals,
       });
 
@@ -97,7 +97,7 @@ describe('nativeTokenStream:context', () => {
       });
     });
 
-    it('should not override existing rules', () => {
+    it('should not override existing rules', async () => {
       const permission: NativeTokenStreamPermission = {
         type: 'native-token-stream',
         data: {
@@ -112,7 +112,7 @@ describe('nativeTokenStream:context', () => {
         },
       };
 
-      const populatedPermission = populatePermission({ permission });
+      const populatedPermission = await populatePermission({ permission });
 
       expect(populatedPermission).toStrictEqual(permission);
     });
@@ -141,7 +141,7 @@ describe('nativeTokenStream:context', () => {
     });
 
     it('should create a context from a permission request', async () => {
-      const context = await permissionRequestToContext({
+      const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
         tokenPricesService: mockTokenPricesService,
         accountController: mockAccountController,
@@ -177,7 +177,7 @@ describe('nativeTokenStream:context', () => {
     };
 
     it('should create metadata for a context', async () => {
-      const metadata = await createContextMetadata({
+      const metadata = await deriveMetadata({
         context,
       });
 
@@ -200,7 +200,7 @@ describe('nativeTokenStream:context', () => {
             },
           };
 
-          const metadata = await createContextMetadata({
+          const metadata = await deriveMetadata({
             context: contextWithInvalidInitialAmount,
           });
 
@@ -219,7 +219,7 @@ describe('nativeTokenStream:context', () => {
           },
         };
 
-        const metadata = await createContextMetadata({
+        const metadata = await deriveMetadata({
           context: contextWithNegativeInitialAmount,
         });
 
@@ -240,7 +240,7 @@ describe('nativeTokenStream:context', () => {
           },
         };
 
-        const metadata = await createContextMetadata({
+        const metadata = await deriveMetadata({
           context: contextWithInitialAmountGreaterThanMaxAmount,
         });
 
@@ -260,7 +260,7 @@ describe('nativeTokenStream:context', () => {
             },
           };
 
-          const metadata = await createContextMetadata({
+          const metadata = await deriveMetadata({
             context: contextWithInvalidMaxAmount,
           });
 
@@ -279,7 +279,7 @@ describe('nativeTokenStream:context', () => {
           },
         };
 
-        const metadata = await createContextMetadata({
+        const metadata = await deriveMetadata({
           context: contextWithNegativeMaxAmount,
         });
 
@@ -301,7 +301,7 @@ describe('nativeTokenStream:context', () => {
             },
           };
 
-          const metadata = await createContextMetadata({
+          const metadata = await deriveMetadata({
             context: contextWithInvalidAmountPerPeriod,
           });
 
@@ -320,7 +320,7 @@ describe('nativeTokenStream:context', () => {
           },
         };
 
-        const metadata = await createContextMetadata({
+        const metadata = await deriveMetadata({
           context: contextWithNegativeAmountPerPeriod,
         });
 
@@ -339,7 +339,7 @@ describe('nativeTokenStream:context', () => {
             },
           };
 
-          const metadata = await createContextMetadata({
+          const metadata = await deriveMetadata({
             context: contextWithStartTimeInThePast,
           });
 
@@ -359,7 +359,7 @@ describe('nativeTokenStream:context', () => {
               },
             };
 
-            const metadata = await createContextMetadata({
+            const metadata = await deriveMetadata({
               context: contextWithInvalidStartTime,
             });
 
@@ -381,7 +381,7 @@ describe('nativeTokenStream:context', () => {
           },
         };
 
-        const metadata = await createContextMetadata({
+        const metadata = await deriveMetadata({
           context: contextWithExpiryInThePast,
         });
 
@@ -401,7 +401,7 @@ describe('nativeTokenStream:context', () => {
             },
           };
 
-          const metadata = await createContextMetadata({
+          const metadata = await deriveMetadata({
             context: contextWithInvalidExpiry,
           });
 
@@ -413,8 +413,8 @@ describe('nativeTokenStream:context', () => {
     });
 
     describe('contextToPermissionRequest()', () => {
-      it('should convert a context to a permission request', () => {
-        const permissionRequest = contextToPermissionRequest({
+      it('should convert a context to a permission request', async () => {
+        const permissionRequest = await applyContext({
           context: alreadyPopulatedContext,
           originalRequest: alreadyPopulatedPermissionRequest,
         });

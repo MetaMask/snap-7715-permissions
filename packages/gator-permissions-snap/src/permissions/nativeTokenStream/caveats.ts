@@ -9,13 +9,13 @@ import type { PopulatedNativeTokenStreamPermission } from './types';
  * @param options0.caveatBuilder - The core caveat builder to append caveats to.
  * @returns The modified caveat builder with appended native token stream caveats.
  */
-export function appendCaveats({
+export async function appendCaveats({
   permission,
   caveatBuilder,
 }: {
   permission: PopulatedNativeTokenStreamPermission;
   caveatBuilder: CoreCaveatBuilder;
-}): CoreCaveatBuilder {
+}): Promise<CoreCaveatBuilder> {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
 

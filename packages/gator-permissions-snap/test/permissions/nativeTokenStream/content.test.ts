@@ -33,8 +33,8 @@ const mockMetadata: NativeTokenStreamMetadata = {
 
 describe('nativeTokenStream:content', () => {
   describe('createConfirmationContent()', () => {
-    it('should render content with all permission details', () => {
-      const content = createConfirmationContent({
+    it('should render content with all permission details', async () => {
+      const content = await createConfirmationContent({
         context: mockContext,
         metadata: mockMetadata,
         isJustificationCollapsed: true,
@@ -335,7 +335,7 @@ describe('nativeTokenStream:content', () => {
                                       "key": null,
                                       "props": {
                                         "children": "Show",
-                                        "name": "justification-show-more",
+                                        "name": "show-more-justification",
                                       },
                                       "type": "Button",
                                     },
@@ -1019,8 +1019,8 @@ describe('nativeTokenStream:content', () => {
 `);
     });
 
-    it('should render content with validation errors', () => {
-      const contentWithErrors = createConfirmationContent({
+    it('should render content with validation errors', async () => {
+      const contentWithErrors = await createConfirmationContent({
         context: mockContext,
         metadata: {
           ...mockMetadata,
@@ -1327,7 +1327,7 @@ describe('nativeTokenStream:content', () => {
                                       "key": null,
                                       "props": {
                                         "children": "Show",
-                                        "name": "justification-show-more",
+                                        "name": "show-more-justification",
                                       },
                                       "type": "Button",
                                     },
@@ -2025,8 +2025,8 @@ describe('nativeTokenStream:content', () => {
 `);
     });
 
-    it('should handle disabled fields when adjustment is not allowed', () => {
-      const contentWithoutAdjustment = createConfirmationContent({
+    it('should handle disabled fields when adjustment is not allowed', async () => {
+      const contentWithoutAdjustment = await createConfirmationContent({
         context: {
           ...mockContext,
           isAdjustmentAllowed: false,
@@ -2330,7 +2330,7 @@ describe('nativeTokenStream:content', () => {
                                       "key": null,
                                       "props": {
                                         "children": "Show",
-                                        "name": "justification-show-more",
+                                        "name": "show-more-justification",
                                       },
                                       "type": "Button",
                                     },
@@ -2940,8 +2940,8 @@ describe('nativeTokenStream:content', () => {
 `);
     });
 
-    it('should handle missing optional fields', () => {
-      const contentWithMissingFields = createConfirmationContent({
+    it('should handle missing optional fields', async () => {
+      const contentWithMissingFields = await createConfirmationContent({
         context: {
           ...mockContext,
           permissionDetails: {
@@ -3252,7 +3252,7 @@ describe('nativeTokenStream:content', () => {
                                       "key": null,
                                       "props": {
                                         "children": "Show",
-                                        "name": "justification-show-more",
+                                        "name": "show-more-justification",
                                       },
                                       "type": "Button",
                                     },
@@ -3786,8 +3786,8 @@ describe('nativeTokenStream:content', () => {
 `);
     });
 
-    it('should handle different time periods', () => {
-      const contentWithDailyPeriod = createConfirmationContent({
+    it('should handle different time periods', async () => {
+      const contentWithDailyPeriod = await createConfirmationContent({
         context: {
           ...mockContext,
           permissionDetails: {
@@ -4097,7 +4097,7 @@ describe('nativeTokenStream:content', () => {
                                       "key": null,
                                       "props": {
                                         "children": "Show",
-                                        "name": "justification-show-more",
+                                        "name": "show-more-justification",
                                       },
                                       "type": "Button",
                                     },

@@ -3,17 +3,19 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 
 import type { AccountController } from '../../src/accountController';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
-import { OrchestratorFactory } from '../../src/core/orchestratorFactory';
-import { NativeTokenStreamOrchestrator } from '../../src/permissions/nativeTokenStream/orchestrator';
+import { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
+import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { TokenPricesService } from '../../src/services/tokenPricesService';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
+import { PermissionHandler } from '../../src/permissions/permissionHandler';
 
-describe('OrchestratorFactory', () => {
-  let orchestratorFactory: OrchestratorFactory;
+describe('PermissionHandlerFactory', () => {
+  let permissionHandlerFactory: PermissionHandlerFactory;
   let mockAccountController: jest.Mocked<AccountController>;
   let mockTokenPricesService: jest.Mocked<TokenPricesService>;
   let mockConfirmationDialogFactory: jest.Mocked<ConfirmationDialogFactory>;
   let mockUserEventDispatcher: jest.Mocked<UserEventDispatcher>;
+  let mockOrchestrator: jest.Mocked<PermissionRequestLifecycleOrchestrator>;
 
   const TEST_ADDRESS = '0x1234567890123456789012345678901234567890' as const;
 
@@ -71,56 +73,35 @@ describe('OrchestratorFactory', () => {
       dispatch: jest.fn(),
     } as unknown as jest.Mocked<UserEventDispatcher>;
 
-    orchestratorFactory = new OrchestratorFactory({
+    mockOrchestrator = {
+      registerHandler: jest.fn(),
+    } as unknown as jest.Mocked<PermissionRequestLifecycleOrchestrator>;
+
+    permissionHandlerFactory = new PermissionHandlerFactory({
       accountController: mockAccountController,
       tokenPricesService: mockTokenPricesService,
       confirmationDialogFactory: mockConfirmationDialogFactory,
       userEventDispatcher: mockUserEventDispatcher,
+      orchestrator: mockOrchestrator,
     });
   });
 
-  describe('createOrchestrator', () => {
-    it('should create a NativeTokenStreamOrchestrator when given native-token-stream permission type', () => {
-      const orchestrator = orchestratorFactory.createOrchestrator(
+  describe('createPermissionHandler', () => {
+    it('should create a PermissionHandler when given native-token-stream permission type', () => {
+      const handler = permissionHandlerFactory.createPermissionHandler(
         mockPermissionRequest,
       );
 
-      expect(orchestrator).toBeDefined();
-      expect(orchestrator).toBeInstanceOf(NativeTokenStreamOrchestrator);
-      expect(orchestrator.orchestrate).toBeInstanceOf(Function);
+      expect(handler).toBeDefined();
+      expect(handler).toBeInstanceOf(PermissionHandler);
     });
 
-    it('should throw error when given an unsupported permission type', () => {
+    it('should throw an error when given an unsupported permission type', () => {
       expect(() =>
-        orchestratorFactory.createOrchestrator(
+        permissionHandlerFactory.createPermissionHandler(
           mockUnsupportedPermissionRequest,
         ),
       ).toThrow('Unsupported permission type: unsupported-permission');
-    });
-
-    // Note: We can't test private field access directly in TypeScript
-    // Instead we test the behavior that depends on these dependencies being properly injected
-    it('should create an orchestrator that can handle permission requests', async () => {
-      const orchestrator = orchestratorFactory.createOrchestrator(
-        mockPermissionRequest,
-      );
-
-      // Mock the orchestrate call with a properly typed response
-      const mockResponse = {
-        success: true,
-        response: {
-          ...mockPermissionRequest,
-          context: TEST_ADDRESS,
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
-        },
-      };
-      jest.spyOn(orchestrator, 'orchestrate').mockResolvedValue(mockResponse);
-
-      const result = await orchestrator.orchestrate({ origin: 'test-origin' });
-
-      expect(result).toStrictEqual(mockResponse);
     });
   });
 });

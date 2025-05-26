@@ -1,3 +1,4 @@
+import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Button, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import { getChainName } from '../../../../shared/src/utils/common';
@@ -21,10 +22,19 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../permissionHandler';
 
-export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'justification-show-more';
-
-export const createConfirmationContent = ({
+/**
+ *
+ * @param options0
+ * @param options0.context
+ * @param options0.metadata
+ * @param options0.isJustificationCollapsed
+ * @param options0.origin
+ * @param options0.chainId
+ * @param options0.showAddMoreRulesButton
+ */
+export async function createConfirmationContent({
   context,
   metadata,
   isJustificationCollapsed,
@@ -38,7 +48,7 @@ export const createConfirmationContent = ({
   origin: string;
   chainId: number;
   showAddMoreRulesButton: boolean;
-}) => {
+}): Promise<GenericSnapElement> {
   const { amountPerSecond } = metadata;
 
   const rulesToAddButton = showAddMoreRulesButton ? (
@@ -119,4 +129,4 @@ export const createConfirmationContent = ({
       </Box>
     </Box>
   );
-};
+}
