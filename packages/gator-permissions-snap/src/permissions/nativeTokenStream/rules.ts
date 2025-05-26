@@ -1,6 +1,5 @@
 import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../rules';
-import { createExpiryRule } from '../sharedRules';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
@@ -12,6 +11,7 @@ export const START_TIME_ELEMENT = 'native-token-stream-start-time';
 export const AMOUNT_PER_PERIOD_ELEMENT =
   'native-token-stream-amount-per-period';
 export const TIME_PERIOD_ELEMENT = 'native-token-stream-time-period';
+export const EXPIRY_ELEMENT = 'native-token-stream-expiry';
 
 type NativeTokenStreamRuleDefinition = RuleDefinition<
   NativeTokenStreamContext,
@@ -114,11 +114,19 @@ export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
     },
   }),
 };
-
-export const expiryRule = createExpiryRule<
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata
->();
+export const expiryRule = {
+  label: 'Expiry',
+  name: EXPIRY_ELEMENT,
+  type: 'text',
+  tooltip: 'The expiry date of the permission.',
+  value: (context: NativeTokenStreamContext) => context.expiry,
+  error: (metadata: NativeTokenStreamMetadata) =>
+    metadata.validationErrors.expiryError,
+  updateContext: (context: NativeTokenStreamContext, value: string) => ({
+    ...context,
+    expiry: value,
+  }),
+};
 
 export const allRules = [
   initialAmountRule,
