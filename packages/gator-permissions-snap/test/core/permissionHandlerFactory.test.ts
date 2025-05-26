@@ -5,9 +5,9 @@ import type { AccountController } from '../../src/accountController';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
+import { PermissionHandler } from '../../src/permissions/permissionHandler';
 import type { TokenPricesService } from '../../src/services/tokenPricesService';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
-import { PermissionHandler } from '../../src/permissions/permissionHandler';
 
 describe('PermissionHandlerFactory', () => {
   let permissionHandlerFactory: PermissionHandlerFactory;

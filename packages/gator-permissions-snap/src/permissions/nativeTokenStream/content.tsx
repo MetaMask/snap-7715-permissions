@@ -8,6 +8,7 @@ import { RequestDetails } from '../../ui/components/RequestDetails';
 import { RequestHeader } from '../../ui/components/RequestHeader';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
 import { IconUrls } from '../../ui/iconConstant';
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../permissionHandler';
 import { TOGGLE_ADD_MORE_RULES_BUTTON } from '../ruleModalManager';
 import { renderRules } from '../rules';
 import {
@@ -22,17 +23,18 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../permissionHandler';
 
 /**
+ * Creates the confirmation content for a native token stream permission request.
  *
- * @param options0
- * @param options0.context
- * @param options0.metadata
- * @param options0.isJustificationCollapsed
- * @param options0.origin
- * @param options0.chainId
- * @param options0.showAddMoreRulesButton
+ * @param options - The options for creating the confirmation content.
+ * @param options.context - The context containing stream details and account information.
+ * @param options.metadata - The metadata containing stream configuration.
+ * @param options.isJustificationCollapsed - Whether the justification section is collapsed.
+ * @param options.origin - The origin of the permission request.
+ * @param options.chainId - The chain ID for the network.
+ * @param options.showAddMoreRulesButton - Whether to show the "Add more rules" button.
+ * @returns A promise that resolves to a GenericSnapElement containing the confirmation UI.
  */
 export async function createConfirmationContent({
   context,

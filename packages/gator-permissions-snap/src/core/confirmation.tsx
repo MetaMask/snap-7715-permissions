@@ -74,10 +74,6 @@ export class ConfirmationDialog {
         resolve(false);
       };
 
-      const onShowMoreButtonClickHandler = async () => {
-        await this.#toggleShowMoreText();
-      };
-
       cleanup = async () => {
         this.#userEventDispatcher.off({
           elementName: GRANT_BUTTON,
