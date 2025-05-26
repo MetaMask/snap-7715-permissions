@@ -3,21 +3,22 @@ import { UserInputEventType } from '@metamask/snaps-sdk';
 import { type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountController } from '../accountController';
-import type { PermissionRequestLifecycleOrchestrator } from '../core/permissionRequestLifecycleOrchestrator';
-import type {
-  BaseContext,
-  DeepRequired,
-  LifecycleOrchestrationHandlers,
-  PermissionRequestResult,
-} from '../core/types';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
+import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import { RuleModalManager } from './ruleModalManager';
-import { bindRuleHandlers, type RuleDefinition } from './rules';
-import type { PermissionHandlerType } from './types';
+import { bindRuleHandlers } from './rules';
+import type {
+  BaseContext,
+  DeepRequired,
+  LifecycleOrchestrationHandlers,
+  PermissionRequestResult,
+  RuleDefinition,
+  PermissionHandlerType,
+} from './types';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 

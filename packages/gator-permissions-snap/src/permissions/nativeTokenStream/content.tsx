@@ -2,15 +2,15 @@ import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Button, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import { getChainName } from '../../../../shared/src/utils/common';
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
+import { TOGGLE_ADD_MORE_RULES_BUTTON } from '../../core/ruleModalManager';
+import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
 import { RequestHeader } from '../../ui/components/RequestHeader';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
 import { IconUrls } from '../../ui/iconConstant';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../permissionHandler';
-import { TOGGLE_ADD_MORE_RULES_BUTTON } from '../ruleModalManager';
-import { renderRules } from '../rules';
 import {
   initialAmountRule,
   maxAmountRule,

@@ -139,3 +139,54 @@ export type LifecycleOrchestrationHandlers<
    */
   onConfirmationResolved?: () => void;
 };
+
+/**
+ * Represents the type of rule input field.
+ */
+export type RuleType = 'number' | 'text' | 'dropdown';
+
+/**
+ * Defines a rule that can be applied to a permission request.
+ *
+ * @template TContext - The type of context object used during request processing
+ * @template TMetadata - The type of metadata object used for request processing
+ */
+export type RuleDefinition<
+  TContext extends BaseContext = BaseContext,
+  TMetadata extends object = object,
+> = {
+  label: string;
+  name: string;
+  tooltip?: string | undefined;
+  isOptional?: boolean;
+  type: RuleType;
+  value: (context: TContext) => string | undefined;
+  error?: (metadata: TMetadata) => string | undefined;
+  options?: string[];
+  // todo: it would be nice if we could make the value type more specific
+  updateContext: (context: TContext, value: any) => TContext;
+};
+
+/**
+ * Generic interface for permission handlers.
+ *
+ * Permission handlers are responsible for:
+ * 1. Handling permission request, orchestrating the full lifecycle from request to response.
+ * 2. Managing permission-specific UI interaction
+ * 3. Providing lifecycle hook implementations
+ * 4. Converting between request/context/metadata formats
+ *
+ * @template TRequest - The specific permission request type
+ * @template TContext - The context type used for this permission
+ * @template TMetadata - The metadata type used for this permission
+ */
+export type PermissionHandlerType = {
+  /**
+   * Handles a permission request, orchestrating the full lifecycle from request to response.
+   *
+   * @param origin - The origin of the permission request
+   * @param permissionRequest - The permission request to handle
+   * @returns A permission response object
+   */
+  handlePermissionRequest(origin: string): Promise<PermissionRequestResult>;
+};

@@ -4,11 +4,11 @@ import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { AccountController } from '../accountController';
 import { createNativeTokenStreamHandler } from '../permissions/nativeTokenStream/createHandler';
 import type { NativeTokenStreamPermissionRequest } from '../permissions/nativeTokenStream/types';
-import type { PermissionHandlerType } from '../permissions/types';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
+import type { PermissionHandlerType } from './types';
 
 /**
  * Factory for creating permission-specific orchestrators.

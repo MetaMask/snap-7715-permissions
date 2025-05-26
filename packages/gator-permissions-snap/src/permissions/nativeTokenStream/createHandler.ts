@@ -1,8 +1,8 @@
 import type { AccountController } from '../../accountController';
+import { PermissionHandler } from '../../core/permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from '../../core/permissionRequestLifecycleOrchestrator';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
-import { PermissionHandler } from '../permissionHandler';
 import { appendCaveats } from './caveats';
 import { createConfirmationContent } from './content';
 import {

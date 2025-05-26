@@ -6,7 +6,7 @@ import type {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
-import type { PermissionHandlerType } from '../../src/permissions/types';
+import type { PermissionHandlerType } from '../../src/core/types';
 import type { ProfileSyncManager } from '../../src/profileSync';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 

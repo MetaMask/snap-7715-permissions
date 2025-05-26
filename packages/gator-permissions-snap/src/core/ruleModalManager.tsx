@@ -12,12 +12,11 @@ import {
   Option,
 } from '@metamask/snaps-sdk/jsx';
 
-import type { BaseContext } from '../core/types';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
-import type { RuleDefinition } from './rules';
+import type { BaseContext, RuleDefinition } from './types';
 
 export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 export const SELECT_NEW_RULE_DROPDOWN = 'select-new-rule';
