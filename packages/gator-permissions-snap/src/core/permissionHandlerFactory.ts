@@ -9,6 +9,8 @@ import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type { PermissionHandlerType } from './types';
+import { createNativeTokenPeriodicHandler } from '../permissions/nativeTokenPeriodic/createHandler';
+import type { NativeTokenPeriodicPermissionRequest } from '../permissions/nativeTokenPeriodic/types';
 
 /**
  * Factory for creating permission-specific orchestrators.
@@ -57,8 +59,6 @@ export class PermissionHandlerFactory {
     const type = extractPermissionName(permissionRequest.permission.type);
 
     const baseDependencies = {
-      permissionRequest:
-        permissionRequest as NativeTokenStreamPermissionRequest,
       accountController: this.#accountController,
       confirmationDialogFactory: this.#confirmationDialogFactory,
       userEventDispatcher: this.#userEventDispatcher,
@@ -69,6 +69,15 @@ export class PermissionHandlerFactory {
       case 'native-token-stream':
         return createNativeTokenStreamHandler({
           ...baseDependencies,
+          permissionRequest:
+            permissionRequest as NativeTokenStreamPermissionRequest,
+          tokenPricesService: this.#tokenPricesService,
+        });
+      case 'native-token-periodic':
+        return createNativeTokenPeriodicHandler({
+          ...baseDependencies,
+          permissionRequest:
+            permissionRequest as NativeTokenPeriodicPermissionRequest,
           tokenPricesService: this.#tokenPricesService,
         });
       default:

@@ -3,7 +3,7 @@ import {
   zPermission,
   zMetaMaskPermissionData,
 } from '@metamask/7715-permissions-shared/types';
-import { type Hex } from 'viem';
+import type { Hex } from 'viem';
 import { z } from 'zod';
 
 import type {
