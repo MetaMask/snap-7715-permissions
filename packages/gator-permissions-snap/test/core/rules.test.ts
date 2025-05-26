@@ -26,6 +26,7 @@ type TestMetadata = {
 const mockContext: TestContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
+  justification: 'Permission to do something important',
   testValue: 'test-value',
   optionalValue: 'optional-value',
   numberValue: '123',

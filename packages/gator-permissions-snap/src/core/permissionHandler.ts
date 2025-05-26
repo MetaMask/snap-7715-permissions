@@ -8,6 +8,7 @@ import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
+import { PermissionHandlerContent } from './permissionHandlerContent';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import { RuleModalManager } from './ruleModalManager';
 import { bindRuleHandlers } from './rules';
@@ -57,6 +58,29 @@ export type PermissionHandlerDependencies<
   }) => Promise<any>;
 };
 
+export type PermissionHandlerParams<
+  TRequest extends PermissionRequest,
+  TContext extends BaseContext,
+  TMetadata extends object,
+  TPermission extends TRequest['permission'],
+  TPopulatedPermission extends DeepRequired<TPermission>,
+> = {
+  accountController: AccountController;
+  userEventDispatcher: UserEventDispatcher;
+  orchestrator: PermissionRequestLifecycleOrchestrator;
+  permissionRequest: TRequest;
+  dependencies: PermissionHandlerDependencies<
+    TRequest,
+    TContext,
+    TMetadata,
+    TPermission,
+    TPopulatedPermission
+  >;
+  tokenPricesService: any;
+  rules: RuleDefinition<TContext, TMetadata>[];
+  title: string;
+};
+
 /**
  * Handler for permission requests.
  * Coordinates the permission-specific validation, UI, and caveat logic.
@@ -89,6 +113,8 @@ export class PermissionHandler<
 
   readonly #rules: RuleDefinition<TContext, TMetadata>[];
 
+  readonly #permissionTitle: string;
+
   #addMoreRulesModal: RuleModalManager<TContext, TMetadata> | undefined;
 
   #isJustificationCollapsed = true;
@@ -105,21 +131,14 @@ export class PermissionHandler<
     dependencies,
     tokenPricesService,
     rules,
-  }: {
-    accountController: AccountController;
-    userEventDispatcher: UserEventDispatcher;
-    orchestrator: PermissionRequestLifecycleOrchestrator;
-    permissionRequest: TRequest;
-    dependencies: PermissionHandlerDependencies<
-      TRequest,
-      TContext,
-      TMetadata,
-      TPermission,
-      TPopulatedPermission
-    >;
-    tokenPricesService: any;
-    rules: RuleDefinition<TContext, TMetadata>[];
-  }) {
+    title,
+  }: PermissionHandlerParams<
+    TRequest,
+    TContext,
+    TMetadata,
+    TPermission,
+    TPopulatedPermission
+  >) {
     this.#accountController = accountController;
     this.#userEventDispatcher = userEventDispatcher;
     this.#orchestrator = orchestrator;
@@ -127,6 +146,7 @@ export class PermissionHandler<
     this.#dependencies = dependencies;
     this.#tokenPricesService = tokenPricesService;
     this.#rules = rules;
+    this.#permissionTitle = title;
   }
 
   /**
@@ -193,7 +213,11 @@ export class PermissionHandler<
           showAddMoreRulesButton,
         });
 
-      return permissionContent;
+      return PermissionHandlerContent({
+        showAddMoreRulesButton,
+        children: permissionContent,
+        permissionTitle: this.#permissionTitle,
+      });
     };
 
     const onConfirmationCreatedHandler = ({

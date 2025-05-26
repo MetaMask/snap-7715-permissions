@@ -150,6 +150,7 @@ export async function buildContext({
 
   return {
     expiry,
+    justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     accountDetails: {
       address,

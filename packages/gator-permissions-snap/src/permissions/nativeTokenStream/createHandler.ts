@@ -47,6 +47,7 @@ export const createNativeTokenStreamHandler = ({
     permissionRequest,
     tokenPricesService,
     rules: allRules,
+    title: 'Native token stream',
     dependencies: {
       validateRequest: parseAndValidatePermission,
       buildContext,

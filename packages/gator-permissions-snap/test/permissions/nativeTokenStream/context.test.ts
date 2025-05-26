@@ -26,7 +26,7 @@ const permissionWithoutOptionals: NativeTokenStreamPermission = {
   data: {
     amountPerSecond: toHex(parseUnits('.5', 18)), // 0.5 eth per second
     startTime: convertReadableDateToTimestamp('10/26/1985'),
-    justification: 'test',
+    justification: 'Permission to do something important',
   },
 };
 
@@ -57,6 +57,7 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
 const alreadyPopulatedContext: NativeTokenStreamContext = {
   expiry: '05/01/2024',
   isAdjustmentAllowed: true,
+  justification: 'Permission to do something important',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
@@ -105,7 +106,7 @@ describe('nativeTokenStream:context', () => {
           maxAmount: '0x1000000000000000000000000000000000000000',
           amountPerSecond: '0x1000000000000000000000000000000000000000',
           startTime: 1714531200,
-          justification: 'test',
+          justification: 'Permission to do something important',
         },
         rules: {
           some: 'rule',
