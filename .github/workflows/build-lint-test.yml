@@ -3,14 +3,16 @@ name: Build, Lint, and Test
 on:
   workflow_call:
 
-env:
-  SNAP_ENV: production
-  PRICE_API_BASE_URL: ${{ secrets.PRICE_API_BASE_URL }}
-
 jobs:
   prepare:
     name: Prepare
     runs-on: ubuntu-latest
+    environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      USE_EOA_ACCOUNT: ${{ vars.USE_EOA_ACCOUNT }}
     strategy:
       matrix:
         node-version: [21.x]
@@ -31,6 +33,12 @@ jobs:
   validate-changelog:
     name: Validate changelog
     runs-on: ubuntu-latest
+    environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      USE_EOA_ACCOUNT: ${{ vars.USE_EOA_ACCOUNT }}
     needs:
       - prepare
     strategy:
@@ -53,6 +61,12 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      USE_EOA_ACCOUNT: ${{ vars.USE_EOA_ACCOUNT }}
     needs:
       - prepare
     strategy:
@@ -72,7 +86,7 @@ jobs:
       - name: Cache gator-permissions snap build
         uses: actions/cache@v4
         with:
-          path: ./packages/permissions-provider-snap/dist
+          path: ./packages/gator-permissions-snap/dist
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
       - name: Require clean working directory
         shell: bash
@@ -85,6 +99,11 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
     needs:
       - prepare
     strategy:
@@ -107,6 +126,12 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    environment: snap-production
+    env:
+      SNAP_ENV: ${{ vars.SNAP_ENV }}
+      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      USE_EOA_ACCOUNT: ${{ vars.USE_EOA_ACCOUNT }}
     needs:
       - prepare
       - build
@@ -126,7 +151,7 @@ jobs:
       - name: Restore gator-permissions snap build cache
         uses: actions/cache@v4
         with:
-          path: ./packages/permissions-provider-snap/dist
+          path: ./packages/gator-permissions-snap/dist
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
       - name: Run e2e tests
         run: yarn test
