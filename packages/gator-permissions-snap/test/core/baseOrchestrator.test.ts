@@ -140,6 +140,7 @@ class TestOrchestrator extends BaseOrchestrator {
       permissionRequest: mockPermissionRequest,
       confirmationDialogFactory: mockConfirmationDialogFactory,
       userEventDispatcher: mockUserEventDispatcher,
+      rules: [],
     });
     this.#mocks = mocks;
   }
@@ -170,6 +171,7 @@ class TestOrchestrator extends BaseOrchestrator {
     metadata: any;
     origin: string;
     chainId: number;
+    showAddMoreRulesButton: boolean;
   }): Promise<GenericSnapElement> {
     return this.#mocks.createUiContent(args);
   }
@@ -337,8 +339,14 @@ describe('BaseOrchestrator', () => {
         > = () => {
           throw new Error('handleEvent should have been reassigned');
         };
-        mockUserEventDispatcher.on.mockImplementation(({ handler }) => {
-          handleEvent = handler;
+        mockUserEventDispatcher.on.mockImplementation((eventMetadata) => {
+          // Only capture the handler for InputChangeEvent with the specific element name
+          if (
+            eventMetadata.eventType === UserInputEventType.InputChangeEvent &&
+            eventMetadata.elementName === 'test-element'
+          ) {
+            handleEvent = eventMetadata.handler;
+          }
           return mockUserEventDispatcher;
         });
 
@@ -480,6 +488,7 @@ describe('BaseOrchestrator', () => {
           metadata: mockMetadata,
           origin: 'test-origin',
           chainId: 1,
+          showAddMoreRulesButton: false,
         });
       });
 
