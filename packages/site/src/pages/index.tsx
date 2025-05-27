@@ -421,8 +421,6 @@ const Index = () => {
       throw new Error(`Unsupported permission type: ${permissionType}`);
     }
 
-    console.log({ permissionData });
-
     const permissionsRequests = [
       {
         chainId,
