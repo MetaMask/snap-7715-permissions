@@ -1,5 +1,5 @@
 import { TimePeriod } from '../../core/types';
-import type { RuleDefinition } from '../rules';
+import type { RuleDefinition } from '../../core/types';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,

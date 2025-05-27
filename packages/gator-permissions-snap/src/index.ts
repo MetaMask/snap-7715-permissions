@@ -25,7 +25,8 @@ import {
 } from './accountController';
 import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
-import { OrchestratorFactory } from './core/orchestratorFactory';
+import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
+import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
 import { HomePage } from './homepage';
 import {
   createProfileSyncOptions,
@@ -38,6 +39,9 @@ import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
+
+const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
+const snapEnv = process.env.SNAP_ENV;
 
 // set up dependencies
 
@@ -55,15 +59,15 @@ const accountController: AccountController = useEoaAccountController
       supportedChains: [sepolia, lineaSepolia],
       deploymentSalt: '0x',
     });
-const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
-const snapEnv = process.env.SNAP_ENV;
 
 const stateManager = createStateManager(snap);
+
 const profileSyncOptions = createProfileSyncOptions(
   stateManager,
   snap,
   MESSAGE_SIGNING_SNAP_ID,
 );
+
 const profileSyncSdkEnv = getProfileSyncSdkEnv(snapEnv);
 
 const auth = new JwtBearerAuth(
@@ -102,6 +106,7 @@ const userEventDispatcher = new UserEventDispatcher();
 
 // eslint-disable-next-line no-restricted-globals
 const priceApiClient = new PriceApiClient(process.env.PRICE_API_BASE_URL ?? '');
+
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
 const confirmationDialogFactory = new ConfirmationDialogFactory({
@@ -109,15 +114,21 @@ const confirmationDialogFactory = new ConfirmationDialogFactory({
   userEventDispatcher,
 });
 
-const orchestratorFactory = new OrchestratorFactory({
+const orchestrator = new PermissionRequestLifecycleOrchestrator({
+  accountController,
+  confirmationDialogFactory,
+});
+
+const permissionHandlerFactory = new PermissionHandlerFactory({
   accountController,
   tokenPricesService,
   confirmationDialogFactory,
   userEventDispatcher,
+  orchestrator,
 });
 
 const rpcHandler = createRpcHandler({
-  orchestratorFactory,
+  permissionHandlerFactory,
   profileSyncManager,
 });
 

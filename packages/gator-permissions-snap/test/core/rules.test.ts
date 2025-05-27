@@ -1,13 +1,12 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
-import type { BaseContext } from '../../src/core/types';
 import {
   renderRule,
   renderRules,
   bindRuleHandlers,
-  type RuleDefinition,
-} from '../../src/permissions/rules';
+} from '../../src/core/rules';
+import type { BaseContext, RuleDefinition } from '../../src/core/types';
 import type {
   UserEventDispatcher,
   UserEventHandler,
@@ -27,6 +26,7 @@ type TestMetadata = {
 const mockContext: TestContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
+  justification: 'Permission to do something important',
   testValue: 'test-value',
   optionalValue: 'optional-value',
   numberValue: '123',

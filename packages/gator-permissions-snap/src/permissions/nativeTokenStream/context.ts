@@ -29,13 +29,13 @@ const DEFAULT_INITIAL_AMOUNT = '0x0';
  * @param options0.originalRequest - The original permission request to be amended.
  * @returns A new permission request with the context changes applied.
  */
-export function contextToPermissionRequest({
+export async function applyContext({
   context,
   originalRequest,
 }: {
   context: NativeTokenStreamContext;
   originalRequest: NativeTokenStreamPermissionRequest;
-}): NativeTokenStreamPermissionRequest {
+}): Promise<NativeTokenStreamPermissionRequest> {
   const { permissionDetails } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
@@ -71,11 +71,11 @@ export function contextToPermissionRequest({
  * @param options0.permission - The native token stream permission to populate with default values.
  * @returns A populated native token stream permission with all required fields populated.
  */
-export function populatePermission({
+export async function populatePermission({
   permission,
 }: {
   permission: NativeTokenStreamPermission;
-}): PopulatedNativeTokenStreamPermission {
+}): Promise<PopulatedNativeTokenStreamPermission> {
   return {
     ...permission,
     data: {
@@ -96,7 +96,7 @@ export function populatePermission({
  * @param options0.accountController - Controller for managing account operations.
  * @returns A context object containing the formatted permission details and account information.
  */
-export async function permissionRequestToContext({
+export async function buildContext({
   permissionRequest,
   tokenPricesService,
   accountController,
@@ -150,6 +150,7 @@ export async function permissionRequestToContext({
 
   return {
     expiry,
+    justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     accountDetails: {
       address,
@@ -172,7 +173,7 @@ export async function permissionRequestToContext({
  * @param options0.context - The native token stream context to validate and create metadata from.
  * @returns Metadata object containing derived values and validation errors.
  */
-export async function createContextMetadata({
+export async function deriveMetadata({
   context,
 }: {
   context: NativeTokenStreamContext;
