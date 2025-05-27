@@ -1,4 +1,12 @@
-import { Box, Text, Input, Button } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Text,
+  Input,
+  Button,
+  Form,
+  Field,
+  Image,
+} from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
 import { TooltipIcon } from './TooltipIcon';
@@ -12,6 +20,7 @@ export type InputFieldParams = {
   type: 'text' | 'number';
   disabled?: boolean;
   errorMessage?: string | undefined;
+  iconUrl?: string | undefined;
 };
 
 export const InputField = ({
@@ -23,6 +32,7 @@ export const InputField = ({
   value,
   disabled,
   errorMessage,
+  iconUrl,
 }: InputFieldParams) => {
   if (disabled) {
     return <TextField label={label} value={value} tooltip={tooltip} />;
@@ -35,9 +45,18 @@ export const InputField = ({
     </Button>
   ) : null;
 
-  const errorElement = errorMessage ? (
-    <Text color="error">{errorMessage}</Text>
-  ) : null;
+  const inputFieldElement = iconUrl ? (
+    <Field error={errorMessage}>
+      <Box>
+        <Image src={iconUrl} alt={`${name} icon`} />
+      </Box>
+      <Input name={name} type={type} value={value} />
+    </Field>
+  ) : (
+    <Field error={errorMessage}>
+      <Input name={name} type={type} value={value} />
+    </Field>
+  );
 
   return (
     <Box direction="vertical">
@@ -48,8 +67,7 @@ export const InputField = ({
         </Box>
         {removeButtonElement}
       </Box>
-      <Input name={name} type={type} value={value} />
-      {errorElement}
+      <Form name={`${name}-form`}>{inputFieldElement}</Form>
     </Box>
   );
 };

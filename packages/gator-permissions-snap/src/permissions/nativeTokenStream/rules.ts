@@ -1,4 +1,5 @@
 import { TimePeriod } from '../../core/types';
+import { IconUrls } from '../../ui/iconConstant';
 import type { RuleDefinition } from '../rules';
 import type {
   NativeTokenStreamContext,
@@ -23,6 +24,7 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
   name: INITIAL_AMOUNT_ELEMENT,
   type: 'number',
   isOptional: true,
+  iconUrl: IconUrls.ethereum.token,
   tooltip: 'The initial amount of tokens that can be streamed.',
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.initialAmount,
@@ -46,6 +48,7 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
   tooltip: 'The maximum amount of tokens that can be streamed.',
   type: 'number',
   isOptional: true,
+  iconUrl: IconUrls.ethereum.token,
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.maxAmount,
   error: (metadata: NativeTokenStreamMetadata) =>
@@ -85,6 +88,7 @@ export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
   name: AMOUNT_PER_PERIOD_ELEMENT,
   type: 'number',
   tooltip: 'The amount of tokens that can be streamed per period.',
+  iconUrl: IconUrls.ethereum.token,
   value: (context: NativeTokenStreamContext) =>
     context.permissionDetails.amountPerPeriod,
   error: (metadata: NativeTokenStreamMetadata) =>

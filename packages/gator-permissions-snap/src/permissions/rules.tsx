@@ -20,6 +20,7 @@ export type RuleDefinition<
   tooltip?: string | undefined;
   isOptional?: boolean;
   type: RuleType;
+  iconUrl?: string | undefined;
   value: (context: TContext) => string | undefined;
   error?: (metadata: TMetadata) => string | undefined;
   options?: string[];
@@ -74,6 +75,7 @@ export function renderRule<
           tooltip={rule.tooltip}
           type={rule.type}
           removeButtonName={removeButtonName}
+          iconUrl={rule.iconUrl}
         />
       );
     }

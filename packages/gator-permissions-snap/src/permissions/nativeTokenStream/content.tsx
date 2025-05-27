@@ -1,4 +1,13 @@
-import { Box, Button, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Button,
+  Field,
+  Form,
+  Input,
+  Section,
+  Text,
+  Image,
+} from '@metamask/snaps-sdk/jsx';
 
 import { getChainName } from '../../../../shared/src/utils/common';
 import { AccountDetails } from '../../ui/components/AccountDetails';
@@ -94,12 +103,19 @@ export const createConfirmationContent = ({
                 <TooltipIcon tooltip="The amount of tokens to stream per second." />
               </Box>
             </Box>
-            <Input
-              name="stream-rate"
-              type="text"
-              value={`${amountPerSecond} ETH/sec`}
-              disabled={true}
-            />
+            <Form name="stream-rate-form">
+              <Field>
+                <Box>
+                  <Image src={IconUrls.ethereum.token} alt="stream-rate icon" />
+                </Box>
+                <Input
+                  name="stream-rate"
+                  type="text"
+                  value={`${amountPerSecond} ETH/sec`}
+                  disabled={true}
+                />
+              </Field>
+            </Form>
           </Box>
         </Section>
 
