@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Field,
-  Form,
   Input,
   Section,
   Text,
@@ -103,19 +102,17 @@ export const createConfirmationContent = ({
                 <TooltipIcon tooltip="The amount of tokens to stream per second." />
               </Box>
             </Box>
-            <Form name="stream-rate-form">
-              <Field>
-                <Box>
-                  <Image src={IconUrls.ethereum.token} alt="stream-rate icon" />
-                </Box>
-                <Input
-                  name="stream-rate"
-                  type="text"
-                  value={`${amountPerSecond} ETH/sec`}
-                  disabled={true}
-                />
-              </Field>
-            </Form>
+            <Field>
+              <Box>
+                <Image src={IconUrls.ethereum.token} alt="stream-rate icon" />
+              </Box>
+              <Input
+                name="stream-rate"
+                type="text"
+                value={`${amountPerSecond} ETH/sec`}
+                disabled={true}
+              />
+            </Field>
           </Box>
         </Section>
 

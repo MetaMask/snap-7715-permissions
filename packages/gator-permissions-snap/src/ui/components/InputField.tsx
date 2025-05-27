@@ -3,9 +3,9 @@ import {
   Text,
   Input,
   Button,
-  Form,
   Field,
   Image,
+  Icon,
 } from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
@@ -41,22 +41,12 @@ export const InputField = ({
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
   const removeButtonElement = removeButtonName ? (
     <Button name={removeButtonName} type="button">
-      Remove
+      <Icon name="close" color="primary" size="md" />
     </Button>
   ) : null;
-
-  const inputFieldElement = iconUrl ? (
-    <Field error={errorMessage}>
-      <Box>
-        <Image src={iconUrl} alt={`${name} icon`} />
-      </Box>
-      <Input name={name} type={type} value={value} />
-    </Field>
-  ) : (
-    <Field error={errorMessage}>
-      <Input name={name} type={type} value={value} />
-    </Field>
-  );
+  const iconElement = iconUrl ? (
+    <Image src={iconUrl} alt={`${name} icon`} />
+  ) : null;
 
   return (
     <Box direction="vertical">
@@ -65,9 +55,12 @@ export const InputField = ({
           <Text>{label}</Text>
           {tooltipElement}
         </Box>
-        {removeButtonElement}
       </Box>
-      <Form name={`${name}-form`}>{inputFieldElement}</Form>
+      <Field error={errorMessage}>
+        <Box>{iconElement}</Box>
+        <Input name={name} type={type} value={value} />
+        <Box>{removeButtonElement}</Box>
+      </Field>
     </Box>
   );
 };
