@@ -1,32 +1,13 @@
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { BaseContext } from '../core/types';
 import { DropdownField } from '../ui/components/DropdownField';
 import { InputField } from '../ui/components/InputField';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
-
-export type RuleType = 'number' | 'text' | 'dropdown';
-
-export type RuleDefinition<
-  TContext extends BaseContext = BaseContext,
-  TMetadata extends object = object,
-> = {
-  label: string;
-  name: string;
-  tooltip?: string | undefined;
-  isOptional?: boolean;
-  type: RuleType;
-  iconUrl?: string | undefined;
-  value: (context: TContext) => string | undefined;
-  error?: (metadata: TMetadata) => string | undefined;
-  options?: string[];
-  // todo: it would be nice if we could make the value type more specific
-  updateContext: (context: TContext, value: any) => TContext;
-};
+import type { BaseContext, RuleDefinition } from './types';
 
 /**
  * Renders a single rule with the provided configuration, context and metadata.

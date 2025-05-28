@@ -1,6 +1,6 @@
+import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
 import { IconUrls } from '../../ui/iconConstant';
-import type { RuleDefinition } from '../rules';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,

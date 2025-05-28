@@ -1,15 +1,14 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
-import type { BaseContext } from '../../src/core/types';
+import { TOGGLE_ADD_MORE_RULES_BUTTON } from '../../src/core/permissionHandlerContent';
 import {
   RuleModalManager,
-  TOGGLE_ADD_MORE_RULES_BUTTON,
   SELECT_NEW_RULE_DROPDOWN,
   NEW_RULE_VALUE_ELEMENT,
   SAVE_NEW_RULE_BUTTON,
-} from '../../src/permissions/ruleModalManager';
-import type { RuleDefinition } from '../../src/permissions/rules';
+} from '../../src/core/ruleModalManager';
+import type { BaseContext, RuleDefinition } from '../../src/core/types';
 import type {
   UserEventDispatcher,
   UserEventHandler,
@@ -28,6 +27,7 @@ type TestMetadata = {
 const mockContext: TestContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
+  justification: 'Permission to do something important',
   rule1Value: 'existing-value',
   // rule2Value and rule3Value are intentionally omitted to test undefined behavior
 };

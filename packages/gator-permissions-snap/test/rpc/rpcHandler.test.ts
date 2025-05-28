@@ -5,19 +5,10 @@ import type {
 } from '@metamask/7715-permissions-shared/types';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { OrchestratorFactory } from '../../src/core/orchestratorFactory';
+import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
+import type { PermissionHandlerType } from '../../src/core/types';
 import type { ProfileSyncManager } from '../../src/profileSync';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
-
-type OrchestrateFunction = (args: { origin: string }) => Promise<{
-  success: boolean;
-  response?: PermissionResponse;
-  reason?: string;
-}>;
-
-type Orchestrator = {
-  orchestrate: OrchestrateFunction;
-};
 
 const TEST_ADDRESS = '0x1234567890123456789012345678901234567890' as const;
 const TEST_SITE_ORIGIN = 'https://example.com';
@@ -63,23 +54,23 @@ const VALID_PERMISSION_RESPONSE: PermissionResponse = {
 };
 
 const MOCK_SUCCESS_RESPONSE = {
-  success: true,
+  approved: true,
   response: VALID_PERMISSION_RESPONSE,
 } as const;
 
 describe('RpcHandler', () => {
   let handler: RpcHandler;
-  let mockOrchestrator: jest.Mocked<Orchestrator>;
-  let mockOrchestratorFactory: jest.Mocked<OrchestratorFactory>;
+  let mockHandler: jest.Mocked<PermissionHandlerType>;
+  let mockHandlerFactory: jest.Mocked<PermissionHandlerFactory>;
 
   beforeEach(() => {
-    mockOrchestrator = {
-      orchestrate: jest.fn<OrchestrateFunction>(),
-    };
+    mockHandler = {
+      handlePermissionRequest: jest.fn(),
+    } as unknown as jest.Mocked<PermissionHandlerType>;
 
-    mockOrchestratorFactory = {
-      createOrchestrator: jest.fn().mockReturnValue(mockOrchestrator),
-    } as unknown as jest.Mocked<OrchestratorFactory>;
+    mockHandlerFactory = {
+      createPermissionHandler: jest.fn().mockReturnValue(mockHandler),
+    } as unknown as jest.Mocked<PermissionHandlerFactory>;
     const mockProfileSyncManager = {
       revokeGrantedPermission: jest.fn(),
       storeGrantedPermission: jest.fn(),
@@ -90,31 +81,31 @@ describe('RpcHandler', () => {
     } as unknown as jest.Mocked<ProfileSyncManager>;
 
     handler = createRpcHandler({
-      orchestratorFactory: mockOrchestratorFactory,
+      permissionHandlerFactory: mockHandlerFactory,
       profileSyncManager: mockProfileSyncManager,
     });
   });
 
   describe('grantPermission', () => {
     it('should handle a single permission request successfully', async () => {
-      mockOrchestrator.orchestrate.mockImplementation(
+      mockHandler.handlePermissionRequest.mockImplementation(
         async () => MOCK_SUCCESS_RESPONSE,
       );
 
       const result = await handler.grantPermission(VALID_REQUEST);
 
-      expect(mockOrchestratorFactory.createOrchestrator).toHaveBeenCalledTimes(
+      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledTimes(
         1,
       );
 
-      expect(mockOrchestratorFactory.createOrchestrator).toHaveBeenCalledWith(
+      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledWith(
         VALID_PERMISSION_REQUEST,
       );
 
-      expect(mockOrchestrator.orchestrate).toHaveBeenCalledTimes(1);
-      expect(mockOrchestrator.orchestrate).toHaveBeenCalledWith({
-        origin: TEST_SITE_ORIGIN,
-      });
+      expect(mockHandler.handlePermissionRequest).toHaveBeenCalledTimes(1);
+      expect(mockHandler.handlePermissionRequest).toHaveBeenCalledWith(
+        TEST_SITE_ORIGIN,
+      );
 
       expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE]);
     });
@@ -170,29 +161,29 @@ describe('RpcHandler', () => {
         siteOrigin: TEST_SITE_ORIGIN,
       };
 
-      mockOrchestrator.orchestrate
+      mockHandler.handlePermissionRequest
         .mockImplementationOnce(async () => MOCK_SUCCESS_RESPONSE)
         .mockImplementationOnce(async () => ({
-          success: true,
+          approved: true,
           response: secondResponse,
         }));
 
       const result = await handler.grantPermission(request);
 
-      expect(mockOrchestratorFactory.createOrchestrator).toHaveBeenCalledTimes(
+      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledTimes(
         2,
       );
       expect(
-        mockOrchestratorFactory.createOrchestrator,
+        mockHandlerFactory.createPermissionHandler,
       ).toHaveBeenNthCalledWith(1, VALID_PERMISSION_REQUEST);
       expect(
-        mockOrchestratorFactory.createOrchestrator,
+        mockHandlerFactory.createPermissionHandler,
       ).toHaveBeenNthCalledWith(2, secondPermissionRequest);
 
-      expect(mockOrchestrator.orchestrate).toHaveBeenCalledTimes(2);
-      expect(mockOrchestrator.orchestrate).toHaveBeenCalledWith({
-        origin: TEST_SITE_ORIGIN,
-      });
+      expect(mockHandler.handlePermissionRequest).toHaveBeenCalledTimes(2);
+      expect(mockHandler.handlePermissionRequest).toHaveBeenCalledWith(
+        TEST_SITE_ORIGIN,
+      );
 
       expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
     });
@@ -211,10 +202,10 @@ describe('RpcHandler', () => {
         siteOrigin: TEST_SITE_ORIGIN,
       };
 
-      mockOrchestrator.orchestrate
+      mockHandler.handlePermissionRequest
         .mockImplementationOnce(async () => MOCK_SUCCESS_RESPONSE)
         .mockImplementationOnce(async () => ({
-          success: false,
+          approved: false,
           reason: 'User rejected the permissions request',
         }));
 
@@ -222,14 +213,14 @@ describe('RpcHandler', () => {
         'User rejected the permissions request',
       );
 
-      expect(mockOrchestratorFactory.createOrchestrator).toHaveBeenCalledTimes(
+      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledTimes(
         2,
       );
-      expect(mockOrchestrator.orchestrate).toHaveBeenCalledTimes(2);
+      expect(mockHandler.handlePermissionRequest).toHaveBeenCalledTimes(2);
     });
 
     it('should throw an error if orchestrator creation fails', async () => {
-      mockOrchestratorFactory.createOrchestrator.mockImplementation(() => {
+      mockHandlerFactory.createPermissionHandler.mockImplementation(() => {
         throw new Error('Failed to create orchestrator');
       });
 
@@ -239,31 +230,14 @@ describe('RpcHandler', () => {
     });
 
     it('should throw an error if orchestration fails', async () => {
-      mockOrchestrator.orchestrate.mockImplementation(async () => ({
-        success: false,
+      mockHandler.handlePermissionRequest.mockImplementation(async () => ({
+        approved: false,
         reason: 'Orchestration failed',
       }));
 
       await expect(handler.grantPermission(VALID_REQUEST)).rejects.toThrow(
         'Orchestration failed',
       );
-    });
-
-    it('should handle orchestrator returning undefined response', async () => {
-      const mockResponseWithUndefined: {
-        success: boolean;
-        response?: PermissionResponse;
-      } = {
-        success: true,
-        response: undefined as unknown as PermissionResponse,
-      };
-
-      mockOrchestrator.orchestrate.mockImplementation(
-        async () => mockResponseWithUndefined,
-      );
-
-      const result = await handler.grantPermission(VALID_REQUEST);
-      expect(result).toStrictEqual([]);
     });
 
     it('should handle permission requests with optional fields missing', async () => {
@@ -277,7 +251,7 @@ describe('RpcHandler', () => {
         siteOrigin: TEST_SITE_ORIGIN,
       };
 
-      mockOrchestrator.orchestrate.mockImplementation(
+      mockHandler.handlePermissionRequest.mockImplementation(
         async () => MOCK_SUCCESS_RESPONSE,
       );
 
@@ -297,7 +271,7 @@ describe('RpcHandler', () => {
         siteOrigin: TEST_SITE_ORIGIN,
       };
 
-      mockOrchestrator.orchestrate.mockImplementation(
+      mockHandler.handlePermissionRequest.mockImplementation(
         async () => MOCK_SUCCESS_RESPONSE,
       );
 
@@ -331,39 +305,13 @@ describe('RpcHandler', () => {
         siteOrigin: TEST_SITE_ORIGIN,
       };
 
-      mockOrchestrator.orchestrate.mockImplementation(async () => ({
-        success: true,
+      mockHandler.handlePermissionRequest.mockImplementation(async () => ({
+        approved: true,
         response: differentResponse,
       }));
 
       const result = await handler.grantPermission(request);
       expect(result).toStrictEqual([differentResponse]);
-    });
-
-    // Response processing tests
-    it('should properly filter undefined responses', async () => {
-      const request: Json = {
-        permissionsRequest: [
-          VALID_PERMISSION_REQUEST,
-          VALID_PERMISSION_REQUEST,
-        ] as unknown as Json[],
-        siteOrigin: TEST_SITE_ORIGIN,
-      };
-
-      const mockResponseWithUndefined: {
-        success: boolean;
-        response?: PermissionResponse;
-      } = {
-        success: true,
-        response: undefined as unknown as PermissionResponse,
-      };
-
-      mockOrchestrator.orchestrate
-        .mockImplementationOnce(async () => mockResponseWithUndefined)
-        .mockImplementationOnce(async () => MOCK_SUCCESS_RESPONSE);
-
-      const result = await handler.grantPermission(request);
-      expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE]);
     });
 
     it('should maintain response order matching request order', async () => {
@@ -386,7 +334,7 @@ describe('RpcHandler', () => {
       };
 
       // Simulate async responses resolving in reverse order
-      mockOrchestrator.orchestrate
+      mockHandler.handlePermissionRequest
         .mockImplementationOnce(
           async () =>
             new Promise((resolve) =>
@@ -394,7 +342,7 @@ describe('RpcHandler', () => {
             ),
         )
         .mockImplementationOnce(async () => ({
-          success: true,
+          approved: true,
           response: secondResponse,
         }));
 
