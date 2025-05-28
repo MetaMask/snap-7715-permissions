@@ -247,8 +247,12 @@ export class PermissionRequestLifecycleOrchestrator {
     const accountMetaObject =
       accountMeta.factory && accountMeta.factoryData
         ? {
-            factory: accountMeta.factory,
-            factoryData: accountMeta.factoryData,
+            accountMeta: [
+              {
+                factory: accountMeta.factory,
+                factoryData: accountMeta.factoryData,
+              },
+            ],
           }
         : {};
 

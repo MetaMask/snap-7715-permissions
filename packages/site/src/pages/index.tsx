@@ -351,6 +351,7 @@ const Index = () => {
     });
 
     try {
+      console.log({ accountMeta });
       const userOperationHash =
         await bundlerClient.sendUserOperationWithDelegation({
           publicClient,
