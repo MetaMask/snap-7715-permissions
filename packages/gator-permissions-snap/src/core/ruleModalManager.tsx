@@ -84,7 +84,7 @@ export class RuleModalManager<
   }
 
   hasRulesToAdd(args: { context: TContext }) {
-    return this.#getRulesToAdd(args).length > 0;
+    return this.#getRulesToAdd({ context: args.context }).length > 0;
   }
 
   async renderModal() {

@@ -10,12 +10,14 @@ import type {
   DeepRequired,
   TypedPermissionRequest,
   BaseContext,
+  TimePeriod,
 } from '../../core/types';
 
 export type NativeTokenPeriodicMetadata = {
   validationErrors: {
     periodAmountError?: string;
     periodDurationError?: string;
+    periodTypeError?: string;
     startTimeError?: string;
     expiryError?: string;
   };
@@ -29,6 +31,7 @@ export type NativeTokenPeriodicContext = BaseContext & {
   };
   permissionDetails: {
     periodAmount: string;
+    periodType: TimePeriod | 'Other';
     periodDuration: string;
     startTime: string;
   };

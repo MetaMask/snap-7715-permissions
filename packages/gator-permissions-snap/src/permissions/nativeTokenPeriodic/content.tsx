@@ -10,6 +10,7 @@ import { RequestDetails } from '../../ui/components/RequestDetails';
 import { IconUrls } from '../../ui/iconConstant';
 import {
   periodAmountRule,
+  periodTypeRule,
   periodDurationRule,
   startTimeRule,
   expiryRule,
@@ -79,7 +80,12 @@ export async function createConfirmationContent({
         />
         <Section>
           {renderRules({
-            rules: [startTimeRule, periodAmountRule, periodDurationRule],
+            rules: [
+              startTimeRule,
+              periodAmountRule,
+              periodTypeRule,
+              periodDurationRule,
+            ],
             context,
             metadata,
           })}

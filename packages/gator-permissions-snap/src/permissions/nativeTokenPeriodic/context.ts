@@ -1,12 +1,14 @@
 import { parseEther, toHex } from 'viem';
 
 import type { AccountController } from '../../accountController';
+import { TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import { formatEtherFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
   getStartOfTodayUTC,
+  TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
 import type {
   NativeTokenPeriodicContext,
@@ -112,6 +114,18 @@ export async function buildContext({
   const periodDuration =
     permissionRequest.permission.data.periodDuration.toString();
 
+  // Determine the period type based on the duration
+  let periodType: TimePeriod | 'Other';
+  if (periodDuration === TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY].toString()) {
+    periodType = TimePeriod.DAILY;
+  } else if (
+    periodDuration === TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY].toString()
+  ) {
+    periodType = TimePeriod.WEEKLY;
+  } else {
+    periodType = 'Other';
+  }
+
   const startTime = convertTimestampToReadableDate(
     permissionRequest.permission.data.startTime,
   );
@@ -127,6 +141,7 @@ export async function buildContext({
     },
     permissionDetails: {
       periodAmount,
+      periodType,
       periodDuration,
       startTime,
     },

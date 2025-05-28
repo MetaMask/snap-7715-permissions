@@ -1,10 +1,13 @@
+import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../../core/types';
 import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
 } from './types';
+import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 
 export const PERIOD_AMOUNT_ELEMENT = 'native-token-periodic-period-amount';
+export const PERIOD_TYPE_ELEMENT = 'native-token-periodic-period-type';
 export const PERIOD_DURATION_ELEMENT = 'native-token-periodic-period-duration';
 export const START_TIME_ELEMENT = 'native-token-periodic-start-date';
 export const EXPIRY_ELEMENT = 'native-token-periodic-expiry';
@@ -30,11 +33,42 @@ export const periodAmountRule: RuleDefinition<
   }),
 };
 
+export const periodTypeRule: RuleDefinition<
+  NativeTokenPeriodicContext,
+  NativeTokenPeriodicMetadata
+> = {
+  label: 'Period duration',
+  name: PERIOD_TYPE_ELEMENT,
+  tooltip: 'The duration of the period',
+  type: 'dropdown',
+  options: [TimePeriod.DAILY, TimePeriod.WEEKLY, 'Other'],
+  value: (context: NativeTokenPeriodicContext) =>
+    context.permissionDetails.periodType,
+  error: (metadata: NativeTokenPeriodicMetadata) =>
+    metadata.validationErrors.periodTypeError,
+  updateContext: (context: NativeTokenPeriodicContext, value: string) => {
+    const periodType = value as TimePeriod | 'Other';
+    const periodDuration =
+      periodType === 'Other'
+        ? context.permissionDetails.periodDuration
+        : Number(TIME_PERIOD_TO_SECONDS[periodType as TimePeriod]).toString();
+
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        periodType,
+        periodDuration,
+      },
+    };
+  },
+};
+
 export const periodDurationRule: RuleDefinition<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
 > = {
-  label: 'Frequency',
+  label: 'Duration (seconds)',
   name: PERIOD_DURATION_ELEMENT,
   tooltip: 'The length of each period in seconds',
   type: 'number',
@@ -49,6 +83,8 @@ export const periodDurationRule: RuleDefinition<
       periodDuration: value,
     },
   }),
+  isVisible: (context: NativeTokenPeriodicContext) =>
+    context.permissionDetails.periodType === 'Other',
 };
 
 export const startTimeRule: RuleDefinition<
@@ -90,6 +126,7 @@ export const expiryRule: RuleDefinition<
 
 export const allRules = [
   periodAmountRule,
+  periodTypeRule,
   periodDurationRule,
   startTimeRule,
   expiryRule,

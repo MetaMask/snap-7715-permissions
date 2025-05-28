@@ -1,9 +1,11 @@
 import { describe, expect, it } from '@jest/globals';
 import { toHex, parseUnits } from 'viem/utils';
 
+import { TimePeriod } from '../../../src/core/types';
 import type { NativeTokenPeriodicPermissionRequest } from '../../../src/permissions/nativeTokenPeriodic/types';
 import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenPeriodic/validation';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 
 const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
   chainId: '0x1',
@@ -19,7 +21,7 @@ const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
     type: 'native-token-periodic',
     data: {
       periodAmount: toHex(parseUnits('1', 18)), // 1 ETH per period
-      periodDuration: 86400, // 1 day in seconds
+      periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
       startTime: convertReadableDateToTimestamp('10/26/2024'),
       justification: 'test',
     },
@@ -123,6 +125,40 @@ describe('nativeTokenPeriodic:validation', () => {
         expect(() =>
           parseAndValidatePermission(floatPeriodDurationRequest),
         ).toThrow('Invalid periodDuration: must be an integer');
+      });
+
+      it('should validate periodDuration for daily period', () => {
+        const dailyPeriodRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(dailyPeriodRequest),
+        ).not.toThrow();
+      });
+
+      it('should validate periodDuration for weekly period', () => {
+        const weeklyPeriodRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY]),
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(weeklyPeriodRequest),
+        ).not.toThrow();
       });
     });
 

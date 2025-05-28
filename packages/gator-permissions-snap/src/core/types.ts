@@ -164,6 +164,7 @@ export type RuleDefinition<
   value: (context: TContext) => string | undefined;
   error?: (metadata: TMetadata) => string | undefined;
   options?: string[];
+  isVisible?: (context: TContext) => boolean;
   // todo: it would be nice if we could make the value type more specific
   updateContext: (context: TContext, value: any) => TContext;
 };

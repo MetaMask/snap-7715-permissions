@@ -2,6 +2,7 @@ import { describe, expect, beforeEach, it } from '@jest/globals';
 import { toHex, parseUnits } from 'viem/utils';
 
 import type { AccountController } from '../../../src/accountController';
+import { TimePeriod } from '../../../src/core/types';
 import {
   populatePermission,
   buildContext,
@@ -17,13 +18,14 @@ import type { TokenPricesService } from '../../../src/services/tokenPricesServic
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
+  TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
 
 const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
   type: 'native-token-periodic',
   data: {
     periodAmount: toHex(parseUnits('1', 18)), // 1 ETH per period
-    periodDuration: 86400, // 1 day in seconds
+    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
     startTime: convertReadableDateToTimestamp('10/26/1985'),
     justification: 'Permission to do something important',
   },
@@ -61,7 +63,8 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
   },
   permissionDetails: {
     periodAmount: '1',
-    periodDuration: '86400',
+    periodType: TimePeriod.DAILY,
+    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
     startTime: '10/26/1985',
   },
 } as const;

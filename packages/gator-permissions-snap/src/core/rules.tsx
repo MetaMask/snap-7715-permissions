@@ -32,7 +32,9 @@ export function renderRule<
 }): GenericSnapElement | null {
   const value = rule.value(context);
 
-  if (value === undefined) {
+  const isVisible = rule.isVisible?.(context) ?? true;
+
+  if (value === undefined || !isVisible) {
     // If the value is not set, don't render the rule
     return null;
   }
