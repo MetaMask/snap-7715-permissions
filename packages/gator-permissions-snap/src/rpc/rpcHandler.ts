@@ -1,8 +1,8 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { OrchestratorFactory } from '../core/orchestratorFactory';
-import { type ProfileSyncManager } from '../profileSync';
+import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
+import type { ProfileSyncManager } from '../profileSync';
 import { validatePermissionRequestParam } from '../utils/validate';
 
 /**
@@ -22,55 +22,54 @@ export type RpcHandler = {
  * Creates an RPC handler with methods for handling permission-related RPC requests.
  *
  * @param config - The parameters for creating the RPC handler.
- * @param config.orchestratorFactory - The factory for creating permission orchestrators.
+ * @param config.permissionHandlerFactory - The factory for creating permission handlers.
  * @param config.profileSyncManager - The profile sync manager.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
-  orchestratorFactory: OrchestratorFactory;
+  permissionHandlerFactory: PermissionHandlerFactory;
   profileSyncManager: ProfileSyncManager;
 }): RpcHandler {
-  const { orchestratorFactory, profileSyncManager } = config;
+  const { permissionHandlerFactory, profileSyncManager } = config;
+
+  /**
+   * Handles grant permission requests.
+   *
+   * @param params - The parameters for the grant permission request.
+   * @returns The result of the grant permission request.
+   */
+  const grantPermission = async (params?: Json): Promise<Json> => {
+    logger.debug('grantPermissions()', params);
+    const { permissionsRequest, siteOrigin } =
+      validatePermissionRequestParam(params);
+
+    const responses = await Promise.all(
+      permissionsRequest.map(async (request) => {
+        const handler =
+          permissionHandlerFactory.createPermissionHandler(request);
+
+        const permissionResponse =
+          await handler.handlePermissionRequest(siteOrigin);
+
+        if (!permissionResponse.approved) {
+          throw new Error(permissionResponse.reason);
+        }
+
+        if (permissionResponse.response) {
+          await profileSyncManager.storeGrantedPermission({
+            permissionResponse: permissionResponse.response,
+            siteOrigin,
+          });
+        }
+
+        return permissionResponse.response;
+      }),
+    );
+
+    return responses as Json[];
+  };
 
   return {
-    /**
-     * Handles grant permission requests.
-     *
-     * @param params - The parameters for the grant permission request.
-     * @returns The result of the grant permission request.
-     */
-    async grantPermission(params?: Json): Promise<Json> {
-      logger.debug('grantPermissions()', params);
-      const { permissionsRequest, siteOrigin } =
-        validatePermissionRequestParam(params);
-
-      const responses = await Promise.all(
-        permissionsRequest.map(async (request) => {
-          const orchestrator = orchestratorFactory.createOrchestrator(request);
-
-          const permissionResponse = await orchestrator.orchestrate({
-            origin: siteOrigin,
-          });
-
-          if (!permissionResponse.success) {
-            throw new Error(permissionResponse.reason);
-          }
-
-          if (permissionResponse.response) {
-            await profileSyncManager.storeGrantedPermission({
-              permissionResponse: permissionResponse.response,
-              siteOrigin,
-            });
-          }
-
-          return permissionResponse.response;
-        }),
-      );
-
-      // todo: type this better
-      const filtered = responses.filter((response) => response !== undefined);
-
-      return filtered as any as Json[];
-    },
+    grantPermission,
   };
 }

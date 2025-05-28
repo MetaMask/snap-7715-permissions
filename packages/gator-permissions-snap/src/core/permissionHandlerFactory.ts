@@ -2,18 +2,19 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 
 import type { AccountController } from '../accountController';
-import { NativeTokenStreamOrchestrator } from '../permissions/nativeTokenStream/orchestrator';
+import { createNativeTokenStreamHandler } from '../permissions/nativeTokenStream/createHandler';
 import type { NativeTokenStreamPermissionRequest } from '../permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
-import type { Orchestrator } from './types';
+import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
+import type { PermissionHandlerType } from './types';
 
 /**
  * Factory for creating permission-specific orchestrators.
  * Each permission type has its own orchestrator that handles the specific logic for that permission.
  */
-export class OrchestratorFactory {
+export class PermissionHandlerFactory {
   readonly #accountController: AccountController;
 
   readonly #tokenPricesService: TokenPricesService;
@@ -22,21 +23,26 @@ export class OrchestratorFactory {
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
+  readonly #orchestrator: PermissionRequestLifecycleOrchestrator;
+
   constructor({
     accountController,
     tokenPricesService,
     confirmationDialogFactory,
     userEventDispatcher,
+    orchestrator,
   }: {
     accountController: AccountController;
     tokenPricesService: TokenPricesService;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
+    orchestrator: PermissionRequestLifecycleOrchestrator;
   }) {
     this.#accountController = accountController;
     this.#tokenPricesService = tokenPricesService;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#orchestrator = orchestrator;
   }
 
   /**
@@ -45,7 +51,9 @@ export class OrchestratorFactory {
    * @returns The permission orchestrator.
    * @throws If the permission type is not supported.
    */
-  createOrchestrator(permissionRequest: PermissionRequest): Orchestrator {
+  createPermissionHandler(
+    permissionRequest: PermissionRequest,
+  ): PermissionHandlerType {
     const type = extractPermissionName(permissionRequest.permission.type);
 
     const baseDependencies = {
@@ -54,11 +62,12 @@ export class OrchestratorFactory {
       accountController: this.#accountController,
       confirmationDialogFactory: this.#confirmationDialogFactory,
       userEventDispatcher: this.#userEventDispatcher,
+      orchestrator: this.#orchestrator,
     };
 
     switch (type) {
       case 'native-token-stream':
-        return new NativeTokenStreamOrchestrator({
+        return createNativeTokenStreamHandler({
           ...baseDependencies,
           tokenPricesService: this.#tokenPricesService,
         });

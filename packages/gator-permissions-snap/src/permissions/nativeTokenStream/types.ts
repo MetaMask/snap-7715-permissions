@@ -25,6 +25,7 @@ export type NativeTokenStreamMetadata = {
   rulesToAdd: string[];
 };
 
+// todo: move accountDetails to the base context so that accountDetails formatting is shared between permissions
 export type NativeTokenStreamContext = BaseContext & {
   accountDetails: {
     address: Hex;
