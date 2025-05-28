@@ -18,11 +18,13 @@ export const zGrantedPermission = z.object({
   context: zHexStr,
 
   /**
-   * Optional but when present then fields for factory and factoryData are required as defined in ERC-4337.
-   * They are either both specified, or none.
-   * DApp MUST deploy the accounts by calling the factory contract with factoryData as the calldata.
+   * The accountMeta field is required and contains information needed to deploy accounts.
+   * Each entry specifies a factory contract and its associated deployment data.
+   * If no account deployment is needed when redeeming the permission, this array must be empty.
+   * When non-empty, DApps MUST deploy the accounts by calling the factory contract with factoryData as the calldata.
+   * Defined in ERC-4337.
    */
-  accountMeta: z.array(zAccountMeta).optional(),
+  accountMeta: z.array(zAccountMeta),
 
   /**
    * Account to assign the permissions to and is dependent on the account type.
