@@ -202,9 +202,9 @@ export class PermissionHandler<
       }
 
       const showAddMoreRulesButton =
-        (await this.#addMoreRulesModal?.hasRulesToAdd({
+        this.#addMoreRulesModal?.hasRulesToAdd({
           context: args.context,
-        })) ?? false;
+        }) ?? false;
 
       const permissionContent =
         await this.#dependencies.createConfirmationContent({

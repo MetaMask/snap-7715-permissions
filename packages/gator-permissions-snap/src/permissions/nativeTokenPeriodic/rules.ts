@@ -1,10 +1,10 @@
 import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../../core/types';
+import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
 } from './types';
-import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 
 export const PERIOD_AMOUNT_ELEMENT = 'native-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'native-token-periodic-period-type';
@@ -51,7 +51,7 @@ export const periodTypeRule: RuleDefinition<
     const periodDuration =
       periodType === 'Other'
         ? context.permissionDetails.periodDuration
-        : Number(TIME_PERIOD_TO_SECONDS[periodType as TimePeriod]).toString();
+        : Number(TIME_PERIOD_TO_SECONDS[periodType]).toString();
 
     return {
       ...context,

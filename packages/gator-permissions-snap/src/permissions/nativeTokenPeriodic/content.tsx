@@ -20,9 +20,9 @@ import type {
   NativeTokenPeriodicMetadata,
 } from './types';
 
-/*
+/**
  * Creates UI content for a native token periodic permission confirmation.
-
+ *
  * @param args - The configuration for the confirmation content.
  * @param args.context - The context containing permission details.
  * @param args.metadata - Metadata including derived values and validation errors.

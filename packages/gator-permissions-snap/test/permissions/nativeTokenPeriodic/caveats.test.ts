@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
+import { toHex, parseUnits } from 'viem/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { appendCaveats } from '../../../src/permissions/nativeTokenPeriodic/caveats';

@@ -4,8 +4,10 @@ import { toHex, parseUnits } from 'viem/utils';
 import { TimePeriod } from '../../../src/core/types';
 import type { NativeTokenPeriodicPermissionRequest } from '../../../src/permissions/nativeTokenPeriodic/types';
 import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenPeriodic/validation';
-import { convertReadableDateToTimestamp } from '../../../src/utils/time';
-import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
+import {
+  convertReadableDateToTimestamp,
+  TIME_PERIOD_TO_SECONDS,
+} from '../../../src/utils/time';
 
 const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
   chainId: '0x1',

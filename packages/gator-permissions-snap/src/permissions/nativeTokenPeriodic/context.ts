@@ -91,18 +91,25 @@ export async function buildContext({
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const address = await accountController.getAccountAddress({
-    chainId,
-  });
+  const balanceFormattedPromise = accountController
+    .getAccountBalance({
+      chainId,
+    })
+    .then(async (balance) => {
+      const balanceFormattedAsCurrency =
+        await tokenPricesService.getCryptoToFiatConversion(
+          `eip155:1/slip44:60`,
+          balance,
+        );
+      return { balance, balanceFormattedAsCurrency };
+    });
 
-  const balance = await accountController.getAccountBalance({
-    chainId,
-  });
-
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:1/slip44:60`,
-    balance,
-  );
+  const [address, { balance, balanceFormattedAsCurrency }] = await Promise.all([
+    accountController.getAccountAddress({
+      chainId,
+    }),
+    balanceFormattedPromise,
+  ]);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
@@ -137,7 +144,7 @@ export async function buildContext({
     accountDetails: {
       address,
       balance,
-      balanceFormattedAsCurrency: balanceFormatted,
+      balanceFormattedAsCurrency,
     },
     permissionDetails: {
       periodAmount,
