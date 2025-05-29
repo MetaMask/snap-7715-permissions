@@ -1,3 +1,4 @@
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 
 import type {
@@ -48,7 +49,7 @@ function validatePermissionData(
  * @throws {Error} If the permission request is invalid.
  */
 export function parseAndValidatePermission(
-  permissionRequest: NativeTokenPeriodicPermissionRequest,
+  permissionRequest: PermissionRequest,
 ): NativeTokenPeriodicPermissionRequest {
   const {
     data: validationResult,

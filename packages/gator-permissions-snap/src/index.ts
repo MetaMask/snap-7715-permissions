@@ -122,7 +122,6 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
 const permissionHandlerFactory = new PermissionHandlerFactory({
   accountController,
   tokenPricesService,
-  confirmationDialogFactory,
   userEventDispatcher,
   orchestrator,
 });

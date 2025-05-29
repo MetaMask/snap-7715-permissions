@@ -2,15 +2,18 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 
 import type { AccountController } from '../accountController';
-import { createNativeTokenPeriodicHandler } from '../permissions/nativeTokenPeriodic/createHandler';
-import type { NativeTokenPeriodicPermissionRequest } from '../permissions/nativeTokenPeriodic/types';
-import { createNativeTokenStreamHandler } from '../permissions/nativeTokenStream/createHandler';
-import type { NativeTokenStreamPermissionRequest } from '../permissions/nativeTokenStream/types';
+import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
+import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
-import type { ConfirmationDialogFactory } from './confirmationFactory';
+import { PermissionHandler } from './permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
-import type { PermissionHandlerType } from './types';
+import type {
+  BaseContext,
+  DeepRequired,
+  PermissionDefinition,
+  PermissionHandlerType,
+} from './types';
 
 /**
  * Factory for creating permission-specific orchestrators.
@@ -21,8 +24,6 @@ export class PermissionHandlerFactory {
 
   readonly #tokenPricesService: TokenPricesService;
 
-  readonly #confirmationDialogFactory: ConfirmationDialogFactory;
-
   readonly #userEventDispatcher: UserEventDispatcher;
 
   readonly #orchestrator: PermissionRequestLifecycleOrchestrator;
@@ -30,19 +31,16 @@ export class PermissionHandlerFactory {
   constructor({
     accountController,
     tokenPricesService,
-    confirmationDialogFactory,
     userEventDispatcher,
     orchestrator,
   }: {
     accountController: AccountController;
     tokenPricesService: TokenPricesService;
-    confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
     orchestrator: PermissionRequestLifecycleOrchestrator;
   }) {
     this.#accountController = accountController;
     this.#tokenPricesService = tokenPricesService;
-    this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
     this.#orchestrator = orchestrator;
   }
@@ -58,30 +56,47 @@ export class PermissionHandlerFactory {
   ): PermissionHandlerType {
     const type = extractPermissionName(permissionRequest.permission.type);
 
-    const baseDependencies = {
-      accountController: this.#accountController,
-      confirmationDialogFactory: this.#confirmationDialogFactory,
-      userEventDispatcher: this.#userEventDispatcher,
-      orchestrator: this.#orchestrator,
+    const createPermissionHandler = <
+      TRequest extends PermissionRequest,
+      TContext extends BaseContext,
+      TMetadata extends object,
+      TPermission extends TRequest['permission'],
+      TPopulatedPermission extends DeepRequired<TPermission>,
+    >(
+      permissionDefinition: PermissionDefinition<
+        TRequest,
+        TContext,
+        TMetadata,
+        TPermission,
+        TPopulatedPermission
+      >,
+    ): PermissionHandlerType => {
+      return new PermissionHandler({
+        ...permissionDefinition,
+        accountController: this.#accountController,
+        userEventDispatcher: this.#userEventDispatcher,
+        orchestrator: this.#orchestrator,
+        permissionRequest,
+        tokenPricesService: this.#tokenPricesService,
+      });
     };
+    let handler: PermissionHandlerType;
 
     switch (type) {
       case 'native-token-stream':
-        return createNativeTokenStreamHandler({
-          ...baseDependencies,
-          permissionRequest:
-            permissionRequest as NativeTokenStreamPermissionRequest,
-          tokenPricesService: this.#tokenPricesService,
-        });
+        handler = createPermissionHandler(
+          nativeTokenStreamPermissionDefinition,
+        );
+        break;
       case 'native-token-periodic':
-        return createNativeTokenPeriodicHandler({
-          ...baseDependencies,
-          permissionRequest:
-            permissionRequest as NativeTokenPeriodicPermissionRequest,
-          tokenPricesService: this.#tokenPricesService,
-        });
+        handler = createPermissionHandler(
+          nativeTokenPeriodicPermissionDefinition,
+        );
+        break;
       default:
         throw new Error(`Unsupported permission type: ${type}`);
     }
+
+    return handler;
   }
 }

@@ -91,7 +91,7 @@ export async function buildContext({
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const balanceFormattedPromise = accountController
+  const balancePromise = accountController
     .getAccountBalance({
       chainId,
     })
@@ -108,7 +108,7 @@ export async function buildContext({
     accountController.getAccountAddress({
       chainId,
     }),
-    balanceFormattedPromise,
+    balancePromise,
   ]);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);

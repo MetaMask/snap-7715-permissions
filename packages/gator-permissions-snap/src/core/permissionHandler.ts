@@ -1,6 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import { type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountController } from '../accountController';
 import type { TokenPricesService } from '../services/tokenPricesService';
@@ -19,67 +18,11 @@ import type {
   PermissionRequestResult,
   RuleDefinition,
   PermissionHandlerType,
+  PermissionHandlerDependencies,
+  PermissionHandlerParams,
 } from './types';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
-
-export type PermissionHandlerDependencies<
-  TRequest extends PermissionRequest,
-  TContext extends BaseContext,
-  TMetadata extends object,
-  TPermission extends TRequest['permission'],
-  TPopulatedPermission extends DeepRequired<TPermission>,
-> = {
-  validateRequest: (permissionRequest: TRequest) => TRequest;
-  buildContext: (args: {
-    permissionRequest: TRequest;
-    tokenPricesService: any;
-    accountController: AccountController;
-  }) => Promise<TContext>;
-  deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
-  createConfirmationContent: (args: {
-    context: TContext;
-    metadata: TMetadata;
-    origin: string;
-    chainId: number;
-    isJustificationCollapsed: boolean;
-    showAddMoreRulesButton: boolean;
-  }) => Promise<GenericSnapElement>;
-  applyContext: (args: {
-    context: TContext;
-    originalRequest: TRequest;
-  }) => Promise<TRequest>;
-  populatePermission: (args: {
-    permission: TPermission;
-  }) => Promise<TPopulatedPermission>;
-  appendCaveats: (args: {
-    permission: TPopulatedPermission;
-    caveatBuilder: any;
-  }) => Promise<any>;
-};
-
-export type PermissionHandlerParams<
-  TRequest extends PermissionRequest,
-  TContext extends BaseContext,
-  TMetadata extends object,
-  TPermission extends TRequest['permission'],
-  TPopulatedPermission extends DeepRequired<TPermission>,
-> = {
-  accountController: AccountController;
-  userEventDispatcher: UserEventDispatcher;
-  orchestrator: PermissionRequestLifecycleOrchestrator;
-  permissionRequest: TRequest;
-  dependencies: PermissionHandlerDependencies<
-    TRequest,
-    TContext,
-    TMetadata,
-    TPermission,
-    TPopulatedPermission
-  >;
-  tokenPricesService: any;
-  rules: RuleDefinition<TContext, TMetadata>[];
-  title: string;
-};
 
 /**
  * Handler for permission requests.
@@ -99,7 +42,7 @@ export class PermissionHandler<
 
   readonly #orchestrator: PermissionRequestLifecycleOrchestrator;
 
-  readonly #permissionRequest: TRequest;
+  readonly #permissionRequest: PermissionRequest;
 
   readonly #dependencies: PermissionHandlerDependencies<
     TRequest,
@@ -290,7 +233,7 @@ export class PermissionHandler<
     };
 
     const {
-      validateRequest,
+      parseAndValidatePermission,
       applyContext,
       populatePermission,
       appendCaveats,
@@ -298,7 +241,7 @@ export class PermissionHandler<
     } = this.#dependencies;
 
     return {
-      validateRequest,
+      parseAndValidatePermission,
       applyContext,
       populatePermission,
       appendCaveats,

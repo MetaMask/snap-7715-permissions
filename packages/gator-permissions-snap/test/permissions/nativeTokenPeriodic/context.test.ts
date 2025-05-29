@@ -112,12 +112,12 @@ describe('nativeTokenPeriodic:context', () => {
       } as unknown as jest.Mocked<TokenPricesService>;
 
       mockAccountController = {
-        getAccountAddress: jest.fn(
-          () => alreadyPopulatedContext.accountDetails.address,
-        ),
-        getAccountBalance: jest.fn(
-          () => alreadyPopulatedContext.accountDetails.balance,
-        ),
+        getAccountAddress: jest
+          .fn()
+          .mockResolvedValue(alreadyPopulatedContext.accountDetails.address),
+        getAccountBalance: jest
+          .fn()
+          .mockResolvedValue(alreadyPopulatedContext.accountDetails.balance),
       } as unknown as jest.Mocked<AccountController>;
     });
 
