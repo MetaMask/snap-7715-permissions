@@ -7,7 +7,7 @@ export type ShowMoreTextProps = {
 };
 
 const MAX_TEXT_LENGTH = 20;
-const ELLIPSED_TEXT_LENGTH = MAX_TEXT_LENGTH - 3; // 3 is the length of the ellipsis
+const ELLIPSIS_TEXT_LENGTH = MAX_TEXT_LENGTH - 3; // 3 is the length of the ellipsis
 
 export const ShowMoreText = ({
   text,
@@ -16,7 +16,7 @@ export const ShowMoreText = ({
 }: ShowMoreTextProps) => {
   const displayText =
     text.length > MAX_TEXT_LENGTH && isCollapsed
-      ? `${text.slice(0, ELLIPSED_TEXT_LENGTH)}...`
+      ? `${text.slice(0, ELLIPSIS_TEXT_LENGTH)}...`
       : text;
   const buttonText = isCollapsed ? 'Show' : 'Hide';
 

@@ -123,7 +123,7 @@ export abstract class BaseAccountController {
         );
 
         // we can just pass the request to the snapsProvider, because
-        // snap_experimentalProviderRequest enforcesan allowlist of methods.
+        // snap_experimentalProviderRequest enforces an allowlist of methods.
         const result = await this.#snapsProvider.request({
           // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
           method: 'snap_experimentalProviderRequest',

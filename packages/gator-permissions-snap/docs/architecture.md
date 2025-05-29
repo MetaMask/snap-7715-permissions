@@ -10,7 +10,7 @@ This document outlines the aspirational architecture of the Permissions Provider
    - This includes validation schemas, context types, and UI components
 
 2. **Hierarchical Organization**
-   - Avoid using barrel files as facades as this flattens heirarchy and removes structure
+   - Avoid using barrel files as facades as this flattens hierarchy and removes structure
    - Leverage the folder hierarchy itself to organize code
    - This helps maintain clear boundaries between components
 
