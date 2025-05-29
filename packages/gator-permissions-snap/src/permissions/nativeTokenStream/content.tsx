@@ -1,5 +1,12 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { Box, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Field,
+  Input,
+  Section,
+  Text,
+  Image,
+} from '@metamask/snaps-sdk/jsx';
 
 import { getChainName } from '../../../../shared/src/utils/common';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
@@ -95,12 +102,17 @@ export async function createConfirmationContent({
               <TooltipIcon tooltip="The amount of tokens to stream per second." />
             </Box>
           </Box>
-          <Input
-            name="stream-rate"
-            type="text"
-            value={`${amountPerSecond} ETH/sec`}
-            disabled={true}
-          />
+          <Field>
+            <Box>
+              <Image src={IconUrls.ethereum.token} alt="Ether token icon" />
+            </Box>
+            <Input
+              name="stream-rate"
+              type="text"
+              value={`${amountPerSecond} ETH/sec`}
+              disabled={true}
+            />
+          </Field>
         </Box>
       </Section>
 

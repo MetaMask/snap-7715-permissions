@@ -1,4 +1,12 @@
-import { Box, Text, Input, Button } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Text,
+  Input,
+  Button,
+  Field,
+  Image,
+  Icon,
+} from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
 import { TooltipIcon } from './TooltipIcon';
@@ -12,6 +20,12 @@ export type InputFieldParams = {
   type: 'text' | 'number';
   disabled?: boolean;
   errorMessage?: string | undefined;
+  iconData?:
+    | {
+        iconUrl: string;
+        iconAltText: string;
+      }
+    | undefined;
 };
 
 export const InputField = ({
@@ -23,6 +37,7 @@ export const InputField = ({
   value,
   disabled,
   errorMessage,
+  iconData,
 }: InputFieldParams) => {
   if (disabled) {
     return <TextField label={label} value={value} tooltip={tooltip} />;
@@ -31,12 +46,11 @@ export const InputField = ({
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
   const removeButtonElement = removeButtonName ? (
     <Button name={removeButtonName} type="button">
-      Remove
+      <Icon name="close" color="primary" size="md" />
     </Button>
   ) : null;
-
-  const errorElement = errorMessage ? (
-    <Text color="error">{errorMessage}</Text>
+  const iconElement = iconData ? (
+    <Image src={iconData.iconUrl} alt={iconData.iconAltText} />
   ) : null;
 
   return (
@@ -46,10 +60,12 @@ export const InputField = ({
           <Text>{label}</Text>
           {tooltipElement}
         </Box>
-        {removeButtonElement}
       </Box>
-      <Input name={name} type={type} value={value} />
-      {errorElement}
+      <Field error={errorMessage}>
+        <Box>{iconElement}</Box>
+        <Input name={name} type={type} value={value} />
+        <Box>{removeButtonElement}</Box>
+      </Field>
     </Box>
   );
 };
