@@ -146,6 +146,11 @@ export type LifecycleOrchestrationHandlers<
  */
 export type RuleType = 'number' | 'text' | 'dropdown';
 
+export type IconData = {
+  iconUrl: string;
+  iconAltText: string;
+};
+
 /**
  * Defines a rule that can be applied to a permission request.
  *
@@ -164,6 +169,10 @@ export type RuleDefinition<
   value: (context: TContext) => string | undefined;
   error?: (metadata: TMetadata) => string | undefined;
   options?: string[];
+  iconData?: {
+    iconUrl: string;
+    iconAltText: string;
+  };
   // todo: it would be nice if we could make the value type more specific
   updateContext: (context: TContext, value: any) => TContext;
 };
