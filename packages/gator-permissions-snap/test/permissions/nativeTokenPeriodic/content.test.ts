@@ -473,47 +473,44 @@ describe('nativeTokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Start Time",
-                                    },
-                                    "type": "Text",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Start Time",
                                   },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
                                       },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The time at which the first period begins",
-                                        },
-                                        "type": "Text",
-                                      },
+                                      "type": "Icon",
                                     },
-                                    "type": "Tooltip",
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The time at which the first period begins",
+                                      },
+                                      "type": "Text",
+                                    },
                                   },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            null,
-                          ],
+                            "type": "Box",
+                          },
                           "direction": "horizontal",
                         },
                         "type": "Box",
@@ -521,13 +518,34 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-periodic-start-date",
-                          "type": "text",
-                          "value": "10/26/1985",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-start-date",
+                                "type": "text",
+                                "value": "10/26/1985",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                          ],
                         },
-                        "type": "Input",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
@@ -541,47 +559,44 @@ describe('nativeTokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Amount",
-                                    },
-                                    "type": "Text",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Amount",
                                   },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
                                       },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The amount of tokens granted during each period",
-                                        },
-                                        "type": "Text",
-                                      },
+                                      "type": "Icon",
                                     },
-                                    "type": "Tooltip",
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens granted during each period",
+                                      },
+                                      "type": "Text",
+                                    },
                                   },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            null,
-                          ],
+                            "type": "Box",
+                          },
                           "direction": "horizontal",
                         },
                         "type": "Box",
@@ -589,13 +604,34 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-periodic-period-amount",
-                          "type": "number",
-                          "value": "1",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-period-amount",
+                                "type": "number",
+                                "value": "1",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                          ],
                         },
-                        "type": "Input",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
@@ -654,38 +690,43 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            {
-                              "key": "Daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "Daily",
-                              },
-                              "type": "Option",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": "Daily",
+                                  "props": {
+                                    "children": "Daily",
+                                    "value": "Daily",
+                                  },
+                                  "type": "Option",
+                                },
+                                {
+                                  "key": "Weekly",
+                                  "props": {
+                                    "children": "Weekly",
+                                    "value": "Weekly",
+                                  },
+                                  "type": "Option",
+                                },
+                                {
+                                  "key": "Other",
+                                  "props": {
+                                    "children": "Other",
+                                    "value": "Other",
+                                  },
+                                  "type": "Option",
+                                },
+                              ],
+                              "name": "native-token-periodic-period-type",
+                              "value": "Daily",
                             },
-                            {
-                              "key": "Weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "Weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "Other",
-                              "props": {
-                                "children": "Other",
-                                "value": "Other",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "native-token-periodic-period-type",
-                          "value": "Daily",
+                            "type": "Dropdown",
+                          },
                         },
-                        "type": "Dropdown",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
@@ -708,26 +749,23 @@ describe('nativeTokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Expiry",
-                                    },
-                                    "type": "Text",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Expiry",
                                   },
-                                  null,
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
+                                  "type": "Text",
+                                },
+                                null,
+                              ],
+                              "direction": "horizontal",
                             },
-                            null,
-                          ],
+                            "type": "Box",
+                          },
                           "direction": "horizontal",
                         },
                         "type": "Box",
@@ -735,13 +773,34 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-periodic-expiry",
-                          "type": "text",
-                          "value": "05/01/2024",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-expiry",
+                                "type": "text",
+                                "value": "05/01/2024",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                          ],
                         },
-                        "type": "Input",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
@@ -1210,47 +1269,44 @@ describe('nativeTokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Start Time",
-                                    },
-                                    "type": "Text",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Start Time",
                                   },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
                                       },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The time at which the first period begins",
-                                        },
-                                        "type": "Text",
-                                      },
+                                      "type": "Icon",
                                     },
-                                    "type": "Tooltip",
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The time at which the first period begins",
+                                      },
+                                      "type": "Text",
+                                    },
                                   },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            null,
-                          ],
+                            "type": "Box",
+                          },
                           "direction": "horizontal",
                         },
                         "type": "Box",
@@ -1258,13 +1314,34 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-periodic-start-date",
-                          "type": "text",
-                          "value": "10/26/1985",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-start-date",
+                                "type": "text",
+                                "value": "10/26/1985",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                          ],
                         },
-                        "type": "Input",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
@@ -1278,47 +1355,44 @@ describe('nativeTokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Amount",
-                                    },
-                                    "type": "Text",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Amount",
                                   },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
                                       },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The amount of tokens granted during each period",
-                                        },
-                                        "type": "Text",
-                                      },
+                                      "type": "Icon",
                                     },
-                                    "type": "Tooltip",
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens granted during each period",
+                                      },
+                                      "type": "Text",
+                                    },
                                   },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            null,
-                          ],
+                            "type": "Box",
+                          },
                           "direction": "horizontal",
                         },
                         "type": "Box",
@@ -1326,13 +1400,34 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-periodic-period-amount",
-                          "type": "number",
-                          "value": "1",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-period-amount",
+                                "type": "number",
+                                "value": "1",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                          ],
                         },
-                        "type": "Input",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
@@ -1391,38 +1486,43 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            {
-                              "key": "Daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "Daily",
-                              },
-                              "type": "Option",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": "Daily",
+                                  "props": {
+                                    "children": "Daily",
+                                    "value": "Daily",
+                                  },
+                                  "type": "Option",
+                                },
+                                {
+                                  "key": "Weekly",
+                                  "props": {
+                                    "children": "Weekly",
+                                    "value": "Weekly",
+                                  },
+                                  "type": "Option",
+                                },
+                                {
+                                  "key": "Other",
+                                  "props": {
+                                    "children": "Other",
+                                    "value": "Other",
+                                  },
+                                  "type": "Option",
+                                },
+                              ],
+                              "name": "native-token-periodic-period-type",
+                              "value": "Other",
                             },
-                            {
-                              "key": "Weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "Weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "Other",
-                              "props": {
-                                "children": "Other",
-                                "value": "Other",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "native-token-periodic-period-type",
-                          "value": "Other",
+                            "type": "Dropdown",
+                          },
                         },
-                        "type": "Dropdown",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
@@ -1436,47 +1536,44 @@ describe('nativeTokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Duration (seconds)",
-                                    },
-                                    "type": "Text",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Duration (seconds)",
                                   },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
                                       },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The length of each period in seconds",
-                                        },
-                                        "type": "Text",
-                                      },
+                                      "type": "Icon",
                                     },
-                                    "type": "Tooltip",
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The length of each period in seconds",
+                                      },
+                                      "type": "Text",
+                                    },
                                   },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                            null,
-                          ],
+                            "type": "Box",
+                          },
                           "direction": "horizontal",
                         },
                         "type": "Box",
@@ -1484,13 +1581,34 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-periodic-period-duration",
-                          "type": "number",
-                          "value": "86400",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-period-duration",
+                                "type": "number",
+                                "value": "86400",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                          ],
                         },
-                        "type": "Input",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
@@ -1512,26 +1630,23 @@ describe('nativeTokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Expiry",
-                                    },
-                                    "type": "Text",
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Expiry",
                                   },
-                                  null,
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
+                                  "type": "Text",
+                                },
+                                null,
+                              ],
+                              "direction": "horizontal",
                             },
-                            null,
-                          ],
+                            "type": "Box",
+                          },
                           "direction": "horizontal",
                         },
                         "type": "Box",
@@ -1539,13 +1654,34 @@ describe('nativeTokenPeriodic:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "name": "native-token-periodic-expiry",
-                          "type": "text",
-                          "value": "05/01/2024",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-expiry",
+                                "type": "text",
+                                "value": "05/01/2024",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": null,
+                              },
+                              "type": "Box",
+                            },
+                          ],
                         },
-                        "type": "Input",
+                        "type": "Field",
                       },
-                      null,
                     ],
                     "direction": "vertical",
                   },
