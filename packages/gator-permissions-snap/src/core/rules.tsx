@@ -56,7 +56,7 @@ export function renderRule<
           tooltip={rule.tooltip}
           type={rule.type}
           removeButtonName={removeButtonName}
-          iconUrl={rule.iconUrl}
+          iconData={rule.iconData}
         />
       );
     }

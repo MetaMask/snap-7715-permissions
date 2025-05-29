@@ -525,7 +525,7 @@ describe('nativeTokenStream:content', () => {
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "alt": "native-token-stream-amount-per-period icon",
+                                  "alt": "Ether token icon",
                                   "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -841,7 +841,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "native-token-stream-initial-amount icon",
+                                "alt": "Ether token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -966,7 +966,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "native-token-stream-max-amount icon",
+                                "alt": "Ether token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -1711,7 +1711,7 @@ describe('nativeTokenStream:content', () => {
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "alt": "native-token-stream-amount-per-period icon",
+                                  "alt": "Ether token icon",
                                   "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -2028,7 +2028,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "native-token-stream-initial-amount icon",
+                                "alt": "Ether token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -2154,7 +2154,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "native-token-stream-max-amount icon",
+                                "alt": "Ether token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -3832,7 +3832,7 @@ describe('nativeTokenStream:content', () => {
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "alt": "native-token-stream-amount-per-period icon",
+                                  "alt": "Ether token icon",
                                   "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -4773,7 +4773,7 @@ describe('nativeTokenStream:content', () => {
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "alt": "native-token-stream-amount-per-period icon",
+                                  "alt": "Ether token icon",
                                   "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -5089,7 +5089,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "native-token-stream-initial-amount icon",
+                                "alt": "Ether token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -5214,7 +5214,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "native-token-stream-max-amount icon",
+                                "alt": "Ether token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>

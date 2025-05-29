@@ -20,7 +20,12 @@ export type InputFieldParams = {
   type: 'text' | 'number';
   disabled?: boolean;
   errorMessage?: string | undefined;
-  iconUrl?: string | undefined;
+  iconData?:
+    | {
+        iconUrl: string;
+        iconAltText: string;
+      }
+    | undefined;
 };
 
 export const InputField = ({
@@ -32,7 +37,7 @@ export const InputField = ({
   value,
   disabled,
   errorMessage,
-  iconUrl,
+  iconData,
 }: InputFieldParams) => {
   if (disabled) {
     return <TextField label={label} value={value} tooltip={tooltip} />;
@@ -44,8 +49,8 @@ export const InputField = ({
       <Icon name="close" color="primary" size="md" />
     </Button>
   ) : null;
-  const iconElement = iconUrl ? (
-    <Image src={iconUrl} alt={`${name} icon`} />
+  const iconElement = iconData ? (
+    <Image src={iconData.iconUrl} alt={iconData.iconAltText} />
   ) : null;
 
   return (
