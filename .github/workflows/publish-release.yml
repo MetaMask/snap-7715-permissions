@@ -11,7 +11,6 @@ on:
 jobs:
   publish-release:
     name: Publish GitHub Release
-    environment: snap-production
     runs-on: ubuntu-latest
     permissions:
       contents: write
