@@ -7,7 +7,6 @@ jobs:
   prepare:
     name: Prepare
     runs-on: ubuntu-latest
-    environment: snap-production
     env:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
@@ -33,7 +32,6 @@ jobs:
   validate-changelog:
     name: Validate changelog
     runs-on: ubuntu-latest
-    environment: snap-production
     env:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
@@ -61,7 +59,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    environment: snap-production
     env:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
@@ -99,7 +96,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    environment: snap-production
     env:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
@@ -126,7 +122,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    environment: snap-production
     env:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
