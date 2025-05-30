@@ -39,6 +39,7 @@ import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
+import { AccountApiClient } from './clients/accountApiClient';
 
 const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
 const snapEnv = process.env.SNAP_ENV;
@@ -48,16 +49,23 @@ const snapEnv = process.env.SNAP_ENV;
 // eslint-disable-next-line no-restricted-globals
 const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
 
+// todo: set up the configuration properly
+const accountApiClient = new AccountApiClient(
+  'https://account.api.cx.metamask.io',
+);
+
 const accountController: AccountController = useEoaAccountController
   ? new EoaAccountController({
       snapsProvider: snap,
       supportedChains: [sepolia, lineaSepolia],
       ethereumProvider: ethereum,
+      accountApiClient,
     })
   : new SmartAccountController({
       snapsProvider: snap,
       supportedChains: [sepolia, lineaSepolia],
       deploymentSalt: '0x',
+      accountApiClient,
     });
 
 const stateManager = createStateManager(snap);

@@ -7,6 +7,7 @@ import {
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { type Address, type Hex } from 'viem';
 
+import { AccountApiClient } from '../clients/accountApiClient';
 import type { SupportedChains } from './baseAccountController';
 import { BaseAccountController } from './baseAccountController';
 import type {
@@ -37,11 +38,13 @@ export class EoaAccountController
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.ethereumProvider - The provider for interacting with Ethereum.
    * @param config.supportedChains - Optional list of supported blockchain chains.
+   * @param config.accountApiClient - The client for interacting with the account API.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
     ethereumProvider: EthereumProvider;
     supportedChains?: SupportedChains;
+    accountApiClient: AccountApiClient;
   }) {
     super(config);
     this.#ethereumProvider = config.ethereumProvider;
@@ -196,30 +199,6 @@ export class EoaAccountController
       factory: undefined,
       factoryData: undefined,
     };
-  }
-
-  /**
-   * Retrieves the balance of the EOA account.
-   * @param options - The options object containing chain information.
-   * @returns The account balance in hex format.
-   */
-  public async getAccountBalance(options: AccountOptionsBase): Promise<Hex> {
-    logger.debug('eoaAccountController:getAccountBalance()');
-
-    this.assertIsSupportedChainId(options.chainId);
-
-    const address = await this.#getAccountAddress();
-
-    const provider = this.createExperimentalProviderRequestProvider(
-      options.chainId,
-    );
-
-    const balance = await provider.request({
-      method: 'eth_getBalance',
-      params: [address, 'latest'],
-    });
-
-    return balance as Hex;
   }
 
   /**

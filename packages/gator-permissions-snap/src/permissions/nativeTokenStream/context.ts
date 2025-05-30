@@ -1,9 +1,9 @@
-import { formatEther, maxUint256, parseEther, toHex } from 'viem';
+import { formatEther, formatUnits, maxUint256, parseEther, toHex } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { formatEtherFromString } from '../../utils/balance';
+import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -111,28 +111,37 @@ export async function buildContext({
     chainId,
   });
 
-  const balance = await accountController.getAccountBalance({
+  const {
+    balance: rawBalance,
+    decimals,
+    symbol,
+    iconUrl,
+  } = await accountController.getTokenBalanceAndMetadata({
     chainId,
   });
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:1/slip44:60`,
-    balance,
+    toHex(rawBalance),
   );
+
+  const balance = formatUnits(rawBalance, decimals);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  const initialAmount = formatEtherFromString(
-    permissionRequest.permission.data.initialAmount,
-    true,
-  );
-
-  const maxAmount = formatEtherFromString(
-    permissionRequest.permission.data.maxAmount,
-    true,
-  );
+  const initialAmount = formatUnitsFromString({
+    value: permissionRequest.permission.data.initialAmount,
+    allowUndefined: true,
+    decimals,
+  });
 
   const timePeriod = TimePeriod.WEEKLY;
+
+  const maxAmount = formatUnitsFromString({
+    value: permissionRequest.permission.data.maxAmount,
+    allowUndefined: true,
+    decimals,
+  });
 
   const amountPerSecond = BigInt(
     permissionRequest.permission.data.amountPerSecond,
@@ -152,10 +161,13 @@ export async function buildContext({
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
+    // todo: we should consider removing the accountDetails from the context object, and into it's own object
     accountDetails: {
       address,
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
+      symbol,
+      iconUrl,
     },
     permissionDetails: {
       initialAmount,

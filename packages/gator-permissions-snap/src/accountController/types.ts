@@ -3,6 +3,7 @@ import type {
   DeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
 import type { Address, Hex } from 'viem';
+import type { TokenBalanceAndMetadata } from '../clients/accountApiClient';
 
 /**
  * Base options required for account operations.
@@ -10,6 +11,10 @@ import type { Address, Hex } from 'viem';
 export type AccountOptionsBase = {
   // really this needs to be of type SupportedChainId, but it makes it hard for callers to validate
   chainId: number;
+};
+
+export type GetTokenBalanceAndMetadataOptions = AccountOptionsBase & {
+  assetAddress?: Address;
 };
 
 /**
@@ -49,7 +54,9 @@ export type AccountController = {
   /**
    * Retrieves the balance of the smart account.
    */
-  getAccountBalance(options: AccountOptionsBase): Promise<Hex>;
+  getTokenBalanceAndMetadata(
+    options: GetTokenBalanceAndMetadataOptions,
+  ): Promise<TokenBalanceAndMetadata>;
 
   /**
    * Retrieves the delegation manager address for the current account.

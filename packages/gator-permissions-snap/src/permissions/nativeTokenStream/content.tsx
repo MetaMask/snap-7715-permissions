@@ -70,8 +70,8 @@ export async function createConfirmationContent({
     },
     {
       label: 'Token',
-      text: 'ETH',
-      iconUrl: IconUrls.ethereum.token,
+      text: context.accountDetails.symbol,
+      iconUrl: context.accountDetails.iconUrl,
     },
   ];
 
@@ -104,7 +104,10 @@ export async function createConfirmationContent({
           </Box>
           <Field>
             <Box>
-              <Image src={IconUrls.ethereum.token} alt="Ether token icon" />
+              <Image
+                src={context.accountDetails.iconUrl}
+                alt={`${context.accountDetails.symbol} token icon`}
+              />
             </Box>
             <Input
               name="stream-rate"

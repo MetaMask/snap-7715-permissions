@@ -1,4 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import { IconUrls } from '../ui/iconConstant';
 import { isAddressEqual, zeroAddress, type Address } from 'viem';
 
 /**
@@ -67,11 +68,13 @@ export class AccountApiClient {
     account,
   }: {
     chainId: number;
-    assetAddress?: Address;
     account: Address;
+    assetAddress?: Address | undefined;
   }): Promise<TokenBalanceAndMetadata> {
+    console.log('getTokenBalanceAndMetadata', chainId, assetAddress, account);
     if (!chainId) {
       const message = 'No chainId provided to fetch token balance';
+      console.log(message);
       logger.error(message);
 
       throw new Error(message);
@@ -79,6 +82,7 @@ export class AccountApiClient {
 
     if (!account) {
       const message = 'No account address provided to fetch token balance';
+      console.log(message);
       logger.error(message);
 
       throw new Error(message);
@@ -87,8 +91,12 @@ export class AccountApiClient {
     // zeroAddress is the native token on the specified chain
     const tokenAddress = assetAddress ?? zeroAddress;
 
+    console.log(
+      `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${1}`,
+    );
+    // todo: chainId is hardcoded to mainnet, because the account api does not support sepolia.
     const response = await this.#fetch(
-      `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
+      `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${1}`,
     );
 
     if (!response.ok) {
@@ -120,11 +128,21 @@ export class AccountApiClient {
       throw new Error(message);
     }
 
+    // this is an awkward workaround. We cannot actually use the iconUrl from
+    // the response, because we must have an SVG literal. The service returns a
+    // png, and we cannot even fetch it due to CORs if it were svg.
+    const iconUrl = ICON_URLS[balanceData.iconUrl] ?? IconUrls.notFound.token;
+
     return {
       balance: BigInt(accountData.rawBalance),
       decimals: balanceData.decimals,
       symbol: balanceData.symbol,
-      iconUrl: balanceData.iconUrl,
+      iconUrl,
     };
   }
 }
+
+const ICON_URLS: Record<string, string> = {
+  'https://dev-static.cx.metamask.io/api/v1/tokenIcons/1/0x0000000000000000000000000000000000000000.png':
+    IconUrls.ethereum.token,
+};

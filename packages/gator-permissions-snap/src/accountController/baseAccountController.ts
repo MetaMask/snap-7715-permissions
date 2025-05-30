@@ -2,6 +2,16 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import { CHAIN_ID as ChainsWithDelegatorDeployed } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import * as chains from 'viem/chains';
+import type { Address } from 'viem';
+
+import type {
+  AccountApiClient,
+  TokenBalanceAndMetadata,
+} from '../clients/accountApiClient';
+import type {
+  AccountOptionsBase,
+  GetTokenBalanceAndMetadataOptions,
+} from './types';
 
 export type SupportedChains =
   (typeof chains)[keyof typeof ChainsWithDelegatorDeployed &
@@ -14,7 +24,9 @@ type SupportedChainId = SupportedChains[number]['id'];
  * Base class for account controllers that provides common functionality.
  */
 export abstract class BaseAccountController {
-  #snapsProvider: SnapsProvider;
+  readonly #snapsProvider: SnapsProvider;
+
+  readonly #accountApiClient: AccountApiClient;
 
   protected supportedChains: SupportedChains;
 
@@ -32,10 +44,12 @@ export abstract class BaseAccountController {
    * @param config - The configuration object.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.supportedChains - The supported blockchain chains.
+   * @param config.accountApiClient - The client for interacting with the account API.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
     supportedChains?: SupportedChains;
+    accountApiClient: AccountApiClient;
   }) {
     // only validate if supportedChains is specified, as it will default to ALL_SUPPORTED_CHAINS
     if (config.supportedChains) {
@@ -43,6 +57,7 @@ export abstract class BaseAccountController {
     }
 
     this.#snapsProvider = config.snapsProvider;
+    this.#accountApiClient = config.accountApiClient;
     this.supportedChains =
       config.supportedChains ?? BaseAccountController.#allSupportedChains;
   }
@@ -146,5 +161,46 @@ export abstract class BaseAccountController {
    */
   protected get snapsProvider(): SnapsProvider {
     return this.#snapsProvider;
+  }
+
+  /**
+   * Gets the account address. Must be implemented by derived classes.
+   *
+   * @param options - The base account options including chainId.
+   * @returns A promise resolving to the account address.
+   */
+  protected abstract getAccountAddress(
+    options: AccountOptionsBase,
+  ): Promise<Address>;
+
+  /**
+   * Retrieves the token balance and metadata for the account.
+   *
+   * @param options - The options for fetching the token balance and metadata.
+   * @returns A promise resolving to the token balance and metadata.
+   */
+  public async getTokenBalanceAndMetadata(
+    options: GetTokenBalanceAndMetadataOptions,
+  ): Promise<TokenBalanceAndMetadata> {
+    logger.debug('accountController:getTokenBalanceAndMetadata()');
+
+    const { chainId, assetAddress } = options;
+
+    this.assertIsSupportedChainId(chainId);
+
+    const account = await this.getAccountAddress({ chainId });
+
+    const balanceAndMetadata =
+      await this.#accountApiClient.getTokenBalanceAndMetadata({
+        chainId,
+        account,
+        assetAddress,
+      });
+
+    logger.debug(
+      'accountController:getTokenBalanceAndMetadata() - balance and metadata resolved',
+    );
+
+    return balanceAndMetadata;
   }
 }

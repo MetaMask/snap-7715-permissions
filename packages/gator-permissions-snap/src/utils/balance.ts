@@ -58,10 +58,18 @@ export const zeroDefaultParser = (value: string | null | undefined) => {
  * @param allowUndefined - Whether to allow undefined values.
  * @returns The formatted value.
  */
-export const formatEtherFromString = <TAllowUndefined extends boolean>(
-  value: TAllowUndefined extends true ? string | undefined : string,
-  allowUndefined: TAllowUndefined,
-): TAllowUndefined extends true ? string | undefined : string => {
+export const formatUnitsFromString = <
+  TAllowUndefined extends boolean,
+  TDecimals extends number,
+>({
+  value,
+  allowUndefined,
+  decimals,
+}: {
+  value: TAllowUndefined extends true ? string | undefined : string;
+  allowUndefined: TAllowUndefined;
+  decimals: TDecimals;
+}): TAllowUndefined extends true ? string | undefined : string => {
   if (value === undefined) {
     if (allowUndefined) {
       return undefined as TAllowUndefined extends true
@@ -72,5 +80,5 @@ export const formatEtherFromString = <TAllowUndefined extends boolean>(
     throw new Error('Value is undefined');
   }
 
-  return formatEther(BigInt(value));
+  return formatUnits(BigInt(value), decimals);
 };
