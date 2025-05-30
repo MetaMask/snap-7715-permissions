@@ -48,6 +48,7 @@ const VALID_PERMISSION_RESPONSE: PermissionResponse = {
     data: { justification: 'Testing permission request' },
   },
   context: TEST_CONTEXT,
+  accountMeta: [],
   signerMeta: {
     delegationManager: TEST_ADDRESS,
   },

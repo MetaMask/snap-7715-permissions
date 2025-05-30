@@ -1,4 +1,5 @@
 import type {
+  AccountMeta,
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
@@ -203,21 +204,21 @@ export class PermissionRequestLifecycleOrchestrator {
       isAdjustmentAllowed,
     };
 
-    const [address, accountMeta, delegationManager] = await Promise.all([
-      this.#accountController.getAccountAddress({
-        chainId,
-      }),
-      this.#accountController.getAccountMetadata({
-        chainId,
-      }),
-      this.#accountController.getDelegationManager({
-        chainId,
-      }),
-    ]);
-
-    const environment = await this.#accountController.getEnvironment({
-      chainId,
-    });
+    const [environment, address, accountMetadata, delegationManager] =
+      await Promise.all([
+        this.#accountController.getEnvironment({
+          chainId,
+        }),
+        this.#accountController.getAccountAddress({
+          chainId,
+        }),
+        this.#accountController.getAccountMetadata({
+          chainId,
+        }),
+        this.#accountController.getDelegationManager({
+          chainId,
+        }),
+      ]);
 
     const caveatBuilder = await lifecycleHandlers.appendCaveats({
       permission: populatedPermission,
@@ -241,23 +242,25 @@ export class PermissionRequestLifecycleOrchestrator {
         caveats: finalCaveatBuilder,
       }),
     });
-    const permissionsContext = encodeDelegation([signedDelegation]);
 
-    // we do this because we cannot have undefined properties set on the response
-    const accountMetaObject =
-      accountMeta.factory && accountMeta.factoryData
-        ? {
-            factory: accountMeta.factory,
-            factoryData: accountMeta.factoryData,
-          }
-        : {};
+    const context = encodeDelegation([signedDelegation]);
+
+    const accountMeta: AccountMeta[] =
+      accountMetadata.factory && accountMetadata.factoryData
+        ? [
+            {
+              factory: accountMetadata.factory,
+              factoryData: accountMetadata.factoryData,
+            },
+          ]
+        : [];
 
     const response: PermissionResponse = {
       ...grantedPermissionRequest,
       chainId: toHex(chainId),
       address,
-      context: permissionsContext,
-      ...accountMetaObject,
+      accountMeta,
+      context,
       signerMeta: {
         delegationManager,
       },
