@@ -264,6 +264,11 @@ const Index = () => {
     setMessageSigningSnapSignMessageResponse,
   ] = useState<string | null>(null);
 
+  const [periodAmount, setPeriodAmount] = useState(
+    BigInt(toHex(parseUnits('1', 18))),
+  ); // 1 ETH in wei
+  const [periodDuration, setPeriodDuration] = useState(2592000); // 30 days in seconds
+
   const handleInitialAmountChange = ({
     target: { value: inputValue },
   }: React.ChangeEvent<HTMLInputElement>) => {
@@ -310,7 +315,7 @@ const Index = () => {
 
   const handlePermissionTypeChange = ({
     target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
+  }: React.ChangeEvent<HTMLSelectElement>) => {
     setPermissionType(inputValue);
   };
 
@@ -330,6 +335,18 @@ const Index = () => {
     target: { value: inputValue },
   }: React.ChangeEvent<HTMLInputElement>) => {
     setValue(BigInt(inputValue));
+  };
+
+  const handlePeriodAmountChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setPeriodAmount(BigInt(inputValue));
+  };
+
+  const handlePeriodDurationChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setPeriodDuration(Number(inputValue));
   };
 
   const handleRedeemPermission = async () => {
@@ -384,6 +401,26 @@ const Index = () => {
       throw new Error('Delegate account not found');
     }
 
+    let permissionData;
+    if (permissionType === 'native-token-stream') {
+      permissionData = {
+        justification,
+        initialAmount,
+        amountPerSecond,
+        startTime,
+        maxAmount,
+      };
+    } else if (permissionType === 'native-token-periodic') {
+      permissionData = {
+        justification,
+        periodAmount: toHex(periodAmount),
+        periodDuration: periodDuration,
+        startTime: startTime,
+      };
+    } else {
+      throw new Error(`Unsupported permission type: ${permissionType}`);
+    }
+
     const permissionsRequests = [
       {
         chainId,
@@ -397,13 +434,7 @@ const Index = () => {
         isAdjustmentAllowed,
         permission: {
           type: permissionType,
-          data: {
-            justification,
-            initialAmount,
-            amountPerSecond,
-            startTime,
-            maxAmount,
-          },
+          data: permissionData,
         },
       },
     ];
@@ -484,7 +515,7 @@ const Index = () => {
       <CardContainer>
         {errors.map((error) => (
           <ErrorMessage>
-            <b>An error happened:</b> {error.message}
+            <b>An error happened:</b> {error?.message}
           </ErrorMessage>
         ))}
 
@@ -567,44 +598,87 @@ const Index = () => {
             <StyledForm>
               <div>
                 <label htmlFor="permissionType">Permission Type:</label>
-                <input
-                  type="text"
+                <select
                   id="permissionType"
                   name="permissionType"
                   value={permissionType}
                   onChange={handlePermissionTypeChange}
-                />
+                  style={{
+                    padding: '0.8rem',
+                    border: '1px solid',
+                    borderRadius: '0.3rem',
+                    flexGrow: 1,
+                  }}
+                >
+                  <option value="native-token-stream">
+                    Native Token Stream
+                  </option>
+                  <option value="native-token-periodic">
+                    Native Token Periodic
+                  </option>
+                </select>
               </div>
-              <div>
-                <label htmlFor="initialAmount">Initial Amount:</label>
-                <input
-                  type="text"
-                  id="initialAmount"
-                  name="initialAmount"
-                  value={initialAmount?.toString()}
-                  onChange={handleInitialAmountChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="amountPerSecond">Amount Per Second:</label>
-                <input
-                  type="text"
-                  id="amountPerSecond"
-                  name="amountPerSecond"
-                  value={amountPerSecond.toString()}
-                  onChange={handleAmountPerSecondChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="maxAmount">Max Amount:</label>
-                <input
-                  type="text"
-                  id="maxAmount"
-                  name="maxAmount"
-                  value={maxAmount?.toString()}
-                  onChange={handleMaxAmountChange}
-                />
-              </div>
+
+              {permissionType === 'native-token-stream' && (
+                <>
+                  <div>
+                    <label htmlFor="initialAmount">Initial Amount:</label>
+                    <input
+                      type="text"
+                      id="initialAmount"
+                      name="initialAmount"
+                      value={initialAmount?.toString()}
+                      onChange={handleInitialAmountChange}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="amountPerSecond">Amount Per Second:</label>
+                    <input
+                      type="text"
+                      id="amountPerSecond"
+                      name="amountPerSecond"
+                      value={amountPerSecond.toString()}
+                      onChange={handleAmountPerSecondChange}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="maxAmount">Max Amount:</label>
+                    <input
+                      type="text"
+                      id="maxAmount"
+                      name="maxAmount"
+                      value={maxAmount?.toString()}
+                      onChange={handleMaxAmountChange}
+                    />
+                  </div>
+                </>
+              )}
+
+              {permissionType === 'native-token-periodic' && (
+                <>
+                  <div>
+                    <label htmlFor="periodAmount">Period Amount:</label>
+                    <input
+                      type="text"
+                      id="periodAmount"
+                      name="periodAmount"
+                      value={periodAmount.toString()}
+                      onChange={handlePeriodAmountChange}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="periodDuration">Period Duration:</label>
+                    <input
+                      type="number"
+                      id="periodDuration"
+                      name="periodDuration"
+                      value={periodDuration}
+                      onChange={handlePeriodDurationChange}
+                    />
+                  </div>
+                </>
+              )}
+
               <div>
                 <label htmlFor="startTime">Start Time:</label>
                 <input

@@ -96,7 +96,7 @@ const mockConfirmationDialogFactory = {
 } as unknown as jest.Mocked<ConfirmationDialogFactory>;
 
 type TestLifecycleHandlersMocks = {
-  validateRequest: jest.Mock;
+  parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
   deriveMetadata: jest.Mock;
   createConfirmationContent: jest.Mock;
@@ -115,7 +115,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     jest.clearAllMocks();
 
     lifecycleHandlerMocks = {
-      validateRequest: jest.fn().mockImplementation((req) => req),
+      parseAndValidatePermission: jest.fn().mockImplementation((req) => req),
       buildContext: jest.fn().mockResolvedValue(mockContext),
       deriveMetadata: jest.fn().mockResolvedValue(mockMetadata),
       createConfirmationContent: jest.fn().mockResolvedValue(mockUiContent),
@@ -392,9 +392,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
        * 1. Validates and builds the initial permission context from the incoming permission request.
        */
       it('validates and builds the initial context with the permission request', async () => {
-        expect(lifecycleHandlerMocks.validateRequest).toHaveBeenCalledWith(
-          mockPermissionRequest,
-        );
+        expect(
+          lifecycleHandlerMocks.parseAndValidatePermission,
+        ).toHaveBeenCalledWith(mockPermissionRequest);
         expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith(
           mockPermissionRequest,
         );
