@@ -18,7 +18,7 @@ export type PermissionRequestResult =
   | { approved: false; reason: string };
 
 /**
- * Represents a Permissionrequest with an explicitly typed permission field.
+ * Represents a Permission request with an explicitly typed permission field.
  *
  * @template TPermission - The specific permission type of the permission field.
  */

@@ -189,7 +189,7 @@ describe('nativeTokenStream:context', () => {
       });
     });
 
-    describe('intialAmount validation', () => {
+    describe('initialAmount validation', () => {
       it.each([['0x1234'], ['Steve']])(
         'should return a validation error for invalid initial amount %s',
         async (initialAmount) => {

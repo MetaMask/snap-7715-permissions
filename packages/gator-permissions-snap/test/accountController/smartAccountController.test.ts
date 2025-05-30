@@ -133,7 +133,7 @@ describe('SmartAccountController', () => {
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
 
-    it('should accept one of mmultiple accepted chains', async () => {
+    it('should accept one of multiple accepted chains', async () => {
       const controller = new SmartAccountController({
         snapsProvider: mockSnapsProvider,
         deploymentSalt: '0x1234',
