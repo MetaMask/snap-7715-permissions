@@ -317,7 +317,7 @@ describe('profileSync', () => {
     });
   });
 
-  describe('Profile Sync feature disabled using unconfigured profile sync manager', () => {
+  describe('Profile Sync feature disabled using unConfigured profile sync manager', () => {
     beforeEach(() => {
       profileSyncManager = createProfileSyncManager({
         isFeatureEnabled: false,

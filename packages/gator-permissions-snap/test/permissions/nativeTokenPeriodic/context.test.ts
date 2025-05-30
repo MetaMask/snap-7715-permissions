@@ -1,5 +1,4 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import { maxUint256 } from 'viem';
 import { toHex, parseUnits } from 'viem/utils';
 
 import type { AccountController } from '../../../src/accountController';
@@ -9,52 +8,51 @@ import {
   buildContext,
   deriveMetadata,
   applyContext,
-} from '../../../src/permissions/nativeTokenStream/context';
+} from '../../../src/permissions/nativeTokenPeriodic/context';
 import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamPermission,
-  NativeTokenStreamPermissionRequest,
-} from '../../../src/permissions/nativeTokenStream/types';
+  NativeTokenPeriodicContext,
+  NativeTokenPeriodicPermission,
+  NativeTokenPeriodicPermissionRequest,
+} from '../../../src/permissions/nativeTokenPeriodic/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
+  TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
 
-const permissionWithoutOptionals: NativeTokenStreamPermission = {
-  type: 'native-token-stream',
+const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
+  type: 'native-token-periodic',
   data: {
-    amountPerSecond: toHex(parseUnits('.5', 18)), // 0.5 eth per second
+    periodAmount: toHex(parseUnits('1', 18)), // 1 ETH per period
+    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
     startTime: convertReadableDateToTimestamp('10/26/1985'),
     justification: 'Permission to do something important',
   },
 };
 
-const alreadyPopulatedPermission: NativeTokenStreamPermission = {
+const alreadyPopulatedPermission: NativeTokenPeriodicPermission = {
   ...permissionWithoutOptionals,
   data: {
     ...permissionWithoutOptionals.data,
-    // 1 Eth
-    initialAmount: toHex(parseUnits('1', 18)),
-    // 10 Eth
-    maxAmount: toHex(parseUnits('10', 18)),
   },
   rules: {},
 };
 
-const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
-  chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
+const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
+  {
+    chainId: '0x1',
+    expiry: convertReadableDateToTimestamp('05/01/2024'),
+    signer: {
+      type: 'account',
+      data: {
+        address: '0x1',
+      },
     },
-  },
-  permission: alreadyPopulatedPermission,
-};
+    permission: alreadyPopulatedPermission,
+  };
 
-const alreadyPopulatedContext: NativeTokenStreamContext = {
+const alreadyPopulatedContext: NativeTokenPeriodicContext = {
   expiry: '05/01/2024',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
@@ -64,15 +62,14 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
     balanceFormattedAsCurrency: '$🐊10.00',
   },
   permissionDetails: {
-    initialAmount: '1',
-    maxAmount: '10',
-    timePeriod: TimePeriod.WEEKLY,
+    periodAmount: '1',
+    periodType: TimePeriod.DAILY,
+    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
     startTime: '10/26/1985',
-    amountPerPeriod: '302400',
   },
 } as const;
 
-describe('nativeTokenStream:context', () => {
+describe('nativeTokenPeriodic:context', () => {
   describe('populatePermission()', () => {
     it('should return the permission unchanged if it is already populated', async () => {
       const populatedPermission = await populatePermission({
@@ -82,29 +79,12 @@ describe('nativeTokenStream:context', () => {
       expect(populatedPermission).toStrictEqual(alreadyPopulatedPermission);
     });
 
-    it('should add defaults to a permission', async () => {
-      const populatedPermission = await populatePermission({
-        permission: permissionWithoutOptionals,
-      });
-
-      expect(populatedPermission).toStrictEqual({
-        ...permissionWithoutOptionals,
-        data: {
-          ...permissionWithoutOptionals.data,
-          initialAmount: '0x0',
-          maxAmount: toHex(maxUint256),
-        },
-        rules: {},
-      });
-    });
-
     it('should not override existing rules', async () => {
-      const permission: NativeTokenStreamPermission = {
-        type: 'native-token-stream',
+      const permission: NativeTokenPeriodicPermission = {
+        type: 'native-token-periodic',
         data: {
-          initialAmount: '0x1000000000000000000000000000000000000000',
-          maxAmount: '0x1000000000000000000000000000000000000000',
-          amountPerSecond: '0x1000000000000000000000000000000000000000',
+          periodAmount: '0x1000000000000000000000000000000000000000',
+          periodDuration: 86400,
           startTime: 1714531200,
           justification: 'Permission to do something important',
         },
@@ -132,12 +112,12 @@ describe('nativeTokenStream:context', () => {
       } as unknown as jest.Mocked<TokenPricesService>;
 
       mockAccountController = {
-        getAccountAddress: jest.fn(
-          () => alreadyPopulatedContext.accountDetails.address,
-        ),
-        getAccountBalance: jest.fn(
-          () => alreadyPopulatedContext.accountDetails.balance,
-        ),
+        getAccountAddress: jest
+          .fn()
+          .mockResolvedValue(alreadyPopulatedContext.accountDetails.address),
+        getAccountBalance: jest
+          .fn()
+          .mockResolvedValue(alreadyPopulatedContext.accountDetails.balance),
       } as unknown as jest.Mocked<AccountController>;
     });
 
@@ -183,192 +163,124 @@ describe('nativeTokenStream:context', () => {
       });
 
       expect(metadata).toStrictEqual({
-        amountPerSecond: '0.5',
         validationErrors: {},
-        rulesToAdd: [],
       });
     });
 
-    describe('initialAmount validation', () => {
+    describe('periodAmount validation', () => {
       it.each([['0x1234'], ['Steve']])(
-        'should return a validation error for invalid initial amount %s',
-        async (initialAmount) => {
-          const contextWithInvalidInitialAmount = {
+        'should return a validation error for invalid period amount %s',
+        async (periodAmount) => {
+          const contextWithInvalidPeriodAmount = {
             ...context,
             permissionDetails: {
               ...context.permissionDetails,
-              initialAmount,
+              periodAmount,
             },
           };
 
           const metadata = await deriveMetadata({
-            context: contextWithInvalidInitialAmount,
+            context: contextWithInvalidPeriodAmount,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
-            initialAmountError: 'Invalid initial amount',
+            periodAmountError: 'Invalid period amount',
           });
         },
       );
 
-      it('should return a validation error for negative initial amount', async () => {
-        const contextWithNegativeInitialAmount = {
+      it('should return a validation error for negative period amount', async () => {
+        const contextWithNegativePeriodAmount = {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            initialAmount: '-1',
+            periodAmount: '-1',
           },
         };
 
         const metadata = await deriveMetadata({
-          context: contextWithNegativeInitialAmount,
+          context: contextWithNegativePeriodAmount,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
-          initialAmountError: 'Initial amount must be greater than 0',
+          periodAmountError: 'Period amount must be greater than 0',
         });
       });
     });
 
-    describe('maxAmount validation', () => {
-      it('should return a validation error for initial amount greater than max amount', async () => {
-        const contextWithInitialAmountGreaterThanMaxAmount = {
+    describe('periodDuration validation', () => {
+      it('should return a validation error for invalid period duration', async () => {
+        const contextWithInvalidPeriodDuration = {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            initialAmount: '10',
-            maxAmount: '1',
+            periodDuration: 'invalid',
           },
         };
 
         const metadata = await deriveMetadata({
-          context: contextWithInitialAmountGreaterThanMaxAmount,
+          context: contextWithInvalidPeriodDuration,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
-          maxAmountError: 'Max amount must be greater than initial amount',
+          periodDurationError: 'Period duration must be greater than 0',
         });
       });
 
-      it.each([['0x1234'], ['Steve']])(
-        'should return a validation error for invalid max amount %s',
-        async (maxAmount) => {
-          const contextWithInvalidMaxAmount = {
-            ...context,
-            permissionDetails: {
-              ...context.permissionDetails,
-              maxAmount,
-            },
-          };
-
-          const metadata = await deriveMetadata({
-            context: contextWithInvalidMaxAmount,
-          });
-
-          expect(metadata.validationErrors).toStrictEqual({
-            maxAmountError: 'Invalid max amount',
-          });
-        },
-      );
-
-      it('should return a validation error for negative max amount', async () => {
-        const contextWithNegativeMaxAmount = {
+      it('should return a validation error for negative period duration', async () => {
+        const contextWithNegativePeriodDuration = {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            maxAmount: '-1',
+            periodDuration: '-1',
           },
         };
 
         const metadata = await deriveMetadata({
-          context: contextWithNegativeMaxAmount,
+          context: contextWithNegativePeriodDuration,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
-          maxAmountError: 'Max amount must be greater than 0',
+          periodDurationError: 'Period duration must be greater than 0',
         });
       });
     });
 
-    describe('amountPerPeriod validation', () => {
-      it.each([['0x1234'], ['Steve']])(
-        'should return a validation error for invalid amount per period %s',
-        async (amountPerPeriod) => {
-          const contextWithInvalidAmountPerPeriod = {
-            ...context,
-            permissionDetails: {
-              ...context.permissionDetails,
-              amountPerPeriod,
-            },
-          };
-
-          const metadata = await deriveMetadata({
-            context: contextWithInvalidAmountPerPeriod,
-          });
-
-          expect(metadata.validationErrors).toStrictEqual({
-            amountPerPeriodError: 'Invalid amount per period',
-          });
-        },
-      );
-
-      it('should return a validation error for negative amount per period', async () => {
-        const contextWithNegativeAmountPerPeriod = {
+    describe('startTime validation', () => {
+      it('should return a validation error for invalid start time', async () => {
+        const contextWithInvalidStartTime = {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            amountPerPeriod: '-1',
+            startTime: 'invalid',
           },
         };
 
         const metadata = await deriveMetadata({
-          context: contextWithNegativeAmountPerPeriod,
+          context: contextWithInvalidStartTime,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
-          amountPerPeriodError: 'Amount per period must be greater than 0',
+          startTimeError: 'Invalid start time',
         });
       });
 
-      describe('startTime validation', () => {
-        it('should return a validation error for startTime in the past', async () => {
-          const contextWithStartTimeInThePast = {
-            ...context,
-            permissionDetails: {
-              ...context.permissionDetails,
-              startTime: '10/26/1985',
-            },
-          };
+      it('should return a validation error for start time in the past', async () => {
+        const contextWithPastStartTime = {
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            startTime: '01/01/2020',
+          },
+        };
 
-          const metadata = await deriveMetadata({
-            context: contextWithStartTimeInThePast,
-          });
-
-          expect(metadata.validationErrors).toStrictEqual({
-            startTimeError: 'Start time must be today or later',
-          });
+        const metadata = await deriveMetadata({
+          context: contextWithPastStartTime,
         });
 
-        it.each([['12345678'], ['0x1234'], ['Steve']])(
-          'should return a validation error for invalid startTime %s',
-          async (startTime) => {
-            const contextWithInvalidStartTime = {
-              ...context,
-              permissionDetails: {
-                ...context.permissionDetails,
-                startTime,
-              },
-            };
-
-            const metadata = await deriveMetadata({
-              context: contextWithInvalidStartTime,
-            });
-
-            expect(metadata.validationErrors).toStrictEqual({
-              startTimeError: 'Invalid start time',
-            });
-          },
-        );
+        expect(metadata.validationErrors).toStrictEqual({
+          startTimeError: 'Start time must be today or later',
+        });
       });
     });
 

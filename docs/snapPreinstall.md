@@ -15,7 +15,7 @@ mkdir deps
 yarn build:pack
 ```
 
-## Add preinstalls to mm-extension local build (mm-extension repo)
+## Add preinstalled snaps to mm-extension local build (mm-extension repo)
 
 Follow these steps to build a local version of MetaMask with packed preinstalled snaps:
 
@@ -25,7 +25,7 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
 4. Follow these instructions to verify that your local build runs correctly:
    - [How to add custom build to Chrome](https://github.com/V00D00-child/metamask-extension/blob/main/docs/add-to-chrome.md)
    - [How to add custom build to Firefox](https://github.com/V00D00-child/metamask-extension/blob/main/docs/add-to-firefox.md)
-5. Once the local build is runing in your browser, you can start interacting with the preinstalled snaps.
+5. Once the local build is running in your browser, you can start interacting with the preinstalled snaps.
 
 ## Making permissions requests using preinstalled gator and kernel snap (snap repo)
 
@@ -37,4 +37,4 @@ Follow these steps to build a local version of MetaMask with packed preinstalled
 
 2. Client connect button to connect dapp to kernel snap.
 3. Make a permissions request.
-4. Requests are sent to `kernel snap` -> `gator snap` preinstalls
+4. Requests are sent to `kernel snap` -> `gator snap` preinstalled snaps.

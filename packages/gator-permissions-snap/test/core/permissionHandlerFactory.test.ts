@@ -2,7 +2,6 @@ import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 
 import type { AccountController } from '../../src/accountController';
-import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
@@ -13,7 +12,6 @@ describe('PermissionHandlerFactory', () => {
   let permissionHandlerFactory: PermissionHandlerFactory;
   let mockAccountController: jest.Mocked<AccountController>;
   let mockTokenPricesService: jest.Mocked<TokenPricesService>;
-  let mockConfirmationDialogFactory: jest.Mocked<ConfirmationDialogFactory>;
   let mockUserEventDispatcher: jest.Mocked<UserEventDispatcher>;
   let mockOrchestrator: jest.Mocked<PermissionRequestLifecycleOrchestrator>;
 
@@ -65,10 +63,6 @@ describe('PermissionHandlerFactory', () => {
       getCryptoToFiatConversion: jest.fn(),
     } as unknown as jest.Mocked<TokenPricesService>;
 
-    mockConfirmationDialogFactory = {
-      create: jest.fn(),
-    } as unknown as jest.Mocked<ConfirmationDialogFactory>;
-
     mockUserEventDispatcher = {
       dispatch: jest.fn(),
     } as unknown as jest.Mocked<UserEventDispatcher>;
@@ -80,7 +74,6 @@ describe('PermissionHandlerFactory', () => {
     permissionHandlerFactory = new PermissionHandlerFactory({
       accountController: mockAccountController,
       tokenPricesService: mockTokenPricesService,
-      confirmationDialogFactory: mockConfirmationDialogFactory,
       userEventDispatcher: mockUserEventDispatcher,
       orchestrator: mockOrchestrator,
     });

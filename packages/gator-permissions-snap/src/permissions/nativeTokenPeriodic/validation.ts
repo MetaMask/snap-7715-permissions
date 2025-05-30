@@ -1,0 +1,71 @@
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+
+import type {
+  NativeTokenPeriodicPermission,
+  NativeTokenPeriodicPermissionRequest,
+} from './types';
+import { zNativeTokenPeriodicPermission } from './types';
+
+/**
+ * Validates a permission object data specific to the permission type.
+ * @param permission - The native token periodic permission object to validate.
+ * @returns True if the permission data is valid, throws an error otherwise.
+ * @throws {Error} If any validation check fails.
+ */
+function validatePermissionData(
+  permission: NativeTokenPeriodicPermission,
+): true {
+  const { periodAmount, periodDuration, startTime } = permission.data;
+  const bigIntPeriodAmount = BigInt(periodAmount);
+
+  if (bigIntPeriodAmount === 0n) {
+    throw new Error('Invalid periodAmount: must be a positive number');
+  }
+
+  if (periodDuration <= 0) {
+    throw new Error('Invalid periodDuration: must be a positive number');
+  }
+
+  if (periodDuration !== Math.floor(periodDuration)) {
+    throw new Error('Invalid periodDuration: must be an integer');
+  }
+
+  if (startTime <= 0) {
+    throw new Error('Invalid startTime: must be a positive number');
+  }
+
+  if (startTime !== Math.floor(startTime)) {
+    throw new Error('Invalid startTime: must be an integer');
+  }
+
+  return true;
+}
+
+/**
+ * Parses and validates a permission request for native token periodic transfers.
+ * @param permissionRequest - The permission request object to validate.
+ * @returns A validated permission request object.
+ * @throws {Error} If the permission request is invalid.
+ */
+export function parseAndValidatePermission(
+  permissionRequest: PermissionRequest,
+): NativeTokenPeriodicPermissionRequest {
+  const {
+    data: validationResult,
+    error: validationError,
+    success,
+  } = zNativeTokenPeriodicPermission.safeParse(permissionRequest.permission);
+
+  if (!success) {
+    throw new Error(extractZodError(validationError.errors));
+  }
+
+  validatePermissionData(validationResult);
+
+  return {
+    ...permissionRequest,
+    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
+    permission: validationResult,
+  };
+}

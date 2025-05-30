@@ -103,7 +103,7 @@ describe('Kernel Snap', () => {
         });
         expect(await registerRes).toRespondWith(true);
 
-        // check that the no addtional offer was stored on the registry
+        // check that the no additional offer was stored on the registry
         const fetchRes = snapRequest({
           method: InternalMethod.WalletGetRegisteredOnchainPermissionOffers,
           origin: MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,

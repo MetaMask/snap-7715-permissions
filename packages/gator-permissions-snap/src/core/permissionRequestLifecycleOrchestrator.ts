@@ -55,7 +55,7 @@ export class PermissionRequestLifecycleOrchestrator {
     TPopulatedPermission extends DeepRequired<TPermission>,
   >(
     origin: string,
-    permissionRequest: TRequest,
+    permissionRequest: PermissionRequest,
     lifecycleHandlers: LifecycleOrchestrationHandlers<
       TRequest,
       TContext,
@@ -67,7 +67,7 @@ export class PermissionRequestLifecycleOrchestrator {
     const isAdjustmentAllowed = permissionRequest.isAdjustmentAllowed ?? true;
 
     const validatedPermissionRequest =
-      lifecycleHandlers.validateRequest(permissionRequest);
+      lifecycleHandlers.parseAndValidatePermission(permissionRequest);
 
     const chainId = parseInt(permissionRequest.chainId, 16);
 

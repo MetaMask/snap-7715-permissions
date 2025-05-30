@@ -34,7 +34,7 @@ export const zPermissionRequest = z.object({
 
   /**
    *
-   * The account being targetted for this permission request.
+   * The account being targeted for this permission request.
    * It is optional to let the user choose which account to grant permission for.
    */
   address: zAddress.optional(),

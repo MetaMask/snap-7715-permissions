@@ -39,7 +39,7 @@ export const parsePermissionRequestParam = (
 };
 
 /**
- * Safely parses the permisssions offer request parameters, validating them using Zod schema.
+ * Safely parses the permissions offer request parameters, validating them using Zod schema.
  *
  * @param params - The permission offer to parse.
  * @returns The parsed and validated permissions offer as a PermissionOffer object.

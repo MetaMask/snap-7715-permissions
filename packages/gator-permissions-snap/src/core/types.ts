@@ -7,7 +7,9 @@ import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
+import type { AccountController } from '../accountController';
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 
 /**
  * Represents the result of a permission request.
@@ -18,7 +20,7 @@ export type PermissionRequestResult =
   | { approved: false; reason: string };
 
 /**
- * Represents a Permissionrequest with an explicitly typed permission field.
+ * Represents a Permission request with an explicitly typed permission field.
  *
  * @template TPermission - The specific permission type of the permission field.
  */
@@ -101,7 +103,7 @@ export type LifecycleOrchestrationHandlers<
   TPermission extends TRequest['permission'],
   TPopulatedPermission extends DeepRequired<TPermission>,
 > = {
-  validateRequest: (request: TRequest) => TRequest;
+  parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (request: TRequest) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   createConfirmationContent: (args: {
@@ -169,10 +171,8 @@ export type RuleDefinition<
   value: (context: TContext) => string | undefined;
   error?: (metadata: TMetadata) => string | undefined;
   options?: string[];
-  iconData?: {
-    iconUrl: string;
-    iconAltText: string;
-  };
+  isVisible?: (context: TContext) => boolean;
+  iconData?: IconData;
   // todo: it would be nice if we could make the value type more specific
   updateContext: (context: TContext, value: any) => TContext;
 };
@@ -199,4 +199,108 @@ export type PermissionHandlerType = {
    * @returns A permission response object
    */
   handlePermissionRequest(origin: string): Promise<PermissionRequestResult>;
+};
+
+/**
+ * Defines the structure and dependencies for a permission type.
+ *
+ * @template TRequest - The type of permission request.
+ * @template TContext - The type of context object used during request processing.
+ * @template TMetadata - The type of metadata object used for request processing.
+ * @template TPermission - The type of permission object.
+ * @template TPopulatedPermission - The type of populated permission object with all required fields.
+ */
+export type PermissionDefinition<
+  TRequest extends PermissionRequest = PermissionRequest,
+  TContext extends BaseContext = BaseContext,
+  TMetadata extends object = object,
+  TPermission extends TRequest['permission'] = TRequest['permission'],
+  TPopulatedPermission extends
+    DeepRequired<TPermission> = DeepRequired<TPermission>,
+> = {
+  rules: RuleDefinition<TContext, TMetadata>[];
+  title: string;
+  dependencies: PermissionHandlerDependencies<
+    TRequest,
+    TContext,
+    TMetadata,
+    TPermission,
+    TPopulatedPermission
+  >;
+};
+
+/**
+ * Parameters required to construct a PermissionHandler instance.
+ *
+ * @template TRequest - The type of permission request being handled.
+ * @template TContext - The type of context object used during request processing.
+ * @template TMetadata - The type of metadata object used for request processing.
+ * @template TPermission - The type of permission object.
+ * @template TPopulatedPermission - The type of populated permission object with all required fields.
+ */
+export type PermissionHandlerParams<
+  TRequest extends PermissionRequest,
+  TContext extends BaseContext,
+  TMetadata extends object,
+  TPermission extends TRequest['permission'],
+  TPopulatedPermission extends DeepRequired<TPermission>,
+> = {
+  accountController: AccountController;
+  userEventDispatcher: UserEventDispatcher;
+  orchestrator: PermissionRequestLifecycleOrchestrator;
+  permissionRequest: PermissionRequest;
+  dependencies: PermissionHandlerDependencies<
+    TRequest,
+    TContext,
+    TMetadata,
+    TPermission,
+    TPopulatedPermission
+  >;
+  tokenPricesService: any;
+  rules: RuleDefinition<TContext, TMetadata>[];
+  title: string;
+};
+
+/**
+ * Dependencies required for a PermissionHandler to process permission requests.
+ *
+ * @template TRequest - The type of permission request being handled.
+ * @template TContext - The type of context object used during request processing.
+ * @template TMetadata - The type of metadata object used for request processing.
+ * @template TPermission - The type of permission object from the request.
+ * @template TPopulatedPermission - The type of fully populated permission object.
+ */
+export type PermissionHandlerDependencies<
+  TRequest extends PermissionRequest,
+  TContext extends BaseContext,
+  TMetadata extends object,
+  TPermission extends TRequest['permission'],
+  TPopulatedPermission extends DeepRequired<TPermission>,
+> = {
+  parseAndValidatePermission: (request: PermissionRequest) => TRequest;
+  buildContext: (args: {
+    permissionRequest: TRequest;
+    tokenPricesService: any;
+    accountController: AccountController;
+  }) => Promise<TContext>;
+  deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
+  createConfirmationContent: (args: {
+    context: TContext;
+    metadata: TMetadata;
+    origin: string;
+    chainId: number;
+    isJustificationCollapsed: boolean;
+    showAddMoreRulesButton: boolean;
+  }) => Promise<GenericSnapElement>;
+  applyContext: (args: {
+    context: TContext;
+    originalRequest: TRequest;
+  }) => Promise<TRequest>;
+  populatePermission: (args: {
+    permission: TPermission;
+  }) => Promise<TPopulatedPermission>;
+  appendCaveats: (args: {
+    permission: TPopulatedPermission;
+    caveatBuilder: any;
+  }) => Promise<any>;
 };

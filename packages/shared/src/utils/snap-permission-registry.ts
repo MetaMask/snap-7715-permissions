@@ -8,6 +8,10 @@ export const DEFAULT_OFFERS: GatorPermission[] = [
     type: 'native-token-stream',
     proposedName: 'Native Token Stream',
   },
+  {
+    type: 'native-token-periodic',
+    proposedName: 'Native Token Periodic Transfer',
+  },
 ];
 
 /**
