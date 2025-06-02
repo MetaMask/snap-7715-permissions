@@ -1,0 +1,210 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
+import type {
+  TokenMetadataClient,
+  TokenBalanceAndMetadata,
+} from '../core/types';
+import type { AbiFunction, AbiParameter, Address, Hex } from 'viem';
+import {
+  decodeAbiParameters,
+  encodeFunctionData,
+  extractChain,
+  zeroAddress,
+} from 'viem';
+import { sepolia, mainnet } from 'viem/chains';
+import { SnapsEthereumProvider } from '@metamask/snaps-sdk';
+
+const BALANCEOF_ABI: AbiFunction = {
+  constant: true,
+  inputs: [{ name: '_owner', type: 'address' }],
+  name: 'balanceOf',
+  outputs: [{ name: 'balance', type: 'uint256' }],
+  type: 'function',
+  stateMutability: 'view',
+};
+
+const DECIMALS_ABI: AbiFunction = {
+  constant: true,
+  inputs: [],
+  name: 'decimals',
+  outputs: [{ name: '', type: 'uint8' }],
+  type: 'function',
+  stateMutability: 'view',
+};
+
+const SYMBOL_ABI: AbiFunction = {
+  constant: true,
+  inputs: [],
+  name: 'symbol',
+  outputs: [{ name: '', type: 'string' }],
+  type: 'function',
+  stateMutability: 'view',
+};
+
+const ERC20_ABI = [BALANCEOF_ABI, DECIMALS_ABI, SYMBOL_ABI] as const;
+
+/**
+ * Client that fetches token metadata directly from the blockchain using the ethereum provider
+ */
+export class BlockchainTokenMetadataClient implements TokenMetadataClient {
+  readonly #ethereumProvider: SnapsEthereumProvider;
+
+  constructor({
+    ethereumProvider,
+  }: {
+    ethereumProvider: SnapsEthereumProvider;
+  }) {
+    this.#ethereumProvider = ethereumProvider;
+  }
+
+  /**
+   * Fetch the token balance and metadata for a given account and token.
+   *
+   * @param params - The parameters for fetching the token balance
+   * @param params.chainId - The chain ID to fetch the balance from
+   * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance
+   * @param params.account - The account address to fetch the balance for
+   * @returns The token balance and metadata
+   */
+  public async getTokenBalanceAndMetadata({
+    chainId,
+    assetAddress,
+    account,
+  }: {
+    chainId: number;
+    account: Address;
+    assetAddress?: Address | undefined;
+  }): Promise<TokenBalanceAndMetadata> {
+    logger.debug('BlockchainTokenMetadataClient:getTokenBalanceAndMetadata()');
+
+    if (!chainId) {
+      const message = 'No chainId provided to fetch token balance';
+      logger.error(message);
+      throw new Error(message);
+    }
+
+    if (!account) {
+      const message = 'No account address provided to fetch token balance';
+      logger.error(message);
+      throw new Error(message);
+    }
+
+    // Check if we're on the correct chain
+    const selectedChain = await this.#ethereumProvider.request({
+      method: 'eth_chainId',
+      params: [],
+    });
+
+    if (Number(selectedChain) !== chainId) {
+      throw new Error('Selected chain does not match the requested chain');
+    }
+
+    // If no asset address is provided, fetch native token balance
+    if (!assetAddress || assetAddress === zeroAddress) {
+      const balance = await this.#ethereumProvider.request<Hex>({
+        method: 'eth_getBalance',
+        params: [account, 'latest'],
+      });
+
+      const chain = extractChain({
+        chains: [sepolia, mainnet],
+        id: chainId as 11155111 | 1,
+      });
+      const { symbol, decimals } = chain.nativeCurrency;
+
+      if (balance === undefined || balance === null) {
+        throw new Error('Failed to fetch native token balance');
+      }
+
+      return {
+        balance: BigInt(balance),
+        decimals,
+        symbol,
+      };
+    }
+
+    const [balanceEncoded, decimalsEncoded, symbolEncoded] = await Promise.all([
+      this.#ethereumProvider.request<Hex>({
+        method: 'eth_call',
+        params: [
+          {
+            to: assetAddress,
+            data: encodeFunctionData({
+              abi: ERC20_ABI,
+              functionName: 'balanceOf',
+              args: [account],
+            }),
+          },
+          'latest',
+        ],
+      }),
+      this.#ethereumProvider.request<Hex>({
+        method: 'eth_call',
+        params: [
+          {
+            to: assetAddress,
+            data: encodeFunctionData({
+              abi: ERC20_ABI,
+              functionName: 'decimals',
+            }),
+          },
+          'latest',
+        ],
+      }),
+      this.#ethereumProvider.request<Hex>({
+        method: 'eth_call',
+        params: [
+          {
+            to: assetAddress,
+            data: encodeFunctionData({
+              abi: ERC20_ABI,
+              functionName: 'symbol',
+            }),
+          },
+          'latest',
+        ],
+      }),
+    ]);
+
+    const decodeOutput = <TReturn>({
+      name,
+      output: outputs,
+      encoded,
+    }: {
+      output: readonly AbiParameter[];
+      encoded: Hex | null | undefined;
+      name: string;
+    }): TReturn => {
+      if (encoded === null || encoded === undefined) {
+        throw new Error(`Failed to fetch ${name}`);
+      }
+
+      const [decoded] = decodeAbiParameters(outputs, encoded) as [TReturn];
+
+      return decoded;
+    };
+
+    const symbol = decodeOutput<string>({
+      output: SYMBOL_ABI.outputs,
+      encoded: symbolEncoded,
+      name: 'symbol',
+    });
+
+    const decimals = decodeOutput<number>({
+      output: DECIMALS_ABI.outputs,
+      encoded: decimalsEncoded,
+      name: 'decimals',
+    });
+
+    const balance = decodeOutput<bigint>({
+      output: BALANCEOF_ABI.outputs,
+      encoded: balanceEncoded,
+      name: 'balance',
+    });
+
+    return {
+      balance,
+      decimals,
+      symbol,
+    };
+  }
+}

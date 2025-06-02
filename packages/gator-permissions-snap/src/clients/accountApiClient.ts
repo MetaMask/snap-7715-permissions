@@ -1,6 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { IconUrls } from '../ui/iconConstant';
 import { isAddressEqual, zeroAddress, type Address } from 'viem';
+import type { TokenBalanceAndMetadata } from '../core/types';
 
 /**
  * Response type for token balance data
@@ -28,13 +28,6 @@ type TokenBalanceResponse = {
   }[];
 };
 
-export type TokenBalanceAndMetadata = {
-  balance: bigint;
-  decimals: number;
-  symbol: string;
-  iconUrl: string;
-};
-
 /**
  * Class responsible for fetching account data from the Account API.
  */
@@ -45,12 +38,27 @@ export class AccountApiClient {
 
   readonly #baseUrl: string;
 
-  constructor(
-    baseUrl: string,
-    fetch: typeof globalThis.fetch = globalThis.fetch,
-  ) {
+  constructor({
+    baseUrl,
+    fetch = globalThis.fetch,
+  }: {
+    baseUrl: string;
+    fetch?: typeof globalThis.fetch;
+  }) {
     this.#fetch = fetch;
     this.#baseUrl = baseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
+  }
+
+  /**
+   * Checks if a chain ID is supported by the account API.
+   * Currently only mainnet (chain ID 1) is supported.
+   *
+   * @param params - The parameters object
+   * @param params.chainId - The chain ID to check
+   * @returns True if the chain ID is supported, false otherwise
+   */
+  public isChainIdSupported({ chainId }: { chainId: number }): boolean {
+    return chainId === 1;
   }
 
   /**
@@ -128,21 +136,10 @@ export class AccountApiClient {
       throw new Error(message);
     }
 
-    // this is an awkward workaround. We cannot actually use the iconUrl from
-    // the response, because we must have an SVG literal. The service returns a
-    // png, and we cannot even fetch it due to CORs if it were svg.
-    const iconUrl = ICON_URLS[balanceData.iconUrl] ?? IconUrls.notFound.token;
-
     return {
       balance: BigInt(accountData.rawBalance),
       decimals: balanceData.decimals,
       symbol: balanceData.symbol,
-      iconUrl,
     };
   }
 }
-
-const ICON_URLS: Record<string, string> = {
-  'https://dev-static.cx.metamask.io/api/v1/tokenIcons/1/0x0000000000000000000000000000000000000000.png':
-    IconUrls.ethereum.token,
-};

@@ -4,10 +4,11 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import * as chains from 'viem/chains';
 import type { Address } from 'viem';
 
+import type { AccountApiClient } from '../clients/accountApiClient';
 import type {
-  AccountApiClient,
+  TokenMetadataClient,
   TokenBalanceAndMetadata,
-} from '../clients/accountApiClient';
+} from '../core/types';
 import type {
   AccountOptionsBase,
   GetTokenBalanceAndMetadataOptions,
@@ -28,6 +29,8 @@ export abstract class BaseAccountController {
 
   readonly #accountApiClient: AccountApiClient;
 
+  readonly #tokenMetadataClient: TokenMetadataClient;
+
   protected supportedChains: SupportedChains;
 
   // the intersection between chains supported by viem, and chains supported by the delegator contracts
@@ -45,11 +48,13 @@ export abstract class BaseAccountController {
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.supportedChains - The supported blockchain chains.
    * @param config.accountApiClient - The client for interacting with the account API.
+   * @param config.tokenMetadataClient - The client for interacting with the token metadata.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
     supportedChains?: SupportedChains;
     accountApiClient: AccountApiClient;
+    tokenMetadataClient: TokenMetadataClient;
   }) {
     // only validate if supportedChains is specified, as it will default to ALL_SUPPORTED_CHAINS
     if (config.supportedChains) {
@@ -58,6 +63,7 @@ export abstract class BaseAccountController {
 
     this.#snapsProvider = config.snapsProvider;
     this.#accountApiClient = config.accountApiClient;
+    this.#tokenMetadataClient = config.tokenMetadataClient;
     this.supportedChains =
       config.supportedChains ?? BaseAccountController.#allSupportedChains;
   }
@@ -174,6 +180,26 @@ export abstract class BaseAccountController {
   ): Promise<Address>;
 
   /**
+   * Gets the appropriate token metadata client for the given chain ID.
+   * Uses the account API client for mainnet (chain ID 1) and the blockchain client for other chains.
+   *
+   * @param params - The parameters object
+   * @param params.chainId - The chain ID to get the client for
+   * @returns The appropriate token metadata client
+   */
+  #getTokenMetadataClientForChainId({
+    chainId,
+  }: {
+    chainId: number;
+  }): TokenMetadataClient {
+    if (this.#accountApiClient.isChainIdSupported({ chainId })) {
+      return this.#accountApiClient;
+    }
+
+    return this.#tokenMetadataClient;
+  }
+
+  /**
    * Retrieves the token balance and metadata for the account.
    *
    * @param options - The options for fetching the token balance and metadata.
@@ -190,12 +216,13 @@ export abstract class BaseAccountController {
 
     const account = await this.getAccountAddress({ chainId });
 
-    const balanceAndMetadata =
-      await this.#accountApiClient.getTokenBalanceAndMetadata({
-        chainId,
-        account,
-        assetAddress,
-      });
+    const client = this.#getTokenMetadataClientForChainId({ chainId });
+
+    const balanceAndMetadata = await client.getTokenBalanceAndMetadata({
+      chainId,
+      account,
+      assetAddress,
+    });
 
     logger.debug(
       'accountController:getTokenBalanceAndMetadata() - balance and metadata resolved',

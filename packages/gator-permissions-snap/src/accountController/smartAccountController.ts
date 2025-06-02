@@ -25,6 +25,7 @@ import type {
   SignDelegationOptions,
   FactoryArgs,
 } from './types';
+import { TokenMetadataClient } from 'src/core/types';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
@@ -60,6 +61,7 @@ export class SmartAccountController
     snapsProvider: SnapsProvider;
     supportedChains?: SupportedChains;
     deploymentSalt: Hex;
+    tokenMetadataClient: TokenMetadataClient;
     accountApiClient: AccountApiClient;
   }) {
     super(config);

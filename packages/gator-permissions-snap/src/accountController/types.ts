@@ -3,7 +3,7 @@ import type {
   DeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
 import type { Address, Hex } from 'viem';
-import type { TokenBalanceAndMetadata } from '../clients/accountApiClient';
+import type { TokenBalanceAndMetadata } from '../core/types';
 
 /**
  * Base options required for account operations.

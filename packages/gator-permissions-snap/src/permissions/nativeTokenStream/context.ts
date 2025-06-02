@@ -17,6 +17,7 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
+import { IconUrls } from '../../ui/iconConstant';
 
 const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
 const DEFAULT_INITIAL_AMOUNT = '0x0';
@@ -115,7 +116,6 @@ export async function buildContext({
     balance: rawBalance,
     decimals,
     symbol,
-    iconUrl,
   } = await accountController.getTokenBalanceAndMetadata({
     chainId,
   });
@@ -125,7 +125,8 @@ export async function buildContext({
     toHex(rawBalance),
   );
 
-  const balance = formatUnits(rawBalance, decimals);
+  // todo: this should just be BigInt
+  const balance = toHex(rawBalance);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
@@ -167,7 +168,7 @@ export async function buildContext({
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
       symbol,
-      iconUrl,
+      iconUrl: IconUrls.ethereum.token,
     },
     permissionDetails: {
       initialAmount,

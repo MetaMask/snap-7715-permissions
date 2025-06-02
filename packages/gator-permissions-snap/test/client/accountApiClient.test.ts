@@ -5,11 +5,17 @@ const mockApiBaseUrl = 'https://mock-account-api.com';
 
 describe('AccountApiClient', () => {
   const mockFetch = jest.fn();
-  let client = new AccountApiClient(mockApiBaseUrl, mockFetch);
+  let client = new AccountApiClient({
+    baseUrl: mockApiBaseUrl,
+    fetch: mockFetch,
+  });
 
   beforeEach(() => {
     mockFetch.mockClear();
-    client = new AccountApiClient(mockApiBaseUrl, mockFetch);
+    client = new AccountApiClient({
+      baseUrl: mockApiBaseUrl,
+      fetch: mockFetch,
+    });
   });
 
   describe('getTokenBalanceAndMetadata', () => {
@@ -56,8 +62,6 @@ describe('AccountApiClient', () => {
         balance: BigInt('1000000000000000000'),
         decimals: 18,
         symbol: 'ETH',
-        iconUrl:
-          'https://dev-static.cx.metamask.io/api/v1/tokenIcons/1/0x0000000000000000000000000000000000000000.png',
       });
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -105,8 +109,6 @@ describe('AccountApiClient', () => {
         balance: BigInt('2000000000000000000'),
         decimals: 18,
         symbol: 'DAI',
-        iconUrl:
-          'https://dev-static.cx.metamask.io/api/v1/tokenIcons/1/0x6b175474e89094c44da98b954eedeac495271d0f.png',
       });
 
       expect(mockFetch).toHaveBeenCalledWith(

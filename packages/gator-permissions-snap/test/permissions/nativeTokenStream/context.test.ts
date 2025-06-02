@@ -20,6 +20,7 @@ import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
 } from '../../../src/utils/time';
+import { IconUrls } from '../../../src/ui/iconConstant';
 
 const permissionWithoutOptionals: NativeTokenStreamPermission = {
   type: 'native-token-stream',
@@ -62,6 +63,8 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+    symbol: 'ETH',
+    iconUrl: IconUrls.ethereum.token,
   },
   permissionDetails: {
     initialAmount: '1',
@@ -135,9 +138,11 @@ describe('nativeTokenStream:context', () => {
         getAccountAddress: jest.fn(
           () => alreadyPopulatedContext.accountDetails.address,
         ),
-        getAccountBalance: jest.fn(
-          () => alreadyPopulatedContext.accountDetails.balance,
-        ),
+        getTokenBalanceAndMetadata: jest.fn(() => ({
+          balance: parseUnits('10', 18),
+          symbol: 'ETH',
+          decimals: 18,
+        })),
       } as unknown as jest.Mocked<AccountController>;
     });
 
@@ -154,7 +159,9 @@ describe('nativeTokenStream:context', () => {
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
       });
 
-      expect(mockAccountController.getAccountBalance).toHaveBeenCalledWith({
+      expect(
+        mockAccountController.getTokenBalanceAndMetadata,
+      ).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
       });
 

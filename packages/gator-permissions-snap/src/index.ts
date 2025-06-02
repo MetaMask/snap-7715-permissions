@@ -40,30 +40,39 @@ import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
 import { AccountApiClient } from './clients/accountApiClient';
+import { BlockchainTokenMetadataClient } from './clients/tokenMetadataClient';
 
 const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
 const snapEnv = process.env.SNAP_ENV;
 
 // set up dependencies
 
+// todo: set up the configuration properly
+const accountApiClient = new AccountApiClient({
+  baseUrl: 'https://account.api.cx.metamask.io',
+});
+
+const tokenMetadataClient = new BlockchainTokenMetadataClient({
+  ethereumProvider: ethereum,
+});
+
 // eslint-disable-next-line no-restricted-globals
 const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
 
-// todo: set up the configuration properly
-const accountApiClient = new AccountApiClient(
-  'https://account.api.cx.metamask.io',
-);
+const supportedChains = [sepolia, lineaSepolia];
 
 const accountController: AccountController = useEoaAccountController
   ? new EoaAccountController({
       snapsProvider: snap,
-      supportedChains: [sepolia, lineaSepolia],
-      ethereumProvider: ethereum,
       accountApiClient,
+      tokenMetadataClient,
+      ethereumProvider: ethereum,
+      supportedChains,
     })
   : new SmartAccountController({
       snapsProvider: snap,
-      supportedChains: [sepolia, lineaSepolia],
+      tokenMetadataClient,
+      supportedChains,
       deploymentSalt: '0x',
       accountApiClient,
     });
