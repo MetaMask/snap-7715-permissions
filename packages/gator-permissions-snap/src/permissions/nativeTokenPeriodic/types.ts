@@ -29,7 +29,6 @@ export type NativeTokenPeriodicContext = BaseContext & {
     balanceFormattedAsCurrency: string;
     balance: string;
     symbol: string;
-    iconUrl: string;
   };
   permissionDetails: {
     periodAmount: string;

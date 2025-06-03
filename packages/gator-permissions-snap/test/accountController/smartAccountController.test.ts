@@ -4,12 +4,12 @@ import {
   createDelegation,
   getDeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
-import type { AccountApiClient } from 'src/clients/accountApiClient';
-import type { TokenMetadataClient } from 'src/core/types';
 import { isHex, parseUnits, size } from 'viem';
 import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
 import { SmartAccountController } from '../../src/accountController';
+import type { AccountApiClient } from '../../src/clients/accountApiClient';
+import type { TokenMetadataClient } from '../../src/core/types';
 
 describe('SmartAccountController', () => {
   const entropy =

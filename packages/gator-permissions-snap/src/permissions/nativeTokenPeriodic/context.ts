@@ -3,7 +3,6 @@ import { parseEther, toHex } from 'viem';
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { IconUrls } from '../../ui/iconConstant';
 import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
@@ -148,7 +147,6 @@ export async function buildContext({
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
       symbol,
-      iconUrl: IconUrls.ethereum.token,
     },
     permissionDetails: {
       periodAmount,

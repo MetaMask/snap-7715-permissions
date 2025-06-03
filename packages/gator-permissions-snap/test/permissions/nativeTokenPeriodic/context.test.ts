@@ -15,7 +15,6 @@ import type {
   NativeTokenPeriodicPermissionRequest,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
-import { IconUrls } from '../../../src/ui/iconConstant';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
@@ -62,7 +61,6 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
     symbol: 'ETH',
-    iconUrl: IconUrls.ethereum.token,
   },
   permissionDetails: {
     periodAmount: '1',

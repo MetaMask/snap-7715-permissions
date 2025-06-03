@@ -16,7 +16,6 @@ import type {
   NativeTokenStreamPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
-import { IconUrls } from '../../../src/ui/iconConstant';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
@@ -64,7 +63,6 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
     symbol: 'ETH',
-    iconUrl: IconUrls.ethereum.token,
   },
   permissionDetails: {
     initialAmount: '1',

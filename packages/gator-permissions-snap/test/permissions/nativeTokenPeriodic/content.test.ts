@@ -7,7 +7,6 @@ import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
-import { IconUrls } from '../../../src/ui/iconConstant';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 
 const mockContext: NativeTokenPeriodicContext = {
@@ -19,7 +18,6 @@ const mockContext: NativeTokenPeriodicContext = {
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
     symbol: 'ETH',
-    iconUrl: IconUrls.ethereum.token,
   },
   permissionDetails: {
     periodAmount: '1',

@@ -7,7 +7,6 @@ import {
   type MetaMaskSmartAccount,
 } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import type { TokenMetadataClient } from 'src/core/types';
 import {
   createClient,
   custom,
@@ -18,6 +17,7 @@ import {
 import { privateKeyToAccount } from 'viem/accounts';
 
 import type { AccountApiClient } from '../clients/accountApiClient';
+import type { TokenMetadataClient } from '../core/types';
 import type { SupportedChains } from './baseAccountController';
 import { BaseAccountController } from './baseAccountController';
 import type {

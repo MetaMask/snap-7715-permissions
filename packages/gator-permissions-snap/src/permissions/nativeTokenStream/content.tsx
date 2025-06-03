@@ -15,6 +15,7 @@ import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
+import { IconUrls } from '../../ui/iconConstant';
 import {
   initialAmountRule,
   maxAmountRule,
@@ -70,7 +71,7 @@ export async function createConfirmationContent({
     {
       label: 'Token',
       text: context.accountDetails.symbol,
-      iconUrl: context.accountDetails.iconUrl,
+      iconUrl: IconUrls.ethereum.token,
     },
   ];
 
@@ -104,7 +105,7 @@ export async function createConfirmationContent({
           <Field>
             <Box>
               <Image
-                src={context.accountDetails.iconUrl}
+                src={IconUrls.ethereum.token}
                 alt={`${context.accountDetails.symbol} token icon`}
               />
             </Box>
