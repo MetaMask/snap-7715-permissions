@@ -190,12 +190,9 @@ export abstract class BaseAccountController {
   #getTokenMetadataClientForChainId(config: {
     chainId: number;
   }): TokenMetadataClient {
-    console.log('getTokenMetadataClientForChainId', config);
     if (this.#accountApiClient.isChainIdSupported(config)) {
-      console.log('Returning account api client', config);
       return this.#accountApiClient;
     }
-    console.log('Returning tokenMetadataClient');
 
     return this.#tokenMetadataClient;
   }
