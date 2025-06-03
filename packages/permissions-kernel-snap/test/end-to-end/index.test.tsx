@@ -44,18 +44,6 @@ describe('Kernel Snap', () => {
 
         snapRequest = request;
       });
-      it('returns the default registered permission offers for a snapHost', async () => {
-        const response = snapRequest({
-          method: InternalMethod.WalletGetRegisteredOnchainPermissionOffers,
-          origin: MOCK_PERMISSIONS_PROVIDER_SNAP_ID,
-        });
-
-        expect(await response).toRespondWith([
-          createMockNativeTransferRegisteredPermissionOffer(
-            MOCK_PERMISSIONS_PROVIDER_SNAP_ID,
-          ),
-        ]);
-      });
     });
 
     describe('wallet_offerOnchainPermission', () => {
@@ -75,45 +63,6 @@ describe('Kernel Snap', () => {
         });
 
         snapRequest = request;
-      });
-
-      it('returns the registered permission offers given from a permission provider snap', async () => {
-        const fetchRes = snapRequest({
-          method: InternalMethod.WalletGetRegisteredOnchainPermissionOffers,
-          origin: MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
-        });
-
-        expect(await fetchRes).toRespondWith([
-          createMockNativeTransferRegisteredPermissionOffer(
-            MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
-          ),
-        ]);
-      });
-
-      it('Should not store duplicate permission offer given from a permission provider snap', async () => {
-        // register the duplicate offer
-        const registerRes = snapRequest({
-          method: InternalMethod.WalletOfferOnchainPermission,
-          origin: MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
-          params: {
-            type: 'native-token-transfer',
-            id: 'd323523d13f344ed84977a720093e2b5c199565fa872ca9d1fbcfc4317c8ef11',
-            proposedName: 'Native Token Transfer',
-          },
-        });
-        expect(await registerRes).toRespondWith(true);
-
-        // check that the no additional offer was stored on the registry
-        const fetchRes = snapRequest({
-          method: InternalMethod.WalletGetRegisteredOnchainPermissionOffers,
-          origin: MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
-        });
-
-        expect(await fetchRes).toRespondWith([
-          createMockNativeTransferRegisteredPermissionOffer(
-            MOCK_PERMISSIONS_PROVIDER_SNAP_ID_TWO,
-          ),
-        ]);
       });
     });
 

@@ -20,9 +20,9 @@ export enum InternalMethod {
   WalletOfferOnchainPermission = 'wallet_offerOnchainPermission',
 
   /**
-   * This method is used by permissions provider to request the kernel to get the registered onchain permission offers.
+   * This method is used by the kernel to request a permissions provider to get its permission offers.
    */
-  WalletGetRegisteredOnchainPermissionOffers = 'wallet_getRegisteredOnchainPermissionOffers',
+  PermissionProviderGetPermissionOffers = 'permissionProvider_getPermissionOffers',
 
   /**
    * This method is used by the kernel to request a permissions provider to grant attenuated permissions to a site.

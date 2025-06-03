@@ -63,3 +63,16 @@ export const zPermissionsRequest = z.array(zPermissionRequest);
 
 export type PermissionRequest = z.infer<typeof zPermissionRequest>;
 export type PermissionsRequest = z.infer<typeof zPermissionsRequest>;
+
+export const zGrantAttenuatedPermissionsParams = z.object({
+  permissionsRequest: zPermissionsRequest,
+  siteOrigin: z.string(),
+});
+
+/**
+ * This is the parameters for the grantAttenuatedPermissions method.
+ * It is used by the kernel to forward request to permission provider snaps.
+ */
+export type GrantAttenuatedPermissionsParams = z.infer<
+  typeof zGrantAttenuatedPermissionsParams
+>;

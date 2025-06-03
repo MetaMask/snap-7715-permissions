@@ -3,7 +3,6 @@ import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 
 import { PERMISSIONS_PROVIDER_SNAP_ID } from '../../src/permissions';
 import {
-  checkForDuplicatePermissionOffer,
   findRelevantPermissions,
   parsePermissionOfferParam,
   parsePermissionRequestParam,
@@ -61,78 +60,6 @@ describe('validate utils', () => {
           proposedName: 'Native Token Transfer',
         }),
       ).toThrow('Failed type validation: id: Required');
-    });
-  });
-
-  describe('checkForDuplicatePermissionOffer', () => {
-    it('should return a false if hostStoredOffers is empty', async () => {
-      const offerToStore = {
-        type: 'native-token-transfer',
-        hostId: 'test:local',
-        hostPermissionId:
-          'd323523d13f344ed84977a720093e2b5c199565fa872ca9d1fbcfc4317c8ef11',
-        proposedName: 'Native Token Transfer',
-      };
-      const res = checkForDuplicatePermissionOffer(offerToStore, []);
-      expect(res).toBe(false);
-    });
-
-    it('should return a false if no duplicate was found', async () => {
-      const mockHostId = 'test:local';
-      const offerToStore = {
-        type: 'native-token-transfer',
-        hostId: mockHostId,
-        hostPermissionId: 'mock-id-native-token-transfer',
-        proposedName: 'Native Token Transfer',
-      };
-
-      const hostStoredOffers = [
-        {
-          type: 'erc20-token-transfer',
-          hostId: mockHostId,
-          hostPermissionId: 'mock-id-erc20-token-transfer',
-
-          proposedName: 'ERC20 Token Transfer',
-        },
-      ];
-
-      const res = checkForDuplicatePermissionOffer(
-        offerToStore,
-        hostStoredOffers,
-      );
-      expect(res).toBe(false);
-    });
-
-    it('should return a true if a duplicate was found', async () => {
-      const mockHostId = 'test:local';
-      const offerToStore = {
-        type: 'native-token-transfer',
-        hostId: mockHostId,
-        hostPermissionId: 'mock-id-native-token-transfer',
-        proposedName: 'Native Token Transfer',
-      };
-
-      const hostStoredOffers = [
-        {
-          type: 'erc20-token-transfer',
-          hostId: mockHostId,
-          hostPermissionId: 'mock-id-erc20-token-transfer',
-
-          proposedName: 'ERC20 Token Transfer',
-        },
-        {
-          type: 'native-token-transfer',
-          hostId: mockHostId,
-          hostPermissionId: 'mock-id-native-token-transfer',
-          proposedName: 'Native Token Transfer',
-        },
-      ];
-
-      const res = checkForDuplicatePermissionOffer(
-        offerToStore,
-        hostStoredOffers,
-      );
-      expect(res).toBe(true);
     });
   });
 
