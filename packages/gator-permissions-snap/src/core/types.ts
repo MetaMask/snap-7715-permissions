@@ -318,7 +318,7 @@ export type TokenBalanceAndMetadata = {
 /**
  * Interface for token metadata clients that can fetch token balance and metadata
  */
-export interface TokenMetadataClient {
+export type TokenMetadataClient = {
   /**
    * Fetch the token balance and metadata for a given account and token.
    *
@@ -333,4 +333,4 @@ export interface TokenMetadataClient {
     account: Address;
     assetAddress?: Address | undefined;
   }): Promise<TokenBalanceAndMetadata>;
-}
+};

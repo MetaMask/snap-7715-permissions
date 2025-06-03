@@ -1,5 +1,7 @@
-import { AccountApiClient } from '../../src/clients/accountApiClient';
 import { zeroAddress } from 'viem';
+import { sepolia } from 'viem/chains';
+
+import { AccountApiClient } from '../../src/clients/accountApiClient';
 
 const mockApiBaseUrl = 'https://mock-account-api.com';
 
@@ -21,7 +23,7 @@ describe('AccountApiClient', () => {
   describe('getTokenBalanceAndMetadata', () => {
     const mockAccount = '0x4f10501E98476Bc5c7C322a8ae87226aFC8a66a2';
     const mockTokenAddress = '0x6b175474e89094c44da98b954eedeac495271d0f';
-    const mockChainId = 1;
+    const mockChainId = sepolia.id;
 
     it('fetches native token balance and metadata successfully', async () => {
       mockFetch.mockResolvedValueOnce({
@@ -37,7 +39,7 @@ describe('AccountApiClient', () => {
           address: zeroAddress,
           occurrences: 100,
           sources: [],
-          chainId: 1,
+          chainId: mockChainId,
           blockNumber: 'latest',
           updatedAt: '2025-05-29T23:14:08.118Z',
           value: {},
@@ -58,7 +60,7 @@ describe('AccountApiClient', () => {
         account: mockAccount,
       });
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         balance: BigInt('1000000000000000000'),
         decimals: 18,
         symbol: 'ETH',
@@ -105,7 +107,7 @@ describe('AccountApiClient', () => {
         assetAddress: mockTokenAddress,
       });
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         balance: BigInt('2000000000000000000'),
         decimals: 18,
         symbol: 'DAI',

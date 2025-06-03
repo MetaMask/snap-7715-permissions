@@ -7,6 +7,7 @@ import {
   type MetaMaskSmartAccount,
 } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
+import type { TokenMetadataClient } from 'src/core/types';
 import {
   createClient,
   custom,
@@ -16,7 +17,7 @@ import {
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-import { AccountApiClient } from '../clients/accountApiClient';
+import type { AccountApiClient } from '../clients/accountApiClient';
 import type { SupportedChains } from './baseAccountController';
 import { BaseAccountController } from './baseAccountController';
 import type {
@@ -25,7 +26,6 @@ import type {
   SignDelegationOptions,
   FactoryArgs,
 } from './types';
-import { TokenMetadataClient } from 'src/core/types';
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
@@ -56,6 +56,7 @@ export class SmartAccountController
    * @param config.supportedChains - The supported blockchain chains.
    * @param config.deploymentSalt - The hex salt for smart account deployment.
    * @param config.accountApiClient - The client for interacting with the account API.
+   * @param config.tokenMetadataClient - The client for interacting with the token metadata.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;

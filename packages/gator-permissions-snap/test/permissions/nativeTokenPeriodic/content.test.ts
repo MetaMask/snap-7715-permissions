@@ -7,8 +7,8 @@ import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
-import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { IconUrls } from '../../../src/ui/iconConstant';
+import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 
 const mockContext: NativeTokenPeriodicContext = {
   expiry: '05/01/2024',

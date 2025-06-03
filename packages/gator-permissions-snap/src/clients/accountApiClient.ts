@@ -1,5 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { isAddressEqual, zeroAddress, type Address } from 'viem';
+
 import type { TokenBalanceAndMetadata } from '../core/types';
 
 /**
@@ -53,9 +54,9 @@ export class AccountApiClient {
    * Checks if a chain ID is supported by the account API.
    * Currently only mainnet (chain ID 1) is supported.
    *
-   * @param params - The parameters object
-   * @param params.chainId - The chain ID to check
-   * @returns True if the chain ID is supported, false otherwise
+   * @param params - The parameters object.
+   * @param params.chainId - The chain ID to check.
+   * @returns True if the chain ID is supported, false otherwise.
    */
   public isChainIdSupported({ chainId }: { chainId: number }): boolean {
     return chainId === 1;
@@ -64,11 +65,11 @@ export class AccountApiClient {
   /**
    * Fetch the token balance and metadata for a given account and token.
    *
-   * @param params - The parameters for fetching the token balance
-   * @param params.chainId - The chain ID to fetch the balance from
-   * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance
-   * @param params.account - The account address to fetch the balance for
-   * @returns The token balance and metadata
+   * @param params - The parameters for fetching the token balance.
+   * @param params.chainId - The chain ID to fetch the balance from.
+   * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance.
+   * @param params.account - The account address to fetch the balance for.
+   * @returns The token balance and metadata.
    */
   public async getTokenBalanceAndMetadata({
     chainId,
@@ -79,10 +80,8 @@ export class AccountApiClient {
     account: Address;
     assetAddress?: Address | undefined;
   }): Promise<TokenBalanceAndMetadata> {
-    console.log('getTokenBalanceAndMetadata', chainId, assetAddress, account);
     if (!chainId) {
       const message = 'No chainId provided to fetch token balance';
-      console.log(message);
       logger.error(message);
 
       throw new Error(message);
@@ -90,7 +89,6 @@ export class AccountApiClient {
 
     if (!account) {
       const message = 'No account address provided to fetch token balance';
-      console.log(message);
       logger.error(message);
 
       throw new Error(message);
@@ -99,12 +97,8 @@ export class AccountApiClient {
     // zeroAddress is the native token on the specified chain
     const tokenAddress = assetAddress ?? zeroAddress;
 
-    console.log(
-      `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${1}`,
-    );
-    // todo: chainId is hardcoded to mainnet, because the account api does not support sepolia.
     const response = await this.#fetch(
-      `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${1}`,
+      `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
     );
 
     if (!response.ok) {
@@ -127,9 +121,7 @@ export class AccountApiClient {
       throw new Error(message);
     }
 
-    if (
-      AccountApiClient.#supportedTokenTypes.indexOf(balanceData.type) === -1
-    ) {
+    if (!AccountApiClient.#supportedTokenTypes.includes(balanceData.type)) {
       const message = `Unsupported token type: ${balanceData.type}`;
       logger.error(message);
 

@@ -16,11 +16,11 @@ import type {
   NativeTokenStreamPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
+import { IconUrls } from '../../../src/ui/iconConstant';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
 } from '../../../src/utils/time';
-import { IconUrls } from '../../../src/ui/iconConstant';
 
 const permissionWithoutOptionals: NativeTokenStreamPermission = {
   type: 'native-token-stream',

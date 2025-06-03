@@ -23,7 +23,9 @@ import {
   SmartAccountController,
   type AccountController,
 } from './accountController';
+import { AccountApiClient } from './clients/accountApiClient';
 import { PriceApiClient } from './clients/priceApiClient';
+import { BlockchainTokenMetadataClient } from './clients/tokenMetadataClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
@@ -39,8 +41,6 @@ import { RpcMethod } from './rpc/rpcMethod';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
-import { AccountApiClient } from './clients/accountApiClient';
-import { BlockchainTokenMetadataClient } from './clients/tokenMetadataClient';
 
 const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
 const snapEnv = process.env.SNAP_ENV;

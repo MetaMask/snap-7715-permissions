@@ -15,7 +15,6 @@ import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
-import { IconUrls } from '../../ui/iconConstant';
 import {
   initialAmountRule,
   maxAmountRule,

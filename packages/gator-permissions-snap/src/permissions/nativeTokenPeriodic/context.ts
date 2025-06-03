@@ -3,6 +3,7 @@ import { parseEther, toHex } from 'viem';
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
+import { IconUrls } from '../../ui/iconConstant';
 import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
@@ -17,7 +18,6 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
-import { IconUrls } from '../../ui/iconConstant';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,

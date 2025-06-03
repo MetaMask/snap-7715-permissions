@@ -4,12 +4,12 @@ import {
   createDelegation,
   getDeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
+import type { AccountApiClient } from 'src/clients/accountApiClient';
+import type { TokenMetadataClient } from 'src/core/types';
 import { isHex, parseUnits, size } from 'viem';
 import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
 import { SmartAccountController } from '../../src/accountController';
-import { TokenMetadataClient } from 'src/core/types';
-import { AccountApiClient } from 'src/clients/accountApiClient';
 
 describe('SmartAccountController', () => {
   const entropy =
@@ -210,8 +210,8 @@ describe('SmartAccountController', () => {
         });
 
       expect(balance).toStrictEqual(parseUnits('10', 18));
-      expect(decimals).toStrictEqual(18);
-      expect(symbol).toStrictEqual('ETH');
+      expect(decimals).toBe(18);
+      expect(symbol).toBe('ETH');
     });
 
     it('should reject if an invalid chainId is supplied', async () => {

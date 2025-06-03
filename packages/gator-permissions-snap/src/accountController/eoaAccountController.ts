@@ -5,9 +5,11 @@ import {
   type DeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
 import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
-import { Hex, type Address } from 'viem';
+import type { Hex } from 'viem';
+import { type Address } from 'viem';
 
-import { AccountApiClient } from '../clients/accountApiClient';
+import type { AccountApiClient } from '../clients/accountApiClient';
+import type { TokenMetadataClient } from '../core/types';
 import type { SupportedChains } from './baseAccountController';
 import { BaseAccountController } from './baseAccountController';
 import type {
@@ -16,7 +18,6 @@ import type {
   SignDelegationOptions,
   FactoryArgs,
 } from './types';
-import type { TokenMetadataClient } from '../core/types';
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
@@ -36,6 +37,7 @@ export class EoaAccountController
    * @param config.ethereumProvider - The provider for interacting with Ethereum.
    * @param config.supportedChains - Optional list of supported blockchain chains.
    * @param config.accountApiClient - The client for interacting with the account API.
+   * @param config.tokenMetadataClient - The client for interacting with the token metadata.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;

@@ -15,12 +15,12 @@ import type {
   NativeTokenPeriodicPermissionRequest,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
+import { IconUrls } from '../../../src/ui/iconConstant';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
-import { IconUrls } from '../../../src/ui/iconConstant';
 
 const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
   type: 'native-token-periodic',

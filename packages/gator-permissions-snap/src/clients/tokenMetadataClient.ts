@@ -1,8 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type {
-  TokenMetadataClient,
-  TokenBalanceAndMetadata,
-} from '../core/types';
+import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
 import type { AbiFunction, AbiParameter, Address, Hex } from 'viem';
 import {
   decodeAbiParameters,
@@ -11,7 +8,11 @@ import {
   zeroAddress,
 } from 'viem';
 import { sepolia, mainnet } from 'viem/chains';
-import { SnapsEthereumProvider } from '@metamask/snaps-sdk';
+
+import type {
+  TokenMetadataClient,
+  TokenBalanceAndMetadata,
+} from '../core/types';
 
 const BALANCEOF_ABI: AbiFunction = {
   constant: true,
@@ -59,11 +60,11 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
   /**
    * Fetch the token balance and metadata for a given account and token.
    *
-   * @param params - The parameters for fetching the token balance
-   * @param params.chainId - The chain ID to fetch the balance from
-   * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance
-   * @param params.account - The account address to fetch the balance for
-   * @returns The token balance and metadata
+   * @param args - The parameters for fetching the token balance.
+   * @param args.chainId - The chain ID to fetch the balance from.
+   * @param args.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance.
+   * @param args.account - The account address to fetch the balance for.
+   * @returns The token balance and metadata.
    */
   public async getTokenBalanceAndMetadata({
     chainId,

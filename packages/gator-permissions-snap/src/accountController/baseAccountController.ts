@@ -1,8 +1,8 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { CHAIN_ID as ChainsWithDelegatorDeployed } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import * as chains from 'viem/chains';
 import type { Address } from 'viem';
+import * as chains from 'viem/chains';
 
 import type { AccountApiClient } from '../clients/accountApiClient';
 import type {
@@ -183,18 +183,19 @@ export abstract class BaseAccountController {
    * Gets the appropriate token metadata client for the given chain ID.
    * Uses the account API client for mainnet (chain ID 1) and the blockchain client for other chains.
    *
-   * @param params - The parameters object
-   * @param params.chainId - The chain ID to get the client for
-   * @returns The appropriate token metadata client
+   * @param config - The configuration object.
+   * @param config.chainId - The chain ID to get the client for.
+   * @returns The appropriate token metadata client.
    */
-  #getTokenMetadataClientForChainId({
-    chainId,
-  }: {
+  #getTokenMetadataClientForChainId(config: {
     chainId: number;
   }): TokenMetadataClient {
-    if (this.#accountApiClient.isChainIdSupported({ chainId })) {
+    console.log('getTokenMetadataClientForChainId', config);
+    if (this.#accountApiClient.isChainIdSupported(config)) {
+      console.log('Returning account api client', config);
       return this.#accountApiClient;
     }
+    console.log('Returning tokenMetadataClient');
 
     return this.#tokenMetadataClient;
   }
