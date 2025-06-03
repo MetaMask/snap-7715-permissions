@@ -8,6 +8,7 @@ import type {
   NativeTokenPeriodicMetadata,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
+import { IconUrls } from '../../../src/ui/iconConstant';
 
 const mockContext: NativeTokenPeriodicContext = {
   expiry: '05/01/2024',
@@ -17,6 +18,8 @@ const mockContext: NativeTokenPeriodicContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+    symbol: 'ETH',
+    iconUrl: IconUrls.ethereum.token,
   },
   permissionDetails: {
     periodAmount: '1',

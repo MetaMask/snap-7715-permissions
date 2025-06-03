@@ -139,8 +139,8 @@ describe('nativeTokenStream:context', () => {
           () => alreadyPopulatedContext.accountDetails.address,
         ),
         getTokenBalanceAndMetadata: jest.fn(() => ({
-          balance: parseUnits('10', 18),
-          symbol: 'ETH',
+          balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
+          symbol: alreadyPopulatedContext.accountDetails.symbol,
           decimals: 18,
         })),
       } as unknown as jest.Mocked<AccountController>;

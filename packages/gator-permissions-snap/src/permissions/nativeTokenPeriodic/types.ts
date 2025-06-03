@@ -28,6 +28,8 @@ export type NativeTokenPeriodicContext = BaseContext & {
     address: Hex;
     balanceFormattedAsCurrency: string;
     balance: string;
+    symbol: string;
+    iconUrl: string;
   };
   permissionDetails: {
     periodAmount: string;

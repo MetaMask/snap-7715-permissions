@@ -3,7 +3,7 @@ import { parseEther, toHex } from 'viem';
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { formatEtherFromString } from '../../utils/balance';
+import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -17,6 +17,7 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
+import { IconUrls } from '../../ui/iconConstant';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -91,32 +92,33 @@ export async function buildContext({
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const balancePromise = accountController
-    .getAccountBalance({
-      chainId,
-    })
-    .then(async (balance) => {
-      const balanceFormattedAsCurrency =
-        await tokenPricesService.getCryptoToFiatConversion(
-          `eip155:1/slip44:60`,
-          balance,
-        );
-      return { balance, balanceFormattedAsCurrency };
-    });
+  const address = await accountController.getAccountAddress({
+    chainId,
+  });
 
-  const [address, { balance, balanceFormattedAsCurrency }] = await Promise.all([
-    accountController.getAccountAddress({
-      chainId,
-    }),
-    balancePromise,
-  ]);
+  const {
+    balance: rawBalance,
+    decimals,
+    symbol,
+  } = await accountController.getTokenBalanceAndMetadata({
+    chainId,
+  });
+
+  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
+    `eip155:1/slip44:60`,
+    toHex(rawBalance),
+  );
+
+  // todo: this should just be BigInt
+  const balance = toHex(rawBalance);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  const periodAmount = formatEtherFromString(
-    permissionRequest.permission.data.periodAmount,
-    false,
-  );
+  const periodAmount = formatUnitsFromString({
+    value: permissionRequest.permission.data.periodAmount,
+    allowUndefined: false,
+    decimals,
+  });
 
   const periodDuration =
     permissionRequest.permission.data.periodDuration.toString();
@@ -144,7 +146,9 @@ export async function buildContext({
     accountDetails: {
       address,
       balance,
-      balanceFormattedAsCurrency,
+      balanceFormattedAsCurrency: balanceFormatted,
+      symbol,
+      iconUrl: IconUrls.ethereum.token,
     },
     permissionDetails: {
       periodAmount,

@@ -20,6 +20,7 @@ import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
+import { IconUrls } from '../../../src/ui/iconConstant';
 
 const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
   type: 'native-token-periodic',
@@ -60,6 +61,8 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+    symbol: 'ETH',
+    iconUrl: IconUrls.ethereum.token,
   },
   permissionDetails: {
     periodAmount: '1',
@@ -115,9 +118,11 @@ describe('nativeTokenPeriodic:context', () => {
         getAccountAddress: jest
           .fn()
           .mockResolvedValue(alreadyPopulatedContext.accountDetails.address),
-        getAccountBalance: jest
-          .fn()
-          .mockResolvedValue(alreadyPopulatedContext.accountDetails.balance),
+        getTokenBalanceAndMetadata: jest.fn(() => ({
+          balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
+          symbol: alreadyPopulatedContext.accountDetails.symbol,
+          decimals: 18,
+        })),
       } as unknown as jest.Mocked<AccountController>;
     });
 
@@ -134,7 +139,9 @@ describe('nativeTokenPeriodic:context', () => {
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
       });
 
-      expect(mockAccountController.getAccountBalance).toHaveBeenCalledWith({
+      expect(
+        mockAccountController.getTokenBalanceAndMetadata,
+      ).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
       });
 
