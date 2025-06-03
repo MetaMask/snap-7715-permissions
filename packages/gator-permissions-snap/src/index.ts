@@ -24,8 +24,8 @@ import {
   type AccountController,
 } from './accountController';
 import { AccountApiClient } from './clients/accountApiClient';
+import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
 import { PriceApiClient } from './clients/priceApiClient';
-import { BlockchainTokenMetadataClient } from './clients/tokenMetadataClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
@@ -42,22 +42,33 @@ import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
 
-const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
+const isStorePermissionsFeatureEnabled =
+  process.env.STORE_PERMISSIONS_ENABLED === 'true';
+
+const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
+
 const snapEnv = process.env.SNAP_ENV;
+
+const accountApiBaseUrl = process.env.ACCOUNT_API_BASE_URL;
+
+if (!accountApiBaseUrl) {
+  throw new Error('ACCOUNT_API_BASE_URL is not set');
+}
+
+const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
+if (!priceApiBaseUrl) {
+  throw new Error('PRICE_API_BASE_URL is not set');
+}
 
 // set up dependencies
 
-// todo: set up the configuration properly
 const accountApiClient = new AccountApiClient({
-  baseUrl: 'https://account.api.cx.metamask.io',
+  baseUrl: accountApiBaseUrl,
 });
 
 const tokenMetadataClient = new BlockchainTokenMetadataClient({
   ethereumProvider: ethereum,
 });
-
-// eslint-disable-next-line no-restricted-globals
-const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
 
 const supportedChains = [sepolia, lineaSepolia];
 
@@ -100,7 +111,7 @@ const auth = new JwtBearerAuth(
 );
 
 const profileSyncManager = createProfileSyncManager({
-  isFeatureEnabled,
+  isFeatureEnabled: isStorePermissionsFeatureEnabled,
   auth,
   userStorage: new UserStorage(
     {
@@ -121,8 +132,7 @@ const homepage = new HomePage({
 
 const userEventDispatcher = new UserEventDispatcher();
 
-// eslint-disable-next-line no-restricted-globals
-const priceApiClient = new PriceApiClient(process.env.PRICE_API_BASE_URL ?? '');
+const priceApiClient = new PriceApiClient(priceApiBaseUrl);
 
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
@@ -220,7 +230,7 @@ export const onInstall: OnInstallHandler = async () => {
    * initialConnections configured to automatically connect to the gator snap, this is not needed in production.
    */
   // eslint-disable-next-line no-restricted-globals
-  if (snapEnv === 'local' && isFeatureEnabled) {
+  if (snapEnv === 'local' && isStorePermissionsFeatureEnabled) {
     const installedSnaps = (await snap.request({
       method: 'wallet_getSnaps',
     })) as unknown as GetSnapsResponse;

@@ -56,7 +56,7 @@ export abstract class BaseAccountController {
     accountApiClient: AccountApiClient;
     tokenMetadataClient: TokenMetadataClient;
   }) {
-    // only validate if supportedChains is specified, as it will default to ALL_SUPPORTED_CHAINS
+    // only validate if supportedChains is specified, as it will default to #allSupportedChains
     if (config.supportedChains) {
       this.#validateSupportedChains(config.supportedChains);
     }

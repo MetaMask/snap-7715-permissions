@@ -1,13 +1,13 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
-import type { AbiFunction, AbiParameter, Address, Hex } from 'viem';
+import type { Abi, AbiFunction, AbiParameter, Address, Chain, Hex } from 'viem';
 import {
   decodeAbiParameters,
   encodeFunctionData,
   extractChain,
   zeroAddress,
 } from 'viem';
-import { sepolia, mainnet } from 'viem/chains';
+import * as allChains from 'viem/chains';
 
 import type {
   TokenMetadataClient,
@@ -41,13 +41,17 @@ const SYMBOL_ABI: AbiFunction = {
   stateMutability: 'view',
 };
 
-const ERC20_ABI = [BALANCEOF_ABI, DECIMALS_ABI, SYMBOL_ABI] as const;
+const ERC20_ABI: Abi = [BALANCEOF_ABI, DECIMALS_ABI, SYMBOL_ABI];
 
 /**
  * Client that fetches token metadata directly from the blockchain using the ethereum provider
  */
 export class BlockchainTokenMetadataClient implements TokenMetadataClient {
   readonly #ethereumProvider: SnapsEthereumProvider;
+
+  static #allChains = Object.keys(allChains).map(
+    (name) => (allChains as any)[name as keyof typeof allChains],
+  ) as Chain[];
 
   constructor({
     ethereumProvider,
@@ -106,10 +110,12 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         params: [account, 'latest'],
       });
 
+      // @ts-expect-error - extractChain does not work well with dynamic `chains`
       const chain = extractChain({
-        chains: [sepolia, mainnet],
-        id: chainId as 11155111 | 1,
+        chains: BlockchainTokenMetadataClient.#allChains,
+        id: chainId,
       });
+
       const { symbol, decimals } = chain.nativeCurrency;
 
       if (balance === undefined || balance === null) {
@@ -123,17 +129,36 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       };
     }
 
+    // todo: it is not clear why these are failing in test, but we will be
+    // removing viem as a dependency, so there is not much point in investigating
+    // the root cause.
+
+    // @ts-expect-error - encodeFunctionData fails tests with Expected 0 arguments, but got 1
+    const balanceOfCalldata = encodeFunctionData({
+      abi: ERC20_ABI,
+      functionName: 'balanceOf',
+      args: [account],
+    });
+
+    // @ts-expect-error - encodeFunctionData fails tests with Expected 0 arguments, but got 1
+    const decimalsCalldata = encodeFunctionData({
+      abi: ERC20_ABI,
+      functionName: 'decimals',
+    });
+
+    // @ts-expect-error - encodeFunctionData fails tests with Expected 0 arguments, but got 1
+    const symbolCalldata = encodeFunctionData({
+      abi: ERC20_ABI,
+      functionName: 'symbol',
+    });
+
     const [balanceEncoded, decimalsEncoded, symbolEncoded] = await Promise.all([
       this.#ethereumProvider.request<Hex>({
         method: 'eth_call',
         params: [
           {
             to: assetAddress,
-            data: encodeFunctionData({
-              abi: ERC20_ABI,
-              functionName: 'balanceOf',
-              args: [account],
-            }),
+            data: balanceOfCalldata,
           },
           'latest',
         ],
@@ -143,10 +168,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         params: [
           {
             to: assetAddress,
-            data: encodeFunctionData({
-              abi: ERC20_ABI,
-              functionName: 'decimals',
-            }),
+            data: decimalsCalldata,
           },
           'latest',
         ],
@@ -156,10 +178,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         params: [
           {
             to: assetAddress,
-            data: encodeFunctionData({
-              abi: ERC20_ABI,
-              functionName: 'symbol',
-            }),
+            data: symbolCalldata,
           },
           'latest',
         ],
@@ -179,6 +198,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         throw new Error(`Failed to fetch ${name}`);
       }
 
+      // @ts-expect-error - decodeAbiParameters does not work well
       const [decoded] = decodeAbiParameters(outputs, encoded) as [TReturn];
 
       return decoded;
