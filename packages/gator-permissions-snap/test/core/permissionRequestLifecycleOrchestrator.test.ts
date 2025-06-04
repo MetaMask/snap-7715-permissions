@@ -251,7 +251,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         };
 
         expect(delegation).toStrictEqual(expectedDelegation);
-        expect(delegation.salt).not.toStrictEqual(0n);
+        expect(delegation.salt).not.toBe(0n);
       });
 
       it('should correctly setup the onConfirmationCreated hook to update the context', async () => {

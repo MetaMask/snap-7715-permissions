@@ -107,7 +107,7 @@ export async function buildContext({
   accountController: AccountController;
 }): Promise<Erc20TokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
-  const tokenAddress = permissionRequest.permission.data.tokenAddress;
+  const { tokenAddress } = permissionRequest.permission.data;
 
   const address = await accountController.getAccountAddress({
     chainId,

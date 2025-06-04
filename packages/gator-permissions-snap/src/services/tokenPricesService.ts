@@ -69,6 +69,7 @@ export class TokenPricesService {
    *
    * @param tokenCaip19Type - The token CAIP-19 asset type to fetch spot prices for.
    * @param balance - The token balance.
+   * @param decimals - The number of decimals the token uses.
    * @returns The value of the token balance in the user's preferred currency in human-readable format.
    */
   async getCryptoToFiatConversion(
