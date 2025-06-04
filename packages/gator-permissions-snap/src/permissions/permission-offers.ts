@@ -1,9 +1,20 @@
-import type { GatorPermission } from '../types';
+import { zTypeDescriptor } from '@metamask/7715-permissions-shared/types';
+import { z } from 'zod';
+
+export const zGatorPermission = z.object({
+  // A type used for matching requests:
+  type: zTypeDescriptor,
+
+  // Used to represent the permission to the user:
+  proposedName: z.string(),
+});
+
+export type GatorPermission = z.infer<typeof zGatorPermission>;
 
 /**
  * The default permission offers that the Gator snap will offer to the kernel snap
  */
-export const DEFAULT_OFFERS: GatorPermission[] = [
+export const DEFAULT_GATOR_PERMISSION_TO_OFFER: GatorPermission[] = [
   {
     type: 'native-token-stream',
     proposedName: 'Native Token Stream',

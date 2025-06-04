@@ -1,15 +1,6 @@
-import type {
-  PermissionOfferRegistry,
-  RegisteredPermissionOffer,
-} from '@metamask/7715-permissions-shared/types';
-import {
-  DEFAULT_OFFERS,
-  getIdFor,
-} from '@metamask/7715-permissions-shared/utils';
+import type { PermissionOfferRegistry } from '@metamask/7715-permissions-shared/types';
 import type { Json } from '@metamask/snaps-sdk';
 import { ManageStateOperation, SnapError } from '@metamask/snaps-sdk';
-
-import { PERMISSIONS_PROVIDER_SNAP_ID } from './permissions';
 
 export type KernelState = {
   permissionOfferRegistry: PermissionOfferRegistry;
@@ -41,22 +32,8 @@ export const createStateManager = (encrypted = true): StateManager => {
         })) as KernelState | null;
 
         if (!state) {
-          const gatorSnapDefaultsOffers = await Promise.all(
-            DEFAULT_OFFERS.map(async (per) => {
-              const id = await getIdFor(per);
-              return {
-                type: per.type,
-                hostId: PERMISSIONS_PROVIDER_SNAP_ID,
-                hostPermissionId: id,
-                proposedName: per.proposedName,
-              } as RegisteredPermissionOffer;
-            }),
-          );
-
           return {
-            permissionOfferRegistry: {
-              [PERMISSIONS_PROVIDER_SNAP_ID]: gatorSnapDefaultsOffers,
-            },
+            permissionOfferRegistry: {},
           };
         }
 

@@ -80,13 +80,3 @@ export const zPermissionOfferRegistry = z.record(
  * The key is the snap host id.
  */
 export type PermissionOfferRegistry = z.infer<typeof zPermissionOfferRegistry>;
-
-export const zGatorPermission = z.object({
-  // A type used for matching requests:
-  type: zTypeDescriptor,
-
-  // Used to represent the permission to the user:
-  proposedName: z.string(),
-});
-
-export type GatorPermission = z.infer<typeof zGatorPermission>;

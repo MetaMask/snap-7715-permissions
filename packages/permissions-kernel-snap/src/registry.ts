@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
+import { GATOR_PERMISSIONS_PROVIDER_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import type {
   PermissionOffers,
   PermissionsRequest,
@@ -14,9 +15,10 @@ import {
   extractZodError,
   logger,
 } from '@metamask/7715-permissions-shared/utils';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
 
-import { InternalMethod, PERMISSIONS_PROVIDER_SNAP_ID } from './permissions';
+import { ExternalMethod } from './rpc/rpcMethod';
 
 export type Registry = {
   buildPermissionProviderRegistry: () => Promise<PermissionOfferRegistry>;
@@ -29,7 +31,7 @@ export type Registry = {
   ) => RegisteredPermissionOffers;
 };
 
-export const createRegistry = (): Registry => {
+export const createRegistry = (snapsProvider: SnapsProvider): Registry => {
   /**
    * Safely parses the permissions offer request parameters, validating them using Zod schema.
    *
@@ -73,7 +75,7 @@ export const createRegistry = (): Registry => {
         if (
           extractPermissionName(registeredOffer.type) ===
             extractPermissionName(permissionRequest.permission.type) &&
-          registeredOffer.hostId === PERMISSIONS_PROVIDER_SNAP_ID
+          registeredOffer.hostId === GATOR_PERMISSIONS_PROVIDER_SNAP_ID
         ) {
           return true;
         }
@@ -96,64 +98,60 @@ export const createRegistry = (): Registry => {
    */
   async function buildPermissionProviderRegistry(): Promise<PermissionOfferRegistry> {
     try {
-      const installedSnaps = await snap.request({
-        method: 'wallet_getSnaps',
-      });
-
       let ephemeralPermissionOfferRegistry: PermissionOfferRegistry = {};
 
-      // Query each snap for permission offers
-      for (const [snapId] of Object.entries(installedSnaps)) {
-        try {
-          logger.debug(`Querying snap ${snapId} for permission offers...`);
+      // Query permission provider snaps for permission offers
+      // We only want gator-permissions-snap for now but we will use more snaps in the future
+      try {
+        logger.debug(
+          `Querying snap ${GATOR_PERMISSIONS_PROVIDER_SNAP_ID} for permission offers...`,
+        );
 
-          const response = await snap.request({
-            method: 'wallet_invokeSnap',
-            params: {
-              snapId,
-              request: {
-                method: InternalMethod.PermissionProviderGetPermissionOffers,
-              },
+        const response = await snapsProvider.request({
+          method: 'wallet_invokeSnap',
+          params: {
+            snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+            request: {
+              method: ExternalMethod.PermissionProviderGetPermissionOffers,
             },
-          });
+          },
+        });
 
-          // Only add snaps that return valid responses
-          if (response && typeof response === 'object') {
-            const parsedOffers = parsePermissionOffersParam(response);
-            const uniqueOffersToStore: RegisteredPermissionOffers = parsedOffers
-              .map((offer) => ({
-                hostId: snapId,
-                type: offer.type,
-                hostPermissionId: offer.id,
-                proposedName: offer.proposedName,
-              }))
-              .filter(
-                (offer, index, self) =>
-                  index ===
-                  self.findIndex(
-                    (off: RegisteredPermissionOffer) =>
-                      off.hostPermissionId === offer.hostPermissionId,
-                  ),
-              );
-
-            ephemeralPermissionOfferRegistry = {
-              ...ephemeralPermissionOfferRegistry,
-              [snapId]: uniqueOffersToStore,
-            };
-
-            logger.debug(
-              `Snap ${snapId} supports permissions_offerPermissions, adding to registry...`,
+        if (response) {
+          const parsedOffers = parsePermissionOffersParam(response);
+          const uniqueOffersToStore: RegisteredPermissionOffers = parsedOffers
+            .map((offer) => ({
+              hostId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+              type: offer.type,
+              hostPermissionId: offer.id,
+              proposedName: offer.proposedName,
+            }))
+            .filter(
+              (offer, index, self) =>
+                index ===
+                self.findIndex(
+                  (off: RegisteredPermissionOffer) =>
+                    off.hostPermissionId === offer.hostPermissionId,
+                ),
             );
-          }
-        } catch (error) {
+
+          ephemeralPermissionOfferRegistry = {
+            ...ephemeralPermissionOfferRegistry,
+            [GATOR_PERMISSIONS_PROVIDER_SNAP_ID]: uniqueOffersToStore,
+          };
+
           logger.debug(
-            {
-              snapId,
-              error,
-            },
-            `Snap ${snapId} does not support permissions_offerPermissions, or returned an invalid response, skipping...`,
+            `Snap ${GATOR_PERMISSIONS_PROVIDER_SNAP_ID} supports ${ExternalMethod.PermissionProviderGetPermissionOffers}, adding to registry...`,
           );
         }
+      } catch (error) {
+        logger.debug(
+          {
+            snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+            error,
+          },
+          `Snap ${GATOR_PERMISSIONS_PROVIDER_SNAP_ID} does not support ${ExternalMethod.PermissionProviderGetPermissionOffers}, or returned an invalid response, skipping...`,
+        );
       }
 
       return ephemeralPermissionOfferRegistry;

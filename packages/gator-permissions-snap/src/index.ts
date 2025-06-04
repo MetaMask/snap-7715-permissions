@@ -137,6 +137,8 @@ const boundRpcHandlers: {
 } = {
   [RpcMethod.PermissionProviderGrantAttenuatedPermissions]:
     rpcHandler.grantPermission.bind(rpcHandler),
+  [RpcMethod.PermissionProviderGetPermissionOffers]:
+    rpcHandler.getPermissionOffers.bind(rpcHandler),
 };
 
 /**

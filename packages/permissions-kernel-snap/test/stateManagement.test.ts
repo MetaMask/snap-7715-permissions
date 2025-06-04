@@ -22,7 +22,7 @@ describe('KernelStateManager', () => {
   });
 
   describe('getState', () => {
-    it('should return the default state when no state is retrieved', async () => {
+    it('should return the empty state when no state is retrieved', async () => {
       mockSnapsProvider.request.mockResolvedValue(null);
 
       const result = await stateManager.getState();
@@ -33,7 +33,9 @@ describe('KernelStateManager', () => {
           encrypted: true,
         },
       });
-      expect(result).toStrictEqual(TEST_CASE_DEFAULT_STATE);
+      expect(result).toStrictEqual({
+        permissionOfferRegistry: {},
+      });
     });
 
     it('should return stored permissions offer registry', async () => {

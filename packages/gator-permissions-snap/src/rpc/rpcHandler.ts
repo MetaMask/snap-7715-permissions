@@ -1,7 +1,12 @@
+import type { PermissionOffer } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
+import {
+  DEFAULT_GATOR_PERMISSION_TO_OFFER,
+  getIdFor,
+} from '../permissions/permission-offers';
 import type { ProfileSyncManager } from '../profileSync';
 import { validatePermissionRequestParam } from '../utils/validate';
 
@@ -16,6 +21,13 @@ export type RpcHandler = {
    * @returns The result of the grant permission request.
    */
   grantPermission(params?: Json): Promise<Json>;
+
+  /**
+   * Handles get permission offers requests.
+   *
+   * @returns The permission offers.
+   */
+  getPermissionOffers(): Promise<Json>;
 };
 
 /**
@@ -69,7 +81,28 @@ export function createRpcHandler(config: {
     return responses as Json[];
   };
 
+  /**
+   * Handles get permission offers requests.
+   *
+   * @returns The permission offers.
+   */
+  const getPermissionOffers = async (): Promise<Json> => {
+    logger.debug('getPermissionOffers()');
+    const gatorSnapDefaultsOffers = await Promise.all(
+      DEFAULT_GATOR_PERMISSION_TO_OFFER.map(async (per) => {
+        const id = await getIdFor(per);
+        return {
+          type: per.type,
+          id,
+          proposedName: per.proposedName,
+        } as PermissionOffer;
+      }),
+    );
+    return gatorSnapDefaultsOffers;
+  };
+
   return {
     grantPermission,
+    getPermissionOffers,
   };
 }

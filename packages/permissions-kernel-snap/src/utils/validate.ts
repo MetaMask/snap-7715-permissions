@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
 import {
-  type PermissionOffer,
   type PermissionsRequest,
-  zPermissionOffer,
   zPermissionsRequest,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
@@ -30,22 +28,4 @@ export const parsePermissionRequestParam = (
   }
 
   return validatePermissionsRequest.data;
-};
-
-/**
- * Safely parses the permissions offer request parameters, validating them using Zod schema.
- *
- * @param params - The permission offer to parse.
- * @returns The parsed and validated permissions offer as a PermissionOffer object.
- * @throws Throws a SnapError if validation fails.
- */
-export const parsePermissionOfferParam = (params: any): PermissionOffer => {
-  const validatePermissionOffer = zPermissionOffer.safeParse(params);
-  if (!validatePermissionOffer.success) {
-    throw new InvalidParamsError(
-      extractZodError(validatePermissionOffer.error.errors),
-    );
-  }
-
-  return validatePermissionOffer.data;
 };

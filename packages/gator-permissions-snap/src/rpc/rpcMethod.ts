@@ -3,14 +3,9 @@
 */
 export enum RpcMethod {
   /**
-   * This method is used by snaps to offer its cryptographic abilities as permissions to kernel.
+   * This method is used by the kernel to request a permissions provider to get its permission offers.
    */
-  WalletOfferOnchainPermission = 'wallet_offerOnchainPermission',
-
-  /**
-   * This method is used by permissions provider to request the kernel to get the registered onchain permission offers.
-   */
-  WalletGetRegisteredOnchainPermissionOffers = 'wallet_getRegisteredOnchainPermissionOffers',
+  PermissionProviderGetPermissionOffers = 'permissionProvider_getPermissionOffers',
 
   /**
    * This method is used by the kernel to request a permissions provider to grant attenuated permissions to a site.
