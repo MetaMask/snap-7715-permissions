@@ -194,6 +194,108 @@ export const DEFAULT_OFFERS: GatorPermission[] = [
 ];
 ```
 
+### 9. Add the Permission to the demo dapp
+
+### 10. Implement Permission Form Component
+
+Create a new form component in `packages/site/src/components/permissions/` for your permission type. For example, `YourPermissionForm.tsx`:
+
+```typescript
+import { useCallback, useEffect, useState } from 'react';
+import { StyledForm } from './styles';
+import type { YourPermissionRequest } from './types';
+
+type YourPermissionFormProps = {
+  onChange: (request: YourPermissionRequest) => void;
+}
+
+export const YourPermissionForm = ({
+  onChange,
+}: YourPermissionFormProps) => {
+  // 1. Define state for each form field
+  const [field1, setField1] = useState(initialValue1);
+  const [field2, setField2] = useState(initialValue2);
+  // ... add more state as needed
+
+  // 2. Implement change handlers for each field
+  const handleField1Change = useCallback(
+    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      setField1(value);
+    },
+    [],
+  );
+
+  // 3. Use useEffect to emit changes to parent
+  useEffect(() => {
+    onChange({
+      type: 'your-permission-type',
+      field1,
+      field2,
+      // ... include all fields
+    });
+  }, [onChange, field1, field2 /* ... */]);
+
+  // 4. Render form fields
+  return (
+    <StyledForm>
+      <div>
+        <label htmlFor="field1">Field 1:</label>
+        <input
+          type="text"
+          id="field1"
+          name="field1"
+          value={field1}
+          onChange={handleField1Change}
+          placeholder="Enter field 1"
+        />
+      </div>
+      {/* Add more form fields */}
+    </StyledForm>
+  );
+};
+```
+
+Then, add your form to the permission type selector in `packages/site/src/pages/index.tsx`:
+
+1. Import your form component:
+```typescript
+import { YourPermissionForm } from '../components/permissions';
+```
+
+2. Add your permission type to the select options:
+```typescript
+<select
+  id="permissionType"
+  name="permissionType"
+  value={permissionType}
+  onChange={handlePermissionTypeChange}
+>
+  {/* ... existing options ... */}
+  <option value="your-permission-type">Your Permission Type</option>
+</select>
+```
+
+3. Add the form component to the conditional rendering:
+```typescript
+{permissionType === 'your-permission-type' && (
+  <YourPermissionForm
+    onChange={(request: YourPermissionRequest) => {
+      setPermissionRequest(request);
+    }}
+  />
+)}
+```
+
+Key points for implementing permission forms:
+1. Use the `StyledForm` component for consistent styling
+2. Implement proper type safety with TypeScript
+3. Use controlled form components with React state
+4. Emit changes to parent component using the `onChange` prop
+5. Include all required fields from your permission type definition
+6. Add appropriate validation and error handling
+7. Follow the existing pattern of using `useCallback` for event handlers
+8. Use `useEffect` to emit form changes to the parent
+
 ## Best Practices
 
 1. **Type Safety**: Use TypeScript and Zod for robust type checking and validation.
