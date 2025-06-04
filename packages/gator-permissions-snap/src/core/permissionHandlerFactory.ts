@@ -4,6 +4,7 @@ import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { AccountController } from '../accountController';
 import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
 import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
+import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
@@ -99,6 +100,9 @@ export class PermissionHandlerFactory {
         handler = createPermissionHandler(
           nativeTokenPeriodicPermissionDefinition,
         );
+        break;
+      case 'erc20-token-stream':
+        handler = createPermissionHandler(erc20TokenStreamPermissionDefinition);
         break;
       default:
         throw new Error(`Unsupported permission type: ${type}`);

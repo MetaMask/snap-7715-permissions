@@ -240,6 +240,9 @@ const Index = () => {
     'This is a very important request for streaming allowance for some very important thing',
   );
   const [permissionType, setPermissionType] = useState('native-token-stream');
+  const [tokenAddress, setTokenAddress] = useState<Hex>(
+    '0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8',
+  );
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
 
   const [isCopied, setIsCopied] = useState(false);
@@ -349,6 +352,12 @@ const Index = () => {
     setPeriodDuration(Number(inputValue));
   };
 
+  const handleTokenAddressChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setTokenAddress(inputValue as Hex);
+  };
+
   const handleRedeemPermission = async () => {
     if (!delegateAccount) {
       throw new Error('Delegate account not found');
@@ -409,6 +418,15 @@ const Index = () => {
         amountPerSecond,
         startTime,
         maxAmount,
+      };
+    } else if (permissionType === 'erc20-token-stream') {
+      permissionData = {
+        justification,
+        initialAmount: initialAmount ? toHex(initialAmount) : undefined,
+        amountPerSecond: toHex(amountPerSecond),
+        startTime: startTime,
+        maxAmount: maxAmount ? toHex(maxAmount) : undefined,
+        tokenAddress,
       };
     } else if (permissionType === 'native-token-periodic') {
       permissionData = {
@@ -613,13 +631,15 @@ const Index = () => {
                   <option value="native-token-stream">
                     Native Token Stream
                   </option>
+                  <option value="erc20-token-stream">ERC20 Token Stream</option>
                   <option value="native-token-periodic">
                     Native Token Periodic
                   </option>
                 </select>
               </div>
 
-              {permissionType === 'native-token-stream' && (
+              {(permissionType === 'native-token-stream' ||
+                permissionType === 'erc20-token-stream') && (
                 <>
                   <div>
                     <label htmlFor="initialAmount">Initial Amount:</label>
@@ -652,6 +672,20 @@ const Index = () => {
                     />
                   </div>
                 </>
+              )}
+
+              {permissionType === 'erc20-token-stream' && (
+                <div>
+                  <label htmlFor="tokenAddress">Token Address:</label>
+                  <input
+                    type="text"
+                    id="tokenAddress"
+                    name="tokenAddress"
+                    value={tokenAddress}
+                    onChange={handleTokenAddressChange}
+                    placeholder="0x..."
+                  />
+                </div>
               )}
 
               {permissionType === 'native-token-periodic' && (
