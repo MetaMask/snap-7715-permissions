@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
+import type { PermissionsResponse } from '@metamask/7715-permissions-shared/types';
 import {
   type PermissionsRequest,
   zPermissionsRequest,
+  zPermissionsResponse,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
@@ -28,4 +30,28 @@ export const parsePermissionRequestParam = (
   }
 
   return validatePermissionsRequest.data;
+};
+
+/**
+ * Safely parses the grant permissions response parameters, validating them using Zod schema.
+ *
+ * @param params - The permissions to parse.
+ * @returns The parsed and validated permissions as a PermissionsResponse object.
+ * @throws Throws a InvalidParamsError if validation fails or if the permissions data is empty.
+ */
+export const parsePermissionsResponseParam = (
+  params: any,
+): PermissionsResponse => {
+  const validatePermissionsResponse = zPermissionsResponse.safeParse(params);
+  if (!validatePermissionsResponse.success) {
+    throw new InvalidParamsError(
+      extractZodError(validatePermissionsResponse.error.errors),
+    );
+  }
+
+  if (validatePermissionsResponse.data.length === 0) {
+    throw new InvalidParamsError('params are empty');
+  }
+
+  return validatePermissionsResponse.data;
 };

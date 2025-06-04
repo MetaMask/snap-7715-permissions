@@ -10,7 +10,10 @@ import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 import type { Registry } from '../registry';
 import type { StateManager } from '../stateManagement';
 import { EmptyRegistryPage, NoOffersFoundPage } from '../ui';
-import { parsePermissionRequestParam } from '../utils';
+import {
+  parsePermissionRequestParam,
+  parsePermissionsResponseParam,
+} from '../utils';
 import { ExternalMethod } from './rpcMethod';
 
 /**
@@ -81,7 +84,7 @@ export function createRpcHandler(config: {
         `No relevant permissions to grant for origin ${siteOrigin}`,
         JSON.stringify(permissionsToGrant, null, 2),
       );
-      await snap.request({
+      await snapsProvider.request({
         method: 'snap_dialog',
         params: {
           type: 'alert',
@@ -114,7 +117,7 @@ export function createRpcHandler(config: {
       },
     });
 
-    return grantedPermissions;
+    return parsePermissionsResponseParam(grantedPermissions) as Json;
   };
 
   return {
