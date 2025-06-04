@@ -33,7 +33,6 @@ const mockContext: Erc20TokenStreamContext = {
 const mockMetadata: Erc20TokenStreamMetadata = {
   amountPerSecond: '0.5',
   validationErrors: {},
-  rulesToAdd: [],
 };
 
 describe('erc20TokenStream:content', () => {

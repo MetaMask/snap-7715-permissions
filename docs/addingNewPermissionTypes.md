@@ -30,12 +30,12 @@ import { z } from 'zod';
 import { zHexStr, zPermission, zMetaMaskPermissionData } from '@metamask/7715-permissions-shared/types';
 
 // Define your permission metadata type
+// Metadata is anything derived from the context that is not editable, such as validtion errors
 export type YourPermissionMetadata = {
   // Add metadata fields
   validationErrors: {
     // Add validation error fields
   };
-  rulesToAdd: string[];
 };
 
 // Define your permission context type
@@ -71,6 +71,7 @@ export function parseAndValidatePermission(
   permissionRequest: PermissionRequest,
 ): YourPermissionRequest {
   // Implement validation logic
+  // Validation failures should throw meaningful errors.
   // Return validated permission request
 }
 ```

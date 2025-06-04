@@ -22,7 +22,6 @@ export type Erc20TokenStreamMetadata = {
     startTimeError?: string;
     expiryError?: string;
   };
-  rulesToAdd: string[];
 };
 
 // todo: move accountDetails to the base context so that accountDetails formatting is shared between permissions

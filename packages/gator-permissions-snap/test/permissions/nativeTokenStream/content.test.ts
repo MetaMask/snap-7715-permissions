@@ -31,7 +31,6 @@ const mockContext: NativeTokenStreamContext = {
 const mockMetadata: NativeTokenStreamMetadata = {
   amountPerSecond: '0.5',
   validationErrors: {},
-  rulesToAdd: [],
 };
 
 describe('nativeTokenStream:content', () => {
@@ -3345,7 +3344,6 @@ describe('nativeTokenStream:content', () => {
         },
         metadata: {
           ...mockMetadata,
-          rulesToAdd: ['Initial amount', 'Max amount'],
         },
         isJustificationCollapsed: true,
         origin: 'https://example.com',
@@ -4286,7 +4284,6 @@ describe('nativeTokenStream:content', () => {
         },
         metadata: {
           ...mockMetadata,
-          rulesToAdd: ['Initial amount', 'Max amount'],
         },
         isJustificationCollapsed: true,
         origin: 'https://example.com',
