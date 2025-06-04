@@ -1,15 +1,15 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Text, Box, Section, Avatar } from '@metamask/snaps-sdk/jsx';
-import { type Hex } from 'viem';
+import { formatUnits, type Hex } from 'viem';
 
-import { formatTokenBalance } from '../../utils/balance';
 import { TooltipIcon } from './TooltipIcon';
 
 export type AccountDetailsProps = {
   account: {
     address: Hex;
     balanceFormattedAsCurrency: string;
-    balance: string;
+    balance: Hex;
+    decimals: number;
   };
   title: string;
   tooltip: string;
@@ -20,7 +20,7 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
   title,
   tooltip,
 }) => {
-  const { address, balance, balanceFormattedAsCurrency } = account;
+  const { address, balance, balanceFormattedAsCurrency, decimals } = account;
   return (
     <Section>
       <Box direction="vertical">
@@ -39,7 +39,7 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
         <Box direction="horizontal" alignment="end">
           <Text color="muted">{balanceFormattedAsCurrency}</Text>
           <Text color="alternative">
-            {`${formatTokenBalance(balance)}`} available
+            {`${formatUnits(BigInt(balance), decimals)}`} available
           </Text>
         </Box>
       </Box>

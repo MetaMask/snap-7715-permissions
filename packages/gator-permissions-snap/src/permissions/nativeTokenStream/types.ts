@@ -30,7 +30,8 @@ export type NativeTokenStreamContext = BaseContext & {
   accountDetails: {
     address: Hex;
     balanceFormattedAsCurrency: string;
-    balance: string;
+    balance: Hex;
+    decimals: number;
     symbol: string;
   };
   permissionDetails: {

@@ -8,7 +8,7 @@ import {
   createDelegation,
   encodeDelegation,
 } from '@metamask/delegation-toolkit';
-import { toHex } from 'viem';
+import { bytesToHex, toHex } from 'viem';
 
 import type { AccountController } from '../accountController';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
@@ -234,13 +234,25 @@ export class PermissionRequestLifecycleOrchestrator {
       validBefore,
     );
 
-    const signedDelegation = await this.#accountController.signDelegation({
-      chainId,
-      delegation: createDelegation({
+    // use a random salt to ensure unique delegation
+    const saltBytes = new Uint8Array(32);
+    for (let i = 0; i < 32; i++) {
+      saltBytes[i] = Math.floor(Math.random() * 256);
+    }
+    const salt = bytesToHex(saltBytes);
+
+    const delegation = {
+      ...createDelegation({
         to: grantedPermissionRequest.signer.data.address,
         from: address,
         caveats: finalCaveatBuilder,
       }),
+      salt,
+    } as const;
+
+    const signedDelegation = await this.#accountController.signDelegation({
+      chainId,
+      delegation,
     });
 
     const context = encodeDelegation([signedDelegation]);

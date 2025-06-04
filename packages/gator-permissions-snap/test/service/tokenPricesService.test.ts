@@ -30,6 +30,7 @@ describe('TokenPricesService', () => {
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
             toHex(parseUnits('.01', 18)), // 1 ETH in wei
+            18,
           );
 
         expect(humanReadableValue).toBe('$10.00');
@@ -54,6 +55,7 @@ describe('TokenPricesService', () => {
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
             toHex(parseUnits('.01', 18)), // 1 ETH in wei
+            18,
           );
 
         expect(humanReadableValue).toBe('$10.00');
@@ -78,6 +80,7 @@ describe('TokenPricesService', () => {
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
             toHex(parseUnits('.5', 18)), // 1 ETH in wei
+            18,
           );
 
         expect(humanReadableValue).toBe('$500.00');
@@ -102,6 +105,7 @@ describe('TokenPricesService', () => {
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
             toHex(parseUnits('1', 18)), // 1 ETH in wei
+            18,
           );
 
         expect(humanReadableValue).toBe('$1,000.00');
@@ -126,6 +130,7 @@ describe('TokenPricesService', () => {
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
             toHex(parseUnits('1.5', 18)), // 1.5 ETH in wei
+            18,
           );
 
         expect(humanReadableValue).toBe('$1,500.00');
@@ -150,6 +155,7 @@ describe('TokenPricesService', () => {
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
             toHex(parseUnits('.01', 18)), // 1 ETH in wei
+            18,
           );
 
         expect(humanReadableValue).toBe('$<-->');

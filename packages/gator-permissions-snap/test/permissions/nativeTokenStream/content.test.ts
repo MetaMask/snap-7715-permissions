@@ -17,6 +17,7 @@ const mockContext: NativeTokenStreamContext = {
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
     symbol: 'ETH',
+    decimals: 18,
   },
   permissionDetails: {
     initialAmount: '1',

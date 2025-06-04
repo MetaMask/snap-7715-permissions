@@ -74,6 +74,7 @@ export class TokenPricesService {
   async getCryptoToFiatConversion(
     tokenCaip19Type: CaipAssetType,
     balance: Hex,
+    decimals: number,
   ): Promise<string> {
     try {
       logger.debug('TokenPricesService:getCryptoToFiatConversion()');
@@ -84,7 +85,7 @@ export class TokenPricesService {
         tokenCaip19Type,
         this.#safeParsePreferences(preferences),
       );
-      const formattedBalance = Number(formatTokenBalance(balance));
+      const formattedBalance = Number(formatTokenBalance(balance, decimals));
       const valueInFiat = formattedBalance * tokenSpotPrice;
 
       const humanReadableValue = formatAsCurrency(preferences, valueInFiat);

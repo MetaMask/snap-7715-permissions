@@ -111,6 +111,7 @@ export async function buildContext({
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:1/slip44:60`,
     toHex(rawBalance),
+    decimals,
   );
 
   // todo: this should just be BigInt
@@ -152,6 +153,7 @@ export async function buildContext({
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
       symbol,
+      decimals,
     },
     permissionDetails: {
       periodAmount,

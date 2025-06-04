@@ -62,6 +62,7 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
     symbol: 'ETH',
+    decimals: 18,
   },
   permissionDetails: {
     periodAmount: '1',
@@ -155,6 +156,7 @@ describe('nativeTokenPeriodic:context', () => {
       ).toHaveBeenCalledWith(
         `eip155:1/slip44:60`,
         alreadyPopulatedContext.accountDetails.balance,
+        18,
       );
     });
   });
