@@ -1,7 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { isAddressEqual, zeroAddress, type Address } from 'viem';
 
-import type { TokenBalanceAndMetadata } from '../core/types';
+import type { TokenBalanceAndMetadata } from './types';
 
 /**
  * Response type for token balance data

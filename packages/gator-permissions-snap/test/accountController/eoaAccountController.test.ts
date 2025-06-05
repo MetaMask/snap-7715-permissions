@@ -4,12 +4,10 @@ import {
   createDelegation,
   getDeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
-import { isHex, parseUnits, size } from 'viem';
+import { isHex, size } from 'viem';
 import { sepolia, oneWorld, mainnet } from 'viem/chains';
 
 import { EoaAccountController } from '../../src/accountController/eoaAccountController';
-import type { AccountApiClient } from '../../src/clients/accountApiClient';
-import type { TokenMetadataClient } from '../../src/core/types';
 
 describe('EoaAccountController', () => {
   const mockAddress = '0x1234567890abcdef1234567890abcdef12345678';
@@ -23,14 +21,6 @@ describe('EoaAccountController', () => {
   let mockEthereumProvider: {
     request: jest.Mock;
   };
-  let mockTokenMetadataClient: jest.Mocked<TokenMetadataClient>;
-  let mockAccountApiClient: jest.Mocked<AccountApiClient>;
-
-  const mockTokenBalanceAndMetadata = {
-    balance: parseUnits('10', 18),
-    symbol: 'ETH',
-    decimals: 18,
-  };
 
   beforeEach(() => {
     mockSnapsProvider = createMockSnapsProvider();
@@ -38,15 +28,6 @@ describe('EoaAccountController', () => {
     mockEthereumProvider = {
       request: jest.fn(),
     };
-
-    mockTokenMetadataClient = {
-      getTokenBalanceAndMetadata: jest.fn(() => mockTokenBalanceAndMetadata),
-    } as unknown as jest.Mocked<TokenMetadataClient>;
-
-    mockAccountApiClient = {
-      isChainIdSupported: jest.fn(() => true),
-      getTokenBalanceAndMetadata: jest.fn(() => mockTokenBalanceAndMetadata),
-    } as unknown as jest.Mocked<AccountApiClient>;
 
     mockEthereumProvider.request.mockImplementation(async (req) => {
       const { method } = req;
@@ -91,8 +72,6 @@ describe('EoaAccountController', () => {
     accountController = new EoaAccountController({
       snapsProvider: mockSnapsProvider,
       ethereumProvider: mockEthereumProvider,
-      tokenMetadataClient: mockTokenMetadataClient,
-      accountApiClient: mockAccountApiClient,
       supportedChains: [sepolia, mainnet],
     });
   });
@@ -104,8 +83,6 @@ describe('EoaAccountController', () => {
           new EoaAccountController({
             snapsProvider: mockSnapsProvider,
             ethereumProvider: mockEthereumProvider,
-            tokenMetadataClient: mockTokenMetadataClient,
-            accountApiClient: mockAccountApiClient,
             supportedChains: [],
           }),
       ).toThrow('No supported chains specified');
@@ -117,8 +94,6 @@ describe('EoaAccountController', () => {
           new EoaAccountController({
             snapsProvider: mockSnapsProvider,
             ethereumProvider: mockEthereumProvider,
-            tokenMetadataClient: mockTokenMetadataClient,
-            accountApiClient: mockAccountApiClient,
             supportedChains: [oneWorld] as any,
           }),
       ).toThrow('Unsupported chains specified: oneworld');
@@ -129,9 +104,7 @@ describe('EoaAccountController', () => {
         () =>
           new EoaAccountController({
             snapsProvider: mockSnapsProvider,
-            tokenMetadataClient: mockTokenMetadataClient,
             ethereumProvider: mockEthereumProvider,
-            accountApiClient: mockAccountApiClient,
           }),
       ).not.toThrow();
     });
@@ -237,73 +210,6 @@ describe('EoaAccountController', () => {
           delegation: unsignedDelegation,
         }),
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
-    });
-  });
-
-  describe('getTokenBalanceAndMetadata()', () => {
-    it('should get the account balance, decimals and symbol', async () => {
-      const { balance, decimals, symbol } =
-        await accountController.getTokenBalanceAndMetadata({
-          chainId: sepolia.id,
-        });
-
-      expect(balance).toStrictEqual(mockTokenBalanceAndMetadata.balance);
-      expect(decimals).toStrictEqual(mockTokenBalanceAndMetadata.decimals);
-      expect(symbol).toStrictEqual(mockTokenBalanceAndMetadata.symbol);
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getTokenBalanceAndMetadata({
-          chainId: invalidChainId,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
-    });
-
-    it('should fetch from the AccountAPI for supported chains', async () => {
-      const chainId = sepolia.id;
-
-      mockAccountApiClient.isChainIdSupported.mockReturnValueOnce(true);
-
-      const { balance, decimals, symbol } =
-        await accountController.getTokenBalanceAndMetadata({
-          chainId,
-        });
-
-      expect(balance).toStrictEqual(mockTokenBalanceAndMetadata.balance);
-      expect(decimals).toStrictEqual(mockTokenBalanceAndMetadata.decimals);
-      expect(symbol).toStrictEqual(mockTokenBalanceAndMetadata.symbol);
-
-      expect(
-        mockAccountApiClient.getTokenBalanceAndMetadata,
-      ).toHaveBeenCalledWith({
-        chainId,
-        account: mockAddress,
-      });
-    });
-
-    it('should fetch from the TokenMetadataClient for unsupported chains', async () => {
-      const chainId = sepolia.id;
-
-      mockAccountApiClient.isChainIdSupported.mockReturnValueOnce(false);
-
-      const { balance, decimals, symbol } =
-        await accountController.getTokenBalanceAndMetadata({
-          chainId,
-        });
-
-      expect(balance).toStrictEqual(mockTokenBalanceAndMetadata.balance);
-      expect(decimals).toStrictEqual(mockTokenBalanceAndMetadata.decimals);
-      expect(symbol).toStrictEqual(mockTokenBalanceAndMetadata.symbol);
-
-      expect(
-        mockTokenMetadataClient.getTokenBalanceAndMetadata,
-      ).toHaveBeenCalledWith({
-        chainId,
-        account: mockAddress,
-      });
     });
   });
 

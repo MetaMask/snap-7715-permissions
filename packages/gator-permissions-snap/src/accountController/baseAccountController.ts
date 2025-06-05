@@ -1,18 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { CHAIN_ID as ChainsWithDelegatorDeployed } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import type { Address } from 'viem';
 import * as chains from 'viem/chains';
-
-import type { AccountApiClient } from '../clients/accountApiClient';
-import type {
-  TokenMetadataClient,
-  TokenBalanceAndMetadata,
-} from '../core/types';
-import type {
-  AccountOptionsBase,
-  GetTokenBalanceAndMetadataOptions,
-} from './types';
 
 export type SupportedChains =
   (typeof chains)[keyof typeof ChainsWithDelegatorDeployed &
@@ -26,10 +15,6 @@ type SupportedChainId = SupportedChains[number]['id'];
  */
 export abstract class BaseAccountController {
   readonly #snapsProvider: SnapsProvider;
-
-  readonly #accountApiClient: AccountApiClient;
-
-  readonly #tokenMetadataClient: TokenMetadataClient;
 
   protected supportedChains: SupportedChains;
 
@@ -47,14 +32,10 @@ export abstract class BaseAccountController {
    * @param config - The configuration object.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.supportedChains - The supported blockchain chains.
-   * @param config.accountApiClient - The client for interacting with the account API.
-   * @param config.tokenMetadataClient - The client for interacting with the token metadata.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
     supportedChains?: SupportedChains;
-    accountApiClient: AccountApiClient;
-    tokenMetadataClient: TokenMetadataClient;
   }) {
     // only validate if supportedChains is specified, as it will default to #allSupportedChains
     if (config.supportedChains) {
@@ -62,8 +43,6 @@ export abstract class BaseAccountController {
     }
 
     this.#snapsProvider = config.snapsProvider;
-    this.#accountApiClient = config.accountApiClient;
-    this.#tokenMetadataClient = config.tokenMetadataClient;
     this.supportedChains =
       config.supportedChains ?? BaseAccountController.#allSupportedChains;
   }
@@ -167,65 +146,5 @@ export abstract class BaseAccountController {
    */
   protected get snapsProvider(): SnapsProvider {
     return this.#snapsProvider;
-  }
-
-  /**
-   * Gets the account address. Must be implemented by derived classes.
-   *
-   * @param options - The base account options including chainId.
-   * @returns A promise resolving to the account address.
-   */
-  protected abstract getAccountAddress(
-    options: AccountOptionsBase,
-  ): Promise<Address>;
-
-  /**
-   * Gets the appropriate token metadata client for the given chain ID.
-   * Uses the account API client for mainnet (chain ID 1) and the blockchain client for other chains.
-   *
-   * @param config - The configuration object.
-   * @param config.chainId - The chain ID to get the client for.
-   * @returns The appropriate token metadata client.
-   */
-  #getTokenMetadataClientForChainId(config: {
-    chainId: number;
-  }): TokenMetadataClient {
-    if (this.#accountApiClient.isChainIdSupported(config)) {
-      return this.#accountApiClient;
-    }
-
-    return this.#tokenMetadataClient;
-  }
-
-  /**
-   * Retrieves the token balance and metadata for the account.
-   *
-   * @param options - The options for fetching the token balance and metadata.
-   * @returns A promise resolving to the token balance and metadata.
-   */
-  public async getTokenBalanceAndMetadata(
-    options: GetTokenBalanceAndMetadataOptions,
-  ): Promise<TokenBalanceAndMetadata> {
-    logger.debug('accountController:getTokenBalanceAndMetadata()');
-
-    const { chainId, assetAddress } = options;
-
-    this.assertIsSupportedChainId(chainId);
-
-    const account = await this.getAccountAddress({ chainId });
-
-    const client = this.#getTokenMetadataClientForChainId({ chainId });
-
-    const balanceAndMetadata = await client.getTokenBalanceAndMetadata({
-      chainId,
-      account,
-      assetAddress,
-    });
-
-    logger.debug(
-      'accountController:getTokenBalanceAndMetadata() - balance and metadata resolved',
-    );
-
-    return balanceAndMetadata;
   }
 }

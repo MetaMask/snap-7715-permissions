@@ -38,6 +38,7 @@ import {
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
@@ -70,22 +71,23 @@ const tokenMetadataClient = new BlockchainTokenMetadataClient({
   ethereumProvider: ethereum,
 });
 
+const tokenMetadataService = new TokenMetadataService({
+  accountApiClient,
+  tokenMetadataClient,
+});
+
 const supportedChains = [sepolia, lineaSepolia];
 
 const accountController: AccountController = useEoaAccountController
   ? new EoaAccountController({
       snapsProvider: snap,
-      accountApiClient,
-      tokenMetadataClient,
       ethereumProvider: ethereum,
       supportedChains,
     })
   : new SmartAccountController({
       snapsProvider: snap,
-      tokenMetadataClient,
       supportedChains,
       deploymentSalt: '0x',
-      accountApiClient,
     });
 
 const stateManager = createStateManager(snap);
@@ -149,6 +151,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
 const permissionHandlerFactory = new PermissionHandlerFactory({
   accountController,
   tokenPricesService,
+  tokenMetadataService,
   userEventDispatcher,
   orchestrator,
 });

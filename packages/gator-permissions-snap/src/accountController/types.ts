@@ -4,18 +4,12 @@ import type {
 } from '@metamask/delegation-toolkit';
 import type { Address, Hex } from 'viem';
 
-import type { TokenBalanceAndMetadata } from '../core/types';
-
 /**
  * Base options required for account operations.
  */
 export type AccountOptionsBase = {
   // really this needs to be of type SupportedChainId, but it makes it hard for callers to validate
   chainId: number;
-};
-
-export type GetTokenBalanceAndMetadataOptions = AccountOptionsBase & {
-  assetAddress?: Address;
 };
 
 /**
@@ -51,13 +45,6 @@ export type AccountController = {
    * Retrieves the metadata for deploying a smart account.
    */
   getAccountMetadata(options: AccountOptionsBase): Promise<FactoryArgs>;
-
-  /**
-   * Retrieves the balance of the smart account.
-   */
-  getTokenBalanceAndMetadata(
-    options: GetTokenBalanceAndMetadataOptions,
-  ): Promise<TokenBalanceAndMetadata>;
 
   /**
    * Retrieves the delegation manager address for the current account.

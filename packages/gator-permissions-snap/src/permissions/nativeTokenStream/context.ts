@@ -2,6 +2,7 @@ import { formatEther, maxUint256, parseEther, toHex } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
+import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import { formatUnitsFromString } from '../../utils/balance';
 import {
@@ -94,16 +95,19 @@ export async function populatePermission({
  * @param options0.permissionRequest - The native token stream permission request to convert.
  * @param options0.tokenPricesService - Service for fetching token price information.
  * @param options0.accountController - Controller for managing account operations.
+ * @param options0.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
   tokenPricesService,
   accountController,
+  tokenMetadataService,
 }: {
   permissionRequest: NativeTokenStreamPermissionRequest;
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
+  tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
 
@@ -115,8 +119,9 @@ export async function buildContext({
     balance: rawBalance,
     decimals,
     symbol,
-  } = await accountController.getTokenBalanceAndMetadata({
+  } = await tokenMetadataService.getTokenBalanceAndMetadata({
     chainId,
+    account: address,
   });
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(

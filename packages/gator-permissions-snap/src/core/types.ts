@@ -6,9 +6,10 @@ import type {
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import type { Address } from 'viem';
 
 import type { AccountController } from '../accountController';
+import type { TokenMetadataService } from '../services/tokenMetadataService';
+import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 
@@ -257,7 +258,8 @@ export type PermissionHandlerParams<
     TPermission,
     TPopulatedPermission
   >;
-  tokenPricesService: any;
+  tokenPricesService: TokenPricesService;
+  tokenMetadataService: TokenMetadataService;
   rules: RuleDefinition<TContext, TMetadata>[];
   title: string;
 };
@@ -281,8 +283,9 @@ export type PermissionHandlerDependencies<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (args: {
     permissionRequest: TRequest;
-    tokenPricesService: any;
+    tokenPricesService: TokenPricesService;
     accountController: AccountController;
+    tokenMetadataService: TokenMetadataService;
   }) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   createConfirmationContent: (args: {
@@ -304,33 +307,4 @@ export type PermissionHandlerDependencies<
     permission: TPopulatedPermission;
     caveatBuilder: any;
   }) => Promise<any>;
-};
-
-/**
- * Represents token balance and metadata information
- */
-export type TokenBalanceAndMetadata = {
-  balance: bigint;
-  decimals: number;
-  symbol: string;
-};
-
-/**
- * Interface for token metadata clients that can fetch token balance and metadata
- */
-export type TokenMetadataClient = {
-  /**
-   * Fetch the token balance and metadata for a given account and token.
-   *
-   * @param params - The parameters for fetching the token balance
-   * @param params.chainId - The chain ID to fetch the balance from
-   * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance
-   * @param params.account - The account address to fetch the balance for
-   * @returns The token balance and metadata
-   */
-  getTokenBalanceAndMetadata(params: {
-    chainId: number;
-    account: Address;
-    assetAddress?: Address | undefined;
-  }): Promise<TokenBalanceAndMetadata>;
 };

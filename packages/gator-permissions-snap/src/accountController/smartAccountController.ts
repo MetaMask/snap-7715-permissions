@@ -16,8 +16,6 @@ import {
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-import type { AccountApiClient } from '../clients/accountApiClient';
-import type { TokenMetadataClient } from '../core/types';
 import type { SupportedChains } from './baseAccountController';
 import { BaseAccountController } from './baseAccountController';
 import type {
@@ -55,15 +53,11 @@ export class SmartAccountController
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.supportedChains - The supported blockchain chains.
    * @param config.deploymentSalt - The hex salt for smart account deployment.
-   * @param config.accountApiClient - The client for interacting with the account API.
-   * @param config.tokenMetadataClient - The client for interacting with the token metadata.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
     supportedChains?: SupportedChains;
     deploymentSalt: Hex;
-    tokenMetadataClient: TokenMetadataClient;
-    accountApiClient: AccountApiClient;
   }) {
     super(config);
     this.#deploymentSalt = config.deploymentSalt;

@@ -9,10 +9,7 @@ import {
 } from 'viem';
 import * as allChains from 'viem/chains';
 
-import type {
-  TokenMetadataClient,
-  TokenBalanceAndMetadata,
-} from '../core/types';
+import type { TokenBalanceAndMetadata, TokenMetadataClient } from './types';
 
 const BALANCEOF_ABI: AbiFunction = {
   constant: true,
