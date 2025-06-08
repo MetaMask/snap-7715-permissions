@@ -75,7 +75,7 @@ describe('TokenMetadataService', () => {
         expect(
           mockTokenMetadataClient.getTokenBalanceAndMetadata,
         ).not.toHaveBeenCalled();
-        expect(result).toEqual(mockTokenBalanceAndMetadata);
+        expect(result).toStrictEqual(mockTokenBalanceAndMetadata);
       });
 
       it('should pass assetAddress when provided', async () => {
@@ -133,7 +133,7 @@ describe('TokenMetadataService', () => {
         expect(
           mockAccountApiClient.getTokenBalanceAndMetadata,
         ).not.toHaveBeenCalled();
-        expect(result).toEqual(mockTokenBalanceAndMetadata);
+        expect(result).toStrictEqual(mockTokenBalanceAndMetadata);
       });
 
       it('should pass assetAddress when provided', async () => {
@@ -237,10 +237,10 @@ describe('TokenMetadataService', () => {
         const result =
           await tokenMetadataService.getTokenBalanceAndMetadata(baseOptions);
 
-        expect(result).toEqual(expectedResult);
-        expect(typeof result.balance).toStrictEqual('bigint');
-        expect(typeof result.symbol).toStrictEqual('string');
-        expect(typeof result.decimals).toStrictEqual('number');
+        expect(result).toStrictEqual(expectedResult);
+        expect(typeof result.balance).toBe('bigint');
+        expect(typeof result.symbol).toBe('string');
+        expect(typeof result.decimals).toBe('number');
       });
     });
   });
