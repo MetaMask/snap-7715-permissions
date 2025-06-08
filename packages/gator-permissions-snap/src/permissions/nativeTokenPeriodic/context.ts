@@ -1,4 +1,4 @@
-import { parseEther, toHex } from 'viem';
+import { parseUnits, toHex } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
@@ -34,11 +34,14 @@ export async function applyContext({
   context: NativeTokenPeriodicContext;
   originalRequest: NativeTokenPeriodicPermissionRequest;
 }): Promise<NativeTokenPeriodicPermissionRequest> {
-  const { permissionDetails } = context;
+  const {
+    permissionDetails,
+    accountDetails: { decimals },
+  } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
   const permissionData = {
-    periodAmount: toHex(parseEther(permissionDetails.periodAmount)),
+    periodAmount: toHex(parseUnits(permissionDetails.periodAmount, decimals)),
     periodDuration: parseInt(permissionDetails.periodDuration, 10),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,
@@ -175,12 +178,19 @@ export async function deriveMetadata({
 }: {
   context: NativeTokenPeriodicContext;
 }): Promise<NativeTokenPeriodicMetadata> {
-  const { permissionDetails, expiry } = context;
+  const {
+    permissionDetails,
+    expiry,
+    accountDetails: { decimals },
+  } = context;
 
   const validationErrors: NativeTokenPeriodicMetadata['validationErrors'] = {};
 
   try {
-    const periodAmountBigInt = parseEther(permissionDetails.periodAmount);
+    const periodAmountBigInt = parseUnits(
+      permissionDetails.periodAmount,
+      decimals,
+    );
     if (periodAmountBigInt <= 0n) {
       validationErrors.periodAmountError =
         'Period amount must be greater than 0';

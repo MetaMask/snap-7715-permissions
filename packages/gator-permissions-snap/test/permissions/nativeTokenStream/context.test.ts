@@ -184,7 +184,7 @@ describe('nativeTokenStream:context', () => {
   describe('createContextMetadata()', () => {
     const context = {
       ...alreadyPopulatedContext,
-      expiry: convertTimestampToReadableDate(Date.now()),
+      expiry: convertTimestampToReadableDate(Date.now() / 1000 + 24 * 60 * 60), // 24 hours from now
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
         startTime: convertTimestampToReadableDate(Date.now() / 1000),

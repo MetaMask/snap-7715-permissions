@@ -2,9 +2,9 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 
 import type { AccountController } from '../accountController';
+import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
 import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
 import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
-import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';

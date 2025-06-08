@@ -1,4 +1,4 @@
-import { formatEther, maxUint256, parseEther, toHex } from 'viem';
+import { formatUnits, maxUint256, parseUnits, toHex } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
@@ -37,18 +37,21 @@ export async function applyContext({
   context: NativeTokenStreamContext;
   originalRequest: NativeTokenStreamPermissionRequest;
 }): Promise<NativeTokenStreamPermissionRequest> {
-  const { permissionDetails } = context;
+  const {
+    permissionDetails,
+    accountDetails: { decimals },
+  } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
-      ? toHex(parseEther(permissionDetails.maxAmount))
+      ? toHex(parseUnits(permissionDetails.maxAmount, decimals))
       : undefined,
     initialAmount: permissionDetails.initialAmount
-      ? toHex(parseEther(permissionDetails.initialAmount))
+      ? toHex(parseUnits(permissionDetails.initialAmount, decimals))
       : undefined,
     amountPerSecond: toHex(
-      parseEther(permissionDetails.amountPerPeriod) /
+      parseUnits(permissionDetails.amountPerPeriod, decimals) /
         TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
@@ -155,8 +158,9 @@ export async function buildContext({
 
   // It may seem strange to convert the amount per second to amount per period, format, and then convert back to amount per second.
   // The user is inputting amount per period, and we derive amount per second, so it makes sense for the context to contain the amount per period.
-  const amountPerPeriod = formatEther(
+  const amountPerPeriod = formatUnits(
     amountPerSecond * TIME_PERIOD_TO_SECONDS[timePeriod],
+    decimals,
   );
 
   const startTime = convertTimestampToReadableDate(
@@ -196,7 +200,11 @@ export async function deriveMetadata({
 }: {
   context: NativeTokenStreamContext;
 }): Promise<NativeTokenStreamMetadata> {
-  const { permissionDetails, expiry } = context;
+  const {
+    permissionDetails,
+    expiry,
+    accountDetails: { decimals },
+  } = context;
 
   const validationErrors: NativeTokenStreamMetadata['validationErrors'] = {};
 
@@ -206,7 +214,7 @@ export async function deriveMetadata({
   let amountPerSecond = 'Unknown';
   if (permissionDetails.maxAmount) {
     try {
-      maxAmountBigInt = parseEther(permissionDetails.maxAmount);
+      maxAmountBigInt = parseUnits(permissionDetails.maxAmount, decimals);
       if (maxAmountBigInt < 0n) {
         validationErrors.maxAmountError = 'Max amount must be greater than 0';
         maxAmountBigInt = undefined;
@@ -218,7 +226,10 @@ export async function deriveMetadata({
 
   if (permissionDetails.initialAmount) {
     try {
-      initialAmountBigInt = parseEther(permissionDetails.initialAmount);
+      initialAmountBigInt = parseUnits(
+        permissionDetails.initialAmount,
+        decimals,
+      );
       if (initialAmountBigInt < 0n) {
         validationErrors.initialAmountError =
           'Initial amount must be greater than 0';
@@ -230,15 +241,19 @@ export async function deriveMetadata({
   }
 
   try {
-    amountPerSecondBigInt = parseEther(permissionDetails.amountPerPeriod);
+    amountPerSecondBigInt = parseUnits(
+      permissionDetails.amountPerPeriod,
+      decimals,
+    );
     if (amountPerSecondBigInt <= 0n) {
       validationErrors.amountPerPeriodError =
         'Amount per period must be greater than 0';
       amountPerSecondBigInt = undefined;
     } else {
-      amountPerSecond = formatEther(
+      amountPerSecond = formatUnits(
         amountPerSecondBigInt /
           TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
+        decimals,
       );
     }
   } catch (error) {
