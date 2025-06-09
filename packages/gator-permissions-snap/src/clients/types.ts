@@ -1,5 +1,5 @@
 import type { CaipAssetType } from '@metamask/utils';
-import type { Address, Hex } from 'viem';
+import type { Address } from 'viem';
 
 /**
  * The params for the price API client to fetch spot prices.
