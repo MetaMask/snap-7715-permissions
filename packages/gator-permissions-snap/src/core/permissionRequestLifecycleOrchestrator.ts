@@ -234,11 +234,7 @@ export class PermissionRequestLifecycleOrchestrator {
       validBefore,
     );
 
-    // use a random salt to ensure unique delegation
-    const saltBytes = new Uint8Array(32);
-    for (let i = 0; i < 32; i++) {
-      saltBytes[i] = Math.floor(Math.random() * 256);
-    }
+    const saltBytes = crypto.getRandomValues(new Uint8Array(32));
     const salt = bytesToHex(saltBytes);
 
     const delegation = {

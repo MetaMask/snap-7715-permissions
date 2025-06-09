@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import { validateHexInteger } from '../validation';
 
 import type {
   NativeTokenStreamPermission,
@@ -16,30 +17,30 @@ import { zNativeTokenStreamPermission } from './types';
 function validatePermissionData(permission: NativeTokenStreamPermission): true {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
-  const bigIntAmountPerSecond = BigInt(amountPerSecond);
 
-  if (maxAmount) {
-    if (BigInt(maxAmount) === 0n) {
-      throw new Error('Invalid maxAmount: must be a positive number');
-    }
-  }
+  validateHexInteger({
+    name: 'maxAmount',
+    value: maxAmount,
+    required: false,
+    allowZero: false,
+  });
 
-  if (initialAmount) {
-    const bigIntInitialAmount = BigInt(initialAmount);
-    if (bigIntInitialAmount === 0n) {
-      throw new Error('Invalid initialAmount: must be greater than zero');
-    }
-    if (maxAmount) {
-      if (BigInt(maxAmount) < bigIntInitialAmount) {
-        throw new Error(
-          'Invalid maxAmount: must be greater than initialAmount',
-        );
-      }
-    }
-  }
+  validateHexInteger({
+    name: 'initialAmount',
+    value: initialAmount,
+    required: false,
+    allowZero: false,
+  });
 
-  if (bigIntAmountPerSecond === 0n) {
-    throw new Error('Invalid amountPerSecond: must be a positive number');
+  validateHexInteger({
+    name: 'amountPerSecond',
+    value: amountPerSecond,
+    required: true,
+    allowZero: false,
+  });
+
+  if (initialAmount && maxAmount && BigInt(maxAmount) < BigInt(initialAmount)) {
+    throw new Error('Invalid maxAmount: must be greater than initialAmount');
   }
 
   if (startTime <= 0) {

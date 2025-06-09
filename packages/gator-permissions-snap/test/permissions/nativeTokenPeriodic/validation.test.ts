@@ -73,7 +73,7 @@ describe('nativeTokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(zeroPeriodAmountRequest),
-        ).toThrow('Invalid periodAmount: must be a positive number');
+        ).toThrow('Invalid periodAmount: must be greater than 0');
       });
     });
 

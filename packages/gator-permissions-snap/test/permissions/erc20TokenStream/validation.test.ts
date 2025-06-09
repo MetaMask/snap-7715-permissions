@@ -72,7 +72,7 @@ describe('erc20TokenStream:validation', () => {
         };
 
         expect(() => parseAndValidatePermission(zeroMaxAmountRequest)).toThrow(
-          'Invalid maxAmount: must be a positive number',
+          'Invalid maxAmount: must be greater than 0',
         );
       });
 
@@ -110,7 +110,7 @@ describe('erc20TokenStream:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(zeroInitialAmountRequest),
-        ).toThrow('Invalid initialAmount: must be greater than zero');
+        ).toThrow('Invalid initialAmount: must be greater than 0');
       });
 
       it('should allow missing initialAmount', () => {
@@ -146,7 +146,7 @@ describe('erc20TokenStream:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(zeroAmountPerSecondRequest),
-        ).toThrow('Invalid amountPerSecond: must be a positive number');
+        ).toThrow('Invalid amountPerSecond: must be greater than 0');
       });
     });
 

@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import { validateHexInteger } from '../validation';
 
 import type {
   NativeTokenPeriodicPermission,
@@ -17,11 +18,13 @@ function validatePermissionData(
   permission: NativeTokenPeriodicPermission,
 ): true {
   const { periodAmount, periodDuration, startTime } = permission.data;
-  const bigIntPeriodAmount = BigInt(periodAmount);
 
-  if (bigIntPeriodAmount === 0n) {
-    throw new Error('Invalid periodAmount: must be a positive number');
-  }
+  validateHexInteger({
+    name: 'periodAmount',
+    value: periodAmount,
+    required: true,
+    allowZero: false,
+  });
 
   if (periodDuration <= 0) {
     throw new Error('Invalid periodDuration: must be a positive number');
