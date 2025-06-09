@@ -12,11 +12,6 @@ export const zPermissionOffer = z.object({
    * Used to represent the permission to the user in the permissions picker UI.
    */
   proposedName: z.string(),
-
-  /**
-   * Used to call the method on the permission provider snap.
-   */
-  id: z.string(),
 });
 
 export const zPermissionOffers = z.array(zPermissionOffer);
@@ -31,6 +26,20 @@ export type PermissionOffer = z.infer<typeof zPermissionOffer>;
  */
 export type PermissionOffers = z.infer<typeof zPermissionOffers>;
 
+export const zPermissionOfferWithHostId = zPermissionOffer.extend({
+  /**
+   * An identifier for which snap this permission belongs to.
+   */
+  hostId: z.string(),
+});
+
+/**
+ * This is a local permissions offer definition by the permission's provider snaps with the hostId added.
+ */
+export type PermissionOfferWithHostId = z.infer<
+  typeof zPermissionOfferWithHostId
+>;
+
 export const zRegisteredPermissionOffer = z.object({
   /**
    * An identifier for which snap this permission belongs to.
@@ -43,7 +52,7 @@ export const zRegisteredPermissionOffer = z.object({
   type: zTypeDescriptor,
 
   /**
-   * An identifier used for identifying the specific permission defined by the permission provider snap.
+   * An identifier used for identifying the specific permission offered by the permission provider snap defined by the kernel snap.
    */
   hostPermissionId: z.string(),
 

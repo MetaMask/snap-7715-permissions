@@ -10,5 +10,5 @@ export enum RpcMethod {
   /**
    * This method is used by the kernel to request a permissions provider to grant attenuated permissions to a site.
    */
-  PermissionProviderGrantAttenuatedPermissions = 'permissionsProvider_grantAttenuatedPermissions',
+  PermissionProviderGrantPermissions = 'permissionsProvider_grantPermissions',
 }

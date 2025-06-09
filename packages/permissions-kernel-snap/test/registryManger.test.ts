@@ -3,36 +3,43 @@ import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testi
 import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 
-import { createRegistry, type Registry } from '../src/registry';
+import {
+  createPermissionOfferRegistryManger,
+  type PermissionOfferRegistryManger,
+} from '../src/registryManger';
 import { ExternalMethod } from '../src/rpc/rpcMethod';
 
-describe('Registry', () => {
-  let registry: Registry;
+describe('PermissionOfferRegistryManger', () => {
+  let permissionOfferRegistryManger: PermissionOfferRegistryManger;
   const mockSnapsProvider = createMockSnapsProvider();
+  const mockSnapId = GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
 
   beforeEach(() => {
     mockSnapsProvider.request.mockReset();
-    registry = createRegistry(mockSnapsProvider);
+    permissionOfferRegistryManger =
+      createPermissionOfferRegistryManger(mockSnapsProvider);
   });
 
-  describe('buildPermissionProviderRegistry', () => {
+  describe('buildPermissionOffersRegistry', () => {
     it('should build registry with valid permission offers', async () => {
       const mockOffers = [
         {
           type: 'native-token-transfer',
-          id: '1',
           proposedName: 'Transfer native tokens',
         },
       ];
 
       mockSnapsProvider.request.mockResolvedValueOnce(mockOffers);
 
-      const result = await registry.buildPermissionProviderRegistry();
+      const result =
+        await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+          mockSnapId,
+        );
 
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'wallet_invokeSnap',
         params: {
-          snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+          snapId: mockSnapId,
           request: {
             method: ExternalMethod.PermissionProviderGetPermissionOffers,
           },
@@ -40,11 +47,12 @@ describe('Registry', () => {
       });
 
       expect(result).toStrictEqual({
-        [GATOR_PERMISSIONS_PROVIDER_SNAP_ID]: [
+        [mockSnapId]: [
           {
-            hostId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+            hostId: mockSnapId,
             type: 'native-token-transfer',
-            hostPermissionId: '1',
+            hostPermissionId:
+              'e185b919751ecd0c88423a9858b9af49672864ebef87af84ab72ceafb32bba40',
             proposedName: 'Transfer native tokens',
           },
         ],
@@ -54,14 +62,20 @@ describe('Registry', () => {
     it('should handle empty permission offers and return empty registry', async () => {
       mockSnapsProvider.request.mockResolvedValueOnce([]);
 
-      const result = await registry.buildPermissionProviderRegistry();
+      const result =
+        await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+          mockSnapId,
+        );
       expect(result).toStrictEqual({});
     });
 
     it('should handle invalid permission offers and return empty registry', async () => {
       mockSnapsProvider.request.mockResolvedValueOnce({ invalid: 'data' });
 
-      const result = await registry.buildPermissionProviderRegistry();
+      const result =
+        await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+          mockSnapId,
+        );
       expect(result).toStrictEqual({});
     });
 
@@ -69,10 +83,13 @@ describe('Registry', () => {
       jest.spyOn(logger, 'debug');
       mockSnapsProvider.request.mockRejectedValueOnce(new Error('Snap error'));
 
-      const result = await registry.buildPermissionProviderRegistry();
+      const result =
+        await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+          mockSnapId,
+        );
       expect(logger.debug).toHaveBeenCalledWith(
         {
-          snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+          snapId: mockSnapId,
           error: expect.any(Error),
         },
         expect.stringContaining('does not support'),
@@ -81,16 +98,16 @@ describe('Registry', () => {
     });
   });
 
-  describe('findRelevantPermissions', () => {
+  describe('findRelevantPermissionsToGrant', () => {
     const mockRegisteredOffers = [
       {
-        hostId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+        hostId: mockSnapId,
         type: 'native-token-transfer',
         hostPermissionId: '1',
         proposedName: 'Transfer native tokens',
       },
       {
-        hostId: 'snap2',
+        hostId: mockSnapId,
         type: 'erc20-token-transfer',
         hostPermissionId: '2',
         proposedName: 'Transfer ERC20 tokens',
@@ -124,17 +141,18 @@ describe('Registry', () => {
           },
         },
         permission: {
-          type: 'erc20-token-transfer',
+          type: 'native-token-stream',
           data: {},
         },
       },
     ];
 
-    it('should find matching permissions', () => {
-      const result = registry.findRelevantPermissions(
-        mockRegisteredOffers,
-        mockPermissionsToGrant,
-      );
+    it('should find relevant permissions to grant filtered against registered offers', () => {
+      const result =
+        permissionOfferRegistryManger.findRelevantPermissionsToGrant(
+          mockRegisteredOffers,
+          mockPermissionsToGrant,
+        );
 
       const { length } = result;
       expect(length).toBe(1);
@@ -142,27 +160,32 @@ describe('Registry', () => {
     });
 
     it('should return empty array when no matches found', () => {
-      const result = registry.findRelevantPermissions(
-        [],
-        mockPermissionsToGrant,
-      );
+      const result =
+        permissionOfferRegistryManger.findRelevantPermissionsToGrant(
+          [],
+          mockPermissionsToGrant,
+        );
 
       expect(result).toStrictEqual([]);
     });
 
     it('should handle empty permissions to grant', () => {
-      const result = registry.findRelevantPermissions(mockRegisteredOffers, []);
+      const result =
+        permissionOfferRegistryManger.findRelevantPermissionsToGrant(
+          mockRegisteredOffers,
+          [],
+        );
 
       expect(result).toStrictEqual([]);
     });
   });
 
-  describe('reducePermissionOfferRegistry', () => {
+  describe('getRegisteredPermissionOffers', () => {
     it('should reduce registry to array of offers', () => {
       const mockRegistry = {
-        [GATOR_PERMISSIONS_PROVIDER_SNAP_ID]: [
+        [mockSnapId]: [
           {
-            hostId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+            hostId: mockSnapId,
             type: 'native-token-transfer',
             hostPermissionId: '1',
             proposedName: 'Transfer native tokens',
@@ -178,11 +201,14 @@ describe('Registry', () => {
         ],
       };
 
-      const result = registry.reducePermissionOfferRegistry(mockRegistry);
+      const result =
+        permissionOfferRegistryManger.getRegisteredPermissionOffers(
+          mockRegistry,
+        );
 
       expect(result).toStrictEqual([
         {
-          hostId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+          hostId: mockSnapId,
           type: 'native-token-transfer',
           hostPermissionId: '1',
           proposedName: 'Transfer native tokens',
@@ -197,7 +223,8 @@ describe('Registry', () => {
     });
 
     it('should handle empty registry', () => {
-      const result = registry.reducePermissionOfferRegistry({});
+      const result =
+        permissionOfferRegistryManger.getRegisteredPermissionOffers({});
 
       expect(result).toStrictEqual([]);
     });

@@ -1,34 +1,5 @@
 import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
 
-import type { KernelState } from '../src/stateManagement';
-
-export const TEST_CASE_PERMISSION_PROVIDER_SNAP_ID =
-  // eslint-disable-next-line no-restricted-globals
-  process.env.SNAP_ENV === 'production'
-    ? 'npm:@metamask/gator-permissions-snap'
-    : 'local:http://localhost:8081';
-
-export const TEST_CASE_DEFAULT_STATE: KernelState = {
-  permissionOfferRegistry: {
-    [TEST_CASE_PERMISSION_PROVIDER_SNAP_ID]: [
-      {
-        type: 'native-token-stream',
-        hostId: TEST_CASE_PERMISSION_PROVIDER_SNAP_ID,
-        hostPermissionId:
-          '8c1697dd46c1e0be7a1627f8efb110612b9ee8510476d78da0f74687afbe0b10',
-        proposedName: 'Native Token Stream',
-      },
-      {
-        hostId: 'npm:@metamask/gator-permissions-snap',
-        hostPermissionId:
-          '1241bf3c50b7d36d1921a9a5c6af5238a363debc86826f11bab553ceed7744ca',
-        proposedName: 'Native Token Periodic Transfer',
-        type: 'native-token-periodic',
-      },
-    ],
-  },
-};
-
 export const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
   {
     chainId: '0x1',

@@ -6,30 +6,24 @@ import type {
 } from '@metamask/7715-permissions-shared/types';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { Registry } from '../../src/registry';
+import type { PermissionOfferRegistryManger } from '../../src/registryManger';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 import { ExternalMethod } from '../../src/rpc/rpcMethod';
-import type { StateManager } from '../../src/stateManagement';
 
 describe('RpcHandler', () => {
   let handler: RpcHandler;
   const mockSnapsProvider = createMockSnapsProvider();
-  const mockStateManager = {
-    getState: jest.fn(),
-    setState: jest.fn(),
-  } as unknown as jest.Mocked<StateManager>;
-  const mockRegistry = {
-    buildPermissionProviderRegistry: jest.fn(),
-    findRelevantPermissions: jest.fn(),
-    reducePermissionOfferRegistry: jest.fn(),
-  } as unknown as jest.Mocked<Registry>;
+  const mockPermissionOfferRegistryManger = {
+    buildPermissionOffersRegistry: jest.fn(),
+    findRelevantPermissionsToGrant: jest.fn(),
+    getRegisteredPermissionOffers: jest.fn(),
+  } as unknown as jest.Mocked<PermissionOfferRegistryManger>;
 
   beforeEach(() => {
     jest.clearAllMocks();
     handler = createRpcHandler({
       snapsProvider: mockSnapsProvider,
-      stateManager: mockStateManager,
-      registry: mockRegistry,
+      permissionOfferRegistryManger: mockPermissionOfferRegistryManger,
     });
   });
 
@@ -55,42 +49,52 @@ describe('RpcHandler', () => {
       },
     ];
 
-    it('should handle empty registry case', async () => {
-      mockRegistry.buildPermissionProviderRegistry.mockResolvedValue({});
-      mockSnapsProvider.request.mockResolvedValueOnce([]);
-
-      const result = await handler.grantPermissions(
-        siteOrigin,
-        mockPermissions as unknown as Json,
+    it('should handle empty registry case when no offers are registered for any permission types', async () => {
+      mockPermissionOfferRegistryManger.buildPermissionOffersRegistry.mockResolvedValue(
+        {},
+      );
+      mockPermissionOfferRegistryManger.getRegisteredPermissionOffers.mockReturnValue(
+        [],
+      );
+      mockPermissionOfferRegistryManger.findRelevantPermissionsToGrant.mockReturnValue(
+        [],
       );
 
-      expect(mockRegistry.buildPermissionProviderRegistry).toHaveBeenCalled();
-      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
-        method: 'snap_dialog',
-        params: expect.any(Object),
-      });
-      expect(result).toStrictEqual([]);
+      await expect(
+        handler.grantPermissions({
+          siteOrigin,
+          params: mockPermissions as unknown as Json,
+        }),
+      ).rejects.toThrow('No relevant permissions to grant');
     });
 
-    it('should handle no relevant permissions case', async () => {
-      mockRegistry.buildPermissionProviderRegistry.mockResolvedValue({
-        'test-provider': [],
-      });
-      mockRegistry.reducePermissionOfferRegistry.mockReturnValue([]);
-      mockRegistry.findRelevantPermissions.mockReturnValue([]);
-      mockSnapsProvider.request.mockResolvedValueOnce([]);
-
-      const result = await handler.grantPermissions(
-        siteOrigin,
-        mockPermissions as unknown as Json,
+    it('should handle no relevant permissions case when no offers are registered for the requested permission', async () => {
+      mockPermissionOfferRegistryManger.buildPermissionOffersRegistry.mockResolvedValue(
+        {
+          'test-provider': [
+            {
+              type: 'some-permission-type',
+              hostId: 'test-provider',
+              hostPermissionId:
+                'e185b919751ecd0c88423a9858b9af49672864ebef87af84ab72ceafb32bba40',
+              proposedName: 'Some Permission',
+            },
+          ],
+        },
+      );
+      mockPermissionOfferRegistryManger.getRegisteredPermissionOffers.mockReturnValue(
+        [],
+      );
+      mockPermissionOfferRegistryManger.findRelevantPermissionsToGrant.mockReturnValue(
+        [],
       );
 
-      expect(mockRegistry.findRelevantPermissions).toHaveBeenCalled();
-      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
-        method: 'snap_dialog',
-        params: expect.any(Object),
-      });
-      expect(result).toStrictEqual([]);
+      await expect(
+        handler.grantPermissions({
+          siteOrigin,
+          params: mockPermissions as unknown as Json,
+        }),
+      ).rejects.toThrow('No relevant permissions to grant');
     });
 
     it('should successfully grant permissions', async () => {
@@ -120,29 +124,32 @@ describe('RpcHandler', () => {
           },
         },
       ];
-      mockRegistry.buildPermissionProviderRegistry.mockResolvedValue({
-        'test-provider': [],
-      });
-      mockRegistry.reducePermissionOfferRegistry.mockReturnValue([]);
-      mockRegistry.findRelevantPermissions.mockReturnValue(mockPermissions);
+      mockPermissionOfferRegistryManger.buildPermissionOffersRegistry.mockResolvedValue(
+        {
+          'test-provider': [],
+        },
+      );
+      mockPermissionOfferRegistryManger.getRegisteredPermissionOffers.mockReturnValue(
+        [],
+      );
+      mockPermissionOfferRegistryManger.findRelevantPermissionsToGrant.mockReturnValue(
+        mockPermissions,
+      );
       mockSnapsProvider.request.mockResolvedValueOnce(
         mockGrantedPermissions as unknown as Json,
       );
 
-      const result = await handler.grantPermissions(
+      const result = await handler.grantPermissions({
         siteOrigin,
-        mockPermissions as unknown as Json,
-      );
-
-      expect(mockStateManager.setState).toHaveBeenCalledWith({
-        permissionOfferRegistry: expect.any(Object),
+        params: mockPermissions as unknown as Json,
       });
+
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'wallet_invokeSnap',
         params: {
           snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
           request: {
-            method: ExternalMethod.PermissionProviderGrantAttenuatedPermissions,
+            method: ExternalMethod.PermissionProviderGrantPermissions,
             params: {
               permissionsRequest: mockPermissions,
               siteOrigin,
@@ -154,18 +161,24 @@ describe('RpcHandler', () => {
     });
 
     it('should handle errors during permission grant', async () => {
-      mockRegistry.buildPermissionProviderRegistry.mockResolvedValue({
-        'test-provider': [],
-      });
-      mockRegistry.reducePermissionOfferRegistry.mockReturnValue([]);
-      mockRegistry.findRelevantPermissions.mockReturnValue(mockPermissions);
+      mockPermissionOfferRegistryManger.buildPermissionOffersRegistry.mockResolvedValue(
+        {
+          'test-provider': [],
+        },
+      );
+      mockPermissionOfferRegistryManger.getRegisteredPermissionOffers.mockReturnValue(
+        [],
+      );
+      mockPermissionOfferRegistryManger.findRelevantPermissionsToGrant.mockReturnValue(
+        mockPermissions,
+      );
       mockSnapsProvider.request.mockRejectedValueOnce(new Error('Test error'));
 
       await expect(
-        handler.grantPermissions(
+        handler.grantPermissions({
           siteOrigin,
-          mockPermissions as unknown as Json,
-        ),
+          params: mockPermissions as unknown as Json,
+        }),
       ).rejects.toThrow('Test error');
     });
   });

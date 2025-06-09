@@ -4,7 +4,7 @@ import { RpcMethod } from './rpcMethod';
 
 const allowedPermissionsByOrigin: { [origin: string]: string[] } = {
   [KERNEL_SNAP_ID]: [
-    RpcMethod.PermissionProviderGrantAttenuatedPermissions,
+    RpcMethod.PermissionProviderGrantPermissions,
     RpcMethod.PermissionProviderGetPermissionOffers,
   ],
 };

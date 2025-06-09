@@ -17,6 +17,7 @@ const config: SnapConfig = {
   },
   polyfills: {
     buffer: true,
+    crypto: true,
   },
   environment: {
     // eslint-disable-next-line n/no-process-env

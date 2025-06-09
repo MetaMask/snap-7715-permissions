@@ -135,7 +135,7 @@ const rpcHandler = createRpcHandler({
 const boundRpcHandlers: {
   [RpcMethod: string]: (params?: JsonRpcParams) => Promise<Json>;
 } = {
-  [RpcMethod.PermissionProviderGrantAttenuatedPermissions]:
+  [RpcMethod.PermissionProviderGrantPermissions]:
     rpcHandler.grantPermission.bind(rpcHandler),
   [RpcMethod.PermissionProviderGetPermissionOffers]:
     rpcHandler.getPermissionOffers.bind(rpcHandler),

@@ -16,7 +16,7 @@ import { InvalidParamsError } from '@metamask/snaps-sdk';
  * @throws Throws a InvalidParamsError if validation fails or if the permissions data is empty.
  */
 export const parsePermissionRequestParam = (
-  params: any,
+  params: unknown,
 ): PermissionsRequest => {
   const validatePermissionsRequest = zPermissionsRequest.safeParse(params);
   if (!validatePermissionsRequest.success) {
@@ -40,7 +40,7 @@ export const parsePermissionRequestParam = (
  * @throws Throws a InvalidParamsError if validation fails or if the permissions data is empty.
  */
 export const parsePermissionsResponseParam = (
-  params: any,
+  params: unknown,
 ): PermissionsResponse => {
   const validatePermissionsResponse = zPermissionsResponse.safeParse(params);
   if (!validatePermissionsResponse.success) {

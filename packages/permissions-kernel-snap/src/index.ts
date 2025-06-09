@@ -1,33 +1,23 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type {
-  Json,
-  JsonRpcParams,
-  OnHomePageHandler,
-} from '@metamask/snaps-sdk';
+import type { Json, JsonRpcParams } from '@metamask/snaps-sdk';
 import { type OnRpcRequestHandler } from '@metamask/snaps-sdk';
 
-import { createRegistry } from './registry';
+import { createPermissionOfferRegistryManger } from './registryManger';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
-import { createStateManager } from './stateManagement';
-import { HomePageContent } from './ui';
 
 // set up dependencies
-const stateManager = createStateManager();
-const registry = createRegistry(snap);
-
 const rpcHandler = createRpcHandler({
-  stateManager,
-  registry,
+  permissionOfferRegistryManger: createPermissionOfferRegistryManger(snap),
   snapsProvider: snap,
 });
 
 // configure RPC methods bindings
 const boundRpcHandlers: {
-  [RpcMethod: string]: (
-    siteOrigin: string,
-    params?: JsonRpcParams,
-  ) => Promise<Json>;
+  [RpcMethod: string]: (options: {
+    siteOrigin: string;
+    params?: JsonRpcParams;
+  }) => Promise<Json>;
 } = {
   [RpcMethod.WalletGrantPermissions]:
     rpcHandler.grantPermissions.bind(rpcHandler),
@@ -58,16 +48,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     throw new Error(`Method ${request.method} not found.`);
   }
 
-  const result = await handler(origin, request.params);
+  const result = await handler({
+    siteOrigin: origin,
+    params: request.params as JsonRpcParams,
+  });
 
   return result;
-};
-
-/**
- * Handle the onHomePage event.
- * @returns The content to display on the home page.
- */
-export const onHomePage: OnHomePageHandler = async () => {
-  const { permissionOfferRegistry } = await stateManager.getState();
-  return HomePageContent(permissionOfferRegistry);
 };

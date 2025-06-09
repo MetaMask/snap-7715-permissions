@@ -1,15 +1,9 @@
 import { GATOR_PERMISSIONS_PROVIDER_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
-import type {
-  RegisteredPermissionOffers,
-  PermissionsRequest,
-  GrantAttenuatedPermissionsParams,
-} from '@metamask/7715-permissions-shared/types';
+import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 
-import type { Registry } from '../registry';
-import type { StateManager } from '../stateManagement';
-import { EmptyRegistryPage, NoOffersFoundPage } from '../ui';
+import type { PermissionOfferRegistryManger } from '../registryManger';
 import {
   parsePermissionRequestParam,
   parsePermissionsResponseParam,
@@ -23,96 +17,77 @@ export type RpcHandler = {
   /**
    * Handles grant permission requests.
    *
-   * @param params - The parameters for the grant permission request.
-   * @param siteOrigin - The origin of the site requesting the permissions.
+   * @param options - The configuration for the grant permission request.
+   * @param options.siteOrigin - The origin of the site requesting the permissions.
+   * @param options.params - The parameters for the grant permission request.
    * @returns The result of the grant permission request.
    */
-  grantPermissions(siteOrigin: string, params?: Json): Promise<Json>;
+  grantPermissions(options: {
+    siteOrigin: string;
+    params?: Json;
+  }): Promise<Json>;
 };
 
 /**
  * Creates an RPC handler with methods for handling permission-related RPC requests.
  *
  * @param config - The parameters for creating the RPC handler.
- * @param config.stateManager - The state manager.
- * @param config.registry - The registry of permission offers.
+ * @param config.permissionOfferRegistryManger - The manager for the permission offer registry.
  * @param config.snapsProvider - The snaps provider.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
-  stateManager: StateManager;
-  registry: Registry;
+  permissionOfferRegistryManger: PermissionOfferRegistryManger;
   snapsProvider: SnapsProvider;
 }): RpcHandler {
-  const { stateManager, registry, snapsProvider } = config;
+  const { permissionOfferRegistryManger, snapsProvider } = config;
 
   /**
    * Handles grant permission requests.
    *
-   * @param siteOrigin - The origin of the site requesting the permissions.
-   * @param params - The parameters for the grant permission request.
+   * @param options - The configuration for the grant permission request.
+   * @param options.siteOrigin - The origin of the site requesting the permissions.
+   * @param options.params - The parameters for the grant permission request.
    * @returns The result of the grant permission request.
    */
-  const grantPermissions = async (
-    siteOrigin: string,
-    params?: Json,
-  ): Promise<Json> => {
-    logger.debug('grantPermissions()', { params, siteOrigin });
-    const permissionsToGrant = parsePermissionRequestParam(params);
+  const grantPermissions = async (options: {
+    siteOrigin: string;
+    params?: Json;
+  }): Promise<Json> => {
+    logger.debug({ options }, 'grantPermissions()');
+    const parsedPermissionsRequest = parsePermissionRequestParam(
+      options.params,
+    );
+
+    // We only want gator-permissions-snap for now but we will use more snaps in the future
     const permissionOfferRegistry =
-      await registry.buildPermissionProviderRegistry();
-
-    if (Object.keys(permissionOfferRegistry).length === 0) {
-      await snapsProvider.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'alert',
-          content: EmptyRegistryPage(),
-        },
-      });
-      return [];
-    }
-
-    // Filter permissions against the registered offers from all permission providers
-    const allRegisteredOffers: RegisteredPermissionOffers =
-      registry.reducePermissionOfferRegistry(permissionOfferRegistry);
-    const relevantPermissionsToGrant: PermissionsRequest =
-      registry.findRelevantPermissions(allRegisteredOffers, permissionsToGrant);
-
-    if (relevantPermissionsToGrant.length === 0) {
-      logger.info(
-        `No relevant permissions to grant for origin ${siteOrigin}`,
-        JSON.stringify(permissionsToGrant, null, 2),
+      await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+        GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
       );
-      await snapsProvider.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'alert',
-          content: NoOffersFoundPage(siteOrigin, permissionsToGrant),
-        },
-      });
-      return [];
+
+    // Find the relevant permissions to grant by filtering against the registered offers
+    const relevantPermissionsRequestToGrant: PermissionsRequest =
+      permissionOfferRegistryManger.findRelevantPermissionsToGrant(
+        permissionOfferRegistryManger.getRegisteredPermissionOffers(
+          permissionOfferRegistry,
+        ),
+        parsedPermissionsRequest,
+      );
+
+    if (relevantPermissionsRequestToGrant.length === 0) {
+      throw new Error('No relevant permissions to grant');
     }
 
-    // Store the permission offer registry in the state manager on every request
-    // to allow home page to display the permission offers
-    // Once preinstall is implemented, we can remove this since home page will not be accessible
-    await stateManager.setState({
-      permissionOfferRegistry,
-    });
-
-    // attenuate by sending permissions to the permission provider
-    const grantAttenuatedPermissionsParams: GrantAttenuatedPermissionsParams = {
-      permissionsRequest: relevantPermissionsToGrant,
-      siteOrigin,
-    };
     const grantedPermissions = await snapsProvider.request({
       method: 'wallet_invokeSnap',
       params: {
-        snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+        snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID, // We only want gator-permissions-snap for now but we will use more snaps in the future
         request: {
-          method: ExternalMethod.PermissionProviderGrantAttenuatedPermissions,
-          params: grantAttenuatedPermissionsParams as Json,
+          method: ExternalMethod.PermissionProviderGrantPermissions,
+          params: {
+            permissionsRequest: relevantPermissionsRequestToGrant,
+            siteOrigin: options.siteOrigin,
+          } as Json,
         },
       },
     });
