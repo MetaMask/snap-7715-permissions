@@ -4,6 +4,7 @@ import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 import type { AccountController } from '../accountController';
 import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
 import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
+import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import { PermissionHandler } from './permissionHandler';
@@ -24,6 +25,8 @@ export class PermissionHandlerFactory {
 
   readonly #tokenPricesService: TokenPricesService;
 
+  readonly #tokenMetadataService: TokenMetadataService;
+
   readonly #userEventDispatcher: UserEventDispatcher;
 
   readonly #orchestrator: PermissionRequestLifecycleOrchestrator;
@@ -31,16 +34,19 @@ export class PermissionHandlerFactory {
   constructor({
     accountController,
     tokenPricesService,
+    tokenMetadataService,
     userEventDispatcher,
     orchestrator,
   }: {
     accountController: AccountController;
     tokenPricesService: TokenPricesService;
+    tokenMetadataService: TokenMetadataService;
     userEventDispatcher: UserEventDispatcher;
     orchestrator: PermissionRequestLifecycleOrchestrator;
   }) {
     this.#accountController = accountController;
     this.#tokenPricesService = tokenPricesService;
+    this.#tokenMetadataService = tokenMetadataService;
     this.#userEventDispatcher = userEventDispatcher;
     this.#orchestrator = orchestrator;
   }
@@ -78,6 +84,7 @@ export class PermissionHandlerFactory {
         orchestrator: this.#orchestrator,
         permissionRequest,
         tokenPricesService: this.#tokenPricesService,
+        tokenMetadataService: this.#tokenMetadataService,
       });
     };
     let handler: PermissionHandlerType;

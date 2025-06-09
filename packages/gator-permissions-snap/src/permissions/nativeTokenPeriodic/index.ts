@@ -1,5 +1,4 @@
-import type { PermissionDefinition } from 'src/core/types';
-
+import type { PermissionDefinition } from '../../core/types';
 import { appendCaveats } from './caveats';
 import { createConfirmationContent } from './content';
 import {

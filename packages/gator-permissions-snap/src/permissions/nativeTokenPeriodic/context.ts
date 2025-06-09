@@ -2,8 +2,9 @@ import { parseEther, toHex } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
+import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { formatEtherFromString } from '../../utils/balance';
+import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -78,45 +79,50 @@ export async function populatePermission({
  * @param args.permissionRequest - The native token periodic permission request to convert.
  * @param args.tokenPricesService - Service for fetching token price information.
  * @param args.accountController - Controller for managing account operations.
+ * @param args.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
   tokenPricesService,
   accountController,
+  tokenMetadataService,
 }: {
   permissionRequest: NativeTokenPeriodicPermissionRequest;
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
+  tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const balancePromise = accountController
-    .getAccountBalance({
-      chainId,
-    })
-    .then(async (balance) => {
-      const balanceFormattedAsCurrency =
-        await tokenPricesService.getCryptoToFiatConversion(
-          `eip155:1/slip44:60`,
-          balance,
-        );
-      return { balance, balanceFormattedAsCurrency };
-    });
+  const address = await accountController.getAccountAddress({
+    chainId,
+  });
 
-  const [address, { balance, balanceFormattedAsCurrency }] = await Promise.all([
-    accountController.getAccountAddress({
-      chainId,
-    }),
-    balancePromise,
-  ]);
+  const {
+    balance: rawBalance,
+    decimals,
+    symbol,
+  } = await tokenMetadataService.getTokenBalanceAndMetadata({
+    chainId,
+    account: address,
+  });
+
+  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
+    `eip155:1/slip44:60`,
+    toHex(rawBalance),
+  );
+
+  // todo: this should just be BigInt
+  const balance = toHex(rawBalance);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  const periodAmount = formatEtherFromString(
-    permissionRequest.permission.data.periodAmount,
-    false,
-  );
+  const periodAmount = formatUnitsFromString({
+    value: permissionRequest.permission.data.periodAmount,
+    allowUndefined: false,
+    decimals,
+  });
 
   const periodDuration =
     permissionRequest.permission.data.periodDuration.toString();
@@ -144,7 +150,8 @@ export async function buildContext({
     accountDetails: {
       address,
       balance,
-      balanceFormattedAsCurrency,
+      balanceFormattedAsCurrency: balanceFormatted,
+      symbol,
     },
     permissionDetails: {
       periodAmount,

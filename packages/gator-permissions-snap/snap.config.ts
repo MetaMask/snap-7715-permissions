@@ -10,6 +10,7 @@ const {
   PRICE_API_BASE_URL,
   STORE_PERMISSIONS_ENABLED,
   USE_EOA_ACCOUNT,
+  ACCOUNT_API_BASE_URL,
 } = process.env;
 
 if (!SNAP_ENV) {
@@ -36,14 +37,18 @@ if (
 }
 
 if (!USE_EOA_ACCOUNT) {
-  throw new Error(
-    'STORE_PERMISSIONS_ENABLED must be set as an environment variable.',
-  );
+  throw new Error('USE_EOA_ACCOUNT must be set as an environment variable.');
 }
 
 if (USE_EOA_ACCOUNT !== 'true' && USE_EOA_ACCOUNT !== 'false') {
   throw new Error(
     'USE_EOA_ACCOUNT must be set as an environment variable and must be set to "true" or "false".',
+  );
+}
+
+if (!ACCOUNT_API_BASE_URL) {
+  throw new Error(
+    'ACCOUNT_API_BASE_URL must be set as an environment variable.',
   );
 }
 
@@ -61,6 +66,7 @@ const config: SnapConfig = {
     PRICE_API_BASE_URL,
     STORE_PERMISSIONS_ENABLED,
     USE_EOA_ACCOUNT,
+    ACCOUNT_API_BASE_URL,
   },
 };
 

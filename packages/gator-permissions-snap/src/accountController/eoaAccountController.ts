@@ -4,8 +4,9 @@ import {
   type Delegation,
   type DeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { type Address, type Hex } from 'viem';
+import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
+import type { Hex } from 'viem';
+import { type Address } from 'viem';
 
 import type { SupportedChains } from './baseAccountController';
 import { BaseAccountController } from './baseAccountController';
@@ -16,10 +17,6 @@ import type {
   FactoryArgs,
 } from './types';
 
-export type EthereumProvider = {
-  request: (args: { method: string; params?: any[] }) => Promise<any>;
-};
-
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
  */
@@ -29,7 +26,7 @@ export class EoaAccountController
 {
   #accountAddress: Address | null = null;
 
-  #ethereumProvider: EthereumProvider;
+  #ethereumProvider: SnapsEthereumProvider;
 
   /**
    * Initializes a new EoaAccountController instance.
@@ -40,10 +37,11 @@ export class EoaAccountController
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
-    ethereumProvider: EthereumProvider;
+    ethereumProvider: SnapsEthereumProvider;
     supportedChains?: SupportedChains;
   }) {
     super(config);
+
     this.#ethereumProvider = config.ethereumProvider;
   }
 
@@ -58,7 +56,7 @@ export class EoaAccountController
       return this.#accountAddress;
     }
 
-    const accounts = await this.#ethereumProvider.request({
+    const accounts = await this.#ethereumProvider.request<Hex[]>({
       method: 'eth_requestAccounts',
     });
 
@@ -102,7 +100,7 @@ export class EoaAccountController
 
     const address = await this.#getAccountAddress();
 
-    const selectedChain = await this.#ethereumProvider.request({
+    const selectedChain = await this.#ethereumProvider.request<Hex>({
       method: 'eth_chainId',
       params: [],
     });
@@ -118,7 +116,7 @@ export class EoaAccountController
       delegation,
     });
 
-    const signature = await this.#ethereumProvider.request({
+    const signature = await this.#ethereumProvider.request<Hex>({
       method: 'eth_signTypedData_v4',
       params: [address, signArgs],
     });
@@ -196,30 +194,6 @@ export class EoaAccountController
       factory: undefined,
       factoryData: undefined,
     };
-  }
-
-  /**
-   * Retrieves the balance of the EOA account.
-   * @param options - The options object containing chain information.
-   * @returns The account balance in hex format.
-   */
-  public async getAccountBalance(options: AccountOptionsBase): Promise<Hex> {
-    logger.debug('eoaAccountController:getAccountBalance()');
-
-    this.assertIsSupportedChainId(options.chainId);
-
-    const address = await this.#getAccountAddress();
-
-    const provider = this.createExperimentalProviderRequestProvider(
-      options.chainId,
-    );
-
-    const balance = await provider.request({
-      method: 'eth_getBalance',
-      params: [address, 'latest'],
-    });
-
-    return balance as Hex;
   }
 
   /**

@@ -2,6 +2,7 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../accountController';
+import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type {
   UserEventDispatcher,
@@ -54,6 +55,8 @@ export class PermissionHandler<
 
   readonly #tokenPricesService: TokenPricesService;
 
+  readonly #tokenMetadataService: TokenMetadataService;
+
   readonly #rules: RuleDefinition<TContext, TMetadata>[];
 
   readonly #permissionTitle: string;
@@ -73,6 +76,7 @@ export class PermissionHandler<
     permissionRequest,
     dependencies,
     tokenPricesService,
+    tokenMetadataService,
     rules,
     title,
   }: PermissionHandlerParams<
@@ -88,6 +92,7 @@ export class PermissionHandler<
     this.#permissionRequest = permissionRequest;
     this.#dependencies = dependencies;
     this.#tokenPricesService = tokenPricesService;
+    this.#tokenMetadataService = tokenMetadataService;
     this.#rules = rules;
     this.#permissionTitle = title;
   }
@@ -131,6 +136,7 @@ export class PermissionHandler<
         permissionRequest: request,
         tokenPricesService: this.#tokenPricesService,
         accountController: this.#accountController,
+        tokenMetadataService: this.#tokenMetadataService,
       });
     };
 

@@ -171,26 +171,6 @@ describe('SmartAccountController', () => {
     });
   });
 
-  describe('getAccountBalance()', () => {
-    it('should get the account balance', async () => {
-      const balance = await accountController.getAccountBalance({
-        chainId: sepolia.id,
-      });
-
-      expect(balance).toStrictEqual(expectedBalance);
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getAccountBalance({
-          chainId: invalidChainId,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
-    });
-  });
-
   describe('signDelegation()', () => {
     const unsignedDelegation = createDelegation({
       to: '0x1234567890abcdef1234567890abcdef12345678',

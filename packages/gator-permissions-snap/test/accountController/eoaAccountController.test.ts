@@ -5,7 +5,7 @@ import {
   getDeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
 import { isHex, size } from 'viem';
-import { sepolia, oneWorld } from 'viem/chains';
+import { sepolia, oneWorld, mainnet } from 'viem/chains';
 
 import { EoaAccountController } from '../../src/accountController/eoaAccountController';
 
@@ -24,6 +24,7 @@ describe('EoaAccountController', () => {
 
   beforeEach(() => {
     mockSnapsProvider = createMockSnapsProvider();
+
     mockEthereumProvider = {
       request: jest.fn(),
     };
@@ -71,7 +72,7 @@ describe('EoaAccountController', () => {
     accountController = new EoaAccountController({
       snapsProvider: mockSnapsProvider,
       ethereumProvider: mockEthereumProvider,
-      supportedChains: [sepolia],
+      supportedChains: [sepolia, mainnet],
     });
   });
 
@@ -207,26 +208,6 @@ describe('EoaAccountController', () => {
         accountController.signDelegation({
           chainId: invalidChainId,
           delegation: unsignedDelegation,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
-    });
-  });
-
-  describe('getAccountBalance()', () => {
-    it('should get the account balance', async () => {
-      const balance = await accountController.getAccountBalance({
-        chainId: sepolia.id,
-      });
-
-      expect(balance).toBe(expectedBalance);
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getAccountBalance({
-          chainId: invalidChainId,
         }),
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });

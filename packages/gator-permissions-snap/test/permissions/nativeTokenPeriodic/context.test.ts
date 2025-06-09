@@ -14,6 +14,7 @@ import type {
   NativeTokenPeriodicPermission,
   NativeTokenPeriodicPermissionRequest,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
+import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import {
   convertTimestampToReadableDate,
@@ -60,6 +61,7 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+    symbol: 'ETH',
   },
   permissionDetails: {
     periodAmount: '1',
@@ -102,6 +104,7 @@ describe('nativeTokenPeriodic:context', () => {
   describe('permissionRequestToContext()', () => {
     let mockTokenPricesService: jest.Mocked<TokenPricesService>;
     let mockAccountController: jest.Mocked<AccountController>;
+    let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
 
     beforeEach(() => {
       mockTokenPricesService = {
@@ -115,10 +118,15 @@ describe('nativeTokenPeriodic:context', () => {
         getAccountAddress: jest
           .fn()
           .mockResolvedValue(alreadyPopulatedContext.accountDetails.address),
-        getAccountBalance: jest
-          .fn()
-          .mockResolvedValue(alreadyPopulatedContext.accountDetails.balance),
       } as unknown as jest.Mocked<AccountController>;
+
+      mockTokenMetadataService = {
+        getTokenBalanceAndMetadata: jest.fn(() => ({
+          balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
+          symbol: alreadyPopulatedContext.accountDetails.symbol,
+          decimals: 18,
+        })),
+      } as unknown as jest.Mocked<TokenMetadataService>;
     });
 
     it('should create a context from a permission request', async () => {
@@ -126,6 +134,7 @@ describe('nativeTokenPeriodic:context', () => {
         permissionRequest: alreadyPopulatedPermissionRequest,
         tokenPricesService: mockTokenPricesService,
         accountController: mockAccountController,
+        tokenMetadataService: mockTokenMetadataService,
       });
 
       expect(context).toStrictEqual(alreadyPopulatedContext);
@@ -134,8 +143,11 @@ describe('nativeTokenPeriodic:context', () => {
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
       });
 
-      expect(mockAccountController.getAccountBalance).toHaveBeenCalledWith({
+      expect(
+        mockTokenMetadataService.getTokenBalanceAndMetadata,
+      ).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
+        account: alreadyPopulatedContext.accountDetails.address,
       });
 
       expect(

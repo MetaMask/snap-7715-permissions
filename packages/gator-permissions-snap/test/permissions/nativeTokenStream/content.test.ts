@@ -16,6 +16,7 @@ const mockContext: NativeTokenStreamContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+    symbol: 'ETH',
   },
   permissionDetails: {
     initialAmount: '1',
@@ -730,7 +731,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "Ether token icon",
+                                "alt": "ETH token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -1917,7 +1918,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "Ether token icon",
+                                "alt": "ETH token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -3021,7 +3022,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "Ether token icon",
+                                "alt": "ETH token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -4037,7 +4038,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "Ether token icon",
+                                "alt": "ETH token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
@@ -4978,7 +4979,7 @@ describe('nativeTokenStream:content', () => {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "Ether token icon",
+                                "alt": "ETH token icon",
                                 "src": "<svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <circle cx="16" cy="16" r="16" fill="#F2F4F6"/>
 <circle cx="16" cy="16" r="15.5" stroke="#B7BBC8" stroke-opacity="0.4"/>
