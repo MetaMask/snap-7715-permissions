@@ -12,6 +12,7 @@ import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
+import { Hex } from 'viem';
 
 /**
  * Represents the result of a permission request.
@@ -39,6 +40,22 @@ export type BaseContext = {
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;
+};
+
+/**
+ * Base context for all token permissions.
+ * This includes the account details and token metadata.
+ */
+export type BaseTokenPermissionContext = BaseContext & {
+  accountDetails: {
+    address: Hex;
+    balanceFormattedAsCurrency: string;
+    balance: Hex; // it would be nice if this was Hex, but must be Json serializable for Snaps JSX
+  };
+  tokenMetadata: {
+    decimals: number;
+    symbol: string;
+  };
 };
 
 /**

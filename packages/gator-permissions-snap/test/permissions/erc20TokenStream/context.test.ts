@@ -187,6 +187,55 @@ describe('erc20TokenStream:context', () => {
         USDC_DECIMALS,
       );
     });
+
+    it('should create a context with different token decimals', async () => {
+      const DAI_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F';
+      const DAI_DECIMALS = 18;
+      const DAI_BALANCE = toHex(BigInt('100000000000000000000')); // 100 DAI (18 decimals)
+
+      const daiPermission: Erc20TokenStreamPermission = {
+        type: 'erc20-token-stream',
+        data: {
+          tokenAddress: DAI_ADDRESS,
+          amountPerSecond: toHex(BigInt('500000000000000000')), // 0.5 DAI per second (18 decimals)
+          startTime: 499132800,
+          initialAmount: toHex(BigInt('1000000000000000000')), // 1 DAI
+          maxAmount: toHex(BigInt('10000000000000000000')), // 10 DAI
+          justification: 'Permission to do something important',
+        },
+        rules: {},
+      };
+
+      const daiPermissionRequest: Erc20TokenStreamPermissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        permission: daiPermission,
+      };
+
+      // Override mock return values for this test
+      mockTokenMetadataService.getTokenBalanceAndMetadata.mockResolvedValueOnce(
+        {
+          balance: BigInt(DAI_BALANCE),
+          symbol: 'DAI',
+          decimals: DAI_DECIMALS,
+        },
+      );
+
+      const context = await buildContext({
+        permissionRequest: daiPermissionRequest,
+        tokenPricesService: mockTokenPricesService,
+        accountController: mockAccountController,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+
+      expect(context.tokenMetadata).toStrictEqual({
+        symbol: 'DAI',
+        decimals: DAI_DECIMALS,
+      });
+
+      expect(context.accountDetails.balance).toBe(DAI_BALANCE);
+      expect(context.permissionDetails.initialAmount).toBe('1');
+      expect(context.permissionDetails.maxAmount).toBe('10');
+    });
   });
 
   describe('createContextMetadata()', () => {

@@ -142,8 +142,6 @@ export async function buildContext({
     decimals,
   );
 
-  const balance = toHex(rawBalance);
-
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
   const initialAmount = formatUnitsFromString({
@@ -175,11 +173,12 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
+  const balance = toHex(rawBalance);
+
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    // todo: we should consider removing the accountDetails from the context object, and into it's own object
     accountDetails: {
       address,
       balance,

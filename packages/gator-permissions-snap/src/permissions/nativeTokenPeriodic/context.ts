@@ -122,9 +122,6 @@ export async function buildContext({
     decimals,
   );
 
-  // todo: this should just be BigInt
-  const balance = toHex(rawBalance);
-
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
   const periodAmount = formatUnitsFromString({
@@ -151,6 +148,8 @@ export async function buildContext({
   const startTime = convertTimestampToReadableDate(
     permissionRequest.permission.data.startTime,
   );
+
+  const balance = toHex(rawBalance);
 
   return {
     expiry,

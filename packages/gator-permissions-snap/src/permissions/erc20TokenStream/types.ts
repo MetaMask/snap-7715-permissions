@@ -3,14 +3,13 @@ import {
   zPermission,
   zMetaMaskPermissionData,
 } from '@metamask/7715-permissions-shared/types';
-import type { Hex } from 'viem';
 import { z } from 'zod';
 
 import type {
   DeepRequired,
   TimePeriod,
   TypedPermissionRequest,
-  BaseContext,
+  BaseTokenPermissionContext,
 } from '../../core/types';
 
 export type Erc20TokenStreamMetadata = {
@@ -24,16 +23,7 @@ export type Erc20TokenStreamMetadata = {
   };
 };
 
-export type Erc20TokenStreamContext = BaseContext & {
-  accountDetails: {
-    address: Hex;
-    balanceFormattedAsCurrency: string;
-    balance: Hex;
-  };
-  tokenMetadata: {
-    decimals: number;
-    symbol: string;
-  };
+export type Erc20TokenStreamContext = BaseTokenPermissionContext & {
   permissionDetails: {
     initialAmount: string | undefined;
     maxAmount: string | undefined;
