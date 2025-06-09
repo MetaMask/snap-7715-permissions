@@ -47,11 +47,6 @@ export type AccountController = {
   getAccountMetadata(options: AccountOptionsBase): Promise<FactoryArgs>;
 
   /**
-   * Retrieves the balance of the smart account.
-   */
-  getAccountBalance(options: AccountOptionsBase): Promise<Hex>;
-
-  /**
    * Retrieves the delegation manager address for the current account.
    */
   getDelegationManager(options: AccountOptionsBase): Promise<Address>;

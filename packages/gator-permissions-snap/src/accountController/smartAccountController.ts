@@ -207,40 +207,24 @@ export class SmartAccountController
   }
 
   /**
-   * Retrieves the balance of the smart account.
+   * Retrieves the environment for the current account.
    *
    * @param options - The base account options including chainId.
-   * @returns A promise resolving to the account balance as a hex string.
+   * @returns A promise resolving to a DeleGatorEnvironment.
    */
-  public async getAccountBalance(options: AccountOptionsBase): Promise<Hex> {
-    logger.debug('accountController:getAccountBalance()');
-
-    const { chainId } = options;
+  public async getEnvironment(
+    options: AccountOptionsBase,
+  ): Promise<DeleGatorEnvironment> {
+    logger.debug('accountController:getEnvironment()');
 
     const smartAccount = await this.#getMetaMaskSmartAccount(options);
 
     logger.debug(
-      'accountController:getAccountBalance() - smartAccount resolved',
+      'accountController:getEnvironment() - smartAccount resolved',
       smartAccount,
     );
 
-    this.assertIsSupportedChainId(chainId);
-
-    const provider = this.createExperimentalProviderRequestProvider(chainId);
-
-    const accountAddress = await smartAccount.getAddress();
-
-    const balance = await provider.request({
-      method: 'eth_getBalance',
-      params: [accountAddress, 'latest'],
-    });
-
-    logger.debug(
-      'accountController:getAccountBalance() - balance resolved',
-      balance,
-    );
-
-    return balance as Hex;
+    return smartAccount.environment;
   }
 
   /**
@@ -271,26 +255,5 @@ export class SmartAccountController
     logger.debug('accountController:signDelegation() - signature resolved');
 
     return { ...delegation, signature };
-  }
-
-  /**
-   * Retrieves the environment for the current account.
-   *
-   * @param options - The base account options including chainId.
-   * @returns A promise resolving to a DeleGatorEnvironment.
-   */
-  public async getEnvironment(
-    options: AccountOptionsBase,
-  ): Promise<DeleGatorEnvironment> {
-    logger.debug('accountController:getEnvironment()');
-
-    const smartAccount = await this.#getMetaMaskSmartAccount(options);
-
-    logger.debug(
-      'accountController:getEnvironment() - smartAccount resolved',
-      smartAccount,
-    );
-
-    return smartAccount.environment;
   }
 }

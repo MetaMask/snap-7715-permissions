@@ -5,6 +5,7 @@ import type { AccountController } from '../../src/accountController';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
+import type { TokenMetadataService } from '../../src/services/tokenMetadataService';
 import type { TokenPricesService } from '../../src/services/tokenPricesService';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
@@ -12,6 +13,7 @@ describe('PermissionHandlerFactory', () => {
   let permissionHandlerFactory: PermissionHandlerFactory;
   let mockAccountController: jest.Mocked<AccountController>;
   let mockTokenPricesService: jest.Mocked<TokenPricesService>;
+  let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
   let mockUserEventDispatcher: jest.Mocked<UserEventDispatcher>;
   let mockOrchestrator: jest.Mocked<PermissionRequestLifecycleOrchestrator>;
 
@@ -63,6 +65,10 @@ describe('PermissionHandlerFactory', () => {
       getCryptoToFiatConversion: jest.fn(),
     } as unknown as jest.Mocked<TokenPricesService>;
 
+    mockTokenMetadataService = {
+      getTokenBalanceAndMetadata: jest.fn(),
+    } as unknown as jest.Mocked<TokenMetadataService>;
+
     mockUserEventDispatcher = {
       dispatch: jest.fn(),
     } as unknown as jest.Mocked<UserEventDispatcher>;
@@ -74,6 +80,7 @@ describe('PermissionHandlerFactory', () => {
     permissionHandlerFactory = new PermissionHandlerFactory({
       accountController: mockAccountController,
       tokenPricesService: mockTokenPricesService,
+      tokenMetadataService: mockTokenMetadataService,
       userEventDispatcher: mockUserEventDispatcher,
       orchestrator: mockOrchestrator,
     });

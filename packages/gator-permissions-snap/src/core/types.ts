@@ -8,6 +8,8 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountController } from '../accountController';
+import type { TokenMetadataService } from '../services/tokenMetadataService';
+import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 
@@ -256,7 +258,8 @@ export type PermissionHandlerParams<
     TPermission,
     TPopulatedPermission
   >;
-  tokenPricesService: any;
+  tokenPricesService: TokenPricesService;
+  tokenMetadataService: TokenMetadataService;
   rules: RuleDefinition<TContext, TMetadata>[];
   title: string;
 };
@@ -280,8 +283,9 @@ export type PermissionHandlerDependencies<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (args: {
     permissionRequest: TRequest;
-    tokenPricesService: any;
+    tokenPricesService: TokenPricesService;
     accountController: AccountController;
+    tokenMetadataService: TokenMetadataService;
   }) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   createConfirmationContent: (args: {

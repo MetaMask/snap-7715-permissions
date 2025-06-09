@@ -1,4 +1,6 @@
 import type { CaipAssetType } from '@metamask/utils';
+import type { Address } from 'viem';
+
 /**
  * The params for the price API client to fetch spot prices.
  */
@@ -73,3 +75,32 @@ export type SpotPricesRes = Record<
   CaipAssetType,
   Record<VsCurrencyParam, number>
 >;
+
+/**
+ * Represents token balance and metadata information
+ */
+export type TokenBalanceAndMetadata = {
+  balance: bigint;
+  decimals: number;
+  symbol: string;
+};
+
+/**
+ * Interface for token metadata clients that can fetch token balance and metadata
+ */
+export type TokenMetadataClient = {
+  /**
+   * Fetch the token balance and metadata for a given account and token.
+   *
+   * @param params - The parameters for fetching the token balance
+   * @param params.chainId - The chain ID to fetch the balance from
+   * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance
+   * @param params.account - The account address to fetch the balance for
+   * @returns The token balance and metadata
+   */
+  getTokenBalanceAndMetadata(params: {
+    chainId: number;
+    account: Address;
+    assetAddress?: Address | undefined;
+  }): Promise<TokenBalanceAndMetadata>;
+};

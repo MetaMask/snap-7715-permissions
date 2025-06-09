@@ -1,5 +1,5 @@
 import type { Hex } from 'viem';
-import { formatEther, formatUnits, maxUint256, parseUnits, toHex } from 'viem';
+import { formatUnits, maxUint256, parseUnits, toHex } from 'viem';
 
 /**
  * Formats a token balance to a human-readable string.
@@ -54,14 +54,24 @@ export const zeroDefaultParser = (value: string | null | undefined) => {
 
 /**
  * Formats a string value to a hex string.
- * @param value - The value to format.
- * @param allowUndefined - Whether to allow undefined values.
+ * @param args - The arguments to format.
+ * @param args.value - The value to format.
+ * @param args.allowUndefined - Whether to allow undefined values.
+ * @param args.decimals - The number of decimal places the token uses.
  * @returns The formatted value.
  */
-export const formatEtherFromString = <TAllowUndefined extends boolean>(
-  value: TAllowUndefined extends true ? string | undefined : string,
-  allowUndefined: TAllowUndefined,
-): TAllowUndefined extends true ? string | undefined : string => {
+export const formatUnitsFromString = <
+  TAllowUndefined extends boolean,
+  TDecimals extends number,
+>({
+  value,
+  allowUndefined,
+  decimals,
+}: {
+  value: TAllowUndefined extends true ? string | undefined : string;
+  allowUndefined: TAllowUndefined;
+  decimals: TDecimals;
+}): TAllowUndefined extends true ? string | undefined : string => {
   if (value === undefined) {
     if (allowUndefined) {
       return undefined as TAllowUndefined extends true
@@ -72,5 +82,5 @@ export const formatEtherFromString = <TAllowUndefined extends boolean>(
     throw new Error('Value is undefined');
   }
 
-  return formatEther(BigInt(value));
+  return formatUnits(BigInt(value), decimals);
 };

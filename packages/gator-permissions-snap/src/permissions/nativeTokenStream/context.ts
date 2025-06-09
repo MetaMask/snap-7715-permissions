@@ -2,8 +2,9 @@ import { formatEther, maxUint256, parseEther, toHex } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
+import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { formatEtherFromString } from '../../utils/balance';
+import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -94,16 +95,19 @@ export async function populatePermission({
  * @param options0.permissionRequest - The native token stream permission request to convert.
  * @param options0.tokenPricesService - Service for fetching token price information.
  * @param options0.accountController - Controller for managing account operations.
+ * @param options0.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
   tokenPricesService,
   accountController,
+  tokenMetadataService,
 }: {
   permissionRequest: NativeTokenStreamPermissionRequest;
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
+  tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
 
@@ -111,28 +115,38 @@ export async function buildContext({
     chainId,
   });
 
-  const balance = await accountController.getAccountBalance({
+  const {
+    balance: rawBalance,
+    decimals,
+    symbol,
+  } = await tokenMetadataService.getTokenBalanceAndMetadata({
     chainId,
+    account: address,
   });
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:1/slip44:60`,
-    balance,
+    toHex(rawBalance),
   );
+
+  // todo: this should just be BigInt
+  const balance = toHex(rawBalance);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  const initialAmount = formatEtherFromString(
-    permissionRequest.permission.data.initialAmount,
-    true,
-  );
-
-  const maxAmount = formatEtherFromString(
-    permissionRequest.permission.data.maxAmount,
-    true,
-  );
+  const initialAmount = formatUnitsFromString({
+    value: permissionRequest.permission.data.initialAmount,
+    allowUndefined: true,
+    decimals,
+  });
 
   const timePeriod = TimePeriod.WEEKLY;
+
+  const maxAmount = formatUnitsFromString({
+    value: permissionRequest.permission.data.maxAmount,
+    allowUndefined: true,
+    decimals,
+  });
 
   const amountPerSecond = BigInt(
     permissionRequest.permission.data.amountPerSecond,
@@ -152,10 +166,12 @@ export async function buildContext({
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
+    // todo: we should consider removing the accountDetails from the context object, and into it's own object
     accountDetails: {
       address,
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
+      symbol,
     },
     permissionDetails: {
       initialAmount,

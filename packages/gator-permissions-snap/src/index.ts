@@ -23,6 +23,8 @@ import {
   SmartAccountController,
   type AccountController,
 } from './accountController';
+import { AccountApiClient } from './clients/accountApiClient';
+import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
 import { PriceApiClient } from './clients/priceApiClient';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
@@ -36,27 +38,55 @@ import {
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
 
-const isFeatureEnabled = process.env.STORE_PERMISSIONS_ENABLED === 'true';
+const isStorePermissionsFeatureEnabled =
+  process.env.STORE_PERMISSIONS_ENABLED === 'true';
+
+const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
+
 const snapEnv = process.env.SNAP_ENV;
+
+const accountApiBaseUrl = process.env.ACCOUNT_API_BASE_URL;
+
+if (!accountApiBaseUrl) {
+  throw new Error('ACCOUNT_API_BASE_URL is not set');
+}
+
+const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
+if (!priceApiBaseUrl) {
+  throw new Error('PRICE_API_BASE_URL is not set');
+}
 
 // set up dependencies
 
-// eslint-disable-next-line no-restricted-globals
-const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
+const accountApiClient = new AccountApiClient({
+  baseUrl: accountApiBaseUrl,
+});
+
+const tokenMetadataClient = new BlockchainTokenMetadataClient({
+  ethereumProvider: ethereum,
+});
+
+const tokenMetadataService = new TokenMetadataService({
+  accountApiClient,
+  tokenMetadataClient,
+});
+
+const supportedChains = [sepolia, lineaSepolia];
 
 const accountController: AccountController = useEoaAccountController
   ? new EoaAccountController({
       snapsProvider: snap,
-      supportedChains: [sepolia, lineaSepolia],
       ethereumProvider: ethereum,
+      supportedChains,
     })
   : new SmartAccountController({
       snapsProvider: snap,
-      supportedChains: [sepolia, lineaSepolia],
+      supportedChains,
       deploymentSalt: '0x',
     });
 
@@ -83,7 +113,7 @@ const auth = new JwtBearerAuth(
 );
 
 const profileSyncManager = createProfileSyncManager({
-  isFeatureEnabled,
+  isFeatureEnabled: isStorePermissionsFeatureEnabled,
   auth,
   userStorage: new UserStorage(
     {
@@ -104,8 +134,7 @@ const homepage = new HomePage({
 
 const userEventDispatcher = new UserEventDispatcher();
 
-// eslint-disable-next-line no-restricted-globals
-const priceApiClient = new PriceApiClient(process.env.PRICE_API_BASE_URL ?? '');
+const priceApiClient = new PriceApiClient(priceApiBaseUrl);
 
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
@@ -122,6 +151,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
 const permissionHandlerFactory = new PermissionHandlerFactory({
   accountController,
   tokenPricesService,
+  tokenMetadataService,
   userEventDispatcher,
   orchestrator,
 });
@@ -203,7 +233,7 @@ export const onInstall: OnInstallHandler = async () => {
    * initialConnections configured to automatically connect to the gator snap, this is not needed in production.
    */
   // eslint-disable-next-line no-restricted-globals
-  if (snapEnv === 'local' && isFeatureEnabled) {
+  if (snapEnv === 'local' && isStorePermissionsFeatureEnabled) {
     const installedSnaps = (await snap.request({
       method: 'wallet_getSnaps',
     })) as unknown as GetSnapsResponse;

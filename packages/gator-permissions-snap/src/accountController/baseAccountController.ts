@@ -14,7 +14,7 @@ type SupportedChainId = SupportedChains[number]['id'];
  * Base class for account controllers that provides common functionality.
  */
 export abstract class BaseAccountController {
-  #snapsProvider: SnapsProvider;
+  readonly #snapsProvider: SnapsProvider;
 
   protected supportedChains: SupportedChains;
 
@@ -37,7 +37,7 @@ export abstract class BaseAccountController {
     snapsProvider: SnapsProvider;
     supportedChains?: SupportedChains;
   }) {
-    // only validate if supportedChains is specified, as it will default to ALL_SUPPORTED_CHAINS
+    // only validate if supportedChains is specified, as it will default to #allSupportedChains
     if (config.supportedChains) {
       this.#validateSupportedChains(config.supportedChains);
     }
