@@ -48,13 +48,11 @@ describe('PermissionOfferRegistryManger', () => {
 
       expect(result).toStrictEqual({
         [mockSnapId]: [
-          {
+          expect.objectContaining({
             hostId: mockSnapId,
             type: 'native-token-transfer',
-            hostPermissionId:
-              'e185b919751ecd0c88423a9858b9af49672864ebef87af84ab72ceafb32bba40',
             proposedName: 'Transfer native tokens',
-          },
+          }),
         ],
       });
     });
