@@ -28,6 +28,8 @@ export type NativeTokenPeriodicContext = BaseContext & {
     address: Hex;
     balanceFormattedAsCurrency: string;
     balance: Hex;
+  };
+  tokenMetadata: {
     decimals: number;
     symbol: string;
   };

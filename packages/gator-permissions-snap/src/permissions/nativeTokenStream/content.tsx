@@ -70,7 +70,7 @@ export async function createConfirmationContent({
     },
     {
       label: 'Token',
-      text: context.accountDetails.symbol,
+      text: context.tokenMetadata.symbol,
       iconUrl: IconUrls.ethereum.token,
     },
   ];
@@ -85,6 +85,7 @@ export async function createConfirmationContent({
       />
       <AccountDetails
         account={context.accountDetails}
+        tokenMetadata={context.tokenMetadata}
         title="Stream from"
         tooltip="The account that the token stream comes from."
       />
@@ -106,7 +107,7 @@ export async function createConfirmationContent({
             <Box>
               <Image
                 src={IconUrls.ethereum.token}
-                alt={`${context.accountDetails.symbol} token icon`}
+                alt={`${context.tokenMetadata.symbol} token icon`}
               />
             </Box>
             <Input

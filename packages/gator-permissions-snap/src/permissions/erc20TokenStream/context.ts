@@ -39,7 +39,7 @@ export async function applyContext({
 }): Promise<Erc20TokenStreamPermissionRequest> {
   const {
     permissionDetails,
-    accountDetails: { decimals },
+    tokenMetadata: { decimals },
   } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
@@ -136,7 +136,6 @@ export async function buildContext({
     decimals,
   );
 
-  // todo: this should just be BigInt
   const balance = toHex(rawBalance);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
@@ -179,6 +178,8 @@ export async function buildContext({
       address,
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
+    },
+    tokenMetadata: {
       symbol,
       decimals,
     },
@@ -206,7 +207,7 @@ export async function deriveMetadata({
   const {
     permissionDetails,
     expiry,
-    accountDetails: { decimals },
+    tokenMetadata: { decimals },
   } = context;
 
   const validationErrors: Erc20TokenStreamMetadata['validationErrors'] = {};

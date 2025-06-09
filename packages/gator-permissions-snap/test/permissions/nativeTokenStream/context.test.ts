@@ -63,6 +63,8 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+  },
+  tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,
   },
@@ -144,7 +146,7 @@ describe('nativeTokenStream:context', () => {
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(() => ({
           balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
-          symbol: alreadyPopulatedContext.accountDetails.symbol,
+          symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: 18,
         })),
       } as unknown as jest.Mocked<TokenMetadataService>;

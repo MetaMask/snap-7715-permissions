@@ -18,6 +18,8 @@ const mockContext: Erc20TokenStreamContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', tokenDecimals)),
     balanceFormattedAsCurrency: '$🐊10.00',
+  },
+  tokenMetadata: {
     decimals: tokenDecimals,
     symbol: 'USDC',
   },

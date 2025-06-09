@@ -9,7 +9,10 @@ export type AccountDetailsProps = {
     address: Hex;
     balanceFormattedAsCurrency: string;
     balance: Hex;
+  };
+  tokenMetadata: {
     decimals: number;
+    symbol: string;
   };
   title: string;
   tooltip: string;
@@ -17,10 +20,12 @@ export type AccountDetailsProps = {
 
 export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
   account,
+  tokenMetadata,
   title,
   tooltip,
 }) => {
-  const { address, balance, balanceFormattedAsCurrency, decimals } = account;
+  const { address, balance, balanceFormattedAsCurrency } = account;
+  const { decimals } = tokenMetadata;
   return (
     <Section>
       <Box direction="vertical">

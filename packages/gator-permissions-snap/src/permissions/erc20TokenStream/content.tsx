@@ -62,7 +62,7 @@ export async function createConfirmationContent({
     },
     {
       label: 'Token',
-      text: context.accountDetails.symbol,
+      text: context.tokenMetadata.symbol,
     },
   ];
 
@@ -76,6 +76,7 @@ export async function createConfirmationContent({
       />
       <AccountDetails
         account={context.accountDetails}
+        tokenMetadata={context.tokenMetadata}
         title="Stream from"
         tooltip="The account that the token stream comes from."
       />
@@ -97,7 +98,7 @@ export async function createConfirmationContent({
             <Input
               name="stream-rate"
               type="text"
-              value={`${amountPerSecond} ${context.accountDetails.symbol}/sec`}
+              value={`${amountPerSecond} ${context.tokenMetadata.symbol}/sec`}
               disabled={true}
             />
           </Field>

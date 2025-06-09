@@ -39,7 +39,7 @@ export async function applyContext({
 }): Promise<NativeTokenStreamPermissionRequest> {
   const {
     permissionDetails,
-    accountDetails: { decimals },
+    tokenMetadata: { decimals },
   } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
@@ -171,11 +171,12 @@ export async function buildContext({
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    // todo: we should consider removing the accountDetails from the context object, and into it's own object
     accountDetails: {
       address,
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
+    },
+    tokenMetadata: {
       symbol,
       decimals,
     },
@@ -203,7 +204,7 @@ export async function deriveMetadata({
   const {
     permissionDetails,
     expiry,
-    accountDetails: { decimals },
+    tokenMetadata: { decimals },
   } = context;
 
   const validationErrors: NativeTokenStreamMetadata['validationErrors'] = {};

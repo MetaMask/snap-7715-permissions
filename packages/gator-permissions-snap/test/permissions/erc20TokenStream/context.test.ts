@@ -67,6 +67,8 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(100_000_000), // 100 USDC (6 decimals)
     balanceFormattedAsCurrency: '$🐊100.00',
+  },
+  tokenMetadata: {
     symbol: 'USDC',
     decimals: USDC_DECIMALS,
   },
@@ -149,7 +151,7 @@ describe('erc20TokenStream:context', () => {
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(() => ({
           balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
-          symbol: alreadyPopulatedContext.accountDetails.symbol,
+          symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: USDC_DECIMALS,
         })),
       } as unknown as jest.Mocked<TokenMetadataService>;

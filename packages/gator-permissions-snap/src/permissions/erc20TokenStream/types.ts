@@ -24,12 +24,13 @@ export type Erc20TokenStreamMetadata = {
   };
 };
 
-// todo: move accountDetails to the base context so that accountDetails formatting is shared between permissions
 export type Erc20TokenStreamContext = BaseContext & {
   accountDetails: {
     address: Hex;
     balanceFormattedAsCurrency: string;
     balance: Hex;
+  };
+  tokenMetadata: {
     decimals: number;
     symbol: string;
   };

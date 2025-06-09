@@ -10,14 +10,16 @@ type ERC20TokenStreamFormProps = {
 export const ERC20TokenStreamForm = ({
   onChange,
 }: ERC20TokenStreamFormProps) => {
+  const decimals = 6;
+
   const [initialAmount, setInitialAmount] = useState<bigint | null>(
-    BigInt(toHex(parseUnits('.5', 18))),
+    BigInt(toHex(parseUnits('.5', decimals))),
   );
   const [amountPerSecond, setAmountPerSecond] = useState(
-    BigInt(toHex(parseUnits('.5', 18))),
+    BigInt(toHex(parseUnits('.5', decimals))),
   );
   const [maxAmount, setMaxAmount] = useState<bigint | null>(
-    BigInt(toHex(parseUnits('2.5', 18))),
+    BigInt(toHex(parseUnits('2.5', decimals))),
   );
   const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
   const [expiry, setExpiry] = useState(
