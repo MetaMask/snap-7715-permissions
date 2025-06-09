@@ -8,9 +8,15 @@ import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
-  getStartOfTodayUTC,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
+import {
+  validateAndParseAmount,
+  validateStartTime,
+  validateExpiry,
+  validateMaxAmountVsInitialAmount,
+  calculateAmountPerSecond,
+} from '../contextValidation';
 import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamPermissionRequest,
@@ -212,88 +218,64 @@ export async function deriveMetadata({
 
   const validationErrors: Erc20TokenStreamMetadata['validationErrors'] = {};
 
-  let maxAmountBigInt: bigint | undefined;
-  let initialAmountBigInt: bigint | undefined;
-  let amountPerSecondBigInt: bigint | undefined;
+  // Validate max amount
+  const maxAmountResult = validateAndParseAmount(
+    permissionDetails.maxAmount,
+    decimals,
+    'Max amount',
+    false, // Disallow zero for max amount
+  );
+  if (maxAmountResult.error) {
+    validationErrors.maxAmountError = maxAmountResult.error;
+  }
+
+  // Validate initial amount
+  const initialAmountResult = validateAndParseAmount(
+    permissionDetails.initialAmount,
+    decimals,
+    'Initial amount',
+    true, // Allow zero for initial amount
+  );
+  if (initialAmountResult.error) {
+    validationErrors.initialAmountError = initialAmountResult.error;
+  }
+
+  // Validate amount per period
+  const amountPerPeriodResult = validateAndParseAmount(
+    permissionDetails.amountPerPeriod,
+    decimals,
+    'Amount per period',
+  );
   let amountPerSecond = 'Unknown';
-  if (permissionDetails.maxAmount) {
-    try {
-      maxAmountBigInt = parseUnits(permissionDetails.maxAmount, decimals);
-      if (maxAmountBigInt < 0n) {
-        validationErrors.maxAmountError = 'Max amount must be greater than 0';
-        maxAmountBigInt = undefined;
-      }
-    } catch (error) {
-      validationErrors.maxAmountError = 'Invalid max amount';
-    }
-  }
-
-  if (permissionDetails.initialAmount) {
-    try {
-      initialAmountBigInt = parseUnits(
-        permissionDetails.initialAmount,
-        decimals,
-      );
-      if (initialAmountBigInt < 0n) {
-        validationErrors.initialAmountError =
-          'Initial amount must be greater than 0';
-        initialAmountBigInt = undefined;
-      }
-    } catch (error) {
-      validationErrors.initialAmountError = 'Invalid initial amount';
-    }
-  }
-
-  try {
-    amountPerSecondBigInt = parseUnits(
-      permissionDetails.amountPerPeriod,
+  if (amountPerPeriodResult.error) {
+    validationErrors.amountPerPeriodError = amountPerPeriodResult.error;
+  } else if (amountPerPeriodResult.amount) {
+    amountPerSecond = calculateAmountPerSecond(
+      amountPerPeriodResult.amount,
+      permissionDetails.timePeriod,
       decimals,
     );
-    if (amountPerSecondBigInt <= 0n) {
-      validationErrors.amountPerPeriodError =
-        'Amount per period must be greater than 0';
-      amountPerSecondBigInt = undefined;
-    } else {
-      amountPerSecond = formatUnits(
-        amountPerSecondBigInt /
-          TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
-        decimals,
-      );
-    }
-  } catch (error) {
-    validationErrors.amountPerPeriodError = 'Invalid amount per period';
   }
 
-  try {
-    const startTimeDate = convertReadableDateToTimestamp(
-      permissionDetails.startTime,
-    );
-
-    if (startTimeDate < getStartOfTodayUTC()) {
-      validationErrors.startTimeError = 'Start time must be today or later';
-    }
-  } catch (error) {
-    validationErrors.startTimeError = 'Invalid start time';
+  // Validate start time
+  const startTimeError = validateStartTime(permissionDetails.startTime);
+  if (startTimeError) {
+    validationErrors.startTimeError = startTimeError;
   }
 
-  try {
-    const expiryDate = convertReadableDateToTimestamp(expiry);
-    const nowSeconds = Math.floor(Date.now() / 1000);
-
-    if (expiryDate < nowSeconds) {
-      validationErrors.expiryError = 'Expiry must be in the future';
-    }
-  } catch (error) {
-    validationErrors.expiryError = 'Invalid expiry';
+  // Validate expiry
+  const expiryError = validateExpiry(expiry);
+  if (expiryError) {
+    validationErrors.expiryError = expiryError;
   }
 
-  if (
-    maxAmountBigInt !== undefined &&
-    initialAmountBigInt !== undefined &&
-    maxAmountBigInt < initialAmountBigInt
-  ) {
-    validationErrors.maxAmountError =
-      'Max amount must be greater than initial amount';
+  // Validate max amount vs initial amount
+  const maxVsInitialError = validateMaxAmountVsInitialAmount(
+    maxAmountResult.amount,
+    initialAmountResult.amount,
+  );
+  if (maxVsInitialError) {
+    validationErrors.maxAmountError = maxVsInitialError;
   }
 
   return {

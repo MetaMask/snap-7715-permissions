@@ -240,7 +240,8 @@ describe('nativeTokenStream:context', () => {
         });
 
         expect(metadata.validationErrors).toStrictEqual({
-          initialAmountError: 'Initial amount must be greater than 0',
+          initialAmountError:
+            'Initial amount must be greater than or equal to 0',
         });
       });
     });

@@ -5,6 +5,7 @@ This guide explains how to add a new permission type to the MetaMask Permissions
 ## Overview
 
 A permission type consists of several components:
+
 1. Permission definition and registration
 2. Type definitions
 3. Validation logic
@@ -17,6 +18,7 @@ A permission type consists of several components:
 ### 1. Create Permission Directory
 
 Create a new directory under `packages/gator-permissions-snap/src/permissions/` for your permission type. For example:
+
 ```
 packages/gator-permissions-snap/src/permissions/yourPermissionType/
 ```
@@ -27,7 +29,11 @@ Create a `types.ts` file in your permission directory with the following structu
 
 ```typescript
 import { z } from 'zod';
-import { zHexStr, zPermission, zMetaMaskPermissionData } from '@metamask/7715-permissions-shared/types';
+import {
+  zHexStr,
+  zPermission,
+  zMetaMaskPermissionData,
+} from '@metamask/7715-permissions-shared/types';
 
 // Define your permission metadata type
 // Metadata is anything derived from the context that is not editable, such as validtion errors
@@ -177,6 +183,7 @@ export const yourPermissionDefinition: PermissionDefinition<
 ### 8. Register the Permission
 
 1. Add your permission type to the permission handler factory:
+
 ```typescript
 case 'your-permission-type':
   handler = createPermissionHandler(yourPermissionDefinition);
@@ -184,6 +191,7 @@ case 'your-permission-type':
 ```
 
 2. Add your permission to the default offers in `snap-permission-registry.ts`:
+
 ```typescript
 export const DEFAULT_OFFERS: GatorPermission[] = [
   // ... existing permissions
@@ -258,11 +266,13 @@ export const YourPermissionForm = ({
 Then, add your form to the permission type selector in `packages/site/src/pages/index.tsx`:
 
 1. Import your form component:
+
 ```typescript
 import { YourPermissionForm } from '../components/permissions';
 ```
 
 2. Add your permission type to the select options:
+
 ```typescript
 <select
   id="permissionType"
@@ -276,6 +286,7 @@ import { YourPermissionForm } from '../components/permissions';
 ```
 
 3. Add the form component to the conditional rendering:
+
 ```typescript
 {permissionType === 'your-permission-type' && (
   <YourPermissionForm
@@ -287,6 +298,7 @@ import { YourPermissionForm } from '../components/permissions';
 ```
 
 Key points for implementing permission forms:
+
 1. Use the `StyledForm` component for consistent styling
 2. Implement proper type safety with TypeScript
 3. Use controlled form components with React state
