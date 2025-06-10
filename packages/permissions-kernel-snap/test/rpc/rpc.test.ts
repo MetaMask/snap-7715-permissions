@@ -6,24 +6,24 @@ import type {
 } from '@metamask/7715-permissions-shared/types';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { PermissionOfferRegistryManger } from '../../src/registryManger';
+import type { PermissionOfferRegistryManager } from '../../src/registryManager';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 import { ExternalMethod } from '../../src/rpc/rpcMethod';
 
 describe('RpcHandler', () => {
   let handler: RpcHandler;
   const mockSnapsProvider = createMockSnapsProvider();
-  const mockPermissionOfferRegistryManger = {
+  const mockPermissionOfferRegistryManager = {
     buildPermissionOffersRegistry: jest.fn(),
     findRelevantPermissionsToGrant: jest.fn(),
     getRegisteredPermissionOffers: jest.fn(),
-  } as unknown as jest.Mocked<PermissionOfferRegistryManger>;
+  } as unknown as jest.Mocked<PermissionOfferRegistryManager>;
 
   beforeEach(() => {
     jest.clearAllMocks();
     handler = createRpcHandler({
       snapsProvider: mockSnapsProvider,
-      permissionOfferRegistryManger: mockPermissionOfferRegistryManger,
+      permissionOfferRegistryManager: mockPermissionOfferRegistryManager,
     });
   });
 
@@ -50,13 +50,13 @@ describe('RpcHandler', () => {
     ];
 
     it('should handle empty registry case when no offers are registered for any permission types', async () => {
-      mockPermissionOfferRegistryManger.buildPermissionOffersRegistry.mockResolvedValue(
+      mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
         {},
       );
-      mockPermissionOfferRegistryManger.getRegisteredPermissionOffers.mockReturnValue(
+      mockPermissionOfferRegistryManager.getRegisteredPermissionOffers.mockReturnValue(
         [],
       );
-      mockPermissionOfferRegistryManger.findRelevantPermissionsToGrant.mockReturnValue(
+      mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
         [],
       );
 
@@ -69,7 +69,7 @@ describe('RpcHandler', () => {
     });
 
     it('should handle no relevant permissions case when no offers are registered for the requested permission', async () => {
-      mockPermissionOfferRegistryManger.buildPermissionOffersRegistry.mockResolvedValue(
+      mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
         {
           'test-provider': [
             {
@@ -82,10 +82,10 @@ describe('RpcHandler', () => {
           ],
         },
       );
-      mockPermissionOfferRegistryManger.getRegisteredPermissionOffers.mockReturnValue(
+      mockPermissionOfferRegistryManager.getRegisteredPermissionOffers.mockReturnValue(
         [],
       );
-      mockPermissionOfferRegistryManger.findRelevantPermissionsToGrant.mockReturnValue(
+      mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
         [],
       );
 
@@ -124,15 +124,15 @@ describe('RpcHandler', () => {
           },
         },
       ];
-      mockPermissionOfferRegistryManger.buildPermissionOffersRegistry.mockResolvedValue(
+      mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
         {
           'test-provider': [],
         },
       );
-      mockPermissionOfferRegistryManger.getRegisteredPermissionOffers.mockReturnValue(
+      mockPermissionOfferRegistryManager.getRegisteredPermissionOffers.mockReturnValue(
         [],
       );
-      mockPermissionOfferRegistryManger.findRelevantPermissionsToGrant.mockReturnValue(
+      mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
         mockPermissions,
       );
       mockSnapsProvider.request.mockResolvedValueOnce(
@@ -161,15 +161,15 @@ describe('RpcHandler', () => {
     });
 
     it('should handle errors during permission grant', async () => {
-      mockPermissionOfferRegistryManger.buildPermissionOffersRegistry.mockResolvedValue(
+      mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
         {
           'test-provider': [],
         },
       );
-      mockPermissionOfferRegistryManger.getRegisteredPermissionOffers.mockReturnValue(
+      mockPermissionOfferRegistryManager.getRegisteredPermissionOffers.mockReturnValue(
         [],
       );
-      mockPermissionOfferRegistryManger.findRelevantPermissionsToGrant.mockReturnValue(
+      mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
         mockPermissions,
       );
       mockSnapsProvider.request.mockRejectedValueOnce(new Error('Test error'));

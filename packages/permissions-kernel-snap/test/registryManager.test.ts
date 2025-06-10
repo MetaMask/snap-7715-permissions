@@ -4,20 +4,20 @@ import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types
 import { logger } from '@metamask/7715-permissions-shared/utils';
 
 import {
-  createPermissionOfferRegistryManger,
-  type PermissionOfferRegistryManger,
-} from '../src/registryManger';
+  createPermissionOfferRegistryManager,
+  type PermissionOfferRegistryManager,
+} from '../src/registryManager';
 import { ExternalMethod } from '../src/rpc/rpcMethod';
 
-describe('PermissionOfferRegistryManger', () => {
-  let permissionOfferRegistryManger: PermissionOfferRegistryManger;
+describe('PermissionOfferRegistryManager', () => {
+  let permissionOfferRegistryManager: PermissionOfferRegistryManager;
   const mockSnapsProvider = createMockSnapsProvider();
   const mockSnapId = GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
 
   beforeEach(() => {
     mockSnapsProvider.request.mockReset();
-    permissionOfferRegistryManger =
-      createPermissionOfferRegistryManger(mockSnapsProvider);
+    permissionOfferRegistryManager =
+      createPermissionOfferRegistryManager(mockSnapsProvider);
   });
 
   describe('buildPermissionOffersRegistry', () => {
@@ -32,7 +32,7 @@ describe('PermissionOfferRegistryManger', () => {
       mockSnapsProvider.request.mockResolvedValueOnce(mockOffers);
 
       const result =
-        await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+        await permissionOfferRegistryManager.buildPermissionOffersRegistry(
           mockSnapId,
         );
 
@@ -61,7 +61,7 @@ describe('PermissionOfferRegistryManger', () => {
       mockSnapsProvider.request.mockResolvedValueOnce([]);
 
       const result =
-        await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+        await permissionOfferRegistryManager.buildPermissionOffersRegistry(
           mockSnapId,
         );
       expect(result).toStrictEqual({});
@@ -71,21 +71,21 @@ describe('PermissionOfferRegistryManger', () => {
       mockSnapsProvider.request.mockResolvedValueOnce({ invalid: 'data' });
 
       const result =
-        await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+        await permissionOfferRegistryManager.buildPermissionOffersRegistry(
           mockSnapId,
         );
       expect(result).toStrictEqual({});
     });
 
     it('should handle snap request error and return empty registry', async () => {
-      jest.spyOn(logger, 'debug');
+      jest.spyOn(logger, 'error');
       mockSnapsProvider.request.mockRejectedValueOnce(new Error('Snap error'));
 
       const result =
-        await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+        await permissionOfferRegistryManager.buildPermissionOffersRegistry(
           mockSnapId,
         );
-      expect(logger.debug).toHaveBeenCalledWith(
+      expect(logger.error).toHaveBeenCalledWith(
         {
           snapId: mockSnapId,
           error: expect.any(Error),
@@ -147,10 +147,10 @@ describe('PermissionOfferRegistryManger', () => {
 
     it('should find relevant permissions to grant filtered against registered offers', () => {
       const result =
-        permissionOfferRegistryManger.findRelevantPermissionsToGrant(
-          mockRegisteredOffers,
-          mockPermissionsToGrant,
-        );
+        permissionOfferRegistryManager.findRelevantPermissionsToGrant({
+          allRegisteredOffers: mockRegisteredOffers,
+          permissionsToGrant: mockPermissionsToGrant,
+        });
 
       const { length } = result;
       expect(length).toBe(1);
@@ -159,20 +159,20 @@ describe('PermissionOfferRegistryManger', () => {
 
     it('should return empty array when no matches found', () => {
       const result =
-        permissionOfferRegistryManger.findRelevantPermissionsToGrant(
-          [],
-          mockPermissionsToGrant,
-        );
+        permissionOfferRegistryManager.findRelevantPermissionsToGrant({
+          allRegisteredOffers: [],
+          permissionsToGrant: mockPermissionsToGrant,
+        });
 
       expect(result).toStrictEqual([]);
     });
 
     it('should handle empty permissions to grant', () => {
       const result =
-        permissionOfferRegistryManger.findRelevantPermissionsToGrant(
-          mockRegisteredOffers,
-          [],
-        );
+        permissionOfferRegistryManager.findRelevantPermissionsToGrant({
+          allRegisteredOffers: mockRegisteredOffers,
+          permissionsToGrant: [],
+        });
 
       expect(result).toStrictEqual([]);
     });
@@ -200,7 +200,7 @@ describe('PermissionOfferRegistryManger', () => {
       };
 
       const result =
-        permissionOfferRegistryManger.getRegisteredPermissionOffers(
+        permissionOfferRegistryManager.getRegisteredPermissionOffers(
           mockRegistry,
         );
 
@@ -222,7 +222,7 @@ describe('PermissionOfferRegistryManger', () => {
 
     it('should handle empty registry', () => {
       const result =
-        permissionOfferRegistryManger.getRegisteredPermissionOffers({});
+        permissionOfferRegistryManager.getRegisteredPermissionOffers({});
 
       expect(result).toStrictEqual([]);
     });

@@ -2,13 +2,13 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, JsonRpcParams } from '@metamask/snaps-sdk';
 import { type OnRpcRequestHandler } from '@metamask/snaps-sdk';
 
-import { createPermissionOfferRegistryManger } from './registryManger';
+import { createPermissionOfferRegistryManager } from './registryManager';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 
 // set up dependencies
 const rpcHandler = createRpcHandler({
-  permissionOfferRegistryManger: createPermissionOfferRegistryManger(snap),
+  permissionOfferRegistryManager: createPermissionOfferRegistryManager(snap),
   snapsProvider: snap,
 });
 

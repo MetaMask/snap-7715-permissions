@@ -3,7 +3,7 @@ import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 
-import type { PermissionOfferRegistryManger } from '../registryManger';
+import type { PermissionOfferRegistryManager } from '../registryManager';
 import {
   parsePermissionRequestParam,
   parsePermissionsResponseParam,
@@ -32,15 +32,15 @@ export type RpcHandler = {
  * Creates an RPC handler with methods for handling permission-related RPC requests.
  *
  * @param config - The parameters for creating the RPC handler.
- * @param config.permissionOfferRegistryManger - The manager for the permission offer registry.
+ * @param config.permissionOfferRegistryManager - The manager for the permission offer registry.
  * @param config.snapsProvider - The snaps provider.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler(config: {
-  permissionOfferRegistryManger: PermissionOfferRegistryManger;
+  permissionOfferRegistryManager: PermissionOfferRegistryManager;
   snapsProvider: SnapsProvider;
 }): RpcHandler {
-  const { permissionOfferRegistryManger, snapsProvider } = config;
+  const { permissionOfferRegistryManager, snapsProvider } = config;
 
   /**
    * Handles grant permission requests.
@@ -61,18 +61,19 @@ export function createRpcHandler(config: {
 
     // We only want gator-permissions-snap for now but we will use more snaps in the future
     const permissionOfferRegistry =
-      await permissionOfferRegistryManger.buildPermissionOffersRegistry(
+      await permissionOfferRegistryManager.buildPermissionOffersRegistry(
         GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
       );
 
     // Find the relevant permissions to grant by filtering against the registered offers
     const relevantPermissionsRequestToGrant: PermissionsRequest =
-      permissionOfferRegistryManger.findRelevantPermissionsToGrant(
-        permissionOfferRegistryManger.getRegisteredPermissionOffers(
-          permissionOfferRegistry,
-        ),
-        parsedPermissionsRequest,
-      );
+      permissionOfferRegistryManager.findRelevantPermissionsToGrant({
+        allRegisteredOffers:
+          permissionOfferRegistryManager.getRegisteredPermissionOffers(
+            permissionOfferRegistry,
+          ),
+        permissionsToGrant: parsedPermissionsRequest,
+      });
 
     if (relevantPermissionsRequestToGrant.length === 0) {
       throw new Error('No relevant permissions to grant');

@@ -20,22 +20,22 @@ import { InvalidParamsError } from '@metamask/snaps-sdk';
 
 import { ExternalMethod } from './rpc/rpcMethod';
 
-export type PermissionOfferRegistryManger = {
+export type PermissionOfferRegistryManager = {
   buildPermissionOffersRegistry: (
     snapId: string,
   ) => Promise<PermissionOfferRegistry>;
-  findRelevantPermissionsToGrant: (
-    allRegisteredOffers: RegisteredPermissionOffer[],
-    permissionsToGrant: PermissionsRequest,
-  ) => PermissionsRequest;
+  findRelevantPermissionsToGrant: (options: {
+    allRegisteredOffers: RegisteredPermissionOffer[];
+    permissionsToGrant: PermissionsRequest;
+  }) => PermissionsRequest;
   getRegisteredPermissionOffers: (
     permissionOfferRegistry: PermissionOfferRegistry,
   ) => RegisteredPermissionOffers;
 };
 
-export const createPermissionOfferRegistryManger = (
+export const createPermissionOfferRegistryManager = (
   snapsProvider: SnapsProvider,
-): PermissionOfferRegistryManger => {
+): PermissionOfferRegistryManager => {
   /**
    * Generates a unique ID for a permission offer with the hostId added.
    * The hostId is used to increase the uniqueness of the ID since the same permission offer can be offered by multiple snaps.
@@ -95,14 +95,17 @@ export const createPermissionOfferRegistryManger = (
    * Could start by recognizing some extra parameters for known permission types.
    * But eventually would be great to have some general-purpose type fields.
    *
-   * @param allRegisteredOffers - All the registered permission offers.
-   * @param permissionsToGrant - The permissions to grant.
+   * @param options - The options for finding relevant permissions to grant.
+   * @param options.allRegisteredOffers - All the registered permission offers.
+   * @param options.permissionsToGrant - The permissions to grant.
    * @returns The relevant permissions to grant or empty array if no match is found.
    */
-  function findRelevantPermissionsToGrant(
-    allRegisteredOffers: RegisteredPermissionOffer[],
-    permissionsToGrant: PermissionsRequest,
-  ): PermissionsRequest {
+  function findRelevantPermissionsToGrant(options: {
+    allRegisteredOffers: RegisteredPermissionOffer[];
+    permissionsToGrant: PermissionsRequest;
+  }): PermissionsRequest {
+    const { allRegisteredOffers, permissionsToGrant } = options;
+
     return permissionsToGrant.filter((permissionRequest) => {
       return allRegisteredOffers.some(
         (registeredOffer) =>
@@ -174,7 +177,7 @@ export const createPermissionOfferRegistryManger = (
           );
         }
       } catch (error) {
-        logger.debug(
+        logger.error(
           {
             snapId,
             error,
@@ -185,8 +188,8 @@ export const createPermissionOfferRegistryManger = (
 
       return ephemeralPermissionOfferRegistry;
     } catch (error) {
-      logger.error('Error building permission provider registry:', error);
-      throw ephemeralPermissionOfferRegistry;
+      logger.error('Error building permission offer registry:', error);
+      return ephemeralPermissionOfferRegistry;
     }
   }
 
