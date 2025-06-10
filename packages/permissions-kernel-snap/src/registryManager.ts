@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
 import type {
   PermissionOffers,
-  PermissionOfferWithHostId,
   PermissionsRequest,
   RegisteredPermissionOffer,
   RegisteredPermissionOffers,
@@ -36,36 +35,6 @@ export type PermissionOfferRegistryManager = {
 export const createPermissionOfferRegistryManager = (
   snapsProvider: SnapsProvider,
 ): PermissionOfferRegistryManager => {
-  /**
-   * Generates a unique ID for a permission offer with the hostId added.
-   * The hostId is used to increase the uniqueness of the ID since the same permission offer can be offered by multiple snaps.
-   *
-   * @param permissionOfferWithHostId - The permission to offer to the kernel snap with the hostId added.
-   * @returns A promise that resolves to the unique ID for the permission offer.
-   */
-  async function deriveIdFromPermissionOffer(
-    permissionOfferWithHostId: PermissionOfferWithHostId,
-  ): Promise<string> {
-    const permissionString = JSON.stringify(permissionOfferWithHostId);
-
-    // Encode the text as a UTF-8 byte array
-    const encoder = new TextEncoder();
-    const data = encoder.encode(permissionString);
-
-    // Hash the data with SHA-256
-    // crypto is allowed in the snap environment via polyfill(see ./snap.config.ts)
-    // eslint-disable-next-line no-restricted-globals
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-
-    // Convert the hash to a hexadecimal string
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray
-      .map((byte) => byte.toString(16).padStart(2, '0'))
-      .join('');
-
-    return hashHex;
-  }
-
   /**
    * Safely parses the permissions offer request parameters, validating them using Zod schema.
    *
@@ -142,30 +111,14 @@ export const createPermissionOfferRegistryManager = (
 
         if (response) {
           const parsedOffers = parsePermissionOffersParam(response);
-          const uniqueOffersToStore: RegisteredPermissionOffers = (
-            await Promise.all(
-              parsedOffers.map(async (offer) => {
-                const hostPermissionId = await deriveIdFromPermissionOffer({
-                  ...offer,
-                  hostId: snapId,
-                });
-                return {
-                  hostId: snapId,
-                  type: offer.type,
-                  hostPermissionId,
-                  proposedName: offer.proposedName,
-                };
-              }),
-            )
-          ).filter(
-            (currentOffer, currentIndex, allOffers) =>
-              currentIndex ===
-              allOffers.findIndex(
-                (comparisonOffer: RegisteredPermissionOffer) =>
-                  comparisonOffer.hostPermissionId ===
-                  currentOffer.hostPermissionId,
-              ),
-          );
+          const uniqueOffersToStore: RegisteredPermissionOffers =
+            parsedOffers.map((offer) => {
+              return {
+                hostId: snapId,
+                type: offer.type,
+                proposedName: offer.proposedName,
+              };
+            });
 
           ephemeralPermissionOfferRegistry = {
             ...ephemeralPermissionOfferRegistry,

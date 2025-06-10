@@ -101,13 +101,11 @@ describe('PermissionOfferRegistryManager', () => {
       {
         hostId: mockSnapId,
         type: 'native-token-transfer',
-        hostPermissionId: '1',
         proposedName: 'Transfer native tokens',
       },
       {
         hostId: mockSnapId,
         type: 'erc20-token-transfer',
-        hostPermissionId: '2',
         proposedName: 'Transfer ERC20 tokens',
       },
     ];
@@ -185,7 +183,6 @@ describe('PermissionOfferRegistryManager', () => {
           {
             hostId: mockSnapId,
             type: 'native-token-transfer',
-            hostPermissionId: '1',
             proposedName: 'Transfer native tokens',
           },
         ],
@@ -193,7 +190,6 @@ describe('PermissionOfferRegistryManager', () => {
           {
             hostId: 'snap2',
             type: 'erc20-token-transfer',
-            hostPermissionId: '2',
             proposedName: 'Transfer ERC20 tokens',
           },
         ],
@@ -208,13 +204,11 @@ describe('PermissionOfferRegistryManager', () => {
         {
           hostId: mockSnapId,
           type: 'native-token-transfer',
-          hostPermissionId: '1',
           proposedName: 'Transfer native tokens',
         },
         {
           hostId: 'snap2',
           type: 'erc20-token-transfer',
-          hostPermissionId: '2',
           proposedName: 'Transfer ERC20 tokens',
         },
       ]);

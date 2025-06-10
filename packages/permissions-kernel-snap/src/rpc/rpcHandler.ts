@@ -79,6 +79,15 @@ export function createRpcHandler(config: {
       throw new Error('No relevant permissions to grant');
     }
 
+    if (
+      relevantPermissionsRequestToGrant.length !==
+      parsedPermissionsRequest.length
+    ) {
+      throw new Error(
+        'Permission provider does not support all permissions requested',
+      );
+    }
+
     const grantedPermissions = await snapsProvider.request({
       method: 'wallet_invokeSnap',
       params: {

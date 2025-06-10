@@ -75,8 +75,6 @@ describe('RpcHandler', () => {
             {
               type: 'some-permission-type',
               hostId: 'test-provider',
-              hostPermissionId:
-                'e185b919751ecd0c88423a9858b9af49672864ebef87af84ab72ceafb32bba40',
               proposedName: 'Some Permission',
             },
           ],
@@ -180,6 +178,53 @@ describe('RpcHandler', () => {
           params: mockPermissions as unknown as Json,
         }),
       ).rejects.toThrow('Test error');
+    });
+
+    it('should throw error when permission provider does not support all requested permissions', async () => {
+      const mockPartialPermissions: PermissionsRequest = [
+        {
+          chainId: '0x1',
+          expiry: Date.now() + 3600000,
+          signer: {
+            type: 'account',
+            data: {
+              address: '0x1234567890123456789012345678901234567890',
+            },
+          },
+          permission: {
+            type: 'native-token-transfer',
+            data: {
+              justification: 'Test permission',
+              allowance: '0x1000',
+            },
+          },
+        },
+      ];
+
+      mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
+        {
+          'test-provider': [],
+        },
+      );
+      mockPermissionOfferRegistryManager.getRegisteredPermissionOffers.mockReturnValue(
+        [],
+      );
+      // Return only one permission when two were requested
+      mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
+        [mockPartialPermissions[0]] as unknown as PermissionsRequest,
+      );
+
+      await expect(
+        handler.grantPermissions({
+          siteOrigin,
+          params: [
+            ...mockPartialPermissions,
+            ...mockPartialPermissions,
+          ] as unknown as Json,
+        }),
+      ).rejects.toThrow(
+        'Permission provider does not support all permissions requested',
+      );
     });
   });
 });
