@@ -202,9 +202,7 @@ export const DEFAULT_OFFERS: GatorPermission[] = [
 ];
 ```
 
-### 9. Add the Permission to the demo dapp
-
-### 10. Implement Permission Form Component
+### 9. Implement Permission Form Component
 
 Create a new form component in `packages/site/src/components/permissions/` for your permission type. For example, `YourPermissionForm.tsx`:
 

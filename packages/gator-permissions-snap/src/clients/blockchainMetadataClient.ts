@@ -226,7 +226,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         symbol,
       };
     } catch (error) {
-      console.error(
+      logger.error(
         `Failed to fetch token balance and metadata: ${(error as Error).message}.`,
       );
 
