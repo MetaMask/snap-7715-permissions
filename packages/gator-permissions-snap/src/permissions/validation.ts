@@ -1,4 +1,4 @@
-import { Hex } from 'viem';
+import type { Hex } from 'viem';
 
 /**
  * Validates a hex integer value with configurable constraints.
@@ -8,7 +8,7 @@ import { Hex } from 'viem';
  * @param params.value - The hex value to validate.
  * @param params.allowZero - Whether zero values are allowed.
  * @param params.required - Whether the value is required (must be defined).
- * @throws {Error} If the value fails validation.
+ * @throws {Error} If the value fails validation
  */
 export function validateHexInteger({
   name,
@@ -39,6 +39,4 @@ export function validateHexInteger({
   if (parsedValue === 0n && !allowZero) {
     throw new Error(`Invalid ${name}: must be greater than 0`);
   }
-
-  return parsedValue;
 }

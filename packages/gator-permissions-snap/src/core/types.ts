@@ -6,13 +6,13 @@ import type {
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import type { Hex } from 'viem';
 
 import type { AccountController } from '../accountController';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
-import { Hex } from 'viem';
 
 /**
  * Represents the result of a permission request.

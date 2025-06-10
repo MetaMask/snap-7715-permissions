@@ -1,7 +1,7 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
-import { validateHexInteger } from '../validation';
 
+import { validateHexInteger } from '../validation';
 import type {
   Erc20TokenStreamPermission,
   Erc20TokenStreamPermissionRequest,

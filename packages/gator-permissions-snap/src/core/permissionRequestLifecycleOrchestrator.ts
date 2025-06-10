@@ -234,6 +234,7 @@ export class PermissionRequestLifecycleOrchestrator {
       validBefore,
     );
 
+    // eslint-disable-next-line no-restricted-globals
     const saltBytes = crypto.getRandomValues(new Uint8Array(32));
     const salt = bytesToHex(saltBytes);
 
