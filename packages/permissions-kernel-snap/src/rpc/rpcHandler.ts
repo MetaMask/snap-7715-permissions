@@ -1,9 +1,11 @@
 import { GATOR_PERMISSIONS_PROVIDER_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
-import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 
-import type { PermissionOfferRegistryManager } from '../registryManager';
+import type {
+  FindRelevantPermissionsToGrantResult,
+  PermissionOfferRegistryManager,
+} from '../registryManager';
 import {
   parsePermissionRequestParam,
   parsePermissionsResponseParam,
@@ -66,7 +68,11 @@ export function createRpcHandler(config: {
       );
 
     // Find the relevant permissions to grant by filtering against the registered offers
-    const relevantPermissionsRequestToGrant: PermissionsRequest =
+    const {
+      permissionsToGrant,
+      isAllPermissionTypesSupported,
+      errorMessage,
+    }: FindRelevantPermissionsToGrantResult =
       permissionOfferRegistryManager.findRelevantPermissionsToGrant({
         allRegisteredOffers:
           permissionOfferRegistryManager.getRegisteredPermissionOffers(
@@ -75,17 +81,8 @@ export function createRpcHandler(config: {
         permissionsToGrant: parsedPermissionsRequest,
       });
 
-    if (relevantPermissionsRequestToGrant.length === 0) {
-      throw new Error('No relevant permissions to grant');
-    }
-
-    if (
-      relevantPermissionsRequestToGrant.length !==
-      parsedPermissionsRequest.length
-    ) {
-      throw new Error(
-        'Permission provider does not support all permissions requested',
-      );
+    if (!isAllPermissionTypesSupported || errorMessage) {
+      throw new Error(errorMessage ?? 'Unknown error');
     }
 
     const grantedPermissions = await snapsProvider.request({
@@ -95,7 +92,7 @@ export function createRpcHandler(config: {
         request: {
           method: ExternalMethod.PermissionProviderGrantPermissions,
           params: {
-            permissionsRequest: relevantPermissionsRequestToGrant,
+            permissionsRequest: permissionsToGrant,
             siteOrigin: options.siteOrigin,
           } as Json,
         },

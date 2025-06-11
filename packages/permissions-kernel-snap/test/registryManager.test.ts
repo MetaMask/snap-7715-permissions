@@ -96,6 +96,52 @@ describe('PermissionOfferRegistryManager', () => {
     });
   });
 
+  describe('getRegisteredPermissionOffers', () => {
+    it('should flatten registry to array of offers', () => {
+      const mockRegistry = {
+        [mockSnapId]: [
+          {
+            hostId: mockSnapId,
+            type: 'native-token-transfer',
+            proposedName: 'Transfer native tokens',
+          },
+        ],
+        snap2: [
+          {
+            hostId: 'snap2',
+            type: 'erc20-token-transfer',
+            proposedName: 'Transfer ERC20 tokens',
+          },
+        ],
+      };
+
+      const result =
+        permissionOfferRegistryManager.getRegisteredPermissionOffers(
+          mockRegistry,
+        );
+
+      expect(result).toStrictEqual([
+        {
+          hostId: mockSnapId,
+          type: 'native-token-transfer',
+          proposedName: 'Transfer native tokens',
+        },
+        {
+          hostId: 'snap2',
+          type: 'erc20-token-transfer',
+          proposedName: 'Transfer ERC20 tokens',
+        },
+      ]);
+    });
+
+    it('should handle empty registry', () => {
+      const result =
+        permissionOfferRegistryManager.getRegisteredPermissionOffers({});
+
+      expect(result).toStrictEqual([]);
+    });
+  });
+
   describe('findRelevantPermissionsToGrant', () => {
     const mockRegisteredOffers = [
       {
@@ -105,7 +151,7 @@ describe('PermissionOfferRegistryManager', () => {
       },
       {
         hostId: mockSnapId,
-        type: 'erc20-token-transfer',
+        type: 'native-token-stream',
         proposedName: 'Transfer ERC20 tokens',
       },
     ];
@@ -150,19 +196,25 @@ describe('PermissionOfferRegistryManager', () => {
           permissionsToGrant: mockPermissionsToGrant,
         });
 
-      const { length } = result;
-      expect(length).toBe(1);
-      expect(result[0]).toStrictEqual(mockPermissionsToGrant[0]);
+      expect(result.isAllPermissionTypesSupported).toBe(true);
+      expect(result.permissionsToGrant).toStrictEqual(mockPermissionsToGrant);
+      expect(result.missingPermissions).toStrictEqual([]);
+      expect(result.errorMessage).toBeUndefined();
     });
 
-    it('should return empty array when no matches found', () => {
+    it('should return empty arrays and error message when no matches found', () => {
       const result =
         permissionOfferRegistryManager.findRelevantPermissionsToGrant({
           allRegisteredOffers: [],
           permissionsToGrant: mockPermissionsToGrant,
         });
 
-      expect(result).toStrictEqual([]);
+      expect(result.isAllPermissionTypesSupported).toBe(false);
+      expect(result.permissionsToGrant).toStrictEqual([]);
+      expect(result.missingPermissions).toStrictEqual(mockPermissionsToGrant);
+      expect(result.errorMessage).toBe(
+        'The following permissions can not be granted by the permission provider: native-token-transfer, native-token-stream',
+      );
     });
 
     it('should handle empty permissions to grant', () => {
@@ -172,53 +224,10 @@ describe('PermissionOfferRegistryManager', () => {
           permissionsToGrant: [],
         });
 
-      expect(result).toStrictEqual([]);
-    });
-  });
-
-  describe('getRegisteredPermissionOffers', () => {
-    it('should reduce registry to array of offers', () => {
-      const mockRegistry = {
-        [mockSnapId]: [
-          {
-            hostId: mockSnapId,
-            type: 'native-token-transfer',
-            proposedName: 'Transfer native tokens',
-          },
-        ],
-        snap2: [
-          {
-            hostId: 'snap2',
-            type: 'erc20-token-transfer',
-            proposedName: 'Transfer ERC20 tokens',
-          },
-        ],
-      };
-
-      const result =
-        permissionOfferRegistryManager.getRegisteredPermissionOffers(
-          mockRegistry,
-        );
-
-      expect(result).toStrictEqual([
-        {
-          hostId: mockSnapId,
-          type: 'native-token-transfer',
-          proposedName: 'Transfer native tokens',
-        },
-        {
-          hostId: 'snap2',
-          type: 'erc20-token-transfer',
-          proposedName: 'Transfer ERC20 tokens',
-        },
-      ]);
-    });
-
-    it('should handle empty registry', () => {
-      const result =
-        permissionOfferRegistryManager.getRegisteredPermissionOffers({});
-
-      expect(result).toStrictEqual([]);
+      expect(result.isAllPermissionTypesSupported).toBe(false);
+      expect(result.permissionsToGrant).toStrictEqual([]);
+      expect(result.missingPermissions).toStrictEqual([]);
+      expect(result.errorMessage).toBeUndefined();
     });
   });
 });

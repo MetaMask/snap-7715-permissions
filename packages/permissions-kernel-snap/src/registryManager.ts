@@ -19,17 +19,24 @@ import { InvalidParamsError } from '@metamask/snaps-sdk';
 
 import { ExternalMethod } from './rpc/rpcMethod';
 
+export type FindRelevantPermissionsToGrantResult = {
+  isAllPermissionTypesSupported: boolean;
+  permissionsToGrant: PermissionsRequest;
+  missingPermissions: PermissionsRequest;
+  errorMessage?: string;
+};
+
 export type PermissionOfferRegistryManager = {
   buildPermissionOffersRegistry: (
     snapId: string,
   ) => Promise<PermissionOfferRegistry>;
-  findRelevantPermissionsToGrant: (options: {
-    allRegisteredOffers: RegisteredPermissionOffer[];
-    permissionsToGrant: PermissionsRequest;
-  }) => PermissionsRequest;
   getRegisteredPermissionOffers: (
     permissionOfferRegistry: PermissionOfferRegistry,
   ) => RegisteredPermissionOffers;
+  findRelevantPermissionsToGrant: (options: {
+    allRegisteredOffers: RegisteredPermissionOffer[];
+    permissionsToGrant: PermissionsRequest;
+  }) => FindRelevantPermissionsToGrantResult;
 };
 
 export const createPermissionOfferRegistryManager = (
@@ -55,33 +62,6 @@ export const createPermissionOfferRegistryManager = (
     }
 
     return validatePermissionOffers.data;
-  }
-
-  /**
-   * Find all the relevant permissions that map to a registered permission offer.
-   *
-   * Currently just matches type. Here is where we would add a rich type description system.
-   * Could start by recognizing some extra parameters for known permission types.
-   * But eventually would be great to have some general-purpose type fields.
-   *
-   * @param options - The options for finding relevant permissions to grant.
-   * @param options.allRegisteredOffers - All the registered permission offers.
-   * @param options.permissionsToGrant - The permissions to grant.
-   * @returns The relevant permissions to grant or empty array if no match is found.
-   */
-  function findRelevantPermissionsToGrant(options: {
-    allRegisteredOffers: RegisteredPermissionOffer[];
-    permissionsToGrant: PermissionsRequest;
-  }): PermissionsRequest {
-    const { allRegisteredOffers, permissionsToGrant } = options;
-
-    return permissionsToGrant.filter((permissionRequest) => {
-      return allRegisteredOffers.some(
-        (registeredOffer) =>
-          extractPermissionName(registeredOffer.type) ===
-          extractPermissionName(permissionRequest.permission.type),
-      );
-    });
   }
 
   /**
@@ -165,9 +145,74 @@ export const createPermissionOfferRegistryManager = (
     );
   }
 
+  /**
+   * Find all the relevant permissions that map to a registered permission offer.
+   *
+   * Currently just matches type. Here is where we would add a rich type description system.
+   * Could start by recognizing some extra parameters for known permission types.
+   * But eventually would be great to have some general-purpose type fields.
+   *
+   * @param options - The options for finding relevant permissions to grant.
+   * @param options.allRegisteredOffers - All the registered permission offers.
+   * @param options.permissionsToGrant - The permissions requested by the site.
+   * @returns The result of finding relevant permissions to grant.
+   */
+  function findRelevantPermissionsToGrant(options: {
+    allRegisteredOffers: RegisteredPermissionOffer[];
+    permissionsToGrant: PermissionsRequest;
+  }): FindRelevantPermissionsToGrantResult {
+    const { allRegisteredOffers, permissionsToGrant } = options;
+    if (permissionsToGrant.length === 0) {
+      return {
+        isAllPermissionTypesSupported: false,
+        permissionsToGrant: [],
+        missingPermissions: [],
+      };
+    }
+
+    const isAllPermissionTypesSupported = permissionsToGrant.every(
+      (permission) =>
+        allRegisteredOffers.some(
+          (offer) =>
+            extractPermissionName(permission.permission.type) ===
+            extractPermissionName(offer.type),
+        ),
+    );
+
+    // Permission provider does not support all permissions requested, so we return an error message
+    if (!isAllPermissionTypesSupported) {
+      const missingPermissions = permissionsToGrant.filter(
+        (permission) =>
+          !allRegisteredOffers.some(
+            (offer) =>
+              extractPermissionName(permission.permission.type) ===
+              extractPermissionName(offer.type),
+          ),
+      );
+      return {
+        isAllPermissionTypesSupported,
+        permissionsToGrant: [],
+        missingPermissions,
+        errorMessage: `The following permissions can not be granted by the permission provider: ${missingPermissions.map((permission) => permission.permission.type).join(', ')}`,
+      };
+    }
+
+    return {
+      isAllPermissionTypesSupported,
+      missingPermissions: [],
+      permissionsToGrant: permissionsToGrant.filter((permissionRequest) => {
+        return allRegisteredOffers.some(
+          (registeredOffer) =>
+            extractPermissionName(registeredOffer.type) ===
+            extractPermissionName(permissionRequest.permission.type),
+        );
+      }),
+    };
+  }
+
   return {
     buildPermissionOffersRegistry,
-    findRelevantPermissionsToGrant,
     getRegisteredPermissionOffers,
+    findRelevantPermissionsToGrant,
   };
 };
