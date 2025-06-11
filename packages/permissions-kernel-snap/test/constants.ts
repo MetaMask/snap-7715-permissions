@@ -25,6 +25,13 @@ export const TEST_CASE_DEFAULT_STATE: KernelState = {
         proposedName: 'Native Token Periodic Transfer',
         type: 'native-token-periodic',
       },
+      {
+        hostId: 'npm:@metamask/gator-permissions-snap',
+        hostPermissionId:
+          '993eae62e4a0f122d7781f98ef0bcd611eacb051a7ee44b8990ad49c49e6c3e8',
+        proposedName: 'ERC20 Token Stream',
+        type: 'erc20-token-stream',
+      },
     ],
   },
 };

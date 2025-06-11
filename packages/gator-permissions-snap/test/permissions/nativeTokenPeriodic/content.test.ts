@@ -17,7 +17,10 @@ const mockContext: NativeTokenPeriodicContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+  },
+  tokenMetadata: {
     symbol: 'ETH',
+    decimals: 18,
   },
   permissionDetails: {
     periodAmount: '1',

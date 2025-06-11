@@ -1,4 +1,4 @@
-import { parseEther, toHex } from 'viem';
+import { parseUnits, toHex } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
@@ -8,9 +8,14 @@ import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
-  getStartOfTodayUTC,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
+import {
+  validateAndParseAmount,
+  validateStartTime,
+  validateExpiry,
+  validatePeriodDuration,
+} from '../contextValidation';
 import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicPermissionRequest,
@@ -34,11 +39,14 @@ export async function applyContext({
   context: NativeTokenPeriodicContext;
   originalRequest: NativeTokenPeriodicPermissionRequest;
 }): Promise<NativeTokenPeriodicPermissionRequest> {
-  const { permissionDetails } = context;
+  const {
+    permissionDetails,
+    tokenMetadata: { decimals },
+  } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
   const permissionData = {
-    periodAmount: toHex(parseEther(permissionDetails.periodAmount)),
+    periodAmount: toHex(parseUnits(permissionDetails.periodAmount, decimals)),
     periodDuration: parseInt(permissionDetails.periodDuration, 10),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,
@@ -111,10 +119,8 @@ export async function buildContext({
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:1/slip44:60`,
     toHex(rawBalance),
+    decimals,
   );
-
-  // todo: this should just be BigInt
-  const balance = toHex(rawBalance);
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
@@ -143,6 +149,8 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
+  const balance = toHex(rawBalance);
+
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
@@ -151,7 +159,10 @@ export async function buildContext({
       address,
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
+    },
+    tokenMetadata: {
       symbol,
+      decimals,
     },
     permissionDetails: {
       periodAmount,
@@ -173,51 +184,42 @@ export async function deriveMetadata({
 }: {
   context: NativeTokenPeriodicContext;
 }): Promise<NativeTokenPeriodicMetadata> {
-  const { permissionDetails, expiry } = context;
+  const {
+    permissionDetails,
+    expiry,
+    tokenMetadata: { decimals },
+  } = context;
 
   const validationErrors: NativeTokenPeriodicMetadata['validationErrors'] = {};
 
-  try {
-    const periodAmountBigInt = parseEther(permissionDetails.periodAmount);
-    if (periodAmountBigInt <= 0n) {
-      validationErrors.periodAmountError =
-        'Period amount must be greater than 0';
-    }
-  } catch (error) {
-    validationErrors.periodAmountError = 'Invalid period amount';
+  // Validate period amount
+  const periodAmountResult = validateAndParseAmount(
+    permissionDetails.periodAmount,
+    decimals,
+    'Period amount',
+  );
+  if (periodAmountResult.error) {
+    validationErrors.periodAmountError = periodAmountResult.error;
   }
 
-  try {
-    const periodDuration = parseInt(permissionDetails.periodDuration, 10);
-    if (isNaN(periodDuration) || periodDuration <= 0) {
-      validationErrors.periodDurationError =
-        'Period duration must be greater than 0';
-    }
-  } catch (error) {
-    validationErrors.periodDurationError = 'Invalid period duration';
+  // Validate period duration
+  const periodDurationResult = validatePeriodDuration(
+    permissionDetails.periodDuration,
+  );
+  if (periodDurationResult.error) {
+    validationErrors.periodDurationError = periodDurationResult.error;
   }
 
-  try {
-    const startTimeTimestamp = convertReadableDateToTimestamp(
-      permissionDetails.startTime,
-    );
-
-    if (startTimeTimestamp < getStartOfTodayUTC()) {
-      validationErrors.startTimeError = 'Start time must be today or later';
-    }
-  } catch (error) {
-    validationErrors.startTimeError = 'Invalid start time';
+  // Validate start time
+  const startTimeError = validateStartTime(permissionDetails.startTime);
+  if (startTimeError) {
+    validationErrors.startTimeError = startTimeError;
   }
 
-  try {
-    const expiryDate = convertReadableDateToTimestamp(expiry);
-    const nowSeconds = Math.floor(Date.now() / 1000);
-
-    if (expiryDate < nowSeconds) {
-      validationErrors.expiryError = 'Expiry must be in the future';
-    }
-  } catch (error) {
-    validationErrors.expiryError = 'Invalid expiry';
+  // Validate expiry
+  const expiryError = validateExpiry(expiry);
+  if (expiryError) {
+    validationErrors.expiryError = expiryError;
   }
 
   return {

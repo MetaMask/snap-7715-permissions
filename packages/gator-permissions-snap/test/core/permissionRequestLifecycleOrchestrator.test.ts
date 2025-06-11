@@ -246,11 +246,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
               terms: toHex(mockPermissionRequest.expiry, { size: 32 }),
             },
           ],
-          salt: 0n,
+          salt: expect.any(BigInt),
           signature: mockSignature,
         };
 
         expect(delegation).toStrictEqual(expectedDelegation);
+        expect(delegation.salt).not.toBe(0n);
       });
 
       it('should correctly setup the onConfirmationCreated hook to update the context', async () => {

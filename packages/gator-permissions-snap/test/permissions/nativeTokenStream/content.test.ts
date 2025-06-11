@@ -16,7 +16,10 @@ const mockContext: NativeTokenStreamContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+  },
+  tokenMetadata: {
     symbol: 'ETH',
+    decimals: 18,
   },
   permissionDetails: {
     initialAmount: '1',
@@ -30,7 +33,6 @@ const mockContext: NativeTokenStreamContext = {
 const mockMetadata: NativeTokenStreamMetadata = {
   amountPerSecond: '0.5',
   validationErrors: {},
-  rulesToAdd: [],
 };
 
 describe('nativeTokenStream:content', () => {
@@ -3344,7 +3346,6 @@ describe('nativeTokenStream:content', () => {
         },
         metadata: {
           ...mockMetadata,
-          rulesToAdd: ['Initial amount', 'Max amount'],
         },
         isJustificationCollapsed: true,
         origin: 'https://example.com',
@@ -4285,7 +4286,6 @@ describe('nativeTokenStream:content', () => {
         },
         metadata: {
           ...mockMetadata,
-          rulesToAdd: ['Initial amount', 'Max amount'],
         },
         isJustificationCollapsed: true,
         origin: 'https://example.com',

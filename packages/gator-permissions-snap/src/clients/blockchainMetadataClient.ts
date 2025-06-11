@@ -201,28 +201,36 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       return decoded;
     };
 
-    const symbol = decodeOutput<string>({
-      output: SYMBOL_ABI.outputs,
-      encoded: symbolEncoded,
-      name: 'symbol',
-    });
+    try {
+      const symbol = decodeOutput<string>({
+        output: SYMBOL_ABI.outputs,
+        encoded: symbolEncoded,
+        name: 'symbol',
+      });
 
-    const decimals = decodeOutput<number>({
-      output: DECIMALS_ABI.outputs,
-      encoded: decimalsEncoded,
-      name: 'decimals',
-    });
+      const decimals = decodeOutput<number>({
+        output: DECIMALS_ABI.outputs,
+        encoded: decimalsEncoded,
+        name: 'decimals',
+      });
 
-    const balance = decodeOutput<bigint>({
-      output: BALANCEOF_ABI.outputs,
-      encoded: balanceEncoded,
-      name: 'balance',
-    });
+      const balance = decodeOutput<bigint>({
+        output: BALANCEOF_ABI.outputs,
+        encoded: balanceEncoded,
+        name: 'balance',
+      });
 
-    return {
-      balance,
-      decimals,
-      symbol,
-    };
+      return {
+        balance,
+        decimals,
+        symbol,
+      };
+    } catch (error) {
+      logger.error(
+        `Failed to fetch token balance and metadata: ${(error as Error).message}.`,
+      );
+
+      throw error;
+    }
   }
 }

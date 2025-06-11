@@ -6,6 +6,7 @@ import type {
 import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import type { Hex } from 'viem';
 
 import type { AccountController } from '../accountController';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
@@ -39,6 +40,22 @@ export type BaseContext = {
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;
+};
+
+/**
+ * Base context for all token permissions.
+ * This includes the account details and token metadata.
+ */
+export type BaseTokenPermissionContext = BaseContext & {
+  accountDetails: {
+    address: Hex;
+    balanceFormattedAsCurrency: string;
+    balance: Hex; // it would be nice if this was Hex, but must be Json serializable for Snaps JSX
+  };
+  tokenMetadata: {
+    decimals: number;
+    symbol: string;
+  };
 };
 
 /**

@@ -61,7 +61,10 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     balance: toHex(parseUnits('10', 18)),
     balanceFormattedAsCurrency: '$🐊10.00',
+  },
+  tokenMetadata: {
     symbol: 'ETH',
+    decimals: 18,
   },
   permissionDetails: {
     periodAmount: '1',
@@ -123,7 +126,7 @@ describe('nativeTokenPeriodic:context', () => {
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(() => ({
           balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
-          symbol: alreadyPopulatedContext.accountDetails.symbol,
+          symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: 18,
         })),
       } as unknown as jest.Mocked<TokenMetadataService>;
@@ -155,6 +158,7 @@ describe('nativeTokenPeriodic:context', () => {
       ).toHaveBeenCalledWith(
         `eip155:1/slip44:60`,
         alreadyPopulatedContext.accountDetails.balance,
+        18,
       );
     });
   });
@@ -162,7 +166,7 @@ describe('nativeTokenPeriodic:context', () => {
   describe('createContextMetadata()', () => {
     const context = {
       ...alreadyPopulatedContext,
-      expiry: convertTimestampToReadableDate(Date.now()),
+      expiry: convertTimestampToReadableDate(Date.now() / 1000 + 24 * 60 * 60), // 24 hours from now
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
         startTime: convertTimestampToReadableDate(Date.now() / 1000),
