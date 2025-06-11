@@ -2,10 +2,7 @@ import { GATOR_PERMISSIONS_PROVIDER_SNAP_ID } from '@metamask/7715-permissions-s
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 
-import type {
-  FindRelevantPermissionsToGrantResult,
-  PermissionOfferRegistryManager,
-} from '../registryManager';
+import type { PermissionOfferRegistryManager } from '../registryManager';
 import {
   parsePermissionRequestParam,
   parsePermissionsResponseParam,
@@ -68,11 +65,7 @@ export function createRpcHandler(config: {
       );
 
     // Find the relevant permissions to grant by filtering against the registered offers
-    const {
-      permissionsToGrant,
-      isAllPermissionTypesSupported,
-      errorMessage,
-    }: FindRelevantPermissionsToGrantResult =
+    const { permissionsToGrant, isAllPermissionTypesSupported, errorMessage } =
       permissionOfferRegistryManager.findRelevantPermissionsToGrant({
         allRegisteredOffers:
           permissionOfferRegistryManager.getRegisteredPermissionOffers(

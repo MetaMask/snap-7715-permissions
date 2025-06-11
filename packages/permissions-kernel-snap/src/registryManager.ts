@@ -200,13 +200,7 @@ export const createPermissionOfferRegistryManager = (
     return {
       isAllPermissionTypesSupported,
       missingPermissions: [],
-      permissionsToGrant: permissionsToGrant.filter((permissionRequest) => {
-        return allRegisteredOffers.some(
-          (registeredOffer) =>
-            extractPermissionName(registeredOffer.type) ===
-            extractPermissionName(permissionRequest.permission.type),
-        );
-      }),
+      permissionsToGrant,
     };
   }
 
