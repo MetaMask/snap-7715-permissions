@@ -81,7 +81,6 @@ describe('RpcHandler', () => {
       // Return only one permission when two were requested
       mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
         {
-          isAllPermissionTypesSupported: false,
           permissionsToGrant: [
             mockPartialPermissions[0],
           ] as unknown as PermissionsRequest,
@@ -140,7 +139,6 @@ describe('RpcHandler', () => {
       );
       mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
         {
-          isAllPermissionTypesSupported: true,
           permissionsToGrant: mockPermissions,
           missingPermissions: [],
         },
@@ -181,7 +179,6 @@ describe('RpcHandler', () => {
       );
       mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
         {
-          isAllPermissionTypesSupported: true,
           permissionsToGrant: mockPermissions,
           missingPermissions: [],
         },

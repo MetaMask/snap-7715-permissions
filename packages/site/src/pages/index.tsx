@@ -1,15 +1,6 @@
 import { erc7715ProviderActions } from '@metamask/delegation-toolkit/experimental';
 import { useMemo, useState } from 'react';
-import styled from 'styled-components';
-import {
-  type Hex,
-  createClient,
-  http,
-  custom,
-  createPublicClient,
-  parseUnits,
-  toHex,
-} from 'viem';
+import { type Hex, createClient, http, custom, createPublicClient } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
 import { sepolia as chain } from 'viem/chains';
 
@@ -21,169 +12,45 @@ import {
   Title,
 } from '../components';
 import {
-  kernelSnapOrigin,
-  gatorSnapOrigin,
-  messageSigningSnapOrigin,
-} from '../config';
+  NativeTokenStreamForm,
+  ERC20TokenStreamForm,
+  NativeTokenPeriodicForm,
+} from '../components/permissions';
+import {
+  Container,
+  Heading,
+  Span,
+  Subtitle,
+  CardContainer,
+  Box,
+  ErrorMessage,
+  StyledForm,
+  ResponseContainer,
+  CopyButton,
+} from '../styles';
+import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import {
   useMetaMask,
   useMetaMaskContext,
   useRequestSnap,
   useDelegateAccount,
   useBundlerClient,
-  useInvokeSnap,
-  useRequest,
 } from '../hooks';
-import type { GetSnapsResponse } from '../types';
 import { isLocalSnap } from '../utils';
+import type {
+  PermissionRequest,
+  NativeTokenStreamPermissionRequest,
+  ERC20TokenStreamPermissionRequest,
+  NativeTokenPeriodicPermissionRequest,
+} from '../components/permissions/types';
 
 /* eslint-disable no-restricted-globals */
 const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  margin-top: 7.6rem;
-  margin-bottom: 7.6rem;
-  ${({ theme }) => theme.mediaQueries.small} {
-    padding-left: 2.4rem;
-    padding-right: 2.4rem;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    width: auto;
-  }
-`;
-
-const Heading = styled.h1`
-  margin-top: 0;
-  margin-bottom: 2.4rem;
-  text-align: center;
-`;
-
-const Span = styled.span`
-  color: ${(props) => props.theme.colors.primary?.default};
-`;
-
-const Subtitle = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.large};
-  font-weight: 500;
-  margin-top: 0;
-  margin-bottom: 0;
-  ${({ theme }) => theme.mediaQueries.small} {
-    font-size: ${({ theme }) => theme.fontSizes.text};
-  }
-`;
-
-const CardContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  max-width: 64.8rem;
-  width: 100%;
-  height: 100%;
-  margin-top: 1.5rem;
-`;
-
-const Box = styled.div`
-  background-color: ${({ theme }) => theme.colors.background?.alternative};
-  border: 1px solid ${({ theme }) => theme.colors.border?.default};
-  color: ${({ theme }) => theme.colors.text?.alternative};
-  border-radius: ${({ theme }) => theme.radii.default};
-  padding: 2.4rem;
-  margin-top: 2.4rem;
-  max-width: 60rem;
-  width: 100%;
-
-  & > * {
-    margin: 0;
-  }
-  ${({ theme }) => theme.mediaQueries.small} {
-    margin-top: 1.2rem;
-    padding: 1.6rem;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  background-color: ${({ theme }) => theme.colors.error?.muted};
-  border: 1px solid ${({ theme }) => theme.colors.error?.default};
-  color: ${({ theme }) => theme.colors.error?.alternative};
-  border-radius: ${({ theme }) => theme.radii.default};
-  padding: 2.4rem;
-  margin-bottom: 2.4rem;
-  margin-top: 2.4rem;
-  max-width: 60rem;
-  width: 100%;
-  ${({ theme }) => theme.mediaQueries.small} {
-    padding: 1.6rem;
-    margin-bottom: 1.2rem;
-    margin-top: 1.2rem;
-    max-width: 100%;
-  }
-`;
-
-const StyledForm = styled.form`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-
-  label {
-    display: inline-block;
-    width: 9rem;
-    margin-right: 1rem;
-    font-weight: 500;
-  }
-
-  textarea,
-  input {
-    padding: 0.8rem;
-    border: 1px solid ${({ theme }) => theme.colors.border?.default};
-    border-radius: 0.3rem;
-    flex-grow: 1;
-  }
-
-  div {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  }
-`;
-
-const ResponseContainer = styled.div`
-  position: relative;
-  & pre {
-    max-height: 50rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-`;
-
-const CopyButton = styled.button`
-  position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  background-color: ${({ theme }) => theme.colors.primary?.default};
-  color: white;
-  border: none;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid transparent;
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.primary?.alternative};
-  }
-  cursor: pointer;
-  font-size: 2rem;
-`;
-
 const Index = () => {
   const { error: metaMaskContextError } = useMetaMaskContext();
   const [permissionResponseError, setPermissionResponseError] =
-    useState<Error | null>(null);
+    useState<Error | null>();
 
   const errors = [metaMaskContextError, permissionResponseError].filter((e) =>
     Boolean(e),
@@ -218,100 +85,18 @@ const Index = () => {
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
-  const isMessageSigningSnapReady = Boolean(
-    installedSnaps[messageSigningSnapOrigin],
-  );
 
   const chainId = chain.id;
-  const [initialAmount, setInitialAmount] = useState<bigint | null>(
-    BigInt(toHex(parseUnits('.5', 18))),
-  ); // .5 ETH in wei
-  const [amountPerSecond, setAmountPerSecond] = useState(
-    BigInt(toHex(parseUnits('.5', 18))),
-  ); // .5 ETH in wei
-  const [maxAmount, setMaxAmount] = useState<bigint | null>(
-    BigInt(toHex(parseUnits('2.5', 18))),
-  ); // 2.5 ETH in wei
-  const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
-  const [expiry, setExpiry] = useState(
-    Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
-  );
-  const [justification, setJustification] = useState(
-    'This is a very important request for streaming allowance for some very important thing',
-  );
   const [permissionType, setPermissionType] = useState('native-token-stream');
+  const [permissionRequest, setPermissionRequest] =
+    useState<PermissionRequest | null>(null);
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
-
   const [isCopied, setIsCopied] = useState(false);
-
   const [to, setTo] = useState<Hex>('0x');
   const [data, setData] = useState<Hex>('0x');
   const [value, setValue] = useState<bigint>(0n);
   const [receipt, setReceipt] = useState<UserOperationReceipt | null>(null);
-
   const [isWorking, setIsWorking] = useState(false);
-  const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
-
-  const request = useRequest();
-  const requestMessageSigningSnap = useRequestSnap(messageSigningSnapOrigin);
-  const invokeMessageSigningSnap = useInvokeSnap(messageSigningSnapOrigin);
-  const [
-    messageSigningSnapPublicKeyResponse,
-    setMessageSigningSnapPublicKeyResponse,
-  ] = useState<string | null>(null);
-  const [
-    messageSigningSnapSignMessageResponse,
-    setMessageSigningSnapSignMessageResponse,
-  ] = useState<string | null>(null);
-
-  const [periodAmount, setPeriodAmount] = useState(
-    BigInt(toHex(parseUnits('1', 18))),
-  ); // 1 ETH in wei
-  const [periodDuration, setPeriodDuration] = useState(2592000); // 30 days in seconds
-
-  const handleInitialAmountChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    if (inputValue.trim() === '') {
-      setInitialAmount(null);
-    } else {
-      setInitialAmount(BigInt(inputValue));
-    }
-  };
-
-  const handleAmountPerSecondChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setAmountPerSecond(BigInt(inputValue));
-  };
-
-  const handleMaxAmountChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    if (inputValue.trim() === '') {
-      setMaxAmount(null);
-    } else {
-      setMaxAmount(BigInt(inputValue));
-    }
-  };
-
-  const handleStartTimeChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setStartTime(Number(inputValue));
-  };
-
-  const handleJustificationChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setJustification(inputValue);
-  };
-
-  const handleExpiryChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setExpiry(Number(inputValue));
-  };
 
   const handlePermissionTypeChange = ({
     target: { value: inputValue },
@@ -337,25 +122,13 @@ const Index = () => {
     setValue(BigInt(inputValue));
   };
 
-  const handlePeriodAmountChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setPeriodAmount(BigInt(inputValue));
-  };
-
-  const handlePeriodDurationChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setPeriodDuration(Number(inputValue));
-  };
-
   const handleRedeemPermission = async () => {
     if (!delegateAccount) {
       throw new Error('Delegate account not found');
     }
     setIsWorking(true);
     setReceipt(null);
-    setPermissionResponseError(null);
+    setPermissionResponseError(undefined);
 
     const feePerGas = await getFeePerGas();
 
@@ -401,25 +174,12 @@ const Index = () => {
       throw new Error('Delegate account not found');
     }
 
-    let permissionData;
-    if (permissionType === 'native-token-stream') {
-      permissionData = {
-        justification,
-        initialAmount,
-        amountPerSecond,
-        startTime,
-        maxAmount,
-      };
-    } else if (permissionType === 'native-token-periodic') {
-      permissionData = {
-        justification,
-        periodAmount: toHex(periodAmount),
-        periodDuration: periodDuration,
-        startTime: startTime,
-      };
-    } else {
-      throw new Error(`Unsupported permission type: ${permissionType}`);
+    if (!permissionRequest) {
+      throw new Error('No permission request data');
     }
+
+    const { type, expiry, isAdjustmentAllowed, ...permissionData } =
+      permissionRequest;
 
     const permissionsRequests = [
       {
@@ -433,7 +193,7 @@ const Index = () => {
         },
         isAdjustmentAllowed,
         permission: {
-          type: permissionType,
+          type,
           data: permissionData,
         },
       },
@@ -443,6 +203,7 @@ const Index = () => {
     setPermissionResponse(null);
     setReceipt(null);
     setPermissionResponseError(null);
+
     try {
       const response = await metaMaskClient?.grantPermissions(
         permissionsRequests,
@@ -467,40 +228,6 @@ const Index = () => {
           console.error('Failed to copy: ', clipboardError);
         });
     }
-  };
-
-  const handleGetPublicKey = async () => {
-    setMessageSigningSnapPublicKeyResponse(null);
-    const connectedSnaps = (await request({
-      method: 'wallet_getSnaps',
-    })) as GetSnapsResponse;
-    if (!connectedSnaps[messageSigningSnapOrigin]) {
-      await requestMessageSigningSnap();
-    }
-
-    const publicKey = await invokeMessageSigningSnap({
-      method: 'getPublicKey',
-      params: {},
-    });
-    setMessageSigningSnapPublicKeyResponse(publicKey as string);
-  };
-
-  const handleSignMessage = async () => {
-    setMessageSigningSnapSignMessageResponse(null);
-    const connectedSnaps = (await request({
-      method: 'wallet_getSnaps',
-    })) as GetSnapsResponse;
-    if (!connectedSnaps[messageSigningSnapOrigin]) {
-      await requestMessageSigningSnap();
-    }
-
-    const signature = await invokeMessageSigningSnap({
-      method: 'signMessage',
-      params: {
-        message: 'metamask: gator snap permission request',
-      },
-    });
-    setMessageSigningSnapSignMessageResponse(signature as string);
   };
 
   return (
@@ -613,6 +340,7 @@ const Index = () => {
                   <option value="native-token-stream">
                     Native Token Stream
                   </option>
+                  <option value="erc20-token-stream">ERC20 Token Stream</option>
                   <option value="native-token-periodic">
                     Native Token Periodic
                   </option>
@@ -620,152 +348,32 @@ const Index = () => {
               </div>
 
               {permissionType === 'native-token-stream' && (
-                <>
-                  <div>
-                    <label htmlFor="initialAmount">Initial Amount:</label>
-                    <input
-                      type="text"
-                      id="initialAmount"
-                      name="initialAmount"
-                      value={initialAmount?.toString()}
-                      onChange={handleInitialAmountChange}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="amountPerSecond">Amount Per Second:</label>
-                    <input
-                      type="text"
-                      id="amountPerSecond"
-                      name="amountPerSecond"
-                      value={amountPerSecond.toString()}
-                      onChange={handleAmountPerSecondChange}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="maxAmount">Max Amount:</label>
-                    <input
-                      type="text"
-                      id="maxAmount"
-                      name="maxAmount"
-                      value={maxAmount?.toString()}
-                      onChange={handleMaxAmountChange}
-                    />
-                  </div>
-                </>
+                <NativeTokenStreamForm
+                  onChange={(request: NativeTokenStreamPermissionRequest) => {
+                    setPermissionRequest(request);
+                  }}
+                />
+              )}
+
+              {permissionType === 'erc20-token-stream' && (
+                <ERC20TokenStreamForm
+                  onChange={(request: ERC20TokenStreamPermissionRequest) => {
+                    setPermissionRequest(request);
+                  }}
+                />
               )}
 
               {permissionType === 'native-token-periodic' && (
-                <>
-                  <div>
-                    <label htmlFor="periodAmount">Period Amount:</label>
-                    <input
-                      type="text"
-                      id="periodAmount"
-                      name="periodAmount"
-                      value={periodAmount.toString()}
-                      onChange={handlePeriodAmountChange}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="periodDuration">Period Duration:</label>
-                    <input
-                      type="number"
-                      id="periodDuration"
-                      name="periodDuration"
-                      value={periodDuration}
-                      onChange={handlePeriodDurationChange}
-                    />
-                  </div>
-                </>
+                <NativeTokenPeriodicForm
+                  onChange={(request: NativeTokenPeriodicPermissionRequest) => {
+                    setPermissionRequest(request);
+                  }}
+                />
               )}
-
-              <div>
-                <label htmlFor="startTime">Start Time:</label>
-                <input
-                  type="number"
-                  id="startTime"
-                  name="startTime"
-                  value={startTime}
-                  onChange={handleStartTimeChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="justification">Justification:</label>
-                <textarea
-                  id="justification"
-                  name="justification"
-                  rows={3}
-                  value={justification}
-                  onChange={handleJustificationChange}
-                ></textarea>
-              </div>
-              <div>
-                <label htmlFor="expiry">Expiry:</label>
-                <input
-                  type="number"
-                  id="expiry"
-                  name="expiry"
-                  value={expiry}
-                  onChange={handleExpiryChange}
-                />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
-                <input
-                  type="checkbox"
-                  id="isAdjustmentAllowed"
-                  name="isAdjustmentAllowed"
-                  checked={isAdjustmentAllowed}
-                  onChange={(e) => setIsAdjustmentAllowed(e.target.checked)}
-                  style={{ width: 'auto', marginLeft: '1rem' }}
-                />
-              </div>
             </StyledForm>
             <CustomMessageButton
               text="Grant Permission"
               onClick={handleGrantPermissions}
-              disabled={isWorking}
-            />
-          </Box>
-        )}
-
-        {metaMaskClient && !isLocalSnap(messageSigningSnapOrigin) && (
-          <Box style={{ position: 'relative' }}>
-            <ResponseContainer>
-              <Title>Message Signing Snap(Get Public Key)</Title>
-              <pre>
-                Get Public Key Result:{' '}
-                {messageSigningSnapPublicKeyResponse
-                  ? JSON.stringify(messageSigningSnapPublicKeyResponse, null, 2)
-                  : ''}
-              </pre>
-            </ResponseContainer>
-
-            <CustomMessageButton
-              text="Get Public Key"
-              onClick={handleGetPublicKey}
-              disabled={isWorking}
-            />
-          </Box>
-        )}
-        {metaMaskClient && !isLocalSnap(messageSigningSnapOrigin) && (
-          <Box style={{ position: 'relative' }}>
-            <ResponseContainer>
-              <Title>Message Signing Snap(Sign Message )</Title>
-              <pre>
-                Sign Message Result:{' '}
-                {messageSigningSnapSignMessageResponse
-                  ? JSON.stringify(
-                      messageSigningSnapSignMessageResponse,
-                      null,
-                      2,
-                    )
-                  : ''}
-              </pre>
-            </ResponseContainer>
-            <CustomMessageButton
-              text="Sign Message"
-              onClick={handleSignMessage}
               disabled={isWorking}
             />
           </Box>

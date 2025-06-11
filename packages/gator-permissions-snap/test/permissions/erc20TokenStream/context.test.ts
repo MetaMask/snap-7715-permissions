@@ -1,6 +1,6 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
 import { maxUint256 } from 'viem';
-import { toHex, parseUnits } from 'viem/utils';
+import { toHex } from 'viem/utils';
 
 import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
@@ -9,12 +9,12 @@ import {
   buildContext,
   deriveMetadata,
   applyContext,
-} from '../../../src/permissions/nativeTokenStream/context';
+} from '../../../src/permissions/erc20TokenStream/context';
 import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamPermission,
-  NativeTokenStreamPermissionRequest,
-} from '../../../src/permissions/nativeTokenStream/types';
+  Erc20TokenStreamContext,
+  Erc20TokenStreamPermission,
+  Erc20TokenStreamPermissionRequest,
+} from '../../../src/permissions/erc20TokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import {
@@ -22,28 +22,32 @@ import {
   convertReadableDateToTimestamp,
 } from '../../../src/utils/time';
 
-const permissionWithoutOptionals: NativeTokenStreamPermission = {
-  type: 'native-token-stream',
+const USDC_ADDRESS = '0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F';
+const USDC_DECIMALS = 6;
+
+const permissionWithoutOptionals: Erc20TokenStreamPermission = {
+  type: 'erc20-token-stream',
   data: {
-    amountPerSecond: toHex(parseUnits('.5', 18)), // 0.5 eth per second
-    startTime: convertReadableDateToTimestamp('10/26/1985'),
+    tokenAddress: USDC_ADDRESS,
+    amountPerSecond: toHex(500_000), // 0.5 USDC per second (6 decimals)
+    startTime: 499132800, // 10/26/1985,
     justification: 'Permission to do something important',
   },
 };
 
-const alreadyPopulatedPermission: NativeTokenStreamPermission = {
+const alreadyPopulatedPermission: Erc20TokenStreamPermission = {
   ...permissionWithoutOptionals,
   data: {
     ...permissionWithoutOptionals.data,
-    // 1 Eth
-    initialAmount: toHex(parseUnits('1', 18)),
-    // 10 Eth
-    maxAmount: toHex(parseUnits('10', 18)),
+    // 1 USDC
+    initialAmount: toHex(1_000_000),
+    // 10 USDC
+    maxAmount: toHex(10_000_000),
   },
   rules: {},
 };
 
-const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
+const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
   chainId: '0x1',
   expiry: convertReadableDateToTimestamp('05/01/2024'),
   signer: {
@@ -55,18 +59,18 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
   permission: alreadyPopulatedPermission,
 };
 
-const alreadyPopulatedContext: NativeTokenStreamContext = {
+const alreadyPopulatedContext: Erc20TokenStreamContext = {
   expiry: '05/01/2024',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('10', 18)),
-    balanceFormattedAsCurrency: '$🐊10.00',
+    balance: toHex(100_000_000), // 100 USDC (6 decimals)
+    balanceFormattedAsCurrency: '$🐊100.00',
   },
   tokenMetadata: {
-    symbol: 'ETH',
-    decimals: 18,
+    symbol: 'USDC',
+    decimals: USDC_DECIMALS,
   },
   permissionDetails: {
     initialAmount: '1',
@@ -77,7 +81,7 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
   },
 } as const;
 
-describe('nativeTokenStream:context', () => {
+describe('erc20TokenStream:context', () => {
   describe('populatePermission()', () => {
     it('should return the permission unchanged if it is already populated', async () => {
       const populatedPermission = await populatePermission({
@@ -104,14 +108,15 @@ describe('nativeTokenStream:context', () => {
     });
 
     it('should not override existing rules', async () => {
-      const permission: NativeTokenStreamPermission = {
-        type: 'native-token-stream',
+      const permission: Erc20TokenStreamPermission = {
+        type: 'erc20-token-stream',
         data: {
           initialAmount: '0x1000000000000000000000000000000000000000',
           maxAmount: '0x1000000000000000000000000000000000000000',
           amountPerSecond: '0x1000000000000000000000000000000000000000',
           startTime: 1714531200,
           justification: 'Permission to do something important',
+          tokenAddress: USDC_ADDRESS,
         },
         rules: {
           some: 'rule',
@@ -124,7 +129,7 @@ describe('nativeTokenStream:context', () => {
     });
   });
 
-  describe('permissionRequestToContext()', () => {
+  describe('buildContext()', () => {
     let mockTokenPricesService: jest.Mocked<TokenPricesService>;
     let mockAccountController: jest.Mocked<AccountController>;
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
@@ -147,7 +152,7 @@ describe('nativeTokenStream:context', () => {
         getTokenBalanceAndMetadata: jest.fn(() => ({
           balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
-          decimals: 18,
+          decimals: USDC_DECIMALS,
         })),
       } as unknown as jest.Mocked<TokenMetadataService>;
     });
@@ -171,15 +176,65 @@ describe('nativeTokenStream:context', () => {
       ).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
         account: alreadyPopulatedContext.accountDetails.address,
+        assetAddress: USDC_ADDRESS,
       });
 
       expect(
         mockTokenPricesService.getCryptoToFiatConversion,
       ).toHaveBeenCalledWith(
-        `eip155:1/slip44:60`,
+        `eip155:1/erc20:${USDC_ADDRESS}`,
         alreadyPopulatedContext.accountDetails.balance,
-        18,
+        USDC_DECIMALS,
       );
+    });
+
+    it('should create a context with different token decimals', async () => {
+      const DAI_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F';
+      const DAI_DECIMALS = 18;
+      const DAI_BALANCE = toHex(BigInt('100000000000000000000')); // 100 DAI (18 decimals)
+
+      const daiPermission: Erc20TokenStreamPermission = {
+        type: 'erc20-token-stream',
+        data: {
+          tokenAddress: DAI_ADDRESS,
+          amountPerSecond: toHex(BigInt('500000000000000000')), // 0.5 DAI per second (18 decimals)
+          startTime: 499132800,
+          initialAmount: toHex(BigInt('1000000000000000000')), // 1 DAI
+          maxAmount: toHex(BigInt('10000000000000000000')), // 10 DAI
+          justification: 'Permission to do something important',
+        },
+        rules: {},
+      };
+
+      const daiPermissionRequest: Erc20TokenStreamPermissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        permission: daiPermission,
+      };
+
+      // Override mock return values for this test
+      mockTokenMetadataService.getTokenBalanceAndMetadata.mockResolvedValueOnce(
+        {
+          balance: BigInt(DAI_BALANCE),
+          symbol: 'DAI',
+          decimals: DAI_DECIMALS,
+        },
+      );
+
+      const context = await buildContext({
+        permissionRequest: daiPermissionRequest,
+        tokenPricesService: mockTokenPricesService,
+        accountController: mockAccountController,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+
+      expect(context.tokenMetadata).toStrictEqual({
+        symbol: 'DAI',
+        decimals: DAI_DECIMALS,
+      });
+
+      expect(context.accountDetails.balance).toBe(DAI_BALANCE);
+      expect(context.permissionDetails.initialAmount).toBe('1');
+      expect(context.permissionDetails.maxAmount).toBe('10');
     });
   });
 

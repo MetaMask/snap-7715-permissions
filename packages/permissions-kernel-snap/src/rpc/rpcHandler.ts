@@ -65,7 +65,7 @@ export function createRpcHandler(config: {
       );
 
     // Find the relevant permissions to grant by filtering against the registered offers
-    const { permissionsToGrant, isAllPermissionTypesSupported, errorMessage } =
+    const { permissionsToGrant, errorMessage } =
       permissionOfferRegistryManager.findRelevantPermissionsToGrant({
         allRegisteredOffers:
           permissionOfferRegistryManager.getRegisteredPermissionOffers(
@@ -74,8 +74,8 @@ export function createRpcHandler(config: {
         permissionsToGrant: parsedPermissionsRequest,
       });
 
-    if (!isAllPermissionTypesSupported || errorMessage) {
-      throw new Error(errorMessage ?? 'Unknown error');
+    if (errorMessage) {
+      throw new Error(errorMessage);
     }
 
     const grantedPermissions = await snapsProvider.request({

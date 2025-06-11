@@ -1,15 +1,13 @@
 import { describe, expect, it } from '@jest/globals';
 import { toHex, parseUnits } from 'viem/utils';
 
-import { TimePeriod } from '../../../src/core/types';
-import type { NativeTokenPeriodicPermissionRequest } from '../../../src/permissions/nativeTokenPeriodic/types';
-import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenPeriodic/validation';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../../src/utils/time';
+import type { Erc20TokenStreamPermissionRequest } from '../../../src/permissions/erc20TokenStream/types';
+import { parseAndValidatePermission } from '../../../src/permissions/erc20TokenStream/validation';
+import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 
-const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
+const tokenDecimals = 10;
+
+const validPermissionRequest: Erc20TokenStreamPermissionRequest = {
   chainId: '0x1',
   expiry: convertReadableDateToTimestamp('05/01/2024'),
   isAdjustmentAllowed: true,
@@ -20,18 +18,20 @@ const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
     },
   },
   permission: {
-    type: 'native-token-periodic',
+    type: 'erc20-token-stream',
     data: {
-      periodAmount: toHex(parseUnits('1', 18)), // 1 ETH per period
-      periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
+      initialAmount: toHex(parseUnits('1', tokenDecimals)), // 1 token
+      maxAmount: toHex(parseUnits('10', tokenDecimals)), // 10 tokens
+      amountPerSecond: toHex(parseUnits('.5', tokenDecimals)), // 0.5 tokens per second
       startTime: convertReadableDateToTimestamp('10/26/2024'),
+      tokenAddress: '0x1234567890123456789012345678901234567890',
       justification: 'test',
     },
     rules: {},
   },
 };
 
-describe('nativeTokenPeriodic:validation', () => {
+describe('erc20TokenStream:validation', () => {
   describe('parseAndValidatePermission()', () => {
     it('should validate a valid permission request', () => {
       expect(() =>
@@ -54,113 +54,99 @@ describe('nativeTokenPeriodic:validation', () => {
       expect(() =>
         parseAndValidatePermission(invalidTypeRequest as any),
       ).toThrow(
-        'Failed type validation: type: Invalid literal value, expected "native-token-periodic"',
+        'Failed type validation: type: Invalid literal value, expected "erc20-token-stream"',
       );
     });
 
-    describe('periodAmount validation', () => {
-      it('should throw for zero periodAmount', () => {
-        const zeroPeriodAmountRequest = {
+    describe('maxAmount validation', () => {
+      it('should throw for zero maxAmount', () => {
+        const zeroMaxAmountRequest = {
           ...validPermissionRequest,
           permission: {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              periodAmount: '0x0' as `0x${string}`,
+              maxAmount: '0x0' as `0x${string}`,
+            },
+          },
+        };
+
+        expect(() => parseAndValidatePermission(zeroMaxAmountRequest)).toThrow(
+          'Invalid maxAmount: must be greater than 0',
+        );
+      });
+
+      it('should throw when maxAmount is less than initialAmount', () => {
+        const invalidMaxAmountRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              maxAmount: toHex(parseUnits('0.5', tokenDecimals)), // 0.5 tokens
+              initialAmount: toHex(parseUnits('1', tokenDecimals)), // 1 token
             },
           },
         };
 
         expect(() =>
-          parseAndValidatePermission(zeroPeriodAmountRequest),
-        ).toThrow('Invalid periodAmount: must be greater than 0');
+          parseAndValidatePermission(invalidMaxAmountRequest),
+        ).toThrow('Invalid maxAmount: must be greater than initialAmount');
       });
     });
 
-    describe('periodDuration validation', () => {
-      it('should throw for zero periodDuration', () => {
-        const zeroPeriodDurationRequest = {
+    describe('initialAmount validation', () => {
+      it('should throw for zero initialAmount', () => {
+        const zeroInitialAmountRequest = {
           ...validPermissionRequest,
           permission: {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              periodDuration: 0,
+              initialAmount: '0x0' as `0x${string}`,
             },
           },
         };
 
         expect(() =>
-          parseAndValidatePermission(zeroPeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be a positive number');
+          parseAndValidatePermission(zeroInitialAmountRequest),
+        ).toThrow('Invalid initialAmount: must be greater than 0');
       });
 
-      it('should throw for negative periodDuration', () => {
-        const negativePeriodDurationRequest = {
+      it('should allow missing initialAmount', () => {
+        const noInitialAmountRequest = {
           ...validPermissionRequest,
           permission: {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              periodDuration: -1,
             },
           },
         };
+        delete noInitialAmountRequest.permission.data.initialAmount;
 
         expect(() =>
-          parseAndValidatePermission(negativePeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be a positive number');
-      });
-
-      it('should throw for non-integer periodDuration', () => {
-        const floatPeriodDurationRequest = {
-          ...validPermissionRequest,
-          permission: {
-            ...validPermissionRequest.permission,
-            data: {
-              ...validPermissionRequest.permission.data,
-              periodDuration: 1.5,
-            },
-          },
-        };
-
-        expect(() =>
-          parseAndValidatePermission(floatPeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be an integer');
-      });
-
-      it('should validate periodDuration for daily period', () => {
-        const dailyPeriodRequest = {
-          ...validPermissionRequest,
-          permission: {
-            ...validPermissionRequest.permission,
-            data: {
-              ...validPermissionRequest.permission.data,
-              periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
-            },
-          },
-        };
-
-        expect(() =>
-          parseAndValidatePermission(dailyPeriodRequest),
+          parseAndValidatePermission(noInitialAmountRequest),
         ).not.toThrow();
       });
+    });
 
-      it('should validate periodDuration for weekly period', () => {
-        const weeklyPeriodRequest = {
+    describe('amountPerSecond validation', () => {
+      it('should throw for zero amountPerSecond', () => {
+        const zeroAmountPerSecondRequest = {
           ...validPermissionRequest,
           permission: {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY]),
+              amountPerSecond: '0x0' as `0x${string}`,
             },
           },
         };
 
         expect(() =>
-          parseAndValidatePermission(weeklyPeriodRequest),
-        ).not.toThrow();
+          parseAndValidatePermission(zeroAmountPerSecondRequest),
+        ).toThrow('Invalid amountPerSecond: must be greater than 0');
       });
     });
 
@@ -214,6 +200,44 @@ describe('nativeTokenPeriodic:validation', () => {
         expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
           'Invalid startTime: must be an integer',
         );
+      });
+    });
+
+    describe('tokenAddress validation', () => {
+      it('should throw for invalid token address', () => {
+        const invalidTokenAddressRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              tokenAddress: '0xinvalid',
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(invalidTokenAddressRequest),
+        ).toThrow(
+          'Failed type validation: data.tokenAddress: Invalid hex value',
+        );
+      });
+
+      it('should throw for missing token address', () => {
+        const missingTokenAddressRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+            },
+          },
+        };
+        delete (missingTokenAddressRequest.permission.data as any).tokenAddress;
+
+        expect(() =>
+          parseAndValidatePermission(missingTokenAddressRequest),
+        ).toThrow('Failed type validation: data.tokenAddress: Required');
       });
     });
   });

@@ -18,21 +18,21 @@ import {
   calculateAmountPerSecond,
 } from '../contextValidation';
 import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamPermissionRequest,
-  NativeTokenStreamMetadata,
-  PopulatedNativeTokenStreamPermission,
-  NativeTokenStreamPermission,
+  Erc20TokenStreamContext,
+  Erc20TokenStreamPermissionRequest,
+  Erc20TokenStreamMetadata,
+  PopulatedErc20TokenStreamPermission,
+  Erc20TokenStreamPermission,
 } from './types';
 
 const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
 const DEFAULT_INITIAL_AMOUNT = '0x0';
 
 /**
- * Construct an amended NativeTokenStreamPermissionRequest, based on the specified request,
+ * Construct an amended Erc20TokenStreamPermissionRequest, based on the specified request,
  * with the changes made by the specified context.
  * @param options0 - The options object containing the context and original request.
- * @param options0.context - The native token stream context containing the updated permission details.
+ * @param options0.context - The Erc20 token stream context containing the updated permission details.
  * @param options0.originalRequest - The original permission request to be amended.
  * @returns A new permission request with the context changes applied.
  */
@@ -40,9 +40,9 @@ export async function applyContext({
   context,
   originalRequest,
 }: {
-  context: NativeTokenStreamContext;
-  originalRequest: NativeTokenStreamPermissionRequest;
-}): Promise<NativeTokenStreamPermissionRequest> {
+  context: Erc20TokenStreamContext;
+  originalRequest: Erc20TokenStreamPermissionRequest;
+}): Promise<Erc20TokenStreamPermissionRequest> {
   const {
     permissionDetails,
     tokenMetadata: { decimals },
@@ -62,13 +62,14 @@ export async function applyContext({
     ),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,
+    tokenAddress: originalRequest.permission.data.tokenAddress,
   };
 
   return {
     ...originalRequest,
     expiry,
     permission: {
-      type: 'native-token-stream',
+      type: 'erc20-token-stream',
       data: permissionData,
       rules: originalRequest.permission.rules ?? {},
     },
@@ -76,16 +77,16 @@ export async function applyContext({
 }
 
 /**
- * Populate a native token stream permission by filling in default values for optional fields.
+ * Populate an Erc20 token stream permission by filling in default values for optional fields.
  * @param options0 - The options object containing the permission to populate.
- * @param options0.permission - The native token stream permission to populate with default values.
- * @returns A populated native token stream permission with all required fields populated.
+ * @param options0.permission - The Erc20 token stream permission to populate with default values.
+ * @returns A populated Erc20 token stream permission with all required fields populated.
  */
 export async function populatePermission({
   permission,
 }: {
-  permission: NativeTokenStreamPermission;
-}): Promise<PopulatedNativeTokenStreamPermission> {
+  permission: Erc20TokenStreamPermission;
+}): Promise<PopulatedErc20TokenStreamPermission> {
   return {
     ...permission,
     data: {
@@ -101,7 +102,7 @@ export async function populatePermission({
  * Converts a permission request into a context object that can be used to render the UI
  * and manage the permission state.
  * @param options0 - The options object containing the request and required services.
- * @param options0.permissionRequest - The native token stream permission request to convert.
+ * @param options0.permissionRequest - The Erc20 token stream permission request to convert.
  * @param options0.tokenPricesService - Service for fetching token price information.
  * @param options0.accountController - Controller for managing account operations.
  * @param options0.tokenMetadataService - Service for fetching token metadata.
@@ -113,12 +114,13 @@ export async function buildContext({
   accountController,
   tokenMetadataService,
 }: {
-  permissionRequest: NativeTokenStreamPermissionRequest;
+  permissionRequest: Erc20TokenStreamPermissionRequest;
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
-}): Promise<NativeTokenStreamContext> {
+}): Promise<Erc20TokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
+  const { tokenAddress } = permissionRequest.permission.data;
 
   const address = await accountController.getAccountAddress({
     chainId,
@@ -131,10 +133,11 @@ export async function buildContext({
   } = await tokenMetadataService.getTokenBalanceAndMetadata({
     chainId,
     account: address,
+    assetAddress: tokenAddress,
   });
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:1/slip44:60`,
+    `eip155:${chainId}/erc20:${tokenAddress}`,
     toHex(rawBalance),
     decimals,
   );
@@ -196,23 +199,23 @@ export async function buildContext({
 }
 
 /**
- * Creates metadata for the native token stream context, including validation of amounts and timestamps.
+ * Creates metadata for the Erc20 token stream context, including validation of amounts and timestamps.
  * @param options0 - The options object containing the context to create metadata for.
- * @param options0.context - The native token stream context to validate and create metadata from.
+ * @param options0.context - The Erc20 token stream context to validate and create metadata from.
  * @returns Metadata object containing derived values and validation errors.
  */
 export async function deriveMetadata({
   context,
 }: {
-  context: NativeTokenStreamContext;
-}): Promise<NativeTokenStreamMetadata> {
+  context: Erc20TokenStreamContext;
+}): Promise<Erc20TokenStreamMetadata> {
   const {
     permissionDetails,
     expiry,
     tokenMetadata: { decimals },
   } = context;
 
-  const validationErrors: NativeTokenStreamMetadata['validationErrors'] = {};
+  const validationErrors: Erc20TokenStreamMetadata['validationErrors'] = {};
 
   // Validate max amount
   const maxAmountResult = validateAndParseAmount(

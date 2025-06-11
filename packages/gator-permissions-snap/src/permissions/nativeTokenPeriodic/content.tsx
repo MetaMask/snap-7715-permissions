@@ -75,6 +75,7 @@ export async function createConfirmationContent({
         />
         <AccountDetails
           account={context.accountDetails}
+          tokenMetadata={context.tokenMetadata}
           title="Transfer from"
           tooltip="The account that the token transfers come from."
         />

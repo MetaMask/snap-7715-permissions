@@ -196,7 +196,6 @@ describe('PermissionOfferRegistryManager', () => {
           permissionsToGrant: mockPermissionsToGrant,
         });
 
-      expect(result.isAllPermissionTypesSupported).toBe(true);
       expect(result.permissionsToGrant).toStrictEqual(mockPermissionsToGrant);
       expect(result.missingPermissions).toStrictEqual([]);
       expect(result.errorMessage).toBeUndefined();
@@ -209,7 +208,6 @@ describe('PermissionOfferRegistryManager', () => {
           permissionsToGrant: mockPermissionsToGrant,
         });
 
-      expect(result.isAllPermissionTypesSupported).toBe(false);
       expect(result.permissionsToGrant).toStrictEqual([]);
       expect(result.missingPermissions).toStrictEqual(mockPermissionsToGrant);
       expect(result.errorMessage).toBe(
@@ -224,7 +222,6 @@ describe('PermissionOfferRegistryManager', () => {
           permissionsToGrant: [],
         });
 
-      expect(result.isAllPermissionTypesSupported).toBe(false);
       expect(result.permissionsToGrant).toStrictEqual([]);
       expect(result.missingPermissions).toStrictEqual([]);
       expect(result.errorMessage).toBeUndefined();

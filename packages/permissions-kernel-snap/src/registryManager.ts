@@ -20,7 +20,6 @@ import { InvalidParamsError } from '@metamask/snaps-sdk';
 import { ExternalMethod } from './rpc/rpcMethod';
 
 export type FindRelevantPermissionsToGrantResult = {
-  isAllPermissionTypesSupported: boolean;
   permissionsToGrant: PermissionsRequest;
   missingPermissions: PermissionsRequest;
   errorMessage?: string;
@@ -164,15 +163,14 @@ export const createPermissionOfferRegistryManager = (
     const { allRegisteredOffers, permissionsToGrant } = options;
     if (permissionsToGrant.length === 0) {
       return {
-        isAllPermissionTypesSupported: false,
         permissionsToGrant: [],
         missingPermissions: [],
       };
     }
 
-    const isAllPermissionTypesSupported = permissionsToGrant.every(
+    const missingPermissions = permissionsToGrant.filter(
       (permission) =>
-        allRegisteredOffers.some(
+        !allRegisteredOffers.some(
           (offer) =>
             extractPermissionName(permission.permission.type) ===
             extractPermissionName(offer.type),
@@ -180,17 +178,8 @@ export const createPermissionOfferRegistryManager = (
     );
 
     // Permission provider does not support all permissions requested, so we return an error message
-    if (!isAllPermissionTypesSupported) {
-      const missingPermissions = permissionsToGrant.filter(
-        (permission) =>
-          !allRegisteredOffers.some(
-            (offer) =>
-              extractPermissionName(permission.permission.type) ===
-              extractPermissionName(offer.type),
-          ),
-      );
+    if (missingPermissions.length > 0) {
       return {
-        isAllPermissionTypesSupported,
         permissionsToGrant: [],
         missingPermissions,
         errorMessage: `The following permissions can not be granted by the permission provider: ${missingPermissions.map((permission) => permission.permission.type).join(', ')}`,
@@ -198,7 +187,6 @@ export const createPermissionOfferRegistryManager = (
     }
 
     return {
-      isAllPermissionTypesSupported,
       missingPermissions: [],
       permissionsToGrant,
     };

@@ -12,7 +12,7 @@ import type {
   BaseTokenPermissionContext,
 } from '../../core/types';
 
-export type NativeTokenStreamMetadata = {
+export type Erc20TokenStreamMetadata = {
   amountPerSecond: string;
   validationErrors: {
     initialAmountError?: string;
@@ -23,7 +23,7 @@ export type NativeTokenStreamMetadata = {
   };
 };
 
-export type NativeTokenStreamContext = BaseTokenPermissionContext & {
+export type Erc20TokenStreamContext = BaseTokenPermissionContext & {
   permissionDetails: {
     initialAmount: string | undefined;
     maxAmount: string | undefined;
@@ -33,8 +33,8 @@ export type NativeTokenStreamContext = BaseTokenPermissionContext & {
   };
 };
 
-export const zNativeTokenStreamPermission = zPermission.extend({
-  type: z.literal('native-token-stream'),
+export const zErc20TokenStreamPermission = zPermission.extend({
+  type: z.literal('erc20-token-stream'),
   data: z.intersection(
     zMetaMaskPermissionData,
     z.object({
@@ -42,16 +42,17 @@ export const zNativeTokenStreamPermission = zPermission.extend({
       maxAmount: zHexStr.optional(),
       amountPerSecond: zHexStr,
       startTime: z.number(),
+      tokenAddress: zHexStr,
     }),
   ),
 });
 
-export type NativeTokenStreamPermission = z.infer<
-  typeof zNativeTokenStreamPermission
+export type Erc20TokenStreamPermission = z.infer<
+  typeof zErc20TokenStreamPermission
 >;
 
-export type NativeTokenStreamPermissionRequest =
-  TypedPermissionRequest<NativeTokenStreamPermission>;
+export type Erc20TokenStreamPermissionRequest =
+  TypedPermissionRequest<Erc20TokenStreamPermission>;
 
-export type PopulatedNativeTokenStreamPermission =
-  DeepRequired<NativeTokenStreamPermission>;
+export type PopulatedErc20TokenStreamPermission =
+  DeepRequired<Erc20TokenStreamPermission>;

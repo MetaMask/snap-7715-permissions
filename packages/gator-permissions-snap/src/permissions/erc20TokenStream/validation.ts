@@ -3,19 +3,19 @@ import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 
 import { validateHexInteger } from '../validation';
 import type {
-  NativeTokenStreamPermission,
-  NativeTokenStreamPermissionRequest,
+  Erc20TokenStreamPermission,
+  Erc20TokenStreamPermissionRequest,
 } from './types';
-import { zNativeTokenStreamPermission } from './types';
+import { zErc20TokenStreamPermission } from './types';
 
 /**
  * Validates a permission object data specific to the permission type.
- * @param permission - The native token stream permission object to validate.
+ * @param permission - The ERC20 token stream permission object to validate.
  * @returns True if the permission data is valid, throws an error otherwise.
  * @throws {Error} If any validation check fails.
  */
-function validatePermissionData(permission: NativeTokenStreamPermission): true {
-  const { initialAmount, maxAmount, amountPerSecond, startTime } =
+function validatePermissionData(permission: Erc20TokenStreamPermission): true {
+  const { initialAmount, maxAmount, amountPerSecond, startTime, tokenAddress } =
     permission.data;
 
   validateHexInteger({
@@ -51,23 +51,29 @@ function validatePermissionData(permission: NativeTokenStreamPermission): true {
     throw new Error('Invalid startTime: must be an integer');
   }
 
+  if (!tokenAddress || tokenAddress === '0x') {
+    throw new Error(
+      'Invalid tokenAddress: must be a valid ERC20 token address',
+    );
+  }
+
   return true;
 }
 
 /**
- * Parses and validates a permission request for native token streaming.
+ * Parses and validates a permission request for ERC20 token streaming.
  * @param permissionRequest - The permission request object to validate.
  * @returns A validated permission request object.
  * @throws {Error} If the permission request is invalid.
  */
 export function parseAndValidatePermission(
   permissionRequest: PermissionRequest,
-): NativeTokenStreamPermissionRequest {
+): Erc20TokenStreamPermissionRequest {
   const {
     data: validationResult,
     error: validationError,
     success,
-  } = zNativeTokenStreamPermission.safeParse(permissionRequest.permission);
+  } = zErc20TokenStreamPermission.safeParse(permissionRequest.permission);
 
   if (!success) {
     throw new Error(extractZodError(validationError.errors));

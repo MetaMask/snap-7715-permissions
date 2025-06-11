@@ -1,12 +1,5 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Field,
-  Input,
-  Section,
-  Text,
-  Image,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Field, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import { getChainName } from '../../../../shared/src/utils/common';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
@@ -15,7 +8,6 @@ import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
-import { IconUrls } from '../../ui/iconConstant';
 import {
   initialAmountRule,
   maxAmountRule,
@@ -25,12 +17,12 @@ import {
   streamPeriodRule,
 } from './rules';
 import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata,
+  Erc20TokenStreamContext,
+  Erc20TokenStreamMetadata,
 } from './types';
 
 /**
- * Creates the confirmation content for a native token stream permission request.
+ * Creates the confirmation content for an ERC20 token stream permission request.
  *
  * @param options - The options for creating the confirmation content.
  * @param options.context - The context containing stream details and account information.
@@ -47,8 +39,8 @@ export async function createConfirmationContent({
   origin,
   chainId,
 }: {
-  context: NativeTokenStreamContext;
-  metadata: NativeTokenStreamMetadata;
+  context: Erc20TokenStreamContext;
+  metadata: Erc20TokenStreamMetadata;
   isJustificationCollapsed: boolean;
   origin: string;
   chainId: number;
@@ -71,7 +63,6 @@ export async function createConfirmationContent({
     {
       label: 'Token',
       text: context.tokenMetadata.symbol,
-      iconUrl: IconUrls.ethereum.token,
     },
   ];
 
@@ -104,16 +95,10 @@ export async function createConfirmationContent({
             </Box>
           </Box>
           <Field>
-            <Box>
-              <Image
-                src={IconUrls.ethereum.token}
-                alt={`${context.tokenMetadata.symbol} token icon`}
-              />
-            </Box>
             <Input
               name="stream-rate"
               type="text"
-              value={`${amountPerSecond} ETH/sec`}
+              value={`${amountPerSecond} ${context.tokenMetadata.symbol}/sec`}
               disabled={true}
             />
           </Field>
