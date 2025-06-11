@@ -12,4 +12,8 @@ export const DEFAULT_GATOR_PERMISSION_TO_OFFER: PermissionOffer[] = [
     type: 'native-token-periodic',
     proposedName: 'Native Token Periodic Transfer',
   },
+  {
+    type: 'erc20-token-stream',
+    proposedName: 'ERC20 Token Stream',
+  },
 ];
