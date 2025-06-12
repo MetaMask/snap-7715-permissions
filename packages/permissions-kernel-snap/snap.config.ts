@@ -11,12 +11,13 @@ if (!process.env.SNAP_ENV) {
 
 const config: SnapConfig = {
   bundler: 'webpack',
-  input: resolve(__dirname, 'src/index.tsx'),
+  input: resolve(__dirname, 'src/index.ts'),
   server: {
     port: 8081,
   },
   polyfills: {
     buffer: true,
+    crypto: true,
   },
   environment: {
     // eslint-disable-next-line n/no-process-env

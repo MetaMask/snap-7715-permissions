@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-import { zPermissionsRequest } from './7715-permissions-request';
 import { zTypeDescriptor } from './7715-permissions-types';
 
 export const zPermissionOffer = z.object({
@@ -13,17 +12,19 @@ export const zPermissionOffer = z.object({
    * Used to represent the permission to the user in the permissions picker UI.
    */
   proposedName: z.string(),
-
-  /**
-   * Used to call the method on the permission provider snap.
-   */
-  id: z.string(),
 });
+
+export const zPermissionOffers = z.array(zPermissionOffer);
 
 /**
  * This is a local permissions offer definition by the permission's provider snaps.
  */
 export type PermissionOffer = z.infer<typeof zPermissionOffer>;
+
+/**
+ * This is a local permissions offer definition by the permission's provider snaps.
+ */
+export type PermissionOffers = z.infer<typeof zPermissionOffers>;
 
 export const zRegisteredPermissionOffer = z.object({
   /**
@@ -37,15 +38,12 @@ export const zRegisteredPermissionOffer = z.object({
   type: zTypeDescriptor,
 
   /**
-   * An identifier used for identifying the specific permission defined by the permission provider snap.
-   */
-  hostPermissionId: z.string(),
-
-  /**
    * Used to represent the permission to the user in the permissions picker UI.
    */
   proposedName: z.string(),
 });
+
+export const zRegisteredPermissionOffers = z.array(zRegisteredPermissionOffer);
 
 /**
  * This stored offer given by permission's provider snaps.
@@ -54,9 +52,16 @@ export type RegisteredPermissionOffer = z.infer<
   typeof zRegisteredPermissionOffer
 >;
 
+/**
+ * This stored offers given by permission's provider snaps.
+ */
+export type RegisteredPermissionOffers = z.infer<
+  typeof zRegisteredPermissionOffers
+>;
+
 export const zPermissionOfferRegistry = z.record(
   z.string(),
-  z.array(zRegisteredPermissionOffer),
+  zRegisteredPermissionOffers,
 );
 
 /**
@@ -65,21 +70,3 @@ export const zPermissionOfferRegistry = z.record(
  * The key is the snap host id.
  */
 export type PermissionOfferRegistry = z.infer<typeof zPermissionOfferRegistry>;
-
-export const zGrantAttenuatedPermissionsParams = z.object({
-  permissionsRequest: zPermissionsRequest,
-  siteOrigin: z.string(),
-});
-export type GrantAttenuatedPermissionsParams = z.infer<
-  typeof zGrantAttenuatedPermissionsParams
->;
-
-export const zGatorPermission = z.object({
-  // A type used for matching requests:
-  type: zTypeDescriptor,
-
-  // Used to represent the permission to the user:
-  proposedName: z.string(),
-});
-
-export type GatorPermission = z.infer<typeof zGatorPermission>;

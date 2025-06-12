@@ -2,6 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
+import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type { ProfileSyncManager } from '../profileSync';
 import { validatePermissionRequestParam } from '../utils/validate';
 
@@ -16,6 +17,13 @@ export type RpcHandler = {
    * @returns The result of the grant permission request.
    */
   grantPermission(params?: Json): Promise<Json>;
+
+  /**
+   * Handles get permission offers requests.
+   *
+   * @returns The permission offers.
+   */
+  getPermissionOffers(): Promise<Json>;
 };
 
 /**
@@ -69,7 +77,18 @@ export function createRpcHandler(config: {
     return responses as Json[];
   };
 
+  /**
+   * Handles get permission offers requests.
+   *
+   * @returns The permission offers.
+   */
+  const getPermissionOffers = async (): Promise<Json> => {
+    logger.debug('getPermissionOffers()');
+    return DEFAULT_GATOR_PERMISSION_TO_OFFER;
+  };
+
   return {
     grantPermission,
+    getPermissionOffers,
   };
 }

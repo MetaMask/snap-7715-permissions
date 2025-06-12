@@ -351,4 +351,24 @@ describe('RpcHandler', () => {
       expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
     });
   });
+
+  describe('getPermissionOffers', () => {
+    it('should return the default permission offers', async () => {
+      const result = await handler.getPermissionOffers();
+      expect(result).toStrictEqual([
+        {
+          proposedName: 'Native Token Stream',
+          type: 'native-token-stream',
+        },
+        {
+          proposedName: 'Native Token Periodic Transfer',
+          type: 'native-token-periodic',
+        },
+        {
+          proposedName: 'ERC20 Token Stream',
+          type: 'erc20-token-stream',
+        },
+      ]);
+    });
+  });
 });

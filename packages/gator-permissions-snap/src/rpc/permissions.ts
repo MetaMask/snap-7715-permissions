@@ -3,7 +3,10 @@ import { KERNEL_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { RpcMethod } from './rpcMethod';
 
 const allowedPermissionsByOrigin: { [origin: string]: string[] } = {
-  [KERNEL_SNAP_ID]: [RpcMethod.PermissionProviderGrantAttenuatedPermissions],
+  [KERNEL_SNAP_ID]: [
+    RpcMethod.PermissionProviderGrantPermissions,
+    RpcMethod.PermissionProviderGetPermissionOffers,
+  ],
 };
 
 /**
