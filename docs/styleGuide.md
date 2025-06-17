@@ -49,7 +49,7 @@ Example:
 Example:
 ```typescript
 describe('MyFunction', () => {
-  it('should return the expected result when given valid input', () => {
+  it('returns the expected result when given valid input', () => {
     // Arrange
     const input = 'valid input';
     
