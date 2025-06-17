@@ -66,7 +66,7 @@ describe('MyFunction', () => {
 
 - Organize code by feature or domain
 - Keep files focused on a single responsibility
-- Use barrel exports (index.ts files) to simplify imports
+- Use barrel exports (index.ts files) sparingly, and with named exports, to simplify imports
 - Separate interfaces/types into their own files when they become large
 
 ## Git Workflow
