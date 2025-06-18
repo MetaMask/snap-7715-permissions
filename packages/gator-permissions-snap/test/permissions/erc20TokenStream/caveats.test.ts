@@ -47,7 +47,9 @@ describe('erc20TokenStream:caveats', () => {
         startTime,
       );
 
-      expect(mockCaveatBuilder.addCaveat).toHaveBeenCalledTimes(1);
+      expect(mockCaveatBuilder.addCaveat).toHaveBeenCalledWith('valueLte', 0n);
+
+      expect(mockCaveatBuilder.addCaveat).toHaveBeenCalledTimes(2);
     });
 
     it('should return the modified caveat builder', async () => {
