@@ -19,14 +19,16 @@ export async function appendCaveats({
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
 
-  caveatBuilder.addCaveat(
-    'erc20Streaming',
-    permission.data.tokenAddress,
-    BigInt(initialAmount),
-    BigInt(maxAmount),
-    BigInt(amountPerSecond),
-    startTime,
-  );
+  caveatBuilder
+    .addCaveat(
+      'erc20Streaming',
+      permission.data.tokenAddress,
+      BigInt(initialAmount),
+      BigInt(maxAmount),
+      BigInt(amountPerSecond),
+      startTime,
+    )
+    .addCaveat('valueLte', 0n);
 
   return caveatBuilder;
 }
