@@ -38,46 +38,66 @@ const mockMetadata: TestMetadata = {
 };
 
 const textRule: RuleDefinition<TestContext, TestMetadata> = {
-  label: 'Test Text Rule',
   name: 'test-text-rule',
-  tooltip: 'This is a test text rule',
+  label: 'Test Text Rule',
   type: 'text',
-  value: (context) => context.testValue,
-  error: (metadata) => metadata.validationErrors.testValue,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.testValue,
+    isVisible: true,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    tooltip: 'This is a test text rule',
+    error: metadata.validationErrors.testValue,
+  }),
   updateContext: (context, value) => ({ ...context, testValue: value }),
 };
 
 const numberRule: RuleDefinition<TestContext, TestMetadata> = {
-  label: 'Test Number Rule',
   name: 'test-number-rule',
+  label: 'Test Number Rule',
   type: 'number',
-  value: (context) => context.numberValue,
+  getRuleData: ({ context }) => ({
+    value: context.numberValue,
+    isVisible: true,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+  }),
   updateContext: (context, value) => ({ ...context, numberValue: value }),
 };
 
 const dropdownRule: RuleDefinition<TestContext, TestMetadata> = {
-  label: 'Test Dropdown Rule',
   name: 'test-dropdown-rule',
+  label: 'Test Dropdown Rule',
   type: 'dropdown',
-  options: ['option1', 'option2', 'option3'],
-  value: (context) => context.dropdownValue,
+  getRuleData: ({ context }) => ({
+    value: context.dropdownValue,
+    isVisible: true,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    options: ['option1', 'option2', 'option3'],
+  }),
   updateContext: (context, value) => ({ ...context, dropdownValue: value }),
 };
 
 const optionalRule: RuleDefinition<TestContext, TestMetadata> = {
-  label: 'Test Optional Rule',
   name: 'test-optional-rule',
+  label: 'Test Optional Rule',
   type: 'text',
   isOptional: true,
-  value: (context) => context.optionalValue,
+  getRuleData: ({ context }) => ({
+    value: context.optionalValue,
+    isVisible: true,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+  }),
   updateContext: (context, value) => ({ ...context, optionalValue: value }),
 };
 
 const undefinedValueRule: RuleDefinition<TestContext, TestMetadata> = {
-  label: 'Undefined Value Rule',
   name: 'undefined-value-rule',
+  label: 'Undefined Value Rule',
   type: 'text',
-  value: () => undefined,
+  getRuleData: () => ({
+    value: undefined,
+    isVisible: true,
+    isAdjustmentAllowed: true,
+  }),
   updateContext: (context, value) => ({ ...context, testValue: value }),
 };
 
@@ -488,13 +508,16 @@ describe('rules', () => {
       {
         "key": null,
         "props": {
-          "children": {
-            "key": null,
-            "props": {
-              "children": "test-value",
+          "children": [
+            null,
+            {
+              "key": null,
+              "props": {
+                "children": "test-value",
+              },
+              "type": "Text",
             },
-            "type": "Text",
-          },
+          ],
           "direction": "horizontal",
         },
         "type": "Box",
@@ -620,10 +643,15 @@ describe('rules', () => {
 
     it('should throw error for dropdown rule without options', () => {
       const invalidDropdownRule: RuleDefinition<TestContext, TestMetadata> = {
-        label: 'Invalid Dropdown',
         name: 'invalid-dropdown',
+        label: 'Invalid Dropdown',
         type: 'dropdown',
-        value: (context) => context.dropdownValue,
+        getRuleData: ({ context }) => ({
+          value: context.dropdownValue,
+          isVisible: true,
+          isAdjustmentAllowed: context.isAdjustmentAllowed,
+          // intentionally omitting options to test error handling
+        }),
         updateContext: (context, value) => ({
           ...context,
           dropdownValue: value,

@@ -86,7 +86,6 @@ export class RuleModalManager<
     context: TContext;
     metadata: TMetadata;
   }) {
-    return [];
     return this.#rules.filter(
       (rule) => rule.getRuleData({ context, metadata }).value === undefined,
     );

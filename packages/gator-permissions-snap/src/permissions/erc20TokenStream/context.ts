@@ -24,7 +24,7 @@ import type {
   PopulatedErc20TokenStreamPermission,
   Erc20TokenStreamPermission,
 } from './types';
-import { fetchIconDataBase64 } from '../iconUtil';
+import { fetchIconDataAsBase64 } from '../iconUtil';
 
 const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
 const DEFAULT_INITIAL_AMOUNT = '0x0';
@@ -114,11 +114,13 @@ export async function buildContext({
   tokenPricesService,
   accountController,
   tokenMetadataService,
+  fetcher,
 }: {
   permissionRequest: Erc20TokenStreamPermissionRequest;
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
+  fetcher?: typeof fetch;
 }): Promise<Erc20TokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
   const { tokenAddress } = permissionRequest.permission.data;
@@ -138,7 +140,10 @@ export async function buildContext({
     assetAddress: tokenAddress,
   });
 
-  const iconDataResponse = await fetchIconDataBase64(iconUrl);
+  const iconDataResponse = await fetchIconDataAsBase64({
+    iconUrl,
+    fetcher,
+  });
 
   const iconDataBase64 = iconDataResponse.success
     ? iconDataResponse.imageDataBase64

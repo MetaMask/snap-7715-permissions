@@ -23,7 +23,7 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
-import { fetchIconDataBase64 } from '../iconUtil';
+import { fetchIconDataAsBase64 } from '../iconUtil';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -96,11 +96,13 @@ export async function buildContext({
   tokenPricesService,
   accountController,
   tokenMetadataService,
+  fetcher,
 }: {
   permissionRequest: NativeTokenPeriodicPermissionRequest;
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
+  fetcher?: typeof fetch;
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
 
@@ -118,7 +120,10 @@ export async function buildContext({
     account: address,
   });
 
-  const iconDataResponse = await fetchIconDataBase64(iconUrl);
+  const iconDataResponse = await fetchIconDataAsBase64({
+    iconUrl,
+    fetcher,
+  });
 
   const iconDataBase64 = iconDataResponse.success
     ? iconDataResponse.imageDataBase64

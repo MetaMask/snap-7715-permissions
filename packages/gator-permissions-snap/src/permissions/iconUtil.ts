@@ -12,9 +12,15 @@ import { BaseTokenPermissionContext, IconData } from '../core/types';
  * @returns A Promise that resolves to a base64 data URI string, or undefined if iconUrl is empty
  * @throws Will throw an error if the fetch request fails or if there's an issue processing the image data
  */
-export const fetchIconDataBase64 = async (
-  iconUrl: string | undefined,
-): Promise<{ success: true; imageDataBase64: string } | { success: false }> => {
+export const fetchIconDataAsBase64 = async ({
+  iconUrl,
+  fetcher = fetch,
+}: {
+  iconUrl: string | undefined;
+  fetcher?: typeof fetch | undefined;
+}): Promise<
+  { success: true; imageDataBase64: string } | { success: false }
+> => {
   if (!iconUrl) {
     return { success: false };
   }
@@ -22,7 +28,11 @@ export const fetchIconDataBase64 = async (
   try {
     let base64 = 'data:image/png;base64,';
 
-    const iconResponse = await fetch(iconUrl);
+    const iconResponse = await fetcher(iconUrl);
+    if (!iconResponse.ok) {
+      return { success: false };
+    }
+
     const iconBuffer = await iconResponse.arrayBuffer();
     const uint8Array = new Uint8Array(iconBuffer);
 

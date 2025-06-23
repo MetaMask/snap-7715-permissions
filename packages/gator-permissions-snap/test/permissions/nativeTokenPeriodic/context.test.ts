@@ -65,6 +65,7 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
   tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,
+    iconDataBase64: null,
   },
   permissionDetails: {
     periodAmount: '1',
@@ -108,7 +109,7 @@ describe('nativeTokenPeriodic:context', () => {
     let mockTokenPricesService: jest.Mocked<TokenPricesService>;
     let mockAccountController: jest.Mocked<AccountController>;
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
-
+    let mockFetcher: jest.MockedFunction<typeof fetch>;
     beforeEach(() => {
       mockTokenPricesService = {
         getCryptoToFiatConversion: jest.fn(
@@ -128,19 +129,43 @@ describe('nativeTokenPeriodic:context', () => {
           balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: 18,
+          iconUrl: 'https://example.com/icon.png',
         })),
       } as unknown as jest.Mocked<TokenMetadataService>;
+
+      mockFetcher = jest.fn(() => {
+        Promise.resolve({
+          ok: false,
+        });
+      }) as unknown as jest.MockedFunction<typeof fetch>;
     });
 
     it('should create a context from a permission request', async () => {
+      const text = 'The contents of the image';
+      const uint8Array = new TextEncoder().encode(text);
+      const arrayBuffer = uint8Array.buffer;
+      const base64 = Buffer.from(uint8Array).toString('base64');
+
+      mockFetcher.mockResolvedValueOnce({
+        ok: true,
+        arrayBuffer: () => Promise.resolve(arrayBuffer),
+      } as unknown as Response);
+
       const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
         tokenPricesService: mockTokenPricesService,
         accountController: mockAccountController,
         tokenMetadataService: mockTokenMetadataService,
+        fetcher: mockFetcher,
       });
 
-      expect(context).toStrictEqual(alreadyPopulatedContext);
+      expect(context).toStrictEqual({
+        ...alreadyPopulatedContext,
+        tokenMetadata: {
+          ...alreadyPopulatedContext.tokenMetadata,
+          iconDataBase64: `data:image/png;base64,${base64}`,
+        },
+      });
 
       expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
