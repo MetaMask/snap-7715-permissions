@@ -24,6 +24,7 @@ import type {
   PopulatedErc20TokenStreamPermission,
   Erc20TokenStreamPermission,
 } from './types';
+import { fetchIconDataBase64 } from '../iconUtil';
 
 const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
 const DEFAULT_INITIAL_AMOUNT = '0x0';
@@ -130,11 +131,18 @@ export async function buildContext({
     balance: rawBalance,
     decimals,
     symbol,
+    iconUrl,
   } = await tokenMetadataService.getTokenBalanceAndMetadata({
     chainId,
     account: address,
     assetAddress: tokenAddress,
   });
+
+  const iconDataResponse = await fetchIconDataBase64(iconUrl);
+
+  const iconDataBase64 = iconDataResponse.success
+    ? iconDataResponse.imageDataBase64
+    : null;
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:${chainId}/erc20:${tokenAddress}`,
@@ -187,6 +195,7 @@ export async function buildContext({
     tokenMetadata: {
       symbol,
       decimals,
+      iconDataBase64,
     },
     permissionDetails: {
       initialAmount,

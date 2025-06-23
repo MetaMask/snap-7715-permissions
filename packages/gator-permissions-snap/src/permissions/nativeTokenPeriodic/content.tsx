@@ -7,7 +7,6 @@ import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
-import { IconUrls } from '../../ui/iconConstant';
 import {
   periodAmountRule,
   periodTypeRule,
@@ -19,6 +18,7 @@ import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
 } from './types';
+import { TokenIcon } from '../../ui/components/TokenIcon';
 
 /**
  * Creates UI content for a native token periodic permission confirmation.
@@ -59,8 +59,13 @@ export async function createConfirmationContent({
     },
     {
       label: 'Token',
-      text: 'ETH',
-      iconUrl: IconUrls.ethereum.token,
+      text: context.tokenMetadata.symbol,
+      icon: (
+        <TokenIcon
+          imageDataBase64={context.tokenMetadata.iconDataBase64}
+          altText={context.tokenMetadata.symbol}
+        />
+      ),
     },
   ];
 

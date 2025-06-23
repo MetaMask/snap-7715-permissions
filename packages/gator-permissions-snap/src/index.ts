@@ -16,7 +16,7 @@ import type {
   OnRpcRequestHandler,
   OnUserInputHandler,
 } from '@metamask/snaps-sdk';
-import { lineaSepolia, sepolia } from 'viem/chains';
+import { mainnet, sepolia } from 'viem/chains';
 
 import {
   EoaAccountController,
@@ -76,7 +76,7 @@ const tokenMetadataService = new TokenMetadataService({
   tokenMetadataClient,
 });
 
-const supportedChains = [sepolia, lineaSepolia];
+const supportedChains = [sepolia, mainnet];
 
 const accountController: AccountController = useEoaAccountController
   ? new EoaAccountController({

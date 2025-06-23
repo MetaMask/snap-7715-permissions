@@ -1,15 +1,8 @@
-import {
-  Box,
-  Text,
-  Input,
-  Button,
-  Field,
-  Image,
-  Icon,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Text, Input, Button, Field, Icon } from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
 import { TooltipIcon } from './TooltipIcon';
+import { TokenIcon } from './TokenIcon';
 
 export type InputFieldParams = {
   label: string;
@@ -22,7 +15,7 @@ export type InputFieldParams = {
   errorMessage?: string | undefined;
   iconData?:
     | {
-        iconUrl: string;
+        iconDataBase64: string;
         iconAltText: string;
       }
     | undefined;
@@ -39,8 +32,22 @@ export const InputField = ({
   errorMessage,
   iconData,
 }: InputFieldParams) => {
+  const iconElement = iconData ? (
+    <TokenIcon
+      imageDataBase64={iconData.iconDataBase64}
+      altText={iconData.iconAltText}
+    />
+  ) : null;
+
   if (disabled) {
-    return <TextField label={label} value={value} tooltip={tooltip} />;
+    return (
+      <TextField
+        label={label}
+        value={value}
+        tooltip={tooltip}
+        iconData={iconData}
+      />
+    );
   }
 
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
@@ -48,9 +55,6 @@ export const InputField = ({
     <Button name={removeButtonName} type="button">
       <Icon name="close" color="primary" size="md" />
     </Button>
-  ) : null;
-  const iconElement = iconData ? (
-    <Image src={iconData.iconUrl} alt={iconData.iconAltText} />
   ) : null;
 
   return (

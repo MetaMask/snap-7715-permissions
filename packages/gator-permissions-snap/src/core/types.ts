@@ -55,6 +55,7 @@ export type BaseTokenPermissionContext = BaseContext & {
   tokenMetadata: {
     decimals: number;
     symbol: string;
+    iconDataBase64: string | null;
   };
 };
 
@@ -168,8 +169,18 @@ export type LifecycleOrchestrationHandlers<
 export type RuleType = 'number' | 'text' | 'dropdown';
 
 export type IconData = {
-  iconUrl: string;
+  iconDataBase64: string;
   iconAltText: string;
+};
+
+export type RuleData = {
+  value: string | undefined;
+  isVisible: boolean;
+  tooltip?: string | undefined;
+  iconData?: IconData | undefined;
+  error?: string | undefined;
+  options?: string[] | undefined;
+  isAdjustmentAllowed: boolean;
 };
 
 /**
@@ -182,16 +193,11 @@ export type RuleDefinition<
   TContext extends BaseContext = BaseContext,
   TMetadata extends object = object,
 > = {
-  label: string;
   name: string;
-  tooltip?: string | undefined;
   isOptional?: boolean;
+  label: string;
   type: RuleType;
-  value: (context: TContext) => string | undefined;
-  error?: (metadata: TMetadata) => string | undefined;
-  options?: string[];
-  isVisible?: (context: TContext) => boolean;
-  iconData?: IconData;
+  getRuleData: (config: { context: TContext; metadata: TMetadata }) => RuleData;
   // todo: it would be nice if we could make the value type more specific
   updateContext: (context: TContext, value: any) => TContext;
 };

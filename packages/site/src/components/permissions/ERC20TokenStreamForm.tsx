@@ -30,7 +30,7 @@ export const ERC20TokenStreamForm = ({
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
   const [tokenAddress, setTokenAddress] = useState<Hex>(
-    '0x616553f076c6f66739a99fef373c6b4ae1b22a7a', // Consensys USDC
+    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // Consensys USDC
   );
 
   const handleInitialAmountChange = useCallback(

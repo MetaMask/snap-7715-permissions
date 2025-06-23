@@ -23,6 +23,7 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
+import { fetchIconDataBase64 } from '../iconUtil';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -111,10 +112,17 @@ export async function buildContext({
     balance: rawBalance,
     decimals,
     symbol,
+    iconUrl,
   } = await tokenMetadataService.getTokenBalanceAndMetadata({
     chainId,
     account: address,
   });
+
+  const iconDataResponse = await fetchIconDataBase64(iconUrl);
+
+  const iconDataBase64 = iconDataResponse.success
+    ? iconDataResponse.imageDataBase64
+    : null;
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:1/slip44:60`,
@@ -163,6 +171,7 @@ export async function buildContext({
     tokenMetadata: {
       symbol,
       decimals,
+      iconDataBase64,
     },
     permissionDetails: {
       periodAmount,

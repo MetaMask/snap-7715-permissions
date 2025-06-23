@@ -1,12 +1,5 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Field,
-  Input,
-  Section,
-  Text,
-  Image,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Field, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import { getChainName } from '../../../../shared/src/utils/common';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
@@ -15,7 +8,6 @@ import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
-import { IconUrls } from '../../ui/iconConstant';
 import {
   initialAmountRule,
   maxAmountRule,
@@ -28,6 +20,7 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
+import { TokenIcon } from '../../ui/components/TokenIcon';
 
 /**
  * Creates the confirmation content for a native token stream permission request.
@@ -71,7 +64,12 @@ export async function createConfirmationContent({
     {
       label: 'Token',
       text: context.tokenMetadata.symbol,
-      iconUrl: IconUrls.ethereum.token,
+      icon: (
+        <TokenIcon
+          imageDataBase64={context.tokenMetadata.iconDataBase64}
+          altText={context.tokenMetadata.symbol}
+        />
+      ),
     },
   ];
 
@@ -105,9 +103,9 @@ export async function createConfirmationContent({
           </Box>
           <Field>
             <Box>
-              <Image
-                src={IconUrls.ethereum.token}
-                alt={`${context.tokenMetadata.symbol} token icon`}
+              <TokenIcon
+                imageDataBase64={context.tokenMetadata.iconDataBase64}
+                altText={context.tokenMetadata.symbol}
               />
             </Box>
             <Input

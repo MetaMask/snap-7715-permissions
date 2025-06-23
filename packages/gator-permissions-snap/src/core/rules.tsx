@@ -30,58 +30,62 @@ export function renderRule<
   context: TContext;
   metadata: TMetadata;
 }): GenericSnapElement | null {
-  const value = rule.value(context);
+  const { label, type, name, isOptional } = rule;
+  const {
+    value,
+    error,
+    tooltip,
+    iconData,
+    isVisible,
+    options,
+    isAdjustmentAllowed,
+  } = rule.getRuleData({ context, metadata });
 
-  const isVisible = rule.isVisible?.(context) ?? true;
-
-  if (value === undefined || !isVisible) {
+  if (value === null || value === undefined || !isVisible) {
     // If the value is not set, don't render the rule
     return null;
   }
 
-  const error = rule.error?.(metadata);
-  const isDisabled = !context.isAdjustmentAllowed;
-  const removeButtonName = rule.isOptional
-    ? `${rule.name}_removeButton`
-    : undefined;
+  const isDisabled = !isAdjustmentAllowed;
+  const removeButtonName = isOptional ? `${name}_removeButton` : undefined;
 
-  switch (rule.type) {
+  switch (type) {
     case 'number':
     case 'text': {
       return (
         <InputField
-          label={rule.label}
-          name={rule.name}
-          value={value}
+          label={label}
+          name={name}
+          value={value ?? ''}
           errorMessage={error}
           disabled={isDisabled}
-          tooltip={rule.tooltip}
-          type={rule.type}
+          tooltip={tooltip}
+          type={type}
           removeButtonName={removeButtonName}
-          iconData={rule.iconData}
+          iconData={iconData}
         />
       );
     }
     case 'dropdown': {
-      if (!rule.options) {
+      if (!options) {
         // todo: type constraint on this would be nice
         throw new Error('Dropdown rule must have options');
       }
 
       return (
         <DropdownField
-          label={rule.label}
-          name={rule.name}
-          options={rule.options}
-          value={value}
+          label={label}
+          name={name}
+          options={options}
+          value={value ?? ''}
           errorMessage={error}
           disabled={isDisabled}
-          tooltip={rule.tooltip}
+          tooltip={tooltip}
         />
       );
     }
     default: {
-      throw new Error(`Unknown rule type: ${rule.type as string}`);
+      throw new Error(`Unknown rule type: ${type as string}`);
     }
   }
 }
@@ -144,6 +148,8 @@ export function bindRuleHandlers<
       handler: UserEventHandler<UserInputEventType>;
     }[]
   >((acc, rule) => {
+    const { name, isOptional } = rule;
+
     const handleInputChange: UserEventHandler<
       UserInputEventType.InputChangeEvent
     > = async ({ event }) => {
@@ -154,19 +160,19 @@ export function bindRuleHandlers<
       await onContextChanged({ context: updatedContext });
     };
     userEventDispatcher.on({
-      elementName: rule.name,
+      elementName: name,
       eventType: UserInputEventType.InputChangeEvent,
       interfaceId,
       handler: handleInputChange,
     });
 
     acc.push({
-      elementName: rule.name,
+      elementName: name,
       eventType: UserInputEventType.InputChangeEvent,
       handler: handleInputChange as UserEventHandler<UserInputEventType>,
     });
 
-    if (rule.isOptional) {
+    if (isOptional) {
       const handleRemoveButtonClick: UserEventHandler<
         UserInputEventType.ButtonClickEvent
       > = async (_) => {

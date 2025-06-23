@@ -1,4 +1,10 @@
-import { Text, Section, Box, Image } from '@metamask/snaps-sdk/jsx';
+import {
+  Text,
+  Section,
+  Box,
+  Image,
+  SnapElement,
+} from '@metamask/snaps-sdk/jsx';
 
 import { ShowMoreText } from './ShowMoreText';
 import { TooltipIcon } from './TooltipIcon';
@@ -15,6 +21,7 @@ export type ItemDetails = {
   text: string;
   tooltipText?: string | undefined;
   iconUrl?: string | undefined;
+  icon?: SnapElement;
 };
 
 export const RequestDetails = ({
@@ -24,8 +31,14 @@ export const RequestDetails = ({
   justificationShowMoreElementName,
 }: RequestDetailsProps) => {
   const requestDetailsFields = itemDetails.map(
-    ({ label, text, iconUrl, tooltipText }) => {
-      const iconElement = iconUrl ? <Image src={iconUrl} alt={text} /> : null;
+    ({ label, text, iconUrl, icon, tooltipText }) => {
+      let iconElement: SnapElement | null = null;
+
+      if (icon) {
+        iconElement = icon;
+      } else if (iconUrl) {
+        iconElement = <Image src={iconUrl} alt={text} />;
+      }
 
       const tooltipElement = tooltipText ? (
         <TooltipIcon tooltip={tooltipText} />

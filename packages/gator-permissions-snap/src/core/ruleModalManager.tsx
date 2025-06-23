@@ -79,20 +79,36 @@ export class RuleModalManager<
     this.#deriveMetadata = deriveMetadata;
   }
 
-  #getRulesToAdd({ context }: { context: TContext }) {
-    return this.#rules.filter((rule) => rule.value(context) === undefined);
+  #getRulesToAdd({
+    context,
+    metadata,
+  }: {
+    context: TContext;
+    metadata: TMetadata;
+  }) {
+    return [];
+    return this.#rules.filter(
+      (rule) => rule.getRuleData({ context, metadata }).value === undefined,
+    );
   }
 
-  hasRulesToAdd(args: { context: TContext }) {
-    return this.#getRulesToAdd({ context: args.context }).length > 0;
+  hasRulesToAdd({
+    context,
+    metadata,
+  }: {
+    context: TContext;
+    metadata: TMetadata;
+  }) {
+    return this.#getRulesToAdd({ context, metadata }).length > 0;
   }
 
   async renderModal() {
     const context = this.#getContext();
+    const metadata = await this.#deriveMetadata({ context });
 
     const validationMessage = await this.#getValidationMessage();
 
-    const rulesToAdd = this.#getRulesToAdd({ context }).map(
+    const rulesToAdd = this.#getRulesToAdd({ context, metadata }).map(
       (rule) => rule.label,
     );
 
@@ -117,7 +133,7 @@ export class RuleModalManager<
             <Option value={ruleIndex.toString()}>{rule}</Option>
           ))}
         </Dropdown>
-        <Field error={validationMessage}>
+        <Field error={validationMessage ?? undefined}>
           <Input name={NEW_RULE_VALUE_ELEMENT} type="number" />
         </Field>
         <Button
@@ -161,7 +177,8 @@ export class RuleModalManager<
     > = async () => {
       if (this.#ruleValue) {
         const context = this.#getContext();
-        const selectedRule = this.#getRulesToAdd({ context })[
+        const metadata = await this.#deriveMetadata({ context });
+        const selectedRule = this.#getRulesToAdd({ context, metadata })[
           this.#selectedRuleIndex
         ];
 
@@ -229,16 +246,18 @@ export class RuleModalManager<
     this.#handlers = [];
   }
 
-  async #getValidationMessage(): Promise<string | undefined> {
+  async #getValidationMessage(): Promise<string | undefined | null> {
     if (!this.#ruleValue) {
       return 'Enter a value';
     }
 
     const originalContext = this.#getContext();
 
-    const selectedRule = this.#rules.filter(
-      (rule) => rule.value(originalContext) === undefined,
-    )[this.#selectedRuleIndex];
+    const metadata = await this.#deriveMetadata({ context: originalContext });
+    const selectedRule = this.#getRulesToAdd({
+      context: originalContext,
+      metadata,
+    })[this.#selectedRuleIndex];
 
     if (selectedRule === undefined) {
       throw new Error('Rule not found');
@@ -248,8 +267,14 @@ export class RuleModalManager<
       originalContext,
       this.#ruleValue,
     );
-    const metadata = await this.#deriveMetadata({ context: updatedContext });
-    const error = selectedRule.error?.(metadata);
+    const updatedMetadata = await this.#deriveMetadata({
+      context: updatedContext,
+    });
+
+    const error = selectedRule.getRuleData({
+      context: updatedContext,
+      metadata: updatedMetadata,
+    }).error;
 
     return error;
   }

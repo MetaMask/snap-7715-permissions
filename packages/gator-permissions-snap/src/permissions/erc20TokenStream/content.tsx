@@ -20,6 +20,7 @@ import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
 } from './types';
+import { TokenIcon } from '../../ui/components/TokenIcon';
 
 /**
  * Creates the confirmation content for an ERC20 token stream permission request.
@@ -63,6 +64,12 @@ export async function createConfirmationContent({
     {
       label: 'Token',
       text: context.tokenMetadata.symbol,
+      icon: (
+        <TokenIcon
+          imageDataBase64={context.tokenMetadata.iconDataBase64}
+          altText={context.tokenMetadata.symbol}
+        />
+      ),
     },
   ];
 
@@ -95,6 +102,12 @@ export async function createConfirmationContent({
             </Box>
           </Box>
           <Field>
+            <Box>
+              <TokenIcon
+                imageDataBase64={context.tokenMetadata.iconDataBase64}
+                altText={context.tokenMetadata.symbol}
+              />
+            </Box>
             <Input
               name="stream-rate"
               type="text"

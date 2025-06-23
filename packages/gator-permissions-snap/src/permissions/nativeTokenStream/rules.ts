@@ -1,6 +1,6 @@
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
-import { IconUrls } from '../../ui/iconConstant';
+import { getIconData } from '../iconUtil';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
@@ -20,19 +20,17 @@ type NativeTokenStreamRuleDefinition = RuleDefinition<
 >;
 
 export const initialAmountRule: NativeTokenStreamRuleDefinition = {
-  label: 'Initial Amount',
   name: INITIAL_AMOUNT_ELEMENT,
+  label: 'Initial Amount',
   type: 'number',
-  isOptional: true,
-  iconData: {
-    iconUrl: IconUrls.ethereum.token,
-    iconAltText: 'Ether token icon',
-  },
-  tooltip: 'The initial amount of tokens that can be streamed.',
-  value: (context: NativeTokenStreamContext) =>
-    context.permissionDetails.initialAmount,
-  error: (metadata: NativeTokenStreamMetadata) =>
-    metadata.validationErrors.initialAmountError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.initialAmount,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    iconData: getIconData(context),
+    tooltip: 'The initial amount of tokens that can be streamed.',
+    error: metadata.validationErrors.initialAmountError,
+  }),
   updateContext: (
     context: NativeTokenStreamContext,
     value: string | undefined,
@@ -46,19 +44,17 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
 };
 
 export const maxAmountRule: NativeTokenStreamRuleDefinition = {
-  label: 'Max Amount',
   name: MAX_AMOUNT_ELEMENT,
-  tooltip: 'The maximum amount of tokens that can be streamed.',
+  label: 'Max Amount',
   type: 'number',
-  isOptional: true,
-  iconData: {
-    iconUrl: IconUrls.ethereum.token,
-    iconAltText: 'Ether token icon',
-  },
-  value: (context: NativeTokenStreamContext) =>
-    context.permissionDetails.maxAmount,
-  error: (metadata: NativeTokenStreamMetadata) =>
-    metadata.validationErrors.maxAmountError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.maxAmount,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The maximum amount of tokens that can be streamed.',
+    iconData: getIconData(context),
+    error: metadata.validationErrors.maxAmountError,
+  }),
   updateContext: (
     context: NativeTokenStreamContext,
     value: string | undefined,
@@ -72,14 +68,16 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
 };
 
 export const startTimeRule: NativeTokenStreamRuleDefinition = {
-  label: 'Start Time',
   name: START_TIME_ELEMENT,
+  label: 'Start Time',
   type: 'text',
-  tooltip: 'The start time of the stream.',
-  value: (context: NativeTokenStreamContext) =>
-    context.permissionDetails.startTime,
-  error: (metadata: NativeTokenStreamMetadata) =>
-    metadata.validationErrors.startTimeError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.startTime,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The start time of the stream.',
+    error: metadata.validationErrors.startTimeError,
+  }),
   updateContext: (context: NativeTokenStreamContext, value: string) => ({
     ...context,
     permissionDetails: {
@@ -90,18 +88,17 @@ export const startTimeRule: NativeTokenStreamRuleDefinition = {
 };
 
 export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
-  label: 'Stream Amount',
   name: AMOUNT_PER_PERIOD_ELEMENT,
+  label: 'Stream Amount',
   type: 'number',
-  tooltip: 'The amount of tokens that can be streamed per period.',
-  iconData: {
-    iconUrl: IconUrls.ethereum.token,
-    iconAltText: 'Ether token icon',
-  },
-  value: (context: NativeTokenStreamContext) =>
-    context.permissionDetails.amountPerPeriod,
-  error: (metadata: NativeTokenStreamMetadata) =>
-    metadata.validationErrors.amountPerPeriodError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.amountPerPeriod,
+    isVisible: true,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    tooltip: 'The amount of tokens that can be streamed per period.',
+    iconData: getIconData(context),
+    error: metadata.validationErrors.amountPerPeriodError,
+  }),
   updateContext: (context: NativeTokenStreamContext, value: string) => ({
     ...context,
     permissionDetails: {
@@ -112,13 +109,16 @@ export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
 };
 
 export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
-  label: 'Stream Period',
   name: TIME_PERIOD_ELEMENT,
+  label: 'Stream Period',
   type: 'dropdown',
-  tooltip: 'The period of the stream.',
-  options: Object.values(TimePeriod),
-  value: (context: NativeTokenStreamContext) =>
-    context.permissionDetails.timePeriod,
+  getRuleData: ({ context }) => ({
+    value: context.permissionDetails.timePeriod,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The period of the stream.',
+    options: Object.values(TimePeriod),
+  }),
   updateContext: (context: NativeTokenStreamContext, value: TimePeriod) => ({
     ...context,
     permissionDetails: {
@@ -129,13 +129,16 @@ export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
 };
 
 export const expiryRule: NativeTokenStreamRuleDefinition = {
-  label: 'Expiry',
   name: EXPIRY_ELEMENT,
+  label: 'Expiry',
   type: 'text',
-  tooltip: 'The expiry date of the permission.',
-  value: (context: NativeTokenStreamContext) => context.expiry,
-  error: (metadata: NativeTokenStreamMetadata) =>
-    metadata.validationErrors.expiryError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.expiry,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The expiry date of the permission.',
+    error: metadata.validationErrors.expiryError,
+  }),
   updateContext: (context: NativeTokenStreamContext, value: string) => ({
     ...context,
     expiry: value,
