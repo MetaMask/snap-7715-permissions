@@ -64,12 +64,12 @@ export async function createConfirmationContent({
     {
       label: 'Token',
       text: context.tokenMetadata.symbol,
-      icon: (
-        <TokenIcon
-          imageDataBase64={context.tokenMetadata.iconDataBase64}
-          altText={context.tokenMetadata.symbol}
-        />
-      ),
+      iconData: context.tokenMetadata.iconDataBase64
+        ? {
+            iconDataBase64: context.tokenMetadata.iconDataBase64,
+            altText: context.tokenMetadata.symbol,
+          }
+        : undefined,
     },
   ];
 

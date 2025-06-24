@@ -7,7 +7,6 @@ import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
-import { TokenIcon } from '../../ui/components/TokenIcon';
 import {
   periodAmountRule,
   periodTypeRule,
@@ -60,12 +59,12 @@ export async function createConfirmationContent({
     {
       label: 'Token',
       text: context.tokenMetadata.symbol,
-      icon: (
-        <TokenIcon
-          imageDataBase64={context.tokenMetadata.iconDataBase64}
-          altText={context.tokenMetadata.symbol}
-        />
-      ),
+      iconData: context.tokenMetadata.iconDataBase64
+        ? {
+            iconDataBase64: context.tokenMetadata.iconDataBase64,
+            altText: context.tokenMetadata.symbol,
+          }
+        : undefined,
     },
   ];
 
