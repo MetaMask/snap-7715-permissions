@@ -1,10 +1,5 @@
-import {
-  Text,
-  Section,
-  Box,
-  Image,
-  SnapElement,
-} from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
+import { Text, Section, Box, Image } from '@metamask/snaps-sdk/jsx';
 
 import { ShowMoreText } from './ShowMoreText';
 import { TooltipIcon } from './TooltipIcon';

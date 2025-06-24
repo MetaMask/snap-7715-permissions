@@ -143,7 +143,7 @@ describe('BlockchainTokenMetadataClient', () => {
           account: mockAccount,
           assetAddress: mockTokenAddress,
         }),
-      ).rejects.toThrow('Failed to fetch balance');
+      ).rejects.toThrow('Failed to fetch token balance');
     });
 
     it('throws an error if ERC20 token decimals fetch fails', async () => {
@@ -163,7 +163,7 @@ describe('BlockchainTokenMetadataClient', () => {
           account: mockAccount,
           assetAddress: mockTokenAddress,
         }),
-      ).rejects.toThrow('Failed to fetch decimals');
+      ).rejects.toThrow('Failed to fetch token decimals');
     });
 
     it('throws an error if ERC20 token symbol fetch fails', async () => {
@@ -183,7 +183,7 @@ describe('BlockchainTokenMetadataClient', () => {
           account: mockAccount,
           assetAddress: mockTokenAddress,
         }),
-      ).rejects.toThrow('Failed to fetch symbol');
+      ).rejects.toThrow('Failed to fetch token symbol');
     });
   });
 });

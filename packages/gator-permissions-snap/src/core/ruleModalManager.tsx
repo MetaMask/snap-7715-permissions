@@ -270,10 +270,10 @@ export class RuleModalManager<
       context: updatedContext,
     });
 
-    const error = selectedRule.getRuleData({
+    const { error } = selectedRule.getRuleData({
       context: updatedContext,
       metadata: updatedMetadata,
-    }).error;
+    });
 
     return error;
   }

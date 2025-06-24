@@ -1,8 +1,8 @@
 import { Box, Text, Input, Button, Field, Icon } from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
-import { TooltipIcon } from './TooltipIcon';
 import { TokenIcon } from './TokenIcon';
+import { TooltipIcon } from './TooltipIcon';
 
 export type InputFieldParams = {
   label: string;

@@ -129,7 +129,6 @@ describe('nativeTokenStream:context', () => {
     let mockTokenPricesService: jest.Mocked<TokenPricesService>;
     let mockAccountController: jest.Mocked<AccountController>;
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
-    let mockFetcher: jest.MockedFunction<typeof fetch>;
     beforeEach(() => {
       mockTokenPricesService = {
         getCryptoToFiatConversion: jest.fn(
@@ -151,32 +150,27 @@ describe('nativeTokenStream:context', () => {
           decimals: 18,
           iconUrl: 'https://example.com/icon.png',
         })),
+        fetchIconDataAsBase64: jest.fn(async () =>
+          Promise.resolve({ success: false }),
+        ),
       } as unknown as jest.Mocked<TokenMetadataService>;
-
-      mockFetcher = jest.fn(() => {
-        Promise.resolve({
-          ok: false,
-        });
-      }) as unknown as jest.MockedFunction<typeof fetch>;
     });
 
     it('should create a context from a permission request', async () => {
       const text = 'The contents of the image';
-      const uint8Array = new TextEncoder().encode(text);
-      const arrayBuffer = uint8Array.buffer;
-      const base64 = Buffer.from(uint8Array).toString('base64');
+      /* eslint-disable no-restricted-globals */
+      const base64 = Buffer.from(text, 'utf8').toString('base64');
 
-      mockFetcher.mockResolvedValueOnce({
-        ok: true,
-        arrayBuffer: () => Promise.resolve(arrayBuffer),
-      } as unknown as Response);
+      mockTokenMetadataService.fetchIconDataAsBase64.mockResolvedValueOnce({
+        success: true,
+        imageDataBase64: `data:image/png;base64,${base64}`,
+      });
 
       const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
         tokenPricesService: mockTokenPricesService,
         accountController: mockAccountController,
         tokenMetadataService: mockTokenMetadataService,
-        fetcher: mockFetcher,
       });
 
       expect(context).toStrictEqual({

@@ -24,7 +24,6 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
-import { fetchIconDataAsBase64 } from '../iconUtil';
 
 const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
 const DEFAULT_INITIAL_AMOUNT = '0x0';
@@ -113,13 +112,11 @@ export async function buildContext({
   tokenPricesService,
   accountController,
   tokenMetadataService,
-  fetcher,
 }: {
   permissionRequest: NativeTokenStreamPermissionRequest;
   tokenPricesService: TokenPricesService;
   accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
-  fetcher?: typeof fetch;
 }): Promise<NativeTokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
 
@@ -137,10 +134,8 @@ export async function buildContext({
     account: address,
   });
 
-  const iconDataResponse = await fetchIconDataAsBase64({
-    iconUrl,
-    fetcher,
-  });
+  const iconDataResponse =
+    await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
 
   const iconDataBase64 = iconDataResponse.success
     ? iconDataResponse.imageDataBase64

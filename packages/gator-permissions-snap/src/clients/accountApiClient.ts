@@ -97,11 +97,6 @@ export class AccountApiClient {
     // zeroAddress is the native token on the specified chain
     const tokenAddress = assetAddress ?? zeroAddress;
 
-    console.log(
-      'Fetching ' +
-        `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
-    );
-
     const response = await this.#fetch(
       `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
     );
@@ -138,8 +133,6 @@ export class AccountApiClient {
     }
 
     const balance = BigInt(accountData.rawBalance);
-
-    console.log('Icon url ' + iconUrl);
 
     return {
       balance,

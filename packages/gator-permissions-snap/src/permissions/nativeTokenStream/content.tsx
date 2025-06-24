@@ -7,6 +7,7 @@ import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
+import { TokenIcon } from '../../ui/components/TokenIcon';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
 import {
   initialAmountRule,
@@ -20,7 +21,6 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
-import { TokenIcon } from '../../ui/components/TokenIcon';
 
 /**
  * Creates the confirmation content for a native token stream permission request.

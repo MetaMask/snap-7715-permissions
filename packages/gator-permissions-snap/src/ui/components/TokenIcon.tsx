@@ -1,4 +1,5 @@
-import { SnapComponent, Image, Text } from '@metamask/snaps-sdk/jsx';
+import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import { Image, Text } from '@metamask/snaps-sdk/jsx';
 
 export type TokenIconParams = {
   imageDataBase64: string | null;

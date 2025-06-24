@@ -7,6 +7,7 @@ import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
+import { TokenIcon } from '../../ui/components/TokenIcon';
 import {
   periodAmountRule,
   periodTypeRule,
@@ -18,7 +19,6 @@ import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
 } from './types';
-import { TokenIcon } from '../../ui/components/TokenIcon';
 
 /**
  * Creates UI content for a native token periodic permission confirmation.

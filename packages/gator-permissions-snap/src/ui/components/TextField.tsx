@@ -1,7 +1,7 @@
 import { Box, Text } from '@metamask/snaps-sdk/jsx';
 
-import { TooltipIcon } from './TooltipIcon';
 import { TokenIcon } from './TokenIcon';
+import { TooltipIcon } from './TooltipIcon';
 
 export type TextFieldParams = {
   label: string;

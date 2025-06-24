@@ -21,22 +21,28 @@ export class TokenMetadataService {
 
   readonly #tokenMetadataClient: TokenMetadataClient;
 
+  readonly #fetcher: typeof fetch;
+
   /**
    * Initializes a new TokenMetadataService instance.
    *
    * @param config - The configuration object.
    * @param config.accountApiClient - The client for interacting with the account API.
    * @param config.tokenMetadataClient - The client for interacting with the token metadata.
+   * @param config.fetcher - The fetch function to use for HTTP requests.
    */
   constructor({
     accountApiClient,
     tokenMetadataClient,
+    fetcher = fetch,
   }: {
     accountApiClient: AccountApiClient;
     tokenMetadataClient: TokenMetadataClient;
+    fetcher?: typeof fetch;
   }) {
     this.#accountApiClient = accountApiClient;
     this.#tokenMetadataClient = tokenMetadataClient;
+    this.#fetcher = fetcher;
   }
 
   /**
@@ -83,5 +89,42 @@ export class TokenMetadataService {
     );
 
     return balanceAndMetadata;
+  }
+
+  /**
+   * Fetches an icon from a URL and converts it to a base64 data URI.
+   *
+   * This function downloads an image from the provided URL, converts the binary data
+   * to a base64 string using a browser-compatible approach, and returns it as a
+   * data URI with PNG MIME type.
+   *
+   * @param iconUrl - The URL of the icon to fetch and convert.
+   * @returns A Promise that resolves to a base64 data URI string, or undefined if iconUrl is empty.
+   * @throws Will throw an error if the fetch request fails or if there's an issue processing the image data.
+   */
+  public async fetchIconDataAsBase64(
+    iconUrl: string | undefined,
+  ): Promise<{ success: true; imageDataBase64: string } | { success: false }> {
+    if (!iconUrl) {
+      return { success: false };
+    }
+
+    try {
+      const iconResponse = await this.#fetcher(iconUrl);
+      if (!iconResponse.ok) {
+        return { success: false };
+      }
+
+      const iconBuffer = await iconResponse.arrayBuffer();
+      /* eslint-disable no-restricted-globals */
+      const buffer = Buffer.from(iconBuffer);
+
+      const imageDataBase64 = `data:image/png;base64,${buffer.toString('base64')}`;
+
+      return { success: true, imageDataBase64 };
+    } catch (error) {
+      logger.error('Error fetching icon data', error);
+      return { success: false };
+    }
   }
 }
