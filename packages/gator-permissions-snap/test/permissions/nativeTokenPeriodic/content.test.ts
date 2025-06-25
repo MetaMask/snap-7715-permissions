@@ -215,13 +215,7 @@ describe('nativeTokenPeriodic:content', () => {
                           "key": null,
                           "props": {
                             "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": " ",
-                                },
-                                "type": "Text",
-                              },
+                              null,
                               {
                                 "key": null,
                                 "props": {
@@ -994,13 +988,7 @@ describe('nativeTokenPeriodic:content', () => {
                           "key": null,
                           "props": {
                             "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": " ",
-                                },
-                                "type": "Text",
-                              },
+                              null,
                               {
                                 "key": null,
                                 "props": {
