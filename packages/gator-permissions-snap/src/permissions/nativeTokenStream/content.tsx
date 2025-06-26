@@ -1,12 +1,5 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Field,
-  Input,
-  Section,
-  Text,
-  Image,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Field, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import { getChainName } from '../../../../shared/src/utils/common';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
@@ -14,8 +7,8 @@ import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
+import { TokenIcon } from '../../ui/components/TokenIcon';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
-import { IconUrls } from '../../ui/iconConstant';
 import {
   initialAmountRule,
   maxAmountRule,
@@ -71,7 +64,12 @@ export async function createConfirmationContent({
     {
       label: 'Token',
       text: context.tokenMetadata.symbol,
-      iconUrl: IconUrls.ethereum.token,
+      iconData: context.tokenMetadata.iconDataBase64
+        ? {
+            iconDataBase64: context.tokenMetadata.iconDataBase64,
+            altText: context.tokenMetadata.symbol,
+          }
+        : undefined,
     },
   ];
 
@@ -105,9 +103,9 @@ export async function createConfirmationContent({
           </Box>
           <Field>
             <Box>
-              <Image
-                src={IconUrls.ethereum.token}
-                alt={`${context.tokenMetadata.symbol} token icon`}
+              <TokenIcon
+                imageDataBase64={context.tokenMetadata.iconDataBase64}
+                altText={context.tokenMetadata.symbol}
               />
             </Box>
             <Input

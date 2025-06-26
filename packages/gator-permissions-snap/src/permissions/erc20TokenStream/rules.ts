@@ -1,5 +1,6 @@
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
+import { getIconData } from '../iconUtil';
 import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
@@ -18,15 +19,18 @@ type Erc20TokenStreamRuleDefinition = RuleDefinition<
 >;
 
 export const initialAmountRule: Erc20TokenStreamRuleDefinition = {
-  label: 'Initial Amount',
   name: INITIAL_AMOUNT_ELEMENT,
+  label: 'Initial Amount',
   type: 'number',
   isOptional: true,
-  tooltip: 'The initial amount of tokens that can be streamed.',
-  value: (context: Erc20TokenStreamContext) =>
-    context.permissionDetails.initialAmount,
-  error: (metadata: Erc20TokenStreamMetadata) =>
-    metadata.validationErrors.initialAmountError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.initialAmount,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The initial amount of tokens that can be streamed.',
+    iconData: getIconData(context),
+    error: metadata.validationErrors.initialAmountError,
+  }),
   updateContext: (
     context: Erc20TokenStreamContext,
     value: string | undefined,
@@ -40,15 +44,18 @@ export const initialAmountRule: Erc20TokenStreamRuleDefinition = {
 };
 
 export const maxAmountRule: Erc20TokenStreamRuleDefinition = {
-  label: 'Max Amount',
   name: MAX_AMOUNT_ELEMENT,
-  tooltip: 'The maximum amount of tokens that can be streamed.',
+  label: 'Max Amount',
   type: 'number',
   isOptional: true,
-  value: (context: Erc20TokenStreamContext) =>
-    context.permissionDetails.maxAmount,
-  error: (metadata: Erc20TokenStreamMetadata) =>
-    metadata.validationErrors.maxAmountError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.maxAmount,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The maximum amount of tokens that can be streamed.',
+    iconData: getIconData(context),
+    error: metadata.validationErrors.maxAmountError,
+  }),
   updateContext: (
     context: Erc20TokenStreamContext,
     value: string | undefined,
@@ -62,14 +69,16 @@ export const maxAmountRule: Erc20TokenStreamRuleDefinition = {
 };
 
 export const startTimeRule: Erc20TokenStreamRuleDefinition = {
-  label: 'Start Time',
   name: START_TIME_ELEMENT,
+  label: 'Start Time',
   type: 'text',
-  tooltip: 'The start time of the stream.',
-  value: (context: Erc20TokenStreamContext) =>
-    context.permissionDetails.startTime,
-  error: (metadata: Erc20TokenStreamMetadata) =>
-    metadata.validationErrors.startTimeError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.startTime,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The start time of the stream.',
+    error: metadata.validationErrors.startTimeError,
+  }),
   updateContext: (context: Erc20TokenStreamContext, value: string) => ({
     ...context,
     permissionDetails: {
@@ -80,14 +89,17 @@ export const startTimeRule: Erc20TokenStreamRuleDefinition = {
 };
 
 export const streamAmountPerPeriodRule: Erc20TokenStreamRuleDefinition = {
-  label: 'Stream Amount',
   name: AMOUNT_PER_PERIOD_ELEMENT,
+  label: 'Stream Amount',
   type: 'number',
-  tooltip: 'The amount of tokens that can be streamed per period.',
-  value: (context: Erc20TokenStreamContext) =>
-    context.permissionDetails.amountPerPeriod,
-  error: (metadata: Erc20TokenStreamMetadata) =>
-    metadata.validationErrors.amountPerPeriodError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.amountPerPeriod,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The amount of tokens that can be streamed per period.',
+    iconData: getIconData(context),
+    error: metadata.validationErrors.amountPerPeriodError,
+  }),
   updateContext: (context: Erc20TokenStreamContext, value: string) => ({
     ...context,
     permissionDetails: {
@@ -98,13 +110,16 @@ export const streamAmountPerPeriodRule: Erc20TokenStreamRuleDefinition = {
 };
 
 export const streamPeriodRule: Erc20TokenStreamRuleDefinition = {
-  label: 'Stream Period',
   name: TIME_PERIOD_ELEMENT,
+  label: 'Stream Period',
   type: 'dropdown',
-  tooltip: 'The period of the stream.',
-  options: Object.values(TimePeriod),
-  value: (context: Erc20TokenStreamContext) =>
-    context.permissionDetails.timePeriod,
+  getRuleData: ({ context }) => ({
+    value: context.permissionDetails.timePeriod,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The period of the stream.',
+    options: Object.values(TimePeriod),
+  }),
   updateContext: (context: Erc20TokenStreamContext, value: TimePeriod) => ({
     ...context,
     permissionDetails: {
@@ -115,13 +130,16 @@ export const streamPeriodRule: Erc20TokenStreamRuleDefinition = {
 };
 
 export const expiryRule: Erc20TokenStreamRuleDefinition = {
-  label: 'Expiry',
   name: EXPIRY_ELEMENT,
+  label: 'Expiry',
   type: 'text',
-  tooltip: 'The expiry date of the permission.',
-  value: (context: Erc20TokenStreamContext) => context.expiry,
-  error: (metadata: Erc20TokenStreamMetadata) =>
-    metadata.validationErrors.expiryError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.expiry,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The expiry date of the permission.',
+    error: metadata.validationErrors.expiryError,
+  }),
   updateContext: (context: Erc20TokenStreamContext, value: string) => ({
     ...context,
     expiry: value,

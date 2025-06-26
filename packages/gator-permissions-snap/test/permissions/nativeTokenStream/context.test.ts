@@ -67,6 +67,7 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
   tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,
+    iconDataBase64: null,
   },
   permissionDetails: {
     initialAmount: '1',
@@ -128,7 +129,6 @@ describe('nativeTokenStream:context', () => {
     let mockTokenPricesService: jest.Mocked<TokenPricesService>;
     let mockAccountController: jest.Mocked<AccountController>;
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
-
     beforeEach(() => {
       mockTokenPricesService = {
         getCryptoToFiatConversion: jest.fn(
@@ -148,11 +148,24 @@ describe('nativeTokenStream:context', () => {
           balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: 18,
+          iconUrl: 'https://example.com/icon.png',
         })),
+        fetchIconDataAsBase64: jest.fn(async () =>
+          Promise.resolve({ success: false }),
+        ),
       } as unknown as jest.Mocked<TokenMetadataService>;
     });
 
     it('should create a context from a permission request', async () => {
+      const text = 'The contents of the image';
+      /* eslint-disable no-restricted-globals */
+      const base64 = Buffer.from(text, 'utf8').toString('base64');
+
+      mockTokenMetadataService.fetchIconDataAsBase64.mockResolvedValueOnce({
+        success: true,
+        imageDataBase64: `data:image/png;base64,${base64}`,
+      });
+
       const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
         tokenPricesService: mockTokenPricesService,
@@ -160,7 +173,13 @@ describe('nativeTokenStream:context', () => {
         tokenMetadataService: mockTokenMetadataService,
       });
 
-      expect(context).toStrictEqual(alreadyPopulatedContext);
+      expect(context).toStrictEqual({
+        ...alreadyPopulatedContext,
+        tokenMetadata: {
+          ...alreadyPopulatedContext.tokenMetadata,
+          iconDataBase64: `data:image/png;base64,${base64}`,
+        },
+      });
 
       expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),

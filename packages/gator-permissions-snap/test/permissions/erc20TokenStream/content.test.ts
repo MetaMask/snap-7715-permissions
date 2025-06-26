@@ -22,6 +22,8 @@ const mockContext: Erc20TokenStreamContext = {
   tokenMetadata: {
     decimals: tokenDecimals,
     symbol: 'USDC',
+    iconDataBase64:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
   },
   permissionDetails: {
     initialAmount: '1',
@@ -214,7 +216,16 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "children": [
-                          null,
+                          {
+                            "key": null,
+                            "props": {
+                              "alt": "USDC",
+                              "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                            },
+                            "type": "Image",
+                          },
                           {
                             "key": null,
                             "props": {
@@ -504,7 +515,16 @@ describe('erc20TokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "USDC",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -682,16 +702,34 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disabled": true,
-                          "name": "stream-rate",
-                          "type": "text",
-                          "value": "0.5 USDC/sec",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
                         },
-                        "type": "Input",
-                      },
+                        {
+                          "key": null,
+                          "props": {
+                            "disabled": true,
+                            "name": "stream-rate",
+                            "type": "text",
+                            "value": "0.5 USDC/sec",
+                          },
+                          "type": "Input",
+                        },
+                      ],
                     },
                     "type": "Field",
                   },
@@ -765,7 +803,16 @@ describe('erc20TokenStream:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": null,
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
                           },
                           "type": "Box",
                         },
@@ -867,7 +914,16 @@ describe('erc20TokenStream:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": null,
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
                           },
                           "type": "Box",
                         },
@@ -1279,7 +1335,16 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "children": [
-                          null,
+                          {
+                            "key": null,
+                            "props": {
+                              "alt": "USDC",
+                              "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                            },
+                            "type": "Image",
+                          },
                           {
                             "key": null,
                             "props": {
@@ -1569,7 +1634,16 @@ describe('erc20TokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "USDC",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -1748,16 +1822,34 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disabled": true,
-                          "name": "stream-rate",
-                          "type": "text",
-                          "value": "0.5 USDC/sec",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
                         },
-                        "type": "Input",
-                      },
+                        {
+                          "key": null,
+                          "props": {
+                            "disabled": true,
+                            "name": "stream-rate",
+                            "type": "text",
+                            "value": "0.5 USDC/sec",
+                          },
+                          "type": "Input",
+                        },
+                      ],
                     },
                     "type": "Field",
                   },
@@ -1831,7 +1923,16 @@ describe('erc20TokenStream:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": null,
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
                           },
                           "type": "Box",
                         },
@@ -1934,7 +2035,16 @@ describe('erc20TokenStream:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": null,
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
                           },
                           "type": "Box",
                         },

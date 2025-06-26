@@ -1,6 +1,7 @@
-import { Text, Section, Box, Image } from '@metamask/snaps-sdk/jsx';
+import { Text, Section, Box } from '@metamask/snaps-sdk/jsx';
 
 import { ShowMoreText } from './ShowMoreText';
+import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
 
 type RequestDetailsProps = {
@@ -14,7 +15,7 @@ export type ItemDetails = {
   label: string;
   text: string;
   tooltipText?: string | undefined;
-  iconUrl?: string | undefined;
+  iconData?: { iconDataBase64: string; altText: string } | undefined;
 };
 
 export const RequestDetails = ({
@@ -24,11 +25,16 @@ export const RequestDetails = ({
   justificationShowMoreElementName,
 }: RequestDetailsProps) => {
   const requestDetailsFields = itemDetails.map(
-    ({ label, text, iconUrl, tooltipText }) => {
-      const iconElement = iconUrl ? <Image src={iconUrl} alt={text} /> : null;
-
+    ({ label, text, iconData, tooltipText }) => {
       const tooltipElement = tooltipText ? (
         <TooltipIcon tooltip={tooltipText} />
+      ) : null;
+
+      const iconElement = iconData ? (
+        <TokenIcon
+          imageDataBase64={iconData.iconDataBase64}
+          altText={iconData.altText}
+        />
       ) : null;
 
       return (

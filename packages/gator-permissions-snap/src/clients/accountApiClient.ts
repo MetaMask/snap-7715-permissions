@@ -108,9 +108,10 @@ export class AccountApiClient {
       throw new Error(message);
     }
 
-    const balanceData = (await response.json()) as TokenBalanceResponse;
+    const { accounts, type, iconUrl, symbol, decimals } =
+      (await response.json()) as TokenBalanceResponse;
 
-    const accountData = balanceData.accounts.find((acc) =>
+    const accountData = accounts.find((acc) =>
       isAddressEqual(acc.accountAddress, account),
     );
 
@@ -121,17 +122,23 @@ export class AccountApiClient {
       throw new Error(message);
     }
 
-    if (!AccountApiClient.#supportedTokenTypes.includes(balanceData.type)) {
-      const message = `Unsupported token type: ${balanceData.type}`;
+    if (
+      type !== undefined &&
+      !AccountApiClient.#supportedTokenTypes.includes(type)
+    ) {
+      const message = `Unsupported token type: ${type}`;
       logger.error(message);
 
       throw new Error(message);
     }
 
+    const balance = BigInt(accountData.rawBalance);
+
     return {
-      balance: BigInt(accountData.rawBalance),
-      decimals: balanceData.decimals,
-      symbol: balanceData.symbol,
+      balance,
+      decimals,
+      symbol,
+      iconUrl,
     };
   }
 }

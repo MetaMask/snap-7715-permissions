@@ -191,8 +191,8 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       encoded: Hex | null | undefined;
       name: string;
     }): TReturn => {
-      if (encoded === null || encoded === undefined) {
-        throw new Error(`Failed to fetch ${name}`);
+      if (encoded === null || encoded === undefined || encoded === '0x') {
+        throw new Error(`Failed to fetch token ${name}`);
       }
 
       // @ts-expect-error - decodeAbiParameters does not work well

@@ -37,27 +37,39 @@ const mockMetadata: TestMetadata = {
 };
 
 const rule1: RuleDefinition<TestContext, TestMetadata> = {
-  label: 'Rule 1',
   name: 'rule1',
+  label: 'Rule 1',
   type: 'text',
-  value: (context) => context.rule1Value,
+  getRuleData: ({ context }) => ({
+    value: context.rule1Value,
+    isVisible: true,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+  }),
   updateContext: (context, value) => ({ ...context, rule1Value: value }),
 };
 
 const rule2: RuleDefinition<TestContext, TestMetadata> = {
-  label: 'Rule 2',
   name: 'rule2',
+  label: 'Rule 2',
   type: 'number',
-  value: (context) => context.rule2Value,
-  error: (metadata) => metadata.validationErrors.rule2Value,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.rule2Value,
+    isVisible: true,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    error: metadata.validationErrors.rule2Value,
+  }),
   updateContext: (context, value) => ({ ...context, rule2Value: value }),
 };
 
 const rule3: RuleDefinition<TestContext, TestMetadata> = {
-  label: 'Rule 3',
   name: 'rule3',
+  label: 'Rule 3',
   type: 'text',
-  value: (context) => context.rule3Value,
+  getRuleData: ({ context }) => ({
+    value: context.rule3Value,
+    isVisible: true,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+  }),
   updateContext: (context, value) => ({ ...context, rule3Value: value }),
 };
 
@@ -112,7 +124,10 @@ describe('RuleModalManager', () => {
 
   describe('hasRulesToAdd()', () => {
     it('should return true when there are rules with undefined values', () => {
-      const result = ruleModalManager.hasRulesToAdd({ context: mockContext });
+      const result = ruleModalManager.hasRulesToAdd({
+        context: mockContext,
+        metadata: mockMetadata,
+      });
       expect(result).toBe(true);
     });
 
@@ -125,6 +140,7 @@ describe('RuleModalManager', () => {
 
       const result = ruleModalManager.hasRulesToAdd({
         context: contextWithAllValues,
+        metadata: mockMetadata,
       });
       expect(result).toBe(false);
     });
@@ -140,7 +156,10 @@ describe('RuleModalManager', () => {
         deriveMetadata: mockDeriveMetadata,
       });
 
-      const result = emptyRuleManager.hasRulesToAdd({ context: mockContext });
+      const result = emptyRuleManager.hasRulesToAdd({
+        context: mockContext,
+        metadata: mockMetadata,
+      });
       expect(result).toBe(false);
     });
   });
@@ -426,7 +445,6 @@ describe('RuleModalManager', () => {
             },
             "type": "Input",
           },
-          "error": "Invalid value",
         },
         "type": "Field",
       },
@@ -434,7 +452,7 @@ describe('RuleModalManager', () => {
         "key": null,
         "props": {
           "children": "Save",
-          "disabled": true,
+          "disabled": false,
           "name": "save-new-rule",
           "type": "submit",
         },
@@ -748,11 +766,15 @@ describe('RuleModalManager', () => {
   describe('validation logic', () => {
     it('should validate rule value with error function', async () => {
       const ruleWithError: RuleDefinition<TestContext, TestMetadata> = {
-        label: 'Rule with Error',
         name: 'rule-with-error',
+        label: 'Rule with Error',
         type: 'text',
-        value: () => undefined,
-        error: (metadata) => metadata.validationErrors.ruleWithError,
+        getRuleData: ({ metadata }) => ({
+          value: undefined,
+          isVisible: true,
+          isAdjustmentAllowed: true,
+          error: metadata.validationErrors.ruleWithError,
+        }),
         updateContext: (context, value) => ({
           ...context,
           ruleWithError: value,
@@ -894,7 +916,6 @@ describe('RuleModalManager', () => {
             },
             "type": "Input",
           },
-          "error": "Custom error message",
         },
         "type": "Field",
       },
@@ -902,7 +923,7 @@ describe('RuleModalManager', () => {
         "key": null,
         "props": {
           "children": "Save",
-          "disabled": true,
+          "disabled": false,
           "name": "save-new-rule",
           "type": "submit",
         },
@@ -921,10 +942,14 @@ describe('RuleModalManager', () => {
 
     it('should handle missing error function gracefully', async () => {
       const ruleWithoutError: RuleDefinition<TestContext, TestMetadata> = {
-        label: 'Rule without Error',
         name: 'rule-without-error',
+        label: 'Rule without Error',
         type: 'text',
-        value: () => undefined,
+        getRuleData: () => ({
+          value: undefined,
+          isVisible: true,
+          isAdjustmentAllowed: true,
+        }),
         updateContext: (context, value) => ({
           ...context,
           ruleWithoutError: value,

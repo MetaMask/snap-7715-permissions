@@ -2,7 +2,7 @@ import { erc7715ProviderActions } from '@metamask/delegation-toolkit/experimenta
 import { useMemo, useState } from 'react';
 import { type Hex, createClient, http, custom, createPublicClient } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
-import { sepolia as chain } from 'viem/chains';
+import { mainnet, sepolia } from 'viem/chains';
 
 import {
   ConnectButton,
@@ -47,6 +47,11 @@ import type {
 /* eslint-disable no-restricted-globals */
 const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
 
+const CHAINS = {
+  sepolia: sepolia,
+  mainnet: mainnet,
+};
+
 const Index = () => {
   const { error: metaMaskContextError } = useMetaMaskContext();
   const [permissionResponseError, setPermissionResponseError] =
@@ -55,12 +60,18 @@ const Index = () => {
   const errors = [metaMaskContextError, permissionResponseError].filter((e) =>
     Boolean(e),
   );
+
+  const [selectedChain, setSelectedChain] = useState<'sepolia' | 'mainnet'>(
+    'sepolia',
+  );
+  const currentChain = CHAINS[selectedChain];
+
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
-  const { delegateAccount } = useDelegateAccount({ chain });
+  const { delegateAccount } = useDelegateAccount({ chain: currentChain });
   const { bundlerClient, getFeePerGas } = useBundlerClient({
-    chain,
+    chain: currentChain,
     bundlerRpcUrl: BUNDLER_RPC_URL,
   });
 
@@ -86,7 +97,7 @@ const Index = () => {
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
 
-  const chainId = chain.id;
+  const chainId = currentChain.id;
   const [permissionType, setPermissionType] = useState('native-token-stream');
   const [permissionRequest, setPermissionRequest] =
     useState<PermissionRequest | null>(null);
@@ -97,6 +108,12 @@ const Index = () => {
   const [value, setValue] = useState<bigint>(0n);
   const [receipt, setReceipt] = useState<UserOperationReceipt | null>(null);
   const [isWorking, setIsWorking] = useState(false);
+
+  const handleChainChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedChain(inputValue as 'sepolia' | 'mainnet');
+  };
 
   const handlePermissionTypeChange = ({
     target: { value: inputValue },
@@ -136,7 +153,7 @@ const Index = () => {
     const { delegationManager } = signerMeta;
 
     const publicClient = createPublicClient({
-      chain,
+      chain: currentChain,
       transport: http(),
     });
 
@@ -312,17 +329,38 @@ const Index = () => {
         )}
         {metaMaskClient && (
           <Box style={{ position: 'relative' }}>
-            <ResponseContainer>
-              <Title>Permission Response</Title>
-              <CopyButton
-                onClick={handleCopyToClipboard}
-                title={'Copy to clipboard'}
-              >
-                {isCopied ? '✅' : '📝'}
-              </CopyButton>
-              <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
-            </ResponseContainer>
+            {permissionResponse && (
+              <ResponseContainer>
+                <Title>Permission Response</Title>
+                <CopyButton
+                  onClick={handleCopyToClipboard}
+                  title={'Copy to clipboard'}
+                >
+                  {isCopied ? '✅' : '📝'}
+                </CopyButton>
+                <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
+              </ResponseContainer>
+            )}
             <StyledForm>
+              <div>
+                <label htmlFor="chainSelector">Chain:</label>
+                <select
+                  id="chainSelector"
+                  name="chainSelector"
+                  value={selectedChain}
+                  onChange={handleChainChange}
+                  style={{
+                    padding: '0.8rem',
+                    border: '1px solid',
+                    borderRadius: '0.3rem',
+                    flexGrow: 1,
+                  }}
+                >
+                  <option value="sepolia">Sepolia</option>
+                  <option value="mainnet">Mainnet</option>
+                </select>
+              </div>
+
               <div>
                 <label htmlFor="permissionType">Permission Type:</label>
                 <select

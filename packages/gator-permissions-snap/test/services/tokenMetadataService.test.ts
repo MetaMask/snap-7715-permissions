@@ -12,6 +12,7 @@ describe('TokenMetadataService', () => {
   let tokenMetadataService: TokenMetadataService;
   let mockAccountApiClient: jest.Mocked<AccountApiClient>;
   let mockTokenMetadataClient: jest.Mocked<TokenMetadataClient>;
+  let mockFetcher: jest.MockedFunction<typeof fetch>;
 
   const mockAddress = '0x1234567890abcdef1234567890abcdef12345678' as Address;
   const mockAssetAddress =
@@ -32,9 +33,12 @@ describe('TokenMetadataService', () => {
       getTokenBalanceAndMetadata: jest.fn(),
     } as unknown as jest.Mocked<TokenMetadataClient>;
 
+    mockFetcher = jest.fn();
+
     tokenMetadataService = new TokenMetadataService({
       accountApiClient: mockAccountApiClient,
       tokenMetadataClient: mockTokenMetadataClient,
+      fetcher: mockFetcher,
     });
   });
 
@@ -242,6 +246,116 @@ describe('TokenMetadataService', () => {
         expect(typeof result.symbol).toBe('string');
         expect(typeof result.decimals).toBe('number');
       });
+    });
+  });
+
+  describe('fetchIconDataAsBase64', () => {
+    const mockIconUrl = 'https://example.com/icon.png';
+
+    it('successfully fetches and converts icon to base64', async () => {
+      /* eslint-disable no-restricted-globals */
+      const mockImageData = Buffer.from('mock image data', 'utf8');
+      const expectedBase64 = `data:image/png;base64,${mockImageData.toString('base64')}`;
+
+      const arrayBuffer = new ArrayBuffer(mockImageData.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      uint8Array.set(mockImageData);
+
+      const response = {
+        ok: true,
+        arrayBuffer: jest.fn(async () => Promise.resolve(mockImageData)),
+      };
+
+      mockFetcher.mockResolvedValueOnce(response as unknown as Response);
+
+      const result =
+        await tokenMetadataService.fetchIconDataAsBase64(mockIconUrl);
+
+      expect(response.arrayBuffer).toHaveBeenCalledTimes(1);
+      expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
+      expect(result).toStrictEqual({
+        success: true,
+        imageDataBase64: expectedBase64,
+      });
+    });
+
+    it('returns success false when iconUrl is undefined', async () => {
+      const result =
+        await tokenMetadataService.fetchIconDataAsBase64(undefined);
+
+      expect(mockFetcher).not.toHaveBeenCalled();
+      expect(result).toStrictEqual({
+        success: false,
+      });
+    });
+
+    it('returns success false when iconUrl is empty string', async () => {
+      const result = await tokenMetadataService.fetchIconDataAsBase64('');
+
+      expect(mockFetcher).not.toHaveBeenCalled();
+      expect(result).toStrictEqual({
+        success: false,
+      });
+    });
+
+    it('returns success false when fetch response is not ok', async () => {
+      mockFetcher.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+      } as Response);
+
+      const result =
+        await tokenMetadataService.fetchIconDataAsBase64(mockIconUrl);
+
+      expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
+      expect(result).toStrictEqual({
+        success: false,
+      });
+    });
+
+    it('returns success false when fetch throws an error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error');
+      mockFetcher.mockRejectedValueOnce(new Error('Network error'));
+
+      const result =
+        await tokenMetadataService.fetchIconDataAsBase64(mockIconUrl);
+
+      expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
+      expect(result).toStrictEqual({
+        success: false,
+      });
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('returns success false when arrayBuffer() throws an error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error');
+
+      mockFetcher.mockResolvedValueOnce({
+        ok: true,
+        arrayBuffer: async () => Promise.reject(new Error('ArrayBuffer error')),
+      } as Response);
+
+      const result =
+        await tokenMetadataService.fetchIconDataAsBase64(mockIconUrl);
+
+      expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
+      expect(result).toStrictEqual({
+        success: false,
+      });
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('constructor with default fetcher', () => {
+    it('uses global fetch when no fetcher is provided', () => {
+      const serviceWithDefaultFetcher = new TokenMetadataService({
+        accountApiClient: mockAccountApiClient,
+        tokenMetadataClient: mockTokenMetadataClient,
+      });
+
+      expect(serviceWithDefaultFetcher).toBeInstanceOf(TokenMetadataService);
     });
   });
 });

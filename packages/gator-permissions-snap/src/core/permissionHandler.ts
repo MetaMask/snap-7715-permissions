@@ -153,6 +153,7 @@ export class PermissionHandler<
       const showAddMoreRulesButton =
         this.#addMoreRulesModal?.hasRulesToAdd({
           context: args.context,
+          metadata: args.metadata,
         }) ?? false;
 
       const permissionContent =

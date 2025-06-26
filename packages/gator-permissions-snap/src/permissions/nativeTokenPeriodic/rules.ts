@@ -1,6 +1,7 @@
 import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../../core/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
+import { getIconData } from '../iconUtil';
 import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
@@ -16,14 +17,17 @@ export const periodAmountRule: RuleDefinition<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
 > = {
-  label: 'Amount',
   name: PERIOD_AMOUNT_ELEMENT,
-  tooltip: 'The amount of tokens granted during each period',
+  label: 'Amount',
   type: 'number',
-  value: (context: NativeTokenPeriodicContext) =>
-    context.permissionDetails.periodAmount,
-  error: (metadata: NativeTokenPeriodicMetadata) =>
-    metadata.validationErrors.periodAmountError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.periodAmount,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The amount of tokens granted during each period',
+    error: metadata.validationErrors.periodAmountError,
+    iconData: getIconData(context),
+  }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
     permissionDetails: {
@@ -37,15 +41,17 @@ export const periodTypeRule: RuleDefinition<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
 > = {
-  label: 'Period duration',
   name: PERIOD_TYPE_ELEMENT,
-  tooltip: 'The duration of the period',
+  label: 'Period duration',
   type: 'dropdown',
-  options: [TimePeriod.DAILY, TimePeriod.WEEKLY, 'Other'],
-  value: (context: NativeTokenPeriodicContext) =>
-    context.permissionDetails.periodType,
-  error: (metadata: NativeTokenPeriodicMetadata) =>
-    metadata.validationErrors.periodTypeError,
+  getRuleData: ({ context, metadata }) => ({
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    value: context.permissionDetails.periodType,
+    isVisible: true,
+    tooltip: 'The duration of the period',
+    options: [TimePeriod.DAILY, TimePeriod.WEEKLY, 'Other'],
+    error: metadata.validationErrors.periodTypeError,
+  }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => {
     const periodType = value as TimePeriod | 'Other';
     const periodDuration =
@@ -68,14 +74,16 @@ export const periodDurationRule: RuleDefinition<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
 > = {
-  label: 'Duration (seconds)',
   name: PERIOD_DURATION_ELEMENT,
-  tooltip: 'The length of each period in seconds',
+  label: 'Duration (seconds)',
   type: 'number',
-  value: (context: NativeTokenPeriodicContext) =>
-    context.permissionDetails.periodDuration,
-  error: (metadata: NativeTokenPeriodicMetadata) =>
-    metadata.validationErrors.periodDurationError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.periodDuration,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: context.permissionDetails.periodType === 'Other',
+    tooltip: 'The length of each period in seconds',
+    error: metadata.validationErrors.periodDurationError,
+  }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
     permissionDetails: {
@@ -83,22 +91,22 @@ export const periodDurationRule: RuleDefinition<
       periodDuration: value,
     },
   }),
-  isVisible: (context: NativeTokenPeriodicContext) =>
-    context.permissionDetails.periodType === 'Other',
 };
 
 export const startTimeRule: RuleDefinition<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
 > = {
-  label: 'Start Time',
   name: START_TIME_ELEMENT,
-  tooltip: 'The time at which the first period begins',
+  label: 'Start Time',
   type: 'text',
-  value: (context: NativeTokenPeriodicContext) =>
-    context.permissionDetails.startTime,
-  error: (metadata: NativeTokenPeriodicMetadata) =>
-    metadata.validationErrors.startTimeError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.permissionDetails.startTime,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The time at which the first period begins',
+    error: metadata.validationErrors.startTimeError,
+  }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
     permissionDetails: {
@@ -112,12 +120,15 @@ export const expiryRule: RuleDefinition<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
 > = {
-  label: 'Expiry',
   name: EXPIRY_ELEMENT,
+  label: 'Expiry',
   type: 'text',
-  value: (context: NativeTokenPeriodicContext) => context.expiry,
-  error: (metadata: NativeTokenPeriodicMetadata) =>
-    metadata.validationErrors.expiryError,
+  getRuleData: ({ context, metadata }) => ({
+    value: context.expiry,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isVisible: true,
+    error: metadata.validationErrors.expiryError,
+  }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
     expiry: value,

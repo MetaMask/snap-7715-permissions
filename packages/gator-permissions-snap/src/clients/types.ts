@@ -83,6 +83,7 @@ export type TokenBalanceAndMetadata = {
   balance: bigint;
   decimals: number;
   symbol: string;
+  iconUrl?: string;
 };
 
 /**

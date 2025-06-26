@@ -7,7 +7,6 @@ import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
-import { IconUrls } from '../../ui/iconConstant';
 import {
   periodAmountRule,
   periodTypeRule,
@@ -59,8 +58,13 @@ export async function createConfirmationContent({
     },
     {
       label: 'Token',
-      text: 'ETH',
-      iconUrl: IconUrls.ethereum.token,
+      text: context.tokenMetadata.symbol,
+      iconData: context.tokenMetadata.iconDataBase64
+        ? {
+            iconDataBase64: context.tokenMetadata.iconDataBase64,
+            altText: context.tokenMetadata.symbol,
+          }
+        : undefined,
     },
   ];
 

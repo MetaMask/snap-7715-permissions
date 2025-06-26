@@ -7,6 +7,7 @@ import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
 import type { ItemDetails } from '../../ui/components/RequestDetails';
 import { RequestDetails } from '../../ui/components/RequestDetails';
+import { TokenIcon } from '../../ui/components/TokenIcon';
 import { TooltipIcon } from '../../ui/components/TooltipIcon';
 import {
   initialAmountRule,
@@ -63,6 +64,12 @@ export async function createConfirmationContent({
     {
       label: 'Token',
       text: context.tokenMetadata.symbol,
+      iconData: context.tokenMetadata.iconDataBase64
+        ? {
+            iconDataBase64: context.tokenMetadata.iconDataBase64,
+            altText: context.tokenMetadata.symbol,
+          }
+        : undefined,
     },
   ];
 
@@ -95,6 +102,12 @@ export async function createConfirmationContent({
             </Box>
           </Box>
           <Field>
+            <Box>
+              <TokenIcon
+                imageDataBase64={context.tokenMetadata.iconDataBase64}
+                altText={context.tokenMetadata.symbol}
+              />
+            </Box>
             <Input
               name="stream-rate"
               type="text"

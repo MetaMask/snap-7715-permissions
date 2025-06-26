@@ -13,6 +13,7 @@ export type AccountDetailsProps = {
   tokenMetadata: {
     decimals: number;
     symbol: string;
+    iconDataBase64: string | null;
   };
   title: string;
   tooltip: string;
@@ -26,6 +27,7 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
 }) => {
   const { address, balance, balanceFormattedAsCurrency } = account;
   const { decimals } = tokenMetadata;
+
   return (
     <Section>
       <Box direction="vertical">

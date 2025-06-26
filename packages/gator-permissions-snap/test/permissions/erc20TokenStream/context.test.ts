@@ -71,6 +71,7 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
   tokenMetadata: {
     symbol: 'USDC',
     decimals: USDC_DECIMALS,
+    iconDataBase64: null,
   },
   permissionDetails: {
     initialAmount: '1',
@@ -153,11 +154,24 @@ describe('erc20TokenStream:context', () => {
           balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: USDC_DECIMALS,
+          iconUrl: 'https://example.com/icon.png',
         })),
+        fetchIconDataAsBase64: jest.fn(async () =>
+          Promise.resolve({ success: false }),
+        ),
       } as unknown as jest.Mocked<TokenMetadataService>;
     });
 
     it('should create a context from a permission request', async () => {
+      const text = 'The contents of the image';
+      /* eslint-disable no-restricted-globals */
+      const base64 = Buffer.from(text, 'utf8').toString('base64');
+
+      mockTokenMetadataService.fetchIconDataAsBase64.mockResolvedValueOnce({
+        success: true,
+        imageDataBase64: `data:image/png;base64,${base64}`,
+      });
+
       const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
         tokenPricesService: mockTokenPricesService,
@@ -165,7 +179,13 @@ describe('erc20TokenStream:context', () => {
         tokenMetadataService: mockTokenMetadataService,
       });
 
-      expect(context).toStrictEqual(alreadyPopulatedContext);
+      expect(context).toStrictEqual({
+        ...alreadyPopulatedContext,
+        tokenMetadata: {
+          ...alreadyPopulatedContext.tokenMetadata,
+          iconDataBase64: `data:image/png;base64,${base64}`,
+        },
+      });
 
       expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
@@ -230,6 +250,7 @@ describe('erc20TokenStream:context', () => {
       expect(context.tokenMetadata).toStrictEqual({
         symbol: 'DAI',
         decimals: DAI_DECIMALS,
+        iconDataBase64: null,
       });
 
       expect(context.accountDetails.balance).toBe(DAI_BALANCE);
