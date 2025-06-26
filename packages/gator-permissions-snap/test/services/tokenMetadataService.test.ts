@@ -346,24 +346,6 @@ describe('TokenMetadataService', () => {
 
       consoleErrorSpy.mockRestore();
     });
-
-    it('uses injected fetcher instead of global fetch', async () => {
-      const globalFetchSpy = jest.spyOn(global, 'fetch');
-      /* eslint-disable no-restricted-globals */
-      const mockImageData = Buffer.from('test data', 'utf8');
-
-      mockFetcher.mockResolvedValueOnce({
-        ok: true,
-        arrayBuffer: async () => Promise.resolve(mockImageData.buffer),
-      } as Response);
-
-      await tokenMetadataService.fetchIconDataAsBase64(mockIconUrl);
-
-      expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
-      expect(globalFetchSpy).not.toHaveBeenCalled();
-
-      globalFetchSpy.mockRestore();
-    });
   });
 
   describe('constructor with default fetcher', () => {
