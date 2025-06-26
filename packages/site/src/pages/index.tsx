@@ -1,8 +1,16 @@
 import { erc7715ProviderActions } from '@metamask/delegation-toolkit/experimental';
 import { useMemo, useState } from 'react';
-import { type Hex, createClient, http, custom, createPublicClient } from 'viem';
+import {
+  type Hex,
+  createClient,
+  http,
+  custom,
+  createPublicClient,
+  extractChain,
+  Chain,
+} from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
-import { mainnet, sepolia } from 'viem/chains';
+import * as chains from 'viem/chains';
 
 import {
   ConnectButton,
@@ -47,10 +55,23 @@ import type {
 /* eslint-disable no-restricted-globals */
 const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
 
-const CHAINS = {
-  sepolia: sepolia,
-  mainnet: mainnet,
-};
+const ALL_CHAINS = Object.values(chains);
+
+const supportedChainsString = process.env.GATSBY_SUPPORTED_CHAINS;
+
+const DEFAULT_CHAINS = [chains.sepolia];
+
+const supportedChains: Chain[] = supportedChainsString
+  ? supportedChainsString.split(',').map((chainIdString) => {
+      const chainId = parseInt(chainIdString);
+      const chain = extractChain({
+        chains: ALL_CHAINS,
+        id: chainId as any,
+      });
+
+      return chain;
+    })
+  : DEFAULT_CHAINS;
 
 const Index = () => {
   const { error: metaMaskContextError } = useMetaMaskContext();
@@ -61,17 +82,18 @@ const Index = () => {
     Boolean(e),
   );
 
-  const [selectedChain, setSelectedChain] = useState<'sepolia' | 'mainnet'>(
-    'sepolia',
-  );
-  const currentChain = CHAINS[selectedChain];
+  if (!supportedChains[0]) {
+    throw new Error('No supported chains found.');
+  }
+
+  const [selectedChain, setSelectedChain] = useState<Chain>(supportedChains[0]);
 
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
-  const { delegateAccount } = useDelegateAccount({ chain: currentChain });
+  const { delegateAccount } = useDelegateAccount({ chain: selectedChain });
   const { bundlerClient, getFeePerGas } = useBundlerClient({
-    chain: currentChain,
+    chain: selectedChain,
     bundlerRpcUrl: BUNDLER_RPC_URL,
   });
 
@@ -97,7 +119,7 @@ const Index = () => {
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
 
-  const chainId = currentChain.id;
+  const chainId = selectedChain.id;
   const [permissionType, setPermissionType] = useState('native-token-stream');
   const [permissionRequest, setPermissionRequest] =
     useState<PermissionRequest | null>(null);
@@ -112,7 +134,11 @@ const Index = () => {
   const handleChainChange = ({
     target: { value: inputValue },
   }: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedChain(inputValue as 'sepolia' | 'mainnet');
+    const chainId = parseInt(inputValue);
+    const chain = supportedChains.find((c) => c.id === chainId);
+    if (chain) {
+      setSelectedChain(chain);
+    }
   };
 
   const handlePermissionTypeChange = ({
@@ -153,7 +179,7 @@ const Index = () => {
     const { delegationManager } = signerMeta;
 
     const publicClient = createPublicClient({
-      chain: currentChain,
+      chain: selectedChain,
       transport: http(),
     });
 
@@ -347,7 +373,7 @@ const Index = () => {
                 <select
                   id="chainSelector"
                   name="chainSelector"
-                  value={selectedChain}
+                  value={selectedChain.id}
                   onChange={handleChainChange}
                   style={{
                     padding: '0.8rem',
@@ -356,8 +382,11 @@ const Index = () => {
                     flexGrow: 1,
                   }}
                 >
-                  <option value="sepolia">Sepolia</option>
-                  <option value="mainnet">Mainnet</option>
+                  {supportedChains.map((chain) => (
+                    <option key={chain.id} value={chain.id}>
+                      {chain.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
