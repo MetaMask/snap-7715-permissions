@@ -28,7 +28,15 @@ export type NativeTokenPeriodicPermissionRequest = BasePermissionRequest & {
   periodDuration: number;
 };
 
+export type ERC20TokenPeriodicPermissionRequest = BasePermissionRequest & {
+  type: 'erc20-token-periodic';
+  periodAmount: Hex;
+  periodDuration: number;
+  tokenAddress: Hex;
+};
+
 export type PermissionRequest =
   | NativeTokenStreamPermissionRequest
   | ERC20TokenStreamPermissionRequest
-  | NativeTokenPeriodicPermissionRequest;
+  | NativeTokenPeriodicPermissionRequest
+  | ERC20TokenPeriodicPermissionRequest;
