@@ -11,6 +11,7 @@ const {
   STORE_PERMISSIONS_ENABLED,
   USE_EOA_ACCOUNT,
   ACCOUNT_API_BASE_URL,
+  SUPPORTED_CHAINS,
 } = process.env;
 
 if (!SNAP_ENV) {
@@ -52,6 +53,10 @@ if (!ACCOUNT_API_BASE_URL) {
   );
 }
 
+if (!SUPPORTED_CHAINS) {
+  throw new Error('SUPPORTED_CHAINS must be set as an environment variable.');
+}
+
 const config: SnapConfig = {
   bundler: 'webpack',
   input: resolve(__dirname, 'src/index.ts'),
@@ -68,6 +73,7 @@ const config: SnapConfig = {
     STORE_PERMISSIONS_ENABLED,
     USE_EOA_ACCOUNT,
     ACCOUNT_API_BASE_URL,
+    SUPPORTED_CHAINS,
   },
 };
 
