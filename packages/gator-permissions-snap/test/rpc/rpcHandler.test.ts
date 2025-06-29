@@ -368,6 +368,10 @@ describe('RpcHandler', () => {
           proposedName: 'ERC20 Token Stream',
           type: 'erc20-token-stream',
         },
+        {
+          proposedName: 'ERC20 Token Periodic Transfer',
+          type: 'erc20-token-periodic',
+        },
       ]);
     });
   });

@@ -15,6 +15,7 @@ import {
   NativeTokenStreamForm,
   ERC20TokenStreamForm,
   NativeTokenPeriodicForm,
+  ERC20TokenPeriodicForm,
 } from '../components/permissions';
 import {
   Container,
@@ -42,6 +43,7 @@ import type {
   NativeTokenStreamPermissionRequest,
   ERC20TokenStreamPermissionRequest,
   NativeTokenPeriodicPermissionRequest,
+  ERC20TokenPeriodicPermissionRequest,
 } from '../components/permissions/types';
 
 /* eslint-disable no-restricted-globals */
@@ -382,6 +384,9 @@ const Index = () => {
                   <option value="native-token-periodic">
                     Native Token Periodic
                   </option>
+                  <option value="erc20-token-periodic">
+                    ERC20 Token Periodic
+                  </option>
                 </select>
               </div>
 
@@ -404,6 +409,14 @@ const Index = () => {
               {permissionType === 'native-token-periodic' && (
                 <NativeTokenPeriodicForm
                   onChange={(request: NativeTokenPeriodicPermissionRequest) => {
+                    setPermissionRequest(request);
+                  }}
+                />
+              )}
+
+              {permissionType === 'erc20-token-periodic' && (
+                <ERC20TokenPeriodicForm
+                  onChange={(request: ERC20TokenPeriodicPermissionRequest) => {
                     setPermissionRequest(request);
                   }}
                 />
