@@ -1,20 +1,44 @@
 import { describe, expect, it } from '@jest/globals';
-import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import { toHex, parseUnits } from 'viem/utils';
 
 import { TimePeriod } from '../../../src/core/types';
-import { appendCaveats } from '../../../src/permissions/erc20TokenPeriodic/caveats';
+import { createPermissionCaveats } from '../../../src/permissions/erc20TokenPeriodic/caveats';
 import type { PopulatedErc20TokenPeriodicPermission } from '../../../src/permissions/erc20TokenPeriodic/types';
 import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
+import { DelegationContracts } from '../../../src/core/delegationContracts';
 
 const tokenDecimals = 6;
 
+// Define the contracts with enforcers
+const contracts = {
+  enforcers: {
+    ERC20PeriodicTransferEnforcer: '0x1234567890123456789012345678901234567890',
+    ValueLteEnforcer: '0x1234567890123456789012345678901234567891',
+  },
+} as any as DelegationContracts;
+
+// Helper function to create expected terms
+const createExpectedTerms = (
+  permission: PopulatedErc20TokenPeriodicPermission,
+) => {
+  const periodAmountHex = permission.data.periodAmount
+    .slice(2)
+    .padStart(64, '0');
+  const periodDurationHex = permission.data.periodDuration
+    .toString(16)
+    .padStart(64, '0');
+  const startTimeHex = permission.data.startTime.toString(16).padStart(64, '0');
+  const tokenAddressHex = permission.data.tokenAddress.slice(2);
+
+  return `0x${tokenAddressHex}${periodAmountHex}${periodDurationHex}${startTimeHex}`;
+};
+
 describe('erc20TokenPeriodic:caveats', () => {
-  describe('appendCaveats()', () => {
-    it('should append caveats for a permission', async () => {
+  describe('createPermissionCaveats()', () => {
+    it('should create erc20TokenPeriodic and valueLte caveats', async () => {
       const permission: PopulatedErc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
@@ -27,54 +51,27 @@ describe('erc20TokenPeriodic:caveats', () => {
         rules: {},
       };
 
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
+      const caveats = await createPermissionCaveats({ permission, contracts });
 
-      await appendCaveats({ permission, caveatBuilder });
+      const erc20TokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'erc20PeriodTransfer',
-        permission.data.tokenAddress,
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith('valueLte', 0n);
-    });
-
-    it('should append caveats for daily period type', async () => {
-      const permission: PopulatedErc20TokenPeriodicPermission = {
-        type: 'erc20-token-periodic',
-        data: {
-          periodAmount: toHex(parseUnits('50', tokenDecimals)), // 50 USDC per period
-          periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
-          tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
-          justification: 'Permission to do something important',
+      expect(caveats).toStrictEqual([
+        {
+          enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+          terms: erc20TokenPeriodicExpectedTerms,
+          args: '0x',
         },
-        rules: {},
-      };
-
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
-
-      await appendCaveats({ permission, caveatBuilder });
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'erc20PeriodTransfer',
-        permission.data.tokenAddress,
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith('valueLte', 0n);
+        {
+          enforcer: contracts.enforcers.ValueLteEnforcer,
+          terms:
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+          args: '0x',
+        },
+      ]);
     });
 
-    it('should append caveats for weekly period type', async () => {
+    // Additional test cases for different period types
+    it('should create erc20TokenPeriodic and valueLte caveats for weekly period type', async () => {
       const permission: PopulatedErc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
@@ -87,24 +84,26 @@ describe('erc20TokenPeriodic:caveats', () => {
         rules: {},
       };
 
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
+      const caveats = await createPermissionCaveats({ permission, contracts });
 
-      await appendCaveats({ permission, caveatBuilder });
+      const erc20TokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'erc20PeriodTransfer',
-        permission.data.tokenAddress,
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith('valueLte', 0n);
+      expect(caveats).toStrictEqual([
+        {
+          enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+          terms: erc20TokenPeriodicExpectedTerms,
+          args: '0x',
+        },
+        {
+          enforcer: contracts.enforcers.ValueLteEnforcer,
+          terms:
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+          args: '0x',
+        },
+      ]);
     });
 
-    it('should append caveats for other period type', async () => {
+    it('should create erc20TokenPeriodic and valueLte caveats for custom period type', async () => {
       const permission: PopulatedErc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
@@ -117,24 +116,26 @@ describe('erc20TokenPeriodic:caveats', () => {
         rules: {},
       };
 
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
+      const caveats = await createPermissionCaveats({ permission, contracts });
 
-      await appendCaveats({ permission, caveatBuilder });
+      const erc20TokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'erc20PeriodTransfer',
-        permission.data.tokenAddress,
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith('valueLte', 0n);
+      expect(caveats).toStrictEqual([
+        {
+          enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+          terms: erc20TokenPeriodicExpectedTerms,
+          args: '0x',
+        },
+        {
+          enforcer: contracts.enforcers.ValueLteEnforcer,
+          terms:
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+          args: '0x',
+        },
+      ]);
     });
 
-    it('should append caveats for different token address', async () => {
+    it('should create erc20TokenPeriodic and valueLte caveats for different token address', async () => {
       const permission: PopulatedErc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
@@ -147,21 +148,23 @@ describe('erc20TokenPeriodic:caveats', () => {
         rules: {},
       };
 
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
+      const caveats = await createPermissionCaveats({ permission, contracts });
 
-      await appendCaveats({ permission, caveatBuilder });
+      const erc20TokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'erc20PeriodTransfer',
-        permission.data.tokenAddress,
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith('valueLte', 0n);
+      expect(caveats).toStrictEqual([
+        {
+          enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+          terms: erc20TokenPeriodicExpectedTerms,
+          args: '0x',
+        },
+        {
+          enforcer: contracts.enforcers.ValueLteEnforcer,
+          terms:
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+          args: '0x',
+        },
+      ]);
     });
   });
 });

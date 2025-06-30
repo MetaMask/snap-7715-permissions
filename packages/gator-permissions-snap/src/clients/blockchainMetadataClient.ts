@@ -1,12 +1,8 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
-import type { Abi, AbiFunction, AbiParameter, Address, Chain, Hex } from 'viem';
-import {
-  decodeAbiParameters,
-  encodeFunctionData,
-  extractChain,
-  zeroAddress,
-} from 'viem';
+import type { Hex } from '@metamask/delegation-core';
+import type { Abi, AbiFunction, AbiParameter, Chain } from 'viem';
+import { decodeAbiParameters, encodeFunctionData, extractChain } from 'viem';
 import * as allChains from 'viem/chains';
 
 import type { TokenBalanceAndMetadata, TokenMetadataClient } from './types';
@@ -50,6 +46,9 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
     (name) => (allChains as any)[name as keyof typeof allChains],
   ) as Chain[];
 
+  static readonly #nativeTokenAddress =
+    '0x0000000000000000000000000000000000000000';
+
   constructor({
     ethereumProvider,
   }: {
@@ -73,8 +72,8 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
     account,
   }: {
     chainId: number;
-    account: Address;
-    assetAddress?: Address | undefined;
+    account: Hex;
+    assetAddress?: Hex | undefined;
   }): Promise<TokenBalanceAndMetadata> {
     logger.debug('BlockchainTokenMetadataClient:getTokenBalanceAndMetadata()');
 
@@ -101,7 +100,10 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
     }
 
     // If no asset address is provided, fetch native token balance
-    if (!assetAddress || assetAddress === zeroAddress) {
+    if (
+      !assetAddress ||
+      assetAddress === BlockchainTokenMetadataClient.#nativeTokenAddress
+    ) {
       const balance = await this.#ethereumProvider.request<Hex>({
         method: 'eth_getBalance',
         params: [account, 'latest'],

@@ -1,4 +1,4 @@
-import { toHex } from 'viem';
+import { numberToHex } from '@metamask/utils';
 import { sepolia, mainnet } from 'viem/chains';
 
 import { BlockchainTokenMetadataClient } from '../../src/clients/blockchainMetadataClient';
@@ -25,7 +25,7 @@ describe('BlockchainTokenMetadataClient', () => {
 
     it('fetches native token balance and metadata successfully', async () => {
       mockEthereumProvider.request
-        .mockResolvedValueOnce(toHex(mockChainId)) // eth_chainId
+        .mockResolvedValueOnce(numberToHex(mockChainId)) // eth_chainId
         .mockResolvedValueOnce('0xde0b6b3a7640000'); // eth_getBalance (1 ETH in wei)
 
       const result = await client.getTokenBalanceAndMetadata({
@@ -52,7 +52,7 @@ describe('BlockchainTokenMetadataClient', () => {
 
     it('fetches ERC20 token balance and metadata successfully', async () => {
       mockEthereumProvider.request
-        .mockResolvedValueOnce(toHex(mockChainId)) // eth_chainId
+        .mockResolvedValueOnce(numberToHex(mockChainId)) // eth_chainId
         .mockResolvedValueOnce(
           '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         ) // balanceOf
@@ -103,7 +103,9 @@ describe('BlockchainTokenMetadataClient', () => {
     });
 
     it('throws an error if selected chain does not match requested chain', async () => {
-      mockEthereumProvider.request.mockResolvedValueOnce(toHex(mainnet.id)); // eth_chainId
+      mockEthereumProvider.request.mockResolvedValueOnce(
+        numberToHex(mainnet.id),
+      ); // eth_chainId
 
       await expect(
         client.getTokenBalanceAndMetadata({
@@ -115,7 +117,7 @@ describe('BlockchainTokenMetadataClient', () => {
 
     it('throws an error if native token balance fetch fails', async () => {
       mockEthereumProvider.request
-        .mockResolvedValueOnce(toHex(mockChainId)) // eth_chainId
+        .mockResolvedValueOnce(numberToHex(mockChainId)) // eth_chainId
         .mockResolvedValueOnce(null); // eth_getBalance
 
       await expect(
@@ -128,7 +130,7 @@ describe('BlockchainTokenMetadataClient', () => {
 
     it('throws an error if ERC20 token balance fetch fails', async () => {
       mockEthereumProvider.request
-        .mockResolvedValueOnce(toHex(mockChainId)) // eth_chainId
+        .mockResolvedValueOnce(numberToHex(mockChainId)) // eth_chainId
         .mockResolvedValueOnce(null) // balanceOf
         .mockResolvedValueOnce(
           '0x0000000000000000000000000000000000000000000000000000000000000012',
@@ -148,7 +150,7 @@ describe('BlockchainTokenMetadataClient', () => {
 
     it('throws an error if ERC20 token decimals fetch fails', async () => {
       mockEthereumProvider.request
-        .mockResolvedValueOnce(toHex(mockChainId)) // eth_chainId
+        .mockResolvedValueOnce(numberToHex(mockChainId)) // eth_chainId
         .mockResolvedValueOnce(
           '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         ) // balanceOf
@@ -168,7 +170,7 @@ describe('BlockchainTokenMetadataClient', () => {
 
     it('throws an error if ERC20 token symbol fetch fails', async () => {
       mockEthereumProvider.request
-        .mockResolvedValueOnce(toHex(mockChainId)) // eth_chainId
+        .mockResolvedValueOnce(numberToHex(mockChainId)) // eth_chainId
         .mockResolvedValueOnce(
           '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
         ) // balanceOf

@@ -1,13 +1,13 @@
 import { describe, it, beforeEach } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import {
-  createDelegation,
   getDeleGatorEnvironment,
+  ROOT_AUTHORITY,
 } from '@metamask/delegation-toolkit';
 import { isHex, size } from 'viem';
-import { sepolia, oneWorld, lineaSepolia } from 'viem/chains';
 
-import { SmartAccountController } from '../../src/accountController';
+import { SmartAccountController } from '../../src/accountController/smartAccountController';
+import { Delegation } from '@metamask/delegation-core';
 
 describe('SmartAccountController', () => {
   const entropy =
@@ -49,7 +49,7 @@ describe('SmartAccountController', () => {
 
     accountController = new SmartAccountController({
       snapsProvider: mockSnapsProvider,
-      supportedChains: [sepolia],
+      supportedChains: [11155111],
       deploymentSalt: '0x1234',
     });
   });
@@ -71,44 +71,10 @@ describe('SmartAccountController', () => {
         () =>
           new SmartAccountController({
             snapsProvider: mockSnapsProvider,
-            supportedChains: [oneWorld] as any,
+            supportedChains: [123456] as any,
             deploymentSalt: '0x1234',
           }),
-      ).toThrow('Unsupported chains specified: oneworld');
-    });
-
-    it('should not throw if supported chains are not specified', () => {
-      expect(
-        () =>
-          new SmartAccountController({
-            snapsProvider: mockSnapsProvider,
-            deploymentSalt: '0x1234',
-          }),
-      ).not.toThrow();
-    });
-  });
-
-  describe('getDelegationManager()', () => {
-    it('should get the delegation manager', async () => {
-      const chainId = sepolia.id;
-      const { DelegationManager: expectedDelegationManager } =
-        getDeleGatorEnvironment(chainId);
-
-      const delegationManager = await accountController.getDelegationManager({
-        chainId,
-      });
-
-      expect(delegationManager).toStrictEqual(expectedDelegationManager);
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getDelegationManager({
-          chainId: invalidChainId,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
+      ).toThrow('Unsupported chains specified: 123456');
     });
   });
 
@@ -117,7 +83,7 @@ describe('SmartAccountController', () => {
       mockSnapsProvider.request.mockResolvedValueOnce(entropy);
 
       const address = await accountController.getAccountAddress({
-        chainId: sepolia.id,
+        chainId: 11155111,
       });
 
       expect(address).toStrictEqual(expectedAddress);
@@ -137,11 +103,11 @@ describe('SmartAccountController', () => {
       const controller = new SmartAccountController({
         snapsProvider: mockSnapsProvider,
         deploymentSalt: '0x1234',
-        supportedChains: [sepolia, lineaSepolia],
+        supportedChains: [11155111],
       });
 
       const address = await controller.getAccountAddress({
-        chainId: sepolia.id,
+        chainId: 11155111,
       });
 
       expect(address).toBeDefined();
@@ -150,10 +116,10 @@ describe('SmartAccountController', () => {
 
   describe('getAccountMetadata()', () => {
     it('should get the account metadata', async () => {
-      const environment = getDeleGatorEnvironment(sepolia.id);
+      const environment = getDeleGatorEnvironment(11155111);
 
       const metadata = await accountController.getAccountMetadata({
-        chainId: sepolia.id,
+        chainId: 11155111,
       });
 
       expect(metadata.factory).toStrictEqual(environment.SimpleFactory);
@@ -172,15 +138,17 @@ describe('SmartAccountController', () => {
   });
 
   describe('signDelegation()', () => {
-    const unsignedDelegation = createDelegation({
-      to: '0x1234567890abcdef1234567890abcdef12345678',
-      from: '0x1234567890abcdef1234567890abcdef12345678',
+    const unsignedDelegation: Omit<Delegation, 'signature'> = {
+      delegate: '0x1234567890abcdef1234567890abcdef12345678',
+      delegator: '0x1234567890abcdef1234567890abcdef12345678',
       caveats: [],
-    });
+      salt: 0n,
+      authority: ROOT_AUTHORITY,
+    };
 
     it('should sign a delegation', async () => {
       const signedDelegation = await accountController.signDelegation({
-        chainId: sepolia.id,
+        chainId: 11155111,
         delegation: unsignedDelegation,
       });
 
@@ -204,29 +172,6 @@ describe('SmartAccountController', () => {
         accountController.signDelegation({
           chainId: invalidChainId,
           delegation: unsignedDelegation,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
-    });
-  });
-
-  describe('getEnvironment()', () => {
-    it('should get the DeleGator Environment for the current account', async () => {
-      const chainId = sepolia.id;
-      const expectedDeleGatorEnvironment = getDeleGatorEnvironment(sepolia.id);
-
-      const environment = await accountController.getEnvironment({
-        chainId,
-      });
-
-      expect(environment).toStrictEqual(expectedDeleGatorEnvironment);
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getEnvironment({
-          chainId: invalidChainId,
         }),
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });

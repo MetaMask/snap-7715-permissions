@@ -1,5 +1,6 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
-import { parseUnits, type Address } from 'viem';
+import { parseUnits } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 
 import type { AccountApiClient } from '../../src/clients/accountApiClient';
 import type { TokenMetadataClient } from '../../src/clients/types';
@@ -14,9 +15,8 @@ describe('TokenMetadataService', () => {
   let mockTokenMetadataClient: jest.Mocked<TokenMetadataClient>;
   let mockFetcher: jest.MockedFunction<typeof fetch>;
 
-  const mockAddress = '0x1234567890abcdef1234567890abcdef12345678' as Address;
-  const mockAssetAddress =
-    '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as Address;
+  const mockAddress = '0x1234567890abcdef1234567890abcdef12345678' as Hex;
+  const mockAssetAddress = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as Hex;
   const mockTokenBalanceAndMetadata = {
     balance: parseUnits('10', 18),
     symbol: 'ETH',

@@ -1,4 +1,4 @@
-import { parseUnits, toHex } from 'viem';
+import { parseUnits } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
@@ -23,6 +23,7 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
+import { bigIntToHex } from '@metamask/utils';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -46,7 +47,9 @@ export async function applyContext({
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
   const permissionData = {
-    periodAmount: toHex(parseUnits(permissionDetails.periodAmount, decimals)),
+    periodAmount: bigIntToHex(
+      parseUnits(permissionDetails.periodAmount, decimals),
+    ),
     periodDuration: parseInt(permissionDetails.periodDuration, 10),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,
@@ -126,7 +129,7 @@ export async function buildContext({
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:1/slip44:60`,
-    toHex(rawBalance),
+    bigIntToHex(rawBalance),
     decimals,
   );
 
@@ -157,7 +160,7 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
-  const balance = toHex(rawBalance);
+  const balance = bigIntToHex(rawBalance);
 
   return {
     expiry,

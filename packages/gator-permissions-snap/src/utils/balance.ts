@@ -1,4 +1,4 @@
-import type { Hex } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 import { formatUnits } from 'viem';
 
 /**

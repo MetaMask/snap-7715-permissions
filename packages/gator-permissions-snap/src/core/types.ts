@@ -3,16 +3,16 @@ import type {
   Permission,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
+import type { Hex, Caveat } from '@metamask/delegation-core';
 
 import type { AccountController } from '../accountController';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
+import { DelegationContracts } from './delegationContracts';
 
 /**
  * Represents the result of a permission request.
@@ -139,10 +139,10 @@ export type LifecycleOrchestrationHandlers<
   populatePermission: (args: {
     permission: TPermission;
   }) => Promise<TPopulatedPermission>;
-  appendCaveats: (args: {
+  createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
-    caveatBuilder: CoreCaveatBuilder;
-  }) => Promise<CoreCaveatBuilder>;
+    contracts: DelegationContracts;
+  }) => Promise<Caveat[]>;
 
   /**
    * Optional callback that is invoked when a confirmation dialog is created.
@@ -326,8 +326,8 @@ export type PermissionHandlerDependencies<
   populatePermission: (args: {
     permission: TPermission;
   }) => Promise<TPopulatedPermission>;
-  appendCaveats: (args: {
+  createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
-    caveatBuilder: any;
-  }) => Promise<any>;
+    contracts: DelegationContracts;
+  }) => Promise<Caveat[]>;
 };

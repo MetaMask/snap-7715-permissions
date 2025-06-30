@@ -1,6 +1,7 @@
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Text, Box, Section, Avatar } from '@metamask/snaps-sdk/jsx';
-import { formatUnits, type Hex } from 'viem';
+import { formatUnits } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 
 import { TooltipIcon } from './TooltipIcon';
 

@@ -1,5 +1,6 @@
-import { extractChain, type Address, type Hex } from 'viem';
+import { extractChain } from 'viem';
 import * as chains from 'viem/chains';
+import type { Hex } from '@metamask/delegation-core';
 
 import type { PermissionRequestIteratorItem } from '../iterator';
 import type { TypeDescriptor } from '../types';
@@ -47,9 +48,9 @@ export function moveToFirstIndex<ItemT>(arr: ItemT[], index: number): ItemT[] {
  * @returns An array of accounts with the selected account at the first index or the original array if the user has not selected an account for the permission.
  */
 export function updateAccountsOrder(
-  accountsToSelect: Address[],
+  accountsToSelect: Hex[],
   curr: PermissionRequestIteratorItem | null,
-): Address[] {
+): Hex[] {
   const accountsUpdated = Array.from(accountsToSelect);
   if (curr) {
     const selectedAccount = curr.permissionRequest.address;

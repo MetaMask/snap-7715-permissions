@@ -1,4 +1,4 @@
-import { formatUnits, maxUint256, parseUnits, toHex } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
@@ -24,8 +24,10 @@ import type {
   PopulatedErc20TokenStreamPermission,
   Erc20TokenStreamPermission,
 } from './types';
+import { bigIntToHex } from '@metamask/utils';
 
-const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
+const DEFAULT_MAX_AMOUNT =
+  '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const DEFAULT_INITIAL_AMOUNT = '0x0';
 
 /**
@@ -51,12 +53,12 @@ export async function applyContext({
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
-      ? toHex(parseUnits(permissionDetails.maxAmount, decimals))
+      ? bigIntToHex(parseUnits(permissionDetails.maxAmount, decimals))
       : undefined,
     initialAmount: permissionDetails.initialAmount
-      ? toHex(parseUnits(permissionDetails.initialAmount, decimals))
+      ? bigIntToHex(parseUnits(permissionDetails.initialAmount, decimals))
       : undefined,
-    amountPerSecond: toHex(
+    amountPerSecond: bigIntToHex(
       parseUnits(permissionDetails.amountPerPeriod, decimals) /
         TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
@@ -146,7 +148,7 @@ export async function buildContext({
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:${chainId}/erc20:${tokenAddress}`,
-    toHex(rawBalance),
+    bigIntToHex(rawBalance),
     decimals,
   );
 
@@ -181,7 +183,7 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
-  const balance = toHex(rawBalance);
+  const balance = bigIntToHex(rawBalance);
 
   return {
     expiry,

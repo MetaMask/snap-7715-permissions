@@ -1,13 +1,12 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
-import {
-  createDelegation,
-  getDeleGatorEnvironment,
-} from '@metamask/delegation-toolkit';
 import { isHex, size } from 'viem';
-import { sepolia, oneWorld, mainnet } from 'viem/chains';
 
 import { EoaAccountController } from '../../src/accountController/eoaAccountController';
+import { Delegation } from '@metamask/delegation-core';
+
+const sepolia = 11155111;
+const mainnet = 1;
 
 describe('EoaAccountController', () => {
   const mockAddress = '0x1234567890abcdef1234567890abcdef12345678';
@@ -72,7 +71,7 @@ describe('EoaAccountController', () => {
     accountController = new EoaAccountController({
       snapsProvider: mockSnapsProvider,
       ethereumProvider: mockEthereumProvider,
-      supportedChains: [sepolia, mainnet],
+      supportedChains: [mainnet, sepolia],
     });
   });
 
@@ -94,26 +93,16 @@ describe('EoaAccountController', () => {
           new EoaAccountController({
             snapsProvider: mockSnapsProvider,
             ethereumProvider: mockEthereumProvider,
-            supportedChains: [oneWorld] as any,
+            supportedChains: [123],
           }),
-      ).toThrow('Unsupported chains specified: oneworld');
-    });
-
-    it('should not throw if supported chains are not specified', () => {
-      expect(
-        () =>
-          new EoaAccountController({
-            snapsProvider: mockSnapsProvider,
-            ethereumProvider: mockEthereumProvider,
-          }),
-      ).not.toThrow();
+      ).toThrow('Unsupported chains specified: 123');
     });
   });
 
   describe('getAccountAddress()', () => {
     it('should get the account address', async () => {
       const address = await accountController.getAccountAddress({
-        chainId: sepolia.id,
+        chainId: sepolia,
       });
 
       expect(address).toBe(mockAddress);
@@ -124,10 +113,10 @@ describe('EoaAccountController', () => {
 
     it('should cache the account address', async () => {
       await accountController.getAccountAddress({
-        chainId: sepolia.id,
+        chainId: sepolia,
       });
       await accountController.getAccountAddress({
-        chainId: sepolia.id,
+        chainId: sepolia,
       });
 
       expect(mockEthereumProvider.request).toHaveBeenCalledTimes(1);
@@ -138,7 +127,7 @@ describe('EoaAccountController', () => {
 
       await expect(
         accountController.getAccountAddress({
-          chainId: sepolia.id,
+          chainId: sepolia,
         }),
       ).rejects.toThrow('No accounts found');
     });
@@ -155,15 +144,17 @@ describe('EoaAccountController', () => {
   });
 
   describe('signDelegation()', () => {
-    const unsignedDelegation = createDelegation({
-      to: '0x1234567890abcdef1234567890abcdef12345678',
-      from: '0x1234567890abcdef1234567890abcdef12345678',
+    const unsignedDelegation: Omit<Delegation, 'signature'> = {
+      delegate: '0x1234567890abcdef1234567890abcdef12345678',
+      delegator: '0x1234567890abcdef1234567890abcdef12345678',
       caveats: [],
-    });
+      authority: '0x1234567890abcdef1234567890abcdef12345678',
+      salt: BigInt('0x1'), // Example salt
+    };
 
     it('should sign a delegation', async () => {
       const signedDelegation = await accountController.signDelegation({
-        chainId: sepolia.id,
+        chainId: sepolia,
         delegation: unsignedDelegation,
       });
 
@@ -182,7 +173,7 @@ describe('EoaAccountController', () => {
 
       await expect(
         accountController.signDelegation({
-          chainId: sepolia.id,
+          chainId: sepolia,
           delegation: unsignedDelegation,
         }),
       ).rejects.toThrow('Selected chain does not match the requested chain');
@@ -195,7 +186,7 @@ describe('EoaAccountController', () => {
 
       await expect(
         accountController.signDelegation({
-          chainId: sepolia.id,
+          chainId: sepolia,
           delegation: unsignedDelegation,
         }),
       ).rejects.toThrow('Failed to sign delegation');
@@ -213,57 +204,10 @@ describe('EoaAccountController', () => {
     });
   });
 
-  describe('getDelegationManager()', () => {
-    it('should get the delegation manager', async () => {
-      const chainId = sepolia.id;
-      const { DelegationManager: expectedDelegationManager } =
-        getDeleGatorEnvironment(chainId);
-
-      const delegationManager = await accountController.getDelegationManager({
-        chainId,
-      });
-
-      expect(delegationManager).toStrictEqual(expectedDelegationManager);
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getDelegationManager({
-          chainId: invalidChainId,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
-    });
-  });
-
-  describe('getEnvironment()', () => {
-    it('should get the DeleGator Environment for the current account', async () => {
-      const chainId = sepolia.id;
-      const expectedDeleGatorEnvironment = getDeleGatorEnvironment(chainId);
-
-      const environment = await accountController.getEnvironment({
-        chainId,
-      });
-
-      expect(environment).toStrictEqual(expectedDeleGatorEnvironment);
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getEnvironment({
-          chainId: invalidChainId,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
-    });
-  });
-
   describe('getAccountMetadata()', () => {
     it('should return empty metadata for EOA accounts', async () => {
       const metadata = await accountController.getAccountMetadata({
-        chainId: sepolia.id,
+        chainId: sepolia,
       });
 
       expect(metadata).toStrictEqual({

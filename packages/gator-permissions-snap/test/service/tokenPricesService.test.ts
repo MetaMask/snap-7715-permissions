@@ -1,8 +1,9 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
-import { parseUnits, toHex } from 'viem';
+import { parseUnits } from 'viem';
 
 import type { PriceApiClient } from '../../src/clients/priceApiClient';
 import { TokenPricesService } from '../../src/services/tokenPricesService';
+import { bigIntToHex } from '@metamask/utils';
 
 describe('TokenPricesService', () => {
   const mockSnapsProvider = createMockSnapsProvider();
@@ -29,7 +30,7 @@ describe('TokenPricesService', () => {
         const humanReadableValue =
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
-            toHex(parseUnits('.01', 18)), // 1 ETH in wei
+            bigIntToHex(parseUnits('.01', 18)), // 1 ETH in wei
             18,
           );
 
@@ -54,7 +55,7 @@ describe('TokenPricesService', () => {
         const humanReadableValue =
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
-            toHex(parseUnits('.01', 18)), // 1 ETH in wei
+            bigIntToHex(parseUnits('.01', 18)), // 1 ETH in wei
             18,
           );
 
@@ -79,7 +80,7 @@ describe('TokenPricesService', () => {
         const humanReadableValue =
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
-            toHex(parseUnits('.5', 18)), // 1 ETH in wei
+            bigIntToHex(parseUnits('.5', 18)), // 1 ETH in wei
             18,
           );
 
@@ -104,7 +105,7 @@ describe('TokenPricesService', () => {
         const humanReadableValue =
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
-            toHex(parseUnits('1', 18)), // 1 ETH in wei
+            bigIntToHex(parseUnits('1', 18)), // 1 ETH in wei
             18,
           );
 
@@ -129,7 +130,7 @@ describe('TokenPricesService', () => {
         const humanReadableValue =
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
-            toHex(parseUnits('1.5', 18)), // 1.5 ETH in wei
+            bigIntToHex(parseUnits('1.5', 18)), // 1.5 ETH in wei
             18,
           );
 
@@ -154,7 +155,7 @@ describe('TokenPricesService', () => {
         const humanReadableValue =
           await tokenPricesService.getCryptoToFiatConversion(
             'eip155:1/slip44:60',
-            toHex(parseUnits('.01', 18)), // 1 ETH in wei
+            bigIntToHex(parseUnits('.01', 18)), // 1 ETH in wei
             18,
           );
 

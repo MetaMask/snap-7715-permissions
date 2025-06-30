@@ -1,6 +1,6 @@
-import type { Hex } from 'viem';
-import { getAddress } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 import { z } from 'zod';
+import { getChecksumAddress } from '@metamask/utils';
 
 export type { ZodIssue } from 'zod';
 
@@ -8,7 +8,7 @@ export const zAddress = z
   .string()
   .regex(/^0x[a-fA-F0-9]{40}$/u, 'Invalid Ethereum address')
   .transform((value) => {
-    return getAddress(value);
+    return getChecksumAddress(value as Hex);
   });
 
 export const zHexStr = z

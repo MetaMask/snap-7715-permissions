@@ -1,12 +1,11 @@
-import { toHex } from 'viem';
-
+import { numberToHex } from 'viem';
 import { createPermissionsRequestIterator } from '../src/iterator';
 import type { PermissionRequest } from '../src/types';
 
 describe('createPermissionsRequestIterator', () => {
   const mockPermissionsRequest: PermissionRequest[] = [
     {
-      chainId: toHex(11155111),
+      chainId: numberToHex(11155111),
       expiry: 1,
       signer: {
         type: 'account',
@@ -18,12 +17,12 @@ describe('createPermissionsRequestIterator', () => {
         type: 'native-token-transfer',
         data: {
           justification: 'shh',
-          allowance: toHex(1),
+          allowance: numberToHex(1),
         },
       },
     },
     {
-      chainId: toHex(11155111),
+      chainId: numberToHex(11155111),
       expiry: 1,
       signer: {
         type: 'account',
@@ -36,12 +35,12 @@ describe('createPermissionsRequestIterator', () => {
         data: {
           justification: 'shh',
           address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
-          allowance: toHex(10000),
+          allowance: numberToHex(10000),
         },
       },
     },
     {
-      chainId: toHex(11155111),
+      chainId: numberToHex(11155111),
       expiry: 1,
       signer: {
         type: 'account',
@@ -54,7 +53,7 @@ describe('createPermissionsRequestIterator', () => {
         data: {
           justification: 'shh',
           address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
-          allowance: toHex(100),
+          allowance: numberToHex(100),
         },
       },
     },

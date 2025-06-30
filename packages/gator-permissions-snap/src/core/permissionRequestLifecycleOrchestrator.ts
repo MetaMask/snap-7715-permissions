@@ -3,12 +3,6 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import {
-  createCaveatBuilder,
-  createDelegation,
-  encodeDelegation,
-} from '@metamask/delegation-toolkit';
-import { bytesToHex, toHex } from 'viem';
 
 import type { AccountController } from '../accountController';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
@@ -18,6 +12,14 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
+import { bytesToHex, numberToHex } from '@metamask/utils';
+import { getDelegationContracts } from './delegationContracts';
+import {
+  createTimestampTerms,
+  encodeDelegations,
+  Delegation,
+  ROOT_AUTHORITY,
+} from '@metamask/delegation-core';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -204,55 +206,56 @@ export class PermissionRequestLifecycleOrchestrator {
       isAdjustmentAllowed,
     };
 
-    const [environment, address, accountMetadata, delegationManager] =
-      await Promise.all([
-        this.#accountController.getEnvironment({
-          chainId,
-        }),
-        this.#accountController.getAccountAddress({
-          chainId,
-        }),
-        this.#accountController.getAccountMetadata({
-          chainId,
-        }),
-        this.#accountController.getDelegationManager({
-          chainId,
-        }),
-      ]);
+    const [address, accountMetadata] = await Promise.all([
+      this.#accountController.getAccountAddress({
+        chainId,
+      }),
+      this.#accountController.getAccountMetadata({
+        chainId,
+      }),
+    ]);
 
-    const caveatBuilder = await lifecycleHandlers.appendCaveats({
+    const contracts = getDelegationContracts({
+      chainId,
+    });
+    const { delegationManager, enforcers } = contracts;
+
+    const caveats = await lifecycleHandlers.createPermissionCaveats({
       permission: populatedPermission,
-      caveatBuilder: createCaveatBuilder(environment),
+      contracts,
     });
 
-    const validAfter = 0;
-    const validBefore = grantedPermissionRequest.expiry;
+    const timestampAfterThreshold = 0;
+    const timestampBeforeThreshold = grantedPermissionRequest.expiry;
 
-    const finalCaveatBuilder = caveatBuilder.addCaveat(
-      'timestamp',
-      validAfter,
-      validBefore,
-    );
+    caveats.push({
+      enforcer: enforcers.TimestampEnforcer,
+      terms: createTimestampTerms({
+        timestampAfterThreshold,
+        timestampBeforeThreshold,
+      }),
+      args: '0x',
+    });
 
     // eslint-disable-next-line no-restricted-globals
     const saltBytes = crypto.getRandomValues(new Uint8Array(32));
     const salt = bytesToHex(saltBytes);
 
     const delegation = {
-      ...createDelegation({
-        to: grantedPermissionRequest.signer.data.address,
-        from: address,
-        caveats: finalCaveatBuilder,
-      }),
-      salt,
+      delegate: grantedPermissionRequest.signer.data.address,
+      authority: ROOT_AUTHORITY,
+      delegator: address,
+      caveats,
+      salt: BigInt(salt),
     } as const;
 
-    const signedDelegation = await this.#accountController.signDelegation({
-      chainId,
-      delegation,
-    });
+    const signedDelegation: Delegation =
+      await this.#accountController.signDelegation({
+        chainId,
+        delegation,
+      });
 
-    const context = encodeDelegation([signedDelegation]);
+    const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
     const accountMeta: AccountMeta[] =
       accountMetadata.factory && accountMetadata.factoryData
@@ -266,7 +269,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const response: PermissionResponse = {
       ...grantedPermissionRequest,
-      chainId: toHex(chainId),
+      chainId: numberToHex(chainId),
       address,
       accountMeta,
       context,

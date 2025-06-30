@@ -1,5 +1,4 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import { maxUint256 } from 'viem';
 import { toHex } from 'viem/utils';
 
 import type { AccountController } from '../../../src/accountController';
@@ -102,7 +101,8 @@ describe('erc20TokenStream:context', () => {
         data: {
           ...permissionWithoutOptionals.data,
           initialAmount: '0x0',
-          maxAmount: toHex(maxUint256),
+          maxAmount:
+            '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
         },
         rules: {},
       });

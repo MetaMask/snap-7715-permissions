@@ -1,6 +1,11 @@
-import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
+import type { DelegationContracts } from '../../core/delegationContracts';
 
 import type { PopulatedErc20TokenPeriodicPermission } from './types';
+import {
+  Caveat,
+  createERC20TokenPeriodTransferTerms,
+  createValueLteTerms,
+} from '@metamask/delegation-core';
 
 /**
  * Appends permission-specific caveats to the caveat builder.
@@ -9,25 +14,34 @@ import type { PopulatedErc20TokenPeriodicPermission } from './types';
  * @param options0.caveatBuilder - The core caveat builder to append caveats to.
  * @returns The modified caveat builder with appended ERC20 token periodic caveats.
  */
-export async function appendCaveats({
+export async function createPermissionCaveats({
   permission,
-  caveatBuilder,
+  contracts,
 }: {
   permission: PopulatedErc20TokenPeriodicPermission;
-  caveatBuilder: CoreCaveatBuilder;
-}): Promise<CoreCaveatBuilder> {
+  contracts: DelegationContracts;
+}): Promise<Caveat[]> {
   const { periodAmount, periodDuration, startTime, tokenAddress } =
     permission.data;
 
-  caveatBuilder
-    .addCaveat(
-      'erc20PeriodTransfer',
+  const erc20PeriodCaveat: Caveat = {
+    enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+    terms: createERC20TokenPeriodTransferTerms({
       tokenAddress,
-      BigInt(periodAmount),
+      periodAmount: BigInt(periodAmount),
       periodDuration,
-      startTime,
-    )
-    .addCaveat('valueLte', 0n);
+      startDate: startTime,
+    }),
+    args: '0x',
+  };
 
-  return caveatBuilder;
+  const valueLteCaveat: Caveat = {
+    enforcer: contracts.enforcers.ValueLteEnforcer,
+    terms: createValueLteTerms({
+      maxValue: 0n,
+    }),
+    args: '0x',
+  };
+
+  return [erc20PeriodCaveat, valueLteCaveat];
 }

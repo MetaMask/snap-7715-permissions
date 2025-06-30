@@ -1,18 +1,42 @@
 import { describe, expect, it } from '@jest/globals';
-import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
 import { toHex, parseUnits } from 'viem/utils';
 
 import { TimePeriod } from '../../../src/core/types';
-import { appendCaveats } from '../../../src/permissions/nativeTokenPeriodic/caveats';
+import { createPermissionCaveats } from '../../../src/permissions/nativeTokenPeriodic/caveats';
 import type { PopulatedNativeTokenPeriodicPermission } from '../../../src/permissions/nativeTokenPeriodic/types';
 import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
+import { DelegationContracts } from 'src/core/delegationContracts';
+
+// Define the contracts with enforcers
+const contracts = {
+  enforcers: {
+    NativeTokenPeriodicTransferEnforcer:
+      '0x726B9Dc7515524819365AC0Cf6464C683Ae61765',
+    ExactCalldataEnforcer: '0x9Ec1216e9E98311bF49f7b644cEE7865672fF4B9',
+  },
+} as any as DelegationContracts;
+
+// Helper function to create expected terms
+const createExpectedTerms = (
+  permission: PopulatedNativeTokenPeriodicPermission,
+) => {
+  const periodAmountHex = permission.data.periodAmount
+    .slice(2)
+    .padStart(64, '0');
+  const periodDurationHex = permission.data.periodDuration
+    .toString(16)
+    .padStart(64, '0');
+  const startTimeHex = permission.data.startTime.toString(16).padStart(64, '0');
+
+  return `0x${periodAmountHex}${periodDurationHex}${startTimeHex}`;
+};
 
 describe('nativeTokenPeriodic:caveats', () => {
-  describe('appendCaveats()', () => {
-    it('should append caveats for a permission', async () => {
+  describe('createPermissionCaveats()', () => {
+    it('should create nativeTokenPeriodic and exactCalldata caveats', async () => {
       const permission: PopulatedNativeTokenPeriodicPermission = {
         type: 'native-token-periodic',
         data: {
@@ -24,57 +48,26 @@ describe('nativeTokenPeriodic:caveats', () => {
         rules: {},
       };
 
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
+      const caveats = await createPermissionCaveats({ permission, contracts });
 
-      await appendCaveats({ permission, caveatBuilder });
+      const nativeTokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'nativeTokenPeriodTransfer',
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'exactCalldata',
-        '0x',
-      );
-    });
-
-    it('should append caveats for daily period type', async () => {
-      const permission: PopulatedNativeTokenPeriodicPermission = {
-        type: 'native-token-periodic',
-        data: {
-          periodAmount: toHex(parseUnits('1', 18)), // 1 ETH per period
-          periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
-          justification: 'Permission to do something important',
+      expect(caveats).toStrictEqual([
+        {
+          enforcer: contracts.enforcers.NativeTokenPeriodicTransferEnforcer,
+          terms: nativeTokenPeriodicExpectedTerms,
+          args: '0x',
         },
-        rules: {},
-      };
-
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
-
-      await appendCaveats({ permission, caveatBuilder });
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'nativeTokenPeriodTransfer',
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'exactCalldata',
-        '0x',
-      );
+        {
+          enforcer: contracts.enforcers.ExactCalldataEnforcer,
+          terms: '0x',
+          args: '0x',
+        },
+      ]);
     });
 
-    it('should append caveats for weekly period type', async () => {
+    // Additional test cases for different period types
+    it('should create nativeTokenPeriodic and exactCalldata caveats for weekly period type', async () => {
       const permission: PopulatedNativeTokenPeriodicPermission = {
         type: 'native-token-periodic',
         data: {
@@ -86,26 +79,25 @@ describe('nativeTokenPeriodic:caveats', () => {
         rules: {},
       };
 
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
+      const caveats = await createPermissionCaveats({ permission, contracts });
 
-      await appendCaveats({ permission, caveatBuilder });
+      const nativeTokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'nativeTokenPeriodTransfer',
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'exactCalldata',
-        '0x',
-      );
+      expect(caveats).toStrictEqual([
+        {
+          enforcer: contracts.enforcers.NativeTokenPeriodicTransferEnforcer,
+          terms: nativeTokenPeriodicExpectedTerms,
+          args: '0x',
+        },
+        {
+          enforcer: contracts.enforcers.ExactCalldataEnforcer,
+          terms: '0x',
+          args: '0x',
+        },
+      ]);
     });
 
-    it('should append caveats for other period type', async () => {
+    it('should create nativeTokenPeriodic and exactCalldata caveats for custom period type', async () => {
       const permission: PopulatedNativeTokenPeriodicPermission = {
         type: 'native-token-periodic',
         data: {
@@ -117,23 +109,22 @@ describe('nativeTokenPeriodic:caveats', () => {
         rules: {},
       };
 
-      const caveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
+      const caveats = await createPermissionCaveats({ permission, contracts });
 
-      await appendCaveats({ permission, caveatBuilder });
+      const nativeTokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'nativeTokenPeriodTransfer',
-        BigInt(permission.data.periodAmount),
-        permission.data.periodDuration,
-        permission.data.startTime,
-      );
-
-      expect(caveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'exactCalldata',
-        '0x',
-      );
+      expect(caveats).toStrictEqual([
+        {
+          enforcer: contracts.enforcers.NativeTokenPeriodicTransferEnforcer,
+          terms: nativeTokenPeriodicExpectedTerms,
+          args: '0x',
+        },
+        {
+          enforcer: contracts.enforcers.ExactCalldataEnforcer,
+          terms: '0x',
+          args: '0x',
+        },
+      ]);
     });
   });
 });
