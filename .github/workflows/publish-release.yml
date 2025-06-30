@@ -18,6 +18,7 @@ jobs:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
       STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
@@ -46,6 +47,7 @@ jobs:
       SNAP_ENV: ${{ vars.SNAP_ENV }}
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
       STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+      SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
