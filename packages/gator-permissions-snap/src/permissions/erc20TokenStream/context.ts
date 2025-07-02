@@ -1,10 +1,8 @@
-import { formatUnits, parseUnits } from 'viem';
-
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { formatUnitsFromString } from '../../utils/balance';
+import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -53,14 +51,20 @@ export async function applyContext({
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
-      ? bigIntToHex(parseUnits(permissionDetails.maxAmount, decimals))
+      ? bigIntToHex(
+          parseUnits({ formatted: permissionDetails.maxAmount, decimals }),
+        )
       : undefined,
     initialAmount: permissionDetails.initialAmount
-      ? bigIntToHex(parseUnits(permissionDetails.initialAmount, decimals))
+      ? bigIntToHex(
+          parseUnits({ formatted: permissionDetails.initialAmount, decimals }),
+        )
       : undefined,
     amountPerSecond: bigIntToHex(
-      parseUnits(permissionDetails.amountPerPeriod, decimals) /
-        TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
+      parseUnits({
+        formatted: permissionDetails.amountPerPeriod,
+        decimals,
+      }) / TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,
@@ -154,7 +158,7 @@ export async function buildContext({
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  const initialAmount = formatUnitsFromString({
+  const initialAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.initialAmount,
     allowUndefined: true,
     decimals,
@@ -162,7 +166,7 @@ export async function buildContext({
 
   const timePeriod = TimePeriod.WEEKLY;
 
-  const maxAmount = formatUnitsFromString({
+  const maxAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.maxAmount,
     allowUndefined: true,
     decimals,
@@ -174,10 +178,10 @@ export async function buildContext({
 
   // It may seem strange to convert the amount per second to amount per period, format, and then convert back to amount per second.
   // The user is inputting amount per period, and we derive amount per second, so it makes sense for the context to contain the amount per period.
-  const amountPerPeriod = formatUnits(
-    amountPerSecond * TIME_PERIOD_TO_SECONDS[timePeriod],
+  const amountPerPeriod = formatUnits({
+    value: amountPerSecond * TIME_PERIOD_TO_SECONDS[timePeriod],
     decimals,
-  );
+  });
 
   const startTime = convertTimestampToReadableDate(
     permissionRequest.permission.data.startTime,

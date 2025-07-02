@@ -4543,8 +4543,8 @@ __metadata:
   linkType: hard
 
 "@metamask/utils@npm:^11.4.0":
-  version: 11.4.2
-  resolution: "@metamask/utils@npm:11.4.2"
+  version: 11.4.1
+  resolution: "@metamask/utils@npm:11.4.1"
   dependencies:
     "@ethereumjs/tx": ^4.2.0
     "@metamask/superstruct": ^3.1.0
@@ -4556,7 +4556,7 @@ __metadata:
     pony-cause: ^2.1.10
     semver: ^7.5.4
     uuid: ^9.0.1
-  checksum: 11061a93f49684563a14caaaab2d8dbb969c907dbc24358cf188dd10ec00ac91e5d04369ef605e9d78e75f8ad53d9a0fbdb65f2325b12ef6c8db85bb46160dff
+  checksum: 64230569753d81b968b8a3b76eed8e64d6a47c00f70a10f430183f869efd42203c3e1b8a03dfb9ba4ec8f54d7e00064afb20b3de4f747d956839e795468dd89b
   languageName: node
   linkType: hard
 

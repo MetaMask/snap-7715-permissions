@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
+import { parseUnits } from '../../../src/utils/value';
 import { TimePeriod } from '../../../src/core/types';
 import { createPermissionCaveats } from '../../../src/permissions/erc20TokenPeriodic/caveats';
 import type { PopulatedErc20TokenPeriodicPermission } from '../../../src/permissions/erc20TokenPeriodic/types';
@@ -42,7 +43,9 @@ describe('erc20TokenPeriodic:caveats', () => {
       const permission: PopulatedErc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
-          periodAmount: toHex(parseUnits('100', tokenDecimals)), // 100 USDC per period
+          periodAmount: bigIntToHex(
+            parseUnits({ formatted: '100', decimals: tokenDecimals }),
+          ), // 100 USDC per period
           periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
           startTime: convertReadableDateToTimestamp('10/26/1985'),
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
@@ -75,7 +78,9 @@ describe('erc20TokenPeriodic:caveats', () => {
       const permission: PopulatedErc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
-          periodAmount: toHex(parseUnits('200', tokenDecimals)), // 200 USDC per period
+          periodAmount: bigIntToHex(
+            parseUnits({ formatted: '200', decimals: tokenDecimals }),
+          ), // 200 USDC per period
           periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY]), // 1 week in seconds
           startTime: convertReadableDateToTimestamp('10/26/1985'),
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
@@ -107,7 +112,9 @@ describe('erc20TokenPeriodic:caveats', () => {
       const permission: PopulatedErc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
-          periodAmount: toHex(parseUnits('75', tokenDecimals)), // 75 USDC per period
+          periodAmount: bigIntToHex(
+            parseUnits({ formatted: '75', decimals: tokenDecimals }),
+          ), // 75 USDC per period
           periodDuration: 123456, // Custom duration in seconds
           startTime: convertReadableDateToTimestamp('10/26/1985'),
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
@@ -139,7 +146,9 @@ describe('erc20TokenPeriodic:caveats', () => {
       const permission: PopulatedErc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
-          periodAmount: toHex(parseUnits('1000', 18)), // 1000 tokens with 18 decimals
+          periodAmount: bigIntToHex(
+            parseUnits({ formatted: '1000', decimals: 18 }),
+          ), // 1000 tokens with 18 decimals
           periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
           startTime: convertReadableDateToTimestamp('10/26/1985'),
           tokenAddress: '0x1234567890123456789012345678901234567890', // Different token

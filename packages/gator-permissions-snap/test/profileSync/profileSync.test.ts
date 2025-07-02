@@ -1,6 +1,6 @@
 import {
   encodeDelegations,
-  getDelegationHash,
+  hashDelegation,
   ROOT_AUTHORITY,
   type Delegation,
 } from '@metamask/delegation-core';
@@ -51,8 +51,8 @@ describe('profileSync', () => {
     signature: '0x2',
   };
 
-  const mockDelegationHash = getDelegationHash(mockDelegation);
-  const mockDelegationHashTwo = getDelegationHash(mockDelegationTwo);
+  const mockDelegationHash = hashDelegation(mockDelegation);
+  const mockDelegationHashTwo = hashDelegation(mockDelegationTwo);
 
   const mockStoredGrantedPermission: StoredGrantedPermission = {
     permissionResponse: {

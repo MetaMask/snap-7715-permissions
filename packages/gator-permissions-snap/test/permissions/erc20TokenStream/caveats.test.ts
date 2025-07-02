@@ -1,17 +1,24 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { createPermissionCaveats } from '../../../src/permissions/erc20TokenStream/caveats';
 import type { PopulatedErc20TokenStreamPermission } from '../../../src/permissions/erc20TokenStream/types';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 import { DelegationContracts } from 'src/core/delegationContracts';
+import { parseUnits } from '../../../src/utils/value';
 
 describe('erc20TokenStream:caveats', () => {
   describe('createPermissionCaveats()', () => {
     const tokenDecimals = 10;
-    const initialAmount = toHex(parseUnits('1', tokenDecimals));
-    const maxAmount = toHex(parseUnits('10', tokenDecimals));
-    const amountPerSecond = toHex(parseUnits('.5', tokenDecimals));
+    const initialAmount = bigIntToHex(
+      parseUnits({ formatted: '1', decimals: tokenDecimals }),
+    );
+    const maxAmount = bigIntToHex(
+      parseUnits({ formatted: '10', decimals: tokenDecimals }),
+    );
+    const amountPerSecond = bigIntToHex(
+      parseUnits({ formatted: '.5', decimals: tokenDecimals }),
+    );
     const startTime = convertReadableDateToTimestamp('10/26/2024');
     const tokenAddress = '0x1234567890123456789012345678901234567890';
 

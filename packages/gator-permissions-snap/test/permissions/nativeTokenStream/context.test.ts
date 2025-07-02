@@ -1,5 +1,5 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
@@ -20,11 +20,12 @@ import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
 } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const permissionWithoutOptionals: NativeTokenStreamPermission = {
   type: 'native-token-stream',
   data: {
-    amountPerSecond: toHex(parseUnits('.5', 18)), // 0.5 eth per second
+    amountPerSecond: bigIntToHex(parseUnits({ formatted: '.5', decimals: 18 })), // 0.5 eth per second
     startTime: convertReadableDateToTimestamp('10/26/1985'),
     justification: 'Permission to do something important',
   },
@@ -35,9 +36,9 @@ const alreadyPopulatedPermission: NativeTokenStreamPermission = {
   data: {
     ...permissionWithoutOptionals.data,
     // 1 Eth
-    initialAmount: toHex(parseUnits('1', 18)),
+    initialAmount: bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })),
     // 10 Eth
-    maxAmount: toHex(parseUnits('10', 18)),
+    maxAmount: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
   },
   rules: {},
 };
@@ -60,7 +61,7 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
   justification: 'Permission to do something important',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('10', 18)),
+    balance: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
     balanceFormattedAsCurrency: '$🐊10.00',
   },
   tokenMetadata: {

@@ -1,4 +1,4 @@
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits, formatUnits } from '../utils/value';
 
 import type { TimePeriod } from '../core/types';
 import {
@@ -30,7 +30,7 @@ export function validateAndParseAmount(
   }
 
   try {
-    const parsedAmount = parseUnits(amount, decimals);
+    const parsedAmount = parseUnits({ formatted: amount, decimals });
     if (!allowZero && parsedAmount <= 0n) {
       return {
         amount: undefined,
@@ -116,10 +116,10 @@ export function calculateAmountPerSecond(
   timePeriod: TimePeriod,
   decimals: number,
 ): string {
-  return formatUnits(
-    amountPerPeriod / TIME_PERIOD_TO_SECONDS[timePeriod],
+  return formatUnits({
+    value: amountPerPeriod / TIME_PERIOD_TO_SECONDS[timePeriod],
     decimals,
-  );
+  });
 }
 
 /**

@@ -1,10 +1,8 @@
-import { parseUnits } from 'viem';
-
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { formatUnitsFromString } from '../../utils/balance';
+import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -48,7 +46,7 @@ export async function applyContext({
 
   const permissionData = {
     periodAmount: bigIntToHex(
-      parseUnits(permissionDetails.periodAmount, decimals),
+      parseUnits({ formatted: permissionDetails.periodAmount, decimals }),
     ),
     periodDuration: parseInt(permissionDetails.periodDuration, 10),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
@@ -135,7 +133,7 @@ export async function buildContext({
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  const periodAmount = formatUnitsFromString({
+  const periodAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.periodAmount,
     allowUndefined: false,
     decimals,

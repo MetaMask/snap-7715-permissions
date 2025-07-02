@@ -1,9 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { createPermissionCaveats } from '../../../src/permissions/nativeTokenStream/caveats';
 import type { PopulatedNativeTokenStreamPermission } from '../../../src/permissions/nativeTokenStream/types';
 import { DelegationContracts } from 'src/core/delegationContracts';
+import { parseUnits } from '../../../src/utils/value';
 
 describe('nativeTokenStream:caveats', () => {
   describe('createPermissionCaveats()', () => {
@@ -15,9 +16,15 @@ describe('nativeTokenStream:caveats', () => {
       },
     } as any as DelegationContracts;
 
-    const initialAmount = toHex(parseUnits('1', 18));
-    const maxAmount = toHex(parseUnits('10', 18));
-    const amountPerSecond = toHex(parseUnits('.5', 18));
+    const initialAmount = bigIntToHex(
+      parseUnits({ formatted: '1', decimals: 18 }),
+    );
+    const maxAmount = bigIntToHex(
+      parseUnits({ formatted: '10', decimals: 18 }),
+    );
+    const amountPerSecond = bigIntToHex(
+      parseUnits({ formatted: '.5', decimals: 18 }),
+    );
     const startTime = 1714531200;
 
     const mockPermission: PopulatedNativeTokenStreamPermission = {

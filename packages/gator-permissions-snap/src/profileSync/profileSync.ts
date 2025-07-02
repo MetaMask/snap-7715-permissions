@@ -3,7 +3,7 @@
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
-  getDelegationHash,
+  hashDelegation,
   decodeDelegations,
   type Hex,
 } from '@metamask/delegation-core';
@@ -80,7 +80,7 @@ export function createProfileSyncManager(
   function generateObjectKey(permissionContext: Hex): Hex {
     const delegations = decodeDelegations(permissionContext);
     const hashes = delegations.map((delegation) =>
-      getDelegationHash(delegation, { out: 'bytes' }),
+      hashDelegation(delegation, { out: 'bytes' }),
     );
 
     const keyBytes = new Uint8Array(hashes.length * 32);

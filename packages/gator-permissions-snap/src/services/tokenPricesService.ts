@@ -5,7 +5,7 @@ import type { Hex } from '@metamask/delegation-core';
 
 import { type PriceApiClient } from '../clients/priceApiClient';
 import type { VsCurrencyParam } from '../clients/types';
-import { formatTokenBalance } from '../utils/balance';
+import { formatUnits } from '../utils/value';
 import {
   FALLBACK_PREFERENCE,
   formatAsCurrency,
@@ -86,7 +86,9 @@ export class TokenPricesService {
         tokenCaip19Type,
         this.#safeParsePreferences(preferences),
       );
-      const formattedBalance = Number(formatTokenBalance(balance, decimals));
+      const formattedBalance = Number(
+        formatUnits({ value: BigInt(balance), decimals }),
+      );
       const valueInFiat = formattedBalance * tokenSpotPrice;
 
       const humanReadableValue = formatAsCurrency(preferences, valueInFiat);
