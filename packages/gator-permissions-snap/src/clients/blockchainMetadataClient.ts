@@ -1,40 +1,9 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/delegation-core';
-import type { Abi, AbiFunction, AbiParameter, Chain } from 'viem';
-import { decodeAbiParameters, encodeFunctionData, extractChain } from 'viem';
-import * as allChains from 'viem/chains';
+import { decodeSingle } from '@metamask/abi-utils';
 
 import type { TokenBalanceAndMetadata, TokenMetadataClient } from './types';
-
-const BALANCEOF_ABI: AbiFunction = {
-  constant: true,
-  inputs: [{ name: '_owner', type: 'address' }],
-  name: 'balanceOf',
-  outputs: [{ name: 'balance', type: 'uint256' }],
-  type: 'function',
-  stateMutability: 'view',
-};
-
-const DECIMALS_ABI: AbiFunction = {
-  constant: true,
-  inputs: [],
-  name: 'decimals',
-  outputs: [{ name: '', type: 'uint8' }],
-  type: 'function',
-  stateMutability: 'view',
-};
-
-const SYMBOL_ABI: AbiFunction = {
-  constant: true,
-  inputs: [],
-  name: 'symbol',
-  outputs: [{ name: '', type: 'string' }],
-  type: 'function',
-  stateMutability: 'view',
-};
-
-const ERC20_ABI: Abi = [BALANCEOF_ABI, DECIMALS_ABI, SYMBOL_ABI];
 
 /**
  * Client that fetches token metadata directly from the blockchain using the ethereum provider
@@ -42,12 +11,19 @@ const ERC20_ABI: Abi = [BALANCEOF_ABI, DECIMALS_ABI, SYMBOL_ABI];
 export class BlockchainTokenMetadataClient implements TokenMetadataClient {
   readonly #ethereumProvider: SnapsEthereumProvider;
 
-  static #allChains = Object.keys(allChains).map(
-    (name) => (allChains as any)[name as keyof typeof allChains],
-  ) as Chain[];
-
   static readonly #nativeTokenAddress =
     '0x0000000000000000000000000000000000000000';
+
+  static readonly #nativeTokenDecimals = 18;
+
+  static readonly #nativeTokenSymbol = 'ETH';
+
+  // keccak256('balanceOf(address)')
+  static readonly #balanceOfCalldata = '0x70a08231';
+  // keccak256('decimals()')
+  static readonly #decimalsCalldata = '0x313ce567';
+  // keccak256('symbol()')
+  static readonly #symbolCalldata = '0x95d89b41';
 
   constructor({
     ethereumProvider,
@@ -109,17 +85,14 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         params: [account, 'latest'],
       });
 
-      // @ts-expect-error - extractChain does not work well with dynamic `chains`
-      const chain = extractChain({
-        chains: BlockchainTokenMetadataClient.#allChains,
-        id: chainId,
-      });
-
-      const { symbol, decimals } = chain.nativeCurrency;
-
       if (balance === undefined || balance === null) {
         throw new Error('Failed to fetch native token balance');
       }
+
+      const { symbol, decimals } = {
+        symbol: BlockchainTokenMetadataClient.#nativeTokenSymbol,
+        decimals: BlockchainTokenMetadataClient.#nativeTokenDecimals,
+      };
 
       return {
         balance: BigInt(balance),
@@ -128,36 +101,13 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       };
     }
 
-    // todo: it is not clear why these are failing in test, but we will be
-    // removing viem as a dependency, so there is not much point in investigating
-    // the root cause.
-
-    // @ts-expect-error - encodeFunctionData fails tests with Expected 0 arguments, but got 1
-    const balanceOfCalldata = encodeFunctionData({
-      abi: ERC20_ABI,
-      functionName: 'balanceOf',
-      args: [account],
-    });
-
-    // @ts-expect-error - encodeFunctionData fails tests with Expected 0 arguments, but got 1
-    const decimalsCalldata = encodeFunctionData({
-      abi: ERC20_ABI,
-      functionName: 'decimals',
-    });
-
-    // @ts-expect-error - encodeFunctionData fails tests with Expected 0 arguments, but got 1
-    const symbolCalldata = encodeFunctionData({
-      abi: ERC20_ABI,
-      functionName: 'symbol',
-    });
-
     const [balanceEncoded, decimalsEncoded, symbolEncoded] = await Promise.all([
       this.#ethereumProvider.request<Hex>({
         method: 'eth_call',
         params: [
           {
             to: assetAddress,
-            data: balanceOfCalldata,
+            data: BlockchainTokenMetadataClient.#balanceOfCalldata,
           },
           'latest',
         ],
@@ -167,7 +117,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         params: [
           {
             to: assetAddress,
-            data: decimalsCalldata,
+            data: BlockchainTokenMetadataClient.#decimalsCalldata,
           },
           'latest',
         ],
@@ -177,54 +127,36 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         params: [
           {
             to: assetAddress,
-            data: symbolCalldata,
+            data: BlockchainTokenMetadataClient.#symbolCalldata,
           },
           'latest',
         ],
       }),
     ]);
 
-    const decodeOutput = <TReturn>({
-      name,
-      output: outputs,
-      encoded,
-    }: {
-      output: readonly AbiParameter[];
-      encoded: Hex | null | undefined;
-      name: string;
-    }): TReturn => {
-      if (encoded === null || encoded === undefined || encoded === '0x') {
-        throw new Error(`Failed to fetch token ${name}`);
-      }
+    if (!symbolEncoded) {
+      logger.error('Failed to fetch token symbol');
+      throw new Error('Failed to fetch token symbol');
+    }
 
-      // @ts-expect-error - decodeAbiParameters does not work well
-      const [decoded] = decodeAbiParameters(outputs, encoded) as [TReturn];
+    if (!decimalsEncoded) {
+      logger.error('Failed to fetch token decimals');
+      throw new Error('Failed to fetch token decimals');
+    }
 
-      return decoded;
-    };
+    if (!balanceEncoded) {
+      logger.error('Failed to fetch token balance');
+      throw new Error('Failed to fetch token balance');
+    }
 
     try {
-      const symbol = decodeOutput<string>({
-        output: SYMBOL_ABI.outputs,
-        encoded: symbolEncoded,
-        name: 'symbol',
-      });
-
-      const decimals = decodeOutput<number>({
-        output: DECIMALS_ABI.outputs,
-        encoded: decimalsEncoded,
-        name: 'decimals',
-      });
-
-      const balance = decodeOutput<bigint>({
-        output: BALANCEOF_ABI.outputs,
-        encoded: balanceEncoded,
-        name: 'balance',
-      });
+      const symbol = decodeSingle('string', symbolEncoded);
+      const decimals = decodeSingle('uint8', decimalsEncoded);
+      const balance = decodeSingle('uint256', balanceEncoded);
 
       return {
         balance,
-        decimals,
+        decimals: Number(decimals),
         symbol,
       };
     } catch (error) {

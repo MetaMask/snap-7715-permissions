@@ -208,7 +208,7 @@ export class SmartAccountController
       smartAccount,
     );
 
-    // smartAccount.signDelegation expected a developer friendly Delegation (salt: Hex)
+    // smartAccount.signDelegation expects a developer friendly Delegation (salt: Hex)
     const toolkitDelegation = {
       delegate: toHex(delegation.delegate),
       delegator: toHex(delegation.delegator),

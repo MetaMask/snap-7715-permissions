@@ -4,7 +4,7 @@ import {
   getDeleGatorEnvironment,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-toolkit';
-import { isHex, size } from 'viem';
+import { isHexString } from '@metamask/utils';
 
 import { SmartAccountController } from '../../src/accountController/smartAccountController';
 import { Delegation } from '@metamask/delegation-core';
@@ -123,7 +123,7 @@ describe('SmartAccountController', () => {
       });
 
       expect(metadata.factory).toStrictEqual(environment.SimpleFactory);
-      expect(isHex(metadata.factoryData)).toBe(true);
+      expect(isHexString(metadata.factoryData)).toBe(true);
     });
 
     it('should reject if an invalid chainId is supplied', async () => {
@@ -157,11 +157,11 @@ describe('SmartAccountController', () => {
         signature: expect.any(String),
       });
 
-      expect(isHex(signedDelegation.signature)).toBe(true);
+      expect(isHexString(signedDelegation.signature)).toBe(true);
 
-      const EXPECTED_EOA_SIGNATURE_LENGTH = 65;
-      expect(size(signedDelegation.signature)).toBe(
-        EXPECTED_EOA_SIGNATURE_LENGTH,
+      const EXPECTED_EOA_SIGNATURE_STRING_LENGTH = 65 * 2 + 2;
+      expect(signedDelegation.signature.length).toBe(
+        EXPECTED_EOA_SIGNATURE_STRING_LENGTH,
       );
     });
 

@@ -1,6 +1,5 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
-import { isHex, size } from 'viem';
 
 import { EoaAccountController } from '../../src/accountController/eoaAccountController';
 import { Delegation } from '@metamask/delegation-core';
@@ -12,7 +11,7 @@ describe('EoaAccountController', () => {
   const mockAddress = '0x1234567890abcdef1234567890abcdef12345678';
   const mockChainId = '0xaa36a7'; // Sepolia in hex
   const mockSignature =
-    '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1';
+    '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef11';
   const expectedBalance = '0x1000000000000000000';
 
   let accountController: EoaAccountController;
@@ -163,8 +162,7 @@ describe('EoaAccountController', () => {
         signature: mockSignature,
       });
 
-      expect(isHex(signedDelegation.signature)).toBe(true);
-      expect(size(signedDelegation.signature)).toBe(65);
+      expect(signedDelegation.signature).toEqual(mockSignature);
     });
 
     it('should reject if chain ID does not match', async () => {
