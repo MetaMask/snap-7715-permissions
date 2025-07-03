@@ -1,5 +1,6 @@
 import { describe, it, beforeEach } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
+import type { Delegation } from '@metamask/delegation-core';
 import {
   getDeleGatorEnvironment,
   ROOT_AUTHORITY,
@@ -7,7 +8,6 @@ import {
 import { isHexString } from '@metamask/utils';
 
 import { SmartAccountController } from '../../src/accountController/smartAccountController';
-import { Delegation } from '@metamask/delegation-core';
 
 describe('SmartAccountController', () => {
   const entropy =
@@ -160,7 +160,7 @@ describe('SmartAccountController', () => {
       expect(isHexString(signedDelegation.signature)).toBe(true);
 
       const EXPECTED_EOA_SIGNATURE_STRING_LENGTH = 65 * 2 + 2;
-      expect(signedDelegation.signature.length).toBe(
+      expect(signedDelegation.signature).toHaveLength(
         EXPECTED_EOA_SIGNATURE_STRING_LENGTH,
       );
     });

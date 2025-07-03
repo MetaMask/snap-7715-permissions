@@ -1,13 +1,15 @@
+import { bigIntToHex } from '@metamask/utils';
+
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
+import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
   validateStartTime,
@@ -22,7 +24,6 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
-import { bigIntToHex } from '@metamask/utils';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';

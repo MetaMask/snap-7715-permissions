@@ -1,17 +1,17 @@
-import type { DelegationContracts } from '../../core/delegationContracts';
-
-import type { PopulatedErc20TokenPeriodicPermission } from './types';
+import type { Caveat } from '@metamask/delegation-core';
 import {
-  Caveat,
   createERC20TokenPeriodTransferTerms,
   createValueLteTerms,
 } from '@metamask/delegation-core';
 
+import type { DelegationContracts } from '../../core/chainMetadata';
+import type { PopulatedErc20TokenPeriodicPermission } from './types';
+
 /**
  * Appends permission-specific caveats to the caveat builder.
- * @param options0 - The options object containing the permission and caveat builder.
- * @param options0.permission - The complete ERC20 token periodic permission containing periodic parameters.
- * @param options0.caveatBuilder - The core caveat builder to append caveats to.
+ * @param args - The options object containing the permission and caveat builder.
+ * @param args.permission - The complete ERC20 token periodic permission containing periodic parameters.
+ * @param args.contracts - The contracts to use for the caveats.
  * @returns The modified caveat builder with appended ERC20 token periodic caveats.
  */
 export async function createPermissionCaveats({

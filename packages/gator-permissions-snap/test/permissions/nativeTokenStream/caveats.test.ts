@@ -1,9 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
+import type { DelegationContracts } from '../../../src/core/chainMetadata';
 import { createPermissionCaveats } from '../../../src/permissions/nativeTokenStream/caveats';
 import type { PopulatedNativeTokenStreamPermission } from '../../../src/permissions/nativeTokenStream/types';
-import { DelegationContracts } from 'src/core/delegationContracts';
 import { parseUnits } from '../../../src/utils/value';
 
 describe('nativeTokenStream:caveats', () => {

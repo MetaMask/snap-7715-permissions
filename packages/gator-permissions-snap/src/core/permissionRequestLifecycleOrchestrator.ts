@@ -3,8 +3,16 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
+import type { Delegation } from '@metamask/delegation-core';
+import {
+  createTimestampTerms,
+  encodeDelegations,
+  ROOT_AUTHORITY,
+} from '@metamask/delegation-core';
+import { bytesToHex, numberToHex } from '@metamask/utils';
 
 import type { AccountController } from '../accountController';
+import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
   BaseContext,
@@ -12,14 +20,6 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
-import { bytesToHex, numberToHex } from '@metamask/utils';
-import { getDelegationContracts } from './delegationContracts';
-import {
-  createTimestampTerms,
-  encodeDelegations,
-  Delegation,
-  ROOT_AUTHORITY,
-} from '@metamask/delegation-core';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -215,10 +215,11 @@ export class PermissionRequestLifecycleOrchestrator {
       }),
     ]);
 
-    const contracts = getDelegationContracts({
-      chainId,
-    });
-    const { delegationManager, enforcers } = contracts;
+    const { contracts } = getChainMetadata({ chainId });
+    const {
+      enforcers: { TimestampEnforcer },
+      delegationManager,
+    } = contracts;
 
     const caveats = await lifecycleHandlers.createPermissionCaveats({
       permission: populatedPermission,
@@ -229,7 +230,7 @@ export class PermissionRequestLifecycleOrchestrator {
     const timestampBeforeThreshold = grantedPermissionRequest.expiry;
 
     caveats.push({
-      enforcer: enforcers.TimestampEnforcer,
+      enforcer: TimestampEnforcer,
       terms: createTimestampTerms({
         timestampAfterThreshold,
         timestampBeforeThreshold,

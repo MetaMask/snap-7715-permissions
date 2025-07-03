@@ -4,8 +4,7 @@ import {
   createNativeTokenPeriodTransferTerms,
 } from '@metamask/delegation-core';
 
-import type { DelegationContracts } from 'src/core/delegationContracts';
-
+import type { DelegationContracts } from '../../core/chainMetadata';
 import type { PopulatedNativeTokenPeriodicPermission } from './types';
 
 /**

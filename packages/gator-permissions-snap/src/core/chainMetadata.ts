@@ -41,33 +41,40 @@ const CONTRACTS_1_3_0: DelegationContracts = {
   },
 };
 
-const contractsByChainId: Record<number, DelegationContracts> = {
+const metadataByChainId: Record<number, ChainMetadata> = {
   // mainnet
-  1: CONTRACTS_1_3_0,
+  1: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Ethereum Mainnet',
+    symbol: 'ETH',
+    decimals: 18,
+  },
   // sepolia
-  11155111: CONTRACTS_1_3_0,
+  11155111: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Sepolia',
+    symbol: 'ETH',
+    decimals: 18,
+  },
 };
 
-/**
- * Retrieves delegation contracts for a specific chain ID. Presently these are
- * hardcoded, but will be resolved from a configuration system such as
- * LaunchDarkly.
- *
- * @param params - The parameters object
- * @param params.chainId - The chain ID to get delegation contracts for
- * @returns The delegation contracts for the specified chain ID
- * @throws {Error} When no delegation contracts are found for the given chain ID
- */
-export const getDelegationContracts = ({
+export type ChainMetadata = {
+  contracts: DelegationContracts;
+  name: string;
+  symbol: string;
+  decimals: number;
+};
+
+export const getChainMetadata = ({
   chainId,
 }: {
   chainId: number;
-}): DelegationContracts => {
-  const contracts = contractsByChainId[chainId];
+}): ChainMetadata => {
+  const metadata = metadataByChainId[chainId];
 
-  if (!contracts) {
-    throw new Error(`No delegation contracts found for chainId: ${chainId}`);
+  if (!metadata) {
+    throw new Error(`No chain metadata found for chainId: ${chainId}`);
   }
 
-  return contracts;
+  return metadata;
 };

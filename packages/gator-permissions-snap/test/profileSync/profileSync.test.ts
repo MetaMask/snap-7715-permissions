@@ -4,11 +4,11 @@ import {
   ROOT_AUTHORITY,
   type Delegation,
 } from '@metamask/delegation-core';
+import type { Hex } from '@metamask/delegation-core';
 import type {
   JwtBearerAuth,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
-import type { Hex } from '@metamask/delegation-core';
 
 import {
   createProfileSyncManager,

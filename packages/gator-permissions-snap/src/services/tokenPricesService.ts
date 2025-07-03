@@ -1,16 +1,16 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { Hex } from '@metamask/delegation-core';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
-import type { Hex } from '@metamask/delegation-core';
 
 import { type PriceApiClient } from '../clients/priceApiClient';
 import type { VsCurrencyParam } from '../clients/types';
-import { formatUnits } from '../utils/value';
 import {
   FALLBACK_PREFERENCE,
   formatAsCurrency,
   type Preferences,
 } from '../utils/locale';
+import { formatUnits } from '../utils/value';
 
 /**
  * Class responsible for fetching token prices and calculating the value of token balances.

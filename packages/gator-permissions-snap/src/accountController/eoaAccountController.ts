@@ -1,8 +1,8 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
-import { getDelegationContracts } from '../core/delegationContracts';
+import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
 
+import { getChainMetadata } from '../core/chainMetadata';
 import { BaseAccountController } from './baseAccountController';
 import type {
   AccountController,
@@ -104,7 +104,9 @@ export class EoaAccountController
       throw new Error('Selected chain does not match the requested chain');
     }
 
-    const { delegationManager } = getDelegationContracts({ chainId });
+    const {
+      contracts: { delegationManager },
+    } = getChainMetadata({ chainId });
 
     const signArgs = this.#getSignDelegationArgs({
       chainId,

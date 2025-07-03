@@ -3,16 +3,16 @@ import type {
   Permission,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
+import type { Hex, Caveat } from '@metamask/delegation-core';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import type { Hex, Caveat } from '@metamask/delegation-core';
 
 import type { AccountController } from '../accountController';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
-import { DelegationContracts } from './delegationContracts';
 
 /**
  * Represents the result of a permission request.

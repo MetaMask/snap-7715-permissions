@@ -1,8 +1,8 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
+import type { Delegation } from '@metamask/delegation-core';
 
 import { EoaAccountController } from '../../src/accountController/eoaAccountController';
-import { Delegation } from '@metamask/delegation-core';
 
 const sepolia = 11155111;
 const mainnet = 1;
@@ -162,7 +162,7 @@ describe('EoaAccountController', () => {
         signature: mockSignature,
       });
 
-      expect(signedDelegation.signature).toEqual(mockSignature);
+      expect(signedDelegation.signature).toStrictEqual(mockSignature);
     });
 
     it('should reject if chain ID does not match', async () => {

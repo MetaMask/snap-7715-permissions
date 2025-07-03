@@ -179,7 +179,7 @@ describe('erc20TokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -1298,7 +1298,7 @@ describe('erc20TokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },

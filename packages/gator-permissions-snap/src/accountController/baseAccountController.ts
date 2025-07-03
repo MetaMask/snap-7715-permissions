@@ -1,6 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { getDelegationContracts } from '../core/delegationContracts';
+
+import { getChainMetadata } from '../core/chainMetadata';
 
 /**
  * Base class for account controllers that provides common functionality.
@@ -39,15 +40,13 @@ export abstract class BaseAccountController {
       throw new Error('No supported chains specified');
     }
 
-    // ensure that there are delegation contracts configured for all specified chains
+    // ensure that there is chain metadata for all specified chains
     try {
-      supportedChains.map((chainId) => {
-        getDelegationContracts({ chainId });
-      });
-    } catch (e) {
+      supportedChains.map((chainId) => getChainMetadata({ chainId }));
+    } catch (error) {
       logger.error('Unsupported chains specified', {
         supportedChains,
-        error: e,
+        error,
       });
       throw new Error(
         `Unsupported chains specified: ${supportedChains.join(', ')}`,

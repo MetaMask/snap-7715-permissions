@@ -1,5 +1,5 @@
-import type { CaipAssetType } from '@metamask/utils';
 import type { Hex } from '@metamask/delegation-core';
+import type { CaipAssetType } from '@metamask/utils';
 
 /**
  * The params for the price API client to fetch spot prices.

@@ -2,8 +2,9 @@ import type { Hex } from '@metamask/delegation-core';
 
 /**
  * Formats a token value to a human-readable string.
- * @param value - The token value in wei as a bigint.
- * @param decimals - The number of decimal places the token uses.
+ * @param args - The arguments to format.
+ * @param args.value - The token value in wei as a bigint.
+ * @param args.decimals - The number of decimal places the token uses.
  * @returns The formatted human-readable token value.
  */
 export const formatUnits = ({
@@ -17,7 +18,7 @@ export const formatUnits = ({
 
   const decimalPart = valueString.slice(0, -decimals);
   const fractionalPart = valueString.slice(-decimals);
-  const trimmedFractionalPart = fractionalPart.replace(/0+$/, '');
+  const trimmedFractionalPart = fractionalPart.replace(/0+$/u, '');
 
   if (trimmedFractionalPart.length > 0) {
     return `${decimalPart}.${trimmedFractionalPart}`;
@@ -59,7 +60,7 @@ export const formatUnitsFromHex = <
 /**
  * Parses a human-readable string to a token value.
  * @param args - The arguments to parse.
- * @param args.value - The human-readable string value to parse.
+ * @param args.formatted - The human-readable string value to parse.
  * @param args.decimals - The number of decimal places the token uses.
  * @returns The parsed value as a BigInt.
  */
@@ -70,19 +71,24 @@ export function parseUnits({
   formatted: string;
   decimals: number;
 }) {
-  if (!/^(-?)([0-9]*)\.?([0-9]*)$/.test(formatted))
-    throw new Error('Invalid numeric value: ' + formatted);
+  if (!/^(-?)([0-9]*)\.?([0-9]*)$/u.test(formatted)) {
+    throw new Error(`Invalid numeric value: ${formatted}`);
+  }
 
   let [integerPart = '0', fractionPart = '0'] = formatted.split('.');
 
   const isNegative = integerPart.startsWith('-');
-  if (isNegative) integerPart = integerPart.slice(1);
+  if (isNegative) {
+    integerPart = integerPart.slice(1);
+  }
 
-  fractionPart = fractionPart.replace(/(0+)$/, '');
+  // strip trailing 0s from the fraction part
+  fractionPart = fractionPart.replace(/(0+)$/u, '');
 
   if (decimals === 0) {
-    if (Math.round(Number(`.${fractionPart}`)) === 1)
+    if (Math.round(Number(`.${fractionPart}`)) === 1) {
       integerPart = `${BigInt(integerPart) + 1n}`;
+    }
     fractionPart = '';
   } else if (fractionPart.length > decimals) {
     const [left, unit, right] = [
@@ -92,12 +98,11 @@ export function parseUnits({
     ];
 
     const rounded = Math.round(Number(`${unit}.${right}`));
-    if (rounded > 9)
-      fractionPart = `${BigInt(left) + BigInt(1)}0`.padStart(
-        left.length + 1,
-        '0',
-      );
-    else fractionPart = `${left}${rounded}`;
+    if (rounded > 9) {
+      fractionPart = `${BigInt(left) + 1n}0`.padStart(left.length + 1, '0');
+    } else {
+      fractionPart = `${left}${rounded}`;
+    }
 
     if (fractionPart.length > decimals) {
       fractionPart = fractionPart.slice(1);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
-import { parseUnits } from '../../../src/utils/value';
+import type { DelegationContracts } from '../../../src/core/chainMetadata';
 import { TimePeriod } from '../../../src/core/types';
 import { createPermissionCaveats } from '../../../src/permissions/erc20TokenPeriodic/caveats';
 import type { PopulatedErc20TokenPeriodicPermission } from '../../../src/permissions/erc20TokenPeriodic/types';
@@ -9,7 +9,7 @@ import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
-import { DelegationContracts } from '../../../src/core/delegationContracts';
+import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 6;
 

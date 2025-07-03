@@ -1,10 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
+import type { DelegationContracts } from '../../../src/core/chainMetadata';
 import { createPermissionCaveats } from '../../../src/permissions/erc20TokenStream/caveats';
 import type { PopulatedErc20TokenStreamPermission } from '../../../src/permissions/erc20TokenStream/types';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
-import { DelegationContracts } from 'src/core/delegationContracts';
 import { parseUnits } from '../../../src/utils/value';
 
 describe('erc20TokenStream:caveats', () => {

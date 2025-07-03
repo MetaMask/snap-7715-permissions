@@ -1,5 +1,3 @@
-import { sepolia } from 'viem/chains';
-
 import { AccountApiClient } from '../../src/clients/accountApiClient';
 
 const mockApiBaseUrl = 'https://mock-account-api.com';
@@ -22,7 +20,7 @@ describe('AccountApiClient', () => {
   describe('getTokenBalanceAndMetadata', () => {
     const mockAccount = '0x4f10501E98476Bc5c7C322a8ae87226aFC8a66a2';
     const mockTokenAddress = '0x6b175474e89094c44da98b954eedeac495271d0f';
-    const mockChainId = sepolia.id;
+    const mockChainId = 11155111;
 
     it('fetches native token balance and metadata successfully', async () => {
       mockFetch.mockResolvedValueOnce({

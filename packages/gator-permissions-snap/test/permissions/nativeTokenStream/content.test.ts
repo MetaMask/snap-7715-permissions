@@ -174,7 +174,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -1219,7 +1219,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -2263,7 +2263,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -3176,7 +3176,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -4053,7 +4053,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },

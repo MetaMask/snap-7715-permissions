@@ -1,11 +1,10 @@
-import { parseUnits, formatUnits } from '../utils/value';
-
 import type { TimePeriod } from '../core/types';
 import {
   convertReadableDateToTimestamp,
   getStartOfTodayUTC,
   TIME_PERIOD_TO_SECONDS,
 } from '../utils/time';
+import { parseUnits, formatUnits } from '../utils/value';
 
 export type ValidationErrors = {
   [key: string]: string;

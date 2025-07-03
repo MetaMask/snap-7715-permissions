@@ -1,6 +1,6 @@
 import type { Hex } from '@metamask/delegation-core';
-import { z } from 'zod';
 import { getChecksumAddress } from '@metamask/utils';
+import { z } from 'zod';
 
 export type { ZodIssue } from 'zod';
 

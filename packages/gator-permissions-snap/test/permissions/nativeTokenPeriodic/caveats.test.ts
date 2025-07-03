@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
+import type { DelegationContracts } from '../../../src/core/chainMetadata';
 import { TimePeriod } from '../../../src/core/types';
 import { createPermissionCaveats } from '../../../src/permissions/nativeTokenPeriodic/caveats';
 import type { PopulatedNativeTokenPeriodicPermission } from '../../../src/permissions/nativeTokenPeriodic/types';
@@ -8,7 +9,6 @@ import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
-import { DelegationContracts } from 'src/core/delegationContracts';
 import { parseUnits } from '../../../src/utils/value';
 
 // Define the contracts with enforcers

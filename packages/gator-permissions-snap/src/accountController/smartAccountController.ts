@@ -6,6 +6,7 @@ import {
   type MetaMaskSmartAccount,
 } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
+import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import {
   createClient,
   custom,
@@ -14,6 +15,7 @@ import {
   type Address,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
+import * as chains from 'viem/chains';
 
 import { BaseAccountController } from './baseAccountController';
 import type {
@@ -23,13 +25,18 @@ import type {
   FactoryArgs,
 } from './types';
 
-import * as chains from 'viem/chains';
-import { bigIntToHex, bytesToHex } from '@metamask/utils';
-
 const ALL_CHAINS = Object.values(chains);
 
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
+
+const toHex = (input: Uint8Array | Hex): Hex => {
+  if (typeof input === 'string') {
+    return input;
+  }
+
+  return bytesToHex(input);
+};
 
 /**
  * Controls smart account operations including creation, delegation signing, and balance queries.
@@ -236,11 +243,3 @@ export class SmartAccountController
     };
   }
 }
-
-const toHex = (input: Uint8Array | Hex): Hex => {
-  if (typeof input === 'string') {
-    return input;
-  }
-
-  return bytesToHex(input);
-};

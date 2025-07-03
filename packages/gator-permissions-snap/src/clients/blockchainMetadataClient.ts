@@ -1,7 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
-import type { Hex } from '@metamask/delegation-core';
 import { decodeSingle } from '@metamask/abi-utils';
+import type { Hex } from '@metamask/delegation-core';
+import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
 
 import type { TokenBalanceAndMetadata, TokenMetadataClient } from './types';
 
@@ -20,8 +20,10 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
 
   // keccak256('balanceOf(address)')
   static readonly #balanceOfCalldata = '0x70a08231';
+
   // keccak256('decimals()')
   static readonly #decimalsCalldata = '0x313ce567';
+
   // keccak256('symbol()')
   static readonly #symbolCalldata = '0x95d89b41';
 

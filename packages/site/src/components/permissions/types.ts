@@ -1,4 +1,4 @@
-import { type Hex } from '@metamask/delegation-core';
+import { type Hex } from 'viem';
 
 export type BasePermissionRequest = {
   justification: string;

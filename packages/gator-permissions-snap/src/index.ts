@@ -2,7 +2,6 @@
 import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { CHAIN_ID as ChainsWithDelegatorDeployed } from '@metamask/delegation-toolkit';
 import {
   AuthType,
   JwtBearerAuth,

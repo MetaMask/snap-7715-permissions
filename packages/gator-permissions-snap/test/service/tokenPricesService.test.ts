@@ -1,9 +1,9 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { bigIntToHex } from '@metamask/utils';
 
-import { parseUnits } from '../../src/utils/value';
 import type { PriceApiClient } from '../../src/clients/priceApiClient';
 import { TokenPricesService } from '../../src/services/tokenPricesService';
+import { parseUnits } from '../../src/utils/value';
 
 describe('TokenPricesService', () => {
   const mockSnapsProvider = createMockSnapsProvider();

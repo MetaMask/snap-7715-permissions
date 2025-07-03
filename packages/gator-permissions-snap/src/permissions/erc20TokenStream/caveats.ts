@@ -4,7 +4,7 @@ import {
   createValueLteTerms,
 } from '@metamask/delegation-core';
 
-import type { DelegationContracts } from '../../core/delegationContracts';
+import type { DelegationContracts } from '../../core/chainMetadata';
 import type { PopulatedErc20TokenStreamPermission } from './types';
 
 /**

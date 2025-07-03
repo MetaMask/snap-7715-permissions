@@ -1,13 +1,15 @@
+import { bigIntToHex } from '@metamask/utils';
+
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
+import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
   validateStartTime,
@@ -21,7 +23,6 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
-import { bigIntToHex } from '@metamask/utils';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,

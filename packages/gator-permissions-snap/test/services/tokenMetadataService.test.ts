@@ -1,13 +1,13 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import type { Hex } from '@metamask/delegation-core';
 
-import { parseUnits } from '../../src/utils/value';
 import type { AccountApiClient } from '../../src/clients/accountApiClient';
 import type { TokenMetadataClient } from '../../src/clients/types';
 import {
   TokenMetadataService,
   type GetTokenBalanceAndMetadataOptions,
 } from '../../src/services/tokenMetadataService';
+import { parseUnits } from '../../src/utils/value';
 
 describe('TokenMetadataService', () => {
   let tokenMetadataService: TokenMetadataService;

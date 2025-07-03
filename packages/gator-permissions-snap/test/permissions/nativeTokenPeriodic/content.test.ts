@@ -176,7 +176,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Ethereum",
+                                  "children": "Ethereum Mainnet",
                                 },
                                 "type": "Text",
                               },
@@ -949,7 +949,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Ethereum",
+                                  "children": "Ethereum Mainnet",
                                 },
                                 "type": "Text",
                               },

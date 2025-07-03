@@ -1,16 +1,23 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { decodeDelegations, ROOT_AUTHORITY } from '@metamask/delegation-core';
+import {
+  decodeDelegations,
+  ROOT_AUTHORITY,
+  createTimestampTerms,
+} from '@metamask/delegation-core';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { createTimestampTerms } from '@metamask/delegation-core';
-import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
+import { bytesToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../src/accountController';
+import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
-import { getDelegationContracts } from '../../src/core/delegationContracts';
 
-const randomAddress = () => privateKeyToAddress(generatePrivateKey());
+const randomAddress = () => {
+  /* eslint-disable no-restricted-globals */
+  const randomBytes = crypto.getRandomValues(new Uint8Array(20));
+  return bytesToHex(randomBytes);
+};
 
 const mockSignature = '0x1234';
 const mockInterfaceId = 'test-interface-id';
@@ -150,7 +157,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           lifecycleHandlerMocks,
         );
 
-        const { delegationManager } = getDelegationContracts({
+        const {
+          contracts: { delegationManager },
+        } = getChainMetadata({
           chainId: Number(mockPermissionRequest.chainId),
         });
 
@@ -204,8 +213,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         const delegationsArray = decodeDelegations(result.response.context);
 
         const {
-          enforcers: { TimestampEnforcer },
-        } = getDelegationContracts({
+          contracts: {
+            enforcers: { TimestampEnforcer },
+          },
+        } = getChainMetadata({
           chainId: Number(mockPermissionRequest.chainId),
         });
 
