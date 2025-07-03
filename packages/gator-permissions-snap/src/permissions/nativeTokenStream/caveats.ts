@@ -1,7 +1,7 @@
 import {
   type Caveat,
   createNativeTokenStreamingTerms,
-  createValueLteTerms,
+  createExactCalldataTerms,
 } from '@metamask/delegation-core';
 
 import type { DelegationContracts } from '../../core/chainMetadata';
@@ -37,8 +37,8 @@ export async function createPermissionCaveats({
 
   const exactCalldataCaveat: Caveat = {
     enforcer: contracts.enforcers.ExactCalldataEnforcer,
-    terms: createValueLteTerms({
-      maxValue: 0n,
+    terms: createExactCalldataTerms({
+      callData: '0x',
     }),
     args: '0x',
   };

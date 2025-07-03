@@ -60,8 +60,7 @@ describe('nativeTokenStream:caveats', () => {
         },
         {
           enforcer: contracts.enforcers.ExactCalldataEnforcer,
-          terms:
-            '0x0000000000000000000000000000000000000000000000000000000000000000',
+          terms: '0x',
           args: '0x',
         },
       ]);
