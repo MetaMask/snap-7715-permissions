@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import type { Erc20TokenPeriodicPermissionRequest } from '../../../src/permissions/erc20TokenPeriodic/types';
@@ -8,6 +8,7 @@ import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 6;
 
@@ -24,7 +25,9 @@ const validPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
   permission: {
     type: 'erc20-token-periodic',
     data: {
-      periodAmount: toHex(parseUnits('100', tokenDecimals)), // 100 USDC per period
+      periodAmount: bigIntToHex(
+        parseUnits({ formatted: '100', decimals: tokenDecimals }),
+      ), // 100 USDC per period
       periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
       startTime: convertReadableDateToTimestamp('10/26/2024'),
       tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
@@ -86,7 +89,9 @@ describe('erc20TokenPeriodic:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              periodAmount: toHex(parseUnits('50', tokenDecimals)),
+              periodAmount: bigIntToHex(
+                parseUnits({ formatted: '50', decimals: tokenDecimals }),
+              ),
             },
           },
         };

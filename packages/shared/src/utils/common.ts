@@ -1,5 +1,4 @@
-import { extractChain, type Address, type Hex } from 'viem';
-import * as chains from 'viem/chains';
+import type { Hex } from '@metamask/delegation-core';
 
 import type { PermissionRequestIteratorItem } from '../iterator';
 import type { TypeDescriptor } from '../types';
@@ -47,9 +46,9 @@ export function moveToFirstIndex<ItemT>(arr: ItemT[], index: number): ItemT[] {
  * @returns An array of accounts with the selected account at the first index or the original array if the user has not selected an account for the permission.
  */
 export function updateAccountsOrder(
-  accountsToSelect: Address[],
+  accountsToSelect: Hex[],
   curr: PermissionRequestIteratorItem | null,
-): Address[] {
+): Hex[] {
   const accountsUpdated = Array.from(accountsToSelect);
   if (curr) {
     const selectedAccount = curr.permissionRequest.address;
@@ -64,26 +63,4 @@ export function updateAccountsOrder(
     }
   }
   return accountsUpdated;
-}
-
-const ALL_CHAINS = Object.values(chains);
-
-/**
- * Gets the chain name for a given chain ID.
- * @param chainId - The chain ID to get the name for.
- * @returns The chain name, or throws if the chain is not found.
- */
-export function getChainName(chainId: number): string {
-  // @ts-expect-error - extractChain does not work well with dynamic `chains`
-  const chain = extractChain({
-    chains: ALL_CHAINS,
-    // we need to do this type assertion because extractChain doesn't work well with dynamic chains
-    id: chainId as any,
-  });
-
-  if (!chain) {
-    throw new Error('Chain not found');
-  }
-
-  return chain.name;
 }

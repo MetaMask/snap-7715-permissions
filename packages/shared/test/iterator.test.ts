@@ -1,4 +1,4 @@
-import { toHex } from 'viem';
+import { bigIntToHex } from '@metamask/utils';
 
 import { createPermissionsRequestIterator } from '../src/iterator';
 import type { PermissionRequest } from '../src/types';
@@ -6,7 +6,7 @@ import type { PermissionRequest } from '../src/types';
 describe('createPermissionsRequestIterator', () => {
   const mockPermissionsRequest: PermissionRequest[] = [
     {
-      chainId: toHex(11155111),
+      chainId: bigIntToHex(11155111n),
       expiry: 1,
       signer: {
         type: 'account',
@@ -18,12 +18,12 @@ describe('createPermissionsRequestIterator', () => {
         type: 'native-token-transfer',
         data: {
           justification: 'shh',
-          allowance: toHex(1),
+          allowance: bigIntToHex(1n),
         },
       },
     },
     {
-      chainId: toHex(11155111),
+      chainId: bigIntToHex(11155111n),
       expiry: 1,
       signer: {
         type: 'account',
@@ -36,12 +36,12 @@ describe('createPermissionsRequestIterator', () => {
         data: {
           justification: 'shh',
           address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
-          allowance: toHex(10000),
+          allowance: bigIntToHex(10000n),
         },
       },
     },
     {
-      chainId: toHex(11155111),
+      chainId: bigIntToHex(11155111n),
       expiry: 1,
       signer: {
         type: 'account',
@@ -54,7 +54,7 @@ describe('createPermissionsRequestIterator', () => {
         data: {
           justification: 'shh',
           address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
-          allowance: toHex(100),
+          allowance: bigIntToHex(100n),
         },
       },
     },

@@ -1,5 +1,5 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
@@ -21,6 +21,7 @@ import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 6;
 const tokenAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'; // USDC
@@ -28,7 +29,9 @@ const tokenAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'; // USDC
 const permissionWithoutOptionals: Erc20TokenPeriodicPermission = {
   type: 'erc20-token-periodic',
   data: {
-    periodAmount: toHex(parseUnits('100', tokenDecimals)), // 100 USDC per period
+    periodAmount: bigIntToHex(
+      parseUnits({ formatted: '100', decimals: tokenDecimals }),
+    ), // 100 USDC per period
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
     startTime: convertReadableDateToTimestamp('10/26/1985'),
     tokenAddress,
@@ -62,8 +65,10 @@ const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
   justification: 'Permission to do something important',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('1000', tokenDecimals)),
-    balanceFormattedAsCurrency: '$🐊1000.00',
+    balance: bigIntToHex(
+      parseUnits({ formatted: '1000', decimals: tokenDecimals }),
+    ),
+    balanceFormattedAsCurrency: '$🐊1,000.00',
   },
   tokenMetadata: {
     symbol: 'USDC',
@@ -92,7 +97,9 @@ describe('erc20TokenPeriodic:context', () => {
       const permission: Erc20TokenPeriodicPermission = {
         type: 'erc20-token-periodic',
         data: {
-          periodAmount: toHex(parseUnits('50', tokenDecimals)),
+          periodAmount: bigIntToHex(
+            parseUnits({ formatted: '50', decimals: tokenDecimals }),
+          ),
           periodDuration: 86400,
           startTime: 1714531200,
           tokenAddress,
@@ -388,7 +395,7 @@ describe('erc20TokenPeriodic:context', () => {
 
       expect(result.permission.type).toBe('erc20-token-periodic');
       expect(result.permission.data.periodAmount).toBe(
-        toHex(parseUnits('200', tokenDecimals)),
+        bigIntToHex(parseUnits({ formatted: '200', decimals: tokenDecimals })),
       );
       expect(result.permission.data.periodDuration).toBe(604800);
       expect(result.permission.data.tokenAddress).toBe(tokenAddress);

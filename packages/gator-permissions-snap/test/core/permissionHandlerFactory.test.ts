@@ -58,7 +58,6 @@ describe('PermissionHandlerFactory', () => {
       getAccountAddress: jest.fn(),
       getAccountBalance: jest.fn(),
       getAccountMetadata: jest.fn(),
-      getDelegationManager: jest.fn(),
     } as unknown as jest.Mocked<AccountController>;
 
     mockTokenPricesService = {

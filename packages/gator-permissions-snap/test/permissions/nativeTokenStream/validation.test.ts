@@ -1,9 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import type { NativeTokenStreamPermissionRequest } from '../../../src/permissions/nativeTokenStream/types';
 import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenStream/validation';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const validPermissionRequest: NativeTokenStreamPermissionRequest = {
   chainId: '0x1',
@@ -18,9 +19,11 @@ const validPermissionRequest: NativeTokenStreamPermissionRequest = {
   permission: {
     type: 'native-token-stream',
     data: {
-      initialAmount: toHex(parseUnits('1', 18)), // 1 ETH
-      maxAmount: toHex(parseUnits('10', 18)), // 10 ETH
-      amountPerSecond: toHex(parseUnits('.5', 18)), // 0.5 ETH per second
+      initialAmount: bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })), // 1 ETH
+      maxAmount: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })), // 10 ETH
+      amountPerSecond: bigIntToHex(
+        parseUnits({ formatted: '.5', decimals: 18 }),
+      ), // 0.5 ETH per second
       startTime: convertReadableDateToTimestamp('10/26/2024'),
       justification: 'test',
     },
@@ -80,8 +83,12 @@ describe('nativeTokenStream:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              maxAmount: toHex(parseUnits('0.5', 18)), // 0.5 ETH
-              initialAmount: toHex(parseUnits('1', 18)), // 1 ETH
+              maxAmount: bigIntToHex(
+                parseUnits({ formatted: '0.5', decimals: 18 }),
+              ), // 0.5 ETH
+              initialAmount: bigIntToHex(
+                parseUnits({ formatted: '1', decimals: 18 }),
+              ), // 1 ETH
             },
           },
         };

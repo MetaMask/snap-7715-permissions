@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { parseUnits, toHex, type Hex } from 'viem';
+import { parseUnits } from 'viem';
+import { bigIntToHex, type Hex } from '@metamask/utils';
 import { StyledForm } from './styles';
 import type { ERC20TokenStreamPermissionRequest } from './types';
 
@@ -13,13 +14,13 @@ export const ERC20TokenStreamForm = ({
   const decimals = 6;
 
   const [initialAmount, setInitialAmount] = useState<bigint | null>(
-    BigInt(toHex(parseUnits('.5', decimals))),
+    BigInt(bigIntToHex(parseUnits('.5', decimals))),
   );
   const [amountPerSecond, setAmountPerSecond] = useState(
-    BigInt(toHex(parseUnits('.5', decimals))),
+    BigInt(bigIntToHex(parseUnits('.5', decimals))),
   );
   const [maxAmount, setMaxAmount] = useState<bigint | null>(
-    BigInt(toHex(parseUnits('2.5', decimals))),
+    BigInt(bigIntToHex(parseUnits('2.5', decimals))),
   );
   const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
   const [expiry, setExpiry] = useState(
@@ -114,9 +115,9 @@ export const ERC20TokenStreamForm = ({
   useEffect(() => {
     onChange({
       type: 'erc20-token-stream',
-      initialAmount: initialAmount ? toHex(initialAmount) : null,
-      amountPerSecond: toHex(amountPerSecond),
-      maxAmount: maxAmount ? toHex(maxAmount) : null,
+      initialAmount: initialAmount ? bigIntToHex(initialAmount) : null,
+      amountPerSecond: bigIntToHex(amountPerSecond),
+      maxAmount: maxAmount ? bigIntToHex(maxAmount) : null,
       startTime,
       expiry,
       justification,

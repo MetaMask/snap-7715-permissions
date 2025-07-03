@@ -1,5 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { isAddressEqual, zeroAddress, type Address } from 'viem';
+import { type Hex } from '@metamask/delegation-core';
 
 import type { TokenBalanceAndMetadata } from './types';
 
@@ -13,7 +13,7 @@ type TokenBalanceResponse = {
   type: string;
   iconUrl: string;
   coingeckoId: string;
-  address: Address;
+  address: Hex;
   occurrences: number;
   sources: string[];
   chainId: number;
@@ -22,7 +22,7 @@ type TokenBalanceResponse = {
   value: Record<string, unknown>;
   price: number;
   accounts: {
-    accountAddress: Address;
+    accountAddress: Hex;
     chainId: number;
     rawBalance: string;
     balance: number;
@@ -34,6 +34,9 @@ type TokenBalanceResponse = {
  */
 export class AccountApiClient {
   static readonly #supportedTokenTypes = ['native', 'erc20'];
+
+  static readonly #nativeTokenAddress =
+    '0x0000000000000000000000000000000000000000';
 
   readonly #fetch: typeof globalThis.fetch;
 
@@ -77,8 +80,8 @@ export class AccountApiClient {
     account,
   }: {
     chainId: number;
-    account: Address;
-    assetAddress?: Address | undefined;
+    account: Hex;
+    assetAddress?: Hex | undefined;
   }): Promise<TokenBalanceAndMetadata> {
     if (!chainId) {
       const message = 'No chainId provided to fetch token balance';
@@ -94,8 +97,7 @@ export class AccountApiClient {
       throw new Error(message);
     }
 
-    // zeroAddress is the native token on the specified chain
-    const tokenAddress = assetAddress ?? zeroAddress;
+    const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
 
     const response = await this.#fetch(
       `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
@@ -111,8 +113,9 @@ export class AccountApiClient {
     const { accounts, type, iconUrl, symbol, decimals } =
       (await response.json()) as TokenBalanceResponse;
 
-    const accountData = accounts.find((acc) =>
-      isAddressEqual(acc.accountAddress, account),
+    const accountLowercase = account.toLowerCase();
+    const accountData = accounts.find(
+      (acc) => acc.accountAddress.toLowerCase() === accountLowercase,
     );
 
     if (!accountData) {

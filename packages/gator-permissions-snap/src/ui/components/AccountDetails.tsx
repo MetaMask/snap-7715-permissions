@@ -1,7 +1,8 @@
+import type { Hex } from '@metamask/delegation-core';
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Text, Box, Section, Avatar } from '@metamask/snaps-sdk/jsx';
-import { formatUnits, type Hex } from 'viem';
 
+import { formatUnitsFromHex } from '../../utils/value';
 import { TooltipIcon } from './TooltipIcon';
 
 export type AccountDetailsProps = {
@@ -46,7 +47,12 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
         <Box direction="horizontal" alignment="end">
           <Text color="muted">{balanceFormattedAsCurrency}</Text>
           <Text color="alternative">
-            {`${formatUnits(BigInt(balance), decimals)}`} available
+            {`${formatUnitsFromHex({
+              value: balance,
+              allowUndefined: false,
+              decimals,
+            })}`}
+            available
           </Text>
         </Box>
       </Box>

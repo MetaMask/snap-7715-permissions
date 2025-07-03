@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { createConfirmationContent } from '../../../src/permissions/nativeTokenStream/content';
@@ -7,6 +7,7 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from '../../../src/permissions/nativeTokenStream/types';
+import { parseUnits } from '../../../src/utils/value';
 
 const mockContext: NativeTokenStreamContext = {
   expiry: '05/01/2024',
@@ -14,7 +15,7 @@ const mockContext: NativeTokenStreamContext = {
   justification: 'Permission to stream native tokens',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('10', 18)),
+    balance: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
     balanceFormattedAsCurrency: '$🐊10.00',
   },
   tokenMetadata: {
@@ -173,7 +174,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -422,7 +423,7 @@ describe('nativeTokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },
@@ -1218,7 +1219,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -1467,7 +1468,7 @@ describe('nativeTokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },
@@ -2262,7 +2263,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -2511,7 +2512,7 @@ describe('nativeTokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },
@@ -3175,7 +3176,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -3424,7 +3425,7 @@ describe('nativeTokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },
@@ -4052,7 +4053,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -4301,7 +4302,7 @@ describe('nativeTokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },

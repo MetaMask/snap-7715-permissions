@@ -1,15 +1,30 @@
 import { describe, expect, it } from '@jest/globals';
-import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
-import { appendCaveats } from '../../../src/permissions/nativeTokenStream/caveats';
+import type { DelegationContracts } from '../../../src/core/chainMetadata';
+import { createPermissionCaveats } from '../../../src/permissions/nativeTokenStream/caveats';
 import type { PopulatedNativeTokenStreamPermission } from '../../../src/permissions/nativeTokenStream/types';
+import { parseUnits } from '../../../src/utils/value';
 
 describe('nativeTokenStream:caveats', () => {
-  describe('appendCaveats()', () => {
-    const initialAmount = toHex(parseUnits('1', 18));
-    const maxAmount = toHex(parseUnits('10', 18));
-    const amountPerSecond = toHex(parseUnits('.5', 18));
+  describe('createPermissionCaveats()', () => {
+    const contracts = {
+      enforcers: {
+        NativeTokenStreamingEnforcer:
+          '0x19B32b6E6e4a8eD49805cC8Fe929a4Fd90287Df9',
+        ExactCalldataEnforcer: '0xB1cd88EF93BF9e34c0fE5bF0D20B9c5499049d80',
+      },
+    } as any as DelegationContracts;
+
+    const initialAmount = bigIntToHex(
+      parseUnits({ formatted: '1', decimals: 18 }),
+    );
+    const maxAmount = bigIntToHex(
+      parseUnits({ formatted: '10', decimals: 18 }),
+    );
+    const amountPerSecond = bigIntToHex(
+      parseUnits({ formatted: '.5', decimals: 18 }),
+    );
     const startTime = 1714531200;
 
     const mockPermission: PopulatedNativeTokenStreamPermission = {
@@ -24,43 +39,31 @@ describe('nativeTokenStream:caveats', () => {
       rules: {},
     };
 
-    it('should append nativeTokenStreaming and exactCalldata caveats', async () => {
-      const mockCaveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
-
-      await appendCaveats({
+    it('should create nativeTokenStreaming and exactCalldata caveats', async () => {
+      const caveats = await createPermissionCaveats({
         permission: mockPermission,
-        caveatBuilder: mockCaveatBuilder,
+        contracts,
       });
 
-      expect(mockCaveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'nativeTokenStreaming',
-        BigInt(initialAmount),
-        BigInt(maxAmount),
-        BigInt(amountPerSecond),
-        startTime,
-      );
+      const initialAmountHex = initialAmount.slice(2).padStart(64, '0');
+      const maxAmountHex = maxAmount.slice(2).padStart(64, '0');
+      const amountPerSecondHex = amountPerSecond.slice(2).padStart(64, '0');
+      const startTimeHex = startTime.toString(16).padStart(64, '0');
 
-      expect(mockCaveatBuilder.addCaveat).toHaveBeenCalledWith(
-        'exactCalldata',
-        '0x',
-      );
+      const nativeTokenStreamExpectedTerms = `0x${initialAmountHex}${maxAmountHex}${amountPerSecondHex}${startTimeHex}`;
 
-      expect(mockCaveatBuilder.addCaveat).toHaveBeenCalledTimes(2);
-    });
-
-    it('should return the modified caveat builder', async () => {
-      const mockCaveatBuilder = {
-        addCaveat: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<CoreCaveatBuilder>;
-
-      const result = await appendCaveats({
-        permission: mockPermission,
-        caveatBuilder: mockCaveatBuilder,
-      });
-
-      expect(result).toBe(mockCaveatBuilder);
+      expect(caveats).toStrictEqual([
+        {
+          enforcer: contracts.enforcers.NativeTokenStreamingEnforcer,
+          terms: nativeTokenStreamExpectedTerms,
+          args: '0x',
+        },
+        {
+          enforcer: contracts.enforcers.ExactCalldataEnforcer,
+          terms: '0x',
+          args: '0x',
+        },
+      ]);
     });
   });
 });

@@ -1,9 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import type { Erc20TokenStreamPermissionRequest } from '../../../src/permissions/erc20TokenStream/types';
 import { parseAndValidatePermission } from '../../../src/permissions/erc20TokenStream/validation';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 10;
 
@@ -20,9 +21,15 @@ const validPermissionRequest: Erc20TokenStreamPermissionRequest = {
   permission: {
     type: 'erc20-token-stream',
     data: {
-      initialAmount: toHex(parseUnits('1', tokenDecimals)), // 1 token
-      maxAmount: toHex(parseUnits('10', tokenDecimals)), // 10 tokens
-      amountPerSecond: toHex(parseUnits('.5', tokenDecimals)), // 0.5 tokens per second
+      initialAmount: bigIntToHex(
+        parseUnits({ formatted: '1', decimals: tokenDecimals }),
+      ), // 1 token
+      maxAmount: bigIntToHex(
+        parseUnits({ formatted: '10', decimals: tokenDecimals }),
+      ), // 10 tokens
+      amountPerSecond: bigIntToHex(
+        parseUnits({ formatted: '.5', decimals: tokenDecimals }),
+      ), // 0.5 tokens per second
       startTime: convertReadableDateToTimestamp('10/26/2024'),
       tokenAddress: '0x1234567890123456789012345678901234567890',
       justification: 'test',
@@ -83,8 +90,12 @@ describe('erc20TokenStream:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              maxAmount: toHex(parseUnits('0.5', tokenDecimals)), // 0.5 tokens
-              initialAmount: toHex(parseUnits('1', tokenDecimals)), // 1 token
+              maxAmount: bigIntToHex(
+                parseUnits({ formatted: '0.5', decimals: tokenDecimals }),
+              ), // 0.5 tokens
+              initialAmount: bigIntToHex(
+                parseUnits({ formatted: '1', decimals: tokenDecimals }),
+              ), // 1 token
             },
           },
         };

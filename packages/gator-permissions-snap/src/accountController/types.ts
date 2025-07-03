@@ -1,8 +1,4 @@
-import type {
-  Delegation,
-  DeleGatorEnvironment,
-} from '@metamask/delegation-toolkit';
-import type { Address, Hex } from 'viem';
+import type { Hex, Delegation } from '@metamask/delegation-core';
 
 /**
  * Base options required for account operations.
@@ -34,7 +30,7 @@ export type AccountController = {
   /**
    * Retrieves the account address for the current account.
    */
-  getAccountAddress(options: AccountOptionsBase): Promise<Address>;
+  getAccountAddress(options: AccountOptionsBase): Promise<Hex>;
 
   /**
    * Signs a delegation using the smart account.
@@ -45,14 +41,4 @@ export type AccountController = {
    * Retrieves the metadata for deploying a smart account.
    */
   getAccountMetadata(options: AccountOptionsBase): Promise<FactoryArgs>;
-
-  /**
-   * Retrieves the delegation manager address for the current account.
-   */
-  getDelegationManager(options: AccountOptionsBase): Promise<Address>;
-
-  /**
-   * Retrieves the environment for the current account.
-   */
-  getEnvironment(options: AccountOptionsBase): Promise<DeleGatorEnvironment>;
 };

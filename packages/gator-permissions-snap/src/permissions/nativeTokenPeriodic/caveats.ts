@@ -1,33 +1,45 @@
-import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
+import {
+  type Caveat,
+  createExactCalldataTerms,
+  createNativeTokenPeriodTransferTerms,
+} from '@metamask/delegation-core';
 
+import type { DelegationContracts } from '../../core/chainMetadata';
 import type { PopulatedNativeTokenPeriodicPermission } from './types';
 
 /**
  * Appends permission-specific caveats to the caveat builder.
  * @param options0 - The options object containing the permission and caveat builder.
  * @param options0.permission - The complete native token periodic permission containing periodic parameters.
- * @param options0.caveatBuilder - The core caveat builder to append caveats to.
+ * @param options0.contracts - The contracts object containing enforcers.
  * @returns The modified caveat builder with appended native token periodic caveats.
  */
-export async function appendCaveats({
+export async function createPermissionCaveats({
   permission,
-  caveatBuilder,
+  contracts,
 }: {
   permission: PopulatedNativeTokenPeriodicPermission;
-  caveatBuilder: CoreCaveatBuilder;
-}): Promise<CoreCaveatBuilder> {
+  contracts: DelegationContracts;
+}): Promise<Caveat[]> {
   const { periodAmount, periodDuration, startTime } = permission.data;
 
-  caveatBuilder
-    .addCaveat(
-      'nativeTokenPeriodTransfer',
-      BigInt(periodAmount),
+  const nativeTokenPeriodTransferCaveat: Caveat = {
+    enforcer: contracts.enforcers.NativeTokenPeriodicTransferEnforcer,
+    terms: createNativeTokenPeriodTransferTerms({
+      periodAmount: BigInt(periodAmount),
       periodDuration,
-      startTime,
-    )
-    // don't allow any calldata as this could be used to extract additional authority
-    // not included in a native token periodic permission
-    .addCaveat('exactCalldata', '0x');
+      startDate: startTime,
+    }),
+    args: '0x',
+  };
 
-  return caveatBuilder;
+  const exactCalldataCaveat: Caveat = {
+    enforcer: contracts.enforcers.ExactCalldataEnforcer,
+    terms: createExactCalldataTerms({
+      callData: '0x',
+    }),
+    args: '0x',
+  };
+
+  return [nativeTokenPeriodTransferCaveat, exactCalldataCaveat];
 }

@@ -1,4 +1,4 @@
-import type { Hex } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 
 /**
  * Validates a hex integer value with configurable constraints.

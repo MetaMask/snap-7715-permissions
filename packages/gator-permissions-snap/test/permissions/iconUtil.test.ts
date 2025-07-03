@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import type { Hex } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 
 import type { BaseTokenPermissionContext } from '../../src/core/types';
 import { getIconData } from '../../src/permissions/iconUtil';

@@ -1,19 +1,23 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
-  DELEGATION_ABI_TYPE_COMPONENTS,
+  decodeDelegations,
   ROOT_AUTHORITY,
-  type DeleGatorEnvironment,
-} from '@metamask/delegation-toolkit';
+  createTimestampTerms,
+} from '@metamask/delegation-core';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { decodeAbiParameters, toHex } from 'viem';
-import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
+import { bytesToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../src/accountController';
+import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 
-const randomAddress = () => privateKeyToAddress(generatePrivateKey());
+const randomAddress = () => {
+  /* eslint-disable no-restricted-globals */
+  const randomBytes = crypto.getRandomValues(new Uint8Array(20));
+  return bytesToHex(randomBytes);
+};
 
 const mockSignature = '0x1234';
 const mockInterfaceId = 'test-interface-id';
@@ -67,21 +71,9 @@ const mockAccountMetadata = {
   factoryData: '0xabc',
 } as const;
 
-const mockEnvironment = {
-  DelegationManager: randomAddress(),
-  caveatEnforcers: {
-    TimestampEnforcer: randomAddress(),
-  },
-  implementations: {},
-  EntryPoint: randomAddress(),
-  SimpleFactory: randomAddress(),
-} as DeleGatorEnvironment;
-
 const mockAccountController = {
   getAccountAddress: jest.fn(),
   getAccountMetadata: jest.fn(),
-  getDelegationManager: jest.fn(),
-  getEnvironment: jest.fn(),
   signDelegation: jest.fn(),
 } as unknown as jest.Mocked<AccountController>;
 
@@ -102,7 +94,7 @@ type TestLifecycleHandlersMocks = {
   createConfirmationContent: jest.Mock;
   applyContext: jest.Mock;
   populatePermission: jest.Mock;
-  appendCaveats: jest.Mock;
+  createPermissionCaveats: jest.Mock;
   onConfirmationCreated?: jest.Mock;
   onConfirmationResolved?: jest.Mock;
 };
@@ -123,9 +115,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       populatePermission: jest.fn().mockResolvedValue(mockPopulatedPermission),
       onConfirmationCreated: jest.fn(),
       onConfirmationResolved: jest.fn(),
-      appendCaveats: jest
-        .fn()
-        .mockImplementation(({ caveatBuilder }) => caveatBuilder),
+      createPermissionCaveats: jest.fn(() => []),
     };
 
     mockAccountController.getAccountAddress.mockResolvedValue(
@@ -134,10 +124,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     mockAccountController.getAccountMetadata.mockResolvedValue(
       mockAccountMetadata,
     );
-    mockAccountController.getDelegationManager.mockResolvedValue(
-      mockEnvironment.DelegationManager,
-    );
-    mockAccountController.getEnvironment.mockResolvedValue(mockEnvironment);
+
     mockAccountController.signDelegation.mockImplementation(
       async ({ delegation }) => ({
         ...delegation,
@@ -170,6 +157,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           lifecycleHandlerMocks,
         );
 
+        const {
+          contracts: { delegationManager },
+        } = getChainMetadata({
+          chainId: Number(mockPermissionRequest.chainId),
+        });
+
         expect(result.approved).toBe(true);
         expect(result.approved && result.response).toStrictEqual({
           ...mockPermissionRequest,
@@ -185,7 +178,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
             type: 'account',
           },
           signerMeta: {
-            delegationManager: mockEnvironment.DelegationManager,
+            delegationManager,
           },
         });
       });
@@ -217,41 +210,36 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           throw new Error('Expected the permission request to be approved');
         }
 
-        // delegationsArray is a 2 dimensional array with a single element [ [ delegation ] ]
-        const delegationsArray = (decodeAbiParameters as any)(
-          [
-            {
-              components: DELEGATION_ABI_TYPE_COMPONENTS,
-              name: 'delegations',
-              type: 'tuple[]',
-            },
-          ],
-          result.response.context,
-        );
+        const delegationsArray = decodeDelegations(result.response.context);
 
-        expect(delegationsArray).toHaveLength(1);
-        const delegations = delegationsArray[0];
-
-        expect(delegations).toHaveLength(1);
-        const delegation = delegations[0];
+        const {
+          contracts: {
+            enforcers: { TimestampEnforcer },
+          },
+        } = getChainMetadata({
+          chainId: Number(mockPermissionRequest.chainId),
+        });
 
         const expectedDelegation = {
-          delegate: requestingAccountAddress,
-          delegator: grantingAccountAddress,
+          delegate: requestingAccountAddress.toLowerCase(),
+          delegator: grantingAccountAddress.toLowerCase(),
           authority: ROOT_AUTHORITY,
           caveats: [
             {
-              enforcer: mockEnvironment.caveatEnforcers.TimestampEnforcer,
+              enforcer: TimestampEnforcer.toLowerCase(),
               args: '0x',
-              terms: toHex(mockPermissionRequest.expiry, { size: 32 }),
+              terms: createTimestampTerms({
+                timestampAfterThreshold: 0,
+                timestampBeforeThreshold: mockPermissionRequest.expiry,
+              }),
             },
           ],
           salt: expect.any(BigInt),
           signature: mockSignature,
         };
 
-        expect(delegation).toStrictEqual(expectedDelegation);
-        expect(delegation.salt).not.toBe(0n);
+        expect(delegationsArray).toStrictEqual([expectedDelegation]);
+        expect(delegationsArray[0]?.salt).not.toBe(0n);
       });
 
       it('should correctly setup the onConfirmationCreated hook to update the context', async () => {
@@ -460,23 +448,17 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(mockAccountController.getAccountMetadata).toHaveBeenCalledWith({
           chainId: 1,
         });
-        expect(mockAccountController.getDelegationManager).toHaveBeenCalledWith(
-          {
-            chainId: 1,
-          },
-        );
-        expect(mockAccountController.getEnvironment).toHaveBeenCalledWith({
-          chainId: 1,
-        });
       });
 
       /*
        * 8. Builds a caveat builder and appends any permission-specific caveats.
        */
       it('appends caveats to the permission', async () => {
-        expect(lifecycleHandlerMocks.appendCaveats).toHaveBeenCalledWith({
+        expect(
+          lifecycleHandlerMocks.createPermissionCaveats,
+        ).toHaveBeenCalledWith({
           permission: mockPopulatedPermission,
-          caveatBuilder: expect.any(Object),
+          contracts: expect.any(Object),
         });
       });
 
