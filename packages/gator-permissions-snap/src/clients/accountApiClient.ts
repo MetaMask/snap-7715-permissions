@@ -1,6 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
 
+import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata } from './types';
 
 /**
@@ -35,8 +36,7 @@ type TokenBalanceResponse = {
 export class AccountApiClient {
   static readonly #supportedTokenTypes = ['native', 'erc20'];
 
-  static readonly #nativeTokenAddress =
-    '0x0000000000000000000000000000000000000000';
+  static readonly #nativeTokenAddress = ZERO_ADDRESS;
 
   readonly #fetch: typeof globalThis.fetch;
 

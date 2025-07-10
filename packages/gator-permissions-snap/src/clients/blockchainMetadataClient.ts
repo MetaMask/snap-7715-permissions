@@ -3,6 +3,7 @@ import { decodeSingle } from '@metamask/abi-utils';
 import type { Hex } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
 
+import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata, TokenMetadataClient } from './types';
 
 /**
@@ -11,8 +12,7 @@ import type { TokenBalanceAndMetadata, TokenMetadataClient } from './types';
 export class BlockchainTokenMetadataClient implements TokenMetadataClient {
   readonly #ethereumProvider: SnapsEthereumProvider;
 
-  static readonly #nativeTokenAddress =
-    '0x0000000000000000000000000000000000000000';
+  static readonly #nativeTokenAddress = ZERO_ADDRESS;
 
   static readonly #nativeTokenDecimals = 18;
 

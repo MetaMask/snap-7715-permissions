@@ -12,7 +12,6 @@ import type {
   JwtBearerAuth,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
-import { bytesToHex } from '@metamask/utils';
 
 export type ProfileSyncManager = {
   getAllGrantedPermissions: () => Promise<StoredGrantedPermission[]>;
@@ -80,18 +79,10 @@ export function createProfileSyncManager(
   function generateObjectKey(permissionContext: Hex): Hex {
     const delegations = decodeDelegations(permissionContext);
     const hashes = delegations.map((delegation) =>
-      hashDelegation(delegation, { out: 'bytes' }),
+      hashDelegation(delegation).slice(2),
     );
 
-    const keyBytes = new Uint8Array(hashes.length * 32);
-    for (let i = 0; i < hashes.length; i++) {
-      const hash = hashes[i];
-      if (hash) {
-        keyBytes.set(hash, i * 32);
-      }
-    }
-
-    return bytesToHex(keyBytes);
+    return `0x${hashes.join('')}`;
   }
 
   /**
