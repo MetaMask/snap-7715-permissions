@@ -44,6 +44,22 @@ describe('value utils', () => {
         'Invalid numeric value: abc',
       );
     });
+
+    it('handles negative numbers with empty integer part when decimals is 0', () => {
+      // Tests scenario 1: "-.5" with decimals=0 should round to -1
+      expect(parseUnits({ formatted: '-.5', decimals: 0 })).toBe(-1n);
+      expect(parseUnits({ formatted: '-.4', decimals: 0 })).toBe(0n);
+      expect(parseUnits({ formatted: '-.6', decimals: 0 })).toBe(-1n);
+      expect(parseUnits({ formatted: '-1.5', decimals: 0 })).toBe(-2n);
+    });
+
+    it('handles fractional rounding with round behavior when decimals is 1', () => {
+      // Tests scenario 2: "0.95" with decimals=1 should round up to 10n (carry-over)
+      expect(parseUnits({ formatted: '0.95', decimals: 1 })).toBe(10n);
+      expect(parseUnits({ formatted: '0.94', decimals: 1 })).toBe(9n);
+      expect(parseUnits({ formatted: '0.96', decimals: 1 })).toBe(10n);
+      expect(parseUnits({ formatted: '1.95', decimals: 1 })).toBe(20n);
+    });
   });
 
   describe('formatUnitsFromHex', () => {

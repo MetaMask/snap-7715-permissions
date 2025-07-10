@@ -82,6 +82,11 @@ export function parseUnits({
     integerPart = integerPart.slice(1);
   }
 
+  // Handle empty integer part (e.g., "-.5" becomes "" after removing "-")
+  if (integerPart === '') {
+    integerPart = '0';
+  }
+
   // strip trailing 0s from the fraction part
   fractionPart = fractionPart.replace(/(0+)$/u, '');
 
@@ -99,7 +104,9 @@ export function parseUnits({
 
     const rounded = Math.round(Number(`${unit}.${right}`));
     if (rounded > 9) {
-      fractionPart = `${BigInt(left) + 1n}0`.padStart(left.length + 1, '0');
+      // Handle empty left part (e.g., when decimals is 1 and left becomes "")
+      const leftBigInt = left === '' ? 0n : BigInt(left);
+      fractionPart = `${leftBigInt + 1n}0`.padStart(left.length + 1, '0');
     } else {
       fractionPart = `${left}${rounded}`;
     }

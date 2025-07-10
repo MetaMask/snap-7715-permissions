@@ -1,8 +1,8 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { Delegation } from '@metamask/delegation-core';
 import {
   Implementation,
   toMetaMaskSmartAccount,
-  type DelegationStruct,
   type MetaMaskSmartAccount,
 } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
@@ -203,7 +203,7 @@ export class SmartAccountController
    */
   public async signDelegation(
     options: SignDelegationOptions,
-  ): Promise<DelegationStruct> {
+  ): Promise<Delegation> {
     logger.debug('accountController:signDelegation()');
 
     const { chainId, delegation } = options;
