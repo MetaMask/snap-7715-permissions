@@ -13,7 +13,7 @@ export enum RpcMethod {
   PermissionProviderGrantPermissions = 'permissionsProvider_grantPermissions',
 
   /**
-   * This method is used by the metamask to request a permissions provider to get the granted permissions for a all sites.
+   * This method is used by Metamask clients to retrieve granted permissions for all sites.
    */
   PermissionProviderGetGrantedPermissions = 'permissionsProvider_getGrantedPermissions',
 }
