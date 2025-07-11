@@ -63,6 +63,7 @@ describe('RpcHandler', () => {
   let handler: RpcHandler;
   let mockHandler: jest.Mocked<PermissionHandlerType>;
   let mockHandlerFactory: jest.Mocked<PermissionHandlerFactory>;
+  let mockProfileSyncManager: jest.Mocked<ProfileSyncManager>;
 
   beforeEach(() => {
     mockHandler = {
@@ -72,7 +73,7 @@ describe('RpcHandler', () => {
     mockHandlerFactory = {
       createPermissionHandler: jest.fn().mockReturnValue(mockHandler),
     } as unknown as jest.Mocked<PermissionHandlerFactory>;
-    const mockProfileSyncManager = {
+    mockProfileSyncManager = {
       revokeGrantedPermission: jest.fn(),
       storeGrantedPermission: jest.fn(),
       storeGrantedPermissionBatch: jest.fn(),
@@ -373,6 +374,92 @@ describe('RpcHandler', () => {
           type: 'erc20-token-periodic',
         },
       ]);
+    });
+  });
+
+  describe('getGrantedPermissions', () => {
+    it('should return all granted permissions successfully', async () => {
+      const mockGrantedPermissions = [
+        {
+          permissionResponse: {
+            chainId: TEST_CHAIN_ID,
+            expiry: TEST_EXPIRY,
+            signer: {
+              type: 'account' as const,
+              data: { address: TEST_ADDRESS },
+            },
+            permission: {
+              type: 'test-permission',
+              data: { justification: 'Testing permission request' },
+            },
+            context: TEST_CONTEXT,
+            accountMeta: [],
+            signerMeta: {
+              delegationManager: TEST_ADDRESS,
+            },
+          },
+          siteOrigin: TEST_SITE_ORIGIN,
+        },
+        {
+          permissionResponse: {
+            chainId: '0x2' as const,
+            expiry: TEST_EXPIRY + 1000,
+            signer: {
+              type: 'account' as const,
+              data: {
+                address: '0x0987654321098765432109876543210987654321' as const,
+              },
+            },
+            permission: {
+              type: 'different-permission',
+              data: { justification: 'Another permission' },
+            },
+            context: '0xefgh' as const,
+            accountMeta: [],
+            signerMeta: {
+              delegationManager:
+                '0x0987654321098765432109876543210987654321' as const,
+            },
+          },
+          siteOrigin: 'https://another-example.com',
+        },
+      ];
+
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue(
+        mockGrantedPermissions,
+      );
+
+      const result = await handler.getGrantedPermissions();
+
+      expect(
+        mockProfileSyncManager.getAllGrantedPermissions,
+      ).toHaveBeenCalledTimes(1);
+      expect(result).toStrictEqual(mockGrantedPermissions);
+    });
+
+    it('should return empty array when no permissions are granted', async () => {
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([]);
+
+      const result = await handler.getGrantedPermissions();
+
+      expect(
+        mockProfileSyncManager.getAllGrantedPermissions,
+      ).toHaveBeenCalledTimes(1);
+      expect(result).toStrictEqual([]);
+    });
+
+    it('should handle errors from profile sync manager', async () => {
+      const errorMessage = 'Failed to retrieve granted permissions';
+      mockProfileSyncManager.getAllGrantedPermissions.mockRejectedValue(
+        new Error(errorMessage),
+      );
+
+      await expect(handler.getGrantedPermissions()).rejects.toThrow(
+        errorMessage,
+      );
+      expect(
+        mockProfileSyncManager.getAllGrantedPermissions,
+      ).toHaveBeenCalledTimes(1);
     });
   });
 });
