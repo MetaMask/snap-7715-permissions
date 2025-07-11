@@ -24,11 +24,63 @@ export const zPermission = z.object({
   rules: z.record(any()).optional(),
 });
 
+/**
+ * Sanitized justification schema that:
+ * - Limits length to 120 characters
+ * - Trims excessive whitespace
+ * - Prevents JSON, XML, control characters, and quotes
+ * - Ensures the string is safe for display
+ */
+export const zSanitizedJustification = z
+  .string()
+  .min(1, 'Justification cannot be empty')
+  .max(120, 'Justification cannot exceed 120 characters')
+  .refine(
+    (val) => {
+      // Check for markup/script patterns (covers HTML, XML, JSON, CSS)
+      const dangerousPatterns = [
+        /[<>]/, // Any angle brackets (HTML/XML tags)
+        /[{}]/, // Any braces (JSON, CSS blocks)
+        /[\[\]]/, // Any brackets (JSON arrays, CSS selectors)
+        /@\w+/, // CSS at-rules (@import, @media, etc.)
+        /:\s*[a-zA-Z]/, // CSS properties or JSON key-value
+        /url\s*\(/, // CSS url() functions
+        /on\w+\s*=/, // Event handlers
+        /javascript:|data:|vbscript:/, // Dangerous protocols
+        /-webkit-|-moz-|-ms-|-o-/, // CSS vendor prefixes
+        /['"`]/, // Quotes
+        /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/, // Control characters (excluding \t and \n)
+        /[\u202E\u202D\u202C\u200E\u200F]/, // RTL/LTR override characters
+        /[\u200B\u200C\u200D\uFEFF]/, // Zero-width characters
+        /[\u0300-\u036F\u1AB0-\u1AFF\u20D0-\u20FF]/, // Combining diacritical marks
+        /[\uFF00-\uFFEF]/, // Full-width characters (homograph attacks)
+        /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/, // Control characters except \t (0x09) and \n (0x0A)
+        /&[a-zA-Z]+;/, // HTML entities
+        /&#\d+;/, // Numeric HTML entities
+        /&#x[0-9a-fA-F]+;/, // Hex HTML entities
+        /\\u[0-9a-fA-F]{4}/, // Unicode escape sequences
+      ];
+      
+      return !dangerousPatterns.some(pattern => pattern.test(val));
+    },
+    {
+      message: 'Justification contains invalid characters or patterns (markup, scripts, control characters, or quotes are not allowed)',
+    }
+  )
+  .transform((val) => val.trim().replace(/\s+/g, ' ')) // Trim and normalize whitespace
+  .refine(
+    (val) => val.length > 0,
+    {
+      message: 'Justification cannot be empty after sanitization',
+    }
+  );
+
 export const zMetaMaskPermissionData = z.object({
   /**
    * A human-readable explanation of why the permission is being requested.
+   * Sanitized to prevent injection attacks and ensure safe display.
    */
-  justification: z.string(),
+  justification: zSanitizedJustification,
 });
 
 export const zNativeTokenTransferPermission = zPermission.extend({
