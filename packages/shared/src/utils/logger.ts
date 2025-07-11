@@ -1,4 +1,4 @@
-import { toHex } from 'viem';
+import { bigIntToHex } from '@metamask/utils';
 
 /**
  * Logging levels.
@@ -57,7 +57,7 @@ const DEFAULT_CONTEXT: LoggerContext = {
 export const objStringify = (data: any) => {
   return JSON.stringify(data, (_: any, value: any) => {
     if (typeof value === 'bigint') {
-      return toHex(value);
+      return bigIntToHex(value);
     }
     return value;
   });

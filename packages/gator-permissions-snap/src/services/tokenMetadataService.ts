@@ -1,5 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { Address } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 
 import type { AccountApiClient } from '../clients/accountApiClient';
 import type {
@@ -9,8 +9,8 @@ import type {
 
 export type GetTokenBalanceAndMetadataOptions = {
   chainId: number;
-  account: Address;
-  assetAddress?: Address;
+  account: Hex;
+  assetAddress?: Hex;
 };
 
 /**

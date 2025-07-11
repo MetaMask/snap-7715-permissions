@@ -1,5 +1,5 @@
+import type { Hex } from '@metamask/delegation-core';
 import type { CaipAssetType } from '@metamask/utils';
-import type { Address } from 'viem';
 
 /**
  * The params for the price API client to fetch spot prices.
@@ -101,7 +101,7 @@ export type TokenMetadataClient = {
    */
   getTokenBalanceAndMetadata(params: {
     chainId: number;
-    account: Address;
-    assetAddress?: Address | undefined;
+    account: Hex;
+    assetAddress?: Hex | undefined;
   }): Promise<TokenBalanceAndMetadata>;
 };

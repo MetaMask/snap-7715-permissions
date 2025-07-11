@@ -2,7 +2,6 @@
 import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { CHAIN_ID as ChainsWithDelegatorDeployed } from '@metamask/delegation-toolkit';
 import {
   AuthType,
   JwtBearerAuth,
@@ -17,15 +16,12 @@ import type {
   OnRpcRequestHandler,
   OnUserInputHandler,
 } from '@metamask/snaps-sdk';
-import { extractChain } from 'viem';
-import * as chains from 'viem/chains';
 
 import {
   EoaAccountController,
   SmartAccountController,
   type AccountController,
 } from './accountController';
-import type { SupportedChains } from './accountController/baseAccountController';
 import { AccountApiClient } from './clients/accountApiClient';
 import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
 import { PriceApiClient } from './clients/priceApiClient';
@@ -45,8 +41,6 @@ import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
-
-const ALL_CHAINS = Object.values(chains);
 
 const isStorePermissionsFeatureEnabled =
   process.env.STORE_PERMISSIONS_ENABLED === 'true';
@@ -71,26 +65,7 @@ if (!supportedChainsString) {
   throw new Error('SUPPORTED_CHAINS is not set');
 }
 
-const chainIdsWithDelegatorDeployed = Object.values(
-  ChainsWithDelegatorDeployed,
-);
-
-const supportedChains = supportedChainsString
-  .split(',')
-  .map((chainIdString) => {
-    const chainId = parseInt(chainIdString, 10);
-
-    if (!chainIdsWithDelegatorDeployed.includes(chainId)) {
-      throw new Error(`Chain ${chainId} is not supported`);
-    }
-
-    const chain = extractChain({
-      chains: ALL_CHAINS,
-      id: chainId as any,
-    });
-
-    return chain;
-  }) as SupportedChains;
+const supportedChains = supportedChainsString.split(',').map(Number);
 
 // set up dependencies
 
