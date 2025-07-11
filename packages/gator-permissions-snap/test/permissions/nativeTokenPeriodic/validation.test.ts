@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import type { NativeTokenPeriodicPermissionRequest } from '../../../src/permissions/nativeTokenPeriodic/types';
@@ -8,6 +8,7 @@ import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
   chainId: '0x1',
@@ -22,7 +23,7 @@ const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
   permission: {
     type: 'native-token-periodic',
     data: {
-      periodAmount: toHex(parseUnits('1', 18)), // 1 ETH per period
+      periodAmount: bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })), // 1 ETH per period
       periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
       startTime: convertReadableDateToTimestamp('10/26/2024'),
       justification: 'test',

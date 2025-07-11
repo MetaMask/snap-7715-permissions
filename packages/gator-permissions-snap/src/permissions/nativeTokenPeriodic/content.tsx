@@ -1,7 +1,7 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Section } from '@metamask/snaps-sdk/jsx';
 
-import { getChainName } from '../../../../shared/src/utils/common';
+import { getChainMetadata } from '../../core/chainMetadata';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
 import { renderRules } from '../../core/rules';
 import { AccountDetails } from '../../ui/components/AccountDetails';
@@ -43,7 +43,7 @@ export async function createConfirmationContent({
   origin: string;
   chainId: number;
 }): Promise<GenericSnapElement> {
-  const networkName = getChainName(chainId);
+  const { name: networkName } = getChainMetadata({ chainId });
 
   const itemDetails: ItemDetails[] = [
     {

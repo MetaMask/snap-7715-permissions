@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { parseUnits, toHex } from 'viem';
+import { parseUnits } from 'viem';
 import { StyledForm } from './styles';
 import type { NativeTokenPeriodicPermissionRequest } from './types';
+import { bigIntToHex } from '@metamask/utils';
 
 type NativeTokenPeriodicFormProps = {
   onChange: (request: NativeTokenPeriodicPermissionRequest) => void;
@@ -11,7 +12,7 @@ export const NativeTokenPeriodicForm = ({
   onChange,
 }: NativeTokenPeriodicFormProps) => {
   const [periodAmount, setPeriodAmount] = useState(
-    BigInt(toHex(parseUnits('1', 18))),
+    BigInt(bigIntToHex(parseUnits('1', 18))),
   );
   const [periodDuration, setPeriodDuration] = useState(2592000); // 30 days in seconds
   const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
@@ -78,7 +79,7 @@ export const NativeTokenPeriodicForm = ({
   useEffect(() => {
     onChange({
       type: 'native-token-periodic',
-      periodAmount: toHex(periodAmount),
+      periodAmount: bigIntToHex(periodAmount),
       periodDuration,
       startTime,
       expiry,
