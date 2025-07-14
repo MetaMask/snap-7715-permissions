@@ -42,7 +42,10 @@ export const zPermissionRequest = z.object({
   /**
    * unix timestamp in seconds
    */
-  expiry: z.number().int().min(946684800, 'Start time must be after 2000-01-01'),
+  expiry: z.number().int().refine(
+    (timestamp) => timestamp > Math.floor(Date.now() / 1000),
+    'Expiry must be in the future'
+  ),
 
   /**
    * Whether the permission can be adjusted
