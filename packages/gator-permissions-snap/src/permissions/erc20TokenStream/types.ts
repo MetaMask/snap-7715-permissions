@@ -2,6 +2,7 @@ import {
   zHexStr,
   zPermission,
   zMetaMaskPermissionData,
+  zAddress,
 } from '@metamask/7715-permissions-shared/types';
 import { z } from 'zod';
 
@@ -41,8 +42,8 @@ export const zErc20TokenStreamPermission = zPermission.extend({
       initialAmount: zHexStr.optional(),
       maxAmount: zHexStr.optional(),
       amountPerSecond: zHexStr,
-      startTime: z.number(),
-      tokenAddress: zHexStr,
+      startTime: z.number().int().min(946684800, 'Start time must be after 2000-01-01'),
+      tokenAddress: zAddress,
     }),
   ),
 });

@@ -41,7 +41,7 @@ export const zNativeTokenStreamPermission = zPermission.extend({
       initialAmount: zHexStr.optional(),
       maxAmount: zHexStr.optional(),
       amountPerSecond: zHexStr,
-      startTime: z.number(),
+      startTime: z.number().int().min(946684800, 'Start time must be after 2000-01-01')
     }),
   ),
 });

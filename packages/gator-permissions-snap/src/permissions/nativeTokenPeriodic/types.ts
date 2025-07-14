@@ -37,8 +37,8 @@ export const zNativeTokenPeriodicPermission = zPermission.extend({
     zMetaMaskPermissionData,
     z.object({
       periodAmount: zHexStr,
-      periodDuration: z.number(),
-      startTime: z.number(),
+      periodDuration: z.number().int().positive(),
+      startTime: z.number().int().min(946684800, 'Start time must be after 2000-01-01'),
     }),
   ),
 });

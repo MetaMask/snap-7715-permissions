@@ -29,7 +29,7 @@ function validatePermissionData(permission: Erc20TokenStreamPermission): true {
     name: 'initialAmount',
     value: initialAmount,
     required: false,
-    allowZero: false,
+    allowZero: true,
   });
 
   validateHexInteger({
@@ -41,20 +41,6 @@ function validatePermissionData(permission: Erc20TokenStreamPermission): true {
 
   if (initialAmount && maxAmount && BigInt(maxAmount) < BigInt(initialAmount)) {
     throw new Error('Invalid maxAmount: must be greater than initialAmount');
-  }
-
-  if (startTime <= 0) {
-    throw new Error('Invalid startTime: must be a positive number');
-  }
-
-  if (startTime !== Math.floor(startTime)) {
-    throw new Error('Invalid startTime: must be an integer');
-  }
-
-  if (!tokenAddress || tokenAddress === '0x') {
-    throw new Error(
-      'Invalid tokenAddress: must be a valid ERC20 token address',
-    );
   }
 
   return true;

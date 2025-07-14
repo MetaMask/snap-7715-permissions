@@ -27,28 +27,6 @@ function validatePermissionData(
     allowZero: false,
   });
 
-  if (periodDuration <= 0) {
-    throw new Error('Invalid periodDuration: must be a positive number');
-  }
-
-  if (periodDuration !== Math.floor(periodDuration)) {
-    throw new Error('Invalid periodDuration: must be an integer');
-  }
-
-  if (startTime <= 0) {
-    throw new Error('Invalid startTime: must be a positive number');
-  }
-
-  if (startTime !== Math.floor(startTime)) {
-    throw new Error('Invalid startTime: must be an integer');
-  }
-
-  if (!tokenAddress || tokenAddress === '0x') {
-    throw new Error(
-      'Invalid tokenAddress: must be a valid ERC20 token address',
-    );
-  }
-
   return true;
 }
 
