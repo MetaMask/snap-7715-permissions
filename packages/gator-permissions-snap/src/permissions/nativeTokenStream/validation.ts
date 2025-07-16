@@ -43,14 +43,6 @@ function validatePermissionData(permission: NativeTokenStreamPermission): true {
     throw new Error('Invalid maxAmount: must be greater than initialAmount');
   }
 
-  if (startTime <= 0) {
-    throw new Error('Invalid startTime: must be a positive number');
-  }
-
-  if (startTime !== Math.floor(startTime)) {
-    throw new Error('Invalid startTime: must be an integer');
-  }
-
   return true;
 }
 
