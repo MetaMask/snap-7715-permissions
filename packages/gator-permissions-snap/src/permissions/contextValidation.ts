@@ -1,11 +1,10 @@
-import { parseUnits, formatUnits } from 'viem';
-
 import type { TimePeriod } from '../core/types';
 import {
   convertReadableDateToTimestamp,
   getStartOfTodayUTC,
   TIME_PERIOD_TO_SECONDS,
 } from '../utils/time';
+import { parseUnits, formatUnits } from '../utils/value';
 
 export type ValidationErrors = {
   [key: string]: string;
@@ -30,7 +29,7 @@ export function validateAndParseAmount(
   }
 
   try {
-    const parsedAmount = parseUnits(amount, decimals);
+    const parsedAmount = parseUnits({ formatted: amount, decimals });
     if (!allowZero && parsedAmount <= 0n) {
       return {
         amount: undefined,
@@ -116,10 +115,10 @@ export function calculateAmountPerSecond(
   timePeriod: TimePeriod,
   decimals: number,
 ): string {
-  return formatUnits(
-    amountPerPeriod / TIME_PERIOD_TO_SECONDS[timePeriod],
+  return formatUnits({
+    value: amountPerPeriod / TIME_PERIOD_TO_SECONDS[timePeriod],
     decimals,
-  );
+  });
 }
 
 /**

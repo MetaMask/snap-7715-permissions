@@ -243,7 +243,7 @@ export class PermissionHandler<
       parseAndValidatePermission,
       applyContext,
       populatePermission,
-      appendCaveats,
+      createPermissionCaveats,
       deriveMetadata,
     } = this.#dependencies;
 
@@ -251,7 +251,7 @@ export class PermissionHandler<
       parseAndValidatePermission,
       applyContext,
       populatePermission,
-      appendCaveats,
+      createPermissionCaveats,
       deriveMetadata,
       buildContext: buildContextHandler,
       createConfirmationContent: createConfirmationContentHandler,

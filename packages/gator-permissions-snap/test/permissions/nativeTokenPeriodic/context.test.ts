@@ -1,5 +1,5 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
@@ -21,11 +21,12 @@ import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
   type: 'native-token-periodic',
   data: {
-    periodAmount: toHex(parseUnits('1', 18)), // 1 ETH per period
+    periodAmount: bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })), // 1 ETH per period
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
     startTime: convertReadableDateToTimestamp('10/26/1985'),
     justification: 'Permission to do something important',
@@ -59,7 +60,7 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
   justification: 'Permission to do something important',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('10', 18)),
+    balance: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
     balanceFormattedAsCurrency: '$🐊10.00',
   },
   tokenMetadata: {

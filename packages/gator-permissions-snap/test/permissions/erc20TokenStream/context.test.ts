@@ -1,6 +1,5 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
-import { maxUint256 } from 'viem';
-import { toHex } from 'viem/utils';
+import { bigIntToHex, numberToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
@@ -29,7 +28,7 @@ const permissionWithoutOptionals: Erc20TokenStreamPermission = {
   type: 'erc20-token-stream',
   data: {
     tokenAddress: USDC_ADDRESS,
-    amountPerSecond: toHex(500_000), // 0.5 USDC per second (6 decimals)
+    amountPerSecond: numberToHex(500_000), // 0.5 USDC per second (6 decimals)
     startTime: 499132800, // 10/26/1985,
     justification: 'Permission to do something important',
   },
@@ -40,9 +39,9 @@ const alreadyPopulatedPermission: Erc20TokenStreamPermission = {
   data: {
     ...permissionWithoutOptionals.data,
     // 1 USDC
-    initialAmount: toHex(1_000_000),
+    initialAmount: numberToHex(1_000_000),
     // 10 USDC
-    maxAmount: toHex(10_000_000),
+    maxAmount: numberToHex(10_000_000),
   },
   rules: {},
 };
@@ -65,7 +64,7 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
   justification: 'Permission to do something important',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(100_000_000), // 100 USDC (6 decimals)
+    balance: numberToHex(100_000_000), // 100 USDC (6 decimals)
     balanceFormattedAsCurrency: '$🐊100.00',
   },
   tokenMetadata: {
@@ -102,7 +101,8 @@ describe('erc20TokenStream:context', () => {
         data: {
           ...permissionWithoutOptionals.data,
           initialAmount: '0x0',
-          maxAmount: toHex(maxUint256),
+          maxAmount:
+            '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
         },
         rules: {},
       });
@@ -211,16 +211,16 @@ describe('erc20TokenStream:context', () => {
     it('should create a context with different token decimals', async () => {
       const DAI_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F';
       const DAI_DECIMALS = 18;
-      const DAI_BALANCE = toHex(BigInt('100000000000000000000')); // 100 DAI (18 decimals)
+      const DAI_BALANCE = bigIntToHex(100000000000000000000n); // 100 DAI (18 decimals)
 
       const daiPermission: Erc20TokenStreamPermission = {
         type: 'erc20-token-stream',
         data: {
           tokenAddress: DAI_ADDRESS,
-          amountPerSecond: toHex(BigInt('500000000000000000')), // 0.5 DAI per second (18 decimals)
+          amountPerSecond: bigIntToHex(500000000000000000n), // 0.5 DAI per second (18 decimals)
           startTime: 499132800,
-          initialAmount: toHex(BigInt('1000000000000000000')), // 1 DAI
-          maxAmount: toHex(BigInt('10000000000000000000')), // 10 DAI
+          initialAmount: bigIntToHex(1000000000000000000n), // 1 DAI
+          maxAmount: bigIntToHex(10000000000000000000n), // 10 DAI
           justification: 'Permission to do something important',
         },
         rules: {},

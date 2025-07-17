@@ -1,12 +1,12 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { Delegation } from '@metamask/delegation-core';
 import {
   Implementation,
   toMetaMaskSmartAccount,
-  type Delegation,
-  type DeleGatorEnvironment,
   type MetaMaskSmartAccount,
 } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
+import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import {
   createClient,
   custom,
@@ -15,8 +15,8 @@ import {
   type Address,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
+import * as chains from 'viem/chains';
 
-import type { SupportedChains } from './baseAccountController';
 import { BaseAccountController } from './baseAccountController';
 import type {
   AccountController,
@@ -25,10 +25,18 @@ import type {
   FactoryArgs,
 } from './types';
 
+const ALL_CHAINS = Object.values(chains);
+
 const GET_ENTROPY_SALT = '7715_permissions_provider_snap';
 const MULTISIG_THRESHOLD = 1n;
 
-type SupportedChainId = SupportedChains[number]['id'];
+const toHex = (input: Uint8Array | Hex): Hex => {
+  if (typeof input === 'string') {
+    return input;
+  }
+
+  return bytesToHex(input);
+};
 
 /**
  * Controls smart account operations including creation, delegation signing, and balance queries.
@@ -40,10 +48,7 @@ export class SmartAccountController
   #deploymentSalt: Hex;
 
   #metaMaskSmartAccountByChainId: Partial<
-    Record<
-      SupportedChainId,
-      Promise<MetaMaskSmartAccount<Implementation.MultiSig>>
-    >
+    Record<number, Promise<MetaMaskSmartAccount<Implementation.MultiSig>>>
   > = {};
 
   /**
@@ -56,7 +61,7 @@ export class SmartAccountController
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
-    supportedChains?: SupportedChains;
+    supportedChains: readonly number[];
     deploymentSalt: Hex;
   }) {
     super(config);
@@ -92,10 +97,10 @@ export class SmartAccountController
         'accountController:getMetaMaskSmartAccount() - smartAccount not found',
       );
 
-      // @ts-expect-error - extractChain does not work well with dynamic `chains`
+      // @ts-expect-error - struggles with ALL_CHAINS
       const chain = extractChain({
-        chains: this.supportedChains,
-        id: chainId,
+        chains: ALL_CHAINS,
+        id: chainId as (typeof ALL_CHAINS)[number]['id'],
       });
 
       if (!chain) {
@@ -167,22 +172,6 @@ export class SmartAccountController
   }
 
   /**
-   * Retrieves the delegation manager address for the current account.
-   *
-   * @param options - The base account options including chainId.
-   * @returns A promise resolving to the delegation manager address as a hex string.
-   */
-  public async getDelegationManager(
-    options: AccountOptionsBase,
-  ): Promise<Address> {
-    const smartAccount = await this.#getMetaMaskSmartAccount(options);
-
-    // once we have multiple versions of the delegation manager supported, we
-    // will need to validate and perhaps upgrade here
-    return smartAccount.environment.DelegationManager;
-  }
-
-  /**
    * Retrieves the metadata for deploying a smart account.
    *
    * @param options - The base account options including chainId.
@@ -207,27 +196,6 @@ export class SmartAccountController
   }
 
   /**
-   * Retrieves the environment for the current account.
-   *
-   * @param options - The base account options including chainId.
-   * @returns A promise resolving to a DeleGatorEnvironment.
-   */
-  public async getEnvironment(
-    options: AccountOptionsBase,
-  ): Promise<DeleGatorEnvironment> {
-    logger.debug('accountController:getEnvironment()');
-
-    const smartAccount = await this.#getMetaMaskSmartAccount(options);
-
-    logger.debug(
-      'accountController:getEnvironment() - smartAccount resolved',
-      smartAccount,
-    );
-
-    return smartAccount.environment;
-  }
-
-  /**
    * Signs a delegation using the smart account.
    *
    * @param options - The options for signing including chainId and delegation data.
@@ -247,13 +215,31 @@ export class SmartAccountController
       smartAccount,
     );
 
+    // smartAccount.signDelegation expects a developer friendly Delegation (salt: Hex)
+    const toolkitDelegation = {
+      delegate: toHex(delegation.delegate),
+      delegator: toHex(delegation.delegator),
+      authority: toHex(delegation.authority),
+      caveats: delegation.caveats.map((caveat) => ({
+        enforcer: toHex(caveat.enforcer),
+        terms: toHex(caveat.terms),
+        args: toHex(caveat.args),
+      })),
+      salt: bigIntToHex(delegation.salt),
+    };
+
     const signature = await smartAccount.signDelegation({
-      delegation,
+      delegation: toolkitDelegation,
       chainId,
     });
 
     logger.debug('accountController:signDelegation() - signature resolved');
 
-    return { ...delegation, signature };
+    // returns a raw Delegation
+    return {
+      ...toolkitDelegation,
+      signature,
+      salt: delegation.salt,
+    };
   }
 }
