@@ -43,7 +43,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
   /**
    * Orchestrates the permission request lifecycle.
-   *
    * @param origin - The origin of the permission request.
    * @param permissionRequest - The permission request to orchestrate.
    * @param lifecycleHandlers - The lifecycle handlers to call during orchestration.
@@ -148,7 +147,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
   /**
    * Resolves a permission request into a final permission response.
-   *
    * @private
    * @template TRequest - Type of permission request
    * @template TContext - Type of context for the permission request.

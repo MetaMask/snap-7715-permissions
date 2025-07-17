@@ -24,7 +24,6 @@ export type PermissionRequestResult =
 
 /**
  * Represents a Permission request with an explicitly typed permission field.
- *
  * @template TPermission - The specific permission type of the permission field.
  */
 export type TypedPermissionRequest<TPermission extends Permission> =
@@ -96,7 +95,6 @@ export enum TimePeriod {
 
 /**
  * Properties required for confirmation dialogs.
- *
  * @property ui - The UI element to be displayed in the confirmation dialog
  * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
@@ -109,7 +107,6 @@ export type ConfirmationProps = {
 
 /**
  * Type definition for lifecycle orchestration handlers that manage the flow of permission requests.
- *
  * @template TRequest - The type of permission request being handled
  * @template TContext - The type of context object used during request processing
  * @template TMetadata - The type of metadata object used for request processing
@@ -185,7 +182,6 @@ export type RuleData = {
 
 /**
  * Defines a rule that can be applied to a permission request.
- *
  * @template TContext - The type of context object used during request processing
  * @template TMetadata - The type of metadata object used for request processing
  */
@@ -210,7 +206,6 @@ export type RuleDefinition<
  * 2. Managing permission-specific UI interaction
  * 3. Providing lifecycle hook implementations
  * 4. Converting between request/context/metadata formats
- *
  * @template TRequest - The specific permission request type
  * @template TContext - The context type used for this permission
  * @template TMetadata - The metadata type used for this permission
@@ -218,9 +213,7 @@ export type RuleDefinition<
 export type PermissionHandlerType = {
   /**
    * Handles a permission request, orchestrating the full lifecycle from request to response.
-   *
    * @param origin - The origin of the permission request
-   * @param permissionRequest - The permission request to handle
    * @returns A permission response object
    */
   handlePermissionRequest(origin: string): Promise<PermissionRequestResult>;
@@ -228,7 +221,6 @@ export type PermissionHandlerType = {
 
 /**
  * Defines the structure and dependencies for a permission type.
- *
  * @template TRequest - The type of permission request.
  * @template TContext - The type of context object used during request processing.
  * @template TMetadata - The type of metadata object used for request processing.
@@ -256,7 +248,6 @@ export type PermissionDefinition<
 
 /**
  * Parameters required to construct a PermissionHandler instance.
- *
  * @template TRequest - The type of permission request being handled.
  * @template TContext - The type of context object used during request processing.
  * @template TMetadata - The type of metadata object used for request processing.
@@ -289,7 +280,6 @@ export type PermissionHandlerParams<
 
 /**
  * Dependencies required for a PermissionHandler to process permission requests.
- *
  * @template TRequest - The type of permission request being handled.
  * @template TContext - The type of context object used during request processing.
  * @template TMetadata - The type of metadata object used for request processing.

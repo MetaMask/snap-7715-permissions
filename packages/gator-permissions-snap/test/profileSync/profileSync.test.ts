@@ -2,9 +2,8 @@ import {
   encodeDelegations,
   hashDelegation,
   ROOT_AUTHORITY,
-  type Delegation,
 } from '@metamask/delegation-core';
-import type { Hex } from '@metamask/delegation-core';
+import type { Hex, type Delegation } from '@metamask/delegation-core';
 import type {
   JwtBearerAuth,
   UserStorage,

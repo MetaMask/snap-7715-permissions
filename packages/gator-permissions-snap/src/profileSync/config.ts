@@ -2,7 +2,6 @@ import { Env } from '@metamask/profile-sync-controller/sdk';
 
 /**
  * Get the environment for the Profile Sync SDK.
- *
  * @param snapEnv - The environment of the snap.
  * @returns The environment for the Profile Sync SDK.
  */

@@ -29,7 +29,6 @@ export class TokenPricesService {
 
   /**
    * Safely parse the user's preferences to determine the currency to use for the token prices.
-   *
    * @param preferences - The user's preferences.
    * @returns The currency to use for the token prices.
    */
@@ -42,7 +41,6 @@ export class TokenPricesService {
 
   /**
    * Get the user's preferences.
-   *
    * @returns The user's preferences.
    */
   #getPreferences = async (): Promise<Preferences> => {
@@ -66,7 +64,6 @@ export class TokenPricesService {
   /**
    * Calculate the value of the token balance in the user's preferred currency.
    * - `from` is crypto and `to` is fiat.
-   *
    * @param tokenCaip19Type - The token CAIP-19 asset type to fetch spot prices for.
    * @param balance - The token balance.
    * @param decimals - The number of decimals the token uses.

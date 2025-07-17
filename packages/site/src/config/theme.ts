@@ -1,5 +1,4 @@
-import type { DefaultTheme } from 'styled-components';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, type DefaultTheme } from 'styled-components';
 
 const breakpoints = ['600px', '768px', '992px'];
 
@@ -116,7 +115,6 @@ export const dark: DefaultTheme = {
 
 /**
  * Default style applied to the app.
- *
  * @param props - Styled Components props.
  * @returns Global style React component.
  */

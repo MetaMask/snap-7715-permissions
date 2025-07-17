@@ -4,8 +4,8 @@ import {
   createExactCalldataTerms,
 } from '@metamask/delegation-core';
 
-import type { DelegationContracts } from '../../core/chainMetadata';
 import type { PopulatedNativeTokenStreamPermission } from './types';
+import type { DelegationContracts } from '../../core/chainMetadata';
 
 /**
  * Appends permission-specific caveats to the caveat builder.

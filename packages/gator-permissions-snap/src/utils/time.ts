@@ -2,7 +2,6 @@ import { TimePeriod } from '../core/types';
 
 /**
  * Converts a unix timestamp(in seconds) to a human-readable date format (MM/DD/YYYY).
- *
  * @param timestamp - The unix timestamp in seconds.
  * @returns The formatted date string.
  */
@@ -24,7 +23,6 @@ export const convertTimestampToReadableDate = (timestamp: number) => {
 
 /**
  * Converts a human-readable date (MM/DD/YYYY) to a Unix timestamp at 12:00:00 AM UTC.
- *
  * @param date - The human-readable date string.
  * @returns The unix timestamp in seconds.
  */
@@ -42,7 +40,6 @@ export const convertReadableDateToTimestamp = (date: string) => {
 
 /**
  * Checks if a human-readable date format (MM/DD/YYYY) is in the correct format.
- *
  * @param date - The human-readable date string.
  * @returns True if the date is in the correct format, otherwise false.
  */
@@ -56,7 +53,6 @@ export const isHumanReadableInCorrectFormat = (date: string) => {
 
 /**
  * Returns the Unix timestamp (in seconds) for the start of today (12:00 AM UTC).
- *
  * @returns Unix timestamp at 12:00:00 AM UTC of today.
  */
 export const getStartOfTodayUTC = (): number => {
@@ -74,7 +70,6 @@ export const getStartOfTodayUTC = (): number => {
 
 /**
  * Returns the Unix timestamp (in seconds) for the start of the next day (12:00 AM UTC).
- *
  * @returns Unix timestamp at 12:00:00 AM UTC of the next day.
  */
 export const getStartOfNextDayUTC = (): number => {

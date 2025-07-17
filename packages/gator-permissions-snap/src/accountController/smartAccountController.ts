@@ -53,7 +53,6 @@ export class SmartAccountController
 
   /**
    * Initializes a new SmartAccountController instance.
-   *
    * @param config - The configuration object.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.supportedChains - The supported blockchain chains.
@@ -70,7 +69,6 @@ export class SmartAccountController
 
   /**
    * Retrieves or creates a MetaMaskSmartAccount for the specified chain.
-   *
    * @param options - The account options containing chain ID.
    * @returns A Promise resolving to a MetaMaskSmartAccount.
    * @throws When the specified chain is not supported.
@@ -150,7 +148,6 @@ export class SmartAccountController
 
   /**
    * Retrieves the account address for the current account.
-   *
    * @param options - The base account options including chainId.
    * @returns A promise resolving to the account address as a hex string.
    */
@@ -173,7 +170,6 @@ export class SmartAccountController
 
   /**
    * Retrieves the metadata for deploying a smart account.
-   *
    * @param options - The base account options including chainId.
    * @returns A promise resolving to the factory arguments needed for deployment.
    */
@@ -197,7 +193,6 @@ export class SmartAccountController
 
   /**
    * Signs a delegation using the smart account.
-   *
    * @param options - The options for signing including chainId and delegation data.
    * @returns A promise resolving to the signed delegation structure.
    */

@@ -11,7 +11,6 @@ export type PermissionHandlerContentProps = {
 
 /**
  * Content wrapping a permission confirmation, including the title and add-more-rules button.
- *
  * @param options - The params for the content.
  * @param options.showAddMoreRulesButton - Whether to show the "Add more rules" button.
  * @param options.children - The children of the content.

@@ -37,7 +37,6 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
 
   /**
    * Fetch the token balance and metadata for a given account and token.
-   *
    * @param args - The parameters for fetching the token balance.
    * @param args.chainId - The chain ID to fetch the balance from.
    * @param args.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance.

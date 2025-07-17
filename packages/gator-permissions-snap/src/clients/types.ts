@@ -92,7 +92,6 @@ export type TokenBalanceAndMetadata = {
 export type TokenMetadataClient = {
   /**
    * Fetch the token balance and metadata for a given account and token.
-   *
    * @param params - The parameters for fetching the token balance
    * @param params.chainId - The chain ID to fetch the balance from
    * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance

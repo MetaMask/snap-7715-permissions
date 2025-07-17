@@ -56,7 +56,6 @@ export class AccountApiClient {
   /**
    * Checks if a chain ID is supported by the account API.
    * Currently only mainnet (chain ID 1) is supported.
-   *
    * @param params - The parameters object.
    * @param params.chainId - The chain ID to check.
    * @returns True if the chain ID is supported, false otherwise.
@@ -67,7 +66,6 @@ export class AccountApiClient {
 
   /**
    * Fetch the token balance and metadata for a given account and token.
-   *
    * @param params - The parameters for fetching the token balance.
    * @param params.chainId - The chain ID to fetch the balance from.
    * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance.

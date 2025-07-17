@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import type { PermissionsResponse } from '@metamask/7715-permissions-shared/types';
 import {
   type PermissionsRequest,
+  type PermissionsResponse,
   zPermissionsRequest,
   zPermissionsResponse,
 } from '@metamask/7715-permissions-shared/types';
@@ -10,7 +10,6 @@ import { InvalidParamsError } from '@metamask/snaps-sdk';
 
 /**
  * Safely parses the grant permissions request parameters, validating them using Zod schema.
- *
  * @param params - The permissions to parse.
  * @returns The parsed and validated permissions as a PermissionsRequest object.
  * @throws Throws a InvalidParamsError if validation fails or if the permissions data is empty.
@@ -34,7 +33,6 @@ export const parsePermissionRequestParam = (
 
 /**
  * Safely parses the grant permissions response parameters, validating them using Zod schema.
- *
  * @param params - The permissions to parse.
  * @returns The parsed and validated permissions as a PermissionsResponse object.
  * @throws Throws a InvalidParamsError if validation fails or if the permissions data is empty.

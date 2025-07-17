@@ -13,7 +13,6 @@ export abstract class BaseAccountController {
 
   /**
    * Initializes a new BaseAccountController instance.
-   *
    * @param config - The configuration object.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.supportedChains - The supported blockchain chains.
@@ -30,7 +29,6 @@ export abstract class BaseAccountController {
 
   /**
    * Validates that the specified chains are supported.
-   *
    * @param supportedChains - The chains to validate.
    * @throws If no chains are specified or if any chain is not supported.
    */
@@ -56,7 +54,6 @@ export abstract class BaseAccountController {
 
   /**
    * Asserts that the specified chain ID is supported.
-   *
    * @param chainId - The chain ID to validate.
    * @throws If the chain ID is not supported.
    */
@@ -74,7 +71,6 @@ export abstract class BaseAccountController {
 
   /**
    * Creates a provider that handles experimental provider requests.
-   *
    * @param chainId - The chain ID for the provider.
    * @returns A provider object with a request method.
    */

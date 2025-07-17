@@ -1,12 +1,6 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Section } from '@metamask/snaps-sdk/jsx';
 
-import { getChainMetadata } from '../../core/chainMetadata';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
-import { renderRules } from '../../core/rules';
-import { AccountDetails } from '../../ui/components/AccountDetails';
-import type { ItemDetails } from '../../ui/components/RequestDetails';
-import { RequestDetails } from '../../ui/components/RequestDetails';
 import {
   periodAmountRule,
   periodTypeRule,
@@ -18,10 +12,15 @@ import type {
   Erc20TokenPeriodicContext,
   Erc20TokenPeriodicMetadata,
 } from './types';
+import { getChainMetadata } from '../../core/chainMetadata';
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
+import { renderRules } from '../../core/rules';
+import { AccountDetails } from '../../ui/components/AccountDetails';
+import type { ItemDetails } from '../../ui/components/RequestDetails';
+import { RequestDetails } from '../../ui/components/RequestDetails';
 
 /**
  * Creates UI content for an ERC20 token periodic permission confirmation.
- *
  * @param args - The configuration for the confirmation content.
  * @param args.context - The context containing permission details.
  * @param args.metadata - Metadata including derived values and validation errors.

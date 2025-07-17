@@ -15,7 +15,6 @@ export const FALLBACK_PREFERENCE: Preferences = {
 
 /**
  * Format a number as currency.
- *
  * @param preferences - The user's preferences.
  * @param value - The number to format.
  * @param decimalPlaces - The number of decimal places to display.

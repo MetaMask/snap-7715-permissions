@@ -6,7 +6,6 @@ type TooltipIconProps = {
 
 /**
  * A reusable component that displays a question mark icon with a tooltip.
- *
  * @param props - The component props.
  * @param props.tooltip - The tooltip text to display.
  * @returns A JSX element containing a tooltip with a question mark icon.

@@ -177,7 +177,6 @@ const boundRpcHandlers: {
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
- *
  * @param args - The request handler args as object.
  * @param args.origin - The origin of the request, e.g., the website that
  * invoked the snap.
@@ -213,7 +212,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
 /**
  * Handle incoming user input events.
- *
  * @param args - The user input handler args as object.
  * @param args.id - The id of the interface.
  * @param args.event - The user input event.
