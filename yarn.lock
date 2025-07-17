@@ -3172,6 +3172,7 @@ __metadata:
     "@metamask/eslint-config-typescript": 12.1.0
     "@metamask/snaps-cli": 8.1.1
     "@metamask/snaps-jest": 9.3.0
+    "@metamask/utils": 11.4.2
     "@types/react": 18.3.23
     "@types/react-dom": 18.2.4
     jest: 29.7.0
@@ -3325,6 +3326,17 @@ __metadata:
   dependencies:
     "@metamask/auto-changelog": ^3.4.4
   checksum: c9e7481499f8497d6b5c15d286e9992b52c0db5ddbb7933ec918a24e758da447ec4537d383d74826dc440eae836b3f26496a89a79b207203fb0f0c7a7e72f66e
+  languageName: node
+  linkType: hard
+
+"@metamask/delegation-core@npm:0.1.0":
+  version: 0.1.0
+  resolution: "@metamask/delegation-core@npm:0.1.0"
+  dependencies:
+    "@metamask/abi-utils": ^3.0.0
+    "@metamask/utils": ^11.4.0
+    "@noble/hashes": ^1.8.0
+  checksum: 438ba9ca13fc1ac02733c64011f1520b7731b7d16175ad40ddbb8b680c2cc4fc24d8202fc0f075577c6a78f98aafe40ff684452efdfeb5d523fbf5c3239b425e
   languageName: node
   linkType: hard
 
@@ -3511,7 +3523,9 @@ __metadata:
   dependencies:
     "@jest/globals": 29.7.0
     "@metamask/7715-permissions-shared": "workspace:*"
+    "@metamask/abi-utils": ^3.0.0
     "@metamask/auto-changelog": 5.0.2
+    "@metamask/delegation-core": 0.1.0
     "@metamask/delegation-toolkit": 0.10.2
     "@metamask/eslint-config": 12.2.0
     "@metamask/eslint-config-jest": 12.1.0

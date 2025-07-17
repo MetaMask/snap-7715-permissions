@@ -47,6 +47,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@metamask/abi-utils": "3.0.0",
+    "@metamask/delegation-core": "0.1.0",
     "@metamask/delegation-toolkit": "0.10.2",
     "@metamask/profile-sync-controller": "21.0.0",
     "@metamask/snaps-sdk": "8.1.0",

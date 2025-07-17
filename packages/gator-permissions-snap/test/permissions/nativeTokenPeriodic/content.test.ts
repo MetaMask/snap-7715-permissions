@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { createConfirmationContent } from '../../../src/permissions/nativeTokenPeriodic/content';
@@ -8,6 +8,7 @@ import type {
   NativeTokenPeriodicMetadata,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const mockContext: NativeTokenPeriodicContext = {
   expiry: '05/01/2024',
@@ -15,7 +16,7 @@ const mockContext: NativeTokenPeriodicContext = {
   justification: 'Permission to do periodic native token transfers',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('10', 18)),
+    balance: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
     balanceFormattedAsCurrency: '$🐊10.00',
   },
   tokenMetadata: {
@@ -175,7 +176,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Ethereum",
+                                  "children": "Ethereum Mainnet",
                                 },
                                 "type": "Text",
                               },
@@ -424,7 +425,7 @@ describe('nativeTokenPeriodic:content', () => {
                             "props": {
                               "children": [
                                 "10",
-                                " available",
+                                "available",
                               ],
                               "color": "alternative",
                             },
@@ -948,7 +949,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Ethereum",
+                                  "children": "Ethereum Mainnet",
                                 },
                                 "type": "Text",
                               },
@@ -1197,7 +1198,7 @@ describe('nativeTokenPeriodic:content', () => {
                             "props": {
                               "children": [
                                 "10",
-                                " available",
+                                "available",
                               ],
                               "color": "alternative",
                             },

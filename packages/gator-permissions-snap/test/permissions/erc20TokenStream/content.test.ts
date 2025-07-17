@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { createConfirmationContent } from '../../../src/permissions/erc20TokenStream/content';
@@ -7,6 +7,7 @@ import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
 } from '../../../src/permissions/erc20TokenStream/types';
+import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 10;
 
@@ -16,7 +17,9 @@ const mockContext: Erc20TokenStreamContext = {
   justification: 'Permission to stream ERC20 tokens',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('10', tokenDecimals)),
+    balance: bigIntToHex(
+      parseUnits({ formatted: '10', decimals: tokenDecimals }),
+    ),
     balanceFormattedAsCurrency: '$🐊10.00',
   },
   tokenMetadata: {
@@ -176,7 +179,7 @@ describe('erc20TokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -434,7 +437,7 @@ describe('erc20TokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },
@@ -1295,7 +1298,7 @@ describe('erc20TokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Ethereum",
+                              "children": "Ethereum Mainnet",
                             },
                             "type": "Text",
                           },
@@ -1553,7 +1556,7 @@ describe('erc20TokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },

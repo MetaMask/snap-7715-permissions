@@ -1,7 +1,5 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { Box, Button } from '@metamask/snaps-sdk/jsx';
-
-import { RequestHeader } from '../ui/components/RequestHeader';
+import { Box, Button, Heading } from '@metamask/snaps-sdk/jsx';
 
 export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 
@@ -32,7 +30,9 @@ export const PermissionHandlerContent = ({
   return (
     <Box>
       <Box direction="vertical">
-        <RequestHeader title={permissionTitle} />
+        <Box center={true}>
+          <Heading size="lg">{permissionTitle}</Heading>
+        </Box>
         {children}
         {addRulesButton}
       </Box>

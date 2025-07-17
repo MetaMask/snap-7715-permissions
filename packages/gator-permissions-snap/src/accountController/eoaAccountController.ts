@@ -1,14 +1,8 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import {
-  getDeleGatorEnvironment,
-  type Delegation,
-  type DeleGatorEnvironment,
-} from '@metamask/delegation-toolkit';
+import { type Hex, type Delegation } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
-import type { Hex } from 'viem';
-import { type Address } from 'viem';
 
-import type { SupportedChains } from './baseAccountController';
+import { getChainMetadata } from '../core/chainMetadata';
 import { BaseAccountController } from './baseAccountController';
 import type {
   AccountController,
@@ -24,7 +18,7 @@ export class EoaAccountController
   extends BaseAccountController
   implements AccountController
 {
-  #accountAddress: Address | null = null;
+  #accountAddress: Hex | null = null;
 
   #ethereumProvider: SnapsEthereumProvider;
 
@@ -38,7 +32,7 @@ export class EoaAccountController
   constructor(config: {
     snapsProvider: SnapsProvider;
     ethereumProvider: SnapsEthereumProvider;
-    supportedChains?: SupportedChains;
+    supportedChains: readonly number[];
   }) {
     super(config);
 
@@ -49,7 +43,7 @@ export class EoaAccountController
    * Gets the connected account address, requesting access if needed.
    * @returns The account address.
    */
-  async #getAccountAddress(): Promise<Address> {
+  async #getAccountAddress(): Promise<Hex> {
     logger.debug('eoaAccountController:#getAccountAddress()');
 
     if (this.#accountAddress) {
@@ -64,7 +58,8 @@ export class EoaAccountController
       throw new Error('No accounts found');
     }
 
-    this.#accountAddress = accounts[0] as Address;
+    this.#accountAddress = accounts[0] as Hex;
+
     return this.#accountAddress;
   }
 
@@ -76,7 +71,7 @@ export class EoaAccountController
    */
   public async getAccountAddress({
     chainId,
-  }: AccountOptionsBase): Promise<Address> {
+  }: AccountOptionsBase): Promise<Hex> {
     logger.debug('eoaAccountController:getAccountAddress()');
 
     this.assertIsSupportedChainId(chainId);
@@ -109,7 +104,10 @@ export class EoaAccountController
       throw new Error('Selected chain does not match the requested chain');
     }
 
-    const delegationManager = await this.getDelegationManager(options);
+    const {
+      contracts: { delegationManager },
+    } = getChainMetadata({ chainId });
+
     const signArgs = this.#getSignDelegationArgs({
       chainId,
       delegationManager,
@@ -137,7 +135,7 @@ export class EoaAccountController
     delegation,
   }: {
     chainId: number;
-    delegationManager: Address;
+    delegationManager: Hex;
     delegation: Omit<Delegation, 'signature'>;
   }) {
     logger.debug('eoaAccountController:#getSignDelegationArgs()');
@@ -194,38 +192,5 @@ export class EoaAccountController
       factory: undefined,
       factoryData: undefined,
     };
-  }
-
-  /**
-   * Retrieves the delegation manager address.
-   * @param options - The options object containing chain information.
-   * @returns The delegation manager address.
-   */
-  public async getDelegationManager(
-    options: AccountOptionsBase,
-  ): Promise<Address> {
-    logger.debug('eoaAccountController:getDelegationManager()');
-
-    const { DelegationManager } = await this.getEnvironment(options);
-
-    return DelegationManager;
-  }
-
-  /**
-   * Retrieves the environment for the current account.
-   * @param options0 - The options object containing chain information.
-   * @param options0.chainId - The ID of the blockchain chain.
-   * @returns The DeleGator environment configuration.
-   */
-  public async getEnvironment({
-    chainId,
-  }: AccountOptionsBase): Promise<DeleGatorEnvironment> {
-    logger.debug('eoaAccountController:getEnvironment()');
-
-    this.assertIsSupportedChainId(chainId);
-
-    const environment = getDeleGatorEnvironment(chainId);
-
-    return environment;
   }
 }

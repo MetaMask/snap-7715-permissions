@@ -1,5 +1,5 @@
 import type { PermissionDefinition } from '../../core/types';
-import { appendCaveats } from './caveats';
+import { createPermissionCaveats } from './caveats';
 import { createConfirmationContent } from './content';
 import {
   applyContext,
@@ -33,6 +33,6 @@ export const erc20TokenStreamPermissionDefinition: PermissionDefinition<
     createConfirmationContent,
     applyContext,
     populatePermission,
-    appendCaveats,
+    createPermissionCaveats,
   },
 };
