@@ -1,46 +1,44 @@
-import { z } from 'zod';
-
 import { zSanitizedJustification } from '../src/types/7715-permissions-types';
 
 describe('zSanitizedJustification', () => {
   describe('Basic validation', () => {
-    it('should reject empty strings', () => {
+    it('rejects empty strings', () => {
       expect(() => zSanitizedJustification.parse('')).toThrow('Justification cannot be empty');
       expect(() => zSanitizedJustification.parse('   ')).toThrow('Justification cannot be empty');
     });
 
-    it('should reject strings longer than 120 characters', () => {
+    it('rejects strings longer than 120 characters', () => {
       const longString = 'a'.repeat(121);
       expect(() => zSanitizedJustification.parse(longString)).toThrow(
         'Justification cannot exceed 120 characters'
       );
     });
 
-    it('should accept strings exactly 120 characters', () => {
+    it('accepts strings exactly 120 characters', () => {
       const exactString = 'a'.repeat(120);
       expect(() => zSanitizedJustification.parse(exactString)).not.toThrow();
     });
   });
 
   describe('Whitespace normalization', () => {
-    it('should trim leading and trailing whitespace', () => {
+    it('trims leading and trailing whitespace', () => {
       const result = zSanitizedJustification.parse('  Hello World  ');
       expect(result).toBe('Hello World');
     });
 
-    it('should normalize multiple spaces to single spaces', () => {
+    it('normalizes multiple spaces to single spaces', () => {
       const result = zSanitizedJustification.parse('Hello    World');
       expect(result).toBe('Hello World');
     });
 
-    it('should normalize tabs and newlines to spaces', () => {
+    it('normalizes tabs and newlines to spaces', () => {
       const result = zSanitizedJustification.parse('Hello\tWorld\nTest');
       expect(result).toBe('Hello World Test');
     });
   });
 
   describe('HTML/XML injection prevention', () => {
-    it('should reject HTML tags', () => {
+    it('rejects HTML tags', () => {
       const htmlPatterns = [
         '<script>alert("xss")</script>',
         '<div>content</div>',
@@ -59,7 +57,7 @@ describe('zSanitizedJustification', () => {
       });
     });
 
-    it('should reject XML patterns', () => {
+    it('rejects XML patterns', () => {
       const xmlPatterns = [
         '<?xml version="1.0"?>',
         '<!DOCTYPE html>',
@@ -77,7 +75,7 @@ describe('zSanitizedJustification', () => {
   });
 
   describe('JSON injection prevention', () => {
-    it('should reject JSON patterns', () => {
+    it('rejects JSON patterns', () => {
       const jsonPatterns = [
         '{"key": "value"}',
         '{"justification": "malicious"}',
@@ -97,7 +95,7 @@ describe('zSanitizedJustification', () => {
   });
 
   describe('CSS injection prevention', () => {
-    it('should reject CSS patterns', () => {
+    it('rejects CSS patterns', () => {
       const cssPatterns = [
         '@import url("evil.css")',
         '@media screen { body { display: none } }',
@@ -124,7 +122,7 @@ describe('zSanitizedJustification', () => {
   });
 
   describe('Event handler prevention', () => {
-    it('should reject event handlers', () => {
+    it('rejects event handlers', () => {
       const eventHandlers = [
         'onclick="alert(1)"',
         'onload="document.location=\'evil.com\'"',
@@ -145,7 +143,7 @@ describe('zSanitizedJustification', () => {
   });
 
   describe('Dangerous protocol prevention', () => {
-    it('should reject dangerous protocols', () => {
+    it('rejects dangerous protocols', () => {
       const dangerousProtocols = [
         'javascript:alert("xss")',
         'data:text/html,<script>alert(1)</script>',
@@ -163,7 +161,7 @@ describe('zSanitizedJustification', () => {
   });
 
   describe('Quote prevention', () => {
-    it('should reject strings with quotes', () => {
+    it('rejects strings with quotes', () => {
       const quotedStrings = [
         'Text with "double quotes"',
         "Text with 'single quotes'",
@@ -183,7 +181,7 @@ describe('zSanitizedJustification', () => {
   });
 
   describe('Control character prevention', () => {
-    it('should reject control characters', () => {
+    it('rejects control characters', () => {
       const controlChars = [
         'Text with \x00 null byte',
         'Text with \x01 start of heading',
@@ -209,14 +207,14 @@ describe('zSanitizedJustification', () => {
       });
     });
 
-    it('should allow newlines and tabs (they get normalized to spaces)', () => {
+    it('allows newlines and tabs (they get normalized to spaces)', () => {
       const result = zSanitizedJustification.parse('Line 1\nLine 2\tLine 3');
       expect(result).toBe('Line 1 Line 2 Line 3');
     });
   });
 
   describe('UI redressing prevention', () => {
-    it('should reject RTL/LTR override characters', () => {
+    it('rejects RTL/LTR override characters', () => {
       const rtlPatterns = [
         'Pay to \u202Eevil.com\u202C', // RTL override
         'Text with \u202D left-to-right override',
@@ -231,7 +229,7 @@ describe('zSanitizedJustification', () => {
       });
     });
 
-    it('should reject zero-width characters', () => {
+    it('rejects zero-width characters', () => {
       const zeroWidthPatterns = [
         'Text with \u200B zero-width space',
         'Text with \u200C zero-width non-joiner',
@@ -246,7 +244,7 @@ describe('zSanitizedJustification', () => {
       });
     });
 
-    it('should reject combining diacritical marks', () => {
+    it('rejects combining diacritical marks', () => {
       const combiningPatterns = [
         'Text with \u0300 combining grave accent',
         'Text with \u0301 combining acute accent',
@@ -369,7 +367,7 @@ describe('zSanitizedJustification', () => {
       });
     });
 
-    it('should reject full-width characters (homograph attacks)', () => {
+    it('rejects full-width characters (homograph attacks)', () => {
       const homographPatterns = [
         'Pay to \uFF41\uFF56\uFF49\uFF4C.com', // Full-width 'evil'
         'Text with \uFF21 full-width A',
@@ -409,7 +407,7 @@ describe('zSanitizedJustification', () => {
   });
 
   describe('Edge cases and complex attacks', () => {
-    it('should reject mixed attack vectors', () => {
+    it('rejects mixed attack vectors', () => {
       const mixedAttacks = [
         'Pay to \u202E<script>alert(1)</script>\u202C',
         'Text with \u200Bjavascript:alert(1)',
@@ -425,7 +423,7 @@ describe('zSanitizedJustification', () => {
       });
     });
 
-    it('should handle boundary conditions', () => {
+    it('handles boundary conditions', () => {
       // Test with maximum allowed length
       const maxLength = 'a'.repeat(120);
       expect(() => zSanitizedJustification.parse(maxLength)).not.toThrow();
@@ -438,7 +436,7 @@ describe('zSanitizedJustification', () => {
       expect(() => zSanitizedJustification.parse(maxLengthWithSpaces)).not.toThrow();
     });
 
-    it('should reject attempts to bypass with encoding', () => {
+    it('rejects attempts to bypass with encoding', () => {
       const encodedAttacks = [
         '&#60;script&#62;alert(1)&#60;/script&#62;',
         '&lt;script&gt;alert(1)&lt;/script&gt;',
@@ -455,7 +453,7 @@ describe('zSanitizedJustification', () => {
   });
 
   describe('Real-world scenarios', () => {
-    it('should accept common legitimate justifications', () => {
+    it('accepts common legitimate justifications', () => {
       const legitimateJustifications = [
         'Gas fee payment',
         'Monthly subscription',
@@ -484,7 +482,7 @@ describe('zSanitizedJustification', () => {
       });
     });
 
-    it('should reject common attack patterns', () => {
+    it('rejects common attack patterns', () => {
       const attackPatterns = [
         '<script>alert("XSS")</script>',
         'javascript:alert("XSS")',
