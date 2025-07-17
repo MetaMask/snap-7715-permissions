@@ -3,14 +3,18 @@ import { zSanitizedJustification } from '../src/types/7715-permissions-types';
 describe('zSanitizedJustification', () => {
   describe('Basic validation', () => {
     it('rejects empty strings', () => {
-      expect(() => zSanitizedJustification.parse('')).toThrow('Justification cannot be empty');
-      expect(() => zSanitizedJustification.parse('   ')).toThrow('Justification cannot be empty');
+      expect(() => zSanitizedJustification.parse('')).toThrow(
+        'Justification cannot be empty',
+      );
+      expect(() => zSanitizedJustification.parse('   ')).toThrow(
+        'Justification cannot be empty',
+      );
     });
 
     it('rejects strings longer than 120 characters', () => {
       const longString = 'a'.repeat(121);
       expect(() => zSanitizedJustification.parse(longString)).toThrow(
-        'Justification cannot exceed 120 characters'
+        'Justification cannot exceed 120 characters',
       );
     });
 
@@ -49,7 +53,7 @@ describe('zSanitizedJustification', () => {
       '<meta http-equiv="refresh" content="0;url=evil.com">',
     ])('rejects HTML tag: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
 
@@ -61,7 +65,7 @@ describe('zSanitizedJustification', () => {
       '&amp;lt;script&amp;gt;',
     ])('rejects XML pattern: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
   });
@@ -77,7 +81,7 @@ describe('zSanitizedJustification', () => {
       '{"nested": {"object": "value"}}',
     ])('rejects JSON pattern: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
   });
@@ -100,7 +104,7 @@ describe('zSanitizedJustification', () => {
       'expression(alert("xss"))',
     ])('rejects CSS pattern: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
   });
@@ -117,12 +121,13 @@ describe('zSanitizedJustification', () => {
       'onsubmit="alert(1)"',
     ])('rejects event handler: %s', (handler) => {
       expect(() => zSanitizedJustification.parse(handler)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
   });
 
   describe('Dangerous protocol prevention', () => {
+    /* eslint-disable no-script-url */
     it.each([
       'javascript:alert("xss")',
       'data:text/html,<script>alert(1)</script>',
@@ -131,9 +136,10 @@ describe('zSanitizedJustification', () => {
       'data:image/svg+xml,<svg onload="alert(1)">',
     ])('rejects dangerous protocol: %s', (protocol) => {
       expect(() => zSanitizedJustification.parse(protocol)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
+    /* eslint-enable no-script-url */
   });
 
   describe('Quote prevention', () => {
@@ -143,11 +149,11 @@ describe('zSanitizedJustification', () => {
       'Text with `backticks`',
       'Mixed "quotes" and \'quotes\'',
       'Just a " quote',
-      'Just a \' quote',
+      "Just a ' quote",
       'Just a ` quote',
     ])('rejects quoted string: %s', (quoted) => {
       expect(() => zSanitizedJustification.parse(quoted)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
   });
@@ -171,7 +177,7 @@ describe('zSanitizedJustification', () => {
       'Text with \x7F delete',
     ])('rejects control character: %s', (text) => {
       expect(() => zSanitizedJustification.parse(text)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
 
@@ -189,7 +195,7 @@ describe('zSanitizedJustification', () => {
       'Text with \u200F right-to-left mark',
     ])('rejects RTL/LTR override character: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
 
@@ -200,7 +206,7 @@ describe('zSanitizedJustification', () => {
       'Text with \uFEFF byte order mark',
     ])('rejects zero-width character: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
 
@@ -319,7 +325,7 @@ describe('zSanitizedJustification', () => {
       'Text with \u036F combining double breve above',
     ])('rejects combining diacritical mark: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
 
@@ -353,7 +359,7 @@ describe('zSanitizedJustification', () => {
       'Text with \uFF3A full-width Z',
     ])('rejects full-width character (homograph attack): %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
   });
@@ -367,7 +373,7 @@ describe('zSanitizedJustification', () => {
       'onclick="\u202Ealert(1)\u202C"',
     ])('rejects mixed attack vector: %s', (attack) => {
       expect(() => zSanitizedJustification.parse(attack)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
 
@@ -381,7 +387,9 @@ describe('zSanitizedJustification', () => {
 
       // Test with exactly 120 characters containing spaces
       const maxLengthWithSpaces = 'a '.repeat(60).trim();
-      expect(() => zSanitizedJustification.parse(maxLengthWithSpaces)).not.toThrow();
+      expect(() =>
+        zSanitizedJustification.parse(maxLengthWithSpaces),
+      ).not.toThrow();
     });
 
     it.each([
@@ -391,7 +399,7 @@ describe('zSanitizedJustification', () => {
       '\\u003Cscript\\u003Ealert(1)\\u003C/script\\u003E',
     ])('rejects encoded attack: %s', (attack) => {
       expect(() => zSanitizedJustification.parse(attack)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
   });
@@ -422,6 +430,7 @@ describe('zSanitizedJustification', () => {
       expect(() => zSanitizedJustification.parse(justification)).not.toThrow();
     });
 
+    /* eslint-disable no-script-url */
     it.each([
       '<script>alert("XSS")</script>',
       'javascript:alert("XSS")',
@@ -435,8 +444,9 @@ describe('zSanitizedJustification', () => {
       'vbscript:msgbox("XSS")',
     ])('rejects attack pattern: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns'
+        'Justification contains invalid characters or patterns',
       );
     });
+    /* eslint-enable no-script-url */
   });
-}); 
+});

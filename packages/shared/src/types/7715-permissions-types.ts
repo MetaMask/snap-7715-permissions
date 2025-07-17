@@ -31,6 +31,7 @@ export const zPermission = z.object({
  * - Prevents JSON, XML, control characters, and quotes
  * - Ensures the string is safe for display
  */
+/* eslint-disable no-useless-escape, require-unicode-regexp, no-control-regex, no-misleading-character-class */
 export const zSanitizedJustification = z
   .string()
   .min(1, 'Justification cannot be empty')
@@ -42,7 +43,7 @@ export const zSanitizedJustification = z
         /[<>]/, // Any angle brackets (HTML/XML tags)
         /[{}]/, // Any braces (JSON, CSS blocks)
         /[\[\]]/, // Any brackets (JSON arrays, CSS selectors)
-        /@\w+/, // CSS at-rules (@import, @media, etc.)
+        /@\w+/, // CSS at-rules (@import, @media, etc.
         /:\s*[a-zA-Z]/, // CSS properties or JSON key-value
         /url\s*\(/, // CSS url() functions
         /on\w+\s*=/, // Event handlers
@@ -60,20 +61,19 @@ export const zSanitizedJustification = z
         /&#x[0-9a-fA-F]+;/, // Hex HTML entities
         /\\u[0-9a-fA-F]{4}/, // Unicode escape sequences
       ];
-      
-      return !dangerousPatterns.some(pattern => pattern.test(val));
+
+      return !dangerousPatterns.some((pattern) => pattern.test(val));
     },
     {
-      message: 'Justification contains invalid characters or patterns (markup, scripts, control characters, or quotes are not allowed)',
-    }
+      message:
+        'Justification contains invalid characters or patterns (markup, scripts, control characters, or quotes are not allowed)',
+    },
   )
   .transform((val) => val.trim().replace(/\s+/g, ' ')) // Trim and normalize whitespace
-  .refine(
-    (val) => val.length > 0,
-    {
-      message: 'Justification cannot be empty after sanitization',
-    }
-  );
+  .refine((val) => val.length > 0, {
+    message: 'Justification cannot be empty after sanitization',
+  });
+/* eslint-enable no-useless-escape, require-unicode-regexp, no-control-regex, no-misleading-character-class */
 
 export const zMetaMaskPermissionData = z.object({
   /**
