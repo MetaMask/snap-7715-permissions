@@ -3184,7 +3184,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metamask/abi-utils@npm:^3.0.0":
+"@metamask/abi-utils@npm:3.0.0, @metamask/abi-utils@npm:^3.0.0":
   version: 3.0.0
   resolution: "@metamask/abi-utils@npm:3.0.0"
   dependencies:
@@ -3523,7 +3523,7 @@ __metadata:
   dependencies:
     "@jest/globals": 29.7.0
     "@metamask/7715-permissions-shared": "workspace:*"
-    "@metamask/abi-utils": ^3.0.0
+    "@metamask/abi-utils": 3.0.0
     "@metamask/auto-changelog": 5.0.2
     "@metamask/delegation-core": 0.1.0
     "@metamask/delegation-toolkit": 0.10.2
