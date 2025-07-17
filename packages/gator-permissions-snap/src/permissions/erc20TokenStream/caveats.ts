@@ -4,8 +4,8 @@ import {
   createValueLteTerms,
 } from '@metamask/delegation-core';
 
-import type { DelegationContracts } from '../../core/chainMetadata';
 import type { PopulatedErc20TokenStreamPermission } from './types';
+import type { DelegationContracts } from '../../core/chainMetadata';
 
 /**
  * Appends permission-specific caveats to the caveat builder.

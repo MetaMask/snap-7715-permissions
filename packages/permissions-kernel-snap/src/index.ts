@@ -1,6 +1,9 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { Json, JsonRpcParams } from '@metamask/snaps-sdk';
-import { type OnRpcRequestHandler } from '@metamask/snaps-sdk';
+import type {
+  Json,
+  JsonRpcParams,
+  OnRpcRequestHandler,
+} from '@metamask/snaps-sdk';
 
 import { createPermissionOfferRegistryManager } from './registryManager';
 import { createRpcHandler } from './rpc/rpcHandler';
@@ -25,7 +28,6 @@ const boundRpcHandlers: {
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
- *
  * @param args - The request handler args as object.
  * @param args.origin - The origin of the request, e.g., the website that
  * invoked the snap.

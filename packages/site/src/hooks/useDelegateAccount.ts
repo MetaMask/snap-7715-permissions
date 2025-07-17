@@ -11,7 +11,6 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 /**
  * Creates and manages a delegate account for smart account interactions.
  * This account is used for permissions delegation with Metamask.
- *
  * @param options - The configuration options.
  * @param options.chain - The blockchain chain to connect to.
  * @returns The delegate account state and related data.

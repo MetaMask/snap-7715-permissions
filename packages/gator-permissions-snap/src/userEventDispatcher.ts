@@ -58,7 +58,6 @@ export class UserEventDispatcher {
 
   /**
    * Register an event handler for a specific event type.
-   *
    * @param args - The event handler arguments as object.
    * @param args.elementName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.eventType - The type of event to listen for.
@@ -95,7 +94,6 @@ export class UserEventDispatcher {
 
   /**
    * Deregister an event handler for a specific event type.
-   *
    * @param args - The event handler arguments as object.
    * @param args.elementName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.eventType - The type of event to stop listening for.
@@ -137,7 +135,6 @@ export class UserEventDispatcher {
   /**
    * Creates a user input event handler function that can only be retrieved once.
    * This ensures that only one component (the ConfirmationDialogFactory) can handle user input events.
-   *
    * @returns A function that handles user input events.
    * @throws If the handler has already been created.
    */

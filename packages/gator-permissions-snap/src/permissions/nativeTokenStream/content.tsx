@@ -1,14 +1,6 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Field, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
 
-import { getChainMetadata } from '../../core/chainMetadata';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
-import { renderRules } from '../../core/rules';
-import { AccountDetails } from '../../ui/components/AccountDetails';
-import type { ItemDetails } from '../../ui/components/RequestDetails';
-import { RequestDetails } from '../../ui/components/RequestDetails';
-import { TokenIcon } from '../../ui/components/TokenIcon';
-import { TooltipIcon } from '../../ui/components/TooltipIcon';
 import {
   initialAmountRule,
   maxAmountRule,
@@ -21,10 +13,17 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
+import { getChainMetadata } from '../../core/chainMetadata';
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from '../../core/permissionHandler';
+import { renderRules } from '../../core/rules';
+import { AccountDetails } from '../../ui/components/AccountDetails';
+import type { ItemDetails } from '../../ui/components/RequestDetails';
+import { RequestDetails } from '../../ui/components/RequestDetails';
+import { TokenIcon } from '../../ui/components/TokenIcon';
+import { TooltipIcon } from '../../ui/components/TooltipIcon';
 
 /**
  * Creates the confirmation content for a native token stream permission request.
- *
  * @param options - The options for creating the confirmation content.
  * @param options.context - The context containing stream details and account information.
  * @param options.metadata - The metadata containing stream configuration.

@@ -6,7 +6,6 @@ import type { BaseTokenPermissionContext, IconData } from '../core/types';
  * This function takes a token permission context and extracts the icon data
  * from the token metadata. It returns an IconData object containing the base64
  * encoded icon and alt text, or undefined if no icon data is available.
- *
  * @param context - The token permission context containing token metadata.
  * @returns An IconData object with iconDataBase64 and iconAltText, or undefined if no icon data exists.
  */

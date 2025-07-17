@@ -15,7 +15,6 @@ import { ExternalMethod } from './rpcMethod';
 export type RpcHandler = {
   /**
    * Handles grant permission requests.
-   *
    * @param options - The configuration for the grant permission request.
    * @param options.siteOrigin - The origin of the site requesting the permissions.
    * @param options.params - The parameters for the grant permission request.
@@ -29,7 +28,6 @@ export type RpcHandler = {
 
 /**
  * Creates an RPC handler with methods for handling permission-related RPC requests.
- *
  * @param config - The parameters for creating the RPC handler.
  * @param config.permissionOfferRegistryManager - The manager for the permission offer registry.
  * @param config.snapsProvider - The snaps provider.
@@ -43,7 +41,6 @@ export function createRpcHandler(config: {
 
   /**
    * Handles grant permission requests.
-   *
    * @param options - The configuration for the grant permission request.
    * @param options.siteOrigin - The origin of the site requesting the permissions.
    * @param options.params - The parameters for the grant permission request.
