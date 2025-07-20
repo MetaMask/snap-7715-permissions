@@ -1,13 +1,8 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { Container } from '@metamask/snaps-sdk/jsx';
+import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
-import {
-  ConfirmationFooter,
-  GRANT_BUTTON,
-  CANCEL_BUTTON,
-} from '../ui/components/ConfirmationFooter';
 import type {
   UserEventDispatcher,
   UserEventHandler,
@@ -15,6 +10,9 @@ import type {
 import type { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
+  static #cancelButton = 'cancel-button';
+  static #grantButton = 'grant-button';
+
   readonly #snaps: SnapsProvider;
 
   readonly #userEventDispatcher: UserEventDispatcher;
@@ -76,14 +74,14 @@ export class ConfirmationDialog {
 
       cleanup = async () => {
         this.#userEventDispatcher.off({
-          elementName: GRANT_BUTTON,
+          elementName: ConfirmationDialog.#grantButton,
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId,
           handler: onGrantButtonClick,
         });
 
         this.#userEventDispatcher.off({
-          elementName: CANCEL_BUTTON,
+          elementName: ConfirmationDialog.#cancelButton,
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId,
           handler: onCancelButtonClick,
@@ -104,14 +102,14 @@ export class ConfirmationDialog {
       };
 
       this.#userEventDispatcher.on({
-        elementName: GRANT_BUTTON,
+        elementName: ConfirmationDialog.#grantButton,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: onGrantButtonClick,
       });
 
       this.#userEventDispatcher.on({
-        elementName: CANCEL_BUTTON,
+        elementName: ConfirmationDialog.#cancelButton,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: onCancelButtonClick,
@@ -139,7 +137,14 @@ export class ConfirmationDialog {
     return (
       <Container>
         {this.#ui}
-        <ConfirmationFooter />
+        <Footer>
+          <Button name={ConfirmationDialog.#cancelButton} variant="destructive">
+            Cancel
+          </Button>
+          <Button name={ConfirmationDialog.#grantButton} variant="primary">
+            Grant
+          </Button>
+        </Footer>
       </Container>
     );
   }

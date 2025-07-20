@@ -81,8 +81,8 @@ export class PermissionRequestLifecycleOrchestrator {
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
       return await lifecycleHandlers.createConfirmationContent({
-        context,
-        metadata,
+        //context,
+        //metadata,
         origin,
         chainId,
       });

@@ -8,7 +8,10 @@ import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
-import { PermissionHandlerContent } from './permissionHandlerContent';
+import {
+  PermissionHandlerContent,
+  SkeletonPermissionHandlerContent,
+} from './permissionHandlerContent';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import { RuleModalManager } from './ruleModalManager';
 import { bindRuleHandlers } from './rules';
@@ -22,6 +25,8 @@ import type {
   PermissionHandlerDependencies,
   PermissionHandlerParams,
 } from './types';
+import { getIconData } from '../permissions/iconUtil';
+import { getChainMetadata } from './chainMetadata';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 
@@ -140,30 +145,58 @@ export class PermissionHandler<
       });
     };
 
-    const createConfirmationContentHandler = async (args: {
-      context: TContext;
-      metadata: TMetadata;
+    const createConfirmationContentHandler = async ({
+      context,
+      metadata,
+      origin,
+      chainId,
+    }: {
+      context?: TContext;
+      metadata?: TMetadata;
       origin: string;
       chainId: number;
     }) => {
+      if (!context || !metadata) {
+        return SkeletonPermissionHandlerContent({
+          permissionTitle: this.#permissionTitle,
+        });
+      }
+
+      // todo: this will go away once we remove add-more-rules
       if (this.#addMoreRulesModal?.isModalVisible()) {
         return await this.#addMoreRulesModal.renderModal();
       }
 
       const showAddMoreRulesButton =
         this.#addMoreRulesModal?.hasRulesToAdd({
-          context: args.context,
-          metadata: args.metadata,
+          context,
+          metadata,
         }) ?? false;
+
+      // end-of todo
+
+      const { name: networkName } = getChainMetadata({ chainId });
+
+      const tokenIconData = getIconData(context);
 
       const permissionContent =
         await this.#dependencies.createConfirmationContent({
-          ...args,
-          isJustificationCollapsed: this.#isJustificationCollapsed,
-          showAddMoreRulesButton,
+          context,
+          metadata,
         });
 
+      const {
+        justification,
+        tokenMetadata: { symbol: tokenSymbol },
+      } = context;
+
       return PermissionHandlerContent({
+        origin,
+        justification,
+        networkName,
+        tokenSymbol,
+        tokenIconData,
+        isJustificationCollapsed: this.#isJustificationCollapsed,
         showAddMoreRulesButton,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import type { Hex } from '@metamask/delegation-core';
 
-import type { BaseTokenPermissionContext } from '../../src/core/types';
+import type { BaseContext } from '../../src/core/types';
 import { getIconData } from '../../src/permissions/iconUtil';
 
 describe('iconUtil', () => {
@@ -9,7 +9,7 @@ describe('iconUtil', () => {
     const createMockContext = (
       iconDataBase64: string | null,
       symbol = 'USDC',
-    ): BaseTokenPermissionContext => ({
+    ): BaseContext => ({
       expiry: '05/01/2024',
       isAdjustmentAllowed: true,
       justification: 'Test permission',

@@ -1,4 +1,4 @@
-import type { BaseTokenPermissionContext, IconData } from '../core/types';
+import type { BaseContext, IconData } from '../core/types';
 
 /**
  * Extracts icon data from a token permission context.
@@ -10,9 +10,7 @@ import type { BaseTokenPermissionContext, IconData } from '../core/types';
  * @param context - The token permission context containing token metadata.
  * @returns An IconData object with iconDataBase64 and iconAltText, or undefined if no icon data exists.
  */
-export const getIconData = (
-  context: BaseTokenPermissionContext,
-): IconData | undefined => {
+export const getIconData = (context: BaseContext): IconData | undefined => {
   const { iconDataBase64: iconUrl } = context.tokenMetadata;
   if (!iconUrl) {
     return undefined;

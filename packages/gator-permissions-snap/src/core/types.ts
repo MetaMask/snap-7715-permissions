@@ -40,13 +40,6 @@ export type BaseContext = {
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;
-};
-
-/**
- * Base context for all token permissions.
- * This includes the account details and token metadata.
- */
-export type BaseTokenPermissionContext = BaseContext & {
   accountDetails: {
     address: Hex;
     balanceFormattedAsCurrency: string;
@@ -127,8 +120,8 @@ export type LifecycleOrchestrationHandlers<
   buildContext: (request: TRequest) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   createConfirmationContent: (args: {
-    context: TContext;
-    metadata: TMetadata;
+    context?: TContext;
+    metadata?: TMetadata;
     origin: string;
     chainId: number;
   }) => Promise<GenericSnapElement>;
@@ -312,12 +305,8 @@ export type PermissionHandlerDependencies<
   }) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   createConfirmationContent: (args: {
-    context: TContext;
-    metadata: TMetadata;
-    origin: string;
-    chainId: number;
-    isJustificationCollapsed: boolean;
-    showAddMoreRulesButton: boolean;
+    context?: TContext;
+    metadata?: TMetadata;
   }) => Promise<GenericSnapElement>;
   applyContext: (args: {
     context: TContext;
