@@ -12,6 +12,7 @@ import type {
   BaseTokenPermissionContext,
 } from '../../core/types';
 
+
 export type NativeTokenStreamMetadata = {
   amountPerSecond: string;
   validationErrors: {
