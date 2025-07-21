@@ -119,9 +119,10 @@ export type LifecycleOrchestrationHandlers<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (request: TRequest) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
+  createSkeletonConfirmationContent: () => Promise<GenericSnapElement>;
   createConfirmationContent: (args: {
-    context?: TContext;
-    metadata?: TMetadata;
+    context: TContext;
+    metadata: TMetadata;
     origin: string;
     chainId: number;
   }) => Promise<GenericSnapElement>;

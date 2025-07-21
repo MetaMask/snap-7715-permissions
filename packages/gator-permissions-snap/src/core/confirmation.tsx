@@ -43,7 +43,7 @@ export class ConfirmationDialog {
     return this.#interfaceId;
   }
 
-  async awaitUserDecision(): Promise<{
+  async displayConfirmationDialogAndAwaitUserDecision(): Promise<{
     isConfirmationGranted: boolean;
   }> {
     if (!this.#interfaceId) {

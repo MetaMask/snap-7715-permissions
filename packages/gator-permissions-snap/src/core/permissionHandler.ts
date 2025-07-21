@@ -145,23 +145,23 @@ export class PermissionHandler<
       });
     };
 
+    const createSkeletonConfirmationContentHandler = async () => {
+      return SkeletonPermissionHandlerContent({
+        permissionTitle: this.#permissionTitle,
+      });
+    };
+
     const createConfirmationContentHandler = async ({
       context,
       metadata,
       origin,
       chainId,
     }: {
-      context?: TContext;
-      metadata?: TMetadata;
+      context: TContext;
+      metadata: TMetadata;
       origin: string;
       chainId: number;
     }) => {
-      if (!context || !metadata) {
-        return SkeletonPermissionHandlerContent({
-          permissionTitle: this.#permissionTitle,
-        });
-      }
-
       // todo: this will go away once we remove add-more-rules
       if (this.#addMoreRulesModal?.isModalVisible()) {
         return await this.#addMoreRulesModal.renderModal();
@@ -288,6 +288,8 @@ export class PermissionHandler<
       deriveMetadata,
       buildContext: buildContextHandler,
       createConfirmationContent: createConfirmationContentHandler,
+      createSkeletonConfirmationContent:
+        createSkeletonConfirmationContentHandler,
       onConfirmationCreated: onConfirmationCreatedHandler,
       onConfirmationResolved: onConfirmationResolvedHandler,
     };

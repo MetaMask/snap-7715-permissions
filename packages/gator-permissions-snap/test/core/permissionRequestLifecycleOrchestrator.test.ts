@@ -135,10 +135,14 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     mockConfirmationDialogFactory.createConfirmation.mockReturnValue(
       mockConfirmationDialog,
     );
-    mockConfirmationDialog.createInterface.mockResolvedValue(mockInterfaceId);
-    mockConfirmationDialog.awaitUserDecision.mockResolvedValue({
-      isConfirmationGranted: true,
-    });
+    mockConfirmationDialog.displayConfirmation.mockResolvedValue(
+      mockInterfaceId,
+    );
+    mockConfirmationDialog.displayConfirmationAndAwaitUserDecision.mockResolvedValue(
+      {
+        isConfirmationGranted: true,
+      },
+    );
     mockConfirmationDialog.updateContent.mockResolvedValue(undefined);
 
     permissionRequestLifecycleOrchestrator =
@@ -184,9 +188,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       it('returns failure if user rejects the request', async () => {
-        mockConfirmationDialog.awaitUserDecision.mockResolvedValueOnce({
-          isConfirmationGranted: false,
-        });
+        mockConfirmationDialog.displayConfirmationAndAwaitUserDecision.mockResolvedValueOnce(
+          {
+            isConfirmationGranted: false,
+          },
+        );
         const result = await permissionRequestLifecycleOrchestrator.orchestrate(
           'test-origin',
           mockPermissionRequest,
@@ -267,7 +273,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         let resolveUserDecision: (decision: boolean) => void = (_) => {
           throw new Error('resolveUserDecision not set');
         };
-        mockConfirmationDialog.awaitUserDecision.mockImplementation(
+        mockConfirmationDialog.displayConfirmationAndAwaitUserDecision.mockImplementation(
           async () => {
             const isConfirmationGranted = await new Promise<boolean>(
               (resolve) => {
@@ -346,9 +352,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(mockConfirmationDialog.updateContent).not.toHaveBeenCalled();
 
-        mockConfirmationDialog.awaitUserDecision.mockResolvedValue({
-          isConfirmationGranted: true,
-        });
+        mockConfirmationDialog.displayConfirmationAndAwaitUserDecision.mockResolvedValue(
+          {
+            isConfirmationGranted: true,
+          },
+        );
 
         await orchestrationPromise;
       });
@@ -415,8 +423,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           ui: mockUiContent,
         });
-        expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();
-        expect(mockConfirmationDialog.awaitUserDecision).toHaveBeenCalled();
+        expect(mockConfirmationDialog.displayConfirmation).toHaveBeenCalled();
+        expect(
+          mockConfirmationDialog.displayConfirmationAndAwaitUserDecision,
+        ).toHaveBeenCalled();
       });
 
       /*
