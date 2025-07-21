@@ -200,6 +200,79 @@ describe('EoaAccountController', () => {
         }),
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
+
+    it('calls eth_signTypedData_v4 with the correct params', async () => {
+      await accountController.signDelegation({
+        chainId: sepolia,
+        delegation: unsignedDelegation,
+      });
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledWith({
+        method: 'eth_signTypedData_v4',
+        params: [
+          mockAddress,
+          {
+            domain: {
+              chainId: sepolia,
+              name: 'DelegationManager',
+              version: '1',
+              verifyingContract: '0xdb9B1e94B5b69Df7e401DDbedE43491141047dB3',
+            },
+            types: {
+              Caveat: [
+                { name: 'enforcer', type: 'address' },
+                { name: 'terms', type: 'bytes' },
+              ],
+              Delegation: [
+                {
+                  name: 'delegate',
+                  type: 'address',
+                },
+                {
+                  name: 'delegator',
+                  type: 'address',
+                },
+                {
+                  name: 'authority',
+                  type: 'bytes32',
+                },
+                {
+                  name: 'caveats',
+                  type: 'Caveat[]',
+                },
+                {
+                  name: 'salt',
+                  type: 'uint256',
+                },
+              ],
+              EIP712Domain: [
+                {
+                  name: 'name',
+                  type: 'string',
+                },
+                {
+                  name: 'version',
+                  type: 'string',
+                },
+                {
+                  name: 'chainId',
+                  type: 'uint256',
+                },
+                {
+                  name: 'verifyingContract',
+                  type: 'address',
+                },
+              ],
+            },
+            primaryType: 'Delegation',
+            message: {
+              ...unsignedDelegation,
+              salt: '0x1',
+            },
+          },
+        ],
+      });
+    });
   });
 
   describe('getAccountMetadata()', () => {
