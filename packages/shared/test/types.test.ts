@@ -93,6 +93,15 @@ describe('zSanitizedJustification', () => {
       '@keyframes slide { from { left: 0 } }',
       '@font-face { font-family: Arial }',
       'url("data:text/css,body{display:none}")',
+      'behavior: url("evil.htc")',
+      'expression(alert("xss"))',
+    ])('rejects dangerous CSS pattern: %s', (pattern) => {
+      expect(() => zSanitizedJustification.parse(pattern)).toThrow(
+        'Justification contains invalid characters or patterns',
+      );
+    });
+
+    it.each([
       'position: absolute; z-index: 9999',
       'overflow: hidden',
       '-webkit-transform: translateX(100px)',
@@ -100,12 +109,8 @@ describe('zSanitizedJustification', () => {
       '-ms-transform: rotate(45deg)',
       '-o-transition: all 0.3s',
       'filter: blur(5px)',
-      'behavior: url("evil.htc")',
-      'expression(alert("xss"))',
-    ])('rejects CSS pattern: %s', (pattern) => {
-      expect(() => zSanitizedJustification.parse(pattern)).toThrow(
-        'Justification contains invalid characters or patterns',
-      );
+    ])('allows benign CSS pattern: %s', (pattern) => {
+      expect(() => zSanitizedJustification.parse(pattern)).not.toThrow();
     });
   });
 
@@ -145,16 +150,25 @@ describe('zSanitizedJustification', () => {
   describe('Quote prevention', () => {
     it.each([
       'Text with "double quotes"',
-      "Text with 'single quotes'",
       'Text with `backticks`',
-      'Mixed "quotes" and \'quotes\'',
+      'Mixed "quotes" and `backticks`',
       'Just a " quote',
-      "Just a ' quote",
       'Just a ` quote',
-    ])('rejects quoted string: %s', (quoted) => {
+    ])('rejects dangerous quotes: %s', (quoted) => {
       expect(() => zSanitizedJustification.parse(quoted)).toThrow(
         'Justification contains invalid characters or patterns',
       );
+    });
+
+    it.each([
+      "Text with 'single quotes'",
+      "It's a test case",
+      "Don't worry about it",
+      "We'll handle this",
+      "Can't proceed without it",
+      "Just a ' quote",
+    ])('allows apostrophes: %s', (quoted) => {
+      expect(() => zSanitizedJustification.parse(quoted)).not.toThrow();
     });
   });
 

@@ -44,18 +44,17 @@ export const zSanitizedJustification = z
         /[{}]/, // Any braces (JSON, CSS blocks)
         /[\[\]]/, // Any brackets (JSON arrays, CSS selectors)
         /@\w+/, // CSS at-rules (@import, @media, etc.
-        /:\s*[a-zA-Z]/, // CSS properties or JSON key-value
+        /expression\s*\(/, // CSS expressions (security risk)
+        /behavior\s*:\s*url/, // CSS behaviors (security risk)
         /url\s*\(/, // CSS url() functions
         /on\w+\s*=/, // Event handlers
         /javascript:|data:|vbscript:/, // Dangerous protocols
-        /-webkit-|-moz-|-ms-|-o-/, // CSS vendor prefixes
-        /['"`]/, // Quotes
-        /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/, // Control characters (excluding \t and \n)
+        /["`]/, // Double quotes and backticks (allow apostrophes for contractions)
+        /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/, // Control characters (excluding \t and \n)
         /[\u202E\u202D\u202C\u200E\u200F]/, // RTL/LTR override characters
         /[\u200B\u200C\u200D\uFEFF]/, // Zero-width characters
         /[\u0300-\u036F\u1AB0-\u1AFF\u20D0-\u20FF]/, // Combining diacritical marks
         /[\uFF00-\uFFEF]/, // Full-width characters (homograph attacks)
-        /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/, // Control characters except \t (0x09) and \n (0x0A)
         /&[a-zA-Z]+;/, // HTML entities
         /&#\d+;/, // Numeric HTML entities
         /&#x[0-9a-fA-F]+;/, // Hex HTML entities
@@ -71,7 +70,7 @@ export const zSanitizedJustification = z
   )
   .transform((val) => val.trim().replace(/\s+/g, ' ')) // Trim and normalize whitespace
   .refine((val) => val.length > 0, {
-    message: 'Justification cannot be empty after sanitization',
+    message: 'Justification cannot be empty',
   });
 /* eslint-enable no-useless-escape, require-unicode-regexp, no-control-regex, no-misleading-character-class */
 
