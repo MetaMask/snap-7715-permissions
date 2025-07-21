@@ -2,12 +2,14 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../accountController';
+import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
+import { getChainMetadata } from './chainMetadata';
 import {
   PermissionHandlerContent,
   SkeletonPermissionHandlerContent,
@@ -25,8 +27,6 @@ import type {
   PermissionHandlerDependencies,
   PermissionHandlerParams,
 } from './types';
-import { getIconData } from '../permissions/iconUtil';
-import { getChainMetadata } from './chainMetadata';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 

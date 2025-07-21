@@ -79,7 +79,7 @@ const mockAccountController = {
 
 const mockConfirmationDialog = {
   createInterface: jest.fn(),
-  awaitUserDecision: jest.fn(),
+  displayConfirmationDialogAndAwaitUserDecision: jest.fn(),
   updateContent: jest.fn(),
 } as unknown as jest.Mocked<ConfirmationDialog>;
 
@@ -91,6 +91,7 @@ type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
   deriveMetadata: jest.Mock;
+  createSkeletonConfirmationContent: jest.Mock;
   createConfirmationContent: jest.Mock;
   applyContext: jest.Mock;
   populatePermission: jest.Mock;
@@ -110,6 +111,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       parseAndValidatePermission: jest.fn().mockImplementation((req) => req),
       buildContext: jest.fn().mockResolvedValue(mockContext),
       deriveMetadata: jest.fn().mockResolvedValue(mockMetadata),
+      createSkeletonConfirmationContent: jest
+        .fn()
+        .mockResolvedValue(mockUiContent),
       createConfirmationContent: jest.fn().mockResolvedValue(mockUiContent),
       applyContext: jest.fn().mockResolvedValue(mockResolvedPermissionRequest),
       populatePermission: jest.fn().mockResolvedValue(mockPopulatedPermission),
@@ -135,10 +139,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     mockConfirmationDialogFactory.createConfirmation.mockReturnValue(
       mockConfirmationDialog,
     );
-    mockConfirmationDialog.displayConfirmation.mockResolvedValue(
-      mockInterfaceId,
-    );
-    mockConfirmationDialog.displayConfirmationAndAwaitUserDecision.mockResolvedValue(
+    mockConfirmationDialog.createInterface.mockResolvedValue(mockInterfaceId);
+    mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
       {
         isConfirmationGranted: true,
       },
@@ -188,7 +190,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       it('returns failure if user rejects the request', async () => {
-        mockConfirmationDialog.displayConfirmationAndAwaitUserDecision.mockResolvedValueOnce(
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValueOnce(
           {
             isConfirmationGranted: false,
           },
@@ -273,7 +275,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         let resolveUserDecision: (decision: boolean) => void = (_) => {
           throw new Error('resolveUserDecision not set');
         };
-        mockConfirmationDialog.displayConfirmationAndAwaitUserDecision.mockImplementation(
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
           async () => {
             const isConfirmationGranted = await new Promise<boolean>(
               (resolve) => {
@@ -350,9 +352,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           }),
         ).rejects.toThrow('Adjustment is not allowed');
 
-        expect(mockConfirmationDialog.updateContent).not.toHaveBeenCalled();
+        // this is called once when the context is first resolved
+        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(1);
 
-        mockConfirmationDialog.displayConfirmationAndAwaitUserDecision.mockResolvedValue(
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
           {
             isConfirmationGranted: true,
           },
@@ -423,9 +426,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           ui: mockUiContent,
         });
-        expect(mockConfirmationDialog.displayConfirmation).toHaveBeenCalled();
+        expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();
         expect(
-          mockConfirmationDialog.displayConfirmationAndAwaitUserDecision,
+          mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision,
         ).toHaveBeenCalled();
       });
 

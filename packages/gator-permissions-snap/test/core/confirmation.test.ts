@@ -4,10 +4,6 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { type GenericSnapElement, Text } from '@metamask/snaps-sdk/jsx';
 
 import { ConfirmationDialog } from '../../src/core/confirmation';
-import {
-  GRANT_BUTTON,
-  CANCEL_BUTTON,
-} from '../../src/ui/components/ConfirmationFooter';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 describe('ConfirmationDialog', () => {
@@ -45,7 +41,7 @@ describe('ConfirmationDialog', () => {
     it('should create a new interface if one does not exist', async () => {
       mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
 
-      const result = await confirmationDialog.displayConfirmation();
+      const result = await confirmationDialog.createInterface();
 
       expect(result).toBe(mockInterfaceId);
       expect(mockSnaps.request).toHaveBeenCalledWith({
@@ -61,21 +57,21 @@ describe('ConfirmationDialog', () => {
       mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
 
       // Create interface first time
-      await confirmationDialog.displayConfirmation();
+      await confirmationDialog.createInterface();
       mockSnaps.request.mockClear();
 
       // Create interface second time
-      const result = await confirmationDialog.displayConfirmation();
+      const result = await confirmationDialog.createInterface();
 
       expect(result).toBe(mockInterfaceId);
       expect(mockSnaps.request).not.toHaveBeenCalled();
     });
   });
 
-  describe('awaitUserDecision()', () => {
+  describe('displayConfirmationDialogAndAwaitUserDecision()', () => {
     beforeEach(async () => {
       mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
-      await confirmationDialog.displayConfirmation();
+      await confirmationDialog.createInterface();
       mockSnaps.request.mockClear();
     });
 
@@ -87,17 +83,17 @@ describe('ConfirmationDialog', () => {
       });
 
       await expect(
-        newDialog.displayConfirmationAndAwaitUserDecision(),
+        newDialog.displayConfirmationDialogAndAwaitUserDecision(),
       ).rejects.toThrow(
-        'Interface not yet created. Call createInterface first.',
+        'Interface not yet created. Call createInterface() first.',
       );
     });
 
     it('should resolve with true when grant button clicked', async () => {
       const awaitingUserDecision =
-        confirmationDialog.displayConfirmationAndAwaitUserDecision();
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (call) => call[0].elementName === GRANT_BUTTON,
+        (call) => call[0].elementName === 'grant-button',
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
@@ -115,9 +111,9 @@ describe('ConfirmationDialog', () => {
 
     it('should resolve with false when cancel button clicked', async () => {
       const awaitingUserDecision =
-        confirmationDialog.displayConfirmationAndAwaitUserDecision();
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (call) => call[0].elementName === CANCEL_BUTTON,
+        (call) => call[0].elementName === 'cancel-button',
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
@@ -135,9 +131,9 @@ describe('ConfirmationDialog', () => {
 
     it('should clean up event listeners after decision', async () => {
       const awaitingUserDecision =
-        confirmationDialog.displayConfirmationAndAwaitUserDecision();
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (call) => call[0].elementName === GRANT_BUTTON,
+        (call) => call[0].elementName === 'grant-button',
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
@@ -170,12 +166,14 @@ describe('ConfirmationDialog', () => {
 
       await expect(
         confirmationDialog.updateContent({ ui: updatedUi }),
-      ).rejects.toThrow('Cannot update content before dialog is created');
+      ).rejects.toThrow(
+        'Interface not yet created. Call createInterface() first.',
+      );
     });
 
     it('should update interface content', async () => {
       mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
-      await confirmationDialog.displayConfirmation();
+      await confirmationDialog.createInterface();
       mockSnaps.request.mockClear();
 
       const updatedUi = Text({

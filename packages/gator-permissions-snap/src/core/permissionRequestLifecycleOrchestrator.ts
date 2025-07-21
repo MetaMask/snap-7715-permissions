@@ -101,7 +101,7 @@ export class PermissionRequestLifecycleOrchestrator {
     };
 
     // replace the skeleton content with the actual content rendered with the resolved context
-    updateConfirmation(context);
+    await updateConfirmation(context);
 
     const isAdjustmentAllowed = permissionRequest.isAdjustmentAllowed ?? true;
 
@@ -258,23 +258,11 @@ export class PermissionRequestLifecycleOrchestrator {
       salt: BigInt(salt),
     } as const;
 
-    console.log('Signing delegation');
-
-    console.log(
-      JSON.stringify(
-        delegation,
-        (_, v) => (typeof v === 'bigint' ? `${v.toString()}n` : v),
-        2,
-      ),
-    );
-
     const signedDelegation: Delegation =
       await this.#accountController.signDelegation({
         chainId,
         delegation,
       });
-
-    console.log('Signed delegation!');
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 

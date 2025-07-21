@@ -306,8 +306,8 @@ export type PermissionHandlerDependencies<
   }) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   createConfirmationContent: (args: {
-    context?: TContext;
-    metadata?: TMetadata;
+    context: TContext;
+    metadata: TMetadata;
   }) => Promise<GenericSnapElement>;
   applyContext: (args: {
     context: TContext;

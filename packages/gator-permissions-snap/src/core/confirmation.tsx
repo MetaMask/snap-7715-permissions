@@ -11,7 +11,11 @@ import type { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
   static #cancelButton = 'cancel-button';
+
   static #grantButton = 'grant-button';
+
+  static #interfaceNotCreatedError =
+    'Interface not yet created. Call createInterface() first.';
 
   readonly #snaps: SnapsProvider;
 
@@ -47,7 +51,7 @@ export class ConfirmationDialog {
     isConfirmationGranted: boolean;
   }> {
     if (!this.#interfaceId) {
-      throw new Error('Interface not yet created. Call createInterface first.');
+      throw new Error(ConfirmationDialog.#interfaceNotCreatedError);
     }
     const interfaceId = this.#interfaceId;
 
@@ -151,7 +155,7 @@ export class ConfirmationDialog {
 
   async updateContent({ ui }: { ui: GenericSnapElement }): Promise<void> {
     if (!this.#interfaceId) {
-      throw new Error('Cannot update content before dialog is created');
+      throw new Error(ConfirmationDialog.#interfaceNotCreatedError);
     }
 
     this.#ui = ui;

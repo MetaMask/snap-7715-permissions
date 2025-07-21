@@ -7,13 +7,14 @@ import {
   Skeleton,
   Text,
 } from '@metamask/snaps-sdk/jsx';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
+
 import {
   ShowMoreText,
   SkeletonField,
   TextField,
   TooltipIcon,
 } from '../ui/components';
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { IconData } from './types';
 
 export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
@@ -48,6 +49,12 @@ export type PermissionHandlerContentProps = {
  * @param options.showAddMoreRulesButton - Whether to show the "Add more rules" button.
  * @param options.children - The children of the content.
  * @param options.permissionTitle - The title of the permission.
+ * @param options.origin - The origin of the permission request.
+ * @param options.justification - The justification for the permission request.
+ * @param options.networkName - The name of the network.
+ * @param options.tokenSymbol - The symbol of the token.
+ * @param options.tokenIconData - The icon data of the token.
+ * @param options.isJustificationCollapsed - Whether the justification is collapsed.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
