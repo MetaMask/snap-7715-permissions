@@ -34,6 +34,7 @@ describe('ConfirmationDialog', () => {
       ...defaultProps,
       snaps: mockSnaps,
       userEventDispatcher: mockUserEventDispatcher,
+      isGrantDisabled: false,
     });
   });
 
@@ -80,6 +81,7 @@ describe('ConfirmationDialog', () => {
         ...defaultProps,
         snaps: mockSnaps,
         userEventDispatcher: mockUserEventDispatcher,
+        isGrantDisabled: false,
       });
 
       await expect(
@@ -165,7 +167,10 @@ describe('ConfirmationDialog', () => {
       }) as GenericSnapElement;
 
       await expect(
-        confirmationDialog.updateContent({ ui: updatedUi }),
+        confirmationDialog.updateContent({
+          ui: updatedUi,
+          isGrantDisabled: false,
+        }),
       ).rejects.toThrow(
         'Interface not yet created. Call createInterface() first.',
       );
@@ -180,7 +185,10 @@ describe('ConfirmationDialog', () => {
         children: 'Updated content',
       }) as GenericSnapElement;
 
-      await confirmationDialog.updateContent({ ui: updatedUi });
+      await confirmationDialog.updateContent({
+        ui: updatedUi,
+        isGrantDisabled: false,
+      });
 
       expect(mockSnaps.request).toHaveBeenCalledWith({
         method: 'snap_updateInterface',

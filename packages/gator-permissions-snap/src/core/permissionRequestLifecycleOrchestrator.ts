@@ -72,6 +72,7 @@ export class PermissionRequestLifecycleOrchestrator {
     const confirmationDialog =
       this.#confirmationDialogFactory.createConfirmation({
         ui: await lifecycleHandlers.createSkeletonConfirmationContent(),
+        isGrantDisabled: true,
       });
 
     const interfaceId = await confirmationDialog.createInterface();
@@ -85,7 +86,13 @@ export class PermissionRequestLifecycleOrchestrator {
       validatedPermissionRequest,
     );
 
-    const updateConfirmation = async (newContext: TContext) => {
+    const updateConfirmation = async ({
+      newContext,
+      isGrantDisabled,
+    }: {
+      newContext: TContext;
+      isGrantDisabled: boolean;
+    }) => {
       context = newContext;
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
@@ -97,11 +104,14 @@ export class PermissionRequestLifecycleOrchestrator {
         chainId,
       });
 
-      await confirmationDialog.updateContent({ ui });
+      await confirmationDialog.updateContent({ ui, isGrantDisabled });
     };
 
     // replace the skeleton content with the actual content rendered with the resolved context
-    await updateConfirmation(context);
+    await updateConfirmation({
+      newContext: context,
+      isGrantDisabled: false,
+    });
 
     const isAdjustmentAllowed = permissionRequest.isAdjustmentAllowed ?? true;
 
@@ -115,7 +125,10 @@ export class PermissionRequestLifecycleOrchestrator {
           throw new Error('Adjustment is not allowed');
         }
 
-        await updateConfirmation(updatedContext);
+        await updateConfirmation({
+          newContext: updatedContext,
+          isGrantDisabled: false,
+        });
       };
 
       lifecycleHandlers.onConfirmationCreated({

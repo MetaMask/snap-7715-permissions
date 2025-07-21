@@ -91,11 +91,13 @@ export enum TimePeriod {
  * Properties required for confirmation dialogs.
  *
  * @property ui - The UI element to be displayed in the confirmation dialog
+ * @property isGrantDisabled - Whether the user can grant the permission
  * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
  */
 export type ConfirmationProps = {
   ui: GenericSnapElement;
+  isGrantDisabled: boolean;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
 };

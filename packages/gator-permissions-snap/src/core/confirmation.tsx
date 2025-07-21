@@ -25,8 +25,16 @@ export class ConfirmationDialog {
 
   #interfaceId: string | undefined;
 
-  constructor({ ui, snaps, userEventDispatcher }: ConfirmationProps) {
+  #isGrantDisabled: boolean;
+
+  constructor({
+    ui,
+    isGrantDisabled,
+    snaps,
+    userEventDispatcher,
+  }: ConfirmationProps) {
     this.#ui = ui;
+    this.#isGrantDisabled = isGrantDisabled;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
   }
@@ -145,7 +153,11 @@ export class ConfirmationDialog {
           <Button name={ConfirmationDialog.#cancelButton} variant="destructive">
             Cancel
           </Button>
-          <Button name={ConfirmationDialog.#grantButton} variant="primary">
+          <Button
+            name={ConfirmationDialog.#grantButton}
+            variant="primary"
+            disabled={this.#isGrantDisabled}
+          >
             Grant
           </Button>
         </Footer>
@@ -153,12 +165,19 @@ export class ConfirmationDialog {
     );
   }
 
-  async updateContent({ ui }: { ui: GenericSnapElement }): Promise<void> {
+  async updateContent({
+    ui,
+    isGrantDisabled,
+  }: {
+    ui: GenericSnapElement;
+    isGrantDisabled: boolean;
+  }): Promise<void> {
     if (!this.#interfaceId) {
       throw new Error(ConfirmationDialog.#interfaceNotCreatedError);
     }
 
     this.#ui = ui;
+    this.#isGrantDisabled = isGrantDisabled;
 
     await this.#snaps.request({
       method: 'snap_updateInterface',
