@@ -1,7 +1,7 @@
 import { type Hex } from 'viem';
 
 export type BasePermissionRequest = {
-  justification: string;
+  justification: string | null;
   startTime: number;
   expiry: number;
   isAdjustmentAllowed: boolean;

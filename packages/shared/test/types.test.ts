@@ -1,14 +1,27 @@
 import { zSanitizedJustification } from '../src/types/7715-permissions-types';
 
+const DEFAULT_JUSTIFICATION_MESSAGE = 'No justification was provided for the permission';
+
 describe('zSanitizedJustification', () => {
+  describe('Optional validation', () => {
+    it('accepts null and returns default message', () => {
+      const result = zSanitizedJustification.parse(null);
+      expect(result).toBe(DEFAULT_JUSTIFICATION_MESSAGE);
+    });
+
+    it('accepts undefined and returns default message', () => {
+      const result = zSanitizedJustification.parse(undefined);
+      expect(result).toBe(DEFAULT_JUSTIFICATION_MESSAGE);
+    });
+  });
+
   describe('Basic validation', () => {
-    it('rejects empty strings', () => {
-      expect(() => zSanitizedJustification.parse('')).toThrow(
-        'Justification cannot be empty',
-      );
-      expect(() => zSanitizedJustification.parse('   ')).toThrow(
-        'Justification cannot be empty',
-      );
+    it('accepts empty strings and returns default message', () => {
+      const result1 = zSanitizedJustification.parse('');
+      expect(result1).toBe(DEFAULT_JUSTIFICATION_MESSAGE);
+      
+      const result2 = zSanitizedJustification.parse('   ');
+      expect(result2).toBe(DEFAULT_JUSTIFICATION_MESSAGE);
     });
 
     it('rejects strings longer than 120 characters', () => {
@@ -183,8 +196,6 @@ describe('zSanitizedJustification', () => {
       'Text with \x06 acknowledge',
       'Text with \x07 bell',
       'Text with \x08 backspace',
-      'Text with \x0B vertical tab',
-      'Text with \x0C form feed',
       'Text with \x0E shift out',
       'Text with \x0F shift in',
       'Text with \x1F unit separator',
@@ -193,6 +204,16 @@ describe('zSanitizedJustification', () => {
       expect(() => zSanitizedJustification.parse(text)).toThrow(
         'Justification contains invalid characters or patterns',
       );
+    });
+
+    it('allows vertical tab that gets normalized to space', () => {
+      const result = zSanitizedJustification.parse('Text with \x0B vertical tab');
+      expect(result).toBe('Text with vertical tab');
+    });
+
+    it('allows form feed that gets normalized to space', () => {
+      const result = zSanitizedJustification.parse('Text with \x0C form feed');
+      expect(result).toBe('Text with form feed');
     });
 
     it('allows newlines and tabs (they get normalized to spaces)', () => {
@@ -217,11 +238,15 @@ describe('zSanitizedJustification', () => {
       'Text with \u200B zero-width space',
       'Text with \u200C zero-width non-joiner',
       'Text with \u200D zero-width joiner',
-      'Text with \uFEFF byte order mark',
     ])('rejects zero-width character: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).toThrow(
         'Justification contains invalid characters or patterns',
       );
+    });
+
+    it('allows byte order mark that gets normalized', () => {
+      const result = zSanitizedJustification.parse('Text with \uFEFF byte order mark');
+      expect(result).toBe('Text with byte order mark');
     });
 
     it.each([

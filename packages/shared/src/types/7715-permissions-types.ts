@@ -25,53 +25,81 @@ export const zPermission = z.object({
 });
 
 /**
+ * Default message for when no justification is provided
+ */
+const DEFAULT_JUSTIFICATION_MESSAGE = 'No justification was provided for the permission';
+
+/**
  * Sanitized justification schema that:
+ * - Makes justification optional (null/undefined/empty becomes default message)
  * - Limits length to 120 characters
- * - Trims excessive whitespace
- * - Prevents JSON, XML, control characters, and quotes
+ * - Trims excessive whitespace and normalizes control characters
+ * - Prevents JSON, XML, dangerous control characters, and quotes
  * - Ensures the string is safe for display
  */
 /* eslint-disable no-useless-escape, require-unicode-regexp, no-control-regex, no-misleading-character-class */
 export const zSanitizedJustification = z
   .string()
-  .min(1, 'Justification cannot be empty')
-  .max(120, 'Justification cannot exceed 120 characters')
-  .refine(
-    (val) => {
-      // Check for markup/script patterns (covers HTML, XML, JSON, CSS)
-      const dangerousPatterns = [
-        /[<>]/, // Any angle brackets (HTML/XML tags)
-        /[{}]/, // Any braces (JSON, CSS blocks)
-        /[\[\]]/, // Any brackets (JSON arrays, CSS selectors)
-        /@\w+/, // CSS at-rules (@import, @media, etc.
-        /expression\s*\(/, // CSS expressions (security risk)
-        /behavior\s*:\s*url/, // CSS behaviors (security risk)
-        /url\s*\(/, // CSS url() functions
-        /on\w+\s*=/, // Event handlers
-        /javascript:|data:|vbscript:/, // Dangerous protocols
-        /["`]/, // Double quotes and backticks (allow apostrophes for contractions)
-        /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/, // Control characters (excluding \t and \n)
-        /[\u202E\u202D\u202C\u200E\u200F]/, // RTL/LTR override characters
-        /[\u200B\u200C\u200D\uFEFF]/, // Zero-width characters
-        /[\u0300-\u036F\u1AB0-\u1AFF\u20D0-\u20FF]/, // Combining diacritical marks
-        /[\uFF00-\uFFEF]/, // Full-width characters (homograph attacks)
-        /&[a-zA-Z]+;/, // HTML entities
-        /&#\d+;/, // Numeric HTML entities
-        /&#x[0-9a-fA-F]+;/, // Hex HTML entities
-        /\\u[0-9a-fA-F]{4}/, // Unicode escape sequences
-      ];
+  .nullable()
+  .optional()
+  .transform((val) => {
+    // If null/undefined, return default message
+    if (val === null || val === undefined) {
+      return DEFAULT_JUSTIFICATION_MESSAGE;
+    }
+    return val;
+  })
+  .pipe(
+    z
+      .string()
+      .transform((val) => {
+        // Trim and normalize whitespace first
+        const trimmed = val.trim().replace(/\s+/g, ' ');
+        // If empty after trimming, return default message
+        if (trimmed.length === 0) {
+          return DEFAULT_JUSTIFICATION_MESSAGE;
+        }
+        return trimmed;
+      })
+      .pipe(
+        z
+          .string()
+          .min(1, 'Justification cannot be empty')
+          .max(120, 'Justification cannot exceed 120 characters')
+          .refine(
+            (val) => {
+              // Check for markup/script patterns (covers HTML, XML, JSON, CSS)
+              const dangerousPatterns = [
+                /[<>]/, // Any angle brackets (HTML/XML tags)
+                /[{}]/, // Any braces (JSON, CSS blocks)
+                /[\[\]]/, // Any brackets (JSON arrays, CSS selectors)
+                /@\w+/, // CSS at-rules (@import, @media, etc.
+                /expression\s*\(/, // CSS expressions (security risk)
+                /behavior\s*:\s*url/, // CSS behaviors (security risk)
+                /url\s*\(/, // CSS url() functions
+                /on\w+\s*=/, // Event handlers
+                /javascript:|data:|vbscript:/, // Dangerous protocols
+                /["`]/, // Double quotes and backticks (allow apostrophes for contractions)
+                /[\u0000-\u0008\u000E-\u001F\u007F]/, // Control characters (excluding \t, \n, \v, \f)
+                /[\u202E\u202D\u202C\u200E\u200F]/, // RTL/LTR override characters
+                /[\u200B\u200C\u200D\uFEFF]/, // Zero-width characters
+                /[\u0300-\u036F\u1AB0-\u1AFF\u20D0-\u20FF]/, // Combining diacritical marks
+                /[\uFF00-\uFFEF]/, // Full-width characters (homograph attacks)
+                /&[a-zA-Z]+;/, // HTML entities
+                /&#\d+;/, // Numeric HTML entities
+                /&#x[0-9a-fA-F]+;/, // Hex HTML entities
+                /\\u[0-9a-fA-F]{4}/, // Unicode escape sequences
+              ];
 
-      return !dangerousPatterns.some((pattern) => pattern.test(val));
-    },
-    {
-      message:
-        'Justification contains invalid characters or patterns (markup, scripts, control characters, or quotes are not allowed)',
-    },
-  )
-  .transform((val) => val.trim().replace(/\s+/g, ' ')) // Trim and normalize whitespace
-  .refine((val) => val.length > 0, {
-    message: 'Justification cannot be empty',
-  });
+              return !dangerousPatterns.some((pattern) => pattern.test(val));
+            },
+            {
+              message:
+                'Justification contains invalid characters or patterns (markup, scripts, control characters, or quotes are not allowed)',
+            },
+          ),
+      ),
+  );
 /* eslint-enable no-useless-escape, require-unicode-regexp, no-control-regex, no-misleading-character-class */
 
 export const zMetaMaskPermissionData = z.object({

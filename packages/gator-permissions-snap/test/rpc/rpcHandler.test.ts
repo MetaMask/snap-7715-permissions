@@ -118,6 +118,50 @@ describe('RpcHandler', () => {
       );
     });
 
+    it('should handle permission request with null justification and return default message', async () => {
+      const requestWithNullJustification: Json = {
+        permissionsRequest: [
+          {
+            ...VALID_PERMISSION_REQUEST,
+            permission: {
+              ...VALID_PERMISSION_REQUEST.permission,
+              data: {
+                ...VALID_PERMISSION_REQUEST.permission.data,
+                justification: null,
+              },
+            },
+          },
+        ] as unknown as Json[],
+        siteOrigin: TEST_SITE_ORIGIN,
+      };
+
+      const expectedResponseWithDefaultJustification = {
+        ...VALID_PERMISSION_RESPONSE,
+        permission: {
+          ...VALID_PERMISSION_RESPONSE.permission,
+          data: {
+            ...VALID_PERMISSION_RESPONSE.permission.data,
+            justification: 'No justification was provided for the permission',
+          },
+        },
+      };
+
+      const mockSuccessResponseWithDefaultJustification = {
+        approved: true as const,
+        response: expectedResponseWithDefaultJustification,
+      };
+
+      mockHandler.handlePermissionRequest.mockImplementation(
+        async () => mockSuccessResponseWithDefaultJustification,
+      );
+
+      const result = await handler.grantPermission(requestWithNullJustification);
+
+      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledTimes(1);
+      expect(mockHandler.handlePermissionRequest).toHaveBeenCalledTimes(1);
+      expect(result).toStrictEqual([expectedResponseWithDefaultJustification]);
+    });
+
     it('should throw an error if permissionsRequest is missing', async () => {
       await expect(
         handler.grantPermission({
