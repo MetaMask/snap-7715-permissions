@@ -27,7 +27,8 @@ export const zPermission = z.object({
 /**
  * Default message for when no justification is provided
  */
-const DEFAULT_JUSTIFICATION_MESSAGE = 'No justification was provided for the permission';
+const DEFAULT_JUSTIFICATION_MESSAGE =
+  'No justification was provided for the permission';
 
 /**
  * Sanitized justification schema that:

@@ -155,9 +155,13 @@ describe('RpcHandler', () => {
         async () => mockSuccessResponseWithDefaultJustification,
       );
 
-      const result = await handler.grantPermission(requestWithNullJustification);
+      const result = await handler.grantPermission(
+        requestWithNullJustification,
+      );
 
-      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledTimes(1);
+      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledTimes(
+        1,
+      );
       expect(mockHandler.handlePermissionRequest).toHaveBeenCalledTimes(1);
       expect(result).toStrictEqual([expectedResponseWithDefaultJustification]);
     });

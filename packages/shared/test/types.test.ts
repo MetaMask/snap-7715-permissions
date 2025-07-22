@@ -1,6 +1,7 @@
 import { zSanitizedJustification } from '../src/types/7715-permissions-types';
 
-const DEFAULT_JUSTIFICATION_MESSAGE = 'No justification was provided for the permission';
+const DEFAULT_JUSTIFICATION_MESSAGE =
+  'No justification was provided for the permission';
 
 describe('zSanitizedJustification', () => {
   describe('Optional validation', () => {
@@ -19,7 +20,7 @@ describe('zSanitizedJustification', () => {
     it('accepts empty strings and returns default message', () => {
       const result1 = zSanitizedJustification.parse('');
       expect(result1).toBe(DEFAULT_JUSTIFICATION_MESSAGE);
-      
+
       const result2 = zSanitizedJustification.parse('   ');
       expect(result2).toBe(DEFAULT_JUSTIFICATION_MESSAGE);
     });
@@ -207,7 +208,9 @@ describe('zSanitizedJustification', () => {
     });
 
     it('allows vertical tab that gets normalized to space', () => {
-      const result = zSanitizedJustification.parse('Text with \x0B vertical tab');
+      const result = zSanitizedJustification.parse(
+        'Text with \x0B vertical tab',
+      );
       expect(result).toBe('Text with vertical tab');
     });
 
@@ -245,7 +248,9 @@ describe('zSanitizedJustification', () => {
     });
 
     it('allows byte order mark that gets normalized', () => {
-      const result = zSanitizedJustification.parse('Text with \uFEFF byte order mark');
+      const result = zSanitizedJustification.parse(
+        'Text with \uFEFF byte order mark',
+      );
       expect(result).toBe('Text with byte order mark');
     });
 
