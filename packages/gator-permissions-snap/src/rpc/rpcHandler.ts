@@ -22,6 +22,13 @@ export type RpcHandler = {
    * @returns The permission offers.
    */
   getPermissionOffers(): Promise<Json>;
+
+  /**
+   * Handles get granted permissions requests.
+   *
+   * @returns The granted permissions.
+   */
+  getGrantedPermissions(): Promise<Json>;
 };
 
 /**
@@ -82,8 +89,21 @@ export function createRpcHandler(config: {
     return DEFAULT_GATOR_PERMISSION_TO_OFFER;
   };
 
+  /**
+   * Handles get granted permissions requests.
+   *
+   * @returns The granted permissions.
+   */
+  const getGrantedPermissions = async (): Promise<Json> => {
+    logger.debug('getGrantedPermissions()');
+    const grantedPermission =
+      await profileSyncManager.getAllGrantedPermissions();
+    return grantedPermission as Json[];
+  };
+
   return {
     grantPermission,
     getPermissionOffers,
+    getGrantedPermissions,
   };
 }
