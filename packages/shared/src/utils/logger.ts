@@ -49,6 +49,7 @@ const DEFAULT_CONTEXT: LoggerContext = {
 
 /**
  * Stringifies an object, converting BigInts to hex strings.
+ *
  * @param data - The object to stringify.
  * @returns The stringified object.
  */
@@ -73,6 +74,7 @@ export class Logger {
 
   /**
    * Sets the logging level.
+   *
    * @param level - Log level to set.
    */
   setLevel(level: LogLevel): void {
@@ -89,6 +91,7 @@ export class Logger {
 
   /**
    * Logs a message at the specified level.
+   *
    * @param level - Log level of the message.
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
@@ -102,6 +105,7 @@ export class Logger {
 
   /**
    * Logs a DEBUG message.
+   *
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
@@ -111,6 +115,7 @@ export class Logger {
 
   /**
    * Logs an INFO message.
+   *
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
@@ -120,6 +125,7 @@ export class Logger {
 
   /**
    * Logs a WARN message.
+   *
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
@@ -129,6 +135,7 @@ export class Logger {
 
   /**
    * Logs an ERROR message.
+   *
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */

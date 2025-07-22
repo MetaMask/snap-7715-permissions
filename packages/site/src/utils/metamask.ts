@@ -5,6 +5,7 @@ import type {
 
 /**
  * Check if the current provider supports snaps by calling `wallet_getSnaps`.
+ *
  * @param provider - The provider to use to check for snaps support. Defaults to
  * `window.ethereum`.
  * @returns True if the provider supports snaps, false otherwise.
@@ -38,6 +39,7 @@ export async function getMetaMaskEIP6963Provider() {
 
     /**
      * Resolve the promise with a MetaMask provider and clean up.
+     *
      * @param provider - A MetaMask provider if found, otherwise null.
      */
     function resolve(provider: MetaMaskInpageProvider | null) {
@@ -52,6 +54,7 @@ export async function getMetaMaskEIP6963Provider() {
     /**
      * Listener for the EIP6963 announceProvider event.
      * Resolves the promise if a MetaMask provider is found.
+     *
      * @param event - The EIP6963 announceProvider event.
      * @param event.detail - The details of the EIP6963 announceProvider event.
      */

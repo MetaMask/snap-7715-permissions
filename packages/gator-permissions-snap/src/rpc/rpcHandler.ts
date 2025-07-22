@@ -12,6 +12,7 @@ import { validatePermissionRequestParam } from '../utils/validate';
 export type RpcHandler = {
   /**
    * Handles grant permission requests.
+   *
    * @param params - The parameters for the grant permission request.
    * @returns The result of the grant permission request.
    */
@@ -19,6 +20,7 @@ export type RpcHandler = {
 
   /**
    * Handles get permission offers requests.
+   *
    * @returns The permission offers.
    */
   getPermissionOffers(): Promise<Json>;
@@ -33,6 +35,7 @@ export type RpcHandler = {
 
 /**
  * Creates an RPC handler with methods for handling permission-related RPC requests.
+ *
  * @param config - The parameters for creating the RPC handler.
  * @param config.permissionHandlerFactory - The factory for creating permission handlers.
  * @param config.profileSyncManager - The profile sync manager.
@@ -46,6 +49,7 @@ export function createRpcHandler(config: {
 
   /**
    * Handles grant permission requests.
+   *
    * @param params - The parameters for the grant permission request.
    * @returns The result of the grant permission request.
    */
@@ -82,6 +86,7 @@ export function createRpcHandler(config: {
 
   /**
    * Handles get permission offers requests.
+   *
    * @returns The permission offers.
    */
   const getPermissionOffers = async (): Promise<Json> => {

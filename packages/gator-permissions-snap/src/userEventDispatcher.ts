@@ -58,6 +58,7 @@ export class UserEventDispatcher {
 
   /**
    * Register an event handler for a specific event type.
+   *
    * @param args - The event handler arguments as object.
    * @param args.elementName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.eventType - The type of event to listen for.
@@ -94,6 +95,7 @@ export class UserEventDispatcher {
 
   /**
    * Deregister an event handler for a specific event type.
+   *
    * @param args - The event handler arguments as object.
    * @param args.elementName - The name that will be sent to onUserInput when a user interacts with the interface.
    * @param args.eventType - The type of event to stop listening for.

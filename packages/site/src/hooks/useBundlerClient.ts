@@ -33,6 +33,7 @@ type PimlicoRpcSchema = [
 
 /**
  * Creates and manages bundler client for smart account interactions.
+ *
  * @param params - The configuration parameters.
  * @param params.chain - The blockchain chain to connect to.
  * @param params.bundlerRpcUrl - The RPC URL for the bundler service.

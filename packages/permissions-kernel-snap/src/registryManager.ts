@@ -40,6 +40,7 @@ export const createPermissionOfferRegistryManager = (
 ): PermissionOfferRegistryManager => {
   /**
    * Safely parses the permissions offer request parameters, validating them using Zod schema.
+   *
    * @param params - The permission offer to parse.
    * @returns The parsed and validated permissions offer as a PermissionOffer object.
    * @throws Throws a SnapError if validation fails.
@@ -62,6 +63,7 @@ export const createPermissionOfferRegistryManager = (
   /**
    * Discovers and builds the permission provider registry by querying all permission provider snaps
    * for their permission offers.
+   *
    * @param snapId - The snap id to query for permission offers.
    * @returns The permission provider registry.
    */
@@ -122,6 +124,7 @@ export const createPermissionOfferRegistryManager = (
 
   /**
    * Flattens the permission offer registry into a single array of registered permission offers.
+   *
    * @param permissionOfferRegistry - The permission offer registry to flatten.
    * @returns The registered permission offers.
    */
@@ -144,6 +147,7 @@ export const createPermissionOfferRegistryManager = (
    * Currently just matches type. Here is where we would add a rich type description system.
    * Could start by recognizing some extra parameters for known permission types.
    * But eventually would be great to have some general-purpose type fields.
+   *
    * @param options - The options for finding relevant permissions to grant.
    * @param options.allRegisteredOffers - All the registered permission offers.
    * @param options.permissionsToGrant - The permissions requested by the site.

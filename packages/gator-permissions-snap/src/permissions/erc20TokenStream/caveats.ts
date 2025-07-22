@@ -9,6 +9,7 @@ import type { DelegationContracts } from '../../core/chainMetadata';
 
 /**
  * Appends permission-specific caveats to the caveat builder.
+ *
  * @param options0 - The options object containing the permission and caveat builder.
  * @param options0.permission - The complete ERC20 token stream permission containing stream parameters.
  * @param options0.contracts - The contracts object containing enforcers.

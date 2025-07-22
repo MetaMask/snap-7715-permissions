@@ -13,6 +13,7 @@ export const useRequest = () => {
 
   /**
    * `provider.request` wrapper.
+   *
    * @param params - The request params.
    * @param params.method - The method to call.
    * @param params.params - The method params.

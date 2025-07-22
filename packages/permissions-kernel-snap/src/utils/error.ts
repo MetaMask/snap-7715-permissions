@@ -12,6 +12,7 @@ import {
 
 /**
  * Determines if the given error is a Snap RPC error.
+ *
  * @param error - The error instance to be checked.
  * @returns A boolean indicating whether the error is a Snap RPC error.
  */
