@@ -126,6 +126,21 @@ describe('zSanitizedJustification', () => {
     ])('allows benign CSS pattern: %s', (pattern) => {
       expect(() => zSanitizedJustification.parse(pattern)).not.toThrow();
     });
+
+    it.each([
+      'user@domain.com',
+      'test@example.org',
+      'contact@company.com',
+      '@username',
+      '@john_doe',
+      '@test_user',
+      'Please contact @john for details',
+      'Email me at user@domain.com',
+      'Follow @company on social media',
+      'Send to admin@example.com',
+    ])('allows legitimate text with @ symbols: %s', (text) => {
+      expect(() => zSanitizedJustification.parse(text)).not.toThrow();
+    });
   });
 
   describe('Event handler prevention', () => {
@@ -247,7 +262,7 @@ describe('zSanitizedJustification', () => {
       );
     });
 
-    it('allows byte order mark that gets normalized', () => {
+    it('allows byte order mark that gets normalized by trim', () => {
       const result = zSanitizedJustification.parse(
         'Text with \uFEFF byte order mark',
       );

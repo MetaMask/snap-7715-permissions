@@ -55,6 +55,7 @@ export const zSanitizedJustification = z
       .string()
       .transform((val) => {
         // Trim and normalize whitespace first
+        // Note: trim() also removes the Byte Order Mark (\uFEFF) and other leading/trailing whitespace
         const trimmed = val.trim().replace(/\s+/g, ' ');
         // If empty after trimming, return default message
         if (trimmed.length === 0) {
@@ -74,7 +75,7 @@ export const zSanitizedJustification = z
                 /[<>]/, // Any angle brackets (HTML/XML tags)
                 /[{}]/, // Any braces (JSON, CSS blocks)
                 /[\[\]]/, // Any brackets (JSON arrays, CSS selectors)
-                /@\w+/, // CSS at-rules (@import, @media, etc.
+                /@(?:import|media|keyframes|font-face|page|charset|namespace|supports|document|viewport|counter-style|font-feature-values|property|layer)\b/, // CSS at-rules
                 /expression\s*\(/, // CSS expressions (security risk)
                 /behavior\s*:\s*url/, // CSS behaviors (security risk)
                 /url\s*\(/, // CSS url() functions
@@ -83,7 +84,7 @@ export const zSanitizedJustification = z
                 /["`]/, // Double quotes and backticks (allow apostrophes for contractions)
                 /[\u0000-\u0008\u000E-\u001F\u007F]/, // Control characters (excluding \t, \n, \v, \f)
                 /[\u202E\u202D\u202C\u200E\u200F]/, // RTL/LTR override characters
-                /[\u200B\u200C\u200D\uFEFF]/, // Zero-width characters
+                /[\u200B\u200C\u200D]/, // Zero-width characters (excluding \uFEFF which is removed by trim())
                 /[\u0300-\u036F\u1AB0-\u1AFF\u20D0-\u20FF]/, // Combining diacritical marks
                 /[\uFF00-\uFFEF]/, // Full-width characters (homograph attacks)
                 /&[a-zA-Z]+;/, // HTML entities
