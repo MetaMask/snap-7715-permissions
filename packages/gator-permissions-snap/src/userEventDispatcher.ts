@@ -157,8 +157,8 @@ export class UserEventDispatcher {
     this.#hasEventHandler = true;
 
     return async (args: { event: UserInputEvent; id: string }) => {
-      // Chain this event to the queue to ensure sequential processing
-      this.#eventQueue = this.#eventQueue.then(async () => {
+      // Create a promise for this specific event's processing
+      const eventPromise = this.#eventQueue.then(async () => {
         const { event, id } = args;
 
         const eventKey = getUserInputEventKey({
@@ -190,8 +190,11 @@ export class UserEventDispatcher {
         await Promise.all(handlersExecutions);
       });
 
-      // Wait for this event to complete
-      await this.#eventQueue;
+      // Chain this event to the queue to ensure sequential processing
+      this.#eventQueue = eventPromise;
+
+      // Wait for this specific event to complete
+      await eventPromise;
     };
   }
 
