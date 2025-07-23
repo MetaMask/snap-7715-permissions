@@ -12,6 +12,7 @@ import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
+import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 const randomAddress = () => {
   /* eslint-disable no-restricted-globals */
@@ -87,6 +88,13 @@ const mockConfirmationDialogFactory = {
   createConfirmation: jest.fn(),
 } as unknown as jest.Mocked<ConfirmationDialogFactory>;
 
+const mockUserEventDispatcher = {
+  on: jest.fn(),
+  off: jest.fn(),
+  createUserInputEventHandler: jest.fn(),
+  waitForPendingUpdates: jest.fn().mockResolvedValue(undefined),
+} as unknown as jest.Mocked<UserEventDispatcher>;
+
 type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
@@ -145,12 +153,13 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       new PermissionRequestLifecycleOrchestrator({
         accountController: mockAccountController,
         confirmationDialogFactory: mockConfirmationDialogFactory,
+        userEventDispatcher: mockUserEventDispatcher,
       });
   });
 
   describe('orchestrate', () => {
     describe('functional tests', () => {
-      it('should successfully orchestrate a permission request', async () => {
+      it('successfully orchestrates a permission request', async () => {
         const result = await permissionRequestLifecycleOrchestrator.orchestrate(
           'test-origin',
           mockPermissionRequest,
@@ -198,7 +207,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         );
       });
 
-      it('should return a context encoding the expected delegation', async () => {
+      it('returns a context encoding the expected delegation', async () => {
         const result = await permissionRequestLifecycleOrchestrator.orchestrate(
           'test-origin',
           mockPermissionRequest,
@@ -242,7 +251,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(delegationsArray[0]?.salt).not.toBe(0n);
       });
 
-      it('should correctly setup the onConfirmationCreated hook to update the context', async () => {
+      it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
         const initialContext = {
           foo: 'original',
           expiry: '2024-12-31',
@@ -307,7 +316,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         });
       });
 
-      it('should throw error when adjustment is not allowed', async () => {
+      it('throws error when adjustment is not allowed', async () => {
         const initialContext = {
           foo: 'bar',
           expiry: '2024-12-31',
