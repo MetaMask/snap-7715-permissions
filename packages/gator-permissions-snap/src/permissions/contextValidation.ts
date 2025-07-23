@@ -24,7 +24,7 @@ export function validateAndParseAmount(
   fieldName: string,
   allowZero = false,
 ): { amount: bigint | undefined; error: string | undefined } {
-  if (!amount) {
+  if (amount == null) {
     return { amount: undefined, error: undefined };
   }
 
@@ -44,7 +44,7 @@ export function validateAndParseAmount(
     }
     return { amount: parsedAmount, error: undefined };
   } catch (error) {
-    return { amount: undefined, error: `Invalid ${fieldName.toLowerCase()}` };
+    return { amount: undefined, error: `Invalid ${fieldName}` };
   }
 }
 

@@ -1,12 +1,5 @@
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Button,
-  Heading,
-  Section,
-  Skeleton,
-  Text,
-} from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
+import { Box, Heading, Section, Text, Skeleton } from '@metamask/snaps-sdk/jsx';
 
 import {
   ShowMoreText,
@@ -16,8 +9,6 @@ import {
 } from '../ui/components';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { IconData } from './types';
-
-export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 
 export const RECIPIENT_LABEL = 'Recipient';
 export const RECIPIENT_TOOLTIP = 'The site requesting the permission';
@@ -31,8 +22,7 @@ export const REASON_TOOLTIP =
   'Reason given by the recipient for requesting this permission.';
 
 export type PermissionHandlerContentProps = {
-  showAddMoreRulesButton: boolean;
-  children: GenericSnapElement;
+  children: SnapElement;
   permissionTitle: string;
   justification: string;
   networkName: string;
@@ -46,7 +36,6 @@ export type PermissionHandlerContentProps = {
  * Content wrapping a permission confirmation, including the title and add-more-rules button.
  *
  * @param options - The params for the content.
- * @param options.showAddMoreRulesButton - Whether to show the "Add more rules" button.
  * @param options.children - The children of the content.
  * @param options.permissionTitle - The title of the permission.
  * @param options.origin - The origin of the permission request.
@@ -58,20 +47,15 @@ export type PermissionHandlerContentProps = {
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
-  origin,
-  showAddMoreRulesButton,
   children,
   permissionTitle,
+  origin,
   justification,
   networkName,
   tokenSymbol,
   tokenIconData,
   isJustificationCollapsed,
-}: PermissionHandlerContentProps): GenericSnapElement => {
-  const addRulesButton = showAddMoreRulesButton ? (
-    <Button name={TOGGLE_ADD_MORE_RULES_BUTTON}>Add more rules</Button>
-  ) : null;
-
+}: PermissionHandlerContentProps): SnapElement => {
   return (
     <Box>
       <Box direction="vertical">
@@ -109,9 +93,7 @@ export const PermissionHandlerContent = ({
             </Box>
           </Box>
         </Section>
-
         {children}
-        {addRulesButton}
       </Box>
     </Box>
   );

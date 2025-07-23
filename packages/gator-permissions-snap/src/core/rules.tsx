@@ -1,5 +1,5 @@
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import { type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { DropdownField } from '../ui/components/DropdownField';
 import { InputField } from '../ui/components/InputField';
@@ -41,13 +41,18 @@ export function renderRule<
     isAdjustmentAllowed,
   } = rule.getRuleData({ context, metadata });
 
-  if (value === null || value === undefined || !isVisible) {
-    // If the value is not set, don't render the rule
+  if (!isVisible) {
     return null;
   }
 
   const isDisabled = !isAdjustmentAllowed;
-  const removeButtonName = isOptional ? `${name}_removeButton` : undefined;
+
+  let addFieldButtonName: string | undefined;
+  let removeFieldButtonName: string | undefined;
+  if (isOptional) {
+    addFieldButtonName = `${name}_addFieldButton`;
+    removeFieldButtonName = `${name}_removeFieldButton`;
+  }
 
   switch (type) {
     case 'number':
@@ -56,12 +61,13 @@ export function renderRule<
         <InputField
           label={label}
           name={name}
-          value={value ?? ''}
+          value={value}
           errorMessage={error}
           disabled={isDisabled}
           tooltip={tooltip}
           type={type}
-          removeButtonName={removeButtonName}
+          addFieldButtonName={addFieldButtonName}
+          removeFieldButtonName={removeFieldButtonName}
           iconData={iconData}
         />
       );
@@ -70,6 +76,9 @@ export function renderRule<
       if (!options) {
         // todo: type constraint on this would be nice
         throw new Error('Dropdown rule must have options');
+      }
+      if (isOptional) {
+        throw new Error('Dropdown rule must not be optional');
       }
 
       return (
@@ -173,23 +182,45 @@ export function bindRuleHandlers<
     });
 
     if (isOptional) {
-      const handleRemoveButtonClick: UserEventHandler<
+      const handleAddFieldButtonClick: UserEventHandler<
         UserInputEventType.ButtonClickEvent
       > = async (_) => {
-        const updatedContext = rule.updateContext(getContext(), undefined);
+        const updatedContext = rule.updateContext(getContext(), '');
         await onContextChanged({ context: updatedContext });
       };
       userEventDispatcher.on({
-        elementName: `${rule.name}_removeButton`,
+        elementName: `${rule.name}_addFieldButton`,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
-        handler: handleRemoveButtonClick,
+        handler: handleAddFieldButtonClick,
       });
       acc.push({
-        elementName: `${rule.name}_removeButton`,
+        elementName: `${rule.name}_addFieldButton`,
         eventType: UserInputEventType.ButtonClickEvent,
         handler:
-          handleRemoveButtonClick as UserEventHandler<UserInputEventType>,
+          handleAddFieldButtonClick as UserEventHandler<UserInputEventType>,
+      });
+
+      const handleRemoveFieldButtonClick: UserEventHandler<
+        UserInputEventType.ButtonClickEvent
+      > = async (_) => {
+        const updatedContext = rule.updateContext(getContext(), undefined);
+
+        await onContextChanged({
+          context: updatedContext,
+        });
+      };
+      userEventDispatcher.on({
+        elementName: `${rule.name}_removeFieldButton`,
+        eventType: UserInputEventType.ButtonClickEvent,
+        interfaceId,
+        handler: handleRemoveFieldButtonClick,
+      });
+      acc.push({
+        elementName: `${rule.name}_removeFieldButton`,
+        eventType: UserInputEventType.ButtonClickEvent,
+        handler:
+          handleRemoveFieldButtonClick as UserEventHandler<UserInputEventType>,
       });
     }
 
