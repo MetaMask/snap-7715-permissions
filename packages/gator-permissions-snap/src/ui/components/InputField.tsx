@@ -1,9 +1,18 @@
-import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { Box, Text, Input, Field, Button, Icon } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Text,
+  Input,
+  Field,
+  Button,
+  SnapElement,
+  Image,
+} from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
 import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
+import ToggleEnabled from '../../../images/toggle_enabled.svg';
+import ToggleDisabled from '../../../images/toggle_disabled.svg';
 
 export type InputFieldParams = {
   label: string;
@@ -54,21 +63,20 @@ export const InputField = ({
   }
 
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
-  const isFieldRemoved = value == null;
+  const isFieldEnabled = value != null;
 
   let toggleFieldButton: SnapElement | null = null;
 
-  const toggleFieldButtonName = isFieldRemoved
-    ? addFieldButtonName
-    : removeFieldButtonName;
+  const toggleFieldButtonName = isFieldEnabled
+    ? removeFieldButtonName
+    : addFieldButtonName;
 
   if (toggleFieldButtonName) {
     toggleFieldButton = (
       <Button name={toggleFieldButtonName}>
-        <Icon
-          name={isFieldRemoved ? 'add' : 'close'}
-          color="primary"
-          size="md"
+        <Image
+          src={isFieldEnabled ? ToggleEnabled : ToggleDisabled}
+          alt={isFieldEnabled ? 'Remove field' : 'Add field'}
         />
       </Button>
     );
@@ -83,7 +91,7 @@ export const InputField = ({
         </Box>
         {toggleFieldButton && <Box>{toggleFieldButton}</Box>}
       </Box>
-      {!isFieldRemoved && (
+      {isFieldEnabled && (
         <Field error={errorMessage}>
           <Box>{iconElement}</Box>
           <Input name={name} type={type} value={value} />
