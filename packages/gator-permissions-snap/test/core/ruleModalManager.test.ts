@@ -28,6 +28,16 @@ const mockContext: TestContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
+  accountDetails: {
+    address: '0x1234567890123456789012345678901234567890',
+    balanceFormattedAsCurrency: '10 ETH',
+    balance: '0xa',
+  },
+  tokenMetadata: {
+    decimals: 18,
+    symbol: 'ETH',
+    iconDataBase64: null,
+  },
   rule1Value: 'existing-value',
   // rule2Value and rule3Value are intentionally omitted to test undefined behavior
 };

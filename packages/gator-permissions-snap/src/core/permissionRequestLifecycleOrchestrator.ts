@@ -9,7 +9,7 @@ import {
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import { bytesToHex, numberToHex } from '@metamask/utils';
+import { bytesToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
 import type { AccountController } from '../accountController';
 import { getChainMetadata } from './chainMetadata';
@@ -66,34 +66,54 @@ export class PermissionRequestLifecycleOrchestrator {
       TPopulatedPermission
     >,
   ): Promise<PermissionRequestResult> {
-    const isAdjustmentAllowed = permissionRequest.isAdjustmentAllowed ?? true;
-
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);
 
-    const chainId = parseInt(permissionRequest.chainId, 16);
+    const confirmationDialog =
+      this.#confirmationDialogFactory.createConfirmation({
+        ui: await lifecycleHandlers.createSkeletonConfirmationContent(),
+        isGrantDisabled: true,
+      });
+
+    const interfaceId = await confirmationDialog.createInterface();
+
+    const decision =
+      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+    const chainId = hexToNumber(permissionRequest.chainId);
 
     let context = await lifecycleHandlers.buildContext(
       validatedPermissionRequest,
     );
 
-    const createUiContent = async () => {
+    const updateConfirmation = async ({
+      newContext,
+      isGrantDisabled,
+    }: {
+      newContext: TContext;
+      isGrantDisabled: boolean;
+    }) => {
+      context = newContext;
+
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
-      return await lifecycleHandlers.createConfirmationContent({
+      const ui = await lifecycleHandlers.createConfirmationContent({
         context,
         metadata,
         origin,
         chainId,
       });
+
+      await confirmationDialog.updateContent({ ui, isGrantDisabled });
     };
 
-    const confirmationDialog =
-      this.#confirmationDialogFactory.createConfirmation({
-        ui: await createUiContent(),
-      });
+    // replace the skeleton content with the actual content rendered with the resolved context
+    await updateConfirmation({
+      newContext: context,
+      isGrantDisabled: false,
+    });
 
-    const interfaceId = await confirmationDialog.createInterface();
+    const isAdjustmentAllowed = permissionRequest.isAdjustmentAllowed ?? true;
 
     if (lifecycleHandlers.onConfirmationCreated) {
       const updateContext = async ({
@@ -105,9 +125,10 @@ export class PermissionRequestLifecycleOrchestrator {
           throw new Error('Adjustment is not allowed');
         }
 
-        context = updatedContext;
-
-        await confirmationDialog.updateContent({ ui: await createUiContent() });
+        await updateConfirmation({
+          newContext: updatedContext,
+          isGrantDisabled: false,
+        });
       };
 
       lifecycleHandlers.onConfirmationCreated({
@@ -118,9 +139,9 @@ export class PermissionRequestLifecycleOrchestrator {
     }
 
     try {
-      const decision = await confirmationDialog.awaitUserDecision();
+      const { isConfirmationGranted } = await decision;
 
-      if (decision.isConfirmationGranted) {
+      if (isConfirmationGranted) {
         const response = await this.#resolveResponse({
           originalRequest: validatedPermissionRequest,
           modifiedContext: context,

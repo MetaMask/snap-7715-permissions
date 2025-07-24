@@ -40,13 +40,6 @@ export type BaseContext = {
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;
-};
-
-/**
- * Base context for all token permissions.
- * This includes the account details and token metadata.
- */
-export type BaseTokenPermissionContext = BaseContext & {
   accountDetails: {
     address: Hex;
     balanceFormattedAsCurrency: string;
@@ -98,11 +91,13 @@ export enum TimePeriod {
  * Properties required for confirmation dialogs.
  *
  * @property ui - The UI element to be displayed in the confirmation dialog
+ * @property isGrantDisabled - Whether the user can grant the permission
  * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
  */
 export type ConfirmationProps = {
   ui: GenericSnapElement;
+  isGrantDisabled: boolean;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
 };
@@ -126,6 +121,7 @@ export type LifecycleOrchestrationHandlers<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (request: TRequest) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
+  createSkeletonConfirmationContent: () => Promise<GenericSnapElement>;
   createConfirmationContent: (args: {
     context: TContext;
     metadata: TMetadata;
@@ -314,10 +310,6 @@ export type PermissionHandlerDependencies<
   createConfirmationContent: (args: {
     context: TContext;
     metadata: TMetadata;
-    origin: string;
-    chainId: number;
-    isJustificationCollapsed: boolean;
-    showAddMoreRulesButton: boolean;
   }) => Promise<GenericSnapElement>;
   applyContext: (args: {
     context: TContext;
