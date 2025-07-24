@@ -92,7 +92,7 @@ const mockUserEventDispatcher = {
   on: jest.fn(),
   off: jest.fn(),
   createUserInputEventHandler: jest.fn(),
-  waitForPendingUpdates: jest.fn().mockResolvedValue(undefined),
+  waitForPendingHandlers: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<UserEventDispatcher>;
 
 type TestLifecycleHandlersMocks = {

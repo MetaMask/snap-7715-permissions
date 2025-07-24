@@ -431,6 +431,66 @@ describe('UserEventDispatcher', () => {
       expect(interface2Events).toStrictEqual(['start', 'end']);
     });
 
+    it('executes multiple handlers for the same event sequentially to prevent race conditions', async () => {
+      const handleEvent = userEventDispatcher.createUserInputEventHandler();
+      const executionOrder: string[] = [];
+
+      // Register multiple handlers for the same event
+      userEventDispatcher.on({
+        elementName: 'test-input',
+        eventType: UserInputEventType.InputChangeEvent,
+        interfaceId: 'test-interface',
+        handler: async () => {
+          executionOrder.push('handler1-start');
+          await new Promise((resolve) => setTimeout(resolve, 30));
+          executionOrder.push('handler1-end');
+        },
+      });
+
+      userEventDispatcher.on({
+        elementName: 'test-input',
+        eventType: UserInputEventType.InputChangeEvent,
+        interfaceId: 'test-interface',
+        handler: async () => {
+          executionOrder.push('handler2-start');
+          await new Promise((resolve) => setTimeout(resolve, 20));
+          executionOrder.push('handler2-end');
+        },
+      });
+
+      userEventDispatcher.on({
+        elementName: 'test-input',
+        eventType: UserInputEventType.InputChangeEvent,
+        interfaceId: 'test-interface',
+        handler: async () => {
+          executionOrder.push('handler3-start');
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          executionOrder.push('handler3-end');
+        },
+      });
+
+      // Trigger a single event that will execute all three handlers
+      await handleEvent({
+        event: {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'test-input',
+          value: 'test-value',
+        },
+        id: 'test-interface',
+      });
+
+      // Verify that handlers were executed sequentially (not concurrently)
+      // Each handler should complete fully before the next one starts
+      expect(executionOrder).toStrictEqual([
+        'handler1-start',
+        'handler1-end',
+        'handler2-start',
+        'handler2-end',
+        'handler3-start',
+        'handler3-end',
+      ]);
+    });
+
     it('handles errors gracefully without breaking sequential processing', async () => {
       const handleEvent = userEventDispatcher.createUserInputEventHandler();
       const executionOrder: string[] = [];
@@ -490,7 +550,7 @@ describe('UserEventDispatcher', () => {
     });
   });
 
-  describe('waitForPendingUpdates integration', () => {
+  describe('waitForPendingHandlers integration', () => {
     it('waits for all pending events before resolving', async () => {
       const testDispatcher = new UserEventDispatcher();
       const handleEvent = testDispatcher.createUserInputEventHandler();
@@ -498,7 +558,7 @@ describe('UserEventDispatcher', () => {
       // Track event processing state
       let event1Completed = false;
       let event2Completed = false;
-      let waitForPendingUpdatesResolved = false;
+      let waitForPendingHandlersResolved = false;
 
       // Register slow event handlers
       testDispatcher.on({
@@ -549,18 +609,18 @@ describe('UserEventDispatcher', () => {
       expect(event1Completed).toBe(false);
       expect(event2Completed).toBe(false);
 
-      // Call waitForPendingUpdates (this should wait for all events to complete)
-      const waitPromise = testDispatcher.waitForPendingUpdates().then(() => {
-        waitForPendingUpdatesResolved = true;
+      // Call waitForPendingHandlers (this should wait for all events to complete)
+      const waitPromise = testDispatcher.waitForPendingHandlers().then(() => {
+        waitForPendingHandlersResolved = true;
       });
 
-      // Wait for waitForPendingUpdates to resolve
+      // Wait for waitForPendingHandlers to resolve
       await waitPromise;
 
       // Verify all events completed
       expect(event1Completed).toBe(true);
       expect(event2Completed).toBe(true);
-      expect(waitForPendingUpdatesResolved).toBe(true);
+      expect(waitForPendingHandlersResolved).toBe(true);
 
       // Clean up
       await Promise.all([event1Promise, event2Promise]);
@@ -568,8 +628,8 @@ describe('UserEventDispatcher', () => {
 
     it('handles the case where no events are pending', async () => {
       const testDispatcher = new UserEventDispatcher();
-      // waitForPendingUpdates should resolve immediately when no events are pending
-      const result = await testDispatcher.waitForPendingUpdates();
+      // waitForPendingHandlers should resolve immediately when no events are pending
+      const result = await testDispatcher.waitForPendingHandlers();
       expect(result).toBeUndefined();
     });
 
@@ -629,8 +689,8 @@ describe('UserEventDispatcher', () => {
 
       expect(errorThrown).toBe(false);
       expect(eventCompleted).toBe(false);
-      // waitForPendingUpdates should still wait for all events to complete
-      await testDispatcher.waitForPendingUpdates();
+      // waitForPendingHandlers should still wait for all events to complete
+      await testDispatcher.waitForPendingHandlers();
 
       // Verify both events completed (even though one threw an error)
       expect(errorThrown).toBe(true);

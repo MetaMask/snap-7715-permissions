@@ -130,7 +130,7 @@ export class PermissionRequestLifecycleOrchestrator {
         // Wait for any pending context updates to complete before granting permission
         // This prevents race conditions where the permission is granted before
         // all user input has been processed
-        await this.#userEventDispatcher.waitForPendingUpdates();
+        await this.#userEventDispatcher.waitForPendingHandlers();
 
         const response = await this.#resolveResponse({
           originalRequest: validatedPermissionRequest,

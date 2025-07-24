@@ -173,7 +173,9 @@ export class UserEventDispatcher {
           return;
         }
 
-        const handlersExecutions = handlers.map(async (handler) => {
+        // Execute handlers sequentially to prevent race conditions where multiple handlers
+        // might overwrite each other's context changes
+        for (const handler of handlers) {
           try {
             await handler({
               event,
@@ -185,9 +187,7 @@ export class UserEventDispatcher {
               error,
             );
           }
-        });
-
-        await Promise.all(handlersExecutions);
+        }
       });
 
       // Chain this event to the queue to ensure sequential processing
@@ -205,7 +205,7 @@ export class UserEventDispatcher {
    *
    * @returns Promise that resolves when all pending updates are complete.
    */
-  async waitForPendingUpdates(): Promise<void> {
+  async waitForPendingHandlers(): Promise<void> {
     // Wait for the event queue to be empty (all events processed)
     await this.#eventQueue;
   }
