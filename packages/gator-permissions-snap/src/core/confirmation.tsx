@@ -1,6 +1,6 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
 import type {
@@ -21,7 +21,7 @@ export class ConfirmationDialog {
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
-  #ui: GenericSnapElement;
+  #ui: SnapElement;
 
   #interfaceId: string | undefined;
 
@@ -169,7 +169,7 @@ export class ConfirmationDialog {
     ui,
     isGrantDisabled,
   }: {
-    ui: GenericSnapElement;
+    ui: SnapElement;
     isGrantDisabled: boolean;
   }): Promise<void> {
     if (!this.#interfaceId) {

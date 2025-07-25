@@ -1,5 +1,15 @@
-import { Box, Text, Input, Button, Field, Icon } from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Text,
+  Input,
+  Field,
+  Button,
+  Image,
+} from '@metamask/snaps-sdk/jsx';
 
+import toggleDisabledImage from '../../../images/toggle_disabled.svg';
+import toggleEnabledImage from '../../../images/toggle_enabled.svg';
 import { TextField } from './TextField';
 import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
@@ -7,9 +17,10 @@ import { TooltipIcon } from './TooltipIcon';
 export type InputFieldParams = {
   label: string;
   name: string;
-  removeButtonName?: string | undefined;
+  addFieldButtonName?: string | undefined;
+  removeFieldButtonName?: string | undefined;
   tooltip?: string | undefined;
-  value: string;
+  value: string | undefined;
   type: 'text' | 'number';
   disabled?: boolean;
   errorMessage?: string | undefined;
@@ -24,7 +35,8 @@ export type InputFieldParams = {
 export const InputField = ({
   label,
   name,
-  removeButtonName,
+  addFieldButtonName,
+  removeFieldButtonName,
   tooltip,
   type,
   value,
@@ -43,7 +55,7 @@ export const InputField = ({
     return (
       <TextField
         label={label}
-        value={value}
+        value={value ?? ''}
         tooltip={tooltip}
         iconData={iconData}
       />
@@ -51,11 +63,24 @@ export const InputField = ({
   }
 
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
-  const removeButtonElement = removeButtonName ? (
-    <Button name={removeButtonName} type="button">
-      <Icon name="close" color="primary" size="md" />
-    </Button>
-  ) : null;
+  const isFieldEnabled = value !== null && value !== undefined;
+
+  let toggleFieldButton: SnapElement | null = null;
+
+  const toggleFieldButtonName = isFieldEnabled
+    ? removeFieldButtonName
+    : addFieldButtonName;
+
+  if (toggleFieldButtonName) {
+    toggleFieldButton = (
+      <Button name={toggleFieldButtonName}>
+        <Image
+          src={isFieldEnabled ? toggleEnabledImage : toggleDisabledImage}
+          alt={isFieldEnabled ? `Remove ${label}` : `Add ${label}`}
+        />
+      </Button>
+    );
+  }
 
   return (
     <Box direction="vertical">
@@ -64,12 +89,14 @@ export const InputField = ({
           <Text>{label}</Text>
           {tooltipElement}
         </Box>
+        {toggleFieldButton && <Box>{toggleFieldButton}</Box>}
       </Box>
-      <Field error={errorMessage}>
-        <Box>{iconElement}</Box>
-        <Input name={name} type={type} value={value} />
-        <Box>{removeButtonElement}</Box>
-      </Field>
+      {isFieldEnabled && (
+        <Field error={errorMessage}>
+          <Box>{iconElement}</Box>
+          <Input name={name} type={type} value={value} />
+        </Field>
+      )}
     </Box>
   );
 };
