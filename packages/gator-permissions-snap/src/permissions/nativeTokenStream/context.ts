@@ -7,6 +7,7 @@ import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
+  convertTimestampToReadableTime,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
@@ -65,7 +66,7 @@ export async function applyContext({
       parseUnits({ formatted: permissionDetails.amountPerPeriod, decimals }) /
         TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
-    startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
+    startTime: parseInt(permissionDetails.startTime, 10),
     justification: originalRequest.permission.data.justification,
   };
 
@@ -179,9 +180,7 @@ export async function buildContext({
     decimals,
   });
 
-  const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
-  );
+  const startTime = permissionRequest.permission.data.startTime.toString();
 
   const balance = bigIntToHex(rawBalance);
 
@@ -205,6 +204,10 @@ export async function buildContext({
       timePeriod,
       startTime,
       amountPerPeriod,
+    },
+    dateTimeDetails: {
+      date: convertTimestampToReadableDate(permissionRequest.permission.data.startTime),
+      time: convertTimestampToReadableTime(permissionRequest.permission.data.startTime),
     },
   };
 }
@@ -266,6 +269,8 @@ export async function deriveMetadata({
       decimals,
     );
   }
+
+  console.log(permissionDetails);
 
   // Validate start time
   const startTimeError = validateStartTime(permissionDetails.startTime);

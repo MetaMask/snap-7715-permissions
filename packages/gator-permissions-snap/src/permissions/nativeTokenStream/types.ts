@@ -12,6 +12,7 @@ import type {
   BaseContext,
 } from '../../core/types';
 
+
 export type NativeTokenStreamMetadata = {
   amountPerSecond: string;
   validationErrors: {

@@ -310,5 +310,179 @@ describe('UserEventDispatcher', () => {
         }),
       ).toBeUndefined();
     });
+
+    describe('debouncing', () => {
+      beforeEach(() => {
+        jest.useFakeTimers();
+      });
+
+      afterEach(() => {
+        jest.useRealTimers();
+        userEventDispatcher.clearDebounceTimers();
+      });
+
+      it('should debounce input change events', async () => {
+        const handler = createHandlerMock();
+        const handleEvent = userEventDispatcher.createUserInputEventHandler();
+
+        userEventDispatcher.on({
+          elementName: 'test-input',
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId,
+          handler,
+        });
+
+        // Trigger multiple input change events rapidly
+        await handleEvent({
+          event: {
+            type: UserInputEventType.InputChangeEvent,
+            name: 'test-input',
+            value: '1',
+          },
+          id: interfaceId,
+        });
+
+        await handleEvent({
+          event: {
+            type: UserInputEventType.InputChangeEvent,
+            name: 'test-input',
+            value: '12',
+          },
+          id: interfaceId,
+        });
+
+        await handleEvent({
+          event: {
+            type: UserInputEventType.InputChangeEvent,
+            name: 'test-input',
+            value: '123',
+          },
+          id: interfaceId,
+        });
+
+        // Handler should not be called immediately
+        expect(handler).not.toHaveBeenCalled();
+
+        // Fast-forward time to trigger the debounced handler
+        jest.advanceTimersByTime(300);
+
+        // Handler should be called once with the last event
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(handler).toHaveBeenCalledWith({
+          event: {
+            type: UserInputEventType.InputChangeEvent,
+            name: 'test-input',
+            value: '123',
+          },
+          interfaceId,
+        });
+      });
+
+      it('should execute non-input-change events immediately', async () => {
+        const handler = createHandlerMock();
+        const handleEvent = userEventDispatcher.createUserInputEventHandler();
+
+        userEventDispatcher.on({
+          elementName,
+          eventType: UserInputEventType.ButtonClickEvent,
+          interfaceId,
+          handler,
+        });
+
+        await handleEvent({
+          event: {
+            type: UserInputEventType.ButtonClickEvent,
+            name: elementName,
+          },
+          id: interfaceId,
+        });
+
+        // Handler should be called immediately for button click events
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(handler).toHaveBeenCalledWith({
+          event: {
+            type: UserInputEventType.ButtonClickEvent,
+            name: elementName,
+          },
+          interfaceId,
+        });
+      });
+
+      it('should handle debounced events for different input fields separately', async () => {
+        const handler1 = createHandlerMock();
+        const handler2 = createHandlerMock();
+        const handleEvent = userEventDispatcher.createUserInputEventHandler();
+
+        userEventDispatcher.on({
+          elementName: 'input1',
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId,
+          handler: handler1,
+        });
+
+        userEventDispatcher.on({
+          elementName: 'input2',
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId,
+          handler: handler2,
+        });
+
+        // Trigger events on different inputs
+        await handleEvent({
+          event: {
+            type: UserInputEventType.InputChangeEvent,
+            name: 'input1',
+            value: 'a',
+          },
+          id: interfaceId,
+        });
+
+        await handleEvent({
+          event: {
+            type: UserInputEventType.InputChangeEvent,
+            name: 'input2',
+            value: 'b',
+          },
+          id: interfaceId,
+        });
+
+        // Fast-forward time
+        jest.advanceTimersByTime(300);
+
+        // Both handlers should be called
+        expect(handler1).toHaveBeenCalledTimes(1);
+        expect(handler2).toHaveBeenCalledTimes(1);
+      });
+
+      it('should clear debounce timers when clearDebounceTimers is called', async () => {
+        const handler = createHandlerMock();
+        const handleEvent = userEventDispatcher.createUserInputEventHandler();
+
+        userEventDispatcher.on({
+          elementName: 'test-input',
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId,
+          handler,
+        });
+
+        await handleEvent({
+          event: {
+            type: UserInputEventType.InputChangeEvent,
+            name: 'test-input',
+            value: 'test',
+          },
+          id: interfaceId,
+        });
+
+        // Clear timers before they can execute
+        userEventDispatcher.clearDebounceTimers();
+
+        // Fast-forward time
+        jest.advanceTimersByTime(300);
+
+        // Handler should not be called because timer was cleared
+        expect(handler).not.toHaveBeenCalled();
+      });
+    });
   });
 });

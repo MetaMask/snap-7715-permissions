@@ -70,21 +70,32 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
 export const startTimeRule: NativeTokenStreamRuleDefinition = {
   name: START_TIME_ELEMENT,
   label: 'Start Time',
-  type: 'text',
+  type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.startTime,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The start time of the stream.',
     error: metadata.validationErrors.startTimeError,
-  }),
-  updateContext: (context: NativeTokenStreamContext, value: string) => ({
-    ...context,
-    permissionDetails: {
-      ...context.permissionDetails,
-      startTime: value,
+    dateTimeParameterNames: {
+      timestampName: 'permissionDetails.startTime',
+      dateName: 'startTime.date',
+      timeName: 'startTime.time',
     },
   }),
+  updateContext: (context: NativeTokenStreamContext, value: any) => {
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        startTime: value.timestamp,
+      },
+      startTime: {
+        date: value.date,
+        time: value.time,
+      },
+    };
+  },
 };
 
 export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {

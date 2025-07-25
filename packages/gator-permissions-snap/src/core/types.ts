@@ -37,6 +37,7 @@ export type TypedPermissionRequest<TPermission extends Permission> =
  * Each permission type will extend this with their specific context needs.
  */
 export type BaseContext = {
+  permissionDetails: any;
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;
@@ -51,6 +52,7 @@ export type BaseContext = {
     iconDataBase64: string | null;
   };
 };
+
 
 /**
  * Base interface for all permission objects.
@@ -162,11 +164,17 @@ export type LifecycleOrchestrationHandlers<
 /**
  * Represents the type of rule input field.
  */
-export type RuleType = 'number' | 'text' | 'dropdown';
+export type RuleType = 'number' | 'text' | 'dropdown' | 'datetime';
 
 export type IconData = {
   iconDataBase64: string;
   iconAltText: string;
+};
+
+export type DateTimeParameterNames = {
+  timestampName: string;
+  dateName: string;
+  timeName: string;
 };
 
 export type RuleData = {
@@ -177,6 +185,7 @@ export type RuleData = {
   error?: string | undefined;
   options?: string[] | undefined;
   isAdjustmentAllowed: boolean;
+  dateTimeParameterNames?: DateTimeParameterNames;
 };
 
 /**
