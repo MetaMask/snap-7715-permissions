@@ -27,14 +27,14 @@ This Snap manages a `permissions offer registry`, which lists all the permission
 
 This Snap creates a [DeleGator account](https://github.com/MetaMask/delegation-framework) and enables the site to request [ERC-7715](https://eip.tools/eip/7715) permissions from that account. Users can review and adjust the granted permissions through a custom interactive confirmation dialog rendered by the Snap.
 
-[Read more on "@metamask/gator-permissions-snap" ->](/packages/gator-permissions-snap/ARCHITECTURE.md)
+[Read more on "@metamask/gator-permissions-snap" ->](/packages/gator-permissions-snap/docs/architecture.md)
 
 ## Development
 
 **Prerequisites**
 
 - [MetaMask Flask >= 12.14.2](https://docs.metamask.io/snaps/get-started/install-flask/)
-- Nodejs `20.0.0` (specified in `.nvmrc`)
+- Nodejs `20.0.0` or > `22.0.0` (specified in `.nvmrc`)
 - yarn 3.2.1
 
 ### Environment variables

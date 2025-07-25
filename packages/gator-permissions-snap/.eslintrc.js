@@ -22,6 +22,8 @@ module.exports = {
             allow: ['Text'],
           },
         ],
+        // Disable jsdoc/tag-lines rule to allow lines after block descriptions
+        'jsdoc/tag-lines': 'off',
       },
     },
 

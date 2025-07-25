@@ -21,7 +21,6 @@ export class PriceApiClient {
 
   /**
    * Fetch the spot prices for the given token CAIP-19 asset type.
-   *
    * @param caipAssetType - The token CAIP-19 asset type to fetch spot prices for. Defaults to ethereum.
    * @param vsCurrency - The currency to fetch the spot prices in. Defaults to USD.
    * @returns The spot prices for the given token CAIP-19 asset type.

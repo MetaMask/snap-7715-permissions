@@ -14,7 +14,6 @@ export type StateManager = {
 
 /**
  * Creates a state manager for the Gator Permissions snap.
- *
  * @param snapsProvider - The snaps provider to use.
  * @param encrypted - Whether the state should be encrypted.
  * @returns A state manager for the Gator Permissions snap.
@@ -25,7 +24,6 @@ export function createStateManager(
 ): StateManager {
   /**
    * Retrieves the current state of the kernel .
-   *
    * @returns The current state of the kernel.
    */
   async function getState(): Promise<GatorPermissionsState> {
@@ -50,7 +48,6 @@ export function createStateManager(
 
   /**
    * Persists the given state.
-   *
    * @param newState - The new state to set.
    */
   async function setState(newState: GatorPermissionsState) {

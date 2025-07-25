@@ -11,6 +11,8 @@ module.exports = {
       extends: ['@metamask/eslint-config-browser'],
       rules: {
         'no-restricted-globals': 'off',
+        // Disable jsdoc/tag-lines rule to allow lines after block descriptions
+        'jsdoc/tag-lines': 'off',
       },
     },
   ],
