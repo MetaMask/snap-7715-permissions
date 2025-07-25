@@ -1,5 +1,5 @@
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import { type GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { DropdownField } from '../ui/components/DropdownField';
 import { InputField } from '../ui/components/InputField';
@@ -29,7 +29,7 @@ export function renderRule<
   rule: RuleDefinition<TContext, TMetadata>;
   context: TContext;
   metadata: TMetadata;
-}): GenericSnapElement | null {
+}): SnapElement | null {
   const { label, type, name, isOptional } = rule;
   const {
     value,
@@ -119,7 +119,7 @@ export function renderRules<
   rules: RuleDefinition<TContext, TMetadata>[];
   context: TContext;
   metadata: TMetadata;
-}): (GenericSnapElement | null)[] {
+}): (SnapElement | null)[] {
   return rules.map((rule) => renderRule({ rule, context, metadata }));
 }
 
