@@ -96,8 +96,7 @@ export const zSanitizedJustification = z
               return !dangerousPatterns.some((pattern) => pattern.test(val));
             },
             {
-              message:
-                'Justification contains invalid characters or patterns',
+              message: 'Justification contains invalid characters or patterns',
             },
           ),
       ),
