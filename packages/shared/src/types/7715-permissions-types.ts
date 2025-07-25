@@ -97,7 +97,7 @@ export const zSanitizedJustification = z
             },
             {
               message:
-                'Justification contains invalid characters or patterns (markup, scripts, control characters, or quotes are not allowed)',
+                'Justification contains invalid characters or patterns',
             },
           ),
       ),
