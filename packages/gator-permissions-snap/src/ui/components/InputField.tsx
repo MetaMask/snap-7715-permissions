@@ -1,18 +1,18 @@
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
   Text,
   Input,
   Field,
   Button,
-  SnapElement,
   Image,
 } from '@metamask/snaps-sdk/jsx';
 
+import toggleDisabledImage from '../../../images/toggle_disabled.svg';
+import toggleEnabledImage from '../../../images/toggle_enabled.svg';
 import { TextField } from './TextField';
 import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
-import ToggleEnabled from '../../../images/toggle_enabled.svg';
-import ToggleDisabled from '../../../images/toggle_disabled.svg';
 
 export type InputFieldParams = {
   label: string;
@@ -63,7 +63,7 @@ export const InputField = ({
   }
 
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
-  const isFieldEnabled = value != null;
+  const isFieldEnabled = value !== null && value !== undefined;
 
   let toggleFieldButton: SnapElement | null = null;
 
@@ -75,8 +75,8 @@ export const InputField = ({
     toggleFieldButton = (
       <Button name={toggleFieldButtonName}>
         <Image
-          src={isFieldEnabled ? ToggleEnabled : ToggleDisabled}
-          alt={isFieldEnabled ? 'Remove field' : 'Add field'}
+          src={isFieldEnabled ? toggleEnabledImage : toggleDisabledImage}
+          alt={isFieldEnabled ? `Remove ${label}` : `Add ${label}`}
         />
       </Button>
     );

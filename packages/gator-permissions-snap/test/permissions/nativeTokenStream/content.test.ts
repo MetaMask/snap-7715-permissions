@@ -500,7 +500,7 @@ describe('nativeTokenStream:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Remove field",
+                                    "alt": "Remove Initial Amount",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -609,7 +609,7 @@ describe('nativeTokenStream:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Remove field",
+                                    "alt": "Remove Max Amount",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1305,7 +1305,7 @@ describe('nativeTokenStream:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Remove field",
+                                    "alt": "Remove Initial Amount",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1415,7 +1415,7 @@ describe('nativeTokenStream:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Remove field",
+                                    "alt": "Remove Max Amount",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -2743,7 +2743,7 @@ describe('nativeTokenStream:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Add field",
+                                    "alt": "Add Initial Amount",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
@@ -2829,7 +2829,7 @@ describe('nativeTokenStream:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Add field",
+                                    "alt": "Add Max Amount",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
@@ -3501,7 +3501,7 @@ describe('nativeTokenStream:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Remove field",
+                                    "alt": "Remove Initial Amount",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -3610,7 +3610,7 @@ describe('nativeTokenStream:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Remove field",
+                                    "alt": "Remove Max Amount",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>

@@ -33,7 +33,7 @@ export function validateAndParseAmount(
   fieldName: string,
   allowZero = false,
 ): { amount: bigint | undefined; error: string | undefined } {
-  if (amount == null) {
+  if (amount === null || amount === undefined) {
     return { amount: undefined, error: undefined };
   }
 

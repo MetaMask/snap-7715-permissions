@@ -26,7 +26,6 @@ import type {
   PermissionHandlerDependencies,
   PermissionHandlerParams,
 } from './types';
-import { Text } from '@metamask/snaps-sdk/jsx';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 

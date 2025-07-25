@@ -47,12 +47,10 @@ export function renderRule<
 
   const isDisabled = !isAdjustmentAllowed;
 
-  let addFieldButtonName: string | undefined;
-  let removeFieldButtonName: string | undefined;
-  if (isOptional) {
-    addFieldButtonName = `${name}_addFieldButton`;
-    removeFieldButtonName = `${name}_removeFieldButton`;
-  }
+  const addFieldButtonName = isOptional ? `${name}_addFieldButton` : undefined;
+  const removeFieldButtonName = isOptional
+    ? `${name}_removeFieldButton`
+    : undefined;
 
   switch (type) {
     case 'number':
