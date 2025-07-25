@@ -28,7 +28,6 @@ export async function hasSnapsSupport(
  * Get a MetaMask provider using EIP6963. This will return the first provider
  * reporting as MetaMask. If no provider is found after 500ms, this will
  * return null instead.
- *
  * @returns A MetaMask provider if found, otherwise null.
  */
 export async function getMetaMaskEIP6963Provider() {
@@ -54,7 +53,6 @@ export async function getMetaMaskEIP6963Provider() {
 
     /**
      * Listener for the EIP6963 announceProvider event.
-     *
      * Resolves the promise if a MetaMask provider is found.
      *
      * @param event - The EIP6963 announceProvider event.
@@ -81,7 +79,6 @@ export async function getMetaMaskEIP6963Provider() {
 /**
  * Get a provider that supports snaps. This will loop through all the detected
  * providers and return the first one that supports snaps.
- *
  * @returns The provider, or `null` if no provider supports snaps.
  */
 export async function getSnapsProvider() {

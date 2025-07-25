@@ -26,6 +26,8 @@ module.exports = {
           'error',
           { allow: ['describe', 'expect', 'it'] },
         ],
+        // Disable jsdoc/tag-lines rule to allow lines after block descriptions
+        'jsdoc/tag-lines': 'off',
       },
     },
   ],

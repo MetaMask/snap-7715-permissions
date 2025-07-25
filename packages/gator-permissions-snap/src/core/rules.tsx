@@ -27,7 +27,6 @@ function getNestedProperty(obj: any, path: string): any {
 
 /**
  * Renders a single rule with the provided configuration, context and metadata.
- *
  * @param options0 - The options object.
  * @param options0.rule - The rule definition to render.
  * @param options0.context - The current context state.
@@ -134,7 +133,6 @@ export function renderRule<
 
 /**
  * Renders a list of rules the the provided configuration, context and metadata.
- *
  * @param options0 - The options object.
  * @param options0.rules - The array of rule definitions to render.
  * @param options0.context - The current context state.
@@ -158,7 +156,6 @@ export function renderRules<
 
 /**
  * Binds the handlers for the provided rules to the user event dispatcher.
- *
  * @param options0 - The options object.
  * @param options0.rules - The array of rule definitions to bind handlers for.
  * @param options0.userEventDispatcher - The user event dispatcher to bind handlers to.

@@ -69,6 +69,11 @@ export class UserEventDispatcher {
   readonly #debounceDelay = 500;
 
   /**
+   * Queue for processing events sequentially to prevent race conditions
+   */
+  #eventQueue: Promise<void> = Promise.resolve();
+
+  /**
    * Register an event handler for a specific event type.
    *
    * @param args - The event handler arguments as object.
@@ -164,7 +169,7 @@ export class UserEventDispatcher {
       return;
     }
 
-    const handlersExecutions = handlers.map(async (handler) => {
+    for (const handler of handlers) {
       try {
         await handler({
           event,
@@ -176,9 +181,7 @@ export class UserEventDispatcher {
           error,
         );
       }
-    });
-
-    await Promise.all(handlersExecutions);
+    }
   }
 
   /**
@@ -199,33 +202,42 @@ export class UserEventDispatcher {
     this.#hasEventHandler = true;
 
     return async (args: { event: UserInputEvent; id: string }) => {
-      const { event, id } = args;
+      // Create a promise for this specific event's processing
+      const eventPromise = this.#eventQueue.then(async () => {
+        const { event, id } = args;
 
-      const eventKey = getUserInputEventKey({
-        elementName: event.name ?? '',
-        eventType: event.type,
-        interfaceId: id,
+        const eventKey = getUserInputEventKey({
+          elementName: event.name ?? '',
+          eventType: event.type,
+          interfaceId: id,
+        });
+
+        // Apply debouncing only for input change events
+        if (event.type === UserInputEventType.InputChangeEvent) {
+          // Clear existing timer for this event key
+          const existingTimer = this.#debounceTimers.get(eventKey);
+          if (existingTimer) {
+            clearTimeout(existingTimer);
+          }
+
+          // Set new timer for debounced execution
+          const timer = setTimeout(async () => {
+            await this.executeHandlers(eventKey, event, id);
+            this.#debounceTimers.delete(eventKey);
+          }, this.#debounceDelay);
+
+          this.#debounceTimers.set(eventKey, timer);
+        } else {
+          // For non-input-change events, execute immediately
+          await this.executeHandlers(eventKey, event, id);
+        }
       });
 
-      // Apply debouncing only for input change events
-      if (event.type === UserInputEventType.InputChangeEvent) {
-        // Clear existing timer for this event key
-        const existingTimer = this.#debounceTimers.get(eventKey);
-        if (existingTimer) {
-          clearTimeout(existingTimer);
-        }
+      // Chain this event to the queue to ensure sequential processing
+      this.#eventQueue = eventPromise;
 
-        // Set new timer
-        const timer = setTimeout(async () => {
-          await this.executeHandlers(eventKey, event, id);
-          this.#debounceTimers.delete(eventKey);
-        }, this.#debounceDelay);
-
-        this.#debounceTimers.set(eventKey, timer);
-      } else {
-        // For non-input-change events, execute immediately
-        await this.executeHandlers(eventKey, event, id);
-      }
+      // Wait for this specific event to complete
+      await eventPromise;
     };
   }
 
@@ -235,5 +247,16 @@ export class UserEventDispatcher {
   public clearDebounceTimers(): void {
     this.#debounceTimers.forEach((timer) => clearTimeout(timer));
     this.#debounceTimers.clear();
+  }
+  /**
+   * Waits for all pending event handler updates to complete.
+   * This is useful for ensuring that all context updates have been processed
+   * before proceeding with operations like granting permissions.
+   *
+   * @returns Promise that resolves when all pending updates are complete.
+   */
+  async waitForPendingHandlers(): Promise<void> {
+    // Wait for the event queue to be empty (all events processed)
+    await this.#eventQueue;
   }
 }

@@ -169,7 +169,6 @@ export const combineDateAndTimeToTimestamp = (date: string, time: string) => {
 
 /**
  * Returns the Unix timestamp (in seconds) for the start of today (12:00 AM UTC).
- *
  * @returns Unix timestamp at 12:00:00 AM UTC of today.
  */
 export const getStartOfTodayUTC = (): number => {
@@ -205,7 +204,6 @@ export const getStartOfTodayLocal = (): number => {
 
 /**
  * Returns the Unix timestamp (in seconds) for the start of the next day (12:00 AM UTC).
- *
  * @returns Unix timestamp at 12:00:00 AM UTC of the next day.
  */
 export const getStartOfNextDayUTC = (): number => {

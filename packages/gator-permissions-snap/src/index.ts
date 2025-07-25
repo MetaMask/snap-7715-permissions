@@ -150,6 +150,7 @@ const confirmationDialogFactory = new ConfirmationDialogFactory({
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
+  userEventDispatcher,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
@@ -173,6 +174,8 @@ const boundRpcHandlers: {
     rpcHandler.grantPermission.bind(rpcHandler),
   [RpcMethod.PermissionProviderGetPermissionOffers]:
     rpcHandler.getPermissionOffers.bind(rpcHandler),
+  [RpcMethod.PermissionProviderGetGrantedPermissions]:
+    rpcHandler.getGrantedPermissions.bind(rpcHandler),
 };
 
 /**

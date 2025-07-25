@@ -2,13 +2,18 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../accountController';
+import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
-import { PermissionHandlerContent } from './permissionHandlerContent';
+import { getChainMetadata } from './chainMetadata';
+import {
+  PermissionHandlerContent,
+  SkeletonPermissionHandlerContent,
+} from './permissionHandlerContent';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import { RuleModalManager } from './ruleModalManager';
 import { bindRuleHandlers } from './rules';
@@ -140,30 +145,58 @@ export class PermissionHandler<
       });
     };
 
-    const createConfirmationContentHandler = async (args: {
+    const createSkeletonConfirmationContentHandler = async () => {
+      return SkeletonPermissionHandlerContent({
+        permissionTitle: this.#permissionTitle,
+      });
+    };
+
+    const createConfirmationContentHandler = async ({
+      context,
+      metadata,
+      origin,
+      chainId,
+    }: {
       context: TContext;
       metadata: TMetadata;
       origin: string;
       chainId: number;
     }) => {
+      // todo: this will go away once we remove add-more-rules
       if (this.#addMoreRulesModal?.isModalVisible()) {
         return await this.#addMoreRulesModal.renderModal();
       }
 
       const showAddMoreRulesButton =
         this.#addMoreRulesModal?.hasRulesToAdd({
-          context: args.context,
-          metadata: args.metadata,
+          context,
+          metadata,
         }) ?? false;
+
+      // end-of todo
+
+      const { name: networkName } = getChainMetadata({ chainId });
+
+      const tokenIconData = getIconData(context);
 
       const permissionContent =
         await this.#dependencies.createConfirmationContent({
-          ...args,
-          isJustificationCollapsed: this.#isJustificationCollapsed,
-          showAddMoreRulesButton,
+          context,
+          metadata,
         });
 
+      const {
+        justification,
+        tokenMetadata: { symbol: tokenSymbol },
+      } = context;
+
       return PermissionHandlerContent({
+        origin,
+        justification,
+        networkName,
+        tokenSymbol,
+        tokenIconData,
+        isJustificationCollapsed: this.#isJustificationCollapsed,
         showAddMoreRulesButton,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,
@@ -256,6 +289,8 @@ export class PermissionHandler<
       deriveMetadata,
       buildContext: buildContextHandler,
       createConfirmationContent: createConfirmationContentHandler,
+      createSkeletonConfirmationContent:
+        createSkeletonConfirmationContentHandler,
       onConfirmationCreated: onConfirmationCreatedHandler,
       onConfirmationResolved: onConfirmationResolvedHandler,
     };
