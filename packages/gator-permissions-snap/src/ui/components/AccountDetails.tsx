@@ -2,8 +2,8 @@ import type { Hex } from '@metamask/delegation-core';
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import { Text, Box, Section, Avatar } from '@metamask/snaps-sdk/jsx';
 
-import { formatUnitsFromHex } from '../../utils/value';
 import { TooltipIcon } from './TooltipIcon';
+import { formatUnitsFromHex } from '../../utils/value';
 
 export type AccountDetailsProps = {
   account: {

@@ -4,10 +4,6 @@ import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { type GenericSnapElement, Text } from '@metamask/snaps-sdk/jsx';
 
 import { ConfirmationDialog } from '../../src/core/confirmation';
-import {
-  GRANT_BUTTON,
-  CANCEL_BUTTON,
-} from '../../src/ui/components/ConfirmationFooter';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 describe('ConfirmationDialog', () => {
@@ -38,6 +34,7 @@ describe('ConfirmationDialog', () => {
       ...defaultProps,
       snaps: mockSnaps,
       userEventDispatcher: mockUserEventDispatcher,
+      isGrantDisabled: false,
     });
   });
 
@@ -72,7 +69,7 @@ describe('ConfirmationDialog', () => {
     });
   });
 
-  describe('awaitUserDecision()', () => {
+  describe('displayConfirmationDialogAndAwaitUserDecision()', () => {
     beforeEach(async () => {
       mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
       await confirmationDialog.createInterface();
@@ -84,17 +81,21 @@ describe('ConfirmationDialog', () => {
         ...defaultProps,
         snaps: mockSnaps,
         userEventDispatcher: mockUserEventDispatcher,
+        isGrantDisabled: false,
       });
 
-      await expect(newDialog.awaitUserDecision()).rejects.toThrow(
-        'Interface not yet created. Call createInterface first.',
+      await expect(
+        newDialog.displayConfirmationDialogAndAwaitUserDecision(),
+      ).rejects.toThrow(
+        'Interface not yet created. Call createInterface() first.',
       );
     });
 
     it('should resolve with true when grant button clicked', async () => {
-      const awaitingUserDecision = confirmationDialog.awaitUserDecision();
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (call) => call[0].elementName === GRANT_BUTTON,
+        (call) => call[0].elementName === 'grant-button',
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
@@ -111,9 +112,10 @@ describe('ConfirmationDialog', () => {
     });
 
     it('should resolve with false when cancel button clicked', async () => {
-      const awaitingUserDecision = confirmationDialog.awaitUserDecision();
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (call) => call[0].elementName === CANCEL_BUTTON,
+        (call) => call[0].elementName === 'cancel-button',
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
@@ -130,9 +132,10 @@ describe('ConfirmationDialog', () => {
     });
 
     it('should clean up event listeners after decision', async () => {
-      const awaitingUserDecision = confirmationDialog.awaitUserDecision();
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
-        (call) => call[0].elementName === GRANT_BUTTON,
+        (call) => call[0].elementName === 'grant-button',
       )?.[0]?.handler;
 
       if (grantButtonHandler === undefined) {
@@ -164,8 +167,13 @@ describe('ConfirmationDialog', () => {
       }) as GenericSnapElement;
 
       await expect(
-        confirmationDialog.updateContent({ ui: updatedUi }),
-      ).rejects.toThrow('Cannot update content before dialog is created');
+        confirmationDialog.updateContent({
+          ui: updatedUi,
+          isGrantDisabled: false,
+        }),
+      ).rejects.toThrow(
+        'Interface not yet created. Call createInterface() first.',
+      );
     });
 
     it('should update interface content', async () => {
@@ -177,7 +185,10 @@ describe('ConfirmationDialog', () => {
         children: 'Updated content',
       }) as GenericSnapElement;
 
-      await confirmationDialog.updateContent({ ui: updatedUi });
+      await confirmationDialog.updateContent({
+        ui: updatedUi,
+        isGrantDisabled: false,
+      });
 
       expect(mockSnaps.request).toHaveBeenCalledWith({
         method: 'snap_updateInterface',

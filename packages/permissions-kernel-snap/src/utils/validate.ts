@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import type { PermissionsResponse } from '@metamask/7715-permissions-shared/types';
 import {
   type PermissionsRequest,
+  type PermissionsResponse,
   zPermissionsRequest,
   zPermissionsResponse,
 } from '@metamask/7715-permissions-shared/types';

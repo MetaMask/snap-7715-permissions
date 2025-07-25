@@ -39,7 +39,6 @@ export type ProfileSyncManagerConfig = {
 
 /**
  * Creates a profile sync manager.
- *
  * @param config - The profile sync manager config.
  * @returns A profile sync manager.
  */
@@ -72,7 +71,6 @@ export function createProfileSyncManager(
 
   /**
    * Generates an object key for the permission response stored in profile sync.
-   *
    * @param permissionContext - The encoded delegation(ie. permissions context).
    * @returns The object key by concatenating the delegation hashes.
    */
@@ -101,7 +99,6 @@ export function createProfileSyncManager(
   /**
    * Retrieve all granted permission items under the "7715_permissions" feature will result in GET /api/v1/userstorage/7715_permissions
    * VALUES: decrypted("JSONstringifyPermission1", storage_key), decrypted("JSONstringifyPermission2", storage_key).
-   *
    * @returns All granted permissions.
    */
   async function getAllGrantedPermissions(): Promise<
@@ -123,7 +120,6 @@ export function createProfileSyncManager(
   /**
    * Retrieve a granted permission by context using query "<permissionContext>" key from the "7715_permissions" feature will result in GET /api/v1/userstorage/7715_permissions/Hash(<storage_key+<permissionContext>>)
    * VALUE: decrypted("JSONstringifyPermission", storage_key).
-   *
    * @param permissionContext - The context of the granted permission.
    * @returns The granted permission or null if the permission is not found.
    */
@@ -153,7 +149,6 @@ export function createProfileSyncManager(
    * it is up to the SDK consumer to enforce proper schema management
    * will result in PUT /api/v1/userstorage/gator_7715_permissions/Hash(<storage_key+<permissionContext>">)
    * VALUE: encrypted("JSONstringifyPermission", storage_key).
-   *
    * @param storedGrantedPermission - The permission response to store.
    */
   async function storeGrantedPermission(
@@ -178,7 +173,6 @@ export function createProfileSyncManager(
    * it is up to the SDK consumer to enforce proper schema management
    * will result in PUT /api/v1/userstorage/gator_7715_permissions/
    * VALUES: encrypted("JSONstringifyPermission1", storage_key), encrypted("JSONstringifyPermission2", storage_key).
-   *
    * @param storedGrantedPermissions - The permission responses to store.
    */
   async function storeGrantedPermissionBatch(

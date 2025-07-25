@@ -13,6 +13,7 @@ import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
+import type { BaseContext } from '../../src/core/types';
 
 const randomAddress = () => {
   /* eslint-disable no-restricted-globals */
@@ -33,7 +34,11 @@ const mockMetadata = {
 };
 
 const mockUiContent = {
-  type: 'panel',
+  type: 'ui-content',
+} as GenericSnapElement;
+
+const mockSkeletonUiContent = {
+  type: 'skeleton',
 } as GenericSnapElement;
 
 const requestingAccountAddress = randomAddress();
@@ -80,7 +85,7 @@ const mockAccountController = {
 
 const mockConfirmationDialog = {
   createInterface: jest.fn(),
-  awaitUserDecision: jest.fn(),
+  displayConfirmationDialogAndAwaitUserDecision: jest.fn(),
   updateContent: jest.fn(),
 } as unknown as jest.Mocked<ConfirmationDialog>;
 
@@ -99,6 +104,7 @@ type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
   deriveMetadata: jest.Mock;
+  createSkeletonConfirmationContent: jest.Mock;
   createConfirmationContent: jest.Mock;
   applyContext: jest.Mock;
   populatePermission: jest.Mock;
@@ -118,6 +124,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       parseAndValidatePermission: jest.fn().mockImplementation((req) => req),
       buildContext: jest.fn().mockResolvedValue(mockContext),
       deriveMetadata: jest.fn().mockResolvedValue(mockMetadata),
+      createSkeletonConfirmationContent: jest
+        .fn()
+        .mockResolvedValue(mockSkeletonUiContent),
       createConfirmationContent: jest.fn().mockResolvedValue(mockUiContent),
       applyContext: jest.fn().mockResolvedValue(mockResolvedPermissionRequest),
       populatePermission: jest.fn().mockResolvedValue(mockPopulatedPermission),
@@ -144,9 +153,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       mockConfirmationDialog,
     );
     mockConfirmationDialog.createInterface.mockResolvedValue(mockInterfaceId);
-    mockConfirmationDialog.awaitUserDecision.mockResolvedValue({
-      isConfirmationGranted: true,
-    });
+    mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
+      {
+        isConfirmationGranted: true,
+      },
+    );
     mockConfirmationDialog.updateContent.mockResolvedValue(undefined);
 
     permissionRequestLifecycleOrchestrator =
@@ -192,10 +203,79 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         });
       });
 
-      it('returns failure if user rejects the request', async () => {
-        mockConfirmationDialog.awaitUserDecision.mockResolvedValueOnce({
-          isConfirmationGranted: false,
+      it('creates a skeleton confirmation before the context is resolved', async () => {
+        // this never resolves, because we are testing the behaviour _before_ the context is returned.
+        const contextPromise = new Promise<BaseContext>((_resolve) => {
+          console.log('Arrow function cannot be empty');
         });
+
+        lifecycleHandlerMocks.buildContext.mockReturnValue(contextPromise);
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(mockConfirmationDialog.updateContent).not.toHaveBeenCalled();
+
+        expect(
+          lifecycleHandlerMocks.createSkeletonConfirmationContent,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          lifecycleHandlerMocks.createConfirmationContent,
+        ).not.toHaveBeenCalled();
+      });
+
+      it('creates the confirmation dialog with a disabled grant button', async () => {
+        // this never resolves, because we are testing the behaviour _before_ the context is returned.
+        const contextPromise = new Promise<BaseContext>((_resolve) => {
+          console.log('Arrow function cannot be empty');
+        });
+
+        lifecycleHandlerMocks.buildContext.mockReturnValue(contextPromise);
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(mockConfirmationDialog.updateContent).not.toHaveBeenCalled();
+        expect(
+          mockConfirmationDialogFactory.createConfirmation,
+        ).toHaveBeenCalledWith({
+          ui: mockSkeletonUiContent,
+          isGrantDisabled: true,
+        });
+      });
+
+      it('enables the grant button when updating the confirmation with the resolved context', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
+          ui: mockUiContent,
+          isGrantDisabled: false,
+        });
+      });
+
+      it('returns failure if user rejects the request', async () => {
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValueOnce(
+          {
+            isConfirmationGranted: false,
+          },
+        );
         const result = await permissionRequestLifecycleOrchestrator.orchestrate(
           'test-origin',
           mockPermissionRequest,
@@ -276,7 +356,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         let resolveUserDecision: (decision: boolean) => void = (_) => {
           throw new Error('resolveUserDecision not set');
         };
-        mockConfirmationDialog.awaitUserDecision.mockImplementation(
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
           async () => {
             const isConfirmationGranted = await new Promise<boolean>(
               (resolve) => {
@@ -316,7 +396,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         });
       });
 
-      it('throws error when adjustment is not allowed', async () => {
+      it('throws an error when adjustment is not allowed', async () => {
         const initialContext = {
           foo: 'bar',
           expiry: '2024-12-31',
@@ -353,11 +433,14 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           }),
         ).rejects.toThrow('Adjustment is not allowed');
 
-        expect(mockConfirmationDialog.updateContent).not.toHaveBeenCalled();
+        // this is called once when the context is first resolved
+        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(1);
 
-        mockConfirmationDialog.awaitUserDecision.mockResolvedValue({
-          isConfirmationGranted: true,
-        });
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
+          {
+            isConfirmationGranted: true,
+          },
+        );
 
         await orchestrationPromise;
       });
@@ -367,15 +450,14 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       /*
        * The PermissionRequestLifecycleOrchestrator orchestrates a permission request by performing the following steps:
        *
-       * 1. Validates and builds the initial permission context from the incoming permission request.
-       * 2. Prepares the UI for user confirmation, including context metadata and content.
-       * 3. Registers the onConfirmationCreated handler to allow dynamic updates to the context and UI.
-       * 4. Presents a confirmation dialog to the user and waits for their decision.
-       * 5. Resolves the permission request, possibly adjusting it based on the context.
-       * 6. Populates the permission with any required default values.
-       * 7. Gathers account address, metadata, and delegation manager information.
-       * 8. Builds a caveat builder and appends any permission-specific caveats.
-       * 9. Creates and signs a delegation for the permission using the account controller.
+       * 1. Validates and builds the initial permission request.
+       * 2. Creates the confirmation dialog with skeleton UI content.
+       * 3. Builds context, derives metadata and updates the UI content for confirmation.
+       * 4. Applies context to resolve the permission request.
+       * 5. Populates the permission with required values.
+       * 6. Retrieves account information.
+       * 7. Appends caveats to the permission.
+       * 8. Signs the delegation for the permission.
        */
 
       beforeEach(async () => {
@@ -387,24 +469,48 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 1. Validates and builds the initial permission context from the incoming permission request.
+       * 1. Validates and builds the initial permission request.
        */
-      it('validates and builds the initial context with the permission request', async () => {
+      it('validates and builds the initial permission request', async () => {
         expect(
           lifecycleHandlerMocks.parseAndValidatePermission,
         ).toHaveBeenCalledWith(mockPermissionRequest);
-        expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith(
-          mockPermissionRequest,
-        );
       });
 
       /*
-       * 2. Prepares the UI for user confirmation, including context metadata and content.
+       * 2. Creates the confirmation dialog with skeleton UI content
        */
-      it('derives metadata and creates UI content for confirmation', async () => {
+      it('creates the confirmation dialog with skeleton UI content', async () => {
+        expect(
+          lifecycleHandlerMocks.createSkeletonConfirmationContent,
+        ).toHaveBeenCalled();
+
+        expect(
+          mockConfirmationDialogFactory.createConfirmation,
+        ).toHaveBeenCalledWith({
+          ui: mockSkeletonUiContent,
+          isGrantDisabled: true,
+        });
+
+        expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();
+
+        expect(
+          mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision,
+        ).toHaveBeenCalled();
+      });
+
+      /*
+       * 3. Builds context, derives metadata and updates the UI content for confirmation.
+       */
+      it('builds context, derives metadata and updates the UI content for confirmation', async () => {
+        expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith(
+          mockPermissionRequest,
+        );
+
         expect(lifecycleHandlerMocks.deriveMetadata).toHaveBeenCalledWith({
           context: mockContext,
         });
+
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
         ).toHaveBeenCalledWith({
@@ -413,23 +519,15 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           origin: 'test-origin',
           chainId: 1,
         });
-      });
 
-      /*
-       * 4. Presents a confirmation dialog to the user and waits for their decision.
-       */
-      it('creates and awaits user decision on the confirmation dialog', async () => {
-        expect(
-          mockConfirmationDialogFactory.createConfirmation,
-        ).toHaveBeenCalledWith({
+        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
           ui: mockUiContent,
+          isGrantDisabled: false,
         });
-        expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();
-        expect(mockConfirmationDialog.awaitUserDecision).toHaveBeenCalled();
       });
 
       /*
-       * 5. Resolves the permission request, possibly adjusting it based on the context.
+       * 4. Applies context to resolve the permission request.
        */
       it('applies context to resolve the permission request', async () => {
         expect(lifecycleHandlerMocks.applyContext).toHaveBeenCalledWith({
@@ -439,7 +537,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 6. Populates the permission with any required default values.
+       * 5. Populates the permission with required values.
        */
       it('populates the permission with required values', async () => {
         expect(lifecycleHandlerMocks.populatePermission).toHaveBeenCalledWith({
@@ -448,7 +546,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 7. Gathers account address, metadata, and delegation manager information.
+       * 6. Retrieves account information.
        */
       it('retrieves account information', async () => {
         expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
@@ -460,7 +558,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 8. Builds a caveat builder and appends any permission-specific caveats.
+       * 7. Appends caveats to the permission.
        */
       it('appends caveats to the permission', async () => {
         expect(
@@ -472,7 +570,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 9. Creates and signs a delegation for the permission using the account controller.
+       * 8. Signs the delegation for the permission.
        */
       it('signs the delegation for the permission', async () => {
         expect(mockAccountController.signDelegation).toHaveBeenCalledWith(
