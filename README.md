@@ -34,7 +34,7 @@ This Snap creates a [DeleGator account](https://github.com/MetaMask/delegation-f
 **Prerequisites**
 
 - [MetaMask Flask >= 12.14.2](https://docs.metamask.io/snaps/get-started/install-flask/)
-- Nodejs `20.0.0` (specified in `.nvmrc`)
+- Nodejs `20.0.0` or > `22.0.0` (specified in `.nvmrc`)
 - yarn 3.2.1
 
 ### Environment variables

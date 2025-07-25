@@ -8,14 +8,14 @@ import {
   Text,
 } from '@metamask/snaps-sdk/jsx';
 
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
+import type { IconData } from './types';
 import {
   ShowMoreText,
   SkeletonField,
   TextField,
   TooltipIcon,
 } from '../ui/components';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
-import type { IconData } from './types';
 
 export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 
@@ -44,7 +44,6 @@ export type PermissionHandlerContentProps = {
 
 /**
  * Content wrapping a permission confirmation, including the title and add-more-rules button.
- *
  * @param options - The params for the content.
  * @param options.showAddMoreRulesButton - Whether to show the "Add more rules" button.
  * @param options.children - The children of the content.

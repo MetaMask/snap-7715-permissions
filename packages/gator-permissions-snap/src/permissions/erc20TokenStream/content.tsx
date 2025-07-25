@@ -1,8 +1,6 @@
 import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Field, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
 
-import { renderRules } from '../../core/rules';
-import { AccountDetails, TokenIcon, TooltipIcon } from '../../ui/components';
 import {
   initialAmountRule,
   maxAmountRule,
@@ -15,10 +13,11 @@ import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
 } from './types';
+import { renderRules } from '../../core/rules';
+import { AccountDetails, TokenIcon, TooltipIcon } from '../../ui/components';
 
 /**
  * Creates the confirmation content for an ERC20 token stream permission request.
- *
  * @param options - The options for creating the confirmation content.
  * @param options.context - The context containing stream details and account information.
  * @param options.metadata - The metadata containing stream configuration.

@@ -17,7 +17,6 @@ export type ProfileSyncOptions = {
 
 /**
  * Creates the profile sync options.
- *
  * @param stateManager - The state manager.
  * @param snapsProvider - The snaps provider.
  * @param messageSigningSnapId - The message signing snap id.

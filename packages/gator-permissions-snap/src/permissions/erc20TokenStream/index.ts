@@ -1,4 +1,3 @@
-import type { PermissionDefinition } from '../../core/types';
 import { createPermissionCaveats } from './caveats';
 import { createConfirmationContent } from './content';
 import {
@@ -16,6 +15,7 @@ import type {
   PopulatedErc20TokenStreamPermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
+import type { PermissionDefinition } from '../../core/types';
 
 export const erc20TokenStreamPermissionDefinition: PermissionDefinition<
   Erc20TokenStreamPermissionRequest,

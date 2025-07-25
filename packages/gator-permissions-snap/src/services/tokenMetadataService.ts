@@ -25,7 +25,6 @@ export class TokenMetadataService {
 
   /**
    * Initializes a new TokenMetadataService instance.
-   *
    * @param config - The configuration object.
    * @param config.accountApiClient - The client for interacting with the account API.
    * @param config.tokenMetadataClient - The client for interacting with the token metadata.
@@ -48,7 +47,6 @@ export class TokenMetadataService {
   /**
    * Gets the appropriate token metadata client for the given chain ID.
    * Uses the account API client for mainnet (chain ID 1) and the blockchain client for other chains.
-   *
    * @param config - The configuration object.
    * @param config.chainId - The chain ID to get the client for.
    * @returns The appropriate token metadata client.
@@ -65,7 +63,6 @@ export class TokenMetadataService {
 
   /**
    * Retrieves the token balance and metadata for the specified account.
-   *
    * @param options - The options for fetching the token balance and metadata.
    * @returns A promise resolving to the token balance and metadata.
    */
@@ -97,7 +94,6 @@ export class TokenMetadataService {
    * This function downloads an image from the provided URL, converts the binary data
    * to a base64 string using a browser-compatible approach, and returns it as a
    * data URI with PNG MIME type.
-   *
    * @param iconUrl - The URL of the icon to fetch and convert.
    * @returns A Promise that resolves to a base64 data URI string, or undefined if iconUrl is empty.
    * @throws Will throw an error if the fetch request fails or if there's an issue processing the image data.
