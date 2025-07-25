@@ -12,8 +12,8 @@ import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
-import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 import type { BaseContext } from '../../src/core/types';
+import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 const randomAddress = () => {
   /* eslint-disable no-restricted-globals */
