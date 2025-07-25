@@ -41,23 +41,6 @@ export const DateTimeField = ({
   iconData
 }: DateTimeFieldParams) => {
 
-  const iconElement = iconData ? (
-    <TokenIcon
-      imageDataBase64={iconData.iconDataBase64}
-      altText={iconData.iconAltText}
-    />
-  ) : null;
-
-  if (disabled) {
-    return (
-      <TextField
-        label={label}
-        value={value}
-        tooltip={tooltip}
-        iconData={iconData}
-      />
-    );
-  }
 
   if (value.timestamp && !value.date && !value.time) {
     try {
@@ -72,6 +55,21 @@ export const DateTimeField = ({
     }
   }
 
+  const date = new Date();
+  const formatterShort = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' });
+  const shortTimeZoneName = formatterShort.formatToParts(date).find((part) => part.type === 'timeZoneName')?.value || '';
+
+  if (disabled) {
+    return (
+      <TextField
+        label={label}
+        value={value.date + ' ' + value.time + ' ' + shortTimeZoneName}
+        tooltip={tooltip}
+        iconData={iconData}
+      />
+    );
+  }
+
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
   const removeButtonElement = removeButtonName ? (
     <Button name={removeButtonName} type="button">
@@ -79,7 +77,7 @@ export const DateTimeField = ({
     </Button>
   ) : null;
 
-  const errorElement = errorMessage ? (<Text color="error">{errorMessage}</Text>) : null;
+  const errorElement = errorMessage ? (<Text size='sm' color="error">{errorMessage}</Text>) : null;
 
   return (
     <Box direction="vertical">
@@ -88,19 +86,22 @@ export const DateTimeField = ({
           <Text>{label}</Text>
           {tooltipElement}
         </Box>
+        <Box direction="horizontal" alignment="end">
+          <Text color='muted' size='sm'>mm/dd/yyyy hh:mm:ss</Text>
+        </Box>
       </Box>
       <Box direction="horizontal" alignment="space-between">
         <Box direction="horizontal">
-          {iconElement}
           <Input 
             name={name+ '_date'} 
             type="text" 
             value={value.date}
-            placeholder="Date"
+            placeholder="mm/dd/yyyy"
           />
-        </Box>
-        <Box direction="horizontal">
           <Input name={name + '_time'} type="text" value={value.time} placeholder="HH:MM:SS"  />
+          <Box direction="vertical" alignment="center">
+            <Text alignment="center">{shortTimeZoneName}</Text>
+          </Box>
         </Box>
       </Box>
       <Box>

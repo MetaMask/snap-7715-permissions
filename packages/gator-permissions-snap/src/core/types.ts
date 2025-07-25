@@ -37,7 +37,6 @@ export type TypedPermissionRequest<TPermission extends Permission> =
  * Each permission type will extend this with their specific context needs.
  */
 export type BaseContext = {
-  permissionDetails: any;
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;

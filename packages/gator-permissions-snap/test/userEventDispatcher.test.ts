@@ -364,7 +364,7 @@ describe('UserEventDispatcher', () => {
         expect(handler).not.toHaveBeenCalled();
 
         // Fast-forward time to trigger the debounced handler
-        jest.advanceTimersByTime(300);
+        jest.advanceTimersByTime(500);
 
         // Handler should be called once with the last event
         expect(handler).toHaveBeenCalledTimes(1);
@@ -447,7 +447,7 @@ describe('UserEventDispatcher', () => {
         });
 
         // Fast-forward time
-        jest.advanceTimersByTime(300);
+        jest.advanceTimersByTime(500);
 
         // Both handlers should be called
         expect(handler1).toHaveBeenCalledTimes(1);
@@ -477,8 +477,8 @@ describe('UserEventDispatcher', () => {
         // Clear timers before they can execute
         userEventDispatcher.clearDebounceTimers();
 
-        // Fast-forward time
-        jest.advanceTimersByTime(300);
+        // Fast-forward time to trigger the debounced handler
+        jest.advanceTimersByTime(500);
 
         // Handler should not be called because timer was cleared
         expect(handler).not.toHaveBeenCalled();

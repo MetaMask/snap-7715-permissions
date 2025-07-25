@@ -184,12 +184,14 @@ describe('nativeTokenPeriodic:context', () => {
   });
 
   describe('createContextMetadata()', () => {
+    const dateInTheFuture = (Math.floor(Date.now() / 1000) + 24 * 60 * 60).toString(); // 24 hours from now
+    
     const context = {
       ...alreadyPopulatedContext,
-      expiry: convertTimestampToReadableDate(Date.now() / 1000 + 24 * 60 * 60), // 24 hours from now
+      expiry: dateInTheFuture,
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: convertTimestampToReadableDate(Date.now() / 1000),
+        startTime: dateInTheFuture,
       },
     };
 

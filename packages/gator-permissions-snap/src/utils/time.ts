@@ -1,10 +1,10 @@
 import { TimePeriod } from '../core/types';
 
 /**
- * Converts a unix timestamp(in seconds) to a human-readable date format based on locale.
+ * Converts a unix timestamp(in seconds) to a human-readable date format.
  *
  * @param timestamp - The unix timestamp in seconds.
- * @returns The formatted date string based on user's locale.
+ * @returns The formatted date string in mm/dd/yyyy format.
  */
 export const convertTimestampToReadableDate = (timestamp: number) => {
   const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
@@ -13,9 +13,12 @@ export const convertTimestampToReadableDate = (timestamp: number) => {
     throw new Error('convertTimestampToReadableDate: Invalid date format');
   }
 
-  // Use browser's locale to format the date appropriately
-  // This will automatically use MM/DD/YYYY for US locale, DD/MM/YYYY for European locales, etc.
-  return date.toLocaleDateString();
+  // Always format as mm/dd/yyyy using UTC
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // JavaScript months are 0-indexed
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const year = date.getUTCFullYear();
+
+  return `${month}/${day}/${year}`;
 };
 
 /**
@@ -42,38 +45,78 @@ export const convertTimestampToReadableTime = (timestamp: number) => {
 
 /**
  * Converts a human-readable date string to a Unix timestamp.
- * This function tries to parse the date in the user's locale format first,
- * then falls back to common formats if that fails.
+ * This function expects dates in mm/dd/yyyy format.
  *
- * @param date - The human-readable date string.
+ * @param date - The human-readable date string in mm/dd/yyyy format.
  * @returns The unix timestamp in seconds.
  */
 export const convertReadableDateToTimestamp = (date: string) => {
-  console.log('convertReadableDateToTimestamp', date);
-
-  if (date == '') {
-    throw new Error('Invalid date format');
-  }
-  
   // Check if the input is already a timestamp (numeric string)
   const numericValue = Number(date);
   if (!isNaN(numericValue) && numericValue > 0 && Number.isInteger(numericValue)) {
-    // If it's a valid positive integer, assume it's already a timestamp
+
+    if (numericValue < 1262304000) {
+      throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+    }
+
+    // Validate that the timestamp represents a reasonable date
+    const timestampDate = new Date(numericValue * 1000);
+    if (isNaN(timestampDate.getTime())) {
+      throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+    }
+    
+    // If it's a valid positive integer representing a reasonable date, assume it's already a timestamp
     return numericValue;
   }
   
-  // First, try to parse using the browser's locale
-  const parsedDate = new Date(date);
-  console.log('parsedDate', parsedDate);
-  
-  // If the date is valid and not NaN, use it
-  if (!isNaN(parsedDate.getTime())) {
-    // Set the time to 00:00:00 in the user's local timezone
-    parsedDate.setHours(0, 0, 0, 0);
-    return Math.floor(parsedDate.getTime() / 1000);
+  // Parse mm/dd/yyyy format
+  const parts = date.split('/');
+  if (parts.length !== 3) {
+    throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
   }
 
-  throw new Error('Invalid date format');
+  const monthStr = parts[0];
+  const dayStr = parts[1];
+  const yearStr = parts[2];
+
+  if (!monthStr || !dayStr || !yearStr) {
+    throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+  }
+
+  const month = parseInt(monthStr.trim());
+  const day = parseInt(dayStr.trim());
+  const year = parseInt(yearStr.trim());
+
+  // Validate that all parts are valid numbers
+  if (isNaN(month) || isNaN(day) || isNaN(year)) {
+    throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+  }
+
+  // Validate ranges
+  if (month < 1 || month > 12) {
+    throw new Error('Invalid month. Month must be between 1 and 12.');
+  }
+  
+  if (day < 1 || day > 31) {
+    throw new Error('Invalid day. Day must be between 1 and 31.');
+  }
+  
+  if (year < 1900) {
+    throw new Error('Invalid year.');
+  }
+
+  // Create the date using UTC (JavaScript months are 0-indexed)
+  const parsedDate = new Date(Date.UTC(year, month - 1, day));
+  
+  // Validate the date (handles edge cases like February 30th)
+  if (parsedDate.getUTCFullYear() !== year || 
+      parsedDate.getUTCMonth() !== month - 1 || 
+      parsedDate.getUTCDate() !== day) {
+    throw new Error('Invalid date. The specified date does not exist.');
+  }
+
+  // Return the UTC timestamp (already at 00:00:00 UTC)
+  return Math.floor(parsedDate.getTime() / 1000);
 };
 
 /**
@@ -83,7 +126,6 @@ export const convertReadableDateToTimestamp = (date: string) => {
  * @returns The seconds since midnight UTC.
  */
 export const convertReadableTimeToSeconds = (time: string) => {
-  console.log("convertReadableTimeToSeconds:", time);
   const [hours, minutes, seconds] = time.split(':');
   if (!hours || !minutes || !seconds) {
     throw new Error('Invalid time format');
@@ -113,42 +155,16 @@ export const convertReadableTimeToSeconds = (time: string) => {
 };
 
 /**
- * Combines a date string (MM/DD/YYYY) and time string (HH:MM:SS) into a Unix timestamp.
+ * Combines a date string (mm/dd/yyyy) and time string (HH:MM:SS) into a Unix timestamp.
  *
- * @param date - The human-readable date string.
+ * @param date - The human-readable date string in mm/dd/yyyy format.
  * @param time - The human-readable time string.
  * @returns The unix timestamp in seconds.
  */
 export const combineDateAndTimeToTimestamp = (date: string, time: string) => {
-  console.log('combineDateAndTimeToTimestamp', date, time);
   const dateTimestamp = convertReadableDateToTimestamp(date);
-  console.log('dateTimestamp', dateTimestamp);
   const timeSeconds = convertReadableTimeToSeconds(time);
-  console.log('timeSeconds', timeSeconds);
   return dateTimestamp + timeSeconds;
-};
-
-/**
- * Checks if a human-readable date string is in a valid format.
- * This function tries to parse the date using the browser's locale first,
- * then falls back to common formats.
- *
- * @param date - The human-readable date string.
- * @returns True if the date is in a valid format, otherwise false.
- */
-export const isHumanReadableInCorrectFormat = (date: string) => {
-  // First, try to parse using the browser's locale
-  const parsedDate = new Date(date);
-  if (!isNaN(parsedDate.getTime())) {
-    return true;
-  }
-
-  // Fallback: check MM/DD/YYYY format (for backward compatibility)
-  const [month, day, year] = date.split('/');
-  if (!month || !day || !year) {
-    return false;
-  }
-  return true;
 };
 
 /**

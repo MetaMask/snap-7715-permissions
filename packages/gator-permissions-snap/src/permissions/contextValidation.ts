@@ -56,16 +56,13 @@ export function validateAndParseAmount(
  */
 export function validateStartTime(startTime: string): string | undefined {
   try {
-    console.log('validateStartTime', startTime);
     const startTimeDate = convertReadableDateToTimestamp(startTime);
-    console.log('startTimeDate', startTimeDate);
    
     if (startTimeDate < getStartOfTodayLocal()) {
       return 'Start time must be today or later';
     }
     return undefined;
   } catch (error) {
-    console.log('error', error);
     return 'Invalid start time';
   }
 }

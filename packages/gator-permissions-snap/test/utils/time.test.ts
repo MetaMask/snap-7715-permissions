@@ -1,29 +1,22 @@
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
-  isHumanReadableInCorrectFormat,
   getStartOfTodayUTC,
   getStartOfNextDayUTC,
 } from '../../src/utils/time';
 
 describe('Time Utility Functions', () => {
   describe('convertTimestampToReadableDate', () => {
-    it('should convert a Unix timestamp to locale-appropriate format', () => {
-      const timestamp = 1747022400;
+    it('should convert a Unix timestamp to mm/dd/yyyy format', () => {
+      const timestamp = 1744588800; // April 14, 2025
       const result = convertTimestampToReadableDate(timestamp);
-      // The result should be a valid date string, but the exact format depends on locale
-      expect(typeof result).toBe('string');
-      expect(result.length).toBeGreaterThan(0);
-      // Verify it contains numbers and separators typical of date formats
-      expect(result).toMatch(/[\d\/\-\.]/);
+      expect(result).toBe('04/14/2025');
     });
 
     it('should handle different dates correctly', () => {
-      const timestamp = 1749700800;
+      const timestamp = 1747180800; // May 14, 2025
       const result = convertTimestampToReadableDate(timestamp);
-      expect(typeof result).toBe('string');
-      expect(result.length).toBeGreaterThan(0);
-      expect(result).toMatch(/[\d\/\-\.]/);
+      expect(result).toBe('05/14/2025');
     });
 
     it('should throw an error for invalid date format', () => {
@@ -35,7 +28,7 @@ describe('Time Utility Functions', () => {
   });
 
   describe('convertReadableDateToTimestamp', () => {
-    it('should convert MM/DD/YYYY format to Unix timestamp (backward compatibility)', () => {
+    it('should convert mm/dd/yyyy format to Unix timestamp (backward compatibility)', () => {
       const date = '04/11/2025';
       const expectedTimestamp = 1744329600;
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
@@ -47,22 +40,14 @@ describe('Time Utility Functions', () => {
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
     });
 
-    it('should handle locale-specific date formats', () => {
-      // Test that it can handle various date formats
+    it('should reject non-mm/dd/yyyy formats', () => {
+      // Test that it rejects various non-mm/dd/yyyy formats
       const date1 = '2025-04-11'; // ISO format
-      const date2 = '11/04/2025'; // DD/MM/YYYY format
+      const date2 = '04-11-2025'; // MM-DD-YYYY format with dashes
       
-      // Both should produce valid timestamps
-      expect(() => convertReadableDateToTimestamp(date1)).not.toThrow();
-      expect(() => convertReadableDateToTimestamp(date2)).not.toThrow();
-      
-      const timestamp1 = convertReadableDateToTimestamp(date1);
-      const timestamp2 = convertReadableDateToTimestamp(date2);
-      
-      expect(typeof timestamp1).toBe('number');
-      expect(typeof timestamp2).toBe('number');
-      expect(timestamp1).toBeGreaterThan(0);
-      expect(timestamp2).toBeGreaterThan(0);
+      // Both should throw errors
+      expect(() => convertReadableDateToTimestamp(date1)).toThrow('Invalid date format. Expected format: mm/dd/yyyy');
+      expect(() => convertReadableDateToTimestamp(date2)).toThrow('Invalid date format. Expected format: mm/dd/yyyy');
     });
 
     it('should throw an error for invalid date format', () => {
@@ -85,25 +70,6 @@ describe('Time Utility Functions', () => {
       expect(() => convertReadableDateToTimestamp(decimalString)).toThrow(
         'Invalid date format',
       );
-    });
-  });
-
-  describe('isHumanReadableInCorrectFormat', () => {
-    it('should return true for valid MM/DD/YYYY format (backward compatibility)', () => {
-      expect(isHumanReadableInCorrectFormat('01/01/2023')).toBe(true);
-      expect(isHumanReadableInCorrectFormat('12/10/2023')).toBe(true);
-    });
-
-    it('should return true for valid locale-specific formats', () => {
-      expect(isHumanReadableInCorrectFormat('2023-01-01')).toBe(true); // ISO format
-      expect(isHumanReadableInCorrectFormat('01/01/2023')).toBe(true); // MM/DD/YYYY
-      expect(isHumanReadableInCorrectFormat('1/1/2023')).toBe(true); // M/D/YYYY
-    });
-
-    it('should return false for invalid formats', () => {
-      expect(isHumanReadableInCorrectFormat('invalid-date')).toBe(false);
-      expect(isHumanReadableInCorrectFormat('01-07-2023')).toBe(false);
-      expect(isHumanReadableInCorrectFormat('')).toBe(false);
     });
   });
 
