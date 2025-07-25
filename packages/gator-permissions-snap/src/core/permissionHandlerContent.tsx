@@ -8,14 +8,14 @@ import {
   Text,
 } from '@metamask/snaps-sdk/jsx';
 
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
+import type { IconData } from './types';
 import {
   ShowMoreText,
   SkeletonField,
   TextField,
   TooltipIcon,
 } from '../ui/components';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
-import type { IconData } from './types';
 
 export const TOGGLE_ADD_MORE_RULES_BUTTON = 'add-more-rules';
 
