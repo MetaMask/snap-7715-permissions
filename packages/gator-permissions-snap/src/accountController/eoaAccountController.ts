@@ -1,6 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
+import { bigIntToHex } from '@metamask/utils';
 
 import { BaseAccountController } from './baseAccountController';
 import type {
@@ -169,7 +170,7 @@ export class EoaAccountController
 
     const primaryType = 'Delegation';
 
-    const message = delegation;
+    const message = { ...delegation, salt: bigIntToHex(delegation.salt) };
 
     return { domain, types, primaryType, message };
   }
