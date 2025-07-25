@@ -172,6 +172,7 @@ Key architectural points:
 - Dispatches events to registered handlers
 - Handles event handler errors gracefully
 - Ensures only one component can handle user input events
+- Ensures events are handled sequentially
 
 The UserEventDispatcher provides a simple interface for:
 1. Registering event handlers with `on()`:

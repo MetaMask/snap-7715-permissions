@@ -13,6 +13,7 @@ import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
+import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 const randomAddress = () => {
   /* eslint-disable no-restricted-globals */
@@ -92,6 +93,13 @@ const mockConfirmationDialogFactory = {
   createConfirmation: jest.fn(),
 } as unknown as jest.Mocked<ConfirmationDialogFactory>;
 
+const mockUserEventDispatcher = {
+  on: jest.fn(),
+  off: jest.fn(),
+  createUserInputEventHandler: jest.fn(),
+  waitForPendingHandlers: jest.fn().mockResolvedValue(undefined),
+} as unknown as jest.Mocked<UserEventDispatcher>;
+
 type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
@@ -156,6 +164,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       new PermissionRequestLifecycleOrchestrator({
         accountController: mockAccountController,
         confirmationDialogFactory: mockConfirmationDialogFactory,
+        userEventDispatcher: mockUserEventDispatcher,
       });
   });
 

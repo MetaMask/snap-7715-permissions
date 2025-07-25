@@ -38,6 +38,7 @@ const getUserInputEventKey = ({
   eventType: UserInputEventType;
   interfaceId: string;
 }) => `${elementName}:${eventType}:${interfaceId}`;
+
 /**
  * Class responsible for dispatching user input events to registered handlers.
  * Provides a way to register, deregister, and dispatch event handlers
@@ -55,6 +56,11 @@ export class UserEventDispatcher {
    * Flag to ensure only one component can get the event handler
    */
   #hasEventHandler = false;
+
+  /**
+   * Queue for processing events sequentially to prevent race conditions
+   */
+  #eventQueue: Promise<void> = Promise.resolve();
 
   /**
    * Register an event handler for a specific event type.
@@ -150,35 +156,56 @@ export class UserEventDispatcher {
     this.#hasEventHandler = true;
 
     return async (args: { event: UserInputEvent; id: string }) => {
-      const { event, id } = args;
+      // Create a promise for this specific event's processing
+      const eventPromise = this.#eventQueue.then(async () => {
+        const { event, id } = args;
 
-      const eventKey = getUserInputEventKey({
-        elementName: event.name ?? '',
-        eventType: event.type,
-        interfaceId: id,
-      });
+        const eventKey = getUserInputEventKey({
+          elementName: event.name ?? '',
+          eventType: event.type,
+          interfaceId: id,
+        });
 
-      const handlers = this.#eventHandlers[eventKey];
+        const handlers = this.#eventHandlers[eventKey];
 
-      if (!handlers?.length) {
-        return;
-      }
+        if (!handlers?.length) {
+          return;
+        }
 
-      const handlersExecutions = handlers.map(async (handler) => {
-        try {
-          await handler({
-            event,
-            interfaceId: id,
-          });
-        } catch (error) {
-          logger.error(
-            `Error in event handler for event type ${event.type} and interface id ${id}:`,
-            error,
-          );
+        // Execute handlers sequentially to prevent race conditions where multiple handlers
+        // might overwrite each other's context changes
+        for (const handler of handlers) {
+          try {
+            await handler({
+              event,
+              interfaceId: id,
+            });
+          } catch (error) {
+            logger.error(
+              `Error in event handler for event type ${event.type} and interface id ${id}:`,
+              error,
+            );
+          }
         }
       });
 
-      await Promise.all(handlersExecutions);
+      // Chain this event to the queue to ensure sequential processing
+      this.#eventQueue = eventPromise;
+
+      // Wait for this specific event to complete
+      await eventPromise;
     };
+  }
+
+  /**
+   * Waits for all pending event handler updates to complete.
+   * This is useful for ensuring that all context updates have been processed
+   * before proceeding with operations like granting permissions.
+   *
+   * @returns Promise that resolves when all pending updates are complete.
+   */
+  async waitForPendingHandlers(): Promise<void> {
+    // Wait for the event queue to be empty (all events processed)
+    await this.#eventQueue;
   }
 }
