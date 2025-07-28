@@ -17,10 +17,10 @@ import type {
   OnUserInputHandler,
 } from '@metamask/snaps-sdk';
 
-import { AccountController } from './core/accountController';
 import { AccountApiClient } from './clients/accountApiClient';
 import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
 import { PriceApiClient } from './clients/priceApiClient';
+import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';

@@ -326,6 +326,7 @@ export type AccountOptionsBase = {
  */
 export type SignDelegationOptions = AccountOptionsBase & {
   delegation: Omit<Delegation, 'signature'>;
+  address: Hex;
 };
 
 /**

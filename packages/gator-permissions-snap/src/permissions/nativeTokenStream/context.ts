@@ -24,6 +24,7 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
+import { fromCaip10Address, toCaip10Address } from '../../utils/utils';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -69,8 +70,11 @@ export async function applyContext({
     justification: originalRequest.permission.data.justification,
   };
 
+  const { address } = fromCaip10Address(context.accountDetails.address);
+
   return {
     ...originalRequest,
+    address,
     expiry,
     permission: {
       type: 'native-token-stream',
@@ -185,7 +189,7 @@ export async function buildContext({
 
   const balance = bigIntToHex(rawBalance);
 
-  const caip10Address = `eip155:1:${address}` as const;
+  const caip10Address = toCaip10Address({ chainId, address });
 
   return {
     expiry,
