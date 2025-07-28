@@ -105,17 +105,17 @@ export const convertReadableDateToTimestamp = (date: string) => {
     throw new Error('Invalid year.');
   }
 
-  // Create the date using UTC (JavaScript months are 0-indexed)
-  const parsedDate = new Date(Date.UTC(year, month - 1, day));
+  // Create the date using local time (JavaScript months are 0-indexed)
+  const parsedDate = new Date(year, month - 1, day);
   
   // Validate the date (handles edge cases like February 30th)
-  if (parsedDate.getUTCFullYear() !== year || 
-      parsedDate.getUTCMonth() !== month - 1 || 
-      parsedDate.getUTCDate() !== day) {
+  if (parsedDate.getFullYear() !== year || 
+      parsedDate.getMonth() !== month - 1 || 
+      parsedDate.getDate() !== day) {
     throw new Error('Invalid date. The specified date does not exist.');
   }
 
-  // Return the UTC timestamp (already at 00:00:00 UTC)
+  // Return the local timestamp (at 00:00:00 local time)
   return Math.floor(parsedDate.getTime() / 1000);
 };
 
