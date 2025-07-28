@@ -244,14 +244,11 @@ export class PermissionRequestLifecycleOrchestrator {
       isAdjustmentAllowed,
     };
 
-    const [address, accountMetadata] = await Promise.all([
-      this.#accountController.getAccountAddress({
-        chainId,
-      }),
-      this.#accountController.getAccountMetadata({
-        chainId,
-      }),
-    ]);
+    const { address } = grantedPermissionRequest;
+    // todo: it would be nice if this was concretely typed
+    if (address === undefined) {
+      throw new Error('Address is undefined');
+    }
 
     const { contracts } = getChainMetadata({ chainId });
     const {
@@ -292,19 +289,13 @@ export class PermissionRequestLifecycleOrchestrator {
       await this.#accountController.signDelegation({
         chainId,
         delegation,
+        address,
       });
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
-    const accountMeta: AccountMeta[] =
-      accountMetadata.factory && accountMetadata.factoryData
-        ? [
-            {
-              factory: accountMetadata.factory,
-              factoryData: accountMetadata.factoryData,
-            },
-          ]
-        : [];
+    // accountMetadata is always empty for EIP-7702 accounts
+    const accountMeta: AccountMeta[] = [];
 
     const response: PermissionResponse = {
       ...grantedPermissionRequest,

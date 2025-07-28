@@ -1,5 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { InputChangeEvent, UserInputEventType } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../accountController';
 import { getIconData } from '../permissions/iconUtil';

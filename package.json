@@ -53,7 +53,7 @@
     "node": "^20 || >=22"
   },
   "resolutions": {
-    "@metamask/snaps-sdk": "8.0.0"
+    "@metamask/snaps-sdk": "9.3.0"
   },
   "lavamoat": {
     "allowScripts": {

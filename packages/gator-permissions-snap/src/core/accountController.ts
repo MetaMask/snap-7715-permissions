@@ -3,13 +3,13 @@ import { type Hex, type Delegation } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
 import { bigIntToHex } from '@metamask/utils';
 
+import { getChainMetadata } from './chainMetadata';
 import type {
   AccountControllerInterface,
   AccountOptionsBase,
   SignDelegationOptions,
   FactoryArgs,
 } from './types';
-import { getChainMetadata } from '../core/chainMetadata';
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
@@ -174,11 +174,9 @@ export class AccountController implements AccountControllerInterface {
   ): Promise<Delegation> {
     logger.debug('eoaAccountController:signDelegation()');
 
-    const { chainId, delegation } = options;
+    const { chainId, delegation, address } = options;
 
     this.assertIsSupportedChainId(chainId);
-
-    const address = await this.#getAccountAddress();
 
     const selectedChain = await this.#ethereumProvider.request<Hex>({
       method: 'eth_chainId',
