@@ -53,8 +53,11 @@ export const convertTimestampToReadableTime = (timestamp: number) => {
 export const convertReadableDateToTimestamp = (date: string) => {
   // Check if the input is already a timestamp (numeric string)
   const numericValue = Number(date);
-  if (!isNaN(numericValue) && numericValue > 0 && Number.isInteger(numericValue)) {
-
+  if (
+    !isNaN(numericValue) &&
+    numericValue > 0 &&
+    Number.isInteger(numericValue)
+  ) {
     if (numericValue < 1262304000) {
       throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
     }
@@ -64,11 +67,11 @@ export const convertReadableDateToTimestamp = (date: string) => {
     if (isNaN(timestampDate.getTime())) {
       throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
     }
-    
+
     // If it's a valid positive integer representing a reasonable date, assume it's already a timestamp
     return numericValue;
   }
-  
+
   // Parse mm/dd/yyyy format
   const parts = date.split('/');
   if (parts.length !== 3) {
@@ -83,9 +86,9 @@ export const convertReadableDateToTimestamp = (date: string) => {
     throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
   }
 
-  const month = parseInt(monthStr.trim());
-  const day = parseInt(dayStr.trim());
-  const year = parseInt(yearStr.trim());
+  const month = parseInt(monthStr.trim(), 10);
+  const day = parseInt(dayStr.trim(), 10);
+  const year = parseInt(yearStr.trim(), 10);
 
   // Validate that all parts are valid numbers
   if (isNaN(month) || isNaN(day) || isNaN(year)) {
@@ -96,22 +99,24 @@ export const convertReadableDateToTimestamp = (date: string) => {
   if (month < 1 || month > 12) {
     throw new Error('Invalid month. Month must be between 1 and 12.');
   }
-  
+
   if (day < 1 || day > 31) {
     throw new Error('Invalid day. Day must be between 1 and 31.');
   }
-  
+
   if (year < 1900) {
     throw new Error('Invalid year.');
   }
 
   // Create the date using local time (JavaScript months are 0-indexed)
   const parsedDate = new Date(year, month - 1, day);
-  
+
   // Validate the date (handles edge cases like February 30th)
-  if (parsedDate.getFullYear() !== year || 
-      parsedDate.getMonth() !== month - 1 || 
-      parsedDate.getDate() !== day) {
+  if (
+    parsedDate.getFullYear() !== year ||
+    parsedDate.getMonth() !== month - 1 ||
+    parsedDate.getDate() !== day
+  ) {
     throw new Error('Invalid date. The specified date does not exist.');
   }
 

@@ -17,7 +17,6 @@ import type {
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import {
-  convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
 } from '../../../src/utils/time';
@@ -184,8 +183,11 @@ describe('nativeTokenPeriodic:context', () => {
   });
 
   describe('createContextMetadata()', () => {
-    const dateInTheFuture = (Math.floor(Date.now() / 1000) + 24 * 60 * 60).toString(); // 24 hours from now
-    
+    const dateInTheFuture = (
+      Math.floor(Date.now() / 1000) +
+      24 * 60 * 60
+    ).toString(); // 24 hours from now
+
     const context = {
       ...alreadyPopulatedContext,
       expiry: dateInTheFuture,

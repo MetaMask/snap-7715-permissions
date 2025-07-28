@@ -44,10 +44,14 @@ describe('Time Utility Functions', () => {
       // Test that it rejects various non-mm/dd/yyyy formats
       const date1 = '2025-04-11'; // ISO format
       const date2 = '04-11-2025'; // MM-DD-YYYY format with dashes
-      
+
       // Both should throw errors
-      expect(() => convertReadableDateToTimestamp(date1)).toThrow('Invalid date format. Expected format: mm/dd/yyyy');
-      expect(() => convertReadableDateToTimestamp(date2)).toThrow('Invalid date format. Expected format: mm/dd/yyyy');
+      expect(() => convertReadableDateToTimestamp(date1)).toThrow(
+        'Invalid date format. Expected format: mm/dd/yyyy',
+      );
+      expect(() => convertReadableDateToTimestamp(date2)).toThrow(
+        'Invalid date format. Expected format: mm/dd/yyyy',
+      );
     });
 
     it('should throw an error for invalid date format', () => {
@@ -60,7 +64,7 @@ describe('Time Utility Functions', () => {
     it('should handle inputs that are already timestamps', () => {
       const timestamp = '1744329600'; // April 11, 2025 timestamp
       expect(convertReadableDateToTimestamp(timestamp)).toBe(1744329600);
-      
+
       const anotherTimestamp = '1640995200'; // January 1, 2022 timestamp
       expect(convertReadableDateToTimestamp(anotherTimestamp)).toBe(1640995200);
     });

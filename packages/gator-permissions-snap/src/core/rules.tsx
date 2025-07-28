@@ -7,21 +7,25 @@ import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
-import type { BaseContext, DateTimeParameterNames, RuleDefinition } from './types';
+import type { BaseContext, RuleDefinition } from './types';
 import { DateTimeField } from '../ui/components/DateTimeField';
-import { combineDateAndTimeToTimestamp, convertTimestampToReadableDate, convertTimestampToReadableTime } from '../utils/time';
+import {
+  combineDateAndTimeToTimestamp,
+  convertTimestampToReadableDate,
+  convertTimestampToReadableTime,
+} from '../utils/time';
 
 /**
  * Utility function to access nested properties in an object using dot notation.
- * For example: getNestedProperty(obj, 'permissionDetails.startTime')
- * 
- * @param obj - The object to access properties from
- * @param path - The dot-notation path to the property
- * @returns The value at the specified path, or undefined if not found
+ * For example: getNestedProperty(obj, 'permissionDetails.startTime').
+ *
+ * @param obj - The object to access properties from.
+ * @param path - The dot-notation path to the property.
+ * @returns The value at the specified path, or undefined if not found.
  */
 function getNestedProperty(obj: any, path: string): any {
   return path.split('.').reduce((current, key) => {
-    return current && current[key] !== undefined ? current[key] : undefined;
+    return current?.[key];
   }, obj);
 }
 
@@ -54,7 +58,7 @@ export function renderRule<
     isVisible,
     options,
     isAdjustmentAllowed,
-    dateTimeParameterNames
+    dateTimeParameterNames,
   } = rule.getRuleData({ context, metadata });
 
   if (value === null || value === undefined || !isVisible) {
@@ -92,31 +96,33 @@ export function renderRule<
         <DropdownField
           label={label}
           name={name}
-          options={options}
           value={value ?? ''}
           errorMessage={error}
           disabled={isDisabled}
           tooltip={tooltip}
+          options={options}
         />
       );
     }
     case 'datetime': {
-
       if (!dateTimeParameterNames) {
         throw new Error('DateTime rule must have dateTimeParameterNames');
       }
 
-      const value = {
-        timestamp: getNestedProperty(context, dateTimeParameterNames.timestampName),
+      const dateTimeValue = {
+        timestamp: getNestedProperty(
+          context,
+          dateTimeParameterNames.timestampName,
+        ),
         date: getNestedProperty(context, dateTimeParameterNames.dateName),
         time: getNestedProperty(context, dateTimeParameterNames.timeName),
-      }
+      };
 
       return (
         <DateTimeField
           label={label}
           name={name}
-          value={value ?? ''}
+          value={dateTimeValue ?? ''}
           errorMessage={error}
           disabled={isDisabled}
           tooltip={tooltip}
@@ -161,6 +167,7 @@ export function renderRules<
  * @param options0.userEventDispatcher - The user event dispatcher to bind handlers to.
  * @param options0.interfaceId - The interface ID for the event handlers.
  * @param options0.getContext - Function to get the current context state.
+ * @param options0.deriveMetadata - Function to derive metadata from context.
  * @param options0.onContextChanged - Function called when context changes.
  * @returns A function that unbinds the handlers when called.
  */
@@ -207,19 +214,24 @@ export function bindRuleHandlers<
       const fieldName = event.name;
       const isDateField = fieldName.endsWith('_date');
       const isTimeField = fieldName.endsWith('_time');
-      
+
       const context = getContext();
       const metadata = await deriveMetadata({ context });
 
-      const ruleData = getRuleData({ context, metadata });
+      const { dateTimeParameterNames } = getRuleData({ context, metadata });
 
-      const dateTimeParameterNames = ruleData.dateTimeParameterNames!;
+      if (!dateTimeParameterNames) {
+        return;
+      }
 
       const currentValues = {
-        timestamp: getNestedProperty(context, dateTimeParameterNames.timestampName),
+        timestamp: getNestedProperty(
+          context,
+          dateTimeParameterNames.timestampName,
+        ),
         date: getNestedProperty(context, dateTimeParameterNames.dateName),
         time: getNestedProperty(context, dateTimeParameterNames.timeName),
-      }
+      };
 
       if (isDateField) {
         currentValues.date = event.value as string;
@@ -228,52 +240,55 @@ export function bindRuleHandlers<
       }
 
       if (!currentValues.date) {
-        currentValues.date = convertTimestampToReadableDate(currentValues.timestamp);
+        currentValues.date = convertTimestampToReadableDate(
+          currentValues.timestamp,
+        );
       }
 
       if (!currentValues.time) {
-        currentValues.time = convertTimestampToReadableTime(currentValues.timestamp);
+        currentValues.time = convertTimestampToReadableTime(
+          currentValues.timestamp,
+        );
       }
 
       try {
-        const timestamp = combineDateAndTimeToTimestamp(currentValues.date, currentValues.time);
+        const timestamp = combineDateAndTimeToTimestamp(
+          currentValues.date,
+          currentValues.time,
+        );
         currentValues.timestamp = timestamp.toString();
       } catch (error) {
         currentValues.timestamp = '';
-        console.log("Error combining date and time", error);
+        console.log('Error combining date and time', error);
       }
 
-      const updatedContext = rule.updateContext(
-        getContext(),
-        currentValues,
-      );
+      const updatedContext = rule.updateContext(getContext(), currentValues);
       await onContextChanged({ context: updatedContext });
-      
     };
 
     if (type === 'datetime') {
       userEventDispatcher.on({
-        elementName: name + '_time',
+        elementName: `${name}_time`,
         eventType: UserInputEventType.InputChangeEvent,
         interfaceId,
         handler: handleDateInputChange,
       });
 
       userEventDispatcher.on({
-        elementName: name + '_date',
+        elementName: `${name}_date`,
         eventType: UserInputEventType.InputChangeEvent,
         interfaceId,
         handler: handleDateInputChange,
       });
-  
+
       acc.push({
-        elementName: name + '_time',
+        elementName: `${name}_time`,
         eventType: UserInputEventType.InputChangeEvent,
         handler: handleDateInputChange as UserEventHandler<UserInputEventType>,
       });
 
       acc.push({
-        elementName: name + '_date',
+        elementName: `${name}_date`,
         eventType: UserInputEventType.InputChangeEvent,
         handler: handleDateInputChange as UserEventHandler<UserInputEventType>,
       });
@@ -284,7 +299,7 @@ export function bindRuleHandlers<
         interfaceId,
         handler: handleInputChange,
       });
-  
+
       acc.push({
         elementName: name,
         eventType: UserInputEventType.InputChangeEvent,

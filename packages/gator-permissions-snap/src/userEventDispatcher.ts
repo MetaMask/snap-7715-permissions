@@ -1,12 +1,12 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import {
+import type {
   ButtonClickEvent,
   FileUploadEvent,
   FormSubmitEvent,
   InputChangeEvent,
   UserInputEvent,
-  UserInputEventType,
 } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
 export type DialogContentEventHandlers = {
   elementName: string;
@@ -48,7 +48,7 @@ const DEBOUNCE_DELAY = 500; // 500ms debounce delay
  * Class responsible for dispatching user input events to registered handlers.
  * Provides a way to register, deregister, and dispatch event handlers
  * based on event type. Handlers can internally filter by event name if needed.
- * 
+ *
  * Key features:
  * - Debouncing logic to prevent rapid successive calls of the same input change event
  * - Sequential event processing to prevent race conditions
@@ -82,11 +82,14 @@ export class UserEventDispatcher {
    * Map to track the latest event data for each debounced event key
    * This ensures we always process the most recent event data
    */
-  readonly #pendingDebouncedEvents = new Map<string, {
-    event: UserInputEvent;
-    id: string;
-    eventKey: string;
-  }>();
+  readonly #pendingDebouncedEvents = new Map<
+    string,
+    {
+      event: UserInputEvent;
+      id: string;
+      eventKey: string;
+    }
+  >();
 
   /**
    * Register an event handler for a specific event type.
@@ -171,8 +174,16 @@ export class UserEventDispatcher {
    * This is the core logic shared between debounced and non-debounced event processing.
    * Handlers are executed one after another to prevent race conditions where multiple handlers
    * might overwrite each other's context changes.
+   * @param event - The user input event to process.
+   * @param id - The interface ID for the event.
+   * @param eventKey - The unique key identifying the event.
+   * @returns Promise that resolves when all handlers have been executed.
    */
-  #processEvent(event: UserInputEvent, id: string, eventKey: string): Promise<void> {
+  async #processEvent(
+    event: UserInputEvent,
+    id: string,
+    eventKey: string,
+  ): Promise<void> {
     return this.#eventQueue.then(async () => {
       const handlers = this.#eventHandlers[eventKey];
 
@@ -203,7 +214,7 @@ export class UserEventDispatcher {
    * This ensures that only one component (the ConfirmationDialogFactory) can handle user input events.
    * The returned function processes events with debouncing for input change events and immediate processing
    * for other event types, while maintaining proper ordering and sequential execution.
-   * 
+   *
    * @returns A function that handles user input events.
    * @throws If the handler has already been created.
    */
@@ -237,22 +248,19 @@ export class UserEventDispatcher {
         }
 
         // Set up new debounce timer
-        const timer = setTimeout(async () => {
+        const timer = setTimeout(() => {
           // Get the latest event data for this key
           const pendingEvent = this.#pendingDebouncedEvents.get(eventKey);
           if (pendingEvent) {
             // Remove from pending events
             this.#pendingDebouncedEvents.delete(eventKey);
-            
+
             // Process the event and chain it to the queue
             this.#eventQueue = this.#processEvent(
               pendingEvent.event,
               pendingEvent.id,
               pendingEvent.eventKey,
             );
-            
-            // Wait for this specific event to complete
-            await this.#eventQueue;
           }
         }, DEBOUNCE_DELAY);
 
@@ -261,40 +269,46 @@ export class UserEventDispatcher {
       } else {
         // For non-input events, first process any pending debounced events immediately
         // This ensures proper ordering: any pending debounced events are processed before the current non-debounced event
-        const pendingEventKeys = Array.from(this.#pendingDebouncedEvents.keys());
+        const pendingEventKeys = Array.from(
+          this.#pendingDebouncedEvents.keys(),
+        );
         if (pendingEventKeys.length > 0) {
           // Process all pending debounced events immediately
-          const pendingPromises = pendingEventKeys.map(async (pendingEventKey) => {
-            const pendingEvent = this.#pendingDebouncedEvents.get(pendingEventKey);
-            if (pendingEvent) {
-              // Clear the debounce timer for this event
-              const timer = this.#debounceTimers.get(pendingEventKey);
-              if (timer) {
-                clearTimeout(timer);
-                this.#debounceTimers.delete(pendingEventKey);
+          const pendingPromises = pendingEventKeys.map(
+            async (pendingEventKey) => {
+              const pendingEvent =
+                this.#pendingDebouncedEvents.get(pendingEventKey);
+              if (pendingEvent) {
+                // Clear the debounce timer for this event
+                const timer = this.#debounceTimers.get(pendingEventKey);
+                if (timer) {
+                  clearTimeout(timer);
+                  this.#debounceTimers.delete(pendingEventKey);
+                }
+
+                // Remove from pending events
+                this.#pendingDebouncedEvents.delete(pendingEventKey);
+
+                // Process the event and chain it to the queue
+                this.#eventQueue = this.#processEvent(
+                  pendingEvent.event,
+                  pendingEvent.id,
+                  pendingEvent.eventKey,
+                );
+
+                // Wait for this specific event to complete
+                return this.#eventQueue;
               }
-              
-              // Remove from pending events
-              this.#pendingDebouncedEvents.delete(pendingEventKey);
-              
-              // Process the event and chain it to the queue
-              this.#eventQueue = this.#processEvent(
-                pendingEvent.event,
-                pendingEvent.id,
-                pendingEvent.eventKey,
-              );
-              
-              // Wait for this specific event to complete
-              return this.#eventQueue;
-            }
-          });
-          
+              return undefined;
+            },
+          );
+
           // Wait for all pending debounced events to complete
           if (pendingPromises.length > 0) {
             await Promise.all(pendingPromises);
           }
         }
-        
+
         // Now process the current non-debounced event and chain it to the queue
         this.#eventQueue = this.#processEvent(event, id, eventKey);
 
@@ -315,7 +329,7 @@ export class UserEventDispatcher {
       clearTimeout(timer);
     }
     this.#debounceTimers.clear();
-    
+
     // Clear pending debounced events
     this.#pendingDebouncedEvents.clear();
   }
@@ -342,26 +356,27 @@ export class UserEventDispatcher {
           this.#debounceTimers.delete(eventKey);
         }
       }
-      
+
       // Create promises for all pending debounced events
       const pendingPromises = pendingEventKeys.map(async (eventKey) => {
         const pendingEvent = this.#pendingDebouncedEvents.get(eventKey);
         if (pendingEvent) {
           // Remove from pending events
           this.#pendingDebouncedEvents.delete(eventKey);
-          
+
           // Process the event and chain it to the queue
           this.#eventQueue = this.#processEvent(
             pendingEvent.event,
             pendingEvent.id,
             pendingEvent.eventKey,
           );
-          
+
           // Wait for this specific event to complete
           return this.#eventQueue;
         }
+        return undefined;
       });
-      
+
       if (pendingPromises.length > 0) {
         await Promise.all(pendingPromises);
       }

@@ -47,7 +47,7 @@ const mockMetadata: TestMetadata = {
   validationErrors: {},
 };
 
-const mockDeriveMetadata = jest.fn(async (args: { context: TestContext }) => mockMetadata);
+const mockDeriveMetadata = jest.fn(async () => mockMetadata);
 
 const textRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-text-rule',

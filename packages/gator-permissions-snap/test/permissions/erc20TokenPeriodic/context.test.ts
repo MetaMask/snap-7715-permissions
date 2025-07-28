@@ -195,8 +195,11 @@ describe('erc20TokenPeriodic:context', () => {
   });
 
   describe('createContextMetadata()', () => {
-    const dateInTheFuture = (Math.floor(Date.now() / 1000) + 24 * 60 * 60).toString() // 24 hours from now
-    
+    const dateInTheFuture = (
+      Math.floor(Date.now() / 1000) +
+      24 * 60 * 60
+    ).toString(); // 24 hours from now
+
     const context = {
       ...alreadyPopulatedContext,
       expiry: dateInTheFuture,

@@ -1,5 +1,6 @@
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
-import { UserInputEventType, InputChangeEvent, ButtonClickEvent } from '@metamask/snaps-sdk';
+import type { InputChangeEvent, ButtonClickEvent } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import { UserEventDispatcher } from '../src/userEventDispatcher';
 
@@ -546,24 +547,24 @@ describe('UserEventDispatcher', () => {
       it('should process button events immediately when no debounced events are pending', async () => {
         const dispatcher = new UserEventDispatcher();
         const buttonHandler = createHandlerMock();
-        
+
         dispatcher.on({
           elementName: 'test-button',
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId: 'test-interface',
           handler: buttonHandler,
         });
-  
+
         const eventHandler = dispatcher.createUserInputEventHandler();
-  
+
         const buttonEvent: ButtonClickEvent = {
           type: UserInputEventType.ButtonClickEvent,
           name: 'test-button',
         };
-  
+
         // Trigger button event (should process immediately when no debounced events are pending)
         await eventHandler({ event: buttonEvent, id: 'test-interface' });
-  
+
         // Button event should be processed immediately
         expect(buttonHandler).toHaveBeenCalledTimes(1);
         expect(buttonHandler).toHaveBeenCalledWith({
@@ -574,7 +575,6 @@ describe('UserEventDispatcher', () => {
     });
 
     describe('debouncing with real timers', () => {
-
       it('should process different event types in correct order when they occur between debounced events', async () => {
         const dispatcher = new UserEventDispatcher();
         const executionOrder: string[] = [];
@@ -587,7 +587,7 @@ describe('UserEventDispatcher', () => {
         const buttonHandler = () => {
           executionOrder.push('button-handler');
         };
-        
+
         dispatcher.on({
           elementName: 'test-input',
           eventType: UserInputEventType.InputChangeEvent,
@@ -626,15 +626,17 @@ describe('UserEventDispatcher', () => {
 
         // Trigger first input event (debounced)
         eventHandler({ event: firstInputEvent, id: 'test-interface' });
-        
+
         // Trigger button event (processes pending debounced events first, then button event)
         eventHandler({ event: buttonEvent, id: 'test-interface' });
-        
+
         // Trigger second input event (debounced)
         eventHandler({ event: secondInputEvent, id: 'test-interface' });
 
         // Wait for debounce delay
-        await new Promise(resolve => setTimeout(resolve, DEBOUNCE_DELAY + 100));
+        await new Promise((resolve) =>
+          setTimeout(resolve, DEBOUNCE_DELAY + 100),
+        );
 
         expect(executionOrder).toStrictEqual([
           'input-handler-value: first value',
@@ -939,7 +941,6 @@ describe('UserEventDispatcher', () => {
       await testDispatcher.waitForPendingHandlers().then(() => {
         waitForPendingHandlersResolved = true;
       });
-
 
       // Verify all events completed
       expect(event1Completed).toBe(true);

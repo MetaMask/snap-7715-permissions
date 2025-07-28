@@ -31,6 +31,7 @@ module.exports = {
       files: ['*.test.ts', '*.test.tsx'],
       rules: {
         '@typescript-eslint/unbound-method': 'off',
+        '@typescript-eslint/no-floating-promises': 'off',
       },
     },
   ],

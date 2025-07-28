@@ -2,8 +2,8 @@ import { Box, Text, Input, Button, Icon } from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
 import { TooltipIcon } from './TooltipIcon';
-import { 
-  convertTimestampToReadableDate, 
+import {
+  convertTimestampToReadableDate,
   convertTimestampToReadableTime,
 } from '../../utils/time';
 
@@ -11,7 +11,7 @@ export type DateTimeValue = {
   timestamp: string;
   date: string;
   time: string;
-}
+};
 
 export type DateTimeFieldParams = {
   label: string;
@@ -37,9 +37,8 @@ export const DateTimeField = ({
   value,
   disabled,
   errorMessage,
-  iconData
+  iconData,
 }: DateTimeFieldParams) => {
-
   if (value.timestamp && !value.date && !value.time) {
     try {
       const timestamp = parseInt(value.timestamp, 10);
@@ -54,14 +53,19 @@ export const DateTimeField = ({
   }
 
   const date = new Date();
-  const formatterShort = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' });
-  const shortTimeZoneName = formatterShort.formatToParts(date).find((part) => part.type === 'timeZoneName')?.value || '';
+  const formatterShort = new Intl.DateTimeFormat('en-US', {
+    timeZoneName: 'short',
+  });
+  const shortTimeZoneName =
+    formatterShort
+      .formatToParts(date)
+      .find((part) => part.type === 'timeZoneName')?.value ?? '';
 
   if (disabled) {
     return (
       <TextField
         label={label}
-        value={value.date + ' ' + value.time + ' ' + shortTimeZoneName}
+        value={`${value.date} ${value.time} ${shortTimeZoneName}`}
         tooltip={tooltip}
         iconData={iconData}
       />
@@ -75,7 +79,11 @@ export const DateTimeField = ({
     </Button>
   ) : null;
 
-  const errorElement = errorMessage ? (<Text size='sm' color="error">{errorMessage}</Text>) : null;
+  const errorElement = errorMessage ? (
+    <Text size="sm" color="error">
+      {errorMessage}
+    </Text>
+  ) : null;
 
   return (
     <Box direction="vertical">
@@ -85,18 +93,25 @@ export const DateTimeField = ({
           {tooltipElement}
         </Box>
         <Box direction="horizontal" alignment="end">
-          <Text color='muted' size='sm'>mm/dd/yyyy hh:mm:ss</Text>
+          <Text color="muted" size="sm">
+            mm/dd/yyyy hh:mm:ss
+          </Text>
         </Box>
       </Box>
       <Box direction="horizontal" alignment="space-between">
         <Box direction="horizontal">
-          <Input 
-            name={name+ '_date'} 
-            type="text" 
+          <Input
+            name={`${name}_date`}
+            type="text"
             value={value.date}
             placeholder="mm/dd/yyyy"
           />
-          <Input name={name + '_time'} type="text" value={value.time} placeholder="HH:MM:SS"  />
+          <Input
+            name={`${name}_time`}
+            type="text"
+            value={value.time}
+            placeholder="HH:MM:SS"
+          />
           <Box direction="vertical" alignment="center">
             <Text alignment="center">{shortTimeZoneName}</Text>
           </Box>
@@ -108,5 +123,4 @@ export const DateTimeField = ({
       </Box>
     </Box>
   );
-  
 };

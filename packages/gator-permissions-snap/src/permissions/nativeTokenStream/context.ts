@@ -62,7 +62,7 @@ export async function applyContext({
       : undefined,
     amountPerSecond: bigIntToHex(
       parseUnits({ formatted: permissionDetails.amountPerPeriod, decimals }) /
-        TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod as TimePeriod],
+        TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,

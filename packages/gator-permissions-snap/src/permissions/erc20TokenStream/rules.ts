@@ -140,7 +140,7 @@ export const streamPeriodRule: Erc20TokenStreamRuleDefinition = {
   }),
 };
 
-export const expiryRule: Erc20TokenStreamRuleDefinition= {
+export const expiryRule: Erc20TokenStreamRuleDefinition = {
   name: EXPIRY_ELEMENT,
   label: 'Expiry',
   type: 'datetime',

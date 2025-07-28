@@ -156,7 +156,6 @@ export const expiryRule: RuleDefinition<
   }),
 };
 
-
 export const allRules = [
   periodAmountRule,
   periodTypeRule,
