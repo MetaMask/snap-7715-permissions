@@ -185,12 +185,14 @@ export async function buildContext({
 
   const balance = bigIntToHex(rawBalance);
 
+  const caip10Address = `eip155:1:${address}` as const;
+
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     accountDetails: {
-      address,
+      address: caip10Address,
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
     },

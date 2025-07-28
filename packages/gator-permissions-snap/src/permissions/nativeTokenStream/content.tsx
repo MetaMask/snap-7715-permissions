@@ -39,6 +39,7 @@ export async function createConfirmationContent({
         tokenMetadata={context.tokenMetadata}
         title="Stream from"
         tooltip="The account that the token stream comes from."
+        accountSelectorName="account-selector"
       />
       <Section>
         {renderRules({

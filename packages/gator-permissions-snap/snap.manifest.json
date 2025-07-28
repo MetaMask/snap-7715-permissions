@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "3bSJ9Th+sBdj3zy04EW1ibs58wv6LJLELNYiLv52FbU=",
+    "shasum": "9dm++o7rlsLzg2XAf+DNBabjkEFUxBhFhTwbJ4DVMhE=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -35,6 +35,6 @@
     "snap_getPreferences": {},
     "endowment:page-home": {}
   },
-  "platformVersion": "8.1.0",
+  "platformVersion": "8.0.0",
   "manifestVersion": "0.1"
 }

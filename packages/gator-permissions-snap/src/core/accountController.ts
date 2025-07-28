@@ -3,9 +3,8 @@ import { type Hex, type Delegation } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
 import { bigIntToHex } from '@metamask/utils';
 
-import { BaseAccountController } from './baseAccountController';
 import type {
-  AccountController,
+  AccountControllerInterface,
   AccountOptionsBase,
   SignDelegationOptions,
   FactoryArgs,
@@ -15,13 +14,14 @@ import { getChainMetadata } from '../core/chainMetadata';
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
  */
-export class EoaAccountController
-  extends BaseAccountController
-  implements AccountController
-{
+export class AccountController implements AccountControllerInterface {
   #accountAddress: Hex | null = null;
 
   #ethereumProvider: SnapsEthereumProvider;
+
+  readonly #snapsProvider: SnapsProvider;
+
+  protected supportedChains: readonly number[];
 
   /**
    * Initializes a new EoaAccountController instance.
@@ -35,9 +35,93 @@ export class EoaAccountController
     ethereumProvider: SnapsEthereumProvider;
     supportedChains: readonly number[];
   }) {
-    super(config);
+    this.#validateSupportedChains(config.supportedChains);
+
+    this.#snapsProvider = config.snapsProvider;
+    this.supportedChains = config.supportedChains;
 
     this.#ethereumProvider = config.ethereumProvider;
+  }
+
+  /**
+   * Validates that the specified chains are supported.
+   * @param supportedChains - The chains to validate.
+   * @throws If no chains are specified or if any chain is not supported.
+   */
+  #validateSupportedChains(supportedChains: readonly number[]) {
+    if (supportedChains.length === 0) {
+      logger.error('No supported chains specified');
+      throw new Error('No supported chains specified');
+    }
+
+    // ensure that there is chain metadata for all specified chains
+    try {
+      supportedChains.map((chainId) => getChainMetadata({ chainId }));
+    } catch (error) {
+      logger.error('Unsupported chains specified', {
+        supportedChains,
+        error,
+      });
+      throw new Error(
+        `Unsupported chains specified: ${supportedChains.join(', ')}`,
+      );
+    }
+  }
+
+  /**
+   * Asserts that the specified chain ID is supported.
+   * @param chainId - The chain ID to validate.
+   * @throws If the chain ID is not supported.
+   */
+  protected assertIsSupportedChainId(chainId: number) {
+    if (!this.supportedChains.includes(chainId)) {
+      logger.error(
+        'accountController:assertIsSupportedChainId() - unsupported chainId',
+        {
+          chainId,
+        },
+      );
+      throw new Error(`Unsupported ChainId: ${chainId}`);
+    }
+  }
+
+  /**
+   * Creates a provider that handles experimental provider requests.
+   * @param chainId - The chain ID for the provider.
+   * @returns A provider object with a request method.
+   */
+  protected createExperimentalProviderRequestProvider(chainId: number) {
+    return {
+      request: async (request: { method: string; params?: unknown[] }) => {
+        logger.debug(
+          'accountController:createExperimentalProviderRequestProvider() - provider.request()',
+          request,
+        );
+
+        // we can just pass the request to the snapsProvider, because
+        // snap_experimentalProviderRequest enforces an allowlist of methods.
+        const result = await this.#snapsProvider.request({
+          // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
+          method: 'snap_experimentalProviderRequest',
+          params: {
+            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
+            chainId: `eip155:${chainId}`,
+            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
+            request,
+          },
+        });
+
+        return result;
+      },
+    };
+  }
+
+  /**
+   * Gets the snaps provider.
+   * @returns The snaps provider instance.
+   */
+  protected get snapsProvider(): SnapsProvider {
+    return this.#snapsProvider;
   }
 
   /**

@@ -52,6 +52,9 @@
   "engines": {
     "node": "^20 || >=22"
   },
+  "resolutions": {
+    "@metamask/snaps-sdk": "8.0.0"
+  },
   "lavamoat": {
     "allowScripts": {
       "@lavamoat/preinstall-always-fail": false,
