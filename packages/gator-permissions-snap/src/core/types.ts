@@ -3,11 +3,10 @@ import type {
   Permission,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import type { Hex, Caveat } from '@metamask/delegation-core';
+import type { Hex, Caveat, Delegation } from '@metamask/delegation-core';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { AccountController } from '../accountController';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
@@ -40,7 +39,7 @@ export type BaseContext = {
   isAdjustmentAllowed: boolean;
   justification: string;
   accountDetails: {
-    address: Hex;
+    address: `${string}:${string}:${Hex}`;
     balanceFormattedAsCurrency: string;
     balance: Hex; // it would be nice if this was Hex, but must be Json serializable for Snaps JSX
   };
@@ -316,4 +315,47 @@ export type PermissionHandlerDependencies<
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
   }) => Promise<Caveat[]>;
+};
+
+/**
+ * Base options required for account operations.
+ */
+export type AccountOptionsBase = {
+  // really this needs to be of type SupportedChainId, but it makes it hard for callers to validate
+  chainId: number;
+};
+
+/**
+ * Options for signing a delegation.
+ */
+export type SignDelegationOptions = AccountOptionsBase & {
+  delegation: Omit<Delegation, 'signature'>;
+};
+
+/**
+ * Factory arguments for smart account deployment.
+ */
+export type FactoryArgs = {
+  factory: Hex | undefined;
+  factoryData: Hex | undefined;
+};
+
+/**
+ * Interface for account controller implementations.
+ */
+export type AccountControllerInterface = {
+  /**
+   * Retrieves the account address for the current account.
+   */
+  getAccountAddress(options: AccountOptionsBase): Promise<Hex>;
+
+  /**
+   * Signs a delegation using the smart account.
+   */
+  signDelegation(options: SignDelegationOptions): Promise<Delegation>;
+
+  /**
+   * Retrieves the metadata for deploying a smart account.
+   */
+  getAccountMetadata(options: AccountOptionsBase): Promise<FactoryArgs>;
 };

@@ -1,5 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { InputChangeEvent, UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../accountController';
 import { getIconData } from '../permissions/iconUtil';
@@ -205,6 +205,31 @@ export class PermissionHandler<
         this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
         await rerender();
       };
+
+      const accountSelectedHandler: UserEventHandler<
+        UserInputEventType.InputChangeEvent
+      > = async ({ event: { value } }) => {
+        const {
+          addresses: [address],
+        } = value as any;
+
+        currentContext = {
+          ...currentContext,
+          accountDetails: {
+            ...currentContext.accountDetails,
+            address,
+          },
+        };
+
+        await rerender();
+      };
+
+      this.#userEventDispatcher.on({
+        elementName: 'account-selector',
+        eventType: UserInputEventType.InputChangeEvent,
+        interfaceId,
+        handler: accountSelectedHandler,
+      });
 
       this.#userEventDispatcher.on({
         elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,

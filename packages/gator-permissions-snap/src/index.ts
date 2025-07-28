@@ -17,11 +17,7 @@ import type {
   OnUserInputHandler,
 } from '@metamask/snaps-sdk';
 
-import {
-  EoaAccountController,
-  SmartAccountController,
-  type AccountController,
-} from './accountController';
+import { AccountController } from './core/accountController';
 import { AccountApiClient } from './clients/accountApiClient';
 import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
 import { PriceApiClient } from './clients/priceApiClient';
@@ -44,8 +40,6 @@ import { UserEventDispatcher } from './userEventDispatcher';
 
 const isStorePermissionsFeatureEnabled =
   process.env.STORE_PERMISSIONS_ENABLED === 'true';
-
-const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
 
 const snapEnv = process.env.SNAP_ENV;
 
@@ -82,17 +76,11 @@ const tokenMetadataService = new TokenMetadataService({
   tokenMetadataClient,
 });
 
-const accountController: AccountController = useEoaAccountController
-  ? new EoaAccountController({
-      snapsProvider: snap,
-      ethereumProvider: ethereum,
-      supportedChains,
-    })
-  : new SmartAccountController({
-      snapsProvider: snap,
-      supportedChains,
-      deploymentSalt: '0x',
-    });
+const accountController = new AccountController({
+  snapsProvider: snap,
+  ethereumProvider: ethereum,
+  supportedChains,
+});
 
 const stateManager = createStateManager(snap);
 

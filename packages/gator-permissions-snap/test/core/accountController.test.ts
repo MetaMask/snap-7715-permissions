@@ -2,19 +2,19 @@ import { describe, it, beforeEach, expect } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { Delegation } from '@metamask/delegation-core';
 
-import { EoaAccountController } from '../../src/accountController/eoaAccountController';
+import { AccountController } from '../../src/core/accountController';
 
 const sepolia = 11155111;
 const mainnet = 1;
 
-describe('EoaAccountController', () => {
+describe('AccountController', () => {
   const mockAddress = '0x1234567890abcdef1234567890abcdef12345678';
   const mockChainId = '0xaa36a7'; // Sepolia in hex
   const mockSignature =
     '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef11';
   const expectedBalance = '0x1000000000000000000';
 
-  let accountController: EoaAccountController;
+  let accountController: AccountController;
   let mockSnapsProvider: ReturnType<typeof createMockSnapsProvider>;
   let mockEthereumProvider: {
     request: jest.Mock;
@@ -67,7 +67,7 @@ describe('EoaAccountController', () => {
       return null;
     });
 
-    accountController = new EoaAccountController({
+    accountController = new AccountController({
       snapsProvider: mockSnapsProvider,
       ethereumProvider: mockEthereumProvider,
       supportedChains: [mainnet, sepolia],
@@ -78,7 +78,7 @@ describe('EoaAccountController', () => {
     it('should throw if no supported chains are specified', () => {
       expect(
         () =>
-          new EoaAccountController({
+          new AccountController({
             snapsProvider: mockSnapsProvider,
             ethereumProvider: mockEthereumProvider,
             supportedChains: [],
@@ -89,7 +89,7 @@ describe('EoaAccountController', () => {
     it('should throw if an unsupported chain is specified', () => {
       expect(
         () =>
-          new EoaAccountController({
+          new AccountController({
             snapsProvider: mockSnapsProvider,
             ethereumProvider: mockEthereumProvider,
             supportedChains: [123],
