@@ -157,7 +157,7 @@ export async function buildContext({
     decimals,
   );
 
-  const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
+  const expiry = permissionRequest.expiry.toString();
 
   const initialAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.initialAmount,
@@ -184,9 +184,7 @@ export async function buildContext({
     decimals,
   });
 
-  const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
-  );
+  const startTime = permissionRequest.permission.data.startTime.toString();
 
   const balance = bigIntToHex(rawBalance);
 
