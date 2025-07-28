@@ -30,13 +30,17 @@ describe('Time Utility Functions', () => {
   describe('convertReadableDateToTimestamp', () => {
     it('should convert mm/dd/yyyy format to Unix timestamp (backward compatibility)', () => {
       const date = '04/11/2025';
-      const expectedTimestamp = 1744329600;
+      // Calculate expected timestamp based on local timezone
+      const localDate = new Date('2025-04-11T00:00:00');
+      const expectedTimestamp = Math.floor(localDate.getTime() / 1000);
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
     });
 
     it('should handle different dates correctly', () => {
       const date = '04/12/2025';
-      const expectedTimestamp = 1744416000;
+      // Calculate expected timestamp based on local timezone
+      const localDate = new Date('2025-04-12T00:00:00');
+      const expectedTimestamp = Math.floor(localDate.getTime() / 1000);
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
     });
 

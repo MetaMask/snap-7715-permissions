@@ -27,7 +27,7 @@ const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
   data: {
     periodAmount: bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })), // 1 ETH per period
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-    startTime: convertReadableDateToTimestamp('10/26/1985'),
+    startTime: convertReadableDateToTimestamp('10/26/2024'),
     justification: 'Permission to do something important',
   },
 };
@@ -50,11 +50,17 @@ const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
         address: '0x1',
       },
     },
-    permission: alreadyPopulatedPermission,
+    permission: {
+      ...alreadyPopulatedPermission,
+      data: {
+        ...alreadyPopulatedPermission.data,
+        startTime: convertReadableDateToTimestamp('10/26/2024'),
+      },
+    },
   };
 
 const alreadyPopulatedContext: NativeTokenPeriodicContext = {
-  expiry: '05/01/2024',
+  expiry: '1714514400',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -71,7 +77,7 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
     periodAmount: '1',
     periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
-    startTime: '10/26/1985',
+    startTime: '1729893600',
   },
 } as const;
 

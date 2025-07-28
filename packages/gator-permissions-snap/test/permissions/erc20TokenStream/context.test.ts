@@ -26,7 +26,7 @@ const permissionWithoutOptionals: Erc20TokenStreamPermission = {
   data: {
     tokenAddress: USDC_ADDRESS,
     amountPerSecond: numberToHex(500_000), // 0.5 USDC per second (6 decimals)
-    startTime: 499132800, // 10/26/1985,
+    startTime: 1729987200, // 10/26/2024,
     justification: 'Permission to do something important',
   },
 };
@@ -52,11 +52,17 @@ const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
       address: '0x1',
     },
   },
-  permission: alreadyPopulatedPermission,
+  permission: {
+    ...alreadyPopulatedPermission,
+    data: {
+      ...alreadyPopulatedPermission.data,
+      startTime: convertReadableDateToTimestamp('10/26/2024'),
+    },
+  },
 };
 
 const alreadyPopulatedContext: Erc20TokenStreamContext = {
-  expiry: '05/01/2024',
+  expiry: '1714514400',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -73,7 +79,7 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
     initialAmount: '1',
     maxAmount: '10',
     timePeriod: TimePeriod.WEEKLY,
-    startTime: '10/26/1985',
+    startTime: '1729893600',
     amountPerPeriod: '302400',
   },
 } as const;
