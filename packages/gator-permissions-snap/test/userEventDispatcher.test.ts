@@ -1,7 +1,10 @@
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { UserInputEventType, InputChangeEvent, ButtonClickEvent } from '@metamask/snaps-sdk';
 
 import { UserEventDispatcher } from '../src/userEventDispatcher';
+
+// Import DEBOUNCE_DELAY from the source file
+const DEBOUNCE_DELAY = 500;
 
 describe('UserEventDispatcher', () => {
   let userEventDispatcher: UserEventDispatcher;
@@ -311,7 +314,7 @@ describe('UserEventDispatcher', () => {
       ).toBeUndefined();
     });
 
-    describe('debouncing', () => {
+    describe('debouncing with fake timers', () => {
       beforeEach(() => {
         jest.useFakeTimers();
       });
@@ -333,7 +336,8 @@ describe('UserEventDispatcher', () => {
         });
 
         // Trigger multiple input change events rapidly
-        await handleEvent({
+        // Don't await these calls - they will be debounced
+        handleEvent({
           event: {
             type: UserInputEventType.InputChangeEvent,
             name: 'test-input',
@@ -342,7 +346,7 @@ describe('UserEventDispatcher', () => {
           id: interfaceId,
         });
 
-        await handleEvent({
+        handleEvent({
           event: {
             type: UserInputEventType.InputChangeEvent,
             name: 'test-input',
@@ -351,7 +355,7 @@ describe('UserEventDispatcher', () => {
           id: interfaceId,
         });
 
-        await handleEvent({
+        handleEvent({
           event: {
             type: UserInputEventType.InputChangeEvent,
             name: 'test-input',
@@ -363,8 +367,11 @@ describe('UserEventDispatcher', () => {
         // Handler should not be called immediately
         expect(handler).not.toHaveBeenCalled();
 
-        // Fast-forward time to trigger the debounced handler
-        jest.advanceTimersByTime(500);
+        // Run all timers to trigger the debounced handler
+        jest.runAllTimers();
+
+        // Wait for all pending promises to resolve
+        await userEventDispatcher.waitForPendingHandlers();
 
         // Handler should be called once with the last event
         expect(handler).toHaveBeenCalledTimes(1);
@@ -428,7 +435,7 @@ describe('UserEventDispatcher', () => {
         });
 
         // Trigger events on different inputs
-        await handleEvent({
+        handleEvent({
           event: {
             type: UserInputEventType.InputChangeEvent,
             name: 'input1',
@@ -437,7 +444,7 @@ describe('UserEventDispatcher', () => {
           id: interfaceId,
         });
 
-        await handleEvent({
+        handleEvent({
           event: {
             type: UserInputEventType.InputChangeEvent,
             name: 'input2',
@@ -446,8 +453,11 @@ describe('UserEventDispatcher', () => {
           id: interfaceId,
         });
 
-        // Fast-forward time
-        jest.advanceTimersByTime(500);
+        // Run all timers
+        jest.runAllTimers();
+
+        // Wait for all pending promises to resolve
+        await userEventDispatcher.waitForPendingHandlers();
 
         // Both handlers should be called
         expect(handler1).toHaveBeenCalledTimes(1);
@@ -465,7 +475,7 @@ describe('UserEventDispatcher', () => {
           handler,
         });
 
-        await handleEvent({
+        handleEvent({
           event: {
             type: UserInputEventType.InputChangeEvent,
             name: 'test-input',
@@ -477,11 +487,160 @@ describe('UserEventDispatcher', () => {
         // Clear timers before they can execute
         userEventDispatcher.clearDebounceTimers();
 
-        // Fast-forward time to trigger the debounced handler
-        jest.advanceTimersByTime(500);
+        // Run all timers to trigger the debounced handler
+        jest.runAllTimers();
+
+        // Wait for any remaining async operations
+        await userEventDispatcher.waitForPendingHandlers();
 
         // Handler should not be called because timer was cleared
         expect(handler).not.toHaveBeenCalled();
+      });
+
+      it('should process multiple handlers for the same debounced event sequentially', async () => {
+        const executionOrder: string[] = [];
+        const handleEvent = userEventDispatcher.createUserInputEventHandler();
+
+        // Register multiple handlers for the same input field
+        userEventDispatcher.on({
+          elementName: 'test-input',
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId: 'test-interface',
+          handler: () => {
+            executionOrder.push('handler1');
+          },
+        });
+
+        userEventDispatcher.on({
+          elementName: 'test-input',
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId: 'test-interface',
+          handler: () => {
+            executionOrder.push('handler2');
+          },
+        });
+
+        // Trigger a single input change event
+        handleEvent({
+          event: {
+            type: UserInputEventType.InputChangeEvent,
+            name: 'test-input',
+            value: 'test-value',
+          },
+          id: 'test-interface',
+        });
+
+        // Handlers should not be called immediately due to debouncing
+        expect(executionOrder).toStrictEqual([]);
+
+        // Run all timers to trigger the debounced handlers
+        jest.runAllTimers();
+
+        // Wait for all pending promises to resolve
+        await userEventDispatcher.waitForPendingHandlers();
+
+        // Verify that multiple handlers for the same event were processed sequentially
+        expect(executionOrder).toStrictEqual(['handler1', 'handler2']);
+      });
+
+      it('should process button events immediately when no debounced events are pending', async () => {
+        const dispatcher = new UserEventDispatcher();
+        const buttonHandler = createHandlerMock();
+        
+        dispatcher.on({
+          elementName: 'test-button',
+          eventType: UserInputEventType.ButtonClickEvent,
+          interfaceId: 'test-interface',
+          handler: buttonHandler,
+        });
+  
+        const eventHandler = dispatcher.createUserInputEventHandler();
+  
+        const buttonEvent: ButtonClickEvent = {
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'test-button',
+        };
+  
+        // Trigger button event (should process immediately when no debounced events are pending)
+        await eventHandler({ event: buttonEvent, id: 'test-interface' });
+  
+        // Button event should be processed immediately
+        expect(buttonHandler).toHaveBeenCalledTimes(1);
+        expect(buttonHandler).toHaveBeenCalledWith({
+          event: buttonEvent,
+          interfaceId: 'test-interface',
+        });
+      });
+    });
+
+    describe('debouncing with real timers', () => {
+
+      it('should process different event types in correct order when they occur between debounced events', async () => {
+        const dispatcher = new UserEventDispatcher();
+        const executionOrder: string[] = [];
+
+        const inputHandler = (args: any) => {
+          const inputEvent = args.event as { value: string };
+          executionOrder.push(`input-handler-value: ${inputEvent.value}`);
+        };
+
+        const buttonHandler = () => {
+          executionOrder.push('button-handler');
+        };
+        
+        dispatcher.on({
+          elementName: 'test-input',
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId: 'test-interface',
+          handler: inputHandler,
+        });
+
+        dispatcher.on({
+          elementName: 'test-button',
+          eventType: UserInputEventType.ButtonClickEvent,
+          interfaceId: 'test-interface',
+          handler: buttonHandler,
+        });
+
+        const eventHandler = dispatcher.createUserInputEventHandler();
+
+        // First input event (will be debounced)
+        const firstInputEvent: InputChangeEvent = {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'test-input',
+          value: 'first value',
+        };
+
+        // Button click event (will process pending debounced events first)
+        const buttonEvent: ButtonClickEvent = {
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'test-button',
+        };
+
+        // Second input event (will be debounced separately)
+        const secondInputEvent: InputChangeEvent = {
+          type: UserInputEventType.InputChangeEvent,
+          name: 'test-input',
+          value: 'second value',
+        };
+
+        // Trigger first input event (debounced)
+        eventHandler({ event: firstInputEvent, id: 'test-interface' });
+        
+        // Trigger button event (processes pending debounced events first, then button event)
+        eventHandler({ event: buttonEvent, id: 'test-interface' });
+        
+        // Trigger second input event (debounced)
+        eventHandler({ event: secondInputEvent, id: 'test-interface' });
+
+        // Wait for debounce delay
+        await new Promise(resolve => setTimeout(resolve, DEBOUNCE_DELAY + 100));
+
+        expect(executionOrder).toStrictEqual([
+          'input-handler-value: first value',
+          'button-handler',
+          'input-handler-value: second value',
+        ]);
       });
     });
   });
@@ -493,8 +652,8 @@ describe('UserEventDispatcher', () => {
 
       // Register handlers that track execution order
       userEventDispatcher.on({
-        elementName: 'input1',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'button1',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: async () => {
           executionOrder.push('handler1-start');
@@ -504,8 +663,8 @@ describe('UserEventDispatcher', () => {
       });
 
       userEventDispatcher.on({
-        elementName: 'input2',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'button2',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: async () => {
           executionOrder.push('handler2-start');
@@ -518,9 +677,8 @@ describe('UserEventDispatcher', () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event1Promise = handleEvent({
         event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'input1',
-          value: 'value1',
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'button1',
         },
         id: 'test-interface',
       });
@@ -528,9 +686,8 @@ describe('UserEventDispatcher', () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event2Promise = handleEvent({
         event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'input2',
-          value: 'value2',
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'button2',
         },
         id: 'test-interface',
       });
@@ -555,8 +712,8 @@ describe('UserEventDispatcher', () => {
 
       // Register handlers for different interfaces
       userEventDispatcher.on({
-        elementName: 'input1',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'button1',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'interface1',
         handler: async () => {
           interface1Events.push('start');
@@ -566,8 +723,8 @@ describe('UserEventDispatcher', () => {
       });
 
       userEventDispatcher.on({
-        elementName: 'input2',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'button2',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'interface2',
         handler: async () => {
           interface2Events.push('start');
@@ -580,9 +737,8 @@ describe('UserEventDispatcher', () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event1Promise = handleEvent({
         event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'input1',
-          value: 'value1',
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'button1',
         },
         id: 'interface1',
       });
@@ -590,9 +746,8 @@ describe('UserEventDispatcher', () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event2Promise = handleEvent({
         event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'input2',
-          value: 'value2',
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'button2',
         },
         id: 'interface2',
       });
@@ -611,8 +766,8 @@ describe('UserEventDispatcher', () => {
 
       // Register multiple handlers for the same event
       userEventDispatcher.on({
-        elementName: 'test-input',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'test-button',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: async () => {
           executionOrder.push('handler1-start');
@@ -622,8 +777,8 @@ describe('UserEventDispatcher', () => {
       });
 
       userEventDispatcher.on({
-        elementName: 'test-input',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'test-button',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: async () => {
           executionOrder.push('handler2-start');
@@ -633,8 +788,8 @@ describe('UserEventDispatcher', () => {
       });
 
       userEventDispatcher.on({
-        elementName: 'test-input',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'test-button',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: async () => {
           executionOrder.push('handler3-start');
@@ -646,9 +801,8 @@ describe('UserEventDispatcher', () => {
       // Trigger a single event that will execute all three handlers
       await handleEvent({
         event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'test-input',
-          value: 'test-value',
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'test-button',
         },
         id: 'test-interface',
       });
@@ -671,8 +825,8 @@ describe('UserEventDispatcher', () => {
 
       // Register handlers - one that throws an error, one that succeeds
       userEventDispatcher.on({
-        elementName: 'input1',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'button1',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: async () => {
           executionOrder.push('handler1-start');
@@ -681,8 +835,8 @@ describe('UserEventDispatcher', () => {
       });
 
       userEventDispatcher.on({
-        elementName: 'input2',
-        eventType: UserInputEventType.InputChangeEvent,
+        elementName: 'button2',
+        eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: async () => {
           executionOrder.push('handler2-start');
@@ -695,9 +849,8 @@ describe('UserEventDispatcher', () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event1Promise = handleEvent({
         event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'input1',
-          value: 'value1',
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'button1',
         },
         id: 'test-interface',
       });
@@ -705,9 +858,8 @@ describe('UserEventDispatcher', () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event2Promise = handleEvent({
         event: {
-          type: UserInputEventType.InputChangeEvent,
-          name: 'input2',
-          value: 'value2',
+          type: UserInputEventType.ButtonClickEvent,
+          name: 'button2',
         },
         id: 'test-interface',
       });
@@ -784,12 +936,10 @@ describe('UserEventDispatcher', () => {
       expect(event2Completed).toBe(false);
 
       // Call waitForPendingHandlers (this should wait for all events to complete)
-      const waitPromise = testDispatcher.waitForPendingHandlers().then(() => {
+      await testDispatcher.waitForPendingHandlers().then(() => {
         waitForPendingHandlersResolved = true;
       });
 
-      // Wait for waitForPendingHandlers to resolve
-      await waitPromise;
 
       // Verify all events completed
       expect(event1Completed).toBe(true);
