@@ -205,7 +205,6 @@ export function bindRuleHandlers<
       UserInputEventType.InputChangeEvent
     > = async ({ event }) => {
       const fieldName = event.name;
-      console.log('fieldName', fieldName);
       const isDateField = fieldName.endsWith('_date');
       const isTimeField = fieldName.endsWith('_time');
       
@@ -216,14 +215,11 @@ export function bindRuleHandlers<
 
       const dateTimeParameterNames = ruleData.dateTimeParameterNames!;
 
-      console.log('dateTimeParameterNames', dateTimeParameterNames);
       const currentValues = {
         timestamp: getNestedProperty(context, dateTimeParameterNames.timestampName),
         date: getNestedProperty(context, dateTimeParameterNames.dateName),
         time: getNestedProperty(context, dateTimeParameterNames.timeName),
       }
-
-      console.log('currentValues', currentValues);
 
       if (isDateField) {
         currentValues.date = event.value as string;

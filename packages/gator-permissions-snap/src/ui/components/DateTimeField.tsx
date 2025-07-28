@@ -1,7 +1,6 @@
 import { Box, Text, Input, Button, Icon } from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
-import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
 import { 
   convertTimestampToReadableDate, 
@@ -40,7 +39,6 @@ export const DateTimeField = ({
   errorMessage,
   iconData
 }: DateTimeFieldParams) => {
-
 
   if (value.timestamp && !value.date && !value.time) {
     try {
