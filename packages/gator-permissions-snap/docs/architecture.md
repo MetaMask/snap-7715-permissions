@@ -1,6 +1,6 @@
 # Permissions Provider Snap Architecture
 
-This document outlines the aspirational architecture of the Permissions Provider Snap system. 
+This document outlines the aspirational architecture of the Permissions Provider Snap system.
 
 ## Key Architectural Principles
 
@@ -27,15 +27,18 @@ This document outlines the aspirational architecture of the Permissions Provider
 ## Component Descriptions
 
 ### Core Components
+
 - **EntryPoint**: The main entrypoint for the snap. Connects the RpcHandler, and UserEventDispatcher to the Snaps runtime. Instantiates dependencies, but this may move to a standalone component in the future if required.
 - **RpcHandler**: Responds to RPC requests from external systems.
 - **UserEventDispatcher**: Receives UserEvents from the snaps environment, and exposes them via an event emitter interface.
 - **PermissionHandlerFactory**: Creates and manages specific permission handlers.
 
 ### Confirmation Components
+
 - **ConfirmationDialogFactory**: Creates and manages confirmation dialogs for permission requests.
 
 ### Permission-Specific Components
+
 - **Permission Handler**: Handles the logic for specific permission types.
 - **Permission Context**: Represents the permission data that is shown to the user.
 - **Confirmation Content**: Permission-specific confirmation dialog content.
@@ -83,7 +86,7 @@ graph TD
     RpcHandler -->|"12 return response"| EntryPoint
 
     %% Style
-    classDef component fill:#000,stroke:#333,stroke-width:2px;
+    classDef component fill:#000,stroke:#333,stroke-width:2px,color:#fff;
     classDef user fill:#fff,stroke:#333,stroke-width:2px;
     class EntryPoint,RpcHandler,PermissionHandlerFactory,PermissionHandler,PermissionRequestLifecycleOrchestrator,ConfirmationDialogFactory,ConfirmationDialog,UserEventDispatcher component;
     class User user;
@@ -107,22 +110,23 @@ graph TD
 8. Response is returned through the call stack
 
 ## Permission Request Lifecycle Orchestration
+
 The `PermissionRequestLifecycleOrchestrator` implements a clear lifecycle for permission requests that defines distinct steps for the flow. This ensures that the implementation is flexible enough to accommodate different permission types while providing a consistent framework for permission-specific customizations.
 
-   ```mermaid
-   flowchart TD
-       A[Validate permission] --> B[Build context]
-       B --> C[Create dialog]
-       C --> D[Derive metadata]
-       D --> E[Update dialog]
-       E --> F{Edit or Accept}
-       F -->|Edit UI| G[Update context]
-       G --> D
-       F -->|Accept permission| H[Populate permission]
-       H --> I[Append caveats]
-       I --> J[Create delegation]
-       J --> K[Return response]
-   ```
+```mermaid
+flowchart TD
+    A[Validate permission] --> B[Build context]
+    B --> C[Create dialog]
+    C --> D[Derive metadata]
+    D --> E[Update dialog]
+    E --> F{Edit or Accept}
+    F -->|Edit UI| G[Update context]
+    G --> D
+    F -->|Accept permission| H[Populate permission]
+    H --> I[Append caveats]
+    I --> J[Create delegation]
+    J --> K[Return response]
+```
 
 ## Component Deep Dive
 
@@ -154,6 +158,7 @@ The EntryPoint serves as the main initialization and configuration point for the
    - Manages error handling and response formatting
 
 Key architectural points:
+
 - Uses dependency injection to create and wire up components
 - Centralizes configuration of external services (e.g., price API)
 - Provides a clean interface for the snap runtime to interact with internal components
@@ -167,6 +172,7 @@ The `entrypoint` contains the "startup" code for the application, instantiating 
 The UserEventDispatcher is responsible for managing user input events from the snaps environment. It provides a simple event emitter interface that allows components to register and unregister handlers for specific user events.
 
 Key architectural points:
+
 - Provides a clean interface for handling user input events
 - Manages event handler registration and cleanup
 - Dispatches events to registered handlers
@@ -175,6 +181,7 @@ Key architectural points:
 - Ensures events are handled sequentially
 
 The UserEventDispatcher provides a simple interface for:
+
 1. Registering event handlers with `on()`:
    - Takes element name, event type, interface ID, and handler function
    - Creates a unique event key combining these parameters
@@ -194,6 +201,7 @@ The UserEventDispatcher provides a simple interface for:
    - Executes handlers concurrently using Promise.all
 
 The dispatcher is used by:
+
 - ConfirmationDialog for handling button clicks and form submissions
 - PermissionOrchestrator for managing state changes in permission requests
 - `BaseOrchestrator` for coordinating UI updates and state management
@@ -205,6 +213,7 @@ This allows components to handle user input events without needing to know about
 The RpcHandler is responsible for processing incoming JSON-RPC requests from the snaps environment. It provides a clean interface for handling permission-related RPC methods and coordinates with the PermissionHandlerFactory to process permission requests.
 
 Key architectural points:
+
 - Provides a type-safe interface for RPC method handlers
 - Validates incoming permission request parameters
 - Coordinates with PermissionHandlerFactory to create permission-specific handlers
@@ -212,6 +221,7 @@ Key architectural points:
 - Filters and returns only valid permission responses
 
 The RpcHandler provides the following functionality:
+
 1. Grant Permission Requests:
    - Validates incoming permission request parameters
    - Extracts permissions request and site origin
@@ -220,6 +230,7 @@ The RpcHandler provides the following functionality:
    - Returns filtered array of valid permission responses
 
 The handler is used by:
+
 - EntryPoint for processing incoming RPC requests
 - PermissionHandlerFactory for creating permission-specific handlers
 - PermissionHandler for handling individual permission requests
@@ -231,6 +242,7 @@ This allows the snap to handle permission-related RPC requests in a type-safe an
 The PermissionHandlerFactory is responsible for creating permission-specific handlers based on the type of permission request. It provides a centralized factory for instantiating the appropriate handler with all required dependencies.
 
 Key architectural points:
+
 - Provides a factory pattern for creating permission handlers
 - Manages dependencies required by handlers
 - Supports extensibility for new permission types
@@ -238,6 +250,7 @@ Key architectural points:
 - Maintains type safety across permission types
 
 The factory provides the following functionality:
+
 1. Creating Permission Handlers:
    - Extracts permission type from request
    - Provides base dependencies to all handlers
@@ -245,6 +258,7 @@ The factory provides the following functionality:
    - Throws error for unsupported permission types
 
 The factory is used by:
+
 - RpcHandler for creating handlers to handle permission requests
 - Permission-specific handlers (e.g., NativeTokenStreamHandler)
 
@@ -255,6 +269,7 @@ This allows the system to handle different types of permission requests in a mod
 The `PermissionHandler` is a generic class that implements the `PermissionHandlerType` interface. All permission types use this same handler class, but it is instantiated with different type parameters and injected dependencies for each permission type. This allows for type-safe, permission-specific logic while sharing a common implementation and lifecycle, which is coordinated by the `PermissionRequestLifecycleOrchestrator`.
 
 Key architectural points:
+
 - A single generic `PermissionHandler` class is used for all permission types, instantiated with permission-specific types and dependencies
 - Type parameters define the request, context, metadata, and permission types
 - Permission-specific logic is injected through dependencies
@@ -262,6 +277,7 @@ Key architectural points:
 - Uses dependency injection for required services
 
 Permission handlers provide the following functionality:
+
 1. Permission Request Handling:
    - Validate permission-specific request formats
    - Build permission-specific context data
@@ -270,6 +286,7 @@ Permission handlers provide the following functionality:
    - Provide lifecycle handlers to the orchestrator
 
 The handler is used by:
+
 - PermissionHandlerFactory for creating type-specific instances
 - RpcHandler for processing permission requests
 - PermissionRequestLifecycleOrchestrator for managing the permission lifecycle
@@ -281,6 +298,7 @@ This pattern allows each permission type to implement its own specific logic whi
 The PermissionRequestLifecycleOrchestrator is responsible for managing the complete lifecycle of permission requests across all permission types. It provides a template method pattern that defines the core flow while allowing permission-specific handlers to provide customized implementations for each step.
 
 Key architectural points:
+
 - Provides a common lifecycle for all permission types
 - Uses handler-provided functions for permission-specific steps
 - Manages the confirmation dialog lifecycle
@@ -288,6 +306,7 @@ Key architectural points:
 - Creates and signs delegations
 
 The orchestrator provides the following functionality:
+
 1. Permission Request Lifecycle:
    - Validates permission requests using handler-provided validators
    - Builds context data using handler-provided context builders
@@ -297,6 +316,7 @@ The orchestrator provides the following functionality:
    - Creates and signs delegations
 
 The orchestrator is used by:
+
 - Permission handlers for orchestrating permission requests
 - ConfirmationDialogFactory for creating confirmation dialogs
 - AccountController for creating and signing delegations
@@ -308,6 +328,7 @@ This pattern allows for a consistent permission request lifecycle across all per
 The ConfirmationDialogFactory is responsible for creating confirmation dialogs that handle user interaction during permission requests. It provides a factory pattern for instantiating confirmation dialogs with the necessary dependencies.
 
 Key architectural points:
+
 - Provides a factory pattern for creating confirmation dialogs
 - Manages dependencies required by confirmation dialogs
 - Ensures consistent UI structure across permission types
@@ -315,6 +336,7 @@ Key architectural points:
 - Maintains type safety for UI components
 
 The factory provides the following functionality:
+
 1. Creating Confirmation Dialogs:
    - Takes UI elements as input
    - Provides snaps provider and event dispatcher
@@ -322,6 +344,7 @@ The factory provides the following functionality:
    - Ensures consistent dialog structure
 
 The factory is used by:
+
 - PermissionOrchestrator for creating confirmation dialogs
 - ConfirmationDialog for managing dialog lifecycle
 - UserEventDispatcher for handling user input events
@@ -333,6 +356,7 @@ This allows the system to present consistent and type-safe confirmation dialogs 
 The ConfirmationDialog is responsible for managing the lifecycle and user interaction of permission confirmation dialogs. It provides a clean interface for creating, updating, and resolving confirmation dialogs.
 
 Key architectural points:
+
 - Manages the complete lifecycle of confirmation dialogs
 - Handles user input events through UserEventDispatcher
 - Provides a clean interface for updating dialog content
@@ -340,6 +364,7 @@ Key architectural points:
 - Coordinates with SnapsProvider for UI updates
 
 The dialog provides the following functionality:
+
 1. Dialog Lifecycle:
    - Creates and manages dialog interface
    - Updates dialog content dynamically
@@ -355,10 +380,10 @@ The dialog provides the following functionality:
    - Maintains consistent footer across dialogs
 
 The dialog is used by:
+
 - PermissionOrchestrator for presenting confirmation UI
 - UserEventDispatcher for handling user input
 - SnapsProvider for UI updates
 - ConfirmationFooter for consistent button handling
 
 This allows the system to present consistent and type-safe confirmation dialogs to users while managing the dialog lifecycle and user interactions in a centralized way.
-
