@@ -86,7 +86,7 @@ graph TD
     RpcHandler -->|"12 return response"| EntryPoint
 
     %% Style
-    classDef component fill:#000,stroke:#333,stroke-width:2px;
+    classDef component fill:#000,stroke:#333,stroke-width:2px,color:#fff;
     classDef user fill:#fff,stroke:#333,stroke-width:2px;
     class EntryPoint,RpcHandler,PermissionHandlerFactory,PermissionHandler,PermissionRequestLifecycleOrchestrator,ConfirmationDialogFactory,ConfirmationDialog,UserEventDispatcher component;
     class User user;
