@@ -7,7 +7,11 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
+<<<<<<< HEAD
     "shasum": "AitiFw328Adt5FHoSyucPHrkf0n/i4DfM04U9hqd5Jk=",
+=======
+    "shasum": "MqouW2bCzVUAQlgWfx8/WI1J+9QyF/xH+N24V+4ydE8=",
+>>>>>>> 8be36ac (fix: update shasum in snap.manifest.json for gator-permissions-snap and permissions-kernel-snap)
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
