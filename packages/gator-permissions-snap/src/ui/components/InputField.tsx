@@ -8,11 +8,11 @@ import {
   Image,
 } from '@metamask/snaps-sdk/jsx';
 
-import toggleDisabledImage from '../../../images/toggle_disabled.svg';
-import toggleEnabledImage from '../../../images/toggle_enabled.svg';
 import { TextField } from './TextField';
 import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
+import toggleDisabledImage from '../../../images/toggle_disabled.svg';
+import toggleEnabledImage from '../../../images/toggle_enabled.svg';
 
 export type InputFieldParams = {
   label: string;
