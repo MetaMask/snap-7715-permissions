@@ -133,7 +133,7 @@ export async function createConfirmationContent({
   isJustificationCollapsed: boolean;
   origin: string;
   chainId: number;
-}): Promise<GenericSnapElement> {
+}): Promise<SnapElement> {
   // Implement UI components
 }
 ```

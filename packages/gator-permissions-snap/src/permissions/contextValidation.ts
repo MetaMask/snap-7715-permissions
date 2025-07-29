@@ -11,6 +11,15 @@ export type ValidationErrors = {
 };
 
 /**
+ * Converts a string to sentence case, capitalizing the first letter, and lowercasing the rest.
+ * @param str - The string to convert.
+ * @returns The converted string.
+ */
+const toSentenceCase = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+/**
  * Validates and parses a token amount string to BigInt.
  * @param amount - The amount string to validate.
  * @param decimals - Token decimals.
@@ -24,7 +33,7 @@ export function validateAndParseAmount(
   fieldName: string,
   allowZero = false,
 ): { amount: bigint | undefined; error: string | undefined } {
-  if (!amount) {
+  if (amount === null || amount === undefined) {
     return { amount: undefined, error: undefined };
   }
 
@@ -33,18 +42,18 @@ export function validateAndParseAmount(
     if (!allowZero && parsedAmount <= 0n) {
       return {
         amount: undefined,
-        error: `${fieldName} must be greater than 0`,
+        error: `${toSentenceCase(fieldName)} must be greater than 0`,
       };
     }
     if (allowZero && parsedAmount < 0n) {
       return {
         amount: undefined,
-        error: `${fieldName} must be greater than or equal to 0`,
+        error: `${toSentenceCase(fieldName)} must be greater than or equal to 0`,
       };
     }
     return { amount: parsedAmount, error: undefined };
   } catch (error) {
-    return { amount: undefined, error: `Invalid ${fieldName.toLowerCase()}` };
+    return { amount: undefined, error: `Invalid ${fieldName}` };
   }
 }
 
