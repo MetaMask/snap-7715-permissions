@@ -1,8 +1,7 @@
 import type { Hex } from '@metamask/utils';
+import { Caip10Address } from '../core/types';
 
-export const fromCaip10Address = (
-  caip10Address: `${string}:${string}:${Hex}`,
-) => {
+export const fromCaip10Address = (caip10Address: Caip10Address) => {
   const [chain, chainId, address] = caip10Address.split(':');
   if (chain !== 'eip155' || chainId === undefined || address === undefined) {
     throw new Error('Invalid address');

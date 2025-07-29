@@ -1,25 +1,22 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
-import { bigIntToHex } from '@metamask/utils';
+import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from './chainMetadata';
 import type {
   AccountControllerInterface,
   AccountOptionsBase,
+  Caip10Address,
   SignDelegationOptions,
-  FactoryArgs,
 } from './types';
+import { toCaip10Address } from '../utils/address';
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
  */
 export class AccountController implements AccountControllerInterface {
-  #accountAddress: Hex | null = null;
-
   #ethereumProvider: SnapsEthereumProvider;
-
-  readonly #snapsProvider: SnapsProvider;
 
   protected supportedChains: readonly number[];
 
@@ -37,7 +34,6 @@ export class AccountController implements AccountControllerInterface {
   }) {
     this.#validateSupportedChains(config.supportedChains);
 
-    this.#snapsProvider = config.snapsProvider;
     this.supportedChains = config.supportedChains;
 
     this.#ethereumProvider = config.ethereumProvider;
@@ -73,7 +69,7 @@ export class AccountController implements AccountControllerInterface {
    * @param chainId - The chain ID to validate.
    * @throws If the chain ID is not supported.
    */
-  protected assertIsSupportedChainId(chainId: number) {
+  #assertIsSupportedChainId(chainId: number) {
     if (!this.supportedChains.includes(chainId)) {
       logger.error(
         'accountController:assertIsSupportedChainId() - unsupported chainId',
@@ -86,82 +82,42 @@ export class AccountController implements AccountControllerInterface {
   }
 
   /**
-   * Creates a provider that handles experimental provider requests.
-   * @param chainId - The chain ID for the provider.
-   * @returns A provider object with a request method.
+   * Retrieves the account addresses available for this current account.
+   * @param options - The options object containing the chain ID.
+   * @returns The account addresses in CAIP-10 format.
    */
-  protected createExperimentalProviderRequestProvider(chainId: number) {
-    return {
-      request: async (request: { method: string; params?: unknown[] }) => {
-        logger.debug(
-          'accountController:createExperimentalProviderRequestProvider() - provider.request()',
-          request,
-        );
+  public async getAccountAddresses(
+    options: AccountOptionsBase,
+  ): Promise<Caip10Address[]> {
+    logger.debug('eoaAccountController:getAccountAddresses()');
 
-        // we can just pass the request to the snapsProvider, because
-        // snap_experimentalProviderRequest enforces an allowlist of methods.
-        const result = await this.#snapsProvider.request({
-          // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-          method: 'snap_experimentalProviderRequest',
-          params: {
-            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-            chainId: `eip155:${chainId}`,
-            // @ts-expect-error -- snap_experimentalProviderRequest are not defined in SnapMethods
-            request,
-          },
-        });
-
-        return result;
-      },
-    };
-  }
-
-  /**
-   * Gets the snaps provider.
-   * @returns The snaps provider instance.
-   */
-  protected get snapsProvider(): SnapsProvider {
-    return this.#snapsProvider;
-  }
-
-  /**
-   * Gets the connected account address, requesting access if needed.
-   * @returns The account address.
-   */
-  async #getAccountAddress(): Promise<Hex> {
-    logger.debug('eoaAccountController:#getAccountAddress()');
-
-    if (this.#accountAddress) {
-      return this.#accountAddress;
-    }
+    this.#assertIsSupportedChainId(options.chainId);
 
     const accounts = await this.#ethereumProvider.request<Hex[]>({
       method: 'eth_requestAccounts',
     });
 
-    if (!accounts || accounts.length === 0) {
+    if (!accounts) {
       throw new Error('No accounts found');
     }
 
-    this.#accountAddress = accounts[0] as Hex;
+    const caip10Addresses = accounts.reduce((acc, account) => {
+      if (account) {
+        acc.push(
+          toCaip10Address({
+            chainId: options.chainId,
+            address: account,
+          }),
+        );
+      }
+      return acc;
+    }, [] as Caip10Address[]);
 
-    return this.#accountAddress;
-  }
+    if (caip10Addresses.length === 0) {
+      throw new Error('No accounts found');
+    }
 
-  /**
-   * Retrieves the account address for the current account.
-   * @param options0 - The options object containing chain information.
-   * @param options0.chainId - The ID of the blockchain chain.
-   * @returns The account address.
-   */
-  public async getAccountAddress({
-    chainId,
-  }: AccountOptionsBase): Promise<Hex> {
-    logger.debug('eoaAccountController:getAccountAddress()');
-
-    this.assertIsSupportedChainId(chainId);
-
-    return this.#getAccountAddress();
+    return caip10Addresses;
   }
 
   /**
@@ -176,15 +132,27 @@ export class AccountController implements AccountControllerInterface {
 
     const { chainId, delegation, address } = options;
 
-    this.assertIsSupportedChainId(chainId);
+    this.#assertIsSupportedChainId(chainId);
 
     const selectedChain = await this.#ethereumProvider.request<Hex>({
       method: 'eth_chainId',
       params: [],
     });
 
-    if (Number(selectedChain) !== chainId) {
-      throw new Error('Selected chain does not match the requested chain');
+    if (selectedChain && hexToNumber(selectedChain) !== chainId) {
+      await this.#ethereumProvider.request<Hex>({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: numberToHex(chainId) }],
+      });
+
+      const updatedChain = await this.#ethereumProvider.request<Hex>({
+        method: 'eth_chainId',
+        params: [],
+      });
+
+      if (updatedChain && hexToNumber(updatedChain) !== chainId) {
+        throw new Error('Selected chain does not match the requested chain');
+      }
     }
 
     const {
@@ -255,25 +223,5 @@ export class AccountController implements AccountControllerInterface {
     const message = { ...delegation, salt: bigIntToHex(delegation.salt) };
 
     return { domain, types, primaryType, message };
-  }
-
-  /**
-   * Retrieves the metadata for deploying a smart account.
-   * Not applicable for EOA accounts.
-   * @param options0 - The options object containing chain information.
-   * @param options0.chainId - The ID of the blockchain chain.
-   * @returns The factory arguments (undefined for EOA accounts).
-   */
-  public async getAccountMetadata({
-    chainId,
-  }: AccountOptionsBase): Promise<FactoryArgs> {
-    logger.debug('eoaAccountController:getAccountMetadata()');
-
-    this.assertIsSupportedChainId(chainId);
-
-    return {
-      factory: undefined,
-      factoryData: undefined,
-    };
   }
 }
