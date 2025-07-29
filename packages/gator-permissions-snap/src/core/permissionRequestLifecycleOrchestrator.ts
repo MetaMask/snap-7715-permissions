@@ -12,6 +12,7 @@ import {
 import { bytesToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
 import type { AccountController } from '../accountController';
+import type { UserEventDispatcher } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
@@ -30,20 +31,24 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
+  readonly #userEventDispatcher: UserEventDispatcher;
+
   constructor({
     accountController,
     confirmationDialogFactory,
+    userEventDispatcher,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
+    userEventDispatcher: UserEventDispatcher;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
+    this.#userEventDispatcher = userEventDispatcher;
   }
 
   /**
    * Orchestrates the permission request lifecycle.
-   *
    * @param origin - The origin of the permission request.
    * @param permissionRequest - The permission request to orchestrate.
    * @param lifecycleHandlers - The lifecycle handlers to call during orchestration.
@@ -142,6 +147,11 @@ export class PermissionRequestLifecycleOrchestrator {
       const { isConfirmationGranted } = await decision;
 
       if (isConfirmationGranted) {
+        // Wait for any pending context updates to complete before granting permission
+        // This prevents race conditions where the permission is granted before
+        // all user input has been processed
+        await this.#userEventDispatcher.waitForPendingHandlers();
+
         const response = await this.#resolveResponse({
           originalRequest: validatedPermissionRequest,
           modifiedContext: context,
@@ -169,7 +179,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
   /**
    * Resolves a permission request into a final permission response.
-   *
    * @private
    * @template TRequest - Type of permission request
    * @template TContext - Type of context for the permission request.

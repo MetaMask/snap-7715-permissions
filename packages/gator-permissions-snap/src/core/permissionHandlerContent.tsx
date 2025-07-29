@@ -1,14 +1,14 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Heading, Section, Text, Skeleton } from '@metamask/snaps-sdk/jsx';
 
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
+import type { IconData } from './types';
 import {
   ShowMoreText,
   SkeletonField,
   TextField,
   TooltipIcon,
 } from '../ui/components';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
-import type { IconData } from './types';
 
 export const RECIPIENT_LABEL = 'Recipient';
 export const RECIPIENT_TOOLTIP = 'The site requesting the permission';
@@ -34,7 +34,6 @@ export type PermissionHandlerContentProps = {
 
 /**
  * Content wrapping a permission confirmation, including the title and add-more-rules button.
- *
  * @param options - The params for the content.
  * @param options.children - The children of the content.
  * @param options.permissionTitle - The title of the permission.

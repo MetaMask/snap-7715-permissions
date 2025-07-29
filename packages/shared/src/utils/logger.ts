@@ -25,7 +25,6 @@ type LoggerContext = {
 
 /**
  * Returns the default logging level.
- *
  * @returns The default logging level.
  */
 function getDefaultLevel(): LogLevel {
@@ -84,7 +83,6 @@ export class Logger {
 
   /**
    * Get the logging level.
-   *
    * @returns The set log level.
    */
   getLevel(): LogLevel {

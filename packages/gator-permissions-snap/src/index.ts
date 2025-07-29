@@ -150,6 +150,7 @@ const confirmationDialogFactory = new ConfirmationDialogFactory({
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
+  userEventDispatcher,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({

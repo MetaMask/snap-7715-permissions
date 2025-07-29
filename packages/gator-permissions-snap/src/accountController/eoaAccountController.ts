@@ -1,8 +1,8 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
+import { bigIntToHex } from '@metamask/utils';
 
-import { getChainMetadata } from '../core/chainMetadata';
 import { BaseAccountController } from './baseAccountController';
 import type {
   AccountController,
@@ -10,6 +10,7 @@ import type {
   SignDelegationOptions,
   FactoryArgs,
 } from './types';
+import { getChainMetadata } from '../core/chainMetadata';
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
@@ -169,7 +170,7 @@ export class EoaAccountController
 
     const primaryType = 'Delegation';
 
-    const message = delegation;
+    const message = { ...delegation, salt: bigIntToHex(delegation.salt) };
 
     return { domain, types, primaryType, message };
   }
