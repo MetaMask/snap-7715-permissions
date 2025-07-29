@@ -44,7 +44,7 @@
     "prepublishOnly": "mm-snap manifest",
     "serve": "mm-snap serve",
     "start": "mm-snap watch",
-    "test": "jest"
+    "test": "TZ=UTC jest"
   },
   "dependencies": {
     "@metamask/abi-utils": "3.0.0",

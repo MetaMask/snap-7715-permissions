@@ -66,7 +66,7 @@ const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
 };
 
 const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
-  expiry: '1714514400',
+  expiry: '1714521600',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -85,7 +85,7 @@ const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
     periodAmount: '100',
     periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
-    startTime: '1729893600',
+    startTime: '1729900800',
   },
 } as const;
 

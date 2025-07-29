@@ -62,7 +62,7 @@ const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
 };
 
 const alreadyPopulatedContext: Erc20TokenStreamContext = {
-  expiry: '1714514400',
+  expiry: '1714521600',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -79,7 +79,7 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
     initialAmount: '1',
     maxAmount: '10',
     timePeriod: TimePeriod.WEEKLY,
-    startTime: '1729893600',
+    startTime: '1729900800',
     amountPerPeriod: '302400',
   },
 } as const;

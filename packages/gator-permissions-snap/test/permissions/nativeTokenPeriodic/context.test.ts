@@ -60,7 +60,7 @@ const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
   };
 
 const alreadyPopulatedContext: NativeTokenPeriodicContext = {
-  expiry: '1714514400',
+  expiry: '1714521600',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -77,7 +77,7 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
     periodAmount: '1',
     periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
-    startTime: '1729893600',
+    startTime: '1729900800',
   },
 } as const;
 
