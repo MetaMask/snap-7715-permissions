@@ -4,7 +4,7 @@ import type {
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import type { Hex, Caveat, Delegation } from '@metamask/delegation-core';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
+import type { CaipAssetType, SnapsProvider } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { TokenMetadataService } from '../services/tokenMetadataService';
@@ -12,6 +12,7 @@ import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
+import type { AccountController } from './accountController';
 
 /**
  * Represents the result of a permission request.
@@ -38,11 +39,8 @@ export type BaseContext = {
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;
-  accountDetails: {
-    address: `${string}:${string}:${Hex}`;
-    balanceFormattedAsCurrency: string;
-    balance: Hex; // it would be nice if this was Hex, but must be Json serializable for Snaps JSX
-  };
+  accountAddressCaip10: Caip10Address;
+  tokenAddressCaip19: CaipAssetType;
   tokenMetadata: {
     decimals: number;
     symbol: string;
@@ -341,7 +339,13 @@ export type FactoryArgs = {
   factoryData: Hex | undefined;
 };
 
-export type Caip10Address = `${string}:${string}:${Hex}`;
+// we explicitly name these types, so that we can have named parameters in the
+// Caip10Address type, without having to use generics.
+type Namespace = 'eip155';
+type Reference = string;
+type Address = Hex;
+
+type Caip10Address = `${Namespace}:${Reference}:${Address}`;
 
 /**
  * Interface for account controller implementations.

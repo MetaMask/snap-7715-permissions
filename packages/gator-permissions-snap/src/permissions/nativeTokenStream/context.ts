@@ -121,12 +121,10 @@ export async function populatePermission({
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
   accountController,
   tokenMetadataService,
 }: {
   permissionRequest: NativeTokenStreamPermissionRequest;
-  tokenPricesService: TokenPricesService;
   accountController: AccountControllerInterface;
   tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenStreamContext> {
@@ -162,15 +160,11 @@ export async function buildContext({
     }
   }
 
-  const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: fromCaip10Address(address).address,
-  });
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: fromCaip10Address(address).address,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -178,12 +172,6 @@ export async function buildContext({
   const iconDataBase64 = iconDataResponse.success
     ? iconDataResponse.imageDataBase64
     : null;
-
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:1/slip44:60`,
-    bigIntToHex(rawBalance),
-    decimals,
-  );
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
@@ -216,17 +204,12 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
-  const balance = bigIntToHex(rawBalance);
-
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    accountAddressCaip10: address,
+    tokenAddressCaip19: `eip155:${chainId}/slip44:60`,
     tokenMetadata: {
       symbol,
       decimals,

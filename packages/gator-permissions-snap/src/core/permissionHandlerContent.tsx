@@ -1,14 +1,23 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { Box, Heading, Section, Text, Skeleton } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Heading,
+  Section,
+  Text,
+  Skeleton,
+  AccountSelector,
+} from '@metamask/snaps-sdk/jsx';
 
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
-import type { IconData } from './types';
+import type { BaseContext, IconData } from './types';
 import {
   ShowMoreText,
   SkeletonField,
   TextField,
   TooltipIcon,
 } from '../ui/components';
+
+export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 
 export const RECIPIENT_LABEL = 'Recipient';
 export const RECIPIENT_TOOLTIP = 'The site requesting the permission';
@@ -30,6 +39,9 @@ export type PermissionHandlerContentProps = {
   tokenIconData?: IconData | undefined;
   isJustificationCollapsed: boolean;
   origin: string;
+  context: BaseContext;
+  tokenBalance: string | undefined;
+  tokenBalanceFiat: string | undefined;
 };
 
 /**
@@ -54,7 +66,22 @@ export const PermissionHandlerContent = ({
   tokenSymbol,
   tokenIconData,
   isJustificationCollapsed,
+  context,
+  tokenBalance,
+  tokenBalanceFiat,
 }: PermissionHandlerContentProps): SnapElement => {
+  const tokenBalanceComponent = tokenBalance ? (
+    <Text>{tokenBalance} available</Text>
+  ) : (
+    <Skeleton />
+  );
+
+  const fiatBalanceComponent = tokenBalanceFiat ? (
+    <Text>{tokenBalanceFiat}</Text>
+  ) : (
+    <Skeleton />
+  );
+
   return (
     <Box>
       <Box direction="vertical">
@@ -92,9 +119,31 @@ export const PermissionHandlerContent = ({
             </Box>
           </Box>
         </Section>
+        <Section>
+          <Box direction="vertical">
+            <Box direction="horizontal" alignment="space-between">
+              <Box direction="horizontal">
+                <Text>Account</Text>
+                <TooltipIcon tooltip="The account from which the permission is being granted." />
+              </Box>
+            </Box>
+            <AccountSelector
+              name={ACCOUNT_SELECTOR_NAME}
+              chainIds={['eip155:1']}
+              switchGlobalAccount={false}
+              value={context.accountAddressCaip10}
+            />
+
+            <Box direction="horizontal" alignment="end">
+              {fiatBalanceComponent}
+              {tokenBalanceComponent}
+            </Box>
+          </Box>
+        </Section>
         {children}
       </Box>
     </Box>
+    // todo: we _could_ collapse the AccountDetails component into this one.
   );
 };
 

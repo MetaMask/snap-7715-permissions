@@ -66,74 +66,58 @@ describe('erc20TokenStream:content', () => {
                   "key": null,
                   "props": {
                     "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream from",
-                              },
-                              "type": "Text",
+                    "children": {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Stream from",
                             },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                            "type": "Text",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "color": "muted",
+                                  "name": "question",
+                                  "size": "inherit",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The account that the token stream comes from.",
-                                  },
-                                  "type": "Text",
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The account that the token stream comes from.",
                                 },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
                             },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
+                            "type": "Tooltip",
+                          },
+                        ],
+                        "direction": "horizontal",
                       },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                                "size": "sm",
-                              },
-                              "type": "Avatar",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Gator Account",
-                                "color": "default",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
+                      "type": "Box",
+                    },
                     "direction": "horizontal",
                   },
                   "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "chainIds": [
+                      "eip155:1",
+                    ],
+                    "switchGlobalAccount": false,
+                    "value": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                  },
+                  "type": "AccountSelector",
                 },
                 {
                   "key": null,
@@ -151,10 +135,11 @@ describe('erc20TokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            "10",
-                            "available",
-                          ],
+                          "children": {
+                            "key": null,
+                            "props": {},
+                            "type": "Skeleton",
+                          },
                           "color": "alternative",
                         },
                         "type": "Text",
@@ -903,74 +888,58 @@ describe('erc20TokenStream:content', () => {
                   "key": null,
                   "props": {
                     "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream from",
-                              },
-                              "type": "Text",
+                    "children": {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Stream from",
                             },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                            "type": "Text",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "color": "muted",
+                                  "name": "question",
+                                  "size": "inherit",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The account that the token stream comes from.",
-                                  },
-                                  "type": "Text",
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The account that the token stream comes from.",
                                 },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
                             },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
+                            "type": "Tooltip",
+                          },
+                        ],
+                        "direction": "horizontal",
                       },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                                "size": "sm",
-                              },
-                              "type": "Avatar",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Gator Account",
-                                "color": "default",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
+                      "type": "Box",
+                    },
                     "direction": "horizontal",
                   },
                   "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "chainIds": [
+                      "eip155:1",
+                    ],
+                    "switchGlobalAccount": false,
+                    "value": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                  },
+                  "type": "AccountSelector",
                 },
                 {
                   "key": null,
@@ -988,10 +957,11 @@ describe('erc20TokenStream:content', () => {
                       {
                         "key": null,
                         "props": {
-                          "children": [
-                            "10",
-                            "available",
-                          ],
+                          "children": {
+                            "key": null,
+                            "props": {},
+                            "type": "Skeleton",
+                          },
                           "color": "alternative",
                         },
                         "type": "Text",
