@@ -113,7 +113,9 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
           params: [
             {
               to: assetAddress,
-              data: BlockchainTokenMetadataClient.#balanceOfCalldata + account.slice(2).padStart(64, '0'),
+              data:
+                BlockchainTokenMetadataClient.#balanceOfCalldata +
+                account.slice(2).padStart(64, '0'),
             },
             'latest',
           ],
@@ -158,8 +160,14 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       throw new Error('Failed to fetch token balance');
     }
 
-    if (symbolEncoded === '0x' && decimalsEncoded === '0x' && balanceEncoded === '0x') {
-      throw new Error('Failed to fetch token balance and metadata: Token address is invalid');
+    if (
+      symbolEncoded === '0x' &&
+      decimalsEncoded === '0x' &&
+      balanceEncoded === '0x'
+    ) {
+      throw new Error(
+        'Failed to fetch token balance and metadata: Token address is invalid',
+      );
     }
 
     try {
@@ -177,9 +185,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         `Failed to fetch token balance and metadata: ${(error as Error).message}.`,
       );
 
-      throw new Error(
-        `Failed to fetch token balance and metadata.`,
-      );
+      throw new Error(`Failed to fetch token balance and metadata.`);
     }
   }
 }
