@@ -297,8 +297,8 @@ const Index = () => {
       </Subtitle>
       {isWorking && <p>Loading...</p>}
       <CardContainer>
-        {errors.map((error) => (
-          <ErrorMessage key={error?.name}>
+        {errors.map((error, idx) => (
+          <ErrorMessage key={idx}>
             <b>An error happened:</b> {error?.message}
           </ErrorMessage>
         ))}
