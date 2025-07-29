@@ -76,9 +76,6 @@ export const Field = ({
       <Box direction="horizontal" alignment="space-between">
         {labelSection}
       </Box>
-      {/* TODO: The original Dropdown field don't use Box like other fields
-          and the Snap UI doesn't support JSX fragments, so we had to work around it.
-          Recommend making all fields self-contained without relying on Box. */}
       {children.type === 'Dropdown' ? (
         <SnapField error={errorMessage}>{children as JSX.Element}</SnapField>
       ) : (
