@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
-import { StyledForm } from './styles';
 import type { NativeTokenPeriodicPermissionRequest } from './types';
 import { bigIntToHex } from '@metamask/utils';
 
@@ -97,7 +96,7 @@ export const NativeTokenPeriodicForm = ({
   ]);
 
   return (
-    <StyledForm>
+    <>
       <div>
         <label htmlFor="periodAmount">Period Amount:</label>
         <input
@@ -159,6 +158,6 @@ export const NativeTokenPeriodicForm = ({
           style={{ width: 'auto', marginLeft: '1rem' }}
         />
       </div>
-    </StyledForm>
+    </>
   );
 };

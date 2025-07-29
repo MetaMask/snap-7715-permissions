@@ -1,5 +1,5 @@
 import { erc7715ProviderActions } from '@metamask/delegation-toolkit/experimental';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   type Hex,
   createClient,
@@ -250,9 +250,8 @@ const Index = () => {
     setPermissionResponseError(null);
 
     try {
-      const response = await metaMaskClient?.grantPermissions(
-        permissionsRequests,
-      );
+      const response =
+        await metaMaskClient?.grantPermissions(permissionsRequests);
       setPermissionResponse(response);
     } catch (error) {
       setPermissionResponse(null);
@@ -275,6 +274,19 @@ const Index = () => {
     }
   };
 
+  const onFormChange = useCallback(
+    (
+      request:
+        | ERC20TokenPeriodicPermissionRequest
+        | ERC20TokenStreamPermissionRequest
+        | NativeTokenPeriodicPermissionRequest
+        | NativeTokenStreamPermissionRequest,
+    ) => {
+      setPermissionRequest(request);
+    },
+    [],
+  );
+
   return (
     <Container>
       <Heading>
@@ -286,7 +298,7 @@ const Index = () => {
       {isWorking && <p>Loading...</p>}
       <CardContainer>
         {errors.map((error) => (
-          <ErrorMessage>
+          <ErrorMessage key={error?.name}>
             <b>An error happened:</b> {error?.message}
           </ErrorMessage>
         ))}
@@ -349,7 +361,7 @@ const Index = () => {
               </div>
             </StyledForm>
             <CustomMessageButton
-              text="Redeem Permission"
+              $text="Redeem Permission"
               onClick={handleRedeemPermission}
               disabled={isWorking}
             />
@@ -420,39 +432,23 @@ const Index = () => {
               </div>
 
               {permissionType === 'native-token-stream' && (
-                <NativeTokenStreamForm
-                  onChange={(request: NativeTokenStreamPermissionRequest) => {
-                    setPermissionRequest(request);
-                  }}
-                />
+                <NativeTokenStreamForm onChange={onFormChange} />
               )}
 
               {permissionType === 'erc20-token-stream' && (
-                <ERC20TokenStreamForm
-                  onChange={(request: ERC20TokenStreamPermissionRequest) => {
-                    setPermissionRequest(request);
-                  }}
-                />
+                <ERC20TokenStreamForm onChange={onFormChange} />
               )}
 
               {permissionType === 'native-token-periodic' && (
-                <NativeTokenPeriodicForm
-                  onChange={(request: NativeTokenPeriodicPermissionRequest) => {
-                    setPermissionRequest(request);
-                  }}
-                />
+                <NativeTokenPeriodicForm onChange={onFormChange} />
               )}
 
               {permissionType === 'erc20-token-periodic' && (
-                <ERC20TokenPeriodicForm
-                  onChange={(request: ERC20TokenPeriodicPermissionRequest) => {
-                    setPermissionRequest(request);
-                  }}
-                />
+                <ERC20TokenPeriodicForm onChange={onFormChange} />
               )}
             </StyledForm>
             <CustomMessageButton
-              text="Grant Permission"
+              $text="Grant Permission"
               onClick={handleGrantPermissions}
               disabled={isWorking}
             />
@@ -480,7 +476,7 @@ const Index = () => {
               <ConnectButton
                 onClick={requestKernelSnap}
                 disabled={!isMetaMaskReady}
-                isReconnect={isKernelSnapReady}
+                $isReconnect={isKernelSnapReady}
               />
             ),
           }}
@@ -496,7 +492,7 @@ const Index = () => {
               <ConnectButton
                 onClick={requestPermissionSnap}
                 disabled={!isMetaMaskReady}
-                isReconnect={isGatorSnapReady}
+                $isReconnect={isGatorSnapReady}
               />
             ),
           }}
