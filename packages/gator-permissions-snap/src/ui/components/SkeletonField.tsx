@@ -1,6 +1,6 @@
-import { Box, Skeleton, Text } from '@metamask/snaps-sdk/jsx';
+import { Skeleton } from '@metamask/snaps-sdk/jsx';
 
-import { TooltipIcon } from './TooltipIcon';
+import { Field } from './Field';
 
 export type SkeletonFieldParams = {
   label: string;
@@ -8,17 +8,9 @@ export type SkeletonFieldParams = {
 };
 
 export const SkeletonField = ({ label, tooltip }: SkeletonFieldParams) => {
-  const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
-
   return (
-    <Box direction="horizontal" alignment="space-between">
-      <Box direction="horizontal">
-        <Text>{label}</Text>
-        {tooltipElement}
-      </Box>
-      <Box direction="horizontal">
-        <Skeleton />
-      </Box>
-    </Box>
+    <Field label={label} tooltip={tooltip} variant="display">
+      <Skeleton />
+    </Field>
   );
 };

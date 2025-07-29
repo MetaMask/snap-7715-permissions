@@ -1,7 +1,7 @@
-import { Box, Text, Dropdown, Option, Field } from '@metamask/snaps-sdk/jsx';
+import { Dropdown, Option } from '@metamask/snaps-sdk/jsx';
 
+import { Field } from './Field';
 import { TextField } from './TextField';
-import { TooltipIcon } from './TooltipIcon';
 
 export type DropdownFieldParams = {
   label: string;
@@ -26,25 +26,20 @@ export const DropdownField = ({
     return <TextField label={label} value={value} tooltip={tooltip} />;
   }
 
-  const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
-
   return (
-    <Box direction="vertical">
-      <Box direction="horizontal" alignment="space-between">
-        <Box direction="horizontal">
-          <Text>{label}</Text>
-          {tooltipElement}
-        </Box>
-      </Box>
-      <Field error={errorMessage}>
-        <Dropdown name={name} value={value}>
-          {options.map((option) => (
-            <Option key={option} value={option}>
-              {option}
-            </Option>
-          ))}
-        </Dropdown>
-      </Field>
-    </Box>
+    <Field
+      label={label}
+      tooltip={tooltip}
+      errorMessage={errorMessage}
+      disabled={disabled}
+    >
+      <Dropdown name={name} value={value}>
+        {options.map((option) => (
+          <Option key={option} value={option}>
+            {option}
+          </Option>
+        ))}
+      </Dropdown>
+    </Field>
   );
 };
