@@ -11,6 +11,7 @@ import type {
 } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import {
+  ACCOUNT_SELECTOR_NAME,
   PermissionHandlerContent,
   SkeletonPermissionHandlerContent,
 } from './permissionHandlerContent';
@@ -26,6 +27,9 @@ import type {
   PermissionHandlerDependencies,
   PermissionHandlerParams,
 } from './types';
+import { bigIntToHex } from '@metamask/utils';
+import { fromCaip10Address, fromCaip19Address } from '../utils/address';
+import { formatUnits } from '../utils/value';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 
@@ -70,6 +74,10 @@ export class PermissionHandler<
   #deregisterHandlers: (() => void) | undefined;
 
   #hasHandledPermissionRequest = false;
+
+  #tokenBalance: string | undefined = undefined;
+
+  #tokenBalanceFiat: string | undefined = undefined;
 
   constructor({
     accountController,
@@ -183,6 +191,9 @@ export class PermissionHandler<
         isJustificationCollapsed: this.#isJustificationCollapsed,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,
+        context,
+        tokenBalance: this.#tokenBalance,
+        tokenBalanceFiat: this.#tokenBalanceFiat,
       });
     };
 
@@ -199,6 +210,36 @@ export class PermissionHandler<
       const rerender = async () =>
         await updateContext({ updatedContext: currentContext });
 
+      // todo: implement a mechanism to cancel any currently loading balance
+      const loadBalance = async (context: TContext) => {
+        const { address, chainId } = fromCaip10Address(
+          context.accountAddressCaip10,
+        );
+
+        const { assetAddress } = fromCaip19Address(context.tokenAddressCaip19);
+
+        const { balance, decimals } =
+          await this.#tokenMetadataService.getTokenBalanceAndMetadata({
+            chainId,
+            account: address,
+            assetAddress,
+          });
+
+        this.#tokenBalance = formatUnits({ value: balance, decimals });
+
+        rerender();
+
+        this.#tokenBalanceFiat =
+          await this.#tokenPricesService.getCryptoToFiatConversion(
+            initialContext.tokenAddressCaip19,
+            bigIntToHex(balance),
+            initialContext.tokenMetadata.decimals,
+          );
+        rerender();
+      };
+
+      loadBalance(currentContext);
+
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
       > = async () => {
@@ -211,21 +252,25 @@ export class PermissionHandler<
       > = async ({ event: { value } }) => {
         const {
           addresses: [address],
-        } = value as any;
+        } = value as unknown as {
+          addresses: [`${string}:${string}:${string}`];
+        };
 
         currentContext = {
           ...currentContext,
-          accountDetails: {
-            ...currentContext.accountDetails,
-            address,
-          },
+          accountAddressCaip10: address,
         };
+
+        this.#tokenBalance = undefined;
+        this.#tokenBalanceFiat = undefined;
+
+        loadBalance(currentContext);
 
         await rerender();
       };
 
       this.#userEventDispatcher.on({
-        elementName: 'account-selector',
+        elementName: ACCOUNT_SELECTOR_NAME,
         eventType: UserInputEventType.InputChangeEvent,
         interfaceId,
         handler: accountSelectedHandler,
@@ -256,6 +301,13 @@ export class PermissionHandler<
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId,
           handler: showMoreButtonClickHandler,
+        });
+
+        this.#userEventDispatcher.off({
+          elementName: ACCOUNT_SELECTOR_NAME,
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId,
+          handler: accountSelectedHandler,
         });
       };
     };
