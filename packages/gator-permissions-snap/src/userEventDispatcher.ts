@@ -273,39 +273,31 @@ export class UserEventDispatcher {
           this.#pendingDebouncedEvents.keys(),
         );
         if (pendingEventKeys.length > 0) {
-          // Process all pending debounced events immediately
-          const pendingPromises = pendingEventKeys.map(
-            async (pendingEventKey) => {
-              const pendingEvent =
-                this.#pendingDebouncedEvents.get(pendingEventKey);
-              if (pendingEvent) {
-                // Clear the debounce timer for this event
-                const timer = this.#debounceTimers.get(pendingEventKey);
-                if (timer) {
-                  clearTimeout(timer);
-                  this.#debounceTimers.delete(pendingEventKey);
-                }
-
-                // Remove from pending events
-                this.#pendingDebouncedEvents.delete(pendingEventKey);
-
-                // Process the event and chain it to the queue
-                this.#eventQueue = this.#processEvent(
-                  pendingEvent.event,
-                  pendingEvent.id,
-                  pendingEvent.eventKey,
-                );
-
-                // Wait for this specific event to complete
-                return this.#eventQueue;
+          // Process all pending debounced events sequentially to maintain proper ordering
+          for (const pendingEventKey of pendingEventKeys) {
+            const pendingEvent =
+              this.#pendingDebouncedEvents.get(pendingEventKey);
+            if (pendingEvent) {
+              // Clear the debounce timer for this event
+              const timer = this.#debounceTimers.get(pendingEventKey);
+              if (timer) {
+                clearTimeout(timer);
+                this.#debounceTimers.delete(pendingEventKey);
               }
-              return undefined;
-            },
-          );
 
-          // Wait for all pending debounced events to complete
-          if (pendingPromises.length > 0) {
-            await Promise.all(pendingPromises);
+              // Remove from pending events
+              this.#pendingDebouncedEvents.delete(pendingEventKey);
+
+              // Process the event and chain it to the queue
+              this.#eventQueue = this.#processEvent(
+                pendingEvent.event,
+                pendingEvent.id,
+                pendingEvent.eventKey,
+              );
+
+              // Wait for this specific event to complete before processing the next
+              await this.#eventQueue;
+            }
           }
         }
 
@@ -357,8 +349,8 @@ export class UserEventDispatcher {
         }
       }
 
-      // Create promises for all pending debounced events
-      const pendingPromises = pendingEventKeys.map(async (eventKey) => {
+      // Process all pending debounced events sequentially to maintain proper ordering
+      for (const eventKey of pendingEventKeys) {
         const pendingEvent = this.#pendingDebouncedEvents.get(eventKey);
         if (pendingEvent) {
           // Remove from pending events
@@ -371,14 +363,9 @@ export class UserEventDispatcher {
             pendingEvent.eventKey,
           );
 
-          // Wait for this specific event to complete
-          return this.#eventQueue;
+          // Wait for this specific event to complete before processing the next
+          await this.#eventQueue;
         }
-        return undefined;
-      });
-
-      if (pendingPromises.length > 0) {
-        await Promise.all(pendingPromises);
       }
     }
   }

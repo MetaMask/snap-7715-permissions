@@ -215,6 +215,7 @@ export function bindRuleHandlers<
       const isDateField = fieldName.endsWith('_date');
       const isTimeField = fieldName.endsWith('_time');
 
+      // Fix race condition: Get context once and reuse it
       const context = getContext();
       const metadata = await deriveMetadata({ context });
 
@@ -239,16 +240,16 @@ export function bindRuleHandlers<
         currentValues.time = event.value as string;
       }
 
-      if (!currentValues.date) {
-        currentValues.date = convertTimestampToReadableDate(
-          currentValues.timestamp,
-        );
-      }
+      // Fix type mismatch: Convert string timestamp to number before passing to utility functions
+      const timestampNumber = Number(currentValues.timestamp);
+      if (!isNaN(timestampNumber) && timestampNumber > 0) {
+        if (!currentValues.date) {
+          currentValues.date = convertTimestampToReadableDate(timestampNumber);
+        }
 
-      if (!currentValues.time) {
-        currentValues.time = convertTimestampToReadableTime(
-          currentValues.timestamp,
-        );
+        if (!currentValues.time) {
+          currentValues.time = convertTimestampToReadableTime(timestampNumber);
+        }
       }
 
       try {
@@ -262,7 +263,8 @@ export function bindRuleHandlers<
         console.log('Error combining date and time', error);
       }
 
-      const updatedContext = rule.updateContext(getContext(), currentValues);
+      // Fix race condition: Use the stored context reference instead of calling getContext() again
+      const updatedContext = rule.updateContext(context, currentValues);
       await onContextChanged({ context: updatedContext });
     };
 
