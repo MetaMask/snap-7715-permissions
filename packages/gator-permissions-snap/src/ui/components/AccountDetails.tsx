@@ -4,10 +4,11 @@ import { Text, Box, Section, AccountSelector } from '@metamask/snaps-sdk/jsx';
 
 import { TooltipIcon } from './TooltipIcon';
 import { formatUnitsFromHex } from '../../utils/value';
+import { Caip10Address } from '../../core/types';
 
 export type AccountDetailsProps = {
   account: {
-    address: `${string}:${string}:${Hex}`;
+    address: Caip10Address;
     balanceFormattedAsCurrency: string;
     balance: Hex;
   };

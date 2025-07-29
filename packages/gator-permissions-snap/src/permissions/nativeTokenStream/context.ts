@@ -1,7 +1,10 @@
 import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
-import { TimePeriod } from '../../core/types';
+import {
+  AccountControllerInterface,
+  TimePeriod,
+  Caip10Address,
+} from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
@@ -24,7 +27,7 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
-import { fromCaip10Address, toCaip10Address } from '../../utils/utils';
+import { fromCaip10Address } from '../../utils/address';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -124,14 +127,40 @@ export async function buildContext({
 }: {
   permissionRequest: NativeTokenStreamPermissionRequest;
   tokenPricesService: TokenPricesService;
-  accountController: AccountController;
+  accountController: AccountControllerInterface;
   tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const address = await accountController.getAccountAddress({
+  // todo: can this address nonsense be moved out into the PermissionProvider or some encapsulation?
+  const requestedAddress = permissionRequest.address?.toLowerCase();
+
+  const allAddresses = await accountController.getAccountAddresses({
     chainId,
   });
+
+  if (allAddresses[0] === undefined) {
+    throw new Error('No addresses found');
+  }
+
+  let address: Caip10Address | undefined = undefined;
+
+  if (requestedAddress === undefined) {
+    // use the first address available for the account
+    address = allAddresses[0];
+  } else {
+    // validate that the requested address is one of the addresses available for the account
+    for (const caip10Address of allAddresses) {
+      const { address: rawAddress } = fromCaip10Address(caip10Address);
+      if (rawAddress === requestedAddress.toLowerCase()) {
+        address = caip10Address;
+        break;
+      }
+    }
+    if (address === undefined) {
+      throw new Error('Requested address not found');
+    }
+  }
 
   const {
     balance: rawBalance,
@@ -140,7 +169,7 @@ export async function buildContext({
     iconUrl,
   } = await tokenMetadataService.getTokenBalanceAndMetadata({
     chainId,
-    account: address,
+    account: fromCaip10Address(address).address,
   });
 
   const iconDataResponse =
@@ -189,14 +218,12 @@ export async function buildContext({
 
   const balance = bigIntToHex(rawBalance);
 
-  const caip10Address = toCaip10Address({ chainId, address });
-
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     accountDetails: {
-      address: caip10Address,
+      address,
       balance,
       balanceFormattedAsCurrency: balanceFormatted,
     },
