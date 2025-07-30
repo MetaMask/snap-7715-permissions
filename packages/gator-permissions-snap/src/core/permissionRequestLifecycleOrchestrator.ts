@@ -103,9 +103,14 @@ export class PermissionRequestLifecycleOrchestrator {
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
+      let finalIsGrantDisabled = isGrantDisabled;
+
       // if there are validation errors, disable the grant button
-      if (metadata && metadata.validationErrors && Object.keys(metadata.validationErrors).length > 0) {
-        isGrantDisabled = true;
+      if (
+        metadata?.validationErrors &&
+        Object.keys(metadata.validationErrors).length > 0
+      ) {
+        finalIsGrantDisabled = true;
       }
 
       const ui = await lifecycleHandlers.createConfirmationContent({
@@ -115,7 +120,10 @@ export class PermissionRequestLifecycleOrchestrator {
         chainId,
       });
 
-      await confirmationDialog.updateContent({ ui, isGrantDisabled });
+      await confirmationDialog.updateContent({
+        ui,
+        isGrantDisabled: finalIsGrantDisabled,
+      });
     };
 
     // replace the skeleton content with the actual content rendered with the resolved context
