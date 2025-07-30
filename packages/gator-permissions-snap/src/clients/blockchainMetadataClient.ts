@@ -142,6 +142,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         }),
       ]);
     } catch (error) {
+      logger.error('Failed to fetch token balance and metadata', error);
       throw new Error('Failed to fetch token balance and metadata');
     }
 
@@ -185,7 +186,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         `Failed to fetch token balance and metadata: ${(error as Error).message}.`,
       );
 
-      throw new Error(`Failed to fetch token balance and metadata.`);
+      throw new Error(`Failed to fetch token balance and metadata`);
     }
   }
 }
