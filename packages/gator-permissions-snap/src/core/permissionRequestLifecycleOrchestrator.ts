@@ -17,6 +17,7 @@ import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
   BaseContext,
+  BaseMetadata,
   DeepRequired,
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
@@ -57,7 +58,7 @@ export class PermissionRequestLifecycleOrchestrator {
   async orchestrate<
     TRequest extends PermissionRequest,
     TContext extends BaseContext,
-    TMetadata extends object,
+    TMetadata extends BaseMetadata,
     TPermission extends TRequest['permission'],
     TPopulatedPermission extends DeepRequired<TPermission>,
   >(
@@ -101,6 +102,11 @@ export class PermissionRequestLifecycleOrchestrator {
       context = newContext;
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
+
+      // if there are validation errors, disable the grant button
+      if (metadata && metadata.validationErrors && Object.keys(metadata.validationErrors).length > 0) {
+        isGrantDisabled = true;
+      }
 
       const ui = await lifecycleHandlers.createConfirmationContent({
         context,
