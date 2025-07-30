@@ -10,6 +10,7 @@ import {
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
 import { bytesToHex, hexToNumber, numberToHex } from '@metamask/utils';
+import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { AccountController } from '../accountController';
 import type { UserEventDispatcher } from '../userEventDispatcher';
@@ -33,18 +34,23 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
+  readonly #nonceCaveatService: NonceCaveatService;
+
   constructor({
     accountController,
     confirmationDialogFactory,
     userEventDispatcher,
+    nonceCaveatService,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
+    nonceCaveatService: NonceCaveatService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#nonceCaveatService = nonceCaveatService;
   }
 
   /**
@@ -267,6 +273,17 @@ export class PermissionRequestLifecycleOrchestrator {
       }),
       args: '0x',
     });
+
+    const nonce = await this.#nonceCaveatService.getNonce(chainId, address);
+    console.log('nonce', nonce);
+
+    // caveats.push({
+    //   enforcer: contracts.enforcers.NonceEnforcer,
+    //   terms: createNonceTerms({
+    //     nonce,
+    //   }),
+    //   args: '0x',
+    // });
 
     // eslint-disable-next-line no-restricted-globals
     const saltBytes = crypto.getRandomValues(new Uint8Array(32));
