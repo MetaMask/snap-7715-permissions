@@ -112,7 +112,7 @@ describe('NonceCaveatClient', () => {
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow('Failed to fetch token symbol');
+      ).rejects.toThrow('Failed to fetch nonce');
     });
 
     it('throws an error if nonce decoding fails', async () => {
@@ -127,7 +127,7 @@ describe('NonceCaveatClient', () => {
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow('Failed to fetch token balance and metadata');
+      ).rejects.toThrow('Failed to fetch nonce');
     });
 
     it('handles large nonce values correctly', async () => {

@@ -83,8 +83,8 @@ export class NonceCaveatClient {
     }
 
     if (!nonceEncoded) {
-      logger.error('Failed to fetch token symbol');
-      throw new Error('Failed to fetch token symbol');
+      logger.error('Failed to fetch nonce');
+      throw new Error('Failed to fetch nonce');
     }
 
     try {
@@ -92,10 +92,10 @@ export class NonceCaveatClient {
       return Number(nonce);
     } catch (error) {
       logger.error(
-        `Failed to fetch token balance and metadata: ${(error as Error).message}.`,
+        `Failed to fetch nonce: ${(error as Error).message}.`,
       );
 
-      throw new Error('Failed to fetch token balance and metadata');
+      throw new Error('Failed to fetch nonce');
     }
   }
 }
