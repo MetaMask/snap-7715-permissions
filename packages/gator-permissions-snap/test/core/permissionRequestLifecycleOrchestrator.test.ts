@@ -4,7 +4,7 @@ import {
   ROOT_AUTHORITY,
   createTimestampTerms,
 } from '@metamask/delegation-core';
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bytesToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../src/accountController';
@@ -35,11 +35,11 @@ const mockMetadata = {
 
 const mockUiContent = {
   type: 'ui-content',
-} as GenericSnapElement;
+} as SnapElement;
 
 const mockSkeletonUiContent = {
   type: 'skeleton',
-} as GenericSnapElement;
+} as SnapElement;
 
 const requestingAccountAddress = randomAddress();
 const mockPermissionRequest = {
