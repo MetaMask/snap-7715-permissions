@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
 import { bigIntToHex, type Hex } from '@metamask/utils';
-import { StyledForm } from './styles';
 import type { ERC20TokenStreamPermissionRequest } from './types';
 
 type ERC20TokenStreamFormProps = {
@@ -137,7 +136,7 @@ export const ERC20TokenStreamForm = ({
   ]);
 
   return (
-    <StyledForm>
+    <>
       <div>
         <label htmlFor="tokenAddress">Token Address:</label>
         <input
@@ -220,6 +219,6 @@ export const ERC20TokenStreamForm = ({
           style={{ width: 'auto', marginLeft: '1rem' }}
         />
       </div>
-    </StyledForm>
+    </>
   );
 };

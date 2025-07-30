@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
-import { StyledForm } from './styles';
 import type { NativeTokenStreamPermissionRequest } from './types';
 
 import { bigIntToHex } from '@metamask/utils';
@@ -122,7 +121,7 @@ export const NativeTokenStreamForm = ({
   ]);
 
   return (
-    <StyledForm>
+    <>
       <div>
         <label htmlFor="initialAmount">Initial Amount:</label>
         <input
@@ -194,6 +193,6 @@ export const NativeTokenStreamForm = ({
           style={{ width: 'auto', marginLeft: '1rem' }}
         />
       </div>
-    </StyledForm>
+    </>
   );
 };
