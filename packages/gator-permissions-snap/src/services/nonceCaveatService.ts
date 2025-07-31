@@ -24,7 +24,7 @@ export class NonceCaveatService {
    * @param account - The address of the account.
    * @returns A promise resolving to the nonce.
    */
-  public async getNonce(chainId: number, account: Hex): Promise<number> {
+  public async getNonce(chainId: number, account: Hex): Promise<bigint> {
     logger.debug('NonceCaveatService:getNonce()');
 
     const nonce = await this.#nonceCaveatClient.getNonce({

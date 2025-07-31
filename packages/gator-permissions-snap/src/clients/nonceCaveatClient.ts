@@ -35,7 +35,7 @@ export class NonceCaveatClient {
   }: {
     chainId: number;
     account: Hex;
-  }): Promise<number> {
+  }): Promise<bigint> {
     logger.debug('BlockchainTokenMetadataClient:getTokenBalanceAndMetadata()');
 
     if (!chainId) {
@@ -89,7 +89,7 @@ export class NonceCaveatClient {
 
     try {
       const nonce = decodeSingle('uint256', nonceEncoded);
-      return Number(nonce);
+      return nonce;
     } catch (error) {
       logger.error(
         `Failed to fetch nonce: ${(error as Error).message}.`,

@@ -37,7 +37,7 @@ describe('NonceCaveatClient', () => {
         account: mockAccount,
       });
 
-      expect(result).toBe(5);
+      expect(result).toBe(5n);
 
       expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
       expect(mockEthereumProvider.request).toHaveBeenNthCalledWith(1, {
@@ -143,7 +143,7 @@ describe('NonceCaveatClient', () => {
         account: mockAccount,
       });
 
-      expect(result).toBe(65535);
+      expect(result).toBe(65535n);
     });
 
     it('handles zero nonce correctly', async () => {
@@ -159,7 +159,7 @@ describe('NonceCaveatClient', () => {
         account: mockAccount,
       });
 
-      expect(result).toBe(0);
+      expect(result).toBe(0n);
     });
   });
 });
