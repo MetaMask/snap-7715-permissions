@@ -24,7 +24,7 @@ const validPermissionRequest: NativeTokenStreamPermissionRequest = {
       amountPerSecond: bigIntToHex(
         parseUnits({ formatted: '.5', decimals: 18 }),
       ), // 0.5 ETH per second
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: Math.floor(Date.now() / 1000) + 86400, // Tomorrow
       justification: 'test',
     },
     rules: {},
@@ -169,7 +169,9 @@ describe('nativeTokenStream:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(negativeStartTimeRequest),
-        ).toThrow('Invalid startTime: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.startTime: Start time must be today or later',
+        );
       });
 
       it('should throw for zero startTime', () => {
@@ -185,7 +187,7 @@ describe('nativeTokenStream:validation', () => {
         };
 
         expect(() => parseAndValidatePermission(zeroStartTimeRequest)).toThrow(
-          'Invalid startTime: must be a positive number',
+          'Failed type validation: data.startTime: Start time must be today or later',
         );
       });
 
@@ -196,13 +198,13 @@ describe('nativeTokenStream:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              startTime: 1.5,
+              startTime: Math.floor(Date.now() / 1000) + 86400 + 0.5, // Tomorrow + 0.5 seconds
             },
           },
         };
 
         expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
-          'Invalid startTime: must be an integer',
+          'Failed type validation: data.startTime: Expected integer, received float',
         );
       });
     });

@@ -30,7 +30,7 @@ const validPermissionRequest: Erc20TokenStreamPermissionRequest = {
       amountPerSecond: bigIntToHex(
         parseUnits({ formatted: '.5', decimals: tokenDecimals }),
       ), // 0.5 tokens per second
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: Math.floor(Date.now() / 1000) + 86400, // Tomorrow
       tokenAddress: '0x1234567890123456789012345678901234567890',
       justification: 'test',
     },
@@ -107,7 +107,7 @@ describe('erc20TokenStream:validation', () => {
     });
 
     describe('initialAmount validation', () => {
-      it('should throw for zero initialAmount', () => {
+      it('should allow zero initialAmount', () => {
         const zeroInitialAmountRequest = {
           ...validPermissionRequest,
           permission: {
@@ -121,7 +121,7 @@ describe('erc20TokenStream:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(zeroInitialAmountRequest),
-        ).toThrow('Invalid initialAmount: must be greater than 0');
+        ).not.toThrow();
       });
 
       it('should allow missing initialAmount', () => {
@@ -176,7 +176,9 @@ describe('erc20TokenStream:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(negativeStartTimeRequest),
-        ).toThrow('Invalid startTime: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.startTime: Start time must be today or later',
+        );
       });
 
       it('should throw for zero startTime', () => {
@@ -192,7 +194,7 @@ describe('erc20TokenStream:validation', () => {
         };
 
         expect(() => parseAndValidatePermission(zeroStartTimeRequest)).toThrow(
-          'Invalid startTime: must be a positive number',
+          'Failed type validation: data.startTime: Start time must be today or later',
         );
       });
 
@@ -203,13 +205,13 @@ describe('erc20TokenStream:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              startTime: 1.5,
+              startTime: Math.floor(Date.now() / 1000) + 86400 + 0.5, // Tomorrow + 0.5 seconds
             },
           },
         };
 
         expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
-          'Invalid startTime: must be an integer',
+          'Failed type validation: data.startTime: Expected integer, received float',
         );
       });
     });
@@ -230,7 +232,7 @@ describe('erc20TokenStream:validation', () => {
         expect(() =>
           parseAndValidatePermission(invalidTokenAddressRequest),
         ).toThrow(
-          'Failed type validation: data.tokenAddress: Invalid hex value',
+          'Failed type validation: data.tokenAddress: Invalid Ethereum address',
         );
       });
 

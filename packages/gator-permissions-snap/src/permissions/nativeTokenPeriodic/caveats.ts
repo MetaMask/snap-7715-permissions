@@ -28,7 +28,7 @@ export async function createPermissionCaveats({
     terms: createNativeTokenPeriodTransferTerms({
       periodAmount: BigInt(periodAmount),
       periodDuration,
-      startDate: startTime,
+      startDate: startTime ?? Math.floor(Date.now() / 1000), // Fallback - should never happen at this point.
     }),
     args: '0x',
   };

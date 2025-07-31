@@ -17,7 +17,7 @@ import { zNativeTokenPeriodicPermission } from './types';
 function validatePermissionData(
   permission: NativeTokenPeriodicPermission,
 ): true {
-  const { periodAmount, periodDuration, startTime } = permission.data;
+  const { periodAmount } = permission.data;
 
   validateHexInteger({
     name: 'periodAmount',

@@ -62,7 +62,12 @@ export function validateAndParseAmount(
  * @param startTime - The start time string to validate.
  * @returns Validation error message or undefined if valid.
  */
-export function validateStartTime(startTime: string): string | undefined {
+export function validateStartTime(
+  startTime: string | undefined,
+): string | undefined {
+  if (!startTime) {
+    return 'Start time is required';
+  }
   try {
     const startTimeDate = convertReadableDateToTimestamp(startTime);
     if (startTimeDate < getStartOfTodayUTC()) {

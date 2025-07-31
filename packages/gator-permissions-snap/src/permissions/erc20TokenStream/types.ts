@@ -12,6 +12,7 @@ import type {
   TypedPermissionRequest,
   BaseContext,
 } from '../../core/types';
+import { validateStartTimeZod } from '../../utils/validate';
 
 export type Erc20TokenStreamMetadata = {
   amountPerSecond: string;
@@ -29,7 +30,7 @@ export type Erc20TokenStreamContext = BaseContext & {
     initialAmount: string | undefined;
     maxAmount: string | undefined;
     timePeriod: TimePeriod;
-    startTime: string;
+    startTime: string | undefined;
     amountPerPeriod: string;
   };
 };
@@ -42,7 +43,22 @@ export const zErc20TokenStreamPermission = zPermission.extend({
       initialAmount: zHexStr.optional(),
       maxAmount: zHexStr.optional(),
       amountPerSecond: zHexStr,
-      startTime: z.number().int().min(946684800, 'Start time must be after 2000-01-01'),
+      startTime: z
+        .number()
+        .int()
+        .nullable()
+        .optional()
+        .refine(
+          (value) => {
+            if (value === undefined || value === null) {
+              return true;
+            }
+            return validateStartTimeZod(value);
+          },
+          {
+            message: 'Start time must be today or later',
+          },
+        ),
       tokenAddress: zAddress,
     }),
   ),

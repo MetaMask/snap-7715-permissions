@@ -17,8 +17,7 @@ import { zErc20TokenPeriodicPermission } from './types';
 function validatePermissionData(
   permission: Erc20TokenPeriodicPermission,
 ): true {
-  const { periodAmount, periodDuration, startTime, tokenAddress } =
-    permission.data;
+  const { periodAmount } = permission.data;
 
   validateHexInteger({
     name: 'periodAmount',

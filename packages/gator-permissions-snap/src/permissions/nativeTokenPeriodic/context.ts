@@ -50,7 +50,9 @@ export async function applyContext({
       parseUnits({ formatted: permissionDetails.periodAmount, decimals }),
     ),
     periodDuration: parseInt(permissionDetails.periodDuration, 10),
-    startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
+    startTime: permissionDetails.startTime
+      ? convertReadableDateToTimestamp(permissionDetails.startTime)
+      : undefined,
     justification: originalRequest.permission.data.justification,
   };
 
@@ -78,6 +80,10 @@ export async function populatePermission({
 }): Promise<PopulatedNativeTokenPeriodicPermission> {
   return {
     ...permission,
+    data: {
+      ...permission.data,
+      startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
+    },
     rules: permission.rules ?? {},
   };
 }
@@ -156,7 +162,7 @@ export async function buildContext({
   }
 
   const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
+    permissionRequest.permission.data.startTime ?? Date.now() / 1000,
   );
 
   const balance = bigIntToHex(rawBalance);

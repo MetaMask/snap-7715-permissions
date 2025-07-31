@@ -65,7 +65,9 @@ export async function applyContext({
       parseUnits({ formatted: permissionDetails.amountPerPeriod, decimals }) /
         TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
-    startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
+    startTime: permissionDetails.startTime
+      ? convertReadableDateToTimestamp(permissionDetails.startTime)
+      : undefined,
     justification: originalRequest.permission.data.justification,
   };
 
@@ -97,6 +99,7 @@ export async function populatePermission({
       ...permission.data,
       initialAmount: permission.data.initialAmount ?? DEFAULT_INITIAL_AMOUNT,
       maxAmount: permission.data.maxAmount ?? DEFAULT_MAX_AMOUNT,
+      startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
     },
     rules: permission.rules ?? {},
   };
@@ -180,7 +183,7 @@ export async function buildContext({
   });
 
   const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
+    permissionRequest.permission.data.startTime ?? Date.now() / 1000,
   );
 
   const balance = bigIntToHex(rawBalance);

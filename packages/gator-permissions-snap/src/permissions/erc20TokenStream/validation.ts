@@ -15,8 +15,7 @@ import { zErc20TokenStreamPermission } from './types';
  * @throws {Error} If any validation check fails.
  */
 function validatePermissionData(permission: Erc20TokenStreamPermission): true {
-  const { initialAmount, maxAmount, amountPerSecond, startTime, tokenAddress } =
-    permission.data;
+  const { initialAmount, maxAmount, amountPerSecond } = permission.data;
 
   validateHexInteger({
     name: 'maxAmount',

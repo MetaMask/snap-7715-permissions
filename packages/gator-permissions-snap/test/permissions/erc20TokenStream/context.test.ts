@@ -128,6 +128,32 @@ describe('erc20TokenStream:context', () => {
 
       expect(populatedPermission).toStrictEqual(permission);
     });
+
+    it('should set startTime to current timestamp when it is null', async () => {
+      const beforeTime = Math.floor(Date.now() / 1000);
+
+      const permission: Erc20TokenStreamPermission = {
+        type: 'erc20-token-stream',
+        data: {
+          tokenAddress: USDC_ADDRESS,
+          initialAmount: '0x1000000000000000000000000000000000000000',
+          maxAmount: '0x1000000000000000000000000000000000000000',
+          amountPerSecond: '0x1000000000000000000000000000000000000000',
+          startTime: null,
+          justification: 'Permission to do something important',
+        },
+        rules: {},
+      };
+
+      const populatedPermission = await populatePermission({ permission });
+
+      const afterTime = Math.floor(Date.now() / 1000);
+
+      expect(populatedPermission.data.startTime).toBeGreaterThanOrEqual(
+        beforeTime,
+      );
+      expect(populatedPermission.data.startTime).toBeLessThanOrEqual(afterTime);
+    });
   });
 
   describe('buildContext()', () => {

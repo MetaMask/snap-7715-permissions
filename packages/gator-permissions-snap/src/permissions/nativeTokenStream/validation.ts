@@ -15,8 +15,7 @@ import { zNativeTokenStreamPermission } from './types';
  * @throws {Error} If any validation check fails.
  */
 function validatePermissionData(permission: NativeTokenStreamPermission): true {
-  const { initialAmount, maxAmount, amountPerSecond, startTime } =
-    permission.data;
+  const { initialAmount, maxAmount, amountPerSecond } = permission.data;
 
   validateHexInteger({
     name: 'maxAmount',

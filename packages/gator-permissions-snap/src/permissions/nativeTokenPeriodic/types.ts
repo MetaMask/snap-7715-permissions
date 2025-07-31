@@ -11,6 +11,7 @@ import type {
   BaseContext,
   TimePeriod,
 } from '../../core/types';
+import { validateStartTimeZod } from '../../utils/validate';
 
 export type NativeTokenPeriodicMetadata = {
   validationErrors: {
@@ -27,7 +28,7 @@ export type NativeTokenPeriodicContext = BaseContext & {
     periodAmount: string;
     periodType: TimePeriod | 'Other';
     periodDuration: string;
-    startTime: string;
+    startTime: string | undefined;
   };
 };
 
@@ -38,7 +39,22 @@ export const zNativeTokenPeriodicPermission = zPermission.extend({
     z.object({
       periodAmount: zHexStr,
       periodDuration: z.number().int().positive(),
-      startTime: z.number().int().min(946684800, 'Start time must be after 2000-01-01'),
+      startTime: z
+        .number()
+        .int()
+        .nullable()
+        .optional()
+        .refine(
+          (value) => {
+            if (value === undefined || value === null) {
+              return true;
+            }
+            return validateStartTimeZod(value);
+          },
+          {
+            message: 'Start time must be today or later',
+          },
+        ),
     }),
   ),
 });

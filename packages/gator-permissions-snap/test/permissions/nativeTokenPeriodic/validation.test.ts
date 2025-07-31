@@ -25,7 +25,7 @@ const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
     data: {
       periodAmount: bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })), // 1 ETH per period
       periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: Math.floor(Date.now() / 1000) + 86400, // Tomorrow
       justification: 'test',
     },
     rules: {},
@@ -93,7 +93,9 @@ describe('nativeTokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(zeroPeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.periodDuration: Number must be greater than 0',
+        );
       });
 
       it('should throw for negative periodDuration', () => {
@@ -110,7 +112,9 @@ describe('nativeTokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(negativePeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.periodDuration: Number must be greater than 0',
+        );
       });
 
       it('should throw for non-integer periodDuration', () => {
@@ -127,7 +131,9 @@ describe('nativeTokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(floatPeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be an integer');
+        ).toThrow(
+          'Failed type validation: data.periodDuration: Expected integer, received float',
+        );
       });
 
       it('should validate periodDuration for daily period', () => {
@@ -180,7 +186,9 @@ describe('nativeTokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(negativeStartTimeRequest),
-        ).toThrow('Invalid startTime: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.startTime: Start time must be today or later',
+        );
       });
 
       it('should throw for zero startTime', () => {
@@ -196,7 +204,7 @@ describe('nativeTokenPeriodic:validation', () => {
         };
 
         expect(() => parseAndValidatePermission(zeroStartTimeRequest)).toThrow(
-          'Invalid startTime: must be a positive number',
+          'Failed type validation: data.startTime: Start time must be today or later',
         );
       });
 
@@ -207,13 +215,13 @@ describe('nativeTokenPeriodic:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              startTime: 1.5,
+              startTime: Math.floor(Date.now() / 1000) + 86400 + 0.5, // Tomorrow + 0.5 seconds
             },
           },
         };
 
         expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
-          'Invalid startTime: must be an integer',
+          'Failed type validation: data.startTime: Expected integer, received float',
         );
       });
     });
