@@ -91,9 +91,7 @@ export class NonceCaveatClient {
       const nonce = decodeSingle('uint256', nonceEncoded);
       return nonce;
     } catch (error) {
-      logger.error(
-        `Failed to fetch nonce: ${(error as Error).message}.`,
-      );
+      logger.error(`Failed to fetch nonce: ${(error as Error).message}.`);
 
       throw new Error('Failed to fetch nonce');
     }

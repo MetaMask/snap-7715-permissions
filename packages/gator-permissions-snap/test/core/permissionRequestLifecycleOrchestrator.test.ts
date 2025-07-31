@@ -3,9 +3,10 @@ import {
   decodeDelegations,
   ROOT_AUTHORITY,
   createTimestampTerms,
+  createNonceTerms,
 } from '@metamask/delegation-core';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { bytesToHex } from '@metamask/utils';
+import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { AccountController } from '../../src/accountController';
@@ -165,7 +166,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     );
     mockConfirmationDialog.updateContent.mockResolvedValue(undefined);
 
-    mockNonceCaveatService.getNonce.mockResolvedValue(0);
+    mockNonceCaveatService.getNonce.mockResolvedValue(0n);
 
     permissionRequestLifecycleOrchestrator =
       new PermissionRequestLifecycleOrchestrator({
@@ -311,7 +312,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         const {
           contracts: {
-            enforcers: { TimestampEnforcer },
+            enforcers: { TimestampEnforcer, NonceEnforcer },
           },
         } = getChainMetadata({
           chainId: Number(mockPermissionRequest.chainId),
@@ -328,6 +329,13 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
               terms: createTimestampTerms({
                 timestampAfterThreshold: 0,
                 timestampBeforeThreshold: mockPermissionRequest.expiry,
+              }),
+            },
+            {
+              enforcer: NonceEnforcer.toLowerCase(),
+              args: '0x',
+              terms: createNonceTerms({
+                nonce: bigIntToHex(0n),
               }),
             },
           ],

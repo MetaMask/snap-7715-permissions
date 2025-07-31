@@ -5,11 +5,17 @@ import type {
 } from '@metamask/7715-permissions-shared/types';
 import type { Delegation } from '@metamask/delegation-core';
 import {
+  createNonceTerms,
   createTimestampTerms,
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import { bytesToHex, hexToNumber, numberToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  bytesToHex,
+  hexToNumber,
+  numberToHex,
+} from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { AccountController } from '../accountController';
@@ -275,15 +281,14 @@ export class PermissionRequestLifecycleOrchestrator {
     });
 
     const nonce = await this.#nonceCaveatService.getNonce(chainId, address);
-    console.log('nonce', nonce);
 
-    // caveats.push({
-    //   enforcer: contracts.enforcers.NonceEnforcer,
-    //   terms: createNonceTerms({
-    //     nonce,
-    //   }),
-    //   args: '0x',
-    // });
+    caveats.push({
+      enforcer: contracts.enforcers.NonceEnforcer,
+      terms: createNonceTerms({
+        nonce: bigIntToHex(nonce),
+      }),
+      args: '0x',
+    });
 
     // eslint-disable-next-line no-restricted-globals
     const saltBytes = crypto.getRandomValues(new Uint8Array(32));
