@@ -292,7 +292,6 @@ export type PermissionHandlerDependencies<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (args: {
     permissionRequest: TRequest;
-    accountController: AccountControllerInterface;
     tokenMetadataService: TokenMetadataService;
   }) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
@@ -339,7 +338,7 @@ export type FactoryArgs = {
 
 // we explicitly name these types, so that we can have named parameters in the
 // Caip10Address type, without having to use generics.
-type Namespace = 'eip155';
+type Namespace = string;
 type Reference = string;
 type Address = Hex;
 
