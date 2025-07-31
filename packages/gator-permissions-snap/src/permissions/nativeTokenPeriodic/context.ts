@@ -1,7 +1,11 @@
 import { bigIntToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../accountController';
-import { TimePeriod } from '../../core/types';
+import {
+  AccountControllerInterface,
+  Caip10Address,
+  TimePeriod,
+} from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
@@ -23,6 +27,8 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
+import { fromCaip10Address, toCaip19Address } from '../../utils/address';
+import { ZERO_ADDRESS } from '../../constants';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -54,8 +60,11 @@ export async function applyContext({
     justification: originalRequest.permission.data.justification,
   };
 
+  const { address } = fromCaip10Address(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
+    address,
     expiry,
     permission: {
       type: 'native-token-periodic',
@@ -94,30 +103,48 @@ export async function populatePermission({
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
   accountController,
   tokenMetadataService,
 }: {
   permissionRequest: NativeTokenPeriodicPermissionRequest;
   tokenPricesService: TokenPricesService;
-  accountController: AccountController;
+  accountController: AccountControllerInterface;
   tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
+  const requestedAddress = permissionRequest.address?.toLowerCase();
 
-  const address = await accountController.getAccountAddress({
+  const allAddresses = await accountController.getAccountAddresses({
     chainId,
   });
 
-  const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: address,
-  });
+  if (allAddresses[0] === undefined) {
+    throw new Error('No addresses found');
+  }
+
+  let address: Caip10Address | undefined = undefined;
+
+  if (requestedAddress === undefined) {
+    // use the first address available for the account
+    address = allAddresses[0];
+  } else {
+    // validate that the requested address is one of the addresses available for the account
+    for (const caip10Address of allAddresses) {
+      const { address: rawAddress } = fromCaip10Address(caip10Address);
+      if (rawAddress === requestedAddress.toLowerCase()) {
+        address = caip10Address;
+        break;
+      }
+    }
+    if (address === undefined) {
+      throw new Error('Requested address not found');
+    }
+  }
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: fromCaip10Address(address).address,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -125,12 +152,6 @@ export async function buildContext({
   const iconDataBase64 = iconDataResponse.success
     ? iconDataResponse.imageDataBase64
     : null;
-
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:1/slip44:60`,
-    bigIntToHex(rawBalance),
-    decimals,
-  );
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
@@ -159,17 +180,18 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
-  const balance = bigIntToHex(rawBalance);
+  const tokenAddressCaip19 = toCaip19Address({
+    address: ZERO_ADDRESS,
+    chainId,
+    assetType: 'slip44',
+  });
 
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    accountAddressCaip10: address,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,

@@ -1,9 +1,11 @@
 import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
-import { TimePeriod } from '../../core/types';
+import {
+  AccountControllerInterface,
+  Caip10Address,
+  TimePeriod,
+} from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -23,6 +25,7 @@ import type {
   PopulatedErc20TokenPeriodicPermission,
   Erc20TokenPeriodicPermission,
 } from './types';
+import { fromCaip10Address, toCaip19Address } from '../../utils/address';
 
 /**
  * Construct an amended Erc20TokenPeriodicPermissionRequest, based on the specified request,
@@ -55,8 +58,11 @@ export async function applyContext({
     tokenAddress: originalRequest.permission.data.tokenAddress,
   };
 
+  const { address } = fromCaip10Address(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
+    address,
     expiry,
     permission: {
       type: 'erc20-token-periodic',
@@ -95,32 +101,51 @@ export async function populatePermission({
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
   accountController,
   tokenMetadataService,
 }: {
   permissionRequest: Erc20TokenPeriodicPermissionRequest;
-  tokenPricesService: TokenPricesService;
-  accountController: AccountController;
+  accountController: AccountControllerInterface;
   tokenMetadataService: TokenMetadataService;
 }): Promise<Erc20TokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
   const { tokenAddress } = permissionRequest.permission.data;
 
-  const address = await accountController.getAccountAddress({
+  const requestedAddress = permissionRequest.address?.toLowerCase();
+
+  const allAddresses = await accountController.getAccountAddresses({
     chainId,
   });
 
-  const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: address,
-    assetAddress: tokenAddress,
-  });
+  if (allAddresses[0] === undefined) {
+    throw new Error('No addresses found');
+  }
+
+  let address: Caip10Address | undefined = undefined;
+
+  if (requestedAddress === undefined) {
+    // use the first address available for the account
+    address = allAddresses[0];
+  } else {
+    // validate that the requested address is one of the addresses available for the account
+    for (const caip10Address of allAddresses) {
+      const { address: rawAddress } = fromCaip10Address(caip10Address);
+      if (rawAddress === requestedAddress.toLowerCase()) {
+        address = caip10Address;
+        break;
+      }
+    }
+    if (address === undefined) {
+      throw new Error('Requested address not found');
+    }
+  }
+
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: fromCaip10Address(address).address,
+      assetAddress: tokenAddress,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -128,12 +153,6 @@ export async function buildContext({
   const iconDataBase64 = iconDataResponse.success
     ? iconDataResponse.imageDataBase64
     : null;
-
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:${chainId}/erc20:${tokenAddress}`,
-    bigIntToHex(rawBalance),
-    decimals,
-  );
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
@@ -162,17 +181,18 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
-  const balance = bigIntToHex(rawBalance);
+  const tokenAddressCaip19 = toCaip19Address({
+    address: permissionRequest.permission.data.tokenAddress,
+    chainId,
+    assetType: 'erc20',
+  });
 
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    accountAddressCaip10: address,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,

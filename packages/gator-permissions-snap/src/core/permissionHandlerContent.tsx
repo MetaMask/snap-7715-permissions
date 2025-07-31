@@ -133,7 +133,6 @@ export const PermissionHandlerContent = ({
               switchGlobalAccount={false}
               value={context.accountAddressCaip10}
             />
-
             <Box direction="horizontal" alignment="end">
               {fiatBalanceComponent}
               {tokenBalanceComponent}

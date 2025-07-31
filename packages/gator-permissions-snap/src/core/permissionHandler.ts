@@ -144,7 +144,6 @@ export class PermissionHandler<
     const buildContextHandler = async (request: TRequest) => {
       return await this.#dependencies.buildContext({
         permissionRequest: request,
-        tokenPricesService: this.#tokenPricesService,
         accountController: this.#accountController,
         tokenMetadataService: this.#tokenMetadataService,
       });
@@ -216,11 +215,11 @@ export class PermissionHandler<
       const loadBalance = async (context: TContext) => {
         const currentLoadBalanceCounter = ++loadBalanceCallCounter;
 
-        const { address, chainId } = fromCaip10Address(
-          context.accountAddressCaip10,
-        );
+        const { address } = fromCaip10Address(context.accountAddressCaip10);
 
-        const { assetAddress } = fromCaip19Address(context.tokenAddressCaip19);
+        const { assetAddress, chainId } = fromCaip19Address(
+          context.tokenAddressCaip19,
+        );
 
         const { balance, decimals } =
           await this.#tokenMetadataService.getTokenBalanceAndMetadata({

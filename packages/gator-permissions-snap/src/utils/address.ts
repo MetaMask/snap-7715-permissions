@@ -72,3 +72,25 @@ export const fromCaip19Address = (caip19Address: CaipAssetType) => {
     assetAddress: assetAddress as Hex,
   };
 };
+
+/**
+ * Constructs a CAIP-19 asset type string from the provided parameters.
+ *
+ * @param options - The options for constructing the CAIP-19 address.
+ * @param options.chainId - The numeric chain ID (e.g., 1 for Ethereum mainnet).
+ * @param options.address - The asset address as a Hex string.
+ * @param options.assetType - The asset type (e.g., 'erc20', 'slip44').
+ * @returns The CAIP-19 asset type string in the format 'eip155:chainId/assetType:address'.
+ */
+export const toCaip19Address = ({
+  chainId,
+  address,
+  assetType,
+}: {
+  chainId: number;
+  address: Hex;
+  assetType: string;
+}): CaipAssetType => {
+  const identifier: CaipAssetType = `eip155:${chainId}/${assetType}:${address}`;
+  return identifier;
+};
