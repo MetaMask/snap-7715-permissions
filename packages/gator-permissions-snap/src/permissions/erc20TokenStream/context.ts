@@ -1,9 +1,11 @@
 import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
-import { TimePeriod } from '../../core/types';
+import {
+  AccountControllerInterface,
+  Caip10Address,
+  TimePeriod,
+} from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -24,6 +26,7 @@ import type {
   PopulatedErc20TokenStreamPermission,
   Erc20TokenStreamPermission,
 } from './types';
+import { fromCaip10Address, toCaip19Address } from '../../utils/address';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -72,8 +75,11 @@ export async function applyContext({
     tokenAddress: originalRequest.permission.data.tokenAddress,
   };
 
+  const { address } = fromCaip10Address(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
+    address,
     expiry,
     permission: {
       type: 'erc20-token-stream',
@@ -121,21 +127,44 @@ export async function buildContext({
   tokenMetadataService,
 }: {
   permissionRequest: Erc20TokenStreamPermissionRequest;
-  accountController: AccountController;
+  accountController: AccountControllerInterface;
   tokenMetadataService: TokenMetadataService;
 }): Promise<Erc20TokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
-  const { tokenAddress } = permissionRequest.permission.data;
+  const requestedAddress = permissionRequest.address?.toLowerCase();
 
-  const address = await accountController.getAccountAddress({
+  const allAddresses = await accountController.getAccountAddresses({
     chainId,
   });
+
+  if (allAddresses[0] === undefined) {
+    throw new Error('No addresses found');
+  }
+
+  let address: Caip10Address | undefined = undefined;
+
+  if (requestedAddress === undefined) {
+    // use the first address available for the account
+    address = allAddresses[0];
+  } else {
+    // validate that the requested address is one of the addresses available for the account
+    for (const caip10Address of allAddresses) {
+      const { address: rawAddress } = fromCaip10Address(caip10Address);
+      if (rawAddress === requestedAddress.toLowerCase()) {
+        address = caip10Address;
+        break;
+      }
+    }
+    if (address === undefined) {
+      throw new Error('Requested address not found');
+    }
+  }
 
   const { decimals, symbol, iconUrl } =
     await tokenMetadataService.getTokenBalanceAndMetadata({
       chainId,
-      account: address,
-      assetAddress: tokenAddress,
+      account: fromCaip10Address(address).address,
+      assetAddress: permissionRequest.permission.data.tokenAddress,
     });
 
   const iconDataResponse =
@@ -176,11 +205,18 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
+  const tokenAddressCaip19 = toCaip19Address({
+    address: permissionRequest.permission.data.tokenAddress,
+    chainId,
+    assetType: 'erc20',
+  });
+
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     accountAddressCaip10: address,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,

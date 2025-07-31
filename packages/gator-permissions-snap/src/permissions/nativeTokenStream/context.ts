@@ -6,7 +6,6 @@ import {
   Caip10Address,
 } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -27,7 +26,8 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
-import { fromCaip10Address } from '../../utils/address';
+import { fromCaip10Address, toCaip19Address } from '../../utils/address';
+import { ZERO_ADDRESS } from '../../constants';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -73,7 +73,7 @@ export async function applyContext({
     justification: originalRequest.permission.data.justification,
   };
 
-  const { address } = fromCaip10Address(context.accountDetails.address);
+  const { address } = fromCaip10Address(context.accountAddressCaip10);
 
   return {
     ...originalRequest,
@@ -130,7 +130,6 @@ export async function buildContext({
 }): Promise<NativeTokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  // todo: can this address nonsense be moved out into the PermissionProvider or some encapsulation?
   const requestedAddress = permissionRequest.address?.toLowerCase();
 
   const allAddresses = await accountController.getAccountAddresses({
@@ -204,12 +203,18 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
+  const tokenAddressCaip19 = toCaip19Address({
+    address: ZERO_ADDRESS,
+    chainId,
+    assetType: 'slip44',
+  });
+
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
     isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     accountAddressCaip10: address,
-    tokenAddressCaip19: `eip155:${chainId}/slip44:60`,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,

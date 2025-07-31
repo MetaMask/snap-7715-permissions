@@ -8,11 +8,10 @@ import type { CaipAssetType, SnapsProvider } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { TokenMetadataService } from '../services/tokenMetadataService';
-import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
-import type { AccountController } from './accountController';
+import type { TokenPricesService } from '../services/tokenPricesService';
 
 /**
  * Represents the result of a permission request.
@@ -258,7 +257,7 @@ export type PermissionHandlerParams<
   TPermission extends TRequest['permission'],
   TPopulatedPermission extends DeepRequired<TPermission>,
 > = {
-  accountController: AccountController;
+  accountController: AccountControllerInterface;
   userEventDispatcher: UserEventDispatcher;
   orchestrator: PermissionRequestLifecycleOrchestrator;
   permissionRequest: PermissionRequest;
@@ -293,8 +292,7 @@ export type PermissionHandlerDependencies<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (args: {
     permissionRequest: TRequest;
-    tokenPricesService: TokenPricesService;
-    accountController: AccountController;
+    accountController: AccountControllerInterface;
     tokenMetadataService: TokenMetadataService;
   }) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
@@ -345,7 +343,7 @@ type Namespace = 'eip155';
 type Reference = string;
 type Address = Hex;
 
-type Caip10Address = `${Namespace}:${Reference}:${Address}`;
+export type Caip10Address = `${Namespace}:${Reference}:${Address}`;
 
 /**
  * Interface for account controller implementations.
