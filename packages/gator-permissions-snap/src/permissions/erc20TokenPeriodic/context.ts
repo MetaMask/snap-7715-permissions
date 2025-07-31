@@ -1,15 +1,15 @@
-import { parseUnits, toHex } from 'viem';
+import { bigIntToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
+import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
   validateStartTime,
@@ -46,7 +46,9 @@ export async function applyContext({
   const expiry = convertReadableDateToTimestamp(context.expiry);
 
   const permissionData = {
-    periodAmount: toHex(parseUnits(permissionDetails.periodAmount, decimals)),
+    periodAmount: bigIntToHex(
+      parseUnits({ formatted: permissionDetails.periodAmount, decimals }),
+    ),
     periodDuration: parseInt(permissionDetails.periodDuration, 10),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,
@@ -129,13 +131,13 @@ export async function buildContext({
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:${chainId}/erc20:${tokenAddress}`,
-    toHex(rawBalance),
+    bigIntToHex(rawBalance),
     decimals,
   );
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  const periodAmount = formatUnitsFromString({
+  const periodAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.periodAmount,
     allowUndefined: false,
     decimals,
@@ -160,7 +162,7 @@ export async function buildContext({
     permissionRequest.permission.data.startTime,
   );
 
-  const balance = toHex(rawBalance);
+  const balance = bigIntToHex(rawBalance);
 
   return {
     expiry,
@@ -208,7 +210,7 @@ export async function deriveMetadata({
   const periodAmountResult = validateAndParseAmount(
     permissionDetails.periodAmount,
     decimals,
-    'Period amount',
+    'period amount',
   );
   if (periodAmountResult.error) {
     validationErrors.periodAmountError = periodAmountResult.error;

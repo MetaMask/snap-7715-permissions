@@ -1,8 +1,7 @@
-import type { Hex } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 
 /**
  * Validates a hex integer value with configurable constraints.
- *
  * @param params - The validation parameters.
  * @param params.name - The name of the value being validated, used in error messages.
  * @param params.value - The hex value to validate.

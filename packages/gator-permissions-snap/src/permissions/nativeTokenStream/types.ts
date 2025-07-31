@@ -9,7 +9,7 @@ import type {
   DeepRequired,
   TimePeriod,
   TypedPermissionRequest,
-  BaseTokenPermissionContext,
+  BaseContext,
 } from '../../core/types';
 
 export type NativeTokenStreamMetadata = {
@@ -23,7 +23,7 @@ export type NativeTokenStreamMetadata = {
   };
 };
 
-export type NativeTokenStreamContext = BaseTokenPermissionContext & {
+export type NativeTokenStreamContext = BaseContext & {
   permissionDetails: {
     initialAmount: string | undefined;
     maxAmount: string | undefined;

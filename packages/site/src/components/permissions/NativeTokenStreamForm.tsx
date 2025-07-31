@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { parseUnits, toHex } from 'viem';
-import { StyledForm } from './styles';
+import { parseUnits } from 'viem';
 import type { NativeTokenStreamPermissionRequest } from './types';
+
+import { bigIntToHex } from '@metamask/utils';
 
 type NativeTokenStreamFormProps = {
   onChange: (request: NativeTokenStreamPermissionRequest) => void;
@@ -11,13 +12,13 @@ export const NativeTokenStreamForm = ({
   onChange,
 }: NativeTokenStreamFormProps) => {
   const [initialAmount, setInitialAmount] = useState<bigint | null>(
-    BigInt(toHex(parseUnits('.5', 18))),
+    BigInt(bigIntToHex(parseUnits('.5', 18))),
   );
   const [amountPerSecond, setAmountPerSecond] = useState(
-    BigInt(toHex(parseUnits('.5', 18))),
+    BigInt(bigIntToHex(parseUnits('.5', 18))),
   );
   const [maxAmount, setMaxAmount] = useState<bigint | null>(
-    BigInt(toHex(parseUnits('2.5', 18))),
+    BigInt(bigIntToHex(parseUnits('2.5', 18))),
   );
   const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
   const [expiry, setExpiry] = useState(
@@ -120,7 +121,7 @@ export const NativeTokenStreamForm = ({
   ]);
 
   return (
-    <StyledForm>
+    <>
       <div>
         <label htmlFor="initialAmount">Initial Amount:</label>
         <input
@@ -192,6 +193,6 @@ export const NativeTokenStreamForm = ({
           style={{ width: 'auto', marginLeft: '1rem' }}
         />
       </div>
-    </StyledForm>
+    </>
   );
 };

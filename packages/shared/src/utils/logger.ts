@@ -1,4 +1,4 @@
-import { toHex } from 'viem';
+import { bigIntToHex } from '@metamask/utils';
 
 /**
  * Logging levels.
@@ -25,7 +25,6 @@ type LoggerContext = {
 
 /**
  * Returns the default logging level.
- *
  * @returns The default logging level.
  */
 function getDefaultLevel(): LogLevel {
@@ -57,7 +56,7 @@ const DEFAULT_CONTEXT: LoggerContext = {
 export const objStringify = (data: any) => {
   return JSON.stringify(data, (_: any, value: any) => {
     if (typeof value === 'bigint') {
-      return toHex(value);
+      return bigIntToHex(value);
     }
     return value;
   });
@@ -84,7 +83,6 @@ export class Logger {
 
   /**
    * Get the logging level.
-   *
    * @returns The set log level.
    */
   getLevel(): LogLevel {

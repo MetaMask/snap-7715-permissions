@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import type {
-  PermissionOffers,
-  PermissionsRequest,
-  RegisteredPermissionOffer,
-  RegisteredPermissionOffers,
-} from '@metamask/7715-permissions-shared/types';
 import {
+  type PermissionOffers,
+  type PermissionsRequest,
   zPermissionOffers,
+  type RegisteredPermissionOffer,
+  type RegisteredPermissionOffers,
   type PermissionOfferRegistry,
 } from '@metamask/7715-permissions-shared/types';
 import {
@@ -14,8 +12,7 @@ import {
   extractZodError,
   logger,
 } from '@metamask/7715-permissions-shared/utils';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { InvalidParamsError } from '@metamask/snaps-sdk';
+import { InvalidParamsError, type SnapsProvider } from '@metamask/snaps-sdk';
 
 import { ExternalMethod } from './rpc/rpcMethod';
 

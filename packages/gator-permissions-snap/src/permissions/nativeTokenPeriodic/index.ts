@@ -1,5 +1,4 @@
-import type { PermissionDefinition } from '../../core/types';
-import { appendCaveats } from './caveats';
+import { createPermissionCaveats } from './caveats';
 import { createConfirmationContent } from './content';
 import {
   applyContext,
@@ -16,6 +15,7 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
+import type { PermissionDefinition } from '../../core/types';
 
 export const nativeTokenPeriodicPermissionDefinition: PermissionDefinition<
   NativeTokenPeriodicPermissionRequest,
@@ -33,6 +33,6 @@ export const nativeTokenPeriodicPermissionDefinition: PermissionDefinition<
     createConfirmationContent,
     applyContext,
     populatePermission,
-    appendCaveats,
+    createPermissionCaveats,
   },
 };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { createConfirmationContent } from '../../../src/permissions/erc20TokenPeriodic/content';
@@ -8,6 +8,7 @@ import type {
   Erc20TokenPeriodicMetadata,
 } from '../../../src/permissions/erc20TokenPeriodic/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
+import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 6;
 
@@ -17,8 +18,10 @@ const mockContext: Erc20TokenPeriodicContext = {
   justification: 'Permission to do periodic ERC20 token transfers',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('1000', tokenDecimals)),
-    balanceFormattedAsCurrency: '$🐊1000.00',
+    balance: bigIntToHex(
+      parseUnits({ formatted: '1000', decimals: tokenDecimals }),
+    ),
+    balanceFormattedAsCurrency: '$🐊1,000.00',
   },
   tokenMetadata: {
     symbol: 'USDC',
@@ -44,14 +47,481 @@ describe('erc20TokenPeriodic:content', () => {
       const content = await createConfirmationContent({
         context: mockContext,
         metadata: mockMetadata,
-        isJustificationCollapsed: true,
-        origin: 'https://example.com',
-        chainId: 1,
       });
 
-      expect(content).toBeDefined();
-      expect(content.type).toBe('Box');
-      expect(content.props.children).toBeDefined();
+      expect(content).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Transfer from",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The account that the token transfers come from.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                "size": "sm",
+                              },
+                              "type": "Avatar",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Gator Account",
+                                "color": "default",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "end",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": "$🐊1,000.00",
+                          "color": "muted",
+                        },
+                        "type": "Text",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            "1000",
+                            "available",
+                          ],
+                          "color": "alternative",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
+              "direction": "vertical",
+            },
+            "type": "Box",
+          },
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-start-date",
+                            "type": "text",
+                            "value": "10/26/1985",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Amount",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens granted during each period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-amount",
+                            "type": "number",
+                            "value": "100",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Period duration",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The duration of the period",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": "Daily",
+                              "props": {
+                                "children": "Daily",
+                                "value": "Daily",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Weekly",
+                              "props": {
+                                "children": "Weekly",
+                                "value": "Weekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Other",
+                              "props": {
+                                "children": "Other",
+                                "value": "Other",
+                              },
+                              "type": "Option",
+                            },
+                          ],
+                          "name": "erc20-token-periodic-period-type",
+                          "value": "Daily",
+                        },
+                        "type": "Dropdown",
+                      },
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            null,
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
+                              },
+                              null,
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-expiry",
+                            "type": "text",
+                            "value": "05/01/2024",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+    ],
+  },
+  "type": "Box",
+}
+`);
     });
 
     it('should render content with validation errors', async () => {
@@ -65,20 +535,489 @@ describe('erc20TokenPeriodic:content', () => {
 
       const metadataWithErrors: Erc20TokenPeriodicMetadata = {
         validationErrors: {
-          periodAmountError: 'Invalid period amount',
+          periodAmountError: 'Invalid Period amount',
         },
       };
 
       const content = await createConfirmationContent({
         context: contextWithErrors,
         metadata: metadataWithErrors,
-        isJustificationCollapsed: true,
-        origin: 'https://example.com',
-        chainId: 1,
       });
 
-      expect(content).toBeDefined();
-      expect(content.type).toBe('Box');
+      expect(content).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Transfer from",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The account that the token transfers come from.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                "size": "sm",
+                              },
+                              "type": "Avatar",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Gator Account",
+                                "color": "default",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "end",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": "$🐊1,000.00",
+                          "color": "muted",
+                        },
+                        "type": "Text",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            "1000",
+                            "available",
+                          ],
+                          "color": "alternative",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
+              "direction": "vertical",
+            },
+            "type": "Box",
+          },
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-start-date",
+                            "type": "text",
+                            "value": "10/26/1985",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Amount",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens granted during each period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-amount",
+                            "type": "number",
+                            "value": "invalid",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                      "error": "Invalid Period amount",
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Period duration",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The duration of the period",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": "Daily",
+                              "props": {
+                                "children": "Daily",
+                                "value": "Daily",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Weekly",
+                              "props": {
+                                "children": "Weekly",
+                                "value": "Weekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Other",
+                              "props": {
+                                "children": "Other",
+                                "value": "Other",
+                              },
+                              "type": "Option",
+                            },
+                          ],
+                          "name": "erc20-token-periodic-period-type",
+                          "value": "Daily",
+                        },
+                        "type": "Dropdown",
+                      },
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            null,
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
+                              },
+                              null,
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-expiry",
+                            "type": "text",
+                            "value": "05/01/2024",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+    ],
+  },
+  "type": "Box",
+}
+`);
     });
 
     it('should render content with weekly period', async () => {
@@ -96,13 +1035,481 @@ describe('erc20TokenPeriodic:content', () => {
       const content = await createConfirmationContent({
         context: weeklyContext,
         metadata: mockMetadata,
-        isJustificationCollapsed: false,
-        origin: 'https://dapp.example.com',
-        chainId: 11155111, // Sepolia
       });
 
-      expect(content).toBeDefined();
-      expect(content.type).toBe('Box');
+      expect(content).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Transfer from",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The account that the token transfers come from.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                "size": "sm",
+                              },
+                              "type": "Avatar",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Gator Account",
+                                "color": "default",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "end",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": "$🐊1,000.00",
+                          "color": "muted",
+                        },
+                        "type": "Text",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            "1000",
+                            "available",
+                          ],
+                          "color": "alternative",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
+              "direction": "vertical",
+            },
+            "type": "Box",
+          },
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-start-date",
+                            "type": "text",
+                            "value": "10/26/1985",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Amount",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens granted during each period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-amount",
+                            "type": "number",
+                            "value": "100",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Period duration",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The duration of the period",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": "Daily",
+                              "props": {
+                                "children": "Daily",
+                                "value": "Daily",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Weekly",
+                              "props": {
+                                "children": "Weekly",
+                                "value": "Weekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Other",
+                              "props": {
+                                "children": "Other",
+                                "value": "Other",
+                              },
+                              "type": "Option",
+                            },
+                          ],
+                          "name": "erc20-token-periodic-period-type",
+                          "value": "Weekly",
+                        },
+                        "type": "Dropdown",
+                      },
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            null,
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
+                              },
+                              null,
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-expiry",
+                            "type": "text",
+                            "value": "05/01/2024",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+    ],
+  },
+  "type": "Box",
+}
+`);
     });
 
     it('should render content with custom period duration', async () => {
@@ -118,13 +1525,562 @@ describe('erc20TokenPeriodic:content', () => {
       const content = await createConfirmationContent({
         context: customContext,
         metadata: mockMetadata,
-        isJustificationCollapsed: true,
-        origin: 'https://custom.example.com',
-        chainId: 137, // Polygon
       });
 
-      expect(content).toBeDefined();
-      expect(content.type).toBe('Box');
+      expect(content).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Transfer from",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The account that the token transfers come from.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                "size": "sm",
+                              },
+                              "type": "Avatar",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Gator Account",
+                                "color": "default",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "end",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": "$🐊1,000.00",
+                          "color": "muted",
+                        },
+                        "type": "Text",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            "1000",
+                            "available",
+                          ],
+                          "color": "alternative",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
+              "direction": "vertical",
+            },
+            "type": "Box",
+          },
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-start-date",
+                            "type": "text",
+                            "value": "10/26/1985",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Amount",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens granted during each period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-amount",
+                            "type": "number",
+                            "value": "100",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Period duration",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The duration of the period",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": "Daily",
+                              "props": {
+                                "children": "Daily",
+                                "value": "Daily",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Weekly",
+                              "props": {
+                                "children": "Weekly",
+                                "value": "Weekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Other",
+                              "props": {
+                                "children": "Other",
+                                "value": "Other",
+                              },
+                              "type": "Option",
+                            },
+                          ],
+                          "name": "erc20-token-periodic-period-type",
+                          "value": "Other",
+                        },
+                        "type": "Dropdown",
+                      },
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Duration (seconds)",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The length of each period in seconds",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-duration",
+                            "type": "number",
+                            "value": "123456",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
+                              },
+                              null,
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-expiry",
+                            "type": "text",
+                            "value": "05/01/2024",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+    ],
+  },
+  "type": "Box",
+}
+`);
     });
 
     it('should render content without token icon', async () => {
@@ -139,26 +2095,953 @@ describe('erc20TokenPeriodic:content', () => {
       const content = await createConfirmationContent({
         context: contextWithoutIcon,
         metadata: mockMetadata,
-        isJustificationCollapsed: true,
-        origin: 'https://noicon.example.com',
-        chainId: 1,
       });
 
-      expect(content).toBeDefined();
-      expect(content.type).toBe('Box');
+      expect(content).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Transfer from",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The account that the token transfers come from.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                "size": "sm",
+                              },
+                              "type": "Avatar",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Gator Account",
+                                "color": "default",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "end",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": "$🐊1,000.00",
+                          "color": "muted",
+                        },
+                        "type": "Text",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            "1000",
+                            "available",
+                          ],
+                          "color": "alternative",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
+              "direction": "vertical",
+            },
+            "type": "Box",
+          },
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-start-date",
+                            "type": "text",
+                            "value": "10/26/1985",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Amount",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens granted during each period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-amount",
+                            "type": "number",
+                            "value": "100",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Period duration",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The duration of the period",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": "Daily",
+                              "props": {
+                                "children": "Daily",
+                                "value": "Daily",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Weekly",
+                              "props": {
+                                "children": "Weekly",
+                                "value": "Weekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Other",
+                              "props": {
+                                "children": "Other",
+                                "value": "Other",
+                              },
+                              "type": "Option",
+                            },
+                          ],
+                          "name": "erc20-token-periodic-period-type",
+                          "value": "Daily",
+                        },
+                        "type": "Dropdown",
+                      },
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            null,
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
+                              },
+                              null,
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-expiry",
+                            "type": "text",
+                            "value": "05/01/2024",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+    ],
+  },
+  "type": "Box",
+}
+`);
     });
 
     it('should handle different chain IDs correctly', async () => {
       const content = await createConfirmationContent({
         context: mockContext,
         metadata: mockMetadata,
-        isJustificationCollapsed: true,
-        origin: 'https://polygon.example.com',
-        chainId: 137, // Polygon
       });
 
-      expect(content).toBeDefined();
-      expect(content.type).toBe('Box');
+      expect(content).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Transfer from",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The account that the token transfers come from.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                "size": "sm",
+                              },
+                              "type": "Avatar",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Gator Account",
+                                "color": "default",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "end",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": "$🐊1,000.00",
+                          "color": "muted",
+                        },
+                        "type": "Text",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            "1000",
+                            "available",
+                          ],
+                          "color": "alternative",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
+              "direction": "vertical",
+            },
+            "type": "Box",
+          },
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-start-date",
+                            "type": "text",
+                            "value": "10/26/1985",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Amount",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens granted during each period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-amount",
+                            "type": "number",
+                            "value": "100",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Period duration",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The duration of the period",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": "Daily",
+                              "props": {
+                                "children": "Daily",
+                                "value": "Daily",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Weekly",
+                              "props": {
+                                "children": "Weekly",
+                                "value": "Weekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Other",
+                              "props": {
+                                "children": "Other",
+                                "value": "Other",
+                              },
+                              "type": "Option",
+                            },
+                          ],
+                          "name": "erc20-token-periodic-period-type",
+                          "value": "Daily",
+                        },
+                        "type": "Dropdown",
+                      },
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            null,
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
+                              },
+                              null,
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-expiry",
+                            "type": "text",
+                            "value": "05/01/2024",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+    ],
+  },
+  "type": "Box",
+}
+`);
     });
 
     it('should render content with multiple validation errors', async () => {
@@ -174,26 +3057,965 @@ describe('erc20TokenPeriodic:content', () => {
       const content = await createConfirmationContent({
         context: mockContext,
         metadata: metadataWithMultipleErrors,
-        isJustificationCollapsed: false,
-        origin: 'https://errors.example.com',
-        chainId: 1,
       });
 
-      expect(content).toBeDefined();
-      expect(content.type).toBe('Box');
+      expect(content).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Transfer from",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The account that the token transfers come from.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                "size": "sm",
+                              },
+                              "type": "Avatar",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Gator Account",
+                                "color": "default",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "end",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": "$🐊1,000.00",
+                          "color": "muted",
+                        },
+                        "type": "Text",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            "1000",
+                            "available",
+                          ],
+                          "color": "alternative",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
+              "direction": "vertical",
+            },
+            "type": "Box",
+          },
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-start-date",
+                            "type": "text",
+                            "value": "10/26/1985",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                      "error": "Invalid start time",
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Amount",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens granted during each period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-amount",
+                            "type": "number",
+                            "value": "100",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                      "error": "Invalid period amount",
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Period duration",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The duration of the period",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": "Daily",
+                              "props": {
+                                "children": "Daily",
+                                "value": "Daily",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Weekly",
+                              "props": {
+                                "children": "Weekly",
+                                "value": "Weekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Other",
+                              "props": {
+                                "children": "Other",
+                                "value": "Other",
+                              },
+                              "type": "Option",
+                            },
+                          ],
+                          "name": "erc20-token-periodic-period-type",
+                          "value": "Daily",
+                        },
+                        "type": "Dropdown",
+                      },
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            null,
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
+                              },
+                              null,
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-expiry",
+                            "type": "text",
+                            "value": "05/01/2024",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                      "error": "Invalid expiry",
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+    ],
+  },
+  "type": "Box",
+}
+`);
     });
 
     it('should render with expanded justification', async () => {
       const content = await createConfirmationContent({
         context: mockContext,
         metadata: mockMetadata,
-        isJustificationCollapsed: false,
-        origin: 'https://expanded.example.com',
-        chainId: 1,
       });
 
-      expect(content).toBeDefined();
-      expect(content.type).toBe('Box');
+      expect(content).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Transfer from",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The account that the token transfers come from.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                "size": "sm",
+                              },
+                              "type": "Avatar",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Gator Account",
+                                "color": "default",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "end",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": "$🐊1,000.00",
+                          "color": "muted",
+                        },
+                        "type": "Text",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            "1000",
+                            "available",
+                          ],
+                          "color": "alternative",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
+              "direction": "vertical",
+            },
+            "type": "Box",
+          },
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-start-date",
+                            "type": "text",
+                            "value": "10/26/1985",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Amount",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens granted during each period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-period-amount",
+                            "type": "number",
+                            "value": "100",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Period duration",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The duration of the period",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": "Daily",
+                              "props": {
+                                "children": "Daily",
+                                "value": "Daily",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Weekly",
+                              "props": {
+                                "children": "Weekly",
+                                "value": "Weekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Other",
+                              "props": {
+                                "children": "Other",
+                                "value": "Other",
+                              },
+                              "type": "Option",
+                            },
+                          ],
+                          "name": "erc20-token-periodic-period-type",
+                          "value": "Daily",
+                        },
+                        "type": "Dropdown",
+                      },
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            null,
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
+                              },
+                              null,
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "erc20-token-periodic-expiry",
+                            "type": "text",
+                            "value": "05/01/2024",
+                          },
+                          "type": "Input",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Section",
+      },
+    ],
+  },
+  "type": "Box",
+}
+`);
     });
   });
 });

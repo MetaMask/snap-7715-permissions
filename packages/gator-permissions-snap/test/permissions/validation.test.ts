@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import type { Hex } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 
 import { validateHexInteger } from '../../src/permissions/validation';
 

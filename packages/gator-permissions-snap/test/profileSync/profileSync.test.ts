@@ -1,15 +1,13 @@
-import type { Delegation } from '@metamask/delegation-toolkit';
 import {
-  createDelegation,
-  encodeDelegation,
-  getDelegationHashOffchain,
-} from '@metamask/delegation-toolkit';
+  encodeDelegations,
+  hashDelegation,
+  ROOT_AUTHORITY,
+} from '@metamask/delegation-core';
+import type { Hex, type Delegation } from '@metamask/delegation-core';
 import type {
   JwtBearerAuth,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
-import type { Hex } from 'viem';
-import { getAddress } from 'viem';
 
 import {
   createProfileSyncManager,
@@ -18,11 +16,10 @@ import {
 } from '../../src/profileSync';
 
 describe('profileSync', () => {
-  const address = getAddress('0x1234567890123456789012345678901234567890');
-  const addressTwo = getAddress('0x1234567890123456789012345678901234567891');
-  const sessionAccount = getAddress(
-    '0x1234567890123456789012345678901234567890',
-  );
+  const address = '0x1234567890123456789012345678901234567890' as const;
+  const addressTwo = '0x1234567890123456789012345678901234567891' as const;
+  const sessionAccount = address;
+
   let profileSyncManager: ProfileSyncManager;
   const jwtBearerAuthMock = {
     getAccessToken: jest.fn(),
@@ -36,25 +33,25 @@ describe('profileSync', () => {
   } as unknown as jest.Mocked<UserStorage>;
 
   const mockDelegation: Delegation = {
-    ...createDelegation({
-      to: sessionAccount,
-      from: address,
-      caveats: [],
-    }),
+    delegate: sessionAccount,
+    delegator: address,
+    caveats: [],
     signature: '0x1',
+    salt: 0n,
+    authority: ROOT_AUTHORITY,
   };
 
   const mockDelegationTwo: Delegation = {
-    ...createDelegation({
-      to: sessionAccount,
-      from: addressTwo,
-      caveats: [],
-    }),
+    delegate: sessionAccount,
+    delegator: addressTwo,
+    caveats: [],
+    salt: 0n,
+    authority: ROOT_AUTHORITY,
     signature: '0x2',
   };
 
-  const mockDelegationHash = getDelegationHashOffchain(mockDelegation);
-  const mockDelegationHashTwo = getDelegationHashOffchain(mockDelegationTwo);
+  const mockDelegationHash = hashDelegation(mockDelegation);
+  const mockDelegationHashTwo = hashDelegation(mockDelegationTwo);
 
   const mockStoredGrantedPermission: StoredGrantedPermission = {
     permissionResponse: {
@@ -66,7 +63,7 @@ describe('profileSync', () => {
         },
       ],
       chainId: '0xaa36a7',
-      context: encodeDelegation([mockDelegation]),
+      context: encodeDelegations([mockDelegation]),
       expiry: 1,
       isAdjustmentAllowed: true,
       permission: {
@@ -215,7 +212,7 @@ describe('profileSync', () => {
           ...mockStoredGrantedPermission,
           permissionResponse: {
             ...mockStoredGrantedPermission.permissionResponse,
-            context: encodeDelegation([mockDelegation, mockDelegationTwo]),
+            context: encodeDelegations([mockDelegation, mockDelegationTwo]),
           },
         };
         await profileSyncManager.storeGrantedPermission(
@@ -257,7 +254,7 @@ describe('profileSync', () => {
                 },
               ],
               chainId: '0xaa36a7',
-              context: encodeDelegation([mockDelegationTwo]),
+              context: encodeDelegations([mockDelegationTwo]),
               expiry: 1,
               isAdjustmentAllowed: true,
               permission: {

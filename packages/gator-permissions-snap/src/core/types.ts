@@ -3,15 +3,15 @@ import type {
   Permission,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import type { CoreCaveatBuilder } from '@metamask/delegation-toolkit';
+import type { Hex, Caveat } from '@metamask/delegation-core';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import type { Hex } from 'viem';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountController } from '../accountController';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 
 /**
@@ -24,7 +24,6 @@ export type PermissionRequestResult =
 
 /**
  * Represents a Permission request with an explicitly typed permission field.
- *
  * @template TPermission - The specific permission type of the permission field.
  */
 export type TypedPermissionRequest<TPermission extends Permission> =
@@ -40,13 +39,6 @@ export type BaseContext = {
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;
-};
-
-/**
- * Base context for all token permissions.
- * This includes the account details and token metadata.
- */
-export type BaseTokenPermissionContext = BaseContext & {
   accountDetails: {
     address: Hex;
     balanceFormattedAsCurrency: string;
@@ -96,20 +88,20 @@ export enum TimePeriod {
 
 /**
  * Properties required for confirmation dialogs.
- *
  * @property ui - The UI element to be displayed in the confirmation dialog
+ * @property isGrantDisabled - Whether the user can grant the permission
  * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
  */
 export type ConfirmationProps = {
-  ui: GenericSnapElement;
+  ui: SnapElement;
+  isGrantDisabled: boolean;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
 };
 
 /**
  * Type definition for lifecycle orchestration handlers that manage the flow of permission requests.
- *
  * @template TRequest - The type of permission request being handled
  * @template TContext - The type of context object used during request processing
  * @template TMetadata - The type of metadata object used for request processing
@@ -126,12 +118,13 @@ export type LifecycleOrchestrationHandlers<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (request: TRequest) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
+  createSkeletonConfirmationContent: () => Promise<SnapElement>;
   createConfirmationContent: (args: {
     context: TContext;
     metadata: TMetadata;
     origin: string;
     chainId: number;
-  }) => Promise<GenericSnapElement>;
+  }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;
     originalRequest: TRequest;
@@ -139,10 +132,10 @@ export type LifecycleOrchestrationHandlers<
   populatePermission: (args: {
     permission: TPermission;
   }) => Promise<TPopulatedPermission>;
-  appendCaveats: (args: {
+  createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
-    caveatBuilder: CoreCaveatBuilder;
-  }) => Promise<CoreCaveatBuilder>;
+    contracts: DelegationContracts;
+  }) => Promise<Caveat[]>;
 
   /**
    * Optional callback that is invoked when a confirmation dialog is created.
@@ -185,7 +178,6 @@ export type RuleData = {
 
 /**
  * Defines a rule that can be applied to a permission request.
- *
  * @template TContext - The type of context object used during request processing
  * @template TMetadata - The type of metadata object used for request processing
  */
@@ -210,7 +202,6 @@ export type RuleDefinition<
  * 2. Managing permission-specific UI interaction
  * 3. Providing lifecycle hook implementations
  * 4. Converting between request/context/metadata formats
- *
  * @template TRequest - The specific permission request type
  * @template TContext - The context type used for this permission
  * @template TMetadata - The metadata type used for this permission
@@ -218,9 +209,7 @@ export type RuleDefinition<
 export type PermissionHandlerType = {
   /**
    * Handles a permission request, orchestrating the full lifecycle from request to response.
-   *
    * @param origin - The origin of the permission request
-   * @param permissionRequest - The permission request to handle
    * @returns A permission response object
    */
   handlePermissionRequest(origin: string): Promise<PermissionRequestResult>;
@@ -228,7 +217,6 @@ export type PermissionHandlerType = {
 
 /**
  * Defines the structure and dependencies for a permission type.
- *
  * @template TRequest - The type of permission request.
  * @template TContext - The type of context object used during request processing.
  * @template TMetadata - The type of metadata object used for request processing.
@@ -256,7 +244,6 @@ export type PermissionDefinition<
 
 /**
  * Parameters required to construct a PermissionHandler instance.
- *
  * @template TRequest - The type of permission request being handled.
  * @template TContext - The type of context object used during request processing.
  * @template TMetadata - The type of metadata object used for request processing.
@@ -289,7 +276,6 @@ export type PermissionHandlerParams<
 
 /**
  * Dependencies required for a PermissionHandler to process permission requests.
- *
  * @template TRequest - The type of permission request being handled.
  * @template TContext - The type of context object used during request processing.
  * @template TMetadata - The type of metadata object used for request processing.
@@ -314,11 +300,7 @@ export type PermissionHandlerDependencies<
   createConfirmationContent: (args: {
     context: TContext;
     metadata: TMetadata;
-    origin: string;
-    chainId: number;
-    isJustificationCollapsed: boolean;
-    showAddMoreRulesButton: boolean;
-  }) => Promise<GenericSnapElement>;
+  }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;
     originalRequest: TRequest;
@@ -326,8 +308,8 @@ export type PermissionHandlerDependencies<
   populatePermission: (args: {
     permission: TPermission;
   }) => Promise<TPopulatedPermission>;
-  appendCaveats: (args: {
+  createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
-    caveatBuilder: any;
-  }) => Promise<any>;
+    contracts: DelegationContracts;
+  }) => Promise<Caveat[]>;
 };

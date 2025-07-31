@@ -1,14 +1,22 @@
-import { parseUnits, formatUnits } from 'viem';
-
 import type { TimePeriod } from '../core/types';
 import {
   convertReadableDateToTimestamp,
   getStartOfTodayUTC,
   TIME_PERIOD_TO_SECONDS,
 } from '../utils/time';
+import { parseUnits, formatUnits } from '../utils/value';
 
 export type ValidationErrors = {
   [key: string]: string;
+};
+
+/**
+ * Converts a string to sentence case, capitalizing the first letter, and lowercasing the rest.
+ * @param str - The string to convert.
+ * @returns The converted string.
+ */
+const toSentenceCase = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
 /**
@@ -25,27 +33,27 @@ export function validateAndParseAmount(
   fieldName: string,
   allowZero = false,
 ): { amount: bigint | undefined; error: string | undefined } {
-  if (!amount) {
+  if (amount === null || amount === undefined) {
     return { amount: undefined, error: undefined };
   }
 
   try {
-    const parsedAmount = parseUnits(amount, decimals);
+    const parsedAmount = parseUnits({ formatted: amount, decimals });
     if (!allowZero && parsedAmount <= 0n) {
       return {
         amount: undefined,
-        error: `${fieldName} must be greater than 0`,
+        error: `${toSentenceCase(fieldName)} must be greater than 0`,
       };
     }
     if (allowZero && parsedAmount < 0n) {
       return {
         amount: undefined,
-        error: `${fieldName} must be greater than or equal to 0`,
+        error: `${toSentenceCase(fieldName)} must be greater than or equal to 0`,
       };
     }
     return { amount: parsedAmount, error: undefined };
   } catch (error) {
-    return { amount: undefined, error: `Invalid ${fieldName.toLowerCase()}` };
+    return { amount: undefined, error: `Invalid ${fieldName}` };
   }
 }
 
@@ -116,10 +124,10 @@ export function calculateAmountPerSecond(
   timePeriod: TimePeriod,
   decimals: number,
 ): string {
-  return formatUnits(
-    amountPerPeriod / TIME_PERIOD_TO_SECONDS[timePeriod],
+  return formatUnits({
+    value: amountPerPeriod / TIME_PERIOD_TO_SECONDS[timePeriod],
     decimals,
-  );
+  });
 }
 
 /**

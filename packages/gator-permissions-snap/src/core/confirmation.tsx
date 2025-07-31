@@ -1,13 +1,8 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
-import { Container } from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
+import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
-import {
-  ConfirmationFooter,
-  GRANT_BUTTON,
-  CANCEL_BUTTON,
-} from '../ui/components/ConfirmationFooter';
 import type {
   UserEventDispatcher,
   UserEventHandler,
@@ -15,16 +10,31 @@ import type {
 import type { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
+  static #cancelButton = 'cancel-button';
+
+  static #grantButton = 'grant-button';
+
+  static #interfaceNotCreatedError =
+    'Interface not yet created. Call createInterface() first.';
+
   readonly #snaps: SnapsProvider;
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
-  #ui: GenericSnapElement;
+  #ui: SnapElement;
 
   #interfaceId: string | undefined;
 
-  constructor({ ui, snaps, userEventDispatcher }: ConfirmationProps) {
+  #isGrantDisabled: boolean;
+
+  constructor({
+    ui,
+    isGrantDisabled,
+    snaps,
+    userEventDispatcher,
+  }: ConfirmationProps) {
     this.#ui = ui;
+    this.#isGrantDisabled = isGrantDisabled;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
   }
@@ -45,11 +55,11 @@ export class ConfirmationDialog {
     return this.#interfaceId;
   }
 
-  async awaitUserDecision(): Promise<{
+  async displayConfirmationDialogAndAwaitUserDecision(): Promise<{
     isConfirmationGranted: boolean;
   }> {
     if (!this.#interfaceId) {
-      throw new Error('Interface not yet created. Call createInterface first.');
+      throw new Error(ConfirmationDialog.#interfaceNotCreatedError);
     }
     const interfaceId = this.#interfaceId;
 
@@ -76,14 +86,14 @@ export class ConfirmationDialog {
 
       cleanup = async () => {
         this.#userEventDispatcher.off({
-          elementName: GRANT_BUTTON,
+          elementName: ConfirmationDialog.#grantButton,
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId,
           handler: onGrantButtonClick,
         });
 
         this.#userEventDispatcher.off({
-          elementName: CANCEL_BUTTON,
+          elementName: ConfirmationDialog.#cancelButton,
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId,
           handler: onCancelButtonClick,
@@ -104,14 +114,14 @@ export class ConfirmationDialog {
       };
 
       this.#userEventDispatcher.on({
-        elementName: GRANT_BUTTON,
+        elementName: ConfirmationDialog.#grantButton,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: onGrantButtonClick,
       });
 
       this.#userEventDispatcher.on({
-        elementName: CANCEL_BUTTON,
+        elementName: ConfirmationDialog.#cancelButton,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: onCancelButtonClick,
@@ -139,17 +149,35 @@ export class ConfirmationDialog {
     return (
       <Container>
         {this.#ui}
-        <ConfirmationFooter />
+        <Footer>
+          <Button name={ConfirmationDialog.#cancelButton} variant="destructive">
+            Cancel
+          </Button>
+          <Button
+            name={ConfirmationDialog.#grantButton}
+            variant="primary"
+            disabled={this.#isGrantDisabled}
+          >
+            Grant
+          </Button>
+        </Footer>
       </Container>
     );
   }
 
-  async updateContent({ ui }: { ui: GenericSnapElement }): Promise<void> {
+  async updateContent({
+    ui,
+    isGrantDisabled,
+  }: {
+    ui: SnapElement;
+    isGrantDisabled: boolean;
+  }): Promise<void> {
     if (!this.#interfaceId) {
-      throw new Error('Cannot update content before dialog is created');
+      throw new Error(ConfirmationDialog.#interfaceNotCreatedError);
     }
 
     this.#ui = ui;
+    this.#isGrantDisabled = isGrantDisabled;
 
     await this.#snaps.request({
       method: 'snap_updateInterface',

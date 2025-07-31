@@ -1,14 +1,7 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { CHAIN_ID as ChainsWithDelegatorDeployed } from '@metamask/delegation-toolkit';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import * as chains from 'viem/chains';
 
-export type SupportedChains =
-  (typeof chains)[keyof typeof ChainsWithDelegatorDeployed &
-    keyof typeof chains][];
-
-// all of the chainIds that have delegator contracts deployed
-type SupportedChainId = SupportedChains[number]['id'];
+import { getChainMetadata } from '../core/chainMetadata';
 
 /**
  * Base class for account controllers that provides common functionality.
@@ -16,86 +9,56 @@ type SupportedChainId = SupportedChains[number]['id'];
 export abstract class BaseAccountController {
   readonly #snapsProvider: SnapsProvider;
 
-  protected supportedChains: SupportedChains;
-
-  // the intersection between chains supported by viem, and chains supported by the delegator contracts
-  // chains is asserted to any here due to the inability to infer the namespace of the global import
-  static #allSupportedChains = Object.keys(chains)
-    .filter((name) => name in ChainsWithDelegatorDeployed)
-    .map(
-      (name) => (chains as any)[name as keyof typeof chains],
-    ) as SupportedChains;
+  protected supportedChains: readonly number[];
 
   /**
    * Initializes a new BaseAccountController instance.
-   *
    * @param config - The configuration object.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.supportedChains - The supported blockchain chains.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
-    supportedChains?: SupportedChains;
+    supportedChains: readonly number[];
   }) {
-    // only validate if supportedChains is specified, as it will default to #allSupportedChains
-    if (config.supportedChains) {
-      this.#validateSupportedChains(config.supportedChains);
-    }
+    this.#validateSupportedChains(config.supportedChains);
 
     this.#snapsProvider = config.snapsProvider;
-    this.supportedChains =
-      config.supportedChains ?? BaseAccountController.#allSupportedChains;
+    this.supportedChains = config.supportedChains;
   }
 
   /**
    * Validates that the specified chains are supported.
-   *
    * @param supportedChains - The chains to validate.
    * @throws If no chains are specified or if any chain is not supported.
    */
-  #validateSupportedChains(supportedChains: SupportedChains) {
+  #validateSupportedChains(supportedChains: readonly number[]) {
     if (supportedChains.length === 0) {
       logger.error('No supported chains specified');
       throw new Error('No supported chains specified');
     }
 
-    // Get chain names from config and check if they're supported by delegator
-    const configuredChains = Object.keys(chains)
-      .filter((name) => {
-        // assert chains to any here due to the inability to infer the namespace of the global import
-        const chain = (chains as any)[name as keyof typeof chains];
-        return supportedChains.some(
-          (supportedChain) => supportedChain.id === chain.id,
-        );
-      })
-      .map((name) => name.toLowerCase());
-
-    const chainsWithDelegatorDeployed = Object.keys(
-      ChainsWithDelegatorDeployed,
-    ).map((name) => name.toLowerCase());
-
-    const unsupportedChains = configuredChains.filter(
-      (chain) => !chainsWithDelegatorDeployed.includes(chain),
-    );
-
-    if (unsupportedChains.length > 0) {
-      logger.error('Unsupported chains specified', unsupportedChains);
+    // ensure that there is chain metadata for all specified chains
+    try {
+      supportedChains.map((chainId) => getChainMetadata({ chainId }));
+    } catch (error) {
+      logger.error('Unsupported chains specified', {
+        supportedChains,
+        error,
+      });
       throw new Error(
-        `Unsupported chains specified: ${unsupportedChains.join(', ')}`,
+        `Unsupported chains specified: ${supportedChains.join(', ')}`,
       );
     }
   }
 
   /**
    * Asserts that the specified chain ID is supported.
-   *
    * @param chainId - The chain ID to validate.
    * @throws If the chain ID is not supported.
    */
-  protected assertIsSupportedChainId(
-    chainId: number,
-  ): asserts chainId is SupportedChainId {
-    if (!this.supportedChains.some((chain) => chain.id === chainId)) {
+  protected assertIsSupportedChainId(chainId: number) {
+    if (!this.supportedChains.includes(chainId)) {
       logger.error(
         'accountController:assertIsSupportedChainId() - unsupported chainId',
         {
@@ -108,13 +71,10 @@ export abstract class BaseAccountController {
 
   /**
    * Creates a provider that handles experimental provider requests.
-   *
    * @param chainId - The chain ID for the provider.
    * @returns A provider object with a request method.
    */
-  protected createExperimentalProviderRequestProvider(
-    chainId: SupportedChainId,
-  ) {
+  protected createExperimentalProviderRequestProvider(chainId: number) {
     return {
       request: async (request: { method: string; params?: unknown[] }) => {
         logger.debug(

@@ -2,15 +2,19 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import type { AccountController } from '../accountController';
+import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
-import { PermissionHandlerContent } from './permissionHandlerContent';
+import { getChainMetadata } from './chainMetadata';
+import {
+  PermissionHandlerContent,
+  SkeletonPermissionHandlerContent,
+} from './permissionHandlerContent';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
-import { RuleModalManager } from './ruleModalManager';
 import { bindRuleHandlers } from './rules';
 import type {
   BaseContext,
@@ -60,8 +64,6 @@ export class PermissionHandler<
   readonly #rules: RuleDefinition<TContext, TMetadata>[];
 
   readonly #permissionTitle: string;
-
-  #addMoreRulesModal: RuleModalManager<TContext, TMetadata> | undefined;
 
   #isJustificationCollapsed = true;
 
@@ -140,31 +142,45 @@ export class PermissionHandler<
       });
     };
 
-    const createConfirmationContentHandler = async (args: {
+    const createSkeletonConfirmationContentHandler = async () => {
+      return SkeletonPermissionHandlerContent({
+        permissionTitle: this.#permissionTitle,
+      });
+    };
+
+    const createConfirmationContentHandler = async ({
+      context,
+      metadata,
+      origin,
+      chainId,
+    }: {
       context: TContext;
       metadata: TMetadata;
       origin: string;
       chainId: number;
     }) => {
-      if (this.#addMoreRulesModal?.isModalVisible()) {
-        return await this.#addMoreRulesModal.renderModal();
-      }
-
-      const showAddMoreRulesButton =
-        this.#addMoreRulesModal?.hasRulesToAdd({
-          context: args.context,
-          metadata: args.metadata,
-        }) ?? false;
-
       const permissionContent =
         await this.#dependencies.createConfirmationContent({
-          ...args,
-          isJustificationCollapsed: this.#isJustificationCollapsed,
-          showAddMoreRulesButton,
+          context,
+          metadata,
         });
 
+      const { name: networkName } = getChainMetadata({ chainId });
+
+      const tokenIconData = getIconData(context);
+
+      const {
+        justification,
+        tokenMetadata: { symbol: tokenSymbol },
+      } = context;
+
       return PermissionHandlerContent({
-        showAddMoreRulesButton,
+        origin,
+        justification,
+        networkName,
+        tokenSymbol,
+        tokenIconData,
+        isJustificationCollapsed: this.#isJustificationCollapsed,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,
       });
@@ -182,21 +198,6 @@ export class PermissionHandler<
       let currentContext = initialContext;
       const rerender = async () =>
         await updateContext({ updatedContext: currentContext });
-
-      this.#addMoreRulesModal = new RuleModalManager({
-        userEventDispatcher: this.#userEventDispatcher,
-        interfaceId,
-        rules: this.#rules,
-        onModalChanged: rerender,
-        getContext: () => currentContext,
-        deriveMetadata: this.#dependencies.deriveMetadata,
-        onContextChanged: async ({ context }) => {
-          currentContext = context;
-          await rerender();
-        },
-      });
-
-      this.#addMoreRulesModal.bindHandlers();
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
@@ -236,14 +237,13 @@ export class PermissionHandler<
 
     const onConfirmationResolvedHandler = () => {
       this.#deregisterHandlers?.();
-      this.#addMoreRulesModal?.unbindHandlers();
     };
 
     const {
       parseAndValidatePermission,
       applyContext,
       populatePermission,
-      appendCaveats,
+      createPermissionCaveats,
       deriveMetadata,
     } = this.#dependencies;
 
@@ -251,10 +251,12 @@ export class PermissionHandler<
       parseAndValidatePermission,
       applyContext,
       populatePermission,
-      appendCaveats,
+      createPermissionCaveats,
       deriveMetadata,
       buildContext: buildContextHandler,
       createConfirmationContent: createConfirmationContentHandler,
+      createSkeletonConfirmationContent:
+        createSkeletonConfirmationContentHandler,
       onConfirmationCreated: onConfirmationCreatedHandler,
       onConfirmationResolved: onConfirmationResolvedHandler,
     };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { toHex, parseUnits } from 'viem/utils';
+import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { createConfirmationContent } from '../../../src/permissions/erc20TokenStream/content';
@@ -7,6 +7,7 @@ import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
 } from '../../../src/permissions/erc20TokenStream/types';
+import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 10;
 
@@ -16,7 +17,9 @@ const mockContext: Erc20TokenStreamContext = {
   justification: 'Permission to stream ERC20 tokens',
   accountDetails: {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: toHex(parseUnits('10', tokenDecimals)),
+    balance: bigIntToHex(
+      parseUnits({ formatted: '10', decimals: tokenDecimals }),
+    ),
     balanceFormattedAsCurrency: '$🐊10.00',
   },
   tokenMetadata: {
@@ -45,9 +48,6 @@ describe('erc20TokenStream:content', () => {
       const content = await createConfirmationContent({
         context: mockContext,
         metadata: mockMetadata,
-        isJustificationCollapsed: true,
-        origin: 'https://example.com',
-        chainId: 1,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -55,287 +55,6 @@ describe('erc20TokenStream:content', () => {
   "key": null,
   "props": {
     "children": [
-      {
-        "key": null,
-        "props": {
-          "children": [
-            [
-              {
-                "key": null,
-                "props": {
-                  "alignment": "space-between",
-                  "children": [
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Recipient",
-                            },
-                            "type": "Text",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "color": "muted",
-                                  "name": "question",
-                                  "size": "inherit",
-                                },
-                                "type": "Icon",
-                              },
-                              "content": {
-                                "key": null,
-                                "props": {
-                                  "children": "The site requesting the permission",
-                                },
-                                "type": "Text",
-                              },
-                            },
-                            "type": "Tooltip",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "https://example.com",
-                            },
-                            "type": "Text",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                  ],
-                  "direction": "horizontal",
-                },
-                "type": "Box",
-              },
-              {
-                "key": null,
-                "props": {
-                  "alignment": "space-between",
-                  "children": [
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Network",
-                            },
-                            "type": "Text",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "color": "muted",
-                                  "name": "question",
-                                  "size": "inherit",
-                                },
-                                "type": "Icon",
-                              },
-                              "content": {
-                                "key": null,
-                                "props": {
-                                  "children": "The network on which the permission is being requested",
-                                },
-                                "type": "Text",
-                              },
-                            },
-                            "type": "Tooltip",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Ethereum",
-                            },
-                            "type": "Text",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                  ],
-                  "direction": "horizontal",
-                },
-                "type": "Box",
-              },
-              {
-                "key": null,
-                "props": {
-                  "alignment": "space-between",
-                  "children": [
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Token",
-                            },
-                            "type": "Text",
-                          },
-                          null,
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "alt": "USDC",
-                              "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
-  </svg>",
-                            },
-                            "type": "Image",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "USDC",
-                            },
-                            "type": "Text",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                  ],
-                  "direction": "horizontal",
-                },
-                "type": "Box",
-              },
-            ],
-            {
-              "key": null,
-              "props": {
-                "alignment": "space-between",
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": "Reason",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
-                              },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "Reason given by the recipient for requesting this token stream allowance.",
-                              },
-                              "type": "Text",
-                            },
-                          },
-                          "type": "Tooltip",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Permission to str...",
-                                "color": "muted",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "end",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Show",
-                                    "name": "show-more-justification",
-                                  },
-                                  "type": "Button",
-                                },
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "horizontal",
-              },
-              "type": "Box",
-            },
-          ],
-        },
-        "type": "Section",
-      },
       {
         "key": null,
         "props": {
@@ -434,7 +153,7 @@ describe('erc20TokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },
@@ -466,44 +185,47 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "alignment": "space-between",
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Stream Amount",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream Amount",
                                   },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The amount of tokens that can be streamed per period.",
-                                    },
-                                    "type": "Text",
-                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens that can be streamed per period.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
+                          null,
+                        ],
                         "direction": "horizontal",
                       },
                       "type": "Box",
@@ -536,13 +258,6 @@ describe('erc20TokenStream:content', () => {
                               "value": "302400",
                             },
                             "type": "Input",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": null,
-                            },
-                            "type": "Box",
                           },
                         ],
                       },
@@ -754,44 +469,74 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Initial Amount",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Initial Amount",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Text",
-                            },
-                            {
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The initial amount of tokens that can be streamed.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                    "alt": "Remove Initial Amount",
+                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
                                   },
-                                  "type": "Icon",
+                                  "type": "Image",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The initial amount of tokens that can be streamed.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "name": "erc20-token-stream-initial-amount_removeFieldButton",
                               },
-                              "type": "Tooltip",
+                              "type": "Button",
                             },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -825,29 +570,6 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Input",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "primary",
-                                    "name": "close",
-                                    "size": "md",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "name": "erc20-token-stream-initial-amount_removeButton",
-                                "type": "button",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
                       ],
                     },
                     "type": "Field",
@@ -865,44 +587,74 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Max Amount",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Max Amount",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Text",
-                            },
-                            {
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The maximum amount of tokens that can be streamed.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                    "alt": "Remove Max Amount",
+                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
                                   },
-                                  "type": "Icon",
+                                  "type": "Image",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The maximum amount of tokens that can be streamed.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "name": "erc20-token-stream-max-amount_removeFieldButton",
                               },
-                              "type": "Tooltip",
+                              "type": "Button",
                             },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -936,29 +688,6 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Input",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "primary",
-                                    "name": "close",
-                                    "size": "md",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "name": "erc20-token-stream-max-amount_removeButton",
-                                "type": "button",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
                       ],
                     },
                     "type": "Field",
@@ -976,44 +705,47 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Start Time",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The start time of the stream.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The start time of the stream.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1038,13 +770,6 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Input",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
                       ],
                     },
                     "type": "Field",
@@ -1062,44 +787,47 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Expiry",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The expiry date of the permission.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1123,13 +851,6 @@ describe('erc20TokenStream:content', () => {
                             "value": "05/01/2024",
                           },
                           "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
                         },
                       ],
                     },
@@ -1164,9 +885,6 @@ describe('erc20TokenStream:content', () => {
             expiryError: 'Invalid expiry',
           },
         },
-        isJustificationCollapsed: true,
-        origin: 'https://example.com',
-        chainId: 1,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -1174,287 +892,6 @@ describe('erc20TokenStream:content', () => {
   "key": null,
   "props": {
     "children": [
-      {
-        "key": null,
-        "props": {
-          "children": [
-            [
-              {
-                "key": null,
-                "props": {
-                  "alignment": "space-between",
-                  "children": [
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Recipient",
-                            },
-                            "type": "Text",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "color": "muted",
-                                  "name": "question",
-                                  "size": "inherit",
-                                },
-                                "type": "Icon",
-                              },
-                              "content": {
-                                "key": null,
-                                "props": {
-                                  "children": "The site requesting the permission",
-                                },
-                                "type": "Text",
-                              },
-                            },
-                            "type": "Tooltip",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "https://example.com",
-                            },
-                            "type": "Text",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                  ],
-                  "direction": "horizontal",
-                },
-                "type": "Box",
-              },
-              {
-                "key": null,
-                "props": {
-                  "alignment": "space-between",
-                  "children": [
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Network",
-                            },
-                            "type": "Text",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "color": "muted",
-                                  "name": "question",
-                                  "size": "inherit",
-                                },
-                                "type": "Icon",
-                              },
-                              "content": {
-                                "key": null,
-                                "props": {
-                                  "children": "The network on which the permission is being requested",
-                                },
-                                "type": "Text",
-                              },
-                            },
-                            "type": "Tooltip",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Ethereum",
-                            },
-                            "type": "Text",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                  ],
-                  "direction": "horizontal",
-                },
-                "type": "Box",
-              },
-              {
-                "key": null,
-                "props": {
-                  "alignment": "space-between",
-                  "children": [
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Token",
-                            },
-                            "type": "Text",
-                          },
-                          null,
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "alt": "USDC",
-                              "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
-  </svg>",
-                            },
-                            "type": "Image",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "USDC",
-                            },
-                            "type": "Text",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                  ],
-                  "direction": "horizontal",
-                },
-                "type": "Box",
-              },
-            ],
-            {
-              "key": null,
-              "props": {
-                "alignment": "space-between",
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": "Reason",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
-                              },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "Reason given by the recipient for requesting this token stream allowance.",
-                              },
-                              "type": "Text",
-                            },
-                          },
-                          "type": "Tooltip",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Permission to str...",
-                                "color": "muted",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "end",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Show",
-                                    "name": "show-more-justification",
-                                  },
-                                  "type": "Button",
-                                },
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "horizontal",
-              },
-              "type": "Box",
-            },
-          ],
-        },
-        "type": "Section",
-      },
       {
         "key": null,
         "props": {
@@ -1553,7 +990,7 @@ describe('erc20TokenStream:content', () => {
                         "props": {
                           "children": [
                             "10",
-                            " available",
+                            "available",
                           ],
                           "color": "alternative",
                         },
@@ -1585,44 +1022,47 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "alignment": "space-between",
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Stream Amount",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream Amount",
                                   },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The amount of tokens that can be streamed per period.",
-                                    },
-                                    "type": "Text",
-                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The amount of tokens that can be streamed per period.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
+                          null,
+                        ],
                         "direction": "horizontal",
                       },
                       "type": "Box",
@@ -1655,13 +1095,6 @@ describe('erc20TokenStream:content', () => {
                               "value": "302400",
                             },
                             "type": "Input",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": null,
-                            },
-                            "type": "Box",
                           },
                         ],
                         "error": "Invalid amount per period",
@@ -1874,44 +1307,74 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Initial Amount",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Initial Amount",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Text",
-                            },
-                            {
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The initial amount of tokens that can be streamed.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                    "alt": "Remove Initial Amount",
+                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
                                   },
-                                  "type": "Icon",
+                                  "type": "Image",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The initial amount of tokens that can be streamed.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "name": "erc20-token-stream-initial-amount_removeFieldButton",
                               },
-                              "type": "Tooltip",
+                              "type": "Button",
                             },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1945,29 +1408,6 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Input",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "primary",
-                                    "name": "close",
-                                    "size": "md",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "name": "erc20-token-stream-initial-amount_removeButton",
-                                "type": "button",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
                       ],
                       "error": "Invalid initial amount",
                     },
@@ -1986,44 +1426,74 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Max Amount",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Max Amount",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Text",
-                            },
-                            {
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The maximum amount of tokens that can be streamed.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                    "alt": "Remove Max Amount",
+                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
                                   },
-                                  "type": "Icon",
+                                  "type": "Image",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The maximum amount of tokens that can be streamed.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "name": "erc20-token-stream-max-amount_removeFieldButton",
                               },
-                              "type": "Tooltip",
+                              "type": "Button",
                             },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -2057,29 +1527,6 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Input",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "primary",
-                                    "name": "close",
-                                    "size": "md",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "name": "erc20-token-stream-max-amount_removeButton",
-                                "type": "button",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
                       ],
                       "error": "Invalid max amount",
                     },
@@ -2098,44 +1545,47 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Start Time",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The start time of the stream.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The start time of the stream.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -2160,13 +1610,6 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Input",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
                       ],
                       "error": "Invalid start time",
                     },
@@ -2185,44 +1628,47 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Expiry",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The expiry date of the permission.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -2246,13 +1692,6 @@ describe('erc20TokenStream:content', () => {
                             "value": "05/01/2024",
                           },
                           "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
                         },
                       ],
                       "error": "Invalid expiry",

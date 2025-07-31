@@ -10,13 +10,14 @@ import {
   Row,
   Divider,
 } from '@metamask/snaps-sdk/jsx';
-import { sepolia } from 'viem/chains';
 
 import type { AccountController } from '../accountController';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../profileSync';
+
+const MAINNET_CHAIN_ID = 1;
 
 export class HomePage {
   #accountController: AccountController;
@@ -54,7 +55,7 @@ export class HomePage {
   }) {
     const address = await this.#accountController.getAccountAddress({
       // this chainId actually doesn't matter here, because we're only using it to infer the address
-      chainId: sepolia.id,
+      chainId: MAINNET_CHAIN_ID,
     });
 
     const grantedPermissions: StoredGrantedPermission[] =

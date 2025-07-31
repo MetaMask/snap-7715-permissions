@@ -8,7 +8,7 @@ import { z } from 'zod';
 import type {
   DeepRequired,
   TypedPermissionRequest,
-  BaseTokenPermissionContext,
+  BaseContext,
   TimePeriod,
 } from '../../core/types';
 
@@ -22,7 +22,7 @@ export type NativeTokenPeriodicMetadata = {
   };
 };
 
-export type NativeTokenPeriodicContext = BaseTokenPermissionContext & {
+export type NativeTokenPeriodicContext = BaseContext & {
   permissionDetails: {
     periodAmount: string;
     periodType: TimePeriod | 'Other';

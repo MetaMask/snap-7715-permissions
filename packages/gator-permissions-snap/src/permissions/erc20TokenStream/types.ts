@@ -10,7 +10,7 @@ import type {
   DeepRequired,
   TimePeriod,
   TypedPermissionRequest,
-  BaseTokenPermissionContext,
+  BaseContext,
 } from '../../core/types';
 
 export type Erc20TokenStreamMetadata = {
@@ -24,7 +24,7 @@ export type Erc20TokenStreamMetadata = {
   };
 };
 
-export type Erc20TokenStreamContext = BaseTokenPermissionContext & {
+export type Erc20TokenStreamContext = BaseContext & {
   permissionDetails: {
     initialAmount: string | undefined;
     maxAmount: string | undefined;

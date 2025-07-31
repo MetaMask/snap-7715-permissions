@@ -1,15 +1,15 @@
-import { formatUnits, maxUint256, parseUnits, toHex } from 'viem';
+import { bigIntToHex } from '@metamask/utils';
 
 import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
-import { formatUnitsFromString } from '../../utils/balance';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
+import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
   validateStartTime,
@@ -25,7 +25,8 @@ import type {
   NativeTokenStreamPermission,
 } from './types';
 
-const DEFAULT_MAX_AMOUNT = toHex(maxUint256);
+const DEFAULT_MAX_AMOUNT =
+  '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const DEFAULT_INITIAL_AMOUNT = '0x0';
 
 /**
@@ -51,13 +52,17 @@ export async function applyContext({
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
-      ? toHex(parseUnits(permissionDetails.maxAmount, decimals))
+      ? bigIntToHex(
+          parseUnits({ formatted: permissionDetails.maxAmount, decimals }),
+        )
       : undefined,
     initialAmount: permissionDetails.initialAmount
-      ? toHex(parseUnits(permissionDetails.initialAmount, decimals))
+      ? bigIntToHex(
+          parseUnits({ formatted: permissionDetails.initialAmount, decimals }),
+        )
       : undefined,
-    amountPerSecond: toHex(
-      parseUnits(permissionDetails.amountPerPeriod, decimals) /
+    amountPerSecond: bigIntToHex(
+      parseUnits({ formatted: permissionDetails.amountPerPeriod, decimals }) /
         TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
     startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
@@ -143,13 +148,13 @@ export async function buildContext({
 
   const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
     `eip155:1/slip44:60`,
-    toHex(rawBalance),
+    bigIntToHex(rawBalance),
     decimals,
   );
 
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
-  const initialAmount = formatUnitsFromString({
+  const initialAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.initialAmount,
     allowUndefined: true,
     decimals,
@@ -157,7 +162,7 @@ export async function buildContext({
 
   const timePeriod = TimePeriod.WEEKLY;
 
-  const maxAmount = formatUnitsFromString({
+  const maxAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.maxAmount,
     allowUndefined: true,
     decimals,
@@ -169,16 +174,16 @@ export async function buildContext({
 
   // It may seem strange to convert the amount per second to amount per period, format, and then convert back to amount per second.
   // The user is inputting amount per period, and we derive amount per second, so it makes sense for the context to contain the amount per period.
-  const amountPerPeriod = formatUnits(
-    amountPerSecond * TIME_PERIOD_TO_SECONDS[timePeriod],
+  const amountPerPeriod = formatUnits({
+    value: amountPerSecond * TIME_PERIOD_TO_SECONDS[timePeriod],
     decimals,
-  );
+  });
 
   const startTime = convertTimestampToReadableDate(
     permissionRequest.permission.data.startTime,
   );
 
-  const balance = toHex(rawBalance);
+  const balance = bigIntToHex(rawBalance);
 
   return {
     expiry,
@@ -227,7 +232,7 @@ export async function deriveMetadata({
   const maxAmountResult = validateAndParseAmount(
     permissionDetails.maxAmount,
     decimals,
-    'Max amount',
+    'max amount',
     false, // Disallow zero for max amount
   );
   if (maxAmountResult.error) {
@@ -238,7 +243,7 @@ export async function deriveMetadata({
   const initialAmountResult = validateAndParseAmount(
     permissionDetails.initialAmount,
     decimals,
-    'Initial amount',
+    'initial amount',
     true, // Allow zero for initial amount
   );
   if (initialAmountResult.error) {
@@ -249,7 +254,7 @@ export async function deriveMetadata({
   const amountPerPeriodResult = validateAndParseAmount(
     permissionDetails.amountPerPeriod,
     decimals,
-    'Amount per period',
+    'amount per period',
   );
   let amountPerSecond = 'Unknown';
   if (amountPerPeriodResult.error) {

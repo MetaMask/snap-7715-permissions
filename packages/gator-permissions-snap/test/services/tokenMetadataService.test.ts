@@ -1,5 +1,5 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
-import { parseUnits, type Address } from 'viem';
+import type { Hex } from '@metamask/delegation-core';
 
 import type { AccountApiClient } from '../../src/clients/accountApiClient';
 import type { TokenMetadataClient } from '../../src/clients/types';
@@ -7,6 +7,7 @@ import {
   TokenMetadataService,
   type GetTokenBalanceAndMetadataOptions,
 } from '../../src/services/tokenMetadataService';
+import { parseUnits } from '../../src/utils/value';
 
 describe('TokenMetadataService', () => {
   let tokenMetadataService: TokenMetadataService;
@@ -14,11 +15,10 @@ describe('TokenMetadataService', () => {
   let mockTokenMetadataClient: jest.Mocked<TokenMetadataClient>;
   let mockFetcher: jest.MockedFunction<typeof fetch>;
 
-  const mockAddress = '0x1234567890abcdef1234567890abcdef12345678' as Address;
-  const mockAssetAddress =
-    '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as Address;
+  const mockAddress = '0x1234567890abcdef1234567890abcdef12345678' as Hex;
+  const mockAssetAddress = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd' as Hex;
   const mockTokenBalanceAndMetadata = {
-    balance: parseUnits('10', 18),
+    balance: parseUnits({ formatted: '10', decimals: 18 }),
     symbol: 'ETH',
     decimals: 18,
   };
@@ -230,7 +230,7 @@ describe('TokenMetadataService', () => {
 
       it('should return correct balance data structure', async () => {
         const expectedResult = {
-          balance: parseUnits('5.5', 18),
+          balance: parseUnits({ formatted: '5.5', decimals: 18 }),
           symbol: 'USDC',
           decimals: 6,
         };
