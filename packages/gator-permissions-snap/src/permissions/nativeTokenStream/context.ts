@@ -1,10 +1,6 @@
 import { bigIntToHex } from '@metamask/utils';
 
-import {
-  AccountControllerInterface,
-  TimePeriod,
-  Caip10Address,
-} from '../../core/types';
+import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import {
   convertReadableDateToTimestamp,
@@ -26,7 +22,11 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
-import { fromCaip10Address, toCaip19Address } from '../../utils/address';
+import {
+  fromCaip10Address,
+  toCaip10Address,
+  toCaip19Address,
+} from '../../utils/address';
 import { ZERO_ADDRESS } from '../../constants';
 
 const DEFAULT_MAX_AMOUNT =
@@ -121,48 +121,27 @@ export async function populatePermission({
  */
 export async function buildContext({
   permissionRequest,
-  accountController,
   tokenMetadataService,
 }: {
   permissionRequest: NativeTokenStreamPermissionRequest;
-  accountController: AccountControllerInterface;
   tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const requestedAddress = permissionRequest.address?.toLowerCase();
+  const {
+    address,
+    isAdjustmentAllowed = true,
+    permission: { data },
+  } = permissionRequest;
 
-  const allAddresses = await accountController.getAccountAddresses({
-    chainId,
-  });
-
-  if (allAddresses[0] === undefined) {
-    throw new Error('No addresses found');
-  }
-
-  let address: Caip10Address | undefined = undefined;
-
-  if (requestedAddress === undefined) {
-    // use the first address available for the account
-    address = allAddresses[0];
-  } else {
-    // validate that the requested address is one of the addresses available for the account
-    for (const caip10Address of allAddresses) {
-      const { address: rawAddress } = fromCaip10Address(caip10Address);
-      if (rawAddress === requestedAddress.toLowerCase()) {
-        address = caip10Address;
-        break;
-      }
-    }
-    if (address === undefined) {
-      throw new Error('Requested address not found');
-    }
+  if (address === undefined) {
+    throw new Error('Address is required');
   }
 
   const { decimals, symbol, iconUrl } =
     await tokenMetadataService.getTokenBalanceAndMetadata({
       chainId,
-      account: fromCaip10Address(address).address,
+      account: address,
     });
 
   const iconDataResponse =
@@ -175,7 +154,7 @@ export async function buildContext({
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
   const initialAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.initialAmount,
+    value: data.initialAmount,
     allowUndefined: true,
     decimals,
   });
@@ -183,14 +162,12 @@ export async function buildContext({
   const timePeriod = TimePeriod.WEEKLY;
 
   const maxAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.maxAmount,
+    value: data.maxAmount,
     allowUndefined: true,
     decimals,
   });
 
-  const amountPerSecond = BigInt(
-    permissionRequest.permission.data.amountPerSecond,
-  );
+  const amountPerSecond = BigInt(data.amountPerSecond);
 
   // It may seem strange to convert the amount per second to amount per period, format, and then convert back to amount per second.
   // The user is inputting amount per period, and we derive amount per second, so it makes sense for the context to contain the amount per period.
@@ -199,9 +176,7 @@ export async function buildContext({
     decimals,
   });
 
-  const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
-  );
+  const startTime = convertTimestampToReadableDate(data.startTime);
 
   const tokenAddressCaip19 = toCaip19Address({
     address: ZERO_ADDRESS,
@@ -209,11 +184,16 @@ export async function buildContext({
     assetType: 'slip44',
   });
 
+  const accountAddressCaip10 = toCaip10Address({
+    address,
+    chainId,
+  });
+
   return {
     expiry,
-    justification: permissionRequest.permission.data.justification,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountAddressCaip10: address,
+    justification: data.justification,
+    isAdjustmentAllowed,
+    accountAddressCaip10,
     tokenAddressCaip19,
     tokenMetadata: {
       symbol,
