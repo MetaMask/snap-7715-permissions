@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits, toHex, type Hex } from 'viem';
-import { StyledForm } from './styles';
 import type { ERC20TokenPeriodicPermissionRequest } from './types';
 
 type ERC20TokenPeriodicFormProps = {
@@ -112,7 +111,7 @@ export const ERC20TokenPeriodicForm = ({
   ]);
 
   return (
-    <StyledForm>
+    <>
       <div>
         <label htmlFor="tokenAddress">Token Address:</label>
         <input
@@ -185,6 +184,6 @@ export const ERC20TokenPeriodicForm = ({
           style={{ width: 'auto', marginLeft: '1rem' }}
         />
       </div>
-    </StyledForm>
+    </>
   );
 };
