@@ -102,38 +102,49 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       };
     }
 
-    const [balanceEncoded, decimalsEncoded, symbolEncoded] = await Promise.all([
-      this.#ethereumProvider.request<Hex>({
-        method: 'eth_call',
-        params: [
-          {
-            to: assetAddress,
-            data: BlockchainTokenMetadataClient.#balanceOfCalldata,
-          },
-          'latest',
-        ],
-      }),
-      this.#ethereumProvider.request<Hex>({
-        method: 'eth_call',
-        params: [
-          {
-            to: assetAddress,
-            data: BlockchainTokenMetadataClient.#decimalsCalldata,
-          },
-          'latest',
-        ],
-      }),
-      this.#ethereumProvider.request<Hex>({
-        method: 'eth_call',
-        params: [
-          {
-            to: assetAddress,
-            data: BlockchainTokenMetadataClient.#symbolCalldata,
-          },
-          'latest',
-        ],
-      }),
-    ]);
+    let balanceEncoded;
+    let decimalsEncoded;
+    let symbolEncoded;
+
+    try {
+      [balanceEncoded, decimalsEncoded, symbolEncoded] = await Promise.all([
+        this.#ethereumProvider.request<Hex>({
+          method: 'eth_call',
+          params: [
+            {
+              to: assetAddress,
+              data:
+                BlockchainTokenMetadataClient.#balanceOfCalldata +
+                account.slice(2).padStart(64, '0'),
+            },
+            'latest',
+          ],
+        }),
+        this.#ethereumProvider.request<Hex>({
+          method: 'eth_call',
+          params: [
+            {
+              to: assetAddress,
+              data: BlockchainTokenMetadataClient.#decimalsCalldata,
+            },
+            'latest',
+          ],
+        }),
+        this.#ethereumProvider.request<Hex>({
+          method: 'eth_call',
+          params: [
+            {
+              to: assetAddress,
+              data: BlockchainTokenMetadataClient.#symbolCalldata,
+            },
+            'latest',
+          ],
+        }),
+      ]);
+    } catch (error) {
+      logger.error('Failed to fetch token balance and metadata', error);
+      throw new Error('Failed to fetch token balance and metadata');
+    }
 
     if (!symbolEncoded) {
       logger.error('Failed to fetch token symbol');
@@ -148,6 +159,16 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
     if (!balanceEncoded) {
       logger.error('Failed to fetch token balance');
       throw new Error('Failed to fetch token balance');
+    }
+
+    if (
+      symbolEncoded === '0x' &&
+      decimalsEncoded === '0x' &&
+      balanceEncoded === '0x'
+    ) {
+      throw new Error(
+        'Failed to fetch token balance and metadata: Token address is invalid',
+      );
     }
 
     try {
@@ -165,7 +186,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         `Failed to fetch token balance and metadata: ${(error as Error).message}.`,
       );
 
-      throw error;
+      throw new Error(`Failed to fetch token balance and metadata`);
     }
   }
 }
