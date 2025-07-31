@@ -188,7 +188,8 @@ export async function buildContext({
   });
 
   const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime ?? Date.now() / 1000,
+    permissionRequest.permission.data.startTime ??
+      Math.floor(Date.now() / 1000),
   );
 
   const balance = bigIntToHex(rawBalance);
