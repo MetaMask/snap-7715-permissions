@@ -207,11 +207,15 @@ export class PermissionHandler<
       updateContext: (args: { updatedContext: TContext }) => Promise<void>;
     }) => {
       let currentContext = initialContext;
-      const rerender = async () =>
+      const rerender = async () => {
         await updateContext({ updatedContext: currentContext });
+      };
 
-      // todo: implement a mechanism to cancel any currently loading balance
+      // loadBalanceCounter is used to cancel any previously executed instances of this function.
+      let loadBalanceCallCounter = 0;
       const loadBalance = async (context: TContext) => {
+        const currentLoadBalanceCounter = ++loadBalanceCallCounter;
+
         const { address, chainId } = fromCaip10Address(
           context.accountAddressCaip10,
         );
@@ -225,17 +229,23 @@ export class PermissionHandler<
             assetAddress,
           });
 
-        this.#tokenBalance = formatUnits({ value: balance, decimals });
+        if (currentLoadBalanceCounter === loadBalanceCallCounter) {
+          this.#tokenBalance = formatUnits({ value: balance, decimals });
 
-        rerender();
+          rerender();
 
-        this.#tokenBalanceFiat =
-          await this.#tokenPricesService.getCryptoToFiatConversion(
-            initialContext.tokenAddressCaip19,
-            bigIntToHex(balance),
-            initialContext.tokenMetadata.decimals,
-          );
-        rerender();
+          const fiatBalance =
+            await this.#tokenPricesService.getCryptoToFiatConversion(
+              initialContext.tokenAddressCaip19,
+              bigIntToHex(balance),
+              initialContext.tokenMetadata.decimals,
+            );
+
+          if (currentLoadBalanceCounter === loadBalanceCallCounter) {
+            this.#tokenBalanceFiat = fiatBalance;
+            rerender();
+          }
+        }
       };
 
       loadBalance(currentContext);

@@ -2755,6 +2755,72 @@ describe('PermissionHandler', () => {
 }
 `);
       });
+
+      it('cancels the balance loading when the account is changed', async () => {
+        const setup = setupDependencies();
+
+        const updateContext =
+          jest.fn<
+            (args: { updatedContext: TestContextType }) => Promise<void>
+          >();
+
+        let resolveTokenBalancePromise: () => void = () => {};
+        const tokenBalancePromise = new Promise<TokenBalanceAndMetadata>(
+          (resolve) => {
+            resolveTokenBalancePromise = () =>
+              resolve(mockTokenBalanceAndMetadata);
+          },
+        );
+
+        setup.tokenMetadataService.getTokenBalanceAndMetadata.mockReturnValueOnce(
+          tokenBalancePromise,
+        );
+
+        const handler = new PermissionHandler(setup);
+
+        await handler.handlePermissionRequest(mockOrigin);
+
+        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
+          setup.orchestrator,
+        );
+
+        await lifecycleHandlers.onConfirmationCreated?.({
+          interfaceId: mockInterfaceId,
+          initialContext: mockContext,
+          updateContext,
+        });
+
+        const accountSelectorChangeHandler = setup.getBoundEvent({
+          elementName: 'account-selector',
+          eventType: 'InputChangeEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        expect(accountSelectorChangeHandler).toBeDefined();
+
+        const mockAddress2Caip10 = `eip155:1:${mockAddress2}`;
+
+        await accountSelectorChangeHandler?.({
+          event: {
+            value: { addresses: [mockAddress2Caip10] } as any,
+            name: 'account-selector',
+            type: UserInputEventType.InputChangeEvent,
+          },
+          interfaceId: mockInterfaceId,
+        });
+
+        resolveTokenBalancePromise();
+        await new Promise((resolve) => setImmediate(resolve));
+
+        // update context is called 3 times:
+        // 1. After the account is changed
+        // 2. After the token balance is resolved for the second account
+        // 3. After the fiat balance is resolved for the second account
+        // if we didn't cancel the original balance loading, there would be another 2 instances
+        // 4. After the original token balance is resolved for the first account
+        // 5. After the original fiat balance is resolved for the first account
+        expect(updateContext).toBeCalledTimes(3);
+      });
     });
   });
 });
