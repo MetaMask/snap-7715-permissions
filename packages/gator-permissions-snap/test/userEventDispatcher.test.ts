@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
 import type { InputChangeEvent, ButtonClickEvent } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
@@ -676,7 +677,6 @@ describe('UserEventDispatcher', () => {
       });
 
       // Trigger events rapidly
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event1Promise = handleEvent({
         event: {
           type: UserInputEventType.ButtonClickEvent,
@@ -685,7 +685,6 @@ describe('UserEventDispatcher', () => {
         id: 'test-interface',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event2Promise = handleEvent({
         event: {
           type: UserInputEventType.ButtonClickEvent,
@@ -736,7 +735,6 @@ describe('UserEventDispatcher', () => {
       });
 
       // Trigger events for different interfaces
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event1Promise = handleEvent({
         event: {
           type: UserInputEventType.ButtonClickEvent,
@@ -745,7 +743,6 @@ describe('UserEventDispatcher', () => {
         id: 'interface1',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event2Promise = handleEvent({
         event: {
           type: UserInputEventType.ButtonClickEvent,
@@ -848,7 +845,6 @@ describe('UserEventDispatcher', () => {
       });
 
       // Trigger events
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event1Promise = handleEvent({
         event: {
           type: UserInputEventType.ButtonClickEvent,
@@ -857,7 +853,6 @@ describe('UserEventDispatcher', () => {
         id: 'test-interface',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event2Promise = handleEvent({
         event: {
           type: UserInputEventType.ButtonClickEvent,
@@ -910,7 +905,6 @@ describe('UserEventDispatcher', () => {
       });
 
       // Trigger events
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event1Promise = handleEvent({
         event: {
           type: UserInputEventType.InputChangeEvent,
@@ -920,7 +914,6 @@ describe('UserEventDispatcher', () => {
         id: 'test-interface',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const event2Promise = handleEvent({
         event: {
           type: UserInputEventType.InputChangeEvent,
@@ -989,7 +982,6 @@ describe('UserEventDispatcher', () => {
       });
 
       // Trigger both events
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const errorEventPromise = handleEvent({
         event: {
           type: UserInputEventType.InputChangeEvent,
@@ -999,7 +991,6 @@ describe('UserEventDispatcher', () => {
         id: 'test-interface',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       const successEventPromise = handleEvent({
         event: {
           type: UserInputEventType.InputChangeEvent,
