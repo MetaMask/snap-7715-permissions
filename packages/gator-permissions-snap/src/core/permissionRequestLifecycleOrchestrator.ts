@@ -24,6 +24,7 @@ import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
   BaseContext,
+  BaseMetadata,
   DeepRequired,
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
@@ -69,7 +70,7 @@ export class PermissionRequestLifecycleOrchestrator {
   async orchestrate<
     TRequest extends PermissionRequest,
     TContext extends BaseContext,
-    TMetadata extends object,
+    TMetadata extends BaseMetadata,
     TPermission extends TRequest['permission'],
     TPopulatedPermission extends DeepRequired<TPermission>,
   >(
@@ -114,6 +115,10 @@ export class PermissionRequestLifecycleOrchestrator {
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
+      const hasValidationErrors = Object.values(
+        metadata?.validationErrors ?? {},
+      ).some((message) => typeof message === 'string');
+
       const ui = await lifecycleHandlers.createConfirmationContent({
         context,
         metadata,
@@ -121,7 +126,10 @@ export class PermissionRequestLifecycleOrchestrator {
         chainId,
       });
 
-      await confirmationDialog.updateContent({ ui, isGrantDisabled });
+      await confirmationDialog.updateContent({
+        ui,
+        isGrantDisabled: isGrantDisabled || hasValidationErrors,
+      });
     };
 
     // replace the skeleton content with the actual content rendered with the resolved context
