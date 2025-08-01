@@ -1,7 +1,7 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
+import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../accountController';
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
@@ -11,6 +11,7 @@ import type {
 } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import {
+  ACCOUNT_SELECTOR_NAME,
   PermissionHandlerContent,
   SkeletonPermissionHandlerContent,
 } from './permissionHandlerContent';
@@ -25,7 +26,11 @@ import type {
   PermissionHandlerType,
   PermissionHandlerDependencies,
   PermissionHandlerParams,
+  Caip10Address,
+  AccountControllerInterface,
 } from './types';
+import { fromCaip10Address, fromCaip19Address } from '../utils/address';
+import { formatUnits } from '../utils/value';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 
@@ -41,7 +46,7 @@ export class PermissionHandler<
   TPopulatedPermission extends DeepRequired<TPermission>,
 > implements PermissionHandlerType
 {
-  readonly #accountController: AccountController;
+  readonly #accountController: AccountControllerInterface;
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
@@ -70,6 +75,10 @@ export class PermissionHandler<
   #deregisterHandlers: (() => void) | undefined;
 
   #hasHandledPermissionRequest = false;
+
+  #tokenBalance: string | undefined = undefined;
+
+  #tokenBalanceFiat: string | undefined = undefined;
 
   constructor({
     accountController,
@@ -134,10 +143,42 @@ export class PermissionHandler<
     TPopulatedPermission
   > {
     const buildContextHandler = async (request: TRequest) => {
+      const chainId = Number(request.chainId);
+      const requestedAddress = request.address?.toLowerCase();
+
+      const allAvailableAddressesCaip10 =
+        await this.#accountController.getAccountAddresses({
+          chainId,
+        });
+
+      if (allAvailableAddressesCaip10[0] === undefined) {
+        throw new Error('No addresses found');
+      }
+
+      let caip10Address: Caip10Address | undefined;
+
+      if (requestedAddress === undefined) {
+        // use the first address available for the account
+        caip10Address = allAvailableAddressesCaip10[0];
+      } else {
+        // validate that the requested address is one of the addresses available for the account
+        for (const availableAddressCaip10 of allAvailableAddressesCaip10) {
+          const { address: rawAddress } = fromCaip10Address(
+            availableAddressCaip10,
+          );
+          if (rawAddress === requestedAddress.toLowerCase()) {
+            caip10Address = availableAddressCaip10;
+            break;
+          }
+        }
+        if (caip10Address === undefined) {
+          throw new Error('Requested address not found');
+        }
+      }
+      const { address } = fromCaip10Address(caip10Address);
+
       return await this.#dependencies.buildContext({
-        permissionRequest: request,
-        tokenPricesService: this.#tokenPricesService,
-        accountController: this.#accountController,
+        permissionRequest: { ...request, address },
         tokenMetadataService: this.#tokenMetadataService,
       });
     };
@@ -183,6 +224,9 @@ export class PermissionHandler<
         isJustificationCollapsed: this.#isJustificationCollapsed,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,
+        context,
+        tokenBalance: this.#tokenBalance,
+        tokenBalanceFiat: this.#tokenBalanceFiat,
       });
     };
 
@@ -196,8 +240,50 @@ export class PermissionHandler<
       updateContext: (args: { updatedContext: TContext }) => Promise<void>;
     }) => {
       let currentContext = initialContext;
-      const rerender = async () =>
+      const rerender = async () => {
         await updateContext({ updatedContext: currentContext });
+      };
+
+      // loadBalanceCounter is used to cancel any previously executed instances of this function.
+      let loadBalanceCallCounter = 0;
+      const loadBalance = async (context: TContext) => {
+        loadBalanceCallCounter += 1;
+        const currentLoadBalanceCounter = loadBalanceCallCounter;
+
+        const { address } = fromCaip10Address(context.accountAddressCaip10);
+
+        const { assetAddress, chainId } = fromCaip19Address(
+          context.tokenAddressCaip19,
+        );
+
+        const { balance, decimals } =
+          await this.#tokenMetadataService.getTokenBalanceAndMetadata({
+            chainId,
+            account: address,
+            assetAddress,
+          });
+
+        if (currentLoadBalanceCounter === loadBalanceCallCounter) {
+          this.#tokenBalance = formatUnits({ value: balance, decimals });
+
+          rerender().catch(console.error);
+
+          const fiatBalance =
+            await this.#tokenPricesService.getCryptoToFiatConversion(
+              initialContext.tokenAddressCaip19,
+              bigIntToHex(balance),
+              initialContext.tokenMetadata.decimals,
+            );
+
+          if (currentLoadBalanceCounter === loadBalanceCallCounter) {
+            this.#tokenBalanceFiat = fiatBalance;
+            rerender().catch(console.error);
+          }
+        }
+      };
+
+      // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
+      loadBalance(currentContext).catch(console.error);
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
@@ -205,6 +291,36 @@ export class PermissionHandler<
         this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
         await rerender();
       };
+
+      const accountSelectedHandler: UserEventHandler<
+        UserInputEventType.InputChangeEvent
+      > = async ({ event: { value } }) => {
+        const {
+          addresses: [address],
+        } = value as unknown as {
+          addresses: [`${string}:${string}:${string}`];
+        };
+
+        currentContext = {
+          ...currentContext,
+          accountAddressCaip10: address,
+        };
+
+        this.#tokenBalance = undefined;
+        this.#tokenBalanceFiat = undefined;
+
+        // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
+        loadBalance(currentContext).catch(console.error);
+
+        await rerender();
+      };
+
+      this.#userEventDispatcher.on({
+        elementName: ACCOUNT_SELECTOR_NAME,
+        eventType: UserInputEventType.InputChangeEvent,
+        interfaceId,
+        handler: accountSelectedHandler,
+      });
 
       this.#userEventDispatcher.on({
         elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
@@ -231,6 +347,13 @@ export class PermissionHandler<
           eventType: UserInputEventType.ButtonClickEvent,
           interfaceId,
           handler: showMoreButtonClickHandler,
+        });
+
+        this.#userEventDispatcher.off({
+          elementName: ACCOUNT_SELECTOR_NAME,
+          eventType: UserInputEventType.InputChangeEvent,
+          interfaceId,
+          handler: accountSelectedHandler,
         });
       };
     };

@@ -1,9 +1,7 @@
 import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -23,6 +21,11 @@ import type {
   PopulatedErc20TokenPeriodicPermission,
   Erc20TokenPeriodicPermission,
 } from './types';
+import {
+  fromCaip10Address,
+  toCaip10Address,
+  toCaip19Address,
+} from '../../utils/address';
 
 /**
  * Construct an amended Erc20TokenPeriodicPermissionRequest, based on the specified request,
@@ -55,8 +58,11 @@ export async function applyContext({
     tokenAddress: originalRequest.permission.data.tokenAddress,
   };
 
+  const { address } = fromCaip10Address(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
+    address,
     expiry,
     permission: {
       type: 'erc20-token-periodic',
@@ -88,39 +94,33 @@ export async function populatePermission({
  * and manage the permission state.
  * @param args - The options object containing the request and required services.
  * @param args.permissionRequest - The ERC20 token periodic permission request to convert.
- * @param args.tokenPricesService - Service for fetching token price information.
- * @param args.accountController - Controller for managing account operations.
  * @param args.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
-  accountController,
   tokenMetadataService,
 }: {
   permissionRequest: Erc20TokenPeriodicPermissionRequest;
-  tokenPricesService: TokenPricesService;
-  accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
 }): Promise<Erc20TokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
-  const { tokenAddress } = permissionRequest.permission.data;
-
-  const address = await accountController.getAccountAddress({
-    chainId,
-  });
-
   const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: address,
-    assetAddress: tokenAddress,
-  });
+    address,
+    isAdjustmentAllowed = true,
+    permission: { data },
+  } = permissionRequest;
+
+  if (address === undefined) {
+    throw new Error('Address is required');
+  }
+
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: address,
+      assetAddress: data.tokenAddress,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -129,22 +129,15 @@ export async function buildContext({
     ? iconDataResponse.imageDataBase64
     : null;
 
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:${chainId}/erc20:${tokenAddress}`,
-    bigIntToHex(rawBalance),
-    decimals,
-  );
-
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
   const periodAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.periodAmount,
+    value: data.periodAmount,
     allowUndefined: false,
     decimals,
   });
 
-  const periodDuration =
-    permissionRequest.permission.data.periodDuration.toString();
+  const periodDuration = data.periodDuration.toString();
 
   // Determine the period type based on the duration
   let periodType: TimePeriod | 'Other';
@@ -158,21 +151,25 @@ export async function buildContext({
     periodType = 'Other';
   }
 
-  const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
-  );
+  const startTime = convertTimestampToReadableDate(data.startTime);
 
-  const balance = bigIntToHex(rawBalance);
+  const tokenAddressCaip19 = toCaip19Address({
+    address: data.tokenAddress,
+    chainId,
+    assetType: 'erc20',
+  });
+
+  const accountAddressCaip10 = toCaip10Address({
+    address,
+    chainId,
+  });
 
   return {
     expiry,
-    justification: permissionRequest.permission.data.justification,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    justification: data.justification,
+    isAdjustmentAllowed,
+    accountAddressCaip10,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,

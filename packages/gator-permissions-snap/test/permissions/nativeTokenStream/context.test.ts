@@ -1,7 +1,6 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
 import {
   populatePermission,
@@ -10,12 +9,10 @@ import {
   applyContext,
 } from '../../../src/permissions/nativeTokenStream/context';
 import type {
-  NativeTokenStreamContext,
   NativeTokenStreamPermission,
   NativeTokenStreamPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
@@ -43,7 +40,10 @@ const alreadyPopulatedPermission: NativeTokenStreamPermission = {
   rules: {},
 };
 
+const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+
 const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
+  address: ACCOUNT_ADDRESS,
   chainId: '0x1',
   expiry: convertReadableDateToTimestamp('05/01/2024'),
   signer: {
@@ -55,15 +55,13 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
   permission: alreadyPopulatedPermission,
 };
 
-const alreadyPopulatedContext: NativeTokenStreamContext = {
+const alreadyPopulatedContext = {
   expiry: '05/01/2024',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
-  accountDetails: {
-    address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
-    balanceFormattedAsCurrency: '$🐊10.00',
-  },
+  accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
+  tokenAddressCaip19:
+    'eip155:1/slip44:0x0000000000000000000000000000000000000000',
   tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,
@@ -127,26 +125,13 @@ describe('nativeTokenStream:context', () => {
   });
 
   describe('permissionRequestToContext()', () => {
-    let mockTokenPricesService: jest.Mocked<TokenPricesService>;
-    let mockAccountController: jest.Mocked<AccountController>;
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
     beforeEach(() => {
-      mockTokenPricesService = {
-        getCryptoToFiatConversion: jest.fn(
-          () =>
-            alreadyPopulatedContext.accountDetails.balanceFormattedAsCurrency,
-        ),
-      } as unknown as jest.Mocked<TokenPricesService>;
-
-      mockAccountController = {
-        getAccountAddress: jest.fn(
-          () => alreadyPopulatedContext.accountDetails.address,
-        ),
-      } as unknown as jest.Mocked<AccountController>;
-
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(() => ({
-          balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
+          balance: BigInt(
+            alreadyPopulatedContext.permissionDetails.initialAmount,
+          ),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: 18,
           iconUrl: 'https://example.com/icon.png',
@@ -169,8 +154,6 @@ describe('nativeTokenStream:context', () => {
 
       const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
-        tokenPricesService: mockTokenPricesService,
-        accountController: mockAccountController,
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -182,24 +165,12 @@ describe('nativeTokenStream:context', () => {
         },
       });
 
-      expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
-        chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-      });
-
       expect(
         mockTokenMetadataService.getTokenBalanceAndMetadata,
       ).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-        account: alreadyPopulatedContext.accountDetails.address,
+        account: ACCOUNT_ADDRESS,
       });
-
-      expect(
-        mockTokenPricesService.getCryptoToFiatConversion,
-      ).toHaveBeenCalledWith(
-        `eip155:1/slip44:60`,
-        alreadyPopulatedContext.accountDetails.balance,
-        18,
-      );
     });
   });
 

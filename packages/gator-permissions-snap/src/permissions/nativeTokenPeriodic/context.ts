@@ -1,9 +1,8 @@
 import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
+import { ZERO_ADDRESS } from '../../constants';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
   convertTimestampToReadableDate,
@@ -23,6 +22,11 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
+import {
+  fromCaip10Address,
+  toCaip10Address,
+  toCaip19Address,
+} from '../../utils/address';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -54,8 +58,11 @@ export async function applyContext({
     justification: originalRequest.permission.data.justification,
   };
 
+  const { address } = fromCaip10Address(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
+    address,
     expiry,
     permission: {
       type: 'native-token-periodic',
@@ -87,37 +94,33 @@ export async function populatePermission({
  * and manage the permission state.
  * @param args - The options object containing the request and required services.
  * @param args.permissionRequest - The native token periodic permission request to convert.
- * @param args.tokenPricesService - Service for fetching token price information.
- * @param args.accountController - Controller for managing account operations.
  * @param args.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
-  accountController,
   tokenMetadataService,
 }: {
   permissionRequest: NativeTokenPeriodicPermissionRequest;
-  tokenPricesService: TokenPricesService;
-  accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const address = await accountController.getAccountAddress({
-    chainId,
-  });
-
   const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: address,
-  });
+    address,
+    isAdjustmentAllowed = true,
+    permission: { data },
+  } = permissionRequest;
+
+  if (address === undefined) {
+    throw new Error('Address is required');
+  }
+
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: address,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -126,22 +129,15 @@ export async function buildContext({
     ? iconDataResponse.imageDataBase64
     : null;
 
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:1/slip44:60`,
-    bigIntToHex(rawBalance),
-    decimals,
-  );
-
   const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
 
   const periodAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.periodAmount,
+    value: data.periodAmount,
     allowUndefined: false,
     decimals,
   });
 
-  const periodDuration =
-    permissionRequest.permission.data.periodDuration.toString();
+  const periodDuration = data.periodDuration.toString();
 
   // Determine the period type based on the duration
   let periodType: TimePeriod | 'Other';
@@ -155,21 +151,25 @@ export async function buildContext({
     periodType = 'Other';
   }
 
-  const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
-  );
+  const startTime = convertTimestampToReadableDate(data.startTime);
 
-  const balance = bigIntToHex(rawBalance);
+  const tokenAddressCaip19 = toCaip19Address({
+    address: ZERO_ADDRESS,
+    chainId,
+    assetType: 'slip44',
+  });
+
+  const accountAddressCaip10 = toCaip10Address({
+    address,
+    chainId,
+  });
 
   return {
     expiry,
-    justification: permissionRequest.permission.data.justification,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    justification: data.justification,
+    isAdjustmentAllowed,
+    accountAddressCaip10,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,

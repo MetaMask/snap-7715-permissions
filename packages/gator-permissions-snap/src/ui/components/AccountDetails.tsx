@@ -1,13 +1,20 @@
 import type { Hex } from '@metamask/delegation-core';
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import { Text, Box, Section, Avatar } from '@metamask/snaps-sdk/jsx';
+import {
+  Text,
+  Box,
+  Section,
+  AccountSelector,
+  Skeleton,
+} from '@metamask/snaps-sdk/jsx';
 
 import { TooltipIcon } from './TooltipIcon';
+import type { Caip10Address } from '../../core/types';
 import { formatUnitsFromHex } from '../../utils/value';
 
 export type AccountDetailsProps = {
   account: {
-    address: Hex;
+    address: Caip10Address;
     balanceFormattedAsCurrency: string;
     balance: Hex;
   };
@@ -18,6 +25,8 @@ export type AccountDetailsProps = {
   };
   title: string;
   tooltip: string;
+  accountSelectorName: string;
+  tokenBalance: Hex | null;
 };
 
 export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
@@ -25,9 +34,21 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
   tokenMetadata,
   title,
   tooltip,
+  accountSelectorName,
+  tokenBalance,
 }) => {
-  const { address, balance, balanceFormattedAsCurrency } = account;
+  const { address, balanceFormattedAsCurrency } = account;
   const { decimals } = tokenMetadata;
+
+  const formattedBalance = tokenBalance ? (
+    `${formatUnitsFromHex({
+      value: tokenBalance,
+      allowUndefined: false,
+      decimals,
+    })} available`
+  ) : (
+    <Skeleton />
+  );
 
   return (
     <Section>
@@ -37,23 +58,17 @@ export const AccountDetails: SnapComponent<AccountDetailsProps> = ({
             <Text>{title}</Text>
             <TooltipIcon tooltip={tooltip} />
           </Box>
-
-          <Box direction="horizontal">
-            <Avatar address={`eip155:1:${address}`} size="sm" />
-            <Text color="default">Gator Account</Text>
-          </Box>
         </Box>
+        <AccountSelector
+          name={accountSelectorName}
+          chainIds={['eip155:1']}
+          switchGlobalAccount={false}
+          value={address}
+        />
 
         <Box direction="horizontal" alignment="end">
           <Text color="muted">{balanceFormattedAsCurrency}</Text>
-          <Text color="alternative">
-            {`${formatUnitsFromHex({
-              value: balance,
-              allowUndefined: false,
-              decimals,
-            })}`}
-            available
-          </Text>
+          <Text color="alternative">{formattedBalance}</Text>
         </Box>
       </Box>
     </Section>
