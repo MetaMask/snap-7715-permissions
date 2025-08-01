@@ -13,7 +13,7 @@ export const convertTimestampToReadableDate = (timestamp: number) => {
     throw new Error('convertTimestampToReadableDate: Invalid date format');
   }
 
-  // Always format as mm/dd/yyyy using UTC
+  // Always format as mm/dd/yyyy using local time
   const month = String(date.getMonth() + 1).padStart(2, '0'); // JavaScript months are 0-indexed
   const day = String(date.getDate()).padStart(2, '0');
   const year = date.getFullYear();
