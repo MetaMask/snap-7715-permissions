@@ -10,9 +10,10 @@ import type {
   TimePeriod,
   TypedPermissionRequest,
   BaseContext,
+  BaseMetadata,
 } from '../../core/types';
 
-export type Erc20TokenStreamMetadata = {
+export type Erc20TokenStreamMetadata = BaseMetadata & {
   amountPerSecond: string;
   validationErrors: {
     initialAmountError?: string;
