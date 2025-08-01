@@ -11,6 +11,7 @@ import { zErc20TokenPeriodicPermission } from './types';
 /**
  * Validates a permission object data specific to the permission type.
  * @param permission - The ERC20 token periodic permission object to validate.
+ * @param expiry - The expiry time of permission request.
  * @returns True if the permission data is valid, throws an error otherwise.
  * @throws {Error} If any validation check fails.
  */
@@ -27,7 +28,7 @@ function validatePermissionData(
     allowZero: false,
   });
 
-  const timeToValidate = startTime ? startTime : Math.floor(Date.now() / 1000);
+  const timeToValidate = startTime ?? Math.floor(Date.now() / 1000);
 
   if (timeToValidate >= expiry) {
     throw new Error('Invalid startTime: must be before expiry');

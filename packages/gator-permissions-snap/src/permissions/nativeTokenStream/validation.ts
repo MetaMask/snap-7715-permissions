@@ -11,6 +11,7 @@ import { zNativeTokenStreamPermission } from './types';
 /**
  * Validates a permission object data specific to the permission type.
  * @param permission - The native token stream permission object to validate.
+ * @param expiry - The expiry time of permission request.
  * @returns True if the permission data is valid, throws an error otherwise.
  * @throws {Error} If any validation check fails.
  */
@@ -18,7 +19,8 @@ function validatePermissionData(
   permission: NativeTokenStreamPermission,
   expiry: number,
 ): true {
-  const { initialAmount, maxAmount, amountPerSecond, startTime } = permission.data;
+  const { initialAmount, maxAmount, amountPerSecond, startTime } =
+    permission.data;
 
   validateHexInteger({
     name: 'maxAmount',
@@ -45,8 +47,7 @@ function validatePermissionData(
     throw new Error('Invalid maxAmount: must be greater than initialAmount');
   }
 
-  const timeToValidate = startTime ? startTime : Math.floor(Date.now() / 1000);
-
+  const timeToValidate = startTime ?? Math.floor(Date.now() / 1000);
 
   if (timeToValidate >= expiry) {
     throw new Error('Invalid startTime: must be before expiry');

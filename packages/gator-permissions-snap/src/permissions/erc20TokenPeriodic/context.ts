@@ -15,6 +15,7 @@ import {
   validateStartTime,
   validateExpiry,
   validatePeriodDuration,
+  validateStartTimeVsExpiry,
 } from '../contextValidation';
 import type {
   Erc20TokenPeriodicContext,
@@ -239,6 +240,17 @@ export async function deriveMetadata({
   const expiryError = validateExpiry(expiry);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
+  }
+
+  // Validate start time vs expiry (only if individual validations passed)
+  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+    const startTimeVsExpiryError = validateStartTimeVsExpiry(
+      permissionDetails.startTime,
+      expiry,
+    );
+    if (startTimeVsExpiryError) {
+      validationErrors.startTimeError = startTimeVsExpiryError;
+    }
   }
 
   return {

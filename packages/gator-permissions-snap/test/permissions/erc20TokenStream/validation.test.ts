@@ -3,14 +3,13 @@ import { bigIntToHex } from '@metamask/utils';
 
 import type { Erc20TokenStreamPermissionRequest } from '../../../src/permissions/erc20TokenStream/types';
 import { parseAndValidatePermission } from '../../../src/permissions/erc20TokenStream/validation';
-import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 10;
 
 const validPermissionRequest: Erc20TokenStreamPermissionRequest = {
   chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
+  expiry: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
   isAdjustmentAllowed: true,
   signer: {
     type: 'account',
@@ -177,7 +176,7 @@ describe('erc20TokenStream:validation', () => {
         expect(() =>
           parseAndValidatePermission(negativeStartTimeRequest),
         ).toThrow(
-          'Failed type validation: data.startTime: Start time must be today or later',
+          'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
         );
       });
 
@@ -194,7 +193,7 @@ describe('erc20TokenStream:validation', () => {
         };
 
         expect(() => parseAndValidatePermission(zeroStartTimeRequest)).toThrow(
-          'Failed type validation: data.startTime: Start time must be today or later',
+          'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
         );
       });
 
@@ -213,6 +212,65 @@ describe('erc20TokenStream:validation', () => {
         expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
           'Failed type validation: data.startTime: Expected integer, received float',
         );
+      });
+    });
+
+    describe('startTime vs expiry validation', () => {
+      it('should throw when startTime is equal to expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const startTimeVsExpiryRequest = {
+          ...validPermissionRequest,
+          expiry: currentTime + 86400, // 1 day from now
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400, // Same as expiry
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(startTimeVsExpiryRequest),
+        ).toThrow('Invalid startTime: must be before expiry');
+      });
+
+      it('should throw when startTime is after expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const startTimeAfterExpiryRequest = {
+          ...validPermissionRequest,
+          expiry: currentTime + 86400, // 1 day from now
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400 * 2, // 2 days from now (after expiry)
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(startTimeAfterExpiryRequest),
+        ).toThrow('Invalid startTime: must be before expiry');
+      });
+
+      it('should validate when startTime is before expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const validStartTimeVsExpiryRequest = {
+          ...validPermissionRequest,
+          expiry: currentTime + 86400 * 2, // 2 days from now
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400, // 1 day from now (before expiry)
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(validStartTimeVsExpiryRequest),
+        ).not.toThrow();
       });
     });
 

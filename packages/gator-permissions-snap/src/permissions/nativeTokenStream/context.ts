@@ -16,6 +16,7 @@ import {
   validateExpiry,
   validateMaxAmountVsInitialAmount,
   calculateAmountPerSecond,
+  validateStartTimeVsExpiry,
 } from '../contextValidation';
 import type {
   NativeTokenStreamContext,
@@ -279,6 +280,17 @@ export async function deriveMetadata({
   const expiryError = validateExpiry(expiry);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
+  }
+
+  // Validate start time vs expiry (only if individual validations passed)
+  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+    const startTimeVsExpiryError = validateStartTimeVsExpiry(
+      permissionDetails.startTime,
+      expiry,
+    );
+    if (startTimeVsExpiryError) {
+      validationErrors.startTimeError = startTimeVsExpiryError;
+    }
   }
 
   // Validate max amount vs initial amount
