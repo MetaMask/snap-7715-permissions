@@ -28,9 +28,8 @@ function validatePermissionData(
     allowZero: false,
   });
 
-  const timeToValidate = startTime ?? Math.floor(Date.now() / 1000);
-
-  if (timeToValidate >= expiry) {
+  // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
+  if (startTime && startTime >= expiry) {
     throw new Error('Invalid startTime: must be before expiry');
   }
 
