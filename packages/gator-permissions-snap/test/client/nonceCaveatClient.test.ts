@@ -78,17 +78,6 @@ describe('NonceCaveatClient', () => {
       expect(mockEthereumProvider.request).not.toHaveBeenCalled();
     });
 
-    it('throws an error if selected chain does not match requested chain', async () => {
-      mockEthereumProvider.request.mockResolvedValueOnce('0x01'); // eth_chainId
-
-      await expect(
-        client.getNonce({
-          chainId: mockChainId,
-          account: mockAccount,
-        }),
-      ).rejects.toThrow('Selected chain does not match the requested chain');
-    });
-
     it('throws an error if nonce fetch fails', async () => {
       mockEthereumProvider.request
         .mockResolvedValueOnce(mockChainIdHex) // eth_chainId

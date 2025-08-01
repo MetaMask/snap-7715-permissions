@@ -2,6 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import { decodeSingle } from '@metamask/abi-utils';
 import type { Hex } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
+import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from '../core/chainMetadata';
 
@@ -52,14 +53,26 @@ export class NonceCaveatClient {
       throw new Error(message);
     }
 
-    // Check if we're on the correct chain
-    const selectedChain = await this.#ethereumProvider.request({
+    // Check if we're on the correct chain and switch if not
+    const selectedChain = await this.#ethereumProvider.request<Hex>({
       method: 'eth_chainId',
       params: [],
     });
 
-    if (Number(selectedChain) !== chainId) {
-      throw new Error('Selected chain does not match the requested chain');
+    if (selectedChain && hexToNumber(selectedChain) !== chainId) {
+      await this.#ethereumProvider.request<Hex>({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: numberToHex(chainId) }],
+      });
+
+      const updatedChain = await this.#ethereumProvider.request<Hex>({
+        method: 'eth_chainId',
+        params: [],
+      });
+
+      if (updatedChain && hexToNumber(updatedChain) !== chainId) {
+        throw new Error('Selected chain does not match the requested chain');
+      }
     }
 
     let nonceEncoded;

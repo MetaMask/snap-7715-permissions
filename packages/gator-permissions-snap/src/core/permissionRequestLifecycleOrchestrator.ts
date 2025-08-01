@@ -280,7 +280,10 @@ export class PermissionRequestLifecycleOrchestrator {
       args: '0x',
     });
 
-    const nonce = await this.#nonceCaveatService.getNonce(chainId, address);
+    const nonce = await this.#nonceCaveatService.getNonce({
+      chainId,
+      account: address,
+    });
 
     caveats.push({
       enforcer: contracts.enforcers.NonceEnforcer,

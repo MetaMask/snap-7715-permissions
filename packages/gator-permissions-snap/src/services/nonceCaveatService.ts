@@ -3,6 +3,11 @@ import type { Hex } from '@metamask/delegation-core';
 
 import type { NonceCaveatClient } from '../clients/nonceCaveatClient';
 
+export type GetNonceOptions = {
+  chainId: number;
+  account: Hex;
+};
+
 /**
  * Service responsible for providing the nonce of caveat enforcer for a given account.
  */
@@ -20,17 +25,15 @@ export class NonceCaveatService {
 
   /**
    * Retrieves the nonce of caveat enforcer for the specified account.
-   * @param chainId - The chain ID.
-   * @param account - The address of the account.
+   * @param options - The options for fetching the nonce.
+   * @param options.chainId - The chain ID.
+   * @param options.account - The address of the account.
    * @returns A promise resolving to the nonce.
    */
-  public async getNonce(chainId: number, account: Hex): Promise<bigint> {
+  public async getNonce(options: GetNonceOptions): Promise<bigint> {
     logger.debug('NonceCaveatService:getNonce()');
 
-    const nonce = await this.#nonceCaveatClient.getNonce({
-      chainId,
-      account,
-    });
+    const nonce = await this.#nonceCaveatClient.getNonce(options);
 
     logger.debug('NonceCaveatService:getNonce() - nonce resolved');
 
