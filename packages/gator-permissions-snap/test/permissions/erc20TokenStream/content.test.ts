@@ -732,7 +732,7 @@ describe('erc20TokenStream:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The start time of the stream.",
+                                      "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
                                     },
                                     "type": "Text",
                                   },
@@ -744,7 +744,23 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
                       ],
                       "direction": "horizontal",
                     },
@@ -753,26 +769,65 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-start-time_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "01/01/1970",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-start-time_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "00:00:10",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
                       "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "erc20-token-stream-start-time",
-                            "type": "text",
-                            "value": "10/26/1985",
-                          },
-                          "type": "Input",
-                        },
+                        null,
+                        null,
                       ],
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -814,7 +869,7 @@ describe('erc20TokenStream:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
                                     },
                                     "type": "Text",
                                   },
@@ -826,7 +881,23 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
                       ],
                       "direction": "horizontal",
                     },
@@ -835,26 +906,65 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-expiry_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "01/01/1970",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-expiry_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "00:00:05",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
                       "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "erc20-token-stream-expiry",
-                            "type": "text",
-                            "value": "05/01/2024",
-                          },
-                          "type": "Input",
-                        },
+                        null,
+                        null,
                       ],
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -1572,7 +1682,7 @@ describe('erc20TokenStream:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The start time of the stream.",
+                                      "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
                                     },
                                     "type": "Text",
                                   },
@@ -1584,7 +1694,23 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
                       ],
                       "direction": "horizontal",
                     },
@@ -1593,27 +1719,73 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-start-time_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "01/01/1970",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-start-time_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "00:00:10",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
                         },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
-                            "name": "erc20-token-stream-start-time",
-                            "type": "text",
-                            "value": "10/26/1985",
+                            "children": "Invalid start time",
+                            "color": "error",
+                            "size": "sm",
                           },
-                          "type": "Input",
+                          "type": "Text",
                         },
                       ],
-                      "error": "Invalid start time",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -1655,7 +1827,7 @@ describe('erc20TokenStream:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
                                     },
                                     "type": "Text",
                                   },
@@ -1667,7 +1839,23 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
                       ],
                       "direction": "horizontal",
                     },
@@ -1676,27 +1864,73 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-expiry_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "01/01/1970",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-expiry_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "00:00:05",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
                         },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
-                            "name": "erc20-token-stream-expiry",
-                            "type": "text",
-                            "value": "05/01/2024",
+                            "children": "Invalid expiry",
+                            "color": "error",
+                            "size": "sm",
                           },
-                          "type": "Input",
+                          "type": "Text",
                         },
                       ],
-                      "error": "Invalid expiry",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
