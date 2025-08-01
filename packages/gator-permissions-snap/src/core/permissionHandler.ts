@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
+import { bigIntToHex } from '@metamask/utils';
 
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
@@ -28,7 +29,6 @@ import type {
   Caip10Address,
   AccountControllerInterface,
 } from './types';
-import { bigIntToHex } from '@metamask/utils';
 import { fromCaip10Address, fromCaip19Address } from '../utils/address';
 import { formatUnits } from '../utils/value';
 
@@ -155,7 +155,7 @@ export class PermissionHandler<
         throw new Error('No addresses found');
       }
 
-      let caip10Address: Caip10Address | undefined = undefined;
+      let caip10Address: Caip10Address | undefined;
 
       if (requestedAddress === undefined) {
         // use the first address available for the account
@@ -247,7 +247,8 @@ export class PermissionHandler<
       // loadBalanceCounter is used to cancel any previously executed instances of this function.
       let loadBalanceCallCounter = 0;
       const loadBalance = async (context: TContext) => {
-        const currentLoadBalanceCounter = ++loadBalanceCallCounter;
+        loadBalanceCallCounter += 1;
+        const currentLoadBalanceCounter = loadBalanceCallCounter;
 
         const { address } = fromCaip10Address(context.accountAddressCaip10);
 
@@ -265,7 +266,7 @@ export class PermissionHandler<
         if (currentLoadBalanceCounter === loadBalanceCallCounter) {
           this.#tokenBalance = formatUnits({ value: balance, decimals });
 
-          rerender();
+          rerender().catch(console.error);
 
           const fiatBalance =
             await this.#tokenPricesService.getCryptoToFiatConversion(
@@ -276,12 +277,13 @@ export class PermissionHandler<
 
           if (currentLoadBalanceCounter === loadBalanceCallCounter) {
             this.#tokenBalanceFiat = fiatBalance;
-            rerender();
+            rerender().catch(console.error);
           }
         }
       };
 
-      loadBalance(currentContext);
+      // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
+      loadBalance(currentContext).catch(console.error);
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
@@ -307,7 +309,8 @@ export class PermissionHandler<
         this.#tokenBalance = undefined;
         this.#tokenBalanceFiat = undefined;
 
-        loadBalance(currentContext);
+        // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
+        loadBalance(currentContext).catch(console.error);
 
         await rerender();
       };

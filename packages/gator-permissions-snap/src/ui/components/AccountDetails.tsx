@@ -9,8 +9,8 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 
 import { TooltipIcon } from './TooltipIcon';
+import type { Caip10Address } from '../../core/types';
 import { formatUnitsFromHex } from '../../utils/value';
-import { Caip10Address } from '../../core/types';
 
 export type AccountDetailsProps = {
   account: {

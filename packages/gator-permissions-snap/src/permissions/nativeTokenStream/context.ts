@@ -1,5 +1,6 @@
 import { bigIntToHex } from '@metamask/utils';
 
+import { ZERO_ADDRESS } from '../../constants';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import {
@@ -27,7 +28,6 @@ import {
   toCaip10Address,
   toCaip19Address,
 } from '../../utils/address';
-import { ZERO_ADDRESS } from '../../constants';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -114,8 +114,6 @@ export async function populatePermission({
  * and manage the permission state.
  * @param options0 - The options object containing the request and required services.
  * @param options0.permissionRequest - The native token stream permission request to convert.
- * @param options0.tokenPricesService - Service for fetching token price information.
- * @param options0.accountController - Controller for managing account operations.
  * @param options0.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */

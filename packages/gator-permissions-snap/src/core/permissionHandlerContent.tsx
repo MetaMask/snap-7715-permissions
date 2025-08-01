@@ -55,6 +55,9 @@ export type PermissionHandlerContentProps = {
  * @param options.tokenSymbol - The symbol of the token.
  * @param options.tokenIconData - The icon data of the token.
  * @param options.isJustificationCollapsed - Whether the justification is collapsed.
+ * @param options.context - The context of the permission.
+ * @param options.tokenBalance - The formatted balance of the token.
+ * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
