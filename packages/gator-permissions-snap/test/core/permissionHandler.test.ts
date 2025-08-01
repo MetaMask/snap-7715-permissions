@@ -883,20 +883,13 @@ describe('PermissionHandler', () => {
                         "children": [
                           {
                             "key": null,
-                            "props": {
-                              "children": "$1000",
-                            },
-                            "type": "Text",
+                            "props": {},
+                            "type": "Skeleton",
                           },
                           {
                             "key": null,
-                            "props": {
-                              "children": [
-                                "1",
-                                " available",
-                              ],
-                            },
-                            "type": "Text",
+                            "props": {},
+                            "type": "Skeleton",
                           },
                         ],
                         "direction": "horizontal",

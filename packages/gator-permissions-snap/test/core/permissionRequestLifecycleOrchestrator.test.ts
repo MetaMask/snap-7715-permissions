@@ -3,6 +3,7 @@ import {
   decodeDelegations,
   ROOT_AUTHORITY,
   createTimestampTerms,
+  Delegation,
 } from '@metamask/delegation-core';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bytesToHex } from '@metamask/utils';
@@ -143,7 +144,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     );
 
     mockAccountController.signDelegation.mockImplementation(
-      async ({ delegation }) => ({
+      async ({ delegation }: { delegation: Delegation }) => ({
         ...delegation,
         signature: mockSignature,
       }),

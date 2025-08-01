@@ -1,5 +1,4 @@
 import { describe, expect, it } from '@jest/globals';
-import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { createConfirmationContent } from '../../../src/permissions/nativeTokenStream/content';
@@ -7,17 +6,13 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from '../../../src/permissions/nativeTokenStream/types';
-import { parseUnits } from '../../../src/utils/value';
 
 const mockContext: NativeTokenStreamContext = {
   expiry: '05/01/2024',
   isAdjustmentAllowed: true,
   justification: 'Permission to stream native tokens',
-  accountDetails: {
-    address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
-    balanceFormattedAsCurrency: '$🐊10.00',
-  },
+  accountAddressCaip10: `eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`,
+  tokenAddressCaip19: `eip155:1/erc20:0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F`,
   tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,
