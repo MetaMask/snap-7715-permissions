@@ -204,7 +204,7 @@ export async function deriveMetadata({
   const periodAmountResult = validateAndParseAmount(
     permissionDetails.periodAmount,
     decimals,
-    'Period amount',
+    'period amount',
   );
   if (periodAmountResult.error) {
     validationErrors.periodAmountError = periodAmountResult.error;

@@ -1,7 +1,7 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { type GenericSnapElement, Text } from '@metamask/snaps-sdk/jsx';
+import { type SnapElement, Text } from '@metamask/snaps-sdk/jsx';
 
 import { ConfirmationDialog } from '../../src/core/confirmation';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
@@ -14,7 +14,7 @@ describe('ConfirmationDialog', () => {
 
   const mockUi = Text({
     children: 'Test Title',
-  }) as GenericSnapElement;
+  }) as unknown as SnapElement;
 
   const defaultProps = {
     ui: mockUi,
@@ -164,7 +164,7 @@ describe('ConfirmationDialog', () => {
     it('should throw error if interface not created', async () => {
       const updatedUi = Text({
         children: 'Updated content',
-      }) as GenericSnapElement;
+      }) as unknown as SnapElement;
 
       await expect(
         confirmationDialog.updateContent({
@@ -183,7 +183,7 @@ describe('ConfirmationDialog', () => {
 
       const updatedUi = Text({
         children: 'Updated content',
-      }) as GenericSnapElement;
+      }) as unknown as SnapElement;
 
       await confirmationDialog.updateContent({
         ui: updatedUi,

@@ -5,7 +5,7 @@ import type {
 } from '@metamask/7715-permissions-shared/types';
 import type { Hex, Caveat } from '@metamask/delegation-core';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { AccountController } from '../accountController';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
@@ -51,6 +51,10 @@ export type BaseContext = {
   };
 };
 
+export type BaseMetadata = {
+  validationErrors?: object;
+};
+
 /**
  * Base interface for all permission objects.
  * Each permission type will extend this with their specific permission data.
@@ -94,7 +98,7 @@ export enum TimePeriod {
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
  */
 export type ConfirmationProps = {
-  ui: GenericSnapElement;
+  ui: SnapElement;
   isGrantDisabled: boolean;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
@@ -118,13 +122,13 @@ export type LifecycleOrchestrationHandlers<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (request: TRequest) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
-  createSkeletonConfirmationContent: () => Promise<GenericSnapElement>;
+  createSkeletonConfirmationContent: () => Promise<SnapElement>;
   createConfirmationContent: (args: {
     context: TContext;
     metadata: TMetadata;
     origin: string;
     chainId: number;
-  }) => Promise<GenericSnapElement>;
+  }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;
     originalRequest: TRequest;
@@ -307,7 +311,7 @@ export type PermissionHandlerDependencies<
   createConfirmationContent: (args: {
     context: TContext;
     metadata: TMetadata;
-  }) => Promise<GenericSnapElement>;
+  }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;
     originalRequest: TRequest;

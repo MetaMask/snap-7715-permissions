@@ -1,4 +1,4 @@
-import type { GenericSnapElement } from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Section } from '@metamask/snaps-sdk/jsx';
 
 import {
@@ -28,7 +28,7 @@ export async function createConfirmationContent({
 }: {
   context: NativeTokenPeriodicContext;
   metadata: NativeTokenPeriodicMetadata;
-}): Promise<GenericSnapElement> {
+}): Promise<SnapElement> {
   return (
     <Box>
       <AccountDetails

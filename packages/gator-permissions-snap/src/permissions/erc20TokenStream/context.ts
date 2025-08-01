@@ -234,7 +234,7 @@ export async function deriveMetadata({
   const maxAmountResult = validateAndParseAmount(
     permissionDetails.maxAmount,
     decimals,
-    'Max amount',
+    'max amount',
     false, // Disallow zero for max amount
   );
   if (maxAmountResult.error) {
@@ -245,7 +245,7 @@ export async function deriveMetadata({
   const initialAmountResult = validateAndParseAmount(
     permissionDetails.initialAmount,
     decimals,
-    'Initial amount',
+    'initial amount',
     true, // Allow zero for initial amount
   );
   if (initialAmountResult.error) {
@@ -256,7 +256,7 @@ export async function deriveMetadata({
   const amountPerPeriodResult = validateAndParseAmount(
     permissionDetails.amountPerPeriod,
     decimals,
-    'Amount per period',
+    'amount per period',
   );
   let amountPerSecond = 'Unknown';
   if (amountPerPeriodResult.error) {

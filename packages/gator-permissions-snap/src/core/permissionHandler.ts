@@ -15,7 +15,6 @@ import {
   SkeletonPermissionHandlerContent,
 } from './permissionHandlerContent';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
-import { RuleModalManager } from './ruleModalManager';
 import { bindRuleHandlers } from './rules';
 import type {
   BaseContext,
@@ -65,8 +64,6 @@ export class PermissionHandler<
   readonly #rules: RuleDefinition<TContext, TMetadata>[];
 
   readonly #permissionTitle: string;
-
-  #addMoreRulesModal: RuleModalManager<TContext, TMetadata> | undefined;
 
   #isJustificationCollapsed = true;
 
@@ -162,28 +159,15 @@ export class PermissionHandler<
       origin: string;
       chainId: number;
     }) => {
-      // todo: this will go away once we remove add-more-rules
-      if (this.#addMoreRulesModal?.isModalVisible()) {
-        return await this.#addMoreRulesModal.renderModal();
-      }
-
-      const showAddMoreRulesButton =
-        this.#addMoreRulesModal?.hasRulesToAdd({
-          context,
-          metadata,
-        }) ?? false;
-
-      // end-of todo
-
-      const { name: networkName } = getChainMetadata({ chainId });
-
-      const tokenIconData = getIconData(context);
-
       const permissionContent =
         await this.#dependencies.createConfirmationContent({
           context,
           metadata,
         });
+
+      const { name: networkName } = getChainMetadata({ chainId });
+
+      const tokenIconData = getIconData(context);
 
       const {
         justification,
@@ -197,7 +181,6 @@ export class PermissionHandler<
         tokenSymbol,
         tokenIconData,
         isJustificationCollapsed: this.#isJustificationCollapsed,
-        showAddMoreRulesButton,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,
       });
@@ -215,21 +198,6 @@ export class PermissionHandler<
       let currentContext = initialContext;
       const rerender = async () =>
         await updateContext({ updatedContext: currentContext });
-
-      this.#addMoreRulesModal = new RuleModalManager({
-        userEventDispatcher: this.#userEventDispatcher,
-        interfaceId,
-        rules: this.#rules,
-        onModalChanged: rerender,
-        getContext: () => currentContext,
-        deriveMetadata: this.#dependencies.deriveMetadata,
-        onContextChanged: async ({ context }) => {
-          currentContext = context;
-          await rerender();
-        },
-      });
-
-      this.#addMoreRulesModal.bindHandlers();
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
@@ -270,7 +238,6 @@ export class PermissionHandler<
 
     const onConfirmationResolvedHandler = () => {
       this.#deregisterHandlers?.();
-      this.#addMoreRulesModal?.unbindHandlers();
     };
 
     const {

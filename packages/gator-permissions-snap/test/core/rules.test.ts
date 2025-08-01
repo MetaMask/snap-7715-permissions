@@ -131,44 +131,47 @@ describe('rules', () => {
         "key": null,
         "props": {
           "alignment": "space-between",
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
-                  "key": null,
-                  "props": {
-                    "children": "Test Text Rule",
-                  },
-                  "type": "Text",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "children": {
-                      "key": null,
-                      "props": {
-                        "color": "muted",
-                        "name": "question",
-                        "size": "inherit",
-                      },
-                      "type": "Icon",
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "children": "Test Text Rule",
                     },
-                    "content": {
-                      "key": null,
-                      "props": {
-                        "children": "This is a test text rule",
-                      },
-                      "type": "Text",
-                    },
+                    "type": "Text",
                   },
-                  "type": "Tooltip",
-                },
-              ],
-              "direction": "horizontal",
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "color": "muted",
+                          "name": "question",
+                          "size": "inherit",
+                        },
+                        "type": "Icon",
+                      },
+                      "content": {
+                        "key": null,
+                        "props": {
+                          "children": "This is a test text rule",
+                        },
+                        "type": "Text",
+                      },
+                    },
+                    "type": "Tooltip",
+                  },
+                ],
+                "direction": "horizontal",
+              },
+              "type": "Box",
             },
-            "type": "Box",
-          },
+            null,
+          ],
           "direction": "horizontal",
         },
         "type": "Box",
@@ -192,13 +195,6 @@ describe('rules', () => {
                 "value": "test-value",
               },
               "type": "Input",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": null,
-              },
-              "type": "Box",
             },
           ],
         },
@@ -228,23 +224,26 @@ describe('rules', () => {
         "key": null,
         "props": {
           "alignment": "space-between",
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
-                  "key": null,
-                  "props": {
-                    "children": "Test Number Rule",
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "children": "Test Number Rule",
+                    },
+                    "type": "Text",
                   },
-                  "type": "Text",
-                },
-                null,
-              ],
-              "direction": "horizontal",
+                  null,
+                ],
+                "direction": "horizontal",
+              },
+              "type": "Box",
             },
-            "type": "Box",
-          },
+            null,
+          ],
           "direction": "horizontal",
         },
         "type": "Box",
@@ -268,13 +267,6 @@ describe('rules', () => {
                 "value": "123",
               },
               "type": "Input",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": null,
-              },
-              "type": "Box",
             },
           ],
         },
@@ -389,23 +381,53 @@ describe('rules', () => {
         "key": null,
         "props": {
           "alignment": "space-between",
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "children": "Test Optional Rule",
+                    },
+                    "type": "Text",
+                  },
+                  null,
+                ],
+                "direction": "horizontal",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": {
                   "key": null,
                   "props": {
-                    "children": "Test Optional Rule",
+                    "children": {
+                      "key": null,
+                      "props": {
+                        "alt": "Remove Test Optional Rule",
+                        "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                      },
+                      "type": "Image",
+                    },
+                    "name": "test-optional-rule_removeFieldButton",
                   },
-                  "type": "Text",
+                  "type": "Button",
                 },
-                null,
-              ],
-              "direction": "horizontal",
+              },
+              "type": "Box",
             },
-            "type": "Box",
-          },
+          ],
           "direction": "horizontal",
         },
         "type": "Box",
@@ -429,29 +451,6 @@ describe('rules', () => {
                 "value": "optional-value",
               },
               "type": "Input",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {
-                    "children": {
-                      "key": null,
-                      "props": {
-                        "color": "primary",
-                        "name": "close",
-                        "size": "md",
-                      },
-                      "type": "Icon",
-                    },
-                    "name": "test-optional-rule_removeButton",
-                    "type": "button",
-                  },
-                  "type": "Button",
-                },
-              },
-              "type": "Box",
             },
           ],
         },
@@ -561,44 +560,47 @@ describe('rules', () => {
         "key": null,
         "props": {
           "alignment": "space-between",
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
-                  "key": null,
-                  "props": {
-                    "children": "Test Text Rule",
-                  },
-                  "type": "Text",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "children": {
-                      "key": null,
-                      "props": {
-                        "color": "muted",
-                        "name": "question",
-                        "size": "inherit",
-                      },
-                      "type": "Icon",
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "children": "Test Text Rule",
                     },
-                    "content": {
-                      "key": null,
-                      "props": {
-                        "children": "This is a test text rule",
-                      },
-                      "type": "Text",
-                    },
+                    "type": "Text",
                   },
-                  "type": "Tooltip",
-                },
-              ],
-              "direction": "horizontal",
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "color": "muted",
+                          "name": "question",
+                          "size": "inherit",
+                        },
+                        "type": "Icon",
+                      },
+                      "content": {
+                        "key": null,
+                        "props": {
+                          "children": "This is a test text rule",
+                        },
+                        "type": "Text",
+                      },
+                    },
+                    "type": "Tooltip",
+                  },
+                ],
+                "direction": "horizontal",
+              },
+              "type": "Box",
             },
-            "type": "Box",
-          },
+            null,
+          ],
           "direction": "horizontal",
         },
         "type": "Box",
@@ -623,13 +625,6 @@ describe('rules', () => {
               },
               "type": "Input",
             },
-            {
-              "key": null,
-              "props": {
-                "children": null,
-              },
-              "type": "Box",
-            },
           ],
           "error": "This field has an error",
         },
@@ -643,14 +638,53 @@ describe('rules', () => {
 `);
     });
 
-    it('should return null when value is undefined', () => {
+    it('should return a field that is toggled to off when value is undefined', () => {
       const result = renderRule({
         rule: undefinedValueRule,
         context: mockContext,
         metadata: mockMetadata,
       });
 
-      expect(result).toBeNull();
+      expect(result).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
+      {
+        "key": null,
+        "props": {
+          "alignment": "space-between",
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "children": "Undefined Value Rule",
+                    },
+                    "type": "Text",
+                  },
+                  null,
+                ],
+                "direction": "horizontal",
+              },
+              "type": "Box",
+            },
+            null,
+          ],
+          "direction": "horizontal",
+        },
+        "type": "Box",
+      },
+      false,
+    ],
+    "direction": "vertical",
+  },
+  "type": "Box",
+}
+`);
     });
 
     it('should throw error for dropdown rule without options', () => {
@@ -710,7 +744,7 @@ describe('rules', () => {
       expect(result[2]).not.toBeNull();
     });
 
-    it('should handle mix of rules with some returning null', () => {
+    it('should handle mix of rules with some returning a field that is toggled to off', () => {
       const rules = [textRule, undefinedValueRule, numberRule];
       const result = renderRules({
         rules,
@@ -720,7 +754,7 @@ describe('rules', () => {
 
       expect(result).toHaveLength(3);
       expect(result[0]).not.toBeNull(); // textRule
-      expect(result[1]).toBeNull(); // undefinedValueRule
+      expect(result[1]).not.toBeNull(); // undefinedValueRule
       expect(result[2]).not.toBeNull(); // numberRule
     });
 
@@ -769,7 +803,7 @@ describe('rules', () => {
         deriveMetadata: mockDeriveMetadata,
       });
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(4); // 3 input handlers + 1 remove button
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(5); // 3 input handlers + 1 toggle on + 1 toggle off
 
       // Check input change handlers
       expect(mockUserEventDispatcher.on).toHaveBeenCalledWith({
@@ -807,7 +841,7 @@ describe('rules', () => {
       });
 
       expect(mockUserEventDispatcher.on).toHaveBeenCalledWith({
-        elementName: 'test-optional-rule_removeButton',
+        elementName: 'test-optional-rule_removeFieldButton',
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: expect.any(Function),
@@ -863,7 +897,8 @@ describe('rules', () => {
 
       // Get the remove button handler
       const onCall = mockUserEventDispatcher.on.mock.calls.find(
-        (call) => call[0].elementName === 'test-optional-rule_removeButton',
+        (call) =>
+          call[0].elementName === 'test-optional-rule_removeFieldButton',
       );
       const handler = onCall?.[0]
         .handler as UserEventHandler<UserInputEventType.ButtonClickEvent>;
@@ -873,7 +908,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         event: {
           type: UserInputEventType.ButtonClickEvent,
-          name: 'test-optional-rule_removeButton',
+          name: 'test-optional-rule_removeFieldButton',
         },
       });
 
@@ -900,7 +935,7 @@ describe('rules', () => {
       // Call unbind
       unbind();
 
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(3); // 2 input handlers + 1 remove button
+      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(4); // 2 input handlers + 1 toggle on + 1 toggle off
 
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
         elementName: 'test-text-rule',
@@ -917,7 +952,7 @@ describe('rules', () => {
       });
 
       expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
-        elementName: 'test-optional-rule_removeButton',
+        elementName: 'test-optional-rule_removeFieldButton',
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId: 'test-interface',
         handler: expect.any(Function),

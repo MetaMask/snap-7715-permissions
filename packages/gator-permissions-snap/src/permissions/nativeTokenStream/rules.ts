@@ -23,6 +23,7 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
   name: INITIAL_AMOUNT_ELEMENT,
   label: 'Initial Amount',
   type: 'number',
+  isOptional: true,
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.initialAmount,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
@@ -47,6 +48,7 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
   name: MAX_AMOUNT_ELEMENT,
   label: 'Max Amount',
   type: 'number',
+  isOptional: true,
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.maxAmount,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
