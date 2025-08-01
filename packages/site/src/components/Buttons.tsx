@@ -84,18 +84,20 @@ export const InstallFlaskButton = () => (
 );
 
 export const ConnectButton = (
-  props: ComponentProps<typeof Button> & { isReconnect?: boolean },
+  props: ComponentProps<typeof Button> & { $isReconnect?: boolean },
 ) => {
   return (
     <Button {...props}>
       <FlaskFox />
-      <ButtonText>{props.isReconnect ? 'Reconnect' : 'Connect'}</ButtonText>
+      <ButtonText>{props.$isReconnect ? 'Reconnect' : 'Connect'}</ButtonText>
     </Button>
   );
 };
 
-export const CustomMessageButton = (props: ComponentProps<typeof Button>) => {
-  return <Button {...props}>{props.text}</Button>;
+export const CustomMessageButton = (
+  props: ComponentProps<typeof Button> & { $text?: string },
+) => {
+  return <Button {...props}>{props.$text}</Button>;
 };
 
 export const HeaderButtons = () => {
@@ -111,7 +113,7 @@ export const HeaderButtons = () => {
   }
 
   if (shouldDisplayReconnectButton(installedSnaps[kernelSnapOrigin])) {
-    return <ConnectButton onClick={requestSnap} isReconnect={true} />;
+    return <ConnectButton onClick={requestSnap} $isReconnect={true} />;
   }
 
   return (

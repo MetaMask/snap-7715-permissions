@@ -12,12 +12,12 @@ type CardProps = {
 };
 
 const CardWrapper = styled.div<{
-  fullWidth?: boolean | undefined;
+  $fullWidth?: boolean | undefined;
   disabled?: boolean | undefined;
 }>`
   display: flex;
   flex-direction: column;
-  width: ${({ fullWidth }) => (fullWidth ? '100%' : '250px')};
+  width: ${({ $fullWidth }) => ($fullWidth ? '100%' : '250px')};
   background-color: ${({ theme }) => theme.colors.card?.default};
   margin-top: 2.4rem;
   margin-bottom: 2.4rem;
@@ -51,7 +51,7 @@ const Description = styled.div`
 export const Card = ({ content, disabled = false, fullWidth }: CardProps) => {
   const { title, description, button } = content;
   return (
-    <CardWrapper fullWidth={fullWidth} disabled={disabled}>
+    <CardWrapper $fullWidth={fullWidth} disabled={disabled}>
       {title && <Title>{title}</Title>}
       <Description>{description}</Description>
       {button}

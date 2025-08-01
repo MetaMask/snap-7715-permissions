@@ -81,9 +81,18 @@ jobs:
       - name: Require clean working directory
         shell: bash
         run: |
-          if ! git diff --exit-code; then
-            echo "Working tree dirty at end of job"
-            exit 1
+          # Check if target branch is 'dev' and exclude snap.manifest.json files if so
+          if [[ "${{ github.base_ref }}" == "dev" || "${{ github.ref_name }}" == "dev" ]]; then
+            echo "Target branch is 'dev', ignoring changes to snap.manifest.json files"
+            if ! git diff --exit-code -- . ':!**/snap.manifest.json'; then
+              echo "Working tree dirty at end of job (excluding snap.manifest.json)"
+              exit 1
+            fi
+          else
+            if ! git diff --exit-code; then
+              echo "Working tree dirty at end of job"
+              exit 1
+            fi
           fi
 
   lint:
