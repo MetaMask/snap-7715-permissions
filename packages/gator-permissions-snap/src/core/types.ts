@@ -51,6 +51,10 @@ export type BaseContext = {
   };
 };
 
+export type BaseMetadata = {
+  validationErrors?: object;
+};
+
 /**
  * Base interface for all permission objects.
  * Each permission type will extend this with their specific permission data.

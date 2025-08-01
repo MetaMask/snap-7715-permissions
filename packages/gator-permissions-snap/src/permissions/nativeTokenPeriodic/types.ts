@@ -10,10 +10,11 @@ import type {
   TypedPermissionRequest,
   BaseContext,
   TimePeriod,
+  BaseMetadata,
 } from '../../core/types';
 import { validateStartTimeZod } from '../../utils/validate';
 
-export type NativeTokenPeriodicMetadata = {
+export type NativeTokenPeriodicMetadata = BaseMetadata & {
   validationErrors: {
     periodAmountError?: string;
     periodDurationError?: string;
