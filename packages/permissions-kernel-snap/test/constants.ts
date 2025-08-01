@@ -3,7 +3,7 @@ import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types
 export const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
   {
     chainId: '0x1',
-    expiry: 1,
+    expiry: Math.floor(Date.now() / 1000) + 3600, // 1 hour in the future
     signer: {
       type: 'account',
       data: {
@@ -23,7 +23,7 @@ export const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
 export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
   {
     chainId: '0x1',
-    expiry: 1,
+    expiry: Math.floor(Date.now() / 1000) + 3600, // 1 hour in the future
     signer: {
       type: 'account',
       data: {
@@ -40,7 +40,7 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
   },
   {
     chainId: '0x1',
-    expiry: 1,
+    expiry: Math.floor(Date.now() / 1000) + 3600, // 1 hour in the future
     signer: {
       type: 'account',
       data: {
@@ -61,7 +61,7 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
 export const MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED: PermissionsRequest = [
   {
     chainId: '0x1',
-    expiry: 1,
+    expiry: Math.floor(Date.now() / 1000) + 3600, // 1 hour in the future
     signer: {
       type: 'account',
       data: {

@@ -3,14 +3,13 @@ import { bigIntToHex } from '@metamask/utils';
 
 import type { Erc20TokenStreamPermissionRequest } from '../../../src/permissions/erc20TokenStream/types';
 import { parseAndValidatePermission } from '../../../src/permissions/erc20TokenStream/validation';
-import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 10;
 
 const validPermissionRequest: Erc20TokenStreamPermissionRequest = {
   chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
+  expiry: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
   isAdjustmentAllowed: true,
   signer: {
     type: 'account',
@@ -30,7 +29,7 @@ const validPermissionRequest: Erc20TokenStreamPermissionRequest = {
       amountPerSecond: bigIntToHex(
         parseUnits({ formatted: '.5', decimals: tokenDecimals }),
       ), // 0.5 tokens per second
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: Math.floor(Date.now() / 1000) + 86400, // Tomorrow
       tokenAddress: '0x1234567890123456789012345678901234567890',
       justification: 'test',
     },
@@ -107,7 +106,7 @@ describe('erc20TokenStream:validation', () => {
     });
 
     describe('initialAmount validation', () => {
-      it('should throw for zero initialAmount', () => {
+      it('should allow zero initialAmount', () => {
         const zeroInitialAmountRequest = {
           ...validPermissionRequest,
           permission: {
@@ -121,7 +120,7 @@ describe('erc20TokenStream:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(zeroInitialAmountRequest),
-        ).toThrow('Invalid initialAmount: must be greater than 0');
+        ).not.toThrow();
       });
 
       it('should allow missing initialAmount', () => {
@@ -176,7 +175,9 @@ describe('erc20TokenStream:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(negativeStartTimeRequest),
-        ).toThrow('Invalid startTime: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
+        );
       });
 
       it('should throw for zero startTime', () => {
@@ -192,7 +193,7 @@ describe('erc20TokenStream:validation', () => {
         };
 
         expect(() => parseAndValidatePermission(zeroStartTimeRequest)).toThrow(
-          'Invalid startTime: must be a positive number',
+          'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
         );
       });
 
@@ -203,14 +204,73 @@ describe('erc20TokenStream:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              startTime: 1.5,
+              startTime: Math.floor(Date.now() / 1000) + 86400 + 0.5, // Tomorrow + 0.5 seconds
             },
           },
         };
 
         expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
-          'Invalid startTime: must be an integer',
+          'Failed type validation: data.startTime: Expected integer, received float',
         );
+      });
+    });
+
+    describe('startTime vs expiry validation', () => {
+      it('should throw when startTime is equal to expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const startTimeVsExpiryRequest = {
+          ...validPermissionRequest,
+          expiry: currentTime + 86400, // 1 day from now
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400, // Same as expiry
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(startTimeVsExpiryRequest),
+        ).toThrow('Invalid startTime: must be before expiry');
+      });
+
+      it('should throw when startTime is after expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const startTimeAfterExpiryRequest = {
+          ...validPermissionRequest,
+          expiry: currentTime + 86400, // 1 day from now
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400 * 2, // 2 days from now (after expiry)
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(startTimeAfterExpiryRequest),
+        ).toThrow('Invalid startTime: must be before expiry');
+      });
+
+      it('should validate when startTime is before expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const validStartTimeVsExpiryRequest = {
+          ...validPermissionRequest,
+          expiry: currentTime + 86400 * 2, // 2 days from now
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400, // 1 day from now (before expiry)
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(validStartTimeVsExpiryRequest),
+        ).not.toThrow();
       });
     });
 
@@ -230,7 +290,7 @@ describe('erc20TokenStream:validation', () => {
         expect(() =>
           parseAndValidatePermission(invalidTokenAddressRequest),
         ).toThrow(
-          'Failed type validation: data.tokenAddress: Invalid hex value',
+          'Failed type validation: data.tokenAddress: Invalid Ethereum address',
         );
       });
 

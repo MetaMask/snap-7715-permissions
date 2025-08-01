@@ -16,6 +16,7 @@ import {
   validateExpiry,
   validateMaxAmountVsInitialAmount,
   calculateAmountPerSecond,
+  validateStartTimeVsExpiry,
 } from '../contextValidation';
 import type {
   Erc20TokenStreamContext,
@@ -100,6 +101,7 @@ export async function populatePermission({
       ...permission.data,
       initialAmount: permission.data.initialAmount ?? DEFAULT_INITIAL_AMOUNT,
       maxAmount: permission.data.maxAmount ?? DEFAULT_MAX_AMOUNT,
+      startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
     },
     rules: permission.rules ?? {},
   };
@@ -185,7 +187,8 @@ export async function buildContext({
   });
 
   const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
+    permissionRequest.permission.data.startTime ??
+      Math.floor(Date.now() / 1000),
   );
 
   const balance = bigIntToHex(rawBalance);
@@ -282,6 +285,17 @@ export async function deriveMetadata({
   const expiryError = validateExpiry(expiry);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
+  }
+
+  // Validate start time vs expiry (only if individual validations passed)
+  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+    const startTimeVsExpiryError = validateStartTimeVsExpiry(
+      permissionDetails.startTime,
+      expiry,
+    );
+    if (startTimeVsExpiryError) {
+      validationErrors.startTimeError = startTimeVsExpiryError;
+    }
   }
 
   // Validate max amount vs initial amount

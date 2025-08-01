@@ -124,6 +124,31 @@ describe('nativeTokenStream:context', () => {
 
       expect(populatedPermission).toStrictEqual(permission);
     });
+
+    it('should set startTime to current timestamp when it is null', async () => {
+      const beforeTime = Math.floor(Date.now() / 1000);
+
+      const permission: NativeTokenStreamPermission = {
+        type: 'native-token-stream',
+        data: {
+          initialAmount: '0x1000000000000000000000000000000000000000',
+          maxAmount: '0x1000000000000000000000000000000000000000',
+          amountPerSecond: '0x1000000000000000000000000000000000000000',
+          startTime: null,
+          justification: 'Permission to do something important',
+        },
+        rules: {},
+      };
+
+      const populatedPermission = await populatePermission({ permission });
+
+      const afterTime = Math.floor(Date.now() / 1000);
+
+      expect(populatedPermission.data.startTime).toBeGreaterThanOrEqual(
+        beforeTime,
+      );
+      expect(populatedPermission.data.startTime).toBeLessThanOrEqual(afterTime);
+    });
   });
 
   describe('permissionRequestToContext()', () => {
