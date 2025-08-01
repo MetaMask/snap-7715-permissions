@@ -10,10 +10,11 @@ import type {
   TimePeriod,
   TypedPermissionRequest,
   BaseContext,
+  BaseMetadata,
 } from '../../core/types';
 import { validateStartTimeZod } from '../../utils/validate';
 
-export type NativeTokenStreamMetadata = {
+export type NativeTokenStreamMetadata = BaseMetadata & {
   amountPerSecond: string;
   validationErrors: {
     initialAmountError?: string;
