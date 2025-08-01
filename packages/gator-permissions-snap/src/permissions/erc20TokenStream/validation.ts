@@ -14,8 +14,11 @@ import { zErc20TokenStreamPermission } from './types';
  * @returns True if the permission data is valid, throws an error otherwise.
  * @throws {Error} If any validation check fails.
  */
-function validatePermissionData(permission: Erc20TokenStreamPermission): true {
-  const { initialAmount, maxAmount, amountPerSecond } = permission.data;
+function validatePermissionData(
+  permission: Erc20TokenStreamPermission,
+  expiry: number,
+): true {
+  const { initialAmount, maxAmount, amountPerSecond, startTime } = permission.data;
 
   validateHexInteger({
     name: 'maxAmount',
@@ -42,6 +45,12 @@ function validatePermissionData(permission: Erc20TokenStreamPermission): true {
     throw new Error('Invalid maxAmount: must be greater than initialAmount');
   }
 
+  const timeToValidate = startTime ? startTime : Math.floor(Date.now() / 1000);
+
+  if (timeToValidate >= expiry) {
+    throw new Error('Invalid startTime: must be before expiry');
+  }
+
   return true;
 }
 
@@ -64,7 +73,7 @@ export function parseAndValidatePermission(
     throw new Error(extractZodError(validationError.errors));
   }
 
-  validatePermissionData(validationResult);
+  validatePermissionData(validationResult, permissionRequest.expiry);
 
   return {
     ...permissionRequest,

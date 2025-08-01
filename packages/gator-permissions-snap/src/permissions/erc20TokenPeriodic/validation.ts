@@ -16,8 +16,9 @@ import { zErc20TokenPeriodicPermission } from './types';
  */
 function validatePermissionData(
   permission: Erc20TokenPeriodicPermission,
+  expiry: number,
 ): true {
-  const { periodAmount } = permission.data;
+  const { periodAmount, startTime } = permission.data;
 
   validateHexInteger({
     name: 'periodAmount',
@@ -25,6 +26,12 @@ function validatePermissionData(
     required: true,
     allowZero: false,
   });
+
+  const timeToValidate = startTime ? startTime : Math.floor(Date.now() / 1000);
+
+  if (timeToValidate >= expiry) {
+    throw new Error('Invalid startTime: must be before expiry');
+  }
 
   return true;
 }
@@ -48,7 +55,7 @@ export function parseAndValidatePermission(
     throw new Error(extractZodError(validationError.errors));
   }
 
-  validatePermissionData(validationResult);
+  validatePermissionData(validationResult, permissionRequest.expiry);
 
   return {
     ...permissionRequest,
