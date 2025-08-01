@@ -38,7 +38,7 @@ export async function createPermissionCaveats({
   const exactCalldataCaveat: Caveat = {
     enforcer: contracts.enforcers.ExactCalldataEnforcer,
     terms: createExactCalldataTerms({
-      callData: '0x',
+      calldata: '0x',
     }),
     args: '0x',
   };
