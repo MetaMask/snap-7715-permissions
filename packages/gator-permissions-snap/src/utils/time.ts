@@ -58,6 +58,7 @@ export const convertReadableDateToTimestamp = (date: string) => {
     numericValue > 0 &&
     Number.isInteger(numericValue)
   ) {
+    // Validate that the timestamp represents a reasonable date (1/1/2000)
     if (numericValue < 1262304000) {
       throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
     }
@@ -78,17 +79,15 @@ export const convertReadableDateToTimestamp = (date: string) => {
     throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
   }
 
-  const monthStr = parts[0];
-  const dayStr = parts[1];
-  const yearStr = parts[2];
+  const [monthStr, dayStr, yearStr] = parts;
 
   if (!monthStr || !dayStr || !yearStr) {
     throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
   }
 
-  const month = parseInt(monthStr.trim(), 10);
-  const day = parseInt(dayStr.trim(), 10);
-  const year = parseInt(yearStr.trim(), 10);
+  const month = parseInt(monthStr, 10);
+  const day = parseInt(dayStr, 10);
+  const year = parseInt(yearStr, 10);
 
   // Validate that all parts are valid numbers
   if (isNaN(month) || isNaN(day) || isNaN(year)) {

@@ -104,7 +104,7 @@ export const startTimeRule: RuleDefinition<
     value: context.permissionDetails.startTime,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The start time of the stream(mm/dd/yyyy hh:mm:ss).',
+    tooltip: 'The time at which the first period begins(mm/dd/yyyy hh:mm:ss).',
     error: metadata.validationErrors.startTimeError,
     dateTimeParameterNames: {
       timestampName: 'permissionDetails.startTime',

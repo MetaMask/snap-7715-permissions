@@ -215,7 +215,6 @@ export function bindRuleHandlers<
       const isDateField = fieldName.endsWith('_date');
       const isTimeField = fieldName.endsWith('_time');
 
-      // Fix race condition: Get context once and reuse it
       const context = getContext();
       const metadata = await deriveMetadata({ context });
 
