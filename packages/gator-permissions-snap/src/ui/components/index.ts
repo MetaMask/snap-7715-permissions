@@ -1,4 +1,3 @@
-export { AccountDetails } from './AccountDetails';
 export { DropdownField } from './DropdownField';
 export { InputField } from './InputField';
 export { ShowMoreText } from './ShowMoreText';

@@ -1,5 +1,4 @@
 import { describe, expect, it } from '@jest/globals';
-import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { createConfirmationContent } from '../../../src/permissions/nativeTokenPeriodic/content';
@@ -8,17 +7,14 @@ import type {
   NativeTokenPeriodicMetadata,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
-import { parseUnits } from '../../../src/utils/value';
 
 const mockContext: NativeTokenPeriodicContext = {
   expiry: '05/01/2024',
   isAdjustmentAllowed: true,
   justification: 'Permission to do periodic native token transfers',
-  accountDetails: {
-    address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
-    balanceFormattedAsCurrency: '$🐊10.00',
-  },
+  accountAddressCaip10: 'eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+  tokenAddressCaip19:
+    'eip155:1/erc20:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
   tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,
@@ -49,108 +45,6 @@ describe('nativeTokenPeriodic:content', () => {
   "key": null,
   "props": {
     "children": [
-      {
-        "key": null,
-        "props": {
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Transfer from",
-                            },
-                            "type": "Text",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "color": "muted",
-                                  "name": "question",
-                                  "size": "inherit",
-                                },
-                                "type": "Icon",
-                              },
-                              "content": {
-                                "key": null,
-                                "props": {
-                                  "children": "The account that the token transfers come from.",
-                                },
-                                "type": "Text",
-                              },
-                            },
-                            "type": "Tooltip",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "chainIds": [
-                      "eip155:1",
-                    ],
-                    "switchGlobalAccount": false,
-                    "value": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                  },
-                  "type": "AccountSelector",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "end",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": "$🐊10.00",
-                          "color": "muted",
-                        },
-                        "type": "Text",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {},
-                            "type": "Skeleton",
-                          },
-                          "color": "alternative",
-                        },
-                        "type": "Text",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-              ],
-              "direction": "vertical",
-            },
-            "type": "Box",
-          },
-        },
-        "type": "Section",
-      },
       {
         "key": null,
         "props": {
@@ -513,108 +407,6 @@ describe('nativeTokenPeriodic:content', () => {
   "key": null,
   "props": {
     "children": [
-      {
-        "key": null,
-        "props": {
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "Transfer from",
-                            },
-                            "type": "Text",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "color": "muted",
-                                  "name": "question",
-                                  "size": "inherit",
-                                },
-                                "type": "Icon",
-                              },
-                              "content": {
-                                "key": null,
-                                "props": {
-                                  "children": "The account that the token transfers come from.",
-                                },
-                                "type": "Text",
-                              },
-                            },
-                            "type": "Tooltip",
-                          },
-                        ],
-                        "direction": "horizontal",
-                      },
-                      "type": "Box",
-                    },
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "chainIds": [
-                      "eip155:1",
-                    ],
-                    "switchGlobalAccount": false,
-                    "value": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                  },
-                  "type": "AccountSelector",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "end",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": "$🐊10.00",
-                          "color": "muted",
-                        },
-                        "type": "Text",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {},
-                            "type": "Skeleton",
-                          },
-                          "color": "alternative",
-                        },
-                        "type": "Text",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-              ],
-              "direction": "vertical",
-            },
-            "type": "Box",
-          },
-        },
-        "type": "Section",
-      },
       {
         "key": null,
         "props": {

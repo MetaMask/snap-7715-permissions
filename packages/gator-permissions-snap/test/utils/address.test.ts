@@ -1,11 +1,12 @@
+import type { CaipAssetType, Hex } from '@metamask/utils';
+
+import { ZERO_ADDRESS } from '../../src/constants';
+import type { Caip10Address } from '../../src/core/types';
 import {
   fromCaip10Address,
   toCaip10Address,
   fromCaip19Address,
 } from '../../src/utils/address';
-import type { CaipAssetType, Hex } from '@metamask/utils';
-import { Caip10Address } from '../../src/core/types';
-import { ZERO_ADDRESS } from '../../src/constants';
 
 describe('address utils', () => {
   describe('fromCaip10Address', () => {
@@ -23,7 +24,7 @@ describe('address utils', () => {
         { chain: 'eip155', chainId: 10, address: '0xabc' as Hex },
       ],
     ])('parses valid CAIP-10 address "%s" to %o', (input, expected) => {
-      expect(fromCaip10Address(input as Caip10Address)).toEqual(expected);
+      expect(fromCaip10Address(input as Caip10Address)).toStrictEqual(expected);
     });
 
     it.each(['bip:1:0x123', 'eip155:1', 'eip155', ':1:0x123'])(
@@ -70,7 +71,7 @@ describe('address utils', () => {
         },
       ],
     ])('parses valid CAIP-19 address "%s" to %o', (input, expected) => {
-      expect(fromCaip19Address(input as CaipAssetType)).toEqual(expected);
+      expect(fromCaip19Address(input as CaipAssetType)).toStrictEqual(expected);
     });
 
     it.each([

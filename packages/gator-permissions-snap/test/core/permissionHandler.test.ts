@@ -1,14 +1,11 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import { UserInputEventType } from '@metamask/snaps-sdk';
+import type { TokenBalanceAndMetadata } from 'src/clients/types';
+
 import type { AccountController } from '../../src/accountController';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
-import type { TokenMetadataService } from '../../src/services/tokenMetadataService';
-import type { TokenPricesService } from '../../src/services/tokenPricesService';
-import type {
-  UserEventDispatcher,
-  UserEventHandler,
-} from '../../src/userEventDispatcher';
 import type {
   BaseContext,
   DeepRequired,
@@ -16,8 +13,12 @@ import type {
   PermissionHandlerDependencies,
   RuleDefinition,
 } from '../../src/core/types';
-import { UserInputEventType } from '@metamask/snaps-sdk';
-import { TokenBalanceAndMetadata } from 'src/clients/types';
+import type { TokenMetadataService } from '../../src/services/tokenMetadataService';
+import type { TokenPricesService } from '../../src/services/tokenPricesService';
+import type {
+  UserEventDispatcher,
+  UserEventHandler,
+} from '../../src/userEventDispatcher';
 
 const mockAddress = '0x1234567890123456789012345678901234567890' as const;
 const mockAddress2 = '0x1234567890123456789012345678901234567891' as const;
@@ -26,9 +27,9 @@ const mockInterfaceId = 'test-interface-id';
 const mockOrigin = 'https://example.com';
 const mockTokenBalanceFiat = '$1000';
 
-type TestRequestType = PermissionRequest & {};
-type TestContextType = BaseContext & {};
-type TestMetadataType = {};
+type TestRequestType = PermissionRequest;
+type TestContextType = BaseContext;
+type TestMetadataType = object;
 type TestPermissionType = TestRequestType['permission'];
 type TestPopulatedPermissionType = DeepRequired<TestPermissionType>;
 type TestLifecycleHandlersType = LifecycleOrchestrationHandlers<
@@ -81,6 +82,8 @@ const mockMetadata: TestMetadataType = {};
 const setupDependencies = () => {
   const title = 'Test permission';
 
+  const boundEvents = new Map<string, UserEventHandler<UserInputEventType>>();
+
   const bindEvent = ({
     elementName,
     eventType,
@@ -109,7 +112,6 @@ const setupDependencies = () => {
     signDelegation: jest.fn(),
     getAccountAddresses: jest.fn(),
   } as unknown as jest.Mocked<AccountController>;
-  const boundEvents = new Map<string, UserEventHandler<UserInputEventType>>();
 
   const userEventDispatcher = {
     on: jest.fn(bindEvent),
@@ -139,12 +141,12 @@ const setupDependencies = () => {
     >
   >;
   const tokenPricesService = {
-    getCryptoToFiatConversion: jest.fn(() =>
+    getCryptoToFiatConversion: jest.fn(async () =>
       Promise.resolve(mockTokenBalanceFiat),
     ),
   } as unknown as jest.Mocked<TokenPricesService>;
   const tokenMetadataService = {
-    getTokenBalanceAndMetadata: jest.fn(() =>
+    getTokenBalanceAndMetadata: jest.fn(async () =>
       Promise.resolve(mockTokenBalanceAndMetadata),
     ),
     fetchIconDataAsBase64: jest.fn(),
@@ -162,6 +164,16 @@ const setupDependencies = () => {
     tokenMetadataService,
     rules,
   };
+};
+
+const getLifecycleHandlersFromOrchestrator = (
+  orchestrator: jest.Mocked<PermissionRequestLifecycleOrchestrator>,
+) => {
+  const call = orchestrator.orchestrate.mock.calls[0];
+  if (!call) {
+    throw new Error('No call found');
+  }
+  return call[2] as TestLifecycleHandlersType;
 };
 
 describe('PermissionHandler', () => {
@@ -195,8 +207,9 @@ describe('PermissionHandler', () => {
 
       expect(setup.orchestrator.orchestrate).toHaveBeenCalledTimes(1);
 
-      const lifecycleHandlers =
-        setup.orchestrator.orchestrate.mock.calls[0]![2];
+      const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
+        setup.orchestrator,
+      );
 
       expect(lifecycleHandlers).toHaveProperty('parseAndValidatePermission');
       expect(lifecycleHandlers).toHaveProperty('applyContext');
@@ -249,8 +262,9 @@ describe('PermissionHandler', () => {
 
         await handler.handlePermissionRequest(mockOrigin);
 
-        const lifecycleHandlers =
-          setup.orchestrator.orchestrate.mock.calls[0]![2];
+        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
+          setup.orchestrator,
+        );
 
         await lifecycleHandlers.createConfirmationContent({
           context: mockContext,
@@ -273,8 +287,9 @@ describe('PermissionHandler', () => {
 
         await handler.handlePermissionRequest(mockOrigin);
 
-        const lifecycleHandlers =
-          setup.orchestrator.orchestrate.mock.calls[0]![2];
+        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
+          setup.orchestrator,
+        );
 
         const result = await lifecycleHandlers.createConfirmationContent({
           context: mockContext,
@@ -289,13 +304,6 @@ describe('PermissionHandler', () => {
     });
 
     describe('onConfirmationCreated', () => {
-      const getLifecycleHandlersFromOrchestrator = (
-        orchestrator: jest.Mocked<PermissionRequestLifecycleOrchestrator>,
-      ) => {
-        return orchestrator.orchestrate.mock
-          .calls[0]![2] as TestLifecycleHandlersType;
-      };
-
       it('registers event handlers for account selection and justification toggle', async () => {
         const setup = setupDependencies();
         const handler = new PermissionHandler(setup);
@@ -351,7 +359,7 @@ describe('PermissionHandler', () => {
           setup.orchestrator,
         );
 
-        await lifecycleHandlers.onConfirmationCreated?.({
+        lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
@@ -381,7 +389,7 @@ describe('PermissionHandler', () => {
           setup.orchestrator,
         );
 
-        await lifecycleHandlers.onConfirmationCreated?.({
+        lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
@@ -431,7 +439,7 @@ describe('PermissionHandler', () => {
           setup.orchestrator,
         );
 
-        await lifecycleHandlers.onConfirmationCreated?.({
+        lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
@@ -484,7 +492,7 @@ describe('PermissionHandler', () => {
           setup.orchestrator,
         );
 
-        await lifecycleHandlers.onConfirmationCreated?.({
+        lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
@@ -883,20 +891,13 @@ describe('PermissionHandler', () => {
                         "children": [
                           {
                             "key": null,
-                            "props": {
-                              "children": "$1000",
-                            },
-                            "type": "Text",
+                            "props": {},
+                            "type": "Skeleton",
                           },
                           {
                             "key": null,
-                            "props": {
-                              "children": [
-                                "1",
-                                " available",
-                              ],
-                            },
-                            "type": "Text",
+                            "props": {},
+                            "type": "Skeleton",
                           },
                         ],
                         "direction": "horizontal",
@@ -938,7 +939,7 @@ describe('PermissionHandler', () => {
           setup.orchestrator,
         );
 
-        await lifecycleHandlers.onConfirmationCreated?.({
+        lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
@@ -1409,7 +1410,9 @@ describe('PermissionHandler', () => {
             (args: { updatedContext: TestContextType }) => Promise<void>
           >();
 
-        let resolveTokenBalancePromise: () => void = () => {};
+        let resolveTokenBalancePromise: () => void = () => {
+          throw new Error('Function should never be called');
+        };
         const tokenBalancePromise = new Promise<TokenBalanceAndMetadata>(
           (resolve) => {
             resolveTokenBalancePromise = () =>
@@ -1421,7 +1424,9 @@ describe('PermissionHandler', () => {
           tokenBalancePromise,
         );
 
-        let resolveFiatBalancePromise: () => void = () => {};
+        let resolveFiatBalancePromise: () => void = () => {
+          throw new Error('Function should never be called');
+        };
         const fiatBalancePromise = new Promise<string>((resolve) => {
           resolveFiatBalancePromise = () => resolve(mockTokenBalanceFiat);
         });
@@ -1436,7 +1441,7 @@ describe('PermissionHandler', () => {
           setup.orchestrator,
         );
 
-        await lifecycleHandlers.onConfirmationCreated?.({
+        lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
@@ -2764,7 +2769,9 @@ describe('PermissionHandler', () => {
             (args: { updatedContext: TestContextType }) => Promise<void>
           >();
 
-        let resolveTokenBalancePromise: () => void = () => {};
+        let resolveTokenBalancePromise: () => void = () => {
+          throw new Error('Function should never be called');
+        };
         const tokenBalancePromise = new Promise<TokenBalanceAndMetadata>(
           (resolve) => {
             resolveTokenBalancePromise = () =>
@@ -2784,7 +2791,7 @@ describe('PermissionHandler', () => {
           setup.orchestrator,
         );
 
-        await lifecycleHandlers.onConfirmationCreated?.({
+        lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
@@ -2810,7 +2817,7 @@ describe('PermissionHandler', () => {
         });
 
         resolveTokenBalancePromise();
-        await new Promise((resolve) => setImmediate(resolve));
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         // update context is called 3 times:
         // 1. After the account is changed
@@ -2819,7 +2826,7 @@ describe('PermissionHandler', () => {
         // if we didn't cancel the original balance loading, there would be another 2 instances
         // 4. After the original token balance is resolved for the first account
         // 5. After the original fiat balance is resolved for the first account
-        expect(updateContext).toBeCalledTimes(3);
+        expect(updateContext).toHaveBeenCalledTimes(3);
       });
     });
   });

@@ -27,11 +27,9 @@ const mockContext: TestContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
-  accountDetails: {
-    address: '0x1234567890123456789012345678901234567890',
-    balanceFormattedAsCurrency: '10 ETH',
-    balance: '0xa',
-  },
+  accountAddressCaip10: 'eip155:1:0x1234567890123456789012345678901234567890',
+  tokenAddressCaip19:
+    'eip155:1/erc20:0x1234567890123456789012345678901234567890',
   tokenMetadata: {
     decimals: 18,
     symbol: 'ETH',

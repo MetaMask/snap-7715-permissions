@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
+import { bigIntToHex } from '@metamask/utils';
 
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
@@ -28,7 +29,7 @@ import type {
   Caip10Address,
   AccountControllerInterface,
 } from './types';
-import { bigIntToHex } from '@metamask/utils';
+import { logger } from '../../../shared/src/utils/logger';
 import { fromCaip10Address, fromCaip19Address } from '../utils/address';
 import { formatUnits } from '../utils/value';
 
@@ -155,7 +156,7 @@ export class PermissionHandler<
         throw new Error('No addresses found');
       }
 
-      let caip10Address: Caip10Address | undefined = undefined;
+      let caip10Address: Caip10Address | undefined;
 
       if (requestedAddress === undefined) {
         // use the first address available for the account
@@ -244,10 +245,12 @@ export class PermissionHandler<
         await updateContext({ updatedContext: currentContext });
       };
 
-      // loadBalanceCounter is used to cancel any previously executed instances of this function.
-      let loadBalanceCallCounter = 0;
-      const loadBalance = async (context: TContext) => {
-        const currentLoadBalanceCounter = ++loadBalanceCallCounter;
+      // fetchAccountBalanceCallCounter is used to cancel any previously executed instances of this function.
+      let fetchAccountBalanceCallCounter = 0;
+      const fetchAccountBalance = async (context: TContext) => {
+        fetchAccountBalanceCallCounter += 1;
+        const currentFetchAccountBalanceCallCounter =
+          fetchAccountBalanceCallCounter;
 
         const { address } = fromCaip10Address(context.accountAddressCaip10);
 
@@ -262,10 +265,13 @@ export class PermissionHandler<
             assetAddress,
           });
 
-        if (currentLoadBalanceCounter === loadBalanceCallCounter) {
+        if (
+          currentFetchAccountBalanceCallCounter ===
+          fetchAccountBalanceCallCounter
+        ) {
           this.#tokenBalance = formatUnits({ value: balance, decimals });
 
-          rerender();
+          rerender().catch((error) => logger.error(error));
 
           const fiatBalance =
             await this.#tokenPricesService.getCryptoToFiatConversion(
@@ -274,14 +280,18 @@ export class PermissionHandler<
               initialContext.tokenMetadata.decimals,
             );
 
-          if (currentLoadBalanceCounter === loadBalanceCallCounter) {
+          if (
+            currentFetchAccountBalanceCallCounter ===
+            fetchAccountBalanceCallCounter
+          ) {
             this.#tokenBalanceFiat = fiatBalance;
-            rerender();
+            rerender().catch((error) => logger.error(error));
           }
         }
       };
 
-      loadBalance(currentContext);
+      // we explicitly don't await this as it's a background process that will re-render the UI (twice) once it is complete
+      fetchAccountBalance(currentContext).catch(console.error);
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
@@ -307,7 +317,8 @@ export class PermissionHandler<
         this.#tokenBalance = undefined;
         this.#tokenBalanceFiat = undefined;
 
-        loadBalance(currentContext);
+        // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
+        fetchAccountBalance(currentContext).catch(console.error);
 
         await rerender();
       };

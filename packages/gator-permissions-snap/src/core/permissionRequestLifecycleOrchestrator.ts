@@ -11,11 +11,11 @@ import {
 } from '@metamask/delegation-core';
 import { bytesToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
-import type { AccountController } from '../accountController';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
+  AccountControllerInterface,
   BaseContext,
   BaseMetadata,
   DeepRequired,
@@ -28,7 +28,7 @@ import type {
  * Orchestrates the lifecycle of permission requests, confirmation dialogs, and delegation creation.
  */
 export class PermissionRequestLifecycleOrchestrator {
-  readonly #accountController: AccountController;
+  readonly #accountController: AccountControllerInterface;
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
@@ -39,7 +39,7 @@ export class PermissionRequestLifecycleOrchestrator {
     confirmationDialogFactory,
     userEventDispatcher,
   }: {
-    accountController: AccountController;
+    accountController: AccountControllerInterface;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
   }) {
@@ -72,6 +72,14 @@ export class PermissionRequestLifecycleOrchestrator {
       TPopulatedPermission
     >,
   ): Promise<PermissionRequestResult> {
+    const chainId = hexToNumber(permissionRequest.chainId);
+
+    // only necessary when not pre-installed, to ensure that the account
+    // permissions are requested before the confirmation dialog is shown.
+    await this.#accountController.getAccountAddresses({
+      chainId,
+    });
+
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);
 
@@ -83,10 +91,8 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    const decision =
+    const decisionPromise =
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
-
-    const chainId = hexToNumber(permissionRequest.chainId);
 
     let context = await lifecycleHandlers.buildContext(
       validatedPermissionRequest,
@@ -152,7 +158,7 @@ export class PermissionRequestLifecycleOrchestrator {
     }
 
     try {
-      const { isConfirmationGranted } = await decision;
+      const { isConfirmationGranted } = await decisionPromise;
 
       if (isConfirmationGranted) {
         // Wait for any pending context updates to complete before granting permission

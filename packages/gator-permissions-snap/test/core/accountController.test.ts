@@ -98,50 +98,6 @@ describe('AccountController', () => {
     });
   });
 
-  describe('getAccountAddress()', () => {
-    it('should get the account address', async () => {
-      const address = await accountController.getAccountAddress({
-        chainId: sepolia,
-      });
-
-      expect(address).toBe(mockAddress);
-      expect(mockEthereumProvider.request).toHaveBeenCalledWith({
-        method: 'eth_requestAccounts',
-      });
-    });
-
-    it('should cache the account address', async () => {
-      await accountController.getAccountAddress({
-        chainId: sepolia,
-      });
-      await accountController.getAccountAddress({
-        chainId: sepolia,
-      });
-
-      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(1);
-    });
-
-    it('should reject if no accounts are found', async () => {
-      mockEthereumProvider.request.mockResolvedValueOnce([]);
-
-      await expect(
-        accountController.getAccountAddress({
-          chainId: sepolia,
-        }),
-      ).rejects.toThrow('No accounts found');
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getAccountAddress({
-          chainId: invalidChainId,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
-    });
-  });
-
   describe('signDelegation()', () => {
     const unsignedDelegation: Omit<Delegation, 'signature'> = {
       delegate: '0x1234567890abcdef1234567890abcdef12345678',
@@ -155,6 +111,7 @@ describe('AccountController', () => {
       const signedDelegation = await accountController.signDelegation({
         chainId: sepolia,
         delegation: unsignedDelegation,
+        address: mockAddress,
       });
 
       expect(signedDelegation).toStrictEqual({
@@ -165,20 +122,30 @@ describe('AccountController', () => {
       expect(signedDelegation.signature).toStrictEqual(mockSignature);
     });
 
-    it('should reject if chain ID does not match', async () => {
-      mockEthereumProvider.request.mockResolvedValueOnce([mockAddress]);
+    it('should switch chain if chain ID does not match', async () => {
       mockEthereumProvider.request.mockResolvedValueOnce('0x1'); // Different chain ID
+      mockEthereumProvider.request.mockResolvedValueOnce('OK'); // switch chain
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // correct chain ID
+      mockEthereumProvider.request.mockResolvedValueOnce(mockSignature); // signature
 
-      await expect(
-        accountController.signDelegation({
-          chainId: sepolia,
-          delegation: unsignedDelegation,
-        }),
-      ).rejects.toThrow('Selected chain does not match the requested chain');
+      const signature = await accountController.signDelegation({
+        chainId: sepolia,
+        delegation: unsignedDelegation,
+        address: mockAddress,
+      });
+
+      expect(signature).toStrictEqual({
+        ...unsignedDelegation,
+        signature: mockSignature,
+      });
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledWith({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: mockChainId }],
+      });
     });
 
     it('should reject if signing fails', async () => {
-      mockEthereumProvider.request.mockResolvedValueOnce([mockAddress]);
       mockEthereumProvider.request.mockResolvedValueOnce(mockChainId);
       mockEthereumProvider.request.mockResolvedValueOnce(null); // Failed signature
 
@@ -186,6 +153,7 @@ describe('AccountController', () => {
         accountController.signDelegation({
           chainId: sepolia,
           delegation: unsignedDelegation,
+          address: mockAddress,
         }),
       ).rejects.toThrow('Failed to sign delegation');
     });
@@ -197,6 +165,7 @@ describe('AccountController', () => {
         accountController.signDelegation({
           chainId: invalidChainId,
           delegation: unsignedDelegation,
+          address: mockAddress,
         }),
       ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
@@ -205,6 +174,7 @@ describe('AccountController', () => {
       await accountController.signDelegation({
         chainId: sepolia,
         delegation: unsignedDelegation,
+        address: mockAddress,
       });
 
       expect(mockEthereumProvider.request).toHaveBeenCalledWith({
@@ -272,29 +242,6 @@ describe('AccountController', () => {
           },
         ],
       });
-    });
-  });
-
-  describe('getAccountMetadata()', () => {
-    it('should return empty metadata for EOA accounts', async () => {
-      const metadata = await accountController.getAccountMetadata({
-        chainId: sepolia,
-      });
-
-      expect(metadata).toStrictEqual({
-        factory: undefined,
-        factoryData: undefined,
-      });
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.getAccountMetadata({
-          chainId: invalidChainId,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
   });
 });

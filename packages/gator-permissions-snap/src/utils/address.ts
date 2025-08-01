@@ -1,6 +1,7 @@
 import type { CaipAssetType, Hex } from '@metamask/utils';
-import { Caip10Address } from '../core/types';
+
 import { ZERO_ADDRESS } from '../constants';
+import type { Caip10Address } from '../core/types';
 
 /**
  * Parses a CAIP-10 address string into its components.
@@ -24,6 +25,9 @@ export const fromCaip10Address = (caip10Address: Caip10Address) => {
 /**
  * Constructs a CAIP-10 address string from its components.
  * @param options - Object with chain (optional, defaults to 'eip155'), chainId (number), and address (Hex).
+ * @param options.chain - The chain of the address.
+ * @param options.chainId - The chain ID of the address.
+ * @param options.address - The address.
  * @returns The CAIP-10 address string.
  */
 export const toCaip10Address = ({
@@ -56,7 +60,10 @@ export const fromCaip19Address = (caip19Address: CaipAssetType) => {
     throw new Error('Invalid address');
   }
 
-  let [assetType, assetAddress] = secondHalf.split(':');
+  const parts = secondHalf.split(':');
+  const [assetType] = parts;
+  let [, assetAddress] = parts;
+
   if (assetType === undefined || assetAddress === undefined) {
     throw new Error('Invalid address');
   }

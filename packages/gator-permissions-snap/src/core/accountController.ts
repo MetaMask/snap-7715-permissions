@@ -101,7 +101,7 @@ export class AccountController implements AccountControllerInterface {
       throw new Error('No accounts found');
     }
 
-    const caip10Addresses = accounts.reduce((acc, account) => {
+    const caip10Addresses = accounts.reduce<Caip10Address[]>((acc, account) => {
       if (account) {
         acc.push(
           toCaip10Address({
@@ -111,7 +111,7 @@ export class AccountController implements AccountControllerInterface {
         );
       }
       return acc;
-    }, [] as Caip10Address[]);
+    }, []);
 
     if (caip10Addresses.length === 0) {
       throw new Error('No accounts found');

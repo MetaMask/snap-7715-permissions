@@ -94,8 +94,6 @@ export async function populatePermission({
  * and manage the permission state.
  * @param args - The options object containing the request and required services.
  * @param args.permissionRequest - The ERC20 token periodic permission request to convert.
- * @param args.tokenPricesService - Service for fetching token price information.
- * @param args.accountController - Controller for managing account operations.
  * @param args.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
