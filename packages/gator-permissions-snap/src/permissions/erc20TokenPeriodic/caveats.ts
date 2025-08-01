@@ -30,7 +30,7 @@ export async function createPermissionCaveats({
       tokenAddress,
       periodAmount: BigInt(periodAmount),
       periodDuration,
-      startDate: startTime ?? Math.floor(Date.now() / 1000), // Fallback - should never happen at this point.
+      startDate: startTime,
     }),
     args: '0x',
   };

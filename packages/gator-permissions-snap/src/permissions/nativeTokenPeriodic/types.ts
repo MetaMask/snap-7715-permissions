@@ -28,7 +28,7 @@ export type NativeTokenPeriodicContext = BaseContext & {
     periodAmount: string;
     periodType: TimePeriod | 'Other';
     periodDuration: string;
-    startTime: string | undefined;
+    startTime: string;
   };
 };
 
@@ -42,6 +42,7 @@ export const zNativeTokenPeriodicPermission = zPermission.extend({
       startTime: z
         .number()
         .int()
+        .positive()
         .nullable()
         .optional()
         .refine(

@@ -67,9 +67,7 @@ export async function applyContext({
         decimals,
       }) / TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
-    startTime: permissionDetails.startTime
-      ? convertReadableDateToTimestamp(permissionDetails.startTime)
-      : undefined,
+    startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,
     tokenAddress: originalRequest.permission.data.tokenAddress,
   };

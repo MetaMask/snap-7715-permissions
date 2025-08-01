@@ -29,7 +29,7 @@ export type NativeTokenStreamContext = BaseContext & {
     initialAmount: string | undefined;
     maxAmount: string | undefined;
     timePeriod: TimePeriod;
-    startTime: string | undefined;
+    startTime: string;
     amountPerPeriod: string;
   };
 };
@@ -45,6 +45,7 @@ export const zNativeTokenStreamPermission = zPermission.extend({
       startTime: z
         .number()
         .int()
+        .positive()
         .nullable()
         .optional()
         .refine(

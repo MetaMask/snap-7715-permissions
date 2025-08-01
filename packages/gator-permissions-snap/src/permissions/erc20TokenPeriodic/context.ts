@@ -50,9 +50,7 @@ export async function applyContext({
       parseUnits({ formatted: permissionDetails.periodAmount, decimals }),
     ),
     periodDuration: parseInt(permissionDetails.periodDuration, 10),
-    startTime: permissionDetails.startTime
-      ? convertReadableDateToTimestamp(permissionDetails.startTime)
-      : undefined,
+    startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
     justification: originalRequest.permission.data.justification,
     tokenAddress: originalRequest.permission.data.tokenAddress,
   };

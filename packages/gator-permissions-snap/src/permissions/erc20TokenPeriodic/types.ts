@@ -29,7 +29,7 @@ export type Erc20TokenPeriodicContext = BaseContext & {
     periodAmount: string;
     periodType: TimePeriod | 'Other';
     periodDuration: string;
-    startTime: string | undefined;
+    startTime: string;
   };
 };
 
@@ -43,6 +43,7 @@ export const zErc20TokenPeriodicPermission = zPermission.extend({
       startTime: z
         .number()
         .int()
+        .positive()
         .nullable()
         .optional()
         .refine(

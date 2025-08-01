@@ -30,7 +30,7 @@ export type Erc20TokenStreamContext = BaseContext & {
     initialAmount: string | undefined;
     maxAmount: string | undefined;
     timePeriod: TimePeriod;
-    startTime: string | undefined;
+    startTime: string;
     amountPerPeriod: string;
   };
 };
@@ -46,6 +46,7 @@ export const zErc20TokenStreamPermission = zPermission.extend({
       startTime: z
         .number()
         .int()
+        .positive()
         .nullable()
         .optional()
         .refine(

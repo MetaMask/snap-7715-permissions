@@ -32,7 +32,7 @@ export async function createPermissionCaveats({
       initialAmount: BigInt(initialAmount),
       maxAmount: BigInt(maxAmount),
       amountPerSecond: BigInt(amountPerSecond),
-      startTime: startTime ?? Math.floor(Date.now() / 1000), // Fallback - should never happen at this point.
+      startTime,
     }),
     args: '0x',
   };
