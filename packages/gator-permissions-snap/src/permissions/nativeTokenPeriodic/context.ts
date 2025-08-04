@@ -5,7 +5,6 @@ import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import {
   convertReadableDateToTimestamp,
-  convertTimestampToReadableDate,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
@@ -129,7 +128,7 @@ export async function buildContext({
     ? iconDataResponse.imageDataBase64
     : null;
 
-  const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
+  const expiry = permissionRequest.expiry.toString();
 
   const periodAmount = formatUnitsFromHex({
     value: data.periodAmount,
@@ -151,7 +150,7 @@ export async function buildContext({
     periodType = 'Other';
   }
 
-  const startTime = convertTimestampToReadableDate(data.startTime);
+  const startTime = data.startTime.toString();
 
   const tokenAddressCaip19 = toCaip19Address({
     address: ZERO_ADDRESS,

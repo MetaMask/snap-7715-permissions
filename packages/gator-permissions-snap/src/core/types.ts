@@ -159,11 +159,17 @@ export type LifecycleOrchestrationHandlers<
 /**
  * Represents the type of rule input field.
  */
-export type RuleType = 'number' | 'text' | 'dropdown';
+export type RuleType = 'number' | 'text' | 'dropdown' | 'datetime';
 
 export type IconData = {
   iconDataBase64: string;
   iconAltText: string;
+};
+
+export type DateTimeParameterNames = {
+  timestampName: string;
+  dateName: string;
+  timeName: string;
 };
 
 export type RuleData = {
@@ -174,6 +180,7 @@ export type RuleData = {
   error?: string | undefined;
   options?: string[] | undefined;
   isAdjustmentAllowed: boolean;
+  dateTimeParameterNames?: DateTimeParameterNames;
 };
 
 /**

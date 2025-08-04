@@ -9,6 +9,7 @@ import {
   applyContext,
 } from '../../../src/permissions/nativeTokenStream/context';
 import type {
+  NativeTokenStreamContext,
   NativeTokenStreamPermission,
   NativeTokenStreamPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/types';
@@ -23,7 +24,7 @@ const permissionWithoutOptionals: NativeTokenStreamPermission = {
   type: 'native-token-stream',
   data: {
     amountPerSecond: bigIntToHex(parseUnits({ formatted: '.5', decimals: 18 })), // 0.5 eth per second
-    startTime: convertReadableDateToTimestamp('10/26/1985'),
+    startTime: convertReadableDateToTimestamp('10/26/2024'),
     justification: 'Permission to do something important',
   },
 };
@@ -52,11 +53,17 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
       address: '0x1',
     },
   },
-  permission: alreadyPopulatedPermission,
+  permission: {
+    ...alreadyPopulatedPermission,
+    data: {
+      ...alreadyPopulatedPermission.data,
+      startTime: convertReadableDateToTimestamp('10/26/2024'),
+    },
+  },
 };
 
-const alreadyPopulatedContext = {
-  expiry: '05/01/2024',
+const alreadyPopulatedContext: NativeTokenStreamContext = {
+  expiry: '1714521600',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
@@ -71,7 +78,7 @@ const alreadyPopulatedContext = {
     initialAmount: '1',
     maxAmount: '10',
     timePeriod: TimePeriod.WEEKLY,
-    startTime: '10/26/1985',
+    startTime: '1729900800',
     amountPerPeriod: '302400',
   },
 } as const;
@@ -130,7 +137,7 @@ describe('nativeTokenStream:context', () => {
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(() => ({
           balance: BigInt(
-            alreadyPopulatedContext.permissionDetails.initialAmount,
+            alreadyPopulatedContext.permissionDetails.initialAmount ?? 0,
           ),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: 18,

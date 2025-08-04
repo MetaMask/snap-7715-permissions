@@ -339,6 +339,7 @@ export class PermissionHandler<
         userEventDispatcher: this.#userEventDispatcher,
         interfaceId,
         getContext: () => currentContext,
+        deriveMetadata: this.#dependencies.deriveMetadata,
         onContextChanged: async ({ context }) => {
           currentContext = context;
           await rerender();
