@@ -256,33 +256,39 @@ export class PermissionHandler<
             assetAddress,
           });
 
+        // only update the token balance if fetchAccountBalance hasn't been called again
         if (
           currentFetchAccountBalanceCallCounter ===
           fetchAccountBalanceCallCounter
         ) {
           this.#tokenBalance = formatUnits({ value: balance, decimals });
 
-          rerender().catch((error) => logger.error(error));
-
-          const fiatBalance =
-            await this.#tokenPricesService.getCryptoToFiatConversion(
+          // send the request to fetch the fiat balance, then re-render the UI while we wait for the response
+          const fiatBalanceRequest =
+            this.#tokenPricesService.getCryptoToFiatConversion(
               initialContext.tokenAddressCaip19,
               bigIntToHex(balance),
               initialContext.tokenMetadata.decimals,
             );
 
+          await rerender();
+
+          const fiatBalance = await fiatBalanceRequest;
+
+          // only update the fiat balance if fetchAccountBalance hasn't been called again
           if (
             currentFetchAccountBalanceCallCounter ===
             fetchAccountBalanceCallCounter
           ) {
             this.#tokenBalanceFiat = fiatBalance;
-            rerender().catch((error) => logger.error(error));
+
+            await rerender();
           }
         }
       };
 
       // we explicitly don't await this as it's a background process that will re-render the UI (twice) once it is complete
-      fetchAccountBalance(currentContext).catch(console.error);
+      fetchAccountBalance(currentContext).catch((error) => logger.error(error));
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent

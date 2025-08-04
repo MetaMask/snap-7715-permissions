@@ -1460,10 +1460,8 @@ describe('PermissionHandler', () => {
                         "children": [
                           {
                             "key": null,
-                            "props": {
-                              "children": "$2000",
-                            },
-                            "type": "Text",
+                            "props": {},
+                            "type": "Skeleton",
                           },
                           {
                             "key": null,
@@ -1564,6 +1562,15 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
         });
 
+        // called once with the context updated to include the new account address
+        expect(updateContext).toHaveBeenCalledTimes(1);
+        expect(updateContext).toHaveBeenCalledWith({
+          updatedContext: {
+            ...mockContext,
+            accountAddressCaip10: mockAddress2Caip10,
+          },
+        });
+
         const confirmationContent =
           await lifecycleHandlers.createConfirmationContent({
             context: mockContext,
@@ -1572,6 +1579,7 @@ describe('PermissionHandler', () => {
             chainId: 1,
           });
 
+        // skeletons in place of both the token balance and fiat balance
         expect(confirmationContent).toMatchInlineSnapshot(`
 {
   "key": null,
@@ -1990,7 +1998,11 @@ describe('PermissionHandler', () => {
 }
 `);
 
+        // resolve the token balance, which triggers a re-render
         resolveTokenBalancePromise();
+
+        // allow the event loop to run the re-render
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         const confirmationContentWithBalance =
           await lifecycleHandlers.createConfirmationContent({
@@ -2000,6 +2012,7 @@ describe('PermissionHandler', () => {
             chainId: 1,
           });
 
+        // concrete token balance, skeleton for fiat balance
         expect(confirmationContentWithBalance).toMatchInlineSnapshot(`
 {
   "key": null,
@@ -2423,7 +2436,11 @@ describe('PermissionHandler', () => {
 }
 `);
 
+        // resolve the fiat balance, which triggers a re-render
         resolveFiatBalancePromise();
+
+        // allow the event loop to run the re-render
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         const confirmationContentWithFiatBalance =
           await lifecycleHandlers.createConfirmationContent({
@@ -2433,6 +2450,7 @@ describe('PermissionHandler', () => {
             chainId: 1,
           });
 
+        // concrete token balance, concrete fiat balance
         expect(confirmationContentWithFiatBalance).toMatchInlineSnapshot(`
 {
   "key": null,
