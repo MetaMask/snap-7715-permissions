@@ -5,7 +5,19 @@ import {
   Field as SnapField,
   Icon,
 } from '@metamask/snaps-sdk/jsx';
-import type { SnapElement } from '@metamask/snaps-sdk/jsx';
+import type {
+  AccountSelectorElement,
+  AddressInputElement,
+  AssetSelectorElement,
+  CheckboxElement,
+  DropdownElement,
+  FileInputElement,
+  GenericSnapElement,
+  InputElement,
+  RadioGroupElement,
+  SelectorElement,
+  SnapsChildren,
+} from '@metamask/snaps-sdk/jsx';
 
 import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
@@ -15,6 +27,22 @@ export type BaseFieldProps = {
   tooltip?: string | undefined;
   errorMessage?: string | undefined;
   disabled?: boolean | undefined;
+};
+
+export type ViewFieldProps = BaseFieldProps & {
+  variant: 'display';
+  children: SnapsChildren<GenericSnapElement>;
+  iconData?:
+    | {
+        iconDataBase64: string;
+        iconAltText: string;
+      }
+    | undefined;
+};
+
+export type InputFieldProps = BaseFieldProps & {
+  variant: 'form';
+  children: InputElement;
   iconData?:
     | {
         iconDataBase64: string;
@@ -22,35 +50,35 @@ export type BaseFieldProps = {
       }
     | undefined;
   removeButtonName?: string | undefined;
-  children: SnapElement;
-  variant?: 'form' | 'display' | undefined;
 };
 
-export const Field = ({
-  label,
-  tooltip,
-  errorMessage,
-  disabled,
-  iconData,
-  removeButtonName,
-  children,
-  variant = 'form',
-}: BaseFieldProps) => {
-  const iconElement = iconData ? (
-    <TokenIcon
-      imageDataBase64={iconData.iconDataBase64}
-      altText={iconData.iconAltText}
-    />
-  ) : null;
+export type ComplexFieldProps = BaseFieldProps & {
+  variant: 'form';
+  children:
+    | DropdownElement
+    | RadioGroupElement
+    | FileInputElement
+    | CheckboxElement
+    | SelectorElement
+    | AssetSelectorElement
+    | AddressInputElement
+    | AccountSelectorElement;
+};
+
+export type FieldProps = InputFieldProps | ComplexFieldProps | ViewFieldProps;
+
+const isInputFieldProps = (props: FieldProps): props is InputFieldProps => {
+  return props.variant === 'form' && props.children.type === 'Input';
+};
+
+const isDisplayFieldProps = (props: FieldProps): props is ViewFieldProps => {
+  return props.variant === 'display';
+};
+
+export const Field = (props: FieldProps) => {
+  const { label, tooltip, errorMessage, disabled } = props;
 
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
-
-  const removeButtonElement =
-    removeButtonName && !disabled ? (
-      <Button name={removeButtonName} type="button">
-        <Icon name="close" color="primary" size="md" />
-      </Button>
-    ) : null;
 
   const labelSection = (
     <Box direction="horizontal">
@@ -59,32 +87,62 @@ export const Field = ({
     </Box>
   );
 
-  if (variant === 'display') {
-    return (
-      <Box direction="horizontal" alignment="space-between">
-        {labelSection}
-        <Box direction="horizontal">
-          {iconElement}
-          {children}
+  if (isInputFieldProps(props) || isDisplayFieldProps(props)) {
+    const { iconData } = props;
+    const iconElement = iconData ? (
+      <TokenIcon
+        imageDataBase64={iconData.iconDataBase64}
+        altText={iconData.iconAltText}
+      />
+    ) : null;
+
+    if (isDisplayFieldProps(props)) {
+      const { children } = props;
+      return (
+        <Box direction="horizontal" alignment="space-between">
+          {labelSection}
+          <Box direction="horizontal">
+            {iconElement}
+            {children}
+          </Box>
         </Box>
-      </Box>
-    );
+      );
+    }
+
+    if (isInputFieldProps(props)) {
+      const { removeButtonName, children } = props;
+
+      const removeButtonElement =
+        removeButtonName && !disabled ? (
+          <Button name={removeButtonName} type="button">
+            <Icon name="close" color="primary" size="md" />
+          </Button>
+        ) : null;
+
+      return (
+        <Box direction="vertical">
+          <Box direction="horizontal" alignment="space-between">
+            {labelSection}
+          </Box>
+
+          <SnapField error={errorMessage}>
+            <Box>{iconElement}</Box>
+            {children}
+            <Box>{removeButtonElement}</Box>
+          </SnapField>
+        </Box>
+      );
+    }
   }
+
+  const { children } = props;
 
   return (
     <Box direction="vertical">
       <Box direction="horizontal" alignment="space-between">
         {labelSection}
       </Box>
-      {children.type === 'Dropdown' ? (
-        <SnapField error={errorMessage}>{children as JSX.Element}</SnapField>
-      ) : (
-        <SnapField error={errorMessage}>
-          <Box>{iconElement}</Box>
-          {children as JSX.Element}
-          <Box>{removeButtonElement}</Box>
-        </SnapField>
-      )}
+      <SnapField error={errorMessage}>{children}</SnapField>
     </Box>
   );
 };

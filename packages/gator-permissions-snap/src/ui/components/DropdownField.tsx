@@ -1,16 +1,13 @@
 import { Dropdown, Option } from '@metamask/snaps-sdk/jsx';
 
+import type { BaseFieldProps } from './Field';
 import { Field } from './Field';
 import { TextField } from './TextField';
 
-export type DropdownFieldParams = {
-  label: string;
+export type DropdownFieldParams = BaseFieldProps & {
   name: string;
-  tooltip?: string | undefined;
   value: string;
   options: string[];
-  disabled?: boolean;
-  errorMessage?: string | undefined;
 };
 
 export const DropdownField = ({
@@ -32,6 +29,7 @@ export const DropdownField = ({
       tooltip={tooltip}
       errorMessage={errorMessage}
       disabled={disabled}
+      variant="form"
     >
       <Dropdown name={name} value={value}>
         {options.map((option) => (

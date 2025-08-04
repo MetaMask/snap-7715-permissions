@@ -1,17 +1,13 @@
 import { Text } from '@metamask/snaps-sdk/jsx';
 
+import type { ViewFieldProps } from './Field';
 import { Field } from './Field';
 
-export type TextFieldParams = {
-  label: string;
+export type TextFieldParams = Pick<
+  ViewFieldProps,
+  'label' | 'tooltip' | 'iconData'
+> & {
   value: string;
-  tooltip?: string | undefined;
-  iconData?:
-    | {
-        iconDataBase64: string;
-        iconAltText: string;
-      }
-    | undefined;
 };
 
 export const TextField = ({

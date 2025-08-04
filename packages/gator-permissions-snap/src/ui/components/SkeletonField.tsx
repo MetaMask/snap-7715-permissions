@@ -1,11 +1,9 @@
 import { Skeleton } from '@metamask/snaps-sdk/jsx';
 
+import type { BaseFieldProps } from './Field';
 import { Field } from './Field';
 
-export type SkeletonFieldParams = {
-  label: string;
-  tooltip?: string | undefined;
-};
+export type SkeletonFieldParams = Pick<BaseFieldProps, 'label' | 'tooltip'>;
 
 export const SkeletonField = ({ label, tooltip }: SkeletonFieldParams) => {
   return (
