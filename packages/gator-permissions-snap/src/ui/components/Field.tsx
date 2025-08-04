@@ -32,8 +32,7 @@ export type BaseFieldProps = {
   tooltip?: string | undefined;
   errorMessage?: string | undefined;
   disabled?: boolean | undefined;
-  // 切换功能相关属性
-  isFieldEnabled?: boolean; // 默认为 true
+  isFieldEnabled?: boolean;
   addFieldButtonName?: string | undefined;
   removeFieldButtonName?: string | undefined;
 };
