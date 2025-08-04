@@ -315,7 +315,9 @@ export class PermissionHandler<
         this.#tokenBalanceFiat = undefined;
 
         // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
-        fetchAccountBalance(currentContext).catch(console.error);
+        fetchAccountBalance(currentContext).catch((error) =>
+          logger.error(error),
+        );
 
         await rerender();
       };
