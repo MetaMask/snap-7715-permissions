@@ -145,7 +145,7 @@ export class PermissionHandler<
   > {
     const buildContextHandler = async (request: TRequest) => {
       const chainId = Number(request.chainId);
-      const requestedAddress = request.address?.toLowerCase();
+      const requestedAddressLowercase = request.address?.toLowerCase();
 
       const allAvailableAddressesCaip10 =
         await this.#accountController.getAccountAddresses({
@@ -158,7 +158,7 @@ export class PermissionHandler<
 
       let caip10Address: Caip10Address | undefined;
 
-      if (requestedAddress === undefined) {
+      if (requestedAddressLowercase === undefined) {
         // use the first address available for the account
         caip10Address = allAvailableAddressesCaip10[0];
       } else {
@@ -167,7 +167,7 @@ export class PermissionHandler<
           const { address: rawAddress } = fromCaip10Address(
             availableAddressCaip10,
           );
-          if (rawAddress === requestedAddress.toLowerCase()) {
+          if (rawAddress.toLowerCase() === requestedAddressLowercase) {
             caip10Address = availableAddressCaip10;
             break;
           }
