@@ -1,21 +1,22 @@
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
-  isHumanReadableInCorrectFormat,
   getStartOfTodayUTC,
   getStartOfNextDayUTC,
 } from '../../src/utils/time';
 
 describe('Time Utility Functions', () => {
   describe('convertTimestampToReadableDate', () => {
-    it('should convert a Unix timestamp to MM/DD/YYYY format', () => {
-      const timestamp = 1747022400;
-      expect(convertTimestampToReadableDate(timestamp)).toBe('05/12/2025');
+    it('should convert a Unix timestamp to mm/dd/yyyy format', () => {
+      const timestamp = 1744588800; // April 14, 2025
+      const result = convertTimestampToReadableDate(timestamp);
+      expect(result).toBe('04/14/2025');
     });
 
     it('should handle different dates correctly', () => {
-      const timestamp = 1749700800;
-      expect(convertTimestampToReadableDate(timestamp)).toBe('06/12/2025');
+      const timestamp = 1747180800; // May 14, 2025
+      const result = convertTimestampToReadableDate(timestamp);
+      expect(result).toBe('05/14/2025');
     });
 
     it('should throw an error for invalid date format', () => {
@@ -27,16 +28,34 @@ describe('Time Utility Functions', () => {
   });
 
   describe('convertReadableDateToTimestamp', () => {
-    it('should convert MM/DD/YYYY format to Unix timestamp', () => {
+    it('should convert mm/dd/yyyy format to Unix timestamp (backward compatibility)', () => {
       const date = '04/11/2025';
-      const expectedTimestamp = 1744329600;
+      // Calculate expected timestamp based on local timezone
+      const localDate = new Date('2025-04-11T00:00:00');
+      const expectedTimestamp = Math.floor(localDate.getTime() / 1000);
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
     });
 
     it('should handle different dates correctly', () => {
       const date = '04/12/2025';
-      const expectedTimestamp = 1744416000;
+      // Calculate expected timestamp based on local timezone
+      const localDate = new Date('2025-04-12T00:00:00');
+      const expectedTimestamp = Math.floor(localDate.getTime() / 1000);
       expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
+    });
+
+    it('should reject non-mm/dd/yyyy formats', () => {
+      // Test that it rejects various non-mm/dd/yyyy formats
+      const date1 = '2025-04-11'; // ISO format
+      const date2 = '04-11-2025'; // MM-DD-YYYY format with dashes
+
+      // Both should throw errors
+      expect(() => convertReadableDateToTimestamp(date1)).toThrow(
+        'Invalid date format. Expected format: mm/dd/yyyy',
+      );
+      expect(() => convertReadableDateToTimestamp(date2)).toThrow(
+        'Invalid date format. Expected format: mm/dd/yyyy',
+      );
     });
 
     it('should throw an error for invalid date format', () => {
@@ -45,18 +64,20 @@ describe('Time Utility Functions', () => {
         'Invalid date format',
       );
     });
-  });
 
-  describe('isHumanReadableInCorrectFormat', () => {
-    it('should return true for valid MM/DD/YYYY format', () => {
-      expect(isHumanReadableInCorrectFormat('01/01/2023')).toBe(true);
-      expect(isHumanReadableInCorrectFormat('12/10/2023')).toBe(true);
+    it('should handle inputs that are already timestamps', () => {
+      const timestamp = '1744329600'; // April 11, 2025 timestamp
+      expect(convertReadableDateToTimestamp(timestamp)).toBe(1744329600);
+
+      const anotherTimestamp = '1640995200'; // January 1, 2022 timestamp
+      expect(convertReadableDateToTimestamp(anotherTimestamp)).toBe(1640995200);
     });
 
-    it('should return false for invalid formats', () => {
-      expect(isHumanReadableInCorrectFormat('invalid-date')).toBe(false);
-      expect(isHumanReadableInCorrectFormat('01-07-2023')).toBe(false);
-      expect(isHumanReadableInCorrectFormat('')).toBe(false);
+    it('should reject non-integer numeric strings', () => {
+      const decimalString = '1744329600.5';
+      expect(() => convertReadableDateToTimestamp(decimalString)).toThrow(
+        'Invalid date format',
+      );
     });
   });
 

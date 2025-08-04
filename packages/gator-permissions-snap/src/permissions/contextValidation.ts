@@ -1,7 +1,7 @@
 import type { TimePeriod } from '../core/types';
 import {
   convertReadableDateToTimestamp,
-  getStartOfTodayUTC,
+  getStartOfTodayLocal,
   TIME_PERIOD_TO_SECONDS,
 } from '../utils/time';
 import { parseUnits, formatUnits } from '../utils/value';
@@ -65,7 +65,8 @@ export function validateAndParseAmount(
 export function validateStartTime(startTime: string): string | undefined {
   try {
     const startTimeDate = convertReadableDateToTimestamp(startTime);
-    if (startTimeDate < getStartOfTodayUTC()) {
+
+    if (startTimeDate < getStartOfTodayLocal()) {
       return 'Start time must be today or later';
     }
     return undefined;
