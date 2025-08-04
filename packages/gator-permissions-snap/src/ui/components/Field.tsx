@@ -4,6 +4,7 @@ import {
   Button,
   Field as SnapField,
   Icon,
+  Image,
 } from '@metamask/snaps-sdk/jsx';
 import type {
   AccountSelectorElement,
@@ -16,19 +17,28 @@ import type {
   InputElement,
   RadioGroupElement,
   SelectorElement,
+  SnapElement,
   SnapsChildren,
 } from '@metamask/snaps-sdk/jsx';
 
 import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
+import toggleDisabledImage from '../../../images/toggle_disabled.svg';
+import toggleEnabledImage from '../../../images/toggle_enabled.svg';
 
+// Base props without toggle functionality
 export type BaseFieldProps = {
   label: string;
   tooltip?: string | undefined;
   errorMessage?: string | undefined;
   disabled?: boolean | undefined;
+  // 切换功能相关属性
+  isFieldEnabled?: boolean; // 默认为 true
+  addFieldButtonName?: string | undefined;
+  removeFieldButtonName?: string | undefined;
 };
 
+// Then extend for specific field variants
 export type ViewFieldProps = BaseFieldProps & {
   variant: 'display';
   children: SnapsChildren<GenericSnapElement>;
@@ -76,16 +86,51 @@ const isDisplayFieldProps = (props: FieldProps): props is ViewFieldProps => {
 };
 
 export const Field = (props: FieldProps) => {
-  const { label, tooltip, errorMessage, disabled } = props;
+  const {
+    label,
+    tooltip,
+    errorMessage,
+    disabled,
+    isFieldEnabled = true,
+    addFieldButtonName,
+    removeFieldButtonName,
+  } = props;
 
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
 
+  let toggleFieldButton: SnapElement | null = null;
+  const hasToggleButtons = Boolean(addFieldButtonName ?? removeFieldButtonName);
+
+  if (hasToggleButtons && !disabled) {
+    const toggleFieldButtonName = isFieldEnabled
+      ? removeFieldButtonName
+      : addFieldButtonName;
+
+    if (toggleFieldButtonName) {
+      toggleFieldButton = (
+        <Button name={toggleFieldButtonName}>
+          <Image
+            src={isFieldEnabled ? toggleEnabledImage : toggleDisabledImage}
+            alt={isFieldEnabled ? `Remove ${label}` : `Add ${label}`}
+          />
+        </Button>
+      );
+    }
+  }
+
   const labelSection = (
-    <Box direction="horizontal">
-      <Text>{label}</Text>
-      {tooltipElement}
+    <Box direction="horizontal" alignment="space-between">
+      <Box direction="horizontal">
+        <Text>{label}</Text>
+        {tooltipElement}
+      </Box>
+      {toggleFieldButton && <Box>{toggleFieldButton}</Box>}
     </Box>
   );
+
+  if (hasToggleButtons && !isFieldEnabled) {
+    return <Box direction="vertical">{labelSection}</Box>;
+  }
 
   if (isInputFieldProps(props) || isDisplayFieldProps(props)) {
     const { iconData } = props;
@@ -121,10 +166,7 @@ export const Field = (props: FieldProps) => {
 
       return (
         <Box direction="vertical">
-          <Box direction="horizontal" alignment="space-between">
-            {labelSection}
-          </Box>
-
+          {labelSection}
           <SnapField error={errorMessage}>
             <Box>{iconElement}</Box>
             {children}
@@ -139,9 +181,7 @@ export const Field = (props: FieldProps) => {
 
   return (
     <Box direction="vertical">
-      <Box direction="horizontal" alignment="space-between">
-        {labelSection}
-      </Box>
+      {labelSection}
       <SnapField error={errorMessage}>{children}</SnapField>
     </Box>
   );
