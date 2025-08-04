@@ -98,6 +98,17 @@ describe('AccountController', () => {
     });
   });
 
+  describe('getAccountAddresses()', () => {
+    it('returns the addresses of the accounts', async () => {
+      const addresses = await accountController.getAccountAddresses();
+      expect(addresses).toStrictEqual([mockAddress]);
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledWith({
+        method: 'eth_requestAccounts',
+      });
+    });
+  });
+
   describe('signDelegation()', () => {
     const unsignedDelegation: Omit<Delegation, 'signature'> = {
       delegate: '0x1234567890abcdef1234567890abcdef12345678',

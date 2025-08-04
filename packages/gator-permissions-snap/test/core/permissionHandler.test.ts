@@ -3,10 +3,10 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { TokenBalanceAndMetadata } from 'src/clients/types';
 
-import type { AccountController } from '../../src/accountController';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type {
+  AccountControllerInterface,
   BaseContext,
   DeepRequired,
   LifecycleOrchestrationHandlers,
@@ -111,7 +111,7 @@ const setupDependencies = () => {
   const accountController = {
     signDelegation: jest.fn(),
     getAccountAddresses: jest.fn(),
-  } as unknown as jest.Mocked<AccountController>;
+  } as unknown as jest.Mocked<AccountControllerInterface>;
 
   const userEventDispatcher = {
     on: jest.fn(bindEvent),
@@ -242,9 +242,107 @@ describe('PermissionHandler', () => {
       expect(typeof lifecycleHandlers.onConfirmationResolved).toBe('function');
     });
 
+    it('resolves the address if one is not provided', async () => {
+      const setup = setupDependencies();
+      setup.accountController.getAccountAddresses.mockResolvedValue([
+        mockAddress,
+        mockAddress2,
+      ]);
+      const handler = new PermissionHandler(setup);
+
+      await handler.handlePermissionRequest(mockOrigin);
+
+      const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
+        setup.orchestrator,
+      );
+
+      await lifecycleHandlers.buildContext({
+        ...mockPermissionRequest,
+        // it's already undefined, but we make sure here
+        address: undefined,
+      });
+
+      expect(setup.accountController.getAccountAddresses).toHaveBeenCalledTimes(
+        1,
+      );
+
+      const permissionRequestWithResolvedAddress = {
+        ...mockPermissionRequest,
+        address: mockAddress,
+      };
+
+      expect(setup.dependencies.buildContext).toHaveBeenCalledWith({
+        permissionRequest: permissionRequestWithResolvedAddress,
+        tokenMetadataService: setup.tokenMetadataService,
+      });
+    });
+
+    it.each([mockAddress, mockAddress2])(
+      'accepts the address if one is provided',
+      async (specifiedAddress) => {
+        const setup = setupDependencies();
+        setup.accountController.getAccountAddresses.mockResolvedValue([
+          mockAddress,
+          mockAddress2,
+        ]);
+        const handler = new PermissionHandler(setup);
+
+        await handler.handlePermissionRequest(mockOrigin);
+
+        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
+          setup.orchestrator,
+        );
+
+        await lifecycleHandlers.buildContext({
+          ...mockPermissionRequest,
+          address: specifiedAddress,
+        });
+
+        expect(
+          setup.accountController.getAccountAddresses,
+        ).toHaveBeenCalledTimes(1);
+
+        const permissionRequestWithResolvedAddress = {
+          ...mockPermissionRequest,
+          address: specifiedAddress,
+        };
+
+        expect(setup.dependencies.buildContext).toHaveBeenCalledWith({
+          permissionRequest: permissionRequestWithResolvedAddress,
+          tokenMetadataService: setup.tokenMetadataService,
+        });
+      },
+    );
+
+    it('rejects the address if it is not one of the addresses available for the account', async () => {
+      const setup = setupDependencies();
+      setup.accountController.getAccountAddresses.mockResolvedValue([
+        mockAddress,
+        mockAddress2,
+      ]);
+      const handler = new PermissionHandler(setup);
+
+      await handler.handlePermissionRequest(mockOrigin);
+
+      const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
+        setup.orchestrator,
+      );
+
+      await expect(
+        lifecycleHandlers.buildContext({
+          ...mockPermissionRequest,
+          address: '0x9876543210987654321098765432109876543210',
+        }),
+      ).rejects.toThrow('Requested address not found');
+
+      expect(setup.accountController.getAccountAddresses).toHaveBeenCalledTimes(
+        1,
+      );
+    });
+
     it('throws error when called multiple times', async () => {
-      const dependencies = setupDependencies();
-      const handler = new PermissionHandler(dependencies);
+      const setup = setupDependencies();
+      const handler = new PermissionHandler(setup);
 
       await handler.handlePermissionRequest(mockOrigin);
 

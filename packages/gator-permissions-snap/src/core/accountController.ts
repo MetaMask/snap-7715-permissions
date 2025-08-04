@@ -6,11 +6,8 @@ import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 import { getChainMetadata } from './chainMetadata';
 import type {
   AccountControllerInterface,
-  AccountOptionsBase,
-  Caip10Address,
   SignDelegationOptions,
 } from './types';
-import { toCaip10Address } from '../utils/address';
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
@@ -83,41 +80,24 @@ export class AccountController implements AccountControllerInterface {
 
   /**
    * Retrieves the account addresses available for this current account.
-   * @param options - The options object containing the chain ID.
    * @returns The account addresses in CAIP-10 format.
    */
-  public async getAccountAddresses(
-    options: AccountOptionsBase,
-  ): Promise<Caip10Address[]> {
+  public async getAccountAddresses(): Promise<Hex[]> {
     logger.debug('eoaAccountController:getAccountAddresses()');
-
-    this.#assertIsSupportedChainId(options.chainId);
 
     const accounts = await this.#ethereumProvider.request<Hex[]>({
       method: 'eth_requestAccounts',
     });
 
-    if (!accounts) {
+    if (
+      !accounts ||
+      accounts.length === 0 ||
+      accounts.some((account) => account === undefined)
+    ) {
       throw new Error('No accounts found');
     }
 
-    const caip10Addresses = accounts.reduce<Caip10Address[]>((acc, account) => {
-      if (account) {
-        acc.push(
-          toCaip10Address({
-            chainId: options.chainId,
-            address: account,
-          }),
-        );
-      }
-      return acc;
-    }, []);
-
-    if (caip10Addresses.length === 0) {
-      throw new Error('No accounts found');
-    }
-
-    return caip10Addresses;
+    return accounts as Hex[];
   }
 
   /**

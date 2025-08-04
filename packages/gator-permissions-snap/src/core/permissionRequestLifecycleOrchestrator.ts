@@ -76,9 +76,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.
-    await this.#accountController.getAccountAddresses({
-      chainId,
-    });
+    await this.#accountController.getAccountAddresses();
 
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);

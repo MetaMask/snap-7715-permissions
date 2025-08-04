@@ -313,17 +313,10 @@ export type PermissionHandlerDependencies<
 };
 
 /**
- * Base options required for account operations.
- */
-export type AccountOptionsBase = {
-  // really this needs to be of type SupportedChainId, but it makes it hard for callers to validate
-  chainId: number;
-};
-
-/**
  * Options for signing a delegation.
  */
-export type SignDelegationOptions = AccountOptionsBase & {
+export type SignDelegationOptions = {
+  chainId: number;
   delegation: Omit<Delegation, 'signature'>;
   address: Hex;
 };
@@ -356,5 +349,5 @@ export type AccountControllerInterface = {
   /**
    * Retrieves the account addresses available for this current account.
    */
-  getAccountAddresses(options: AccountOptionsBase): Promise<Caip10Address[]>;
+  getAccountAddresses(): Promise<Hex[]>;
 };

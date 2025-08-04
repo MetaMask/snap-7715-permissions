@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
+import type { Hex } from '@metamask/utils';
 import { bigIntToHex } from '@metamask/utils';
 
 import { getIconData } from '../permissions/iconUtil';
@@ -26,7 +27,6 @@ import type {
   PermissionHandlerType,
   PermissionHandlerDependencies,
   PermissionHandlerParams,
-  Caip10Address,
   AccountControllerInterface,
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
@@ -144,39 +144,30 @@ export class PermissionHandler<
     TPopulatedPermission
   > {
     const buildContextHandler = async (request: TRequest) => {
-      const chainId = Number(request.chainId);
-      const requestedAddressLowercase = request.address?.toLowerCase();
+      const requestedAddressLowercase = request.address?.toLowerCase() as
+        | Hex
+        | undefined;
 
-      const allAvailableAddressesCaip10 =
-        await this.#accountController.getAccountAddresses({
-          chainId,
-        });
+      const allAvailableAddresses =
+        await this.#accountController.getAccountAddresses();
 
-      if (allAvailableAddressesCaip10[0] === undefined) {
-        throw new Error('No addresses found');
-      }
-
-      let caip10Address: Caip10Address | undefined;
+      let address: Hex | undefined;
 
       if (requestedAddressLowercase === undefined) {
         // use the first address available for the account
-        caip10Address = allAvailableAddressesCaip10[0];
+        address = allAvailableAddresses[0];
       } else {
         // validate that the requested address is one of the addresses available for the account
-        for (const availableAddressCaip10 of allAvailableAddressesCaip10) {
-          const { address: rawAddress } = fromCaip10Address(
-            availableAddressCaip10,
-          );
-          if (rawAddress.toLowerCase() === requestedAddressLowercase) {
-            caip10Address = availableAddressCaip10;
-            break;
-          }
-        }
-        if (caip10Address === undefined) {
+        if (
+          !allAvailableAddresses.some(
+            (availableAddress) =>
+              availableAddress.toLowerCase() === requestedAddressLowercase,
+          )
+        ) {
           throw new Error('Requested address not found');
         }
+        address = requestedAddressLowercase;
       }
-      const { address } = fromCaip10Address(caip10Address);
 
       return await this.#dependencies.buildContext({
         permissionRequest: { ...request, address },

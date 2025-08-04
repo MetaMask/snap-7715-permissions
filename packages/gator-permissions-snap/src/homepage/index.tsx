@@ -18,8 +18,6 @@ import type {
   StoredGrantedPermission,
 } from '../profileSync';
 
-const MAINNET_CHAIN_ID = 1;
-
 export class HomePage {
   #accountController: AccountControllerInterface;
 
@@ -54,10 +52,7 @@ export class HomePage {
   }: {
     showDirectionsToHomepage: boolean;
   }) {
-    const [address] = await this.#accountController.getAccountAddresses({
-      // this chainId actually doesn't matter here, because we're only using it to infer the address
-      chainId: MAINNET_CHAIN_ID,
-    });
+    const [address] = await this.#accountController.getAccountAddresses();
 
     const grantedPermissions: StoredGrantedPermission[] =
       await this.#profileSyncManager.getAllGrantedPermissions();
