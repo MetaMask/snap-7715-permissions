@@ -26,7 +26,6 @@ import { TooltipIcon } from './TooltipIcon';
 import toggleDisabledImage from '../../../images/toggle_disabled.svg';
 import toggleEnabledImage from '../../../images/toggle_enabled.svg';
 
-// Base props without toggle functionality
 export type BaseFieldProps = {
   label: string;
   tooltip?: string | undefined;
@@ -37,7 +36,6 @@ export type BaseFieldProps = {
   removeFieldButtonName?: string | undefined;
 };
 
-// Then extend for specific field variants
 export type ViewFieldProps = BaseFieldProps & {
   variant: 'display';
   children: SnapsChildren<GenericSnapElement>;
