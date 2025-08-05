@@ -1,6 +1,11 @@
-import { bigIntToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  parseCaipAccountId,
+  toCaipAccountId,
+  toCaipAssetType,
+  type Hex,
+} from '@metamask/utils';
 
-import { ZERO_ADDRESS } from '../../constants';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import {
@@ -21,11 +26,10 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
-import {
-  fromCaip10Address,
-  toCaip10Address,
-  toCaip19Address,
-} from '../../utils/address';
+import { ZERO_ADDRESS } from '../../constants';
+
+const ASSET_NAMESPACE = 'slip44';
+const CHAIN_NAMESPACE = 'eip155';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -57,11 +61,11 @@ export async function applyContext({
     justification: originalRequest.permission.data.justification,
   };
 
-  const { address } = fromCaip10Address(context.accountAddressCaip10);
+  const { address } = parseCaipAccountId(context.accountAddressCaip10);
 
   return {
     ...originalRequest,
-    address,
+    address: address as Hex,
     expiry,
     permission: {
       type: 'native-token-periodic',
@@ -152,16 +156,18 @@ export async function buildContext({
 
   const startTime = data.startTime.toString();
 
-  const tokenAddressCaip19 = toCaip19Address({
-    address: ZERO_ADDRESS,
-    chainId,
-    assetType: 'slip44',
-  });
+  const tokenAddressCaip19 = toCaipAssetType(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    ASSET_NAMESPACE,
+    ZERO_ADDRESS,
+  );
 
-  const accountAddressCaip10 = toCaip10Address({
+  const accountAddressCaip10 = toCaipAccountId(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
     address,
-    chainId,
-  });
+  );
 
   return {
     expiry,

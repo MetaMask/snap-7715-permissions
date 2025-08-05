@@ -1,7 +1,11 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
-import { bigIntToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  parseCaipAccountId,
+  parseCaipAssetType,
+} from '@metamask/utils';
 
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
@@ -30,7 +34,6 @@ import type {
   AccountControllerInterface,
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
-import { fromCaip10Address, fromCaip19Address } from '../utils/address';
 import { formatUnits } from '../utils/value';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
@@ -243,17 +246,18 @@ export class PermissionHandler<
         const currentFetchAccountBalanceCallCounter =
           fetchAccountBalanceCallCounter;
 
-        const { address } = fromCaip10Address(context.accountAddressCaip10);
+        const { address } = parseCaipAccountId(context.accountAddressCaip10);
 
-        const { assetAddress, chainId } = fromCaip19Address(
-          context.tokenAddressCaip19,
-        );
+        const {
+          assetReference: assetAddress,
+          chain: { reference: chainId },
+        } = parseCaipAssetType(context.tokenAddressCaip19);
 
         const { balance, decimals } =
           await this.#tokenMetadataService.getTokenBalanceAndMetadata({
-            chainId,
-            account: address,
-            assetAddress,
+            chainId: parseInt(chainId, 10),
+            account: address as Hex,
+            assetAddress: assetAddress as Hex,
           });
 
         // only update the token balance if fetchAccountBalance hasn't been called again

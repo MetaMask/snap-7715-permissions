@@ -1,4 +1,10 @@
-import { bigIntToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  parseCaipAccountId,
+  toCaipAssetType,
+  toCaipAccountId,
+  type Hex,
+} from '@metamask/utils';
 
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
@@ -20,11 +26,9 @@ import type {
   PopulatedErc20TokenPeriodicPermission,
   Erc20TokenPeriodicPermission,
 } from './types';
-import {
-  fromCaip10Address,
-  toCaip10Address,
-  toCaip19Address,
-} from '../../utils/address';
+
+const ASSET_NAMESPACE = 'erc20';
+const CHAIN_NAMESPACE = 'eip155';
 
 /**
  * Construct an amended Erc20TokenPeriodicPermissionRequest, based on the specified request,
@@ -57,11 +61,11 @@ export async function applyContext({
     tokenAddress: originalRequest.permission.data.tokenAddress,
   };
 
-  const { address } = fromCaip10Address(context.accountAddressCaip10);
+  const { address } = parseCaipAccountId(context.accountAddressCaip10);
 
   return {
     ...originalRequest,
-    address,
+    address: address as Hex,
     expiry,
     permission: {
       type: 'erc20-token-periodic',
@@ -152,16 +156,18 @@ export async function buildContext({
 
   const startTime = data.startTime.toString();
 
-  const tokenAddressCaip19 = toCaip19Address({
-    address: data.tokenAddress,
-    chainId,
-    assetType: 'erc20',
-  });
+  const tokenAddressCaip19 = toCaipAssetType(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    ASSET_NAMESPACE,
+    data.tokenAddress,
+  );
 
-  const accountAddressCaip10 = toCaip10Address({
+  const accountAddressCaip10 = toCaipAccountId(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
     address,
-    chainId,
-  });
+  );
 
   return {
     expiry,
