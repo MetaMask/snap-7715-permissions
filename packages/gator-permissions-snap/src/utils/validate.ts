@@ -4,7 +4,7 @@ import {
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 
-import { getStartOfTodayUTC } from './time';
+import { getStartOfTodayLocal } from './time';
 
 export const validatePermissionRequestParam = (
   params: any | any[],
@@ -26,7 +26,6 @@ export const validatePermissionRequestParam = (
  * @returns True if the start time is today or later, false otherwise.
  */
 export const validateStartTimeZod = (value: number): boolean => {
-  // TODO: change to getStartOfTodayLocal when dateTime gets merged.
-  const startOfToday = getStartOfTodayUTC();
+  const startOfToday = getStartOfTodayLocal();
   return value >= startOfToday;
 };
