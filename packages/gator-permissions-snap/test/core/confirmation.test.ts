@@ -10,6 +10,7 @@ describe('ConfirmationDialog', () => {
   let mockSnaps: jest.Mocked<SnapsProvider>;
   let mockUserEventDispatcher: jest.Mocked<UserEventDispatcher>;
   let confirmationDialog: ConfirmationDialog;
+  let mockUnbindFunctions: jest.MockedFunction<() => UserEventDispatcher>[];
   const mockInterfaceId = 'test-interface-id';
 
   const mockUi = Text({
@@ -21,12 +22,22 @@ describe('ConfirmationDialog', () => {
   };
 
   beforeEach(() => {
+    // Reset the array of mock unbind functions for each test
+    mockUnbindFunctions = [];
+
     mockSnaps = {
       request: jest.fn().mockImplementation(async () => Promise.resolve()),
     } as unknown as jest.Mocked<SnapsProvider>;
 
     mockUserEventDispatcher = {
-      on: jest.fn(),
+      on: jest.fn().mockImplementation(() => {
+        // Create a new mock unbind function for each call to on()
+        const mockUnbind = jest
+          .fn<() => UserEventDispatcher>()
+          .mockReturnValue(mockUserEventDispatcher);
+        mockUnbindFunctions.push(mockUnbind);
+        return { unbind: mockUnbind, dispatcher: mockUserEventDispatcher };
+      }),
       off: jest.fn(),
     } as unknown as jest.Mocked<UserEventDispatcher>;
 
@@ -142,6 +153,10 @@ describe('ConfirmationDialog', () => {
         throw new Error('Grant button handler is undefined');
       }
 
+      // Verify that event handlers were registered (should be 2: grant and cancel buttons)
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(2);
+      expect(mockUnbindFunctions).toHaveLength(2);
+
       await grantButtonHandler({
         event: { type: UserInputEventType.ButtonClickEvent },
         interfaceId: mockInterfaceId,
@@ -149,7 +164,11 @@ describe('ConfirmationDialog', () => {
 
       await awaitingUserDecision;
 
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(2); // Grant, Cancel
+      // Verify that all unbind functions were called to clean up event listeners
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
       expect(mockSnaps.request).toHaveBeenCalledWith({
         method: 'snap_resolveInterface',
         params: {

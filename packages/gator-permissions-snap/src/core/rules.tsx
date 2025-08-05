@@ -8,6 +8,7 @@ import type {
   UserEventHandler,
 } from '../userEventDispatcher';
 import type { BaseContext, RuleDefinition } from './types';
+import { logger } from '../../../shared/src/utils/logger';
 import { DateTimeField } from '../ui/components/DateTimeField';
 import {
   combineDateAndTimeToTimestamp,
@@ -196,13 +197,7 @@ export function bindRuleHandlers<
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   onContextChanged: (args: { context: TContext }) => Promise<void>;
 }): () => void {
-  const handlers = rules.reduce<
-    {
-      elementName: string;
-      eventType: UserInputEventType;
-      handler: UserEventHandler<UserInputEventType>;
-    }[]
-  >((acc, rule) => {
+  const unbinders = rules.reduce<(() => void)[]>((acc, rule) => {
     const { name, isOptional, type, getRuleData } = rule;
 
     const handleInputChange: UserEventHandler<
@@ -266,7 +261,7 @@ export function bindRuleHandlers<
         currentValues.timestamp = timestamp.toString();
       } catch (error) {
         currentValues.timestamp = '';
-        console.log('Error combining date and time', error);
+        logger.log('Error combining date and time', error);
       }
 
       // Fix race condition: Use the stored context reference instead of calling getContext() again
@@ -275,100 +270,66 @@ export function bindRuleHandlers<
     };
 
     if (type === 'datetime') {
-      userEventDispatcher.on({
+      const { unbind: unbindTimeInputChange } = userEventDispatcher.on({
         elementName: `${name}_time`,
         eventType: UserInputEventType.InputChangeEvent,
         interfaceId,
         handler: handleDateInputChange,
       });
 
-      userEventDispatcher.on({
+      acc.push(unbindTimeInputChange);
+
+      const { unbind: unbindDateInputChange } = userEventDispatcher.on({
         elementName: `${name}_date`,
         eventType: UserInputEventType.InputChangeEvent,
         interfaceId,
         handler: handleDateInputChange,
       });
 
-      acc.push({
-        elementName: `${name}_time`,
-        eventType: UserInputEventType.InputChangeEvent,
-        handler: handleDateInputChange as UserEventHandler<UserInputEventType>,
-      });
-
-      acc.push({
-        elementName: `${name}_date`,
-        eventType: UserInputEventType.InputChangeEvent,
-        handler: handleDateInputChange as UserEventHandler<UserInputEventType>,
-      });
+      acc.push(unbindDateInputChange);
     } else {
-      userEventDispatcher.on({
+      const { unbind: unbindInputChange } = userEventDispatcher.on({
         elementName: name,
         eventType: UserInputEventType.InputChangeEvent,
         interfaceId,
         handler: handleInputChange,
       });
 
-      acc.push({
-        elementName: name,
-        eventType: UserInputEventType.InputChangeEvent,
-        handler: handleInputChange as UserEventHandler<UserInputEventType>,
-      });
+      acc.push(unbindInputChange);
     }
 
     if (isOptional) {
-      const handleAddFieldButtonClick: UserEventHandler<
-        UserInputEventType.ButtonClickEvent
-      > = async (_) => {
-        const updatedContext = rule.updateContext(getContext(), '');
-        await onContextChanged({ context: updatedContext });
-      };
-      userEventDispatcher.on({
+      const { unbind: unbindAddFieldButtonClick } = userEventDispatcher.on({
         elementName: `${rule.name}_addFieldButton`,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
-        handler: handleAddFieldButtonClick,
+        handler: async (_) => {
+          const updatedContext = rule.updateContext(getContext(), '');
+          await onContextChanged({ context: updatedContext });
+        },
       });
-      acc.push({
-        elementName: `${rule.name}_addFieldButton`,
-        eventType: UserInputEventType.ButtonClickEvent,
-        handler:
-          handleAddFieldButtonClick as UserEventHandler<UserInputEventType>,
-      });
+      acc.push(unbindAddFieldButtonClick);
 
-      const handleRemoveFieldButtonClick: UserEventHandler<
-        UserInputEventType.ButtonClickEvent
-      > = async (_) => {
-        const updatedContext = rule.updateContext(getContext(), undefined);
-
-        await onContextChanged({
-          context: updatedContext,
-        });
-      };
-      userEventDispatcher.on({
+      const { unbind: unbindRemoveFieldButtonClick } = userEventDispatcher.on({
         elementName: `${rule.name}_removeFieldButton`,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
-        handler: handleRemoveFieldButtonClick,
+        handler: async (_) => {
+          const updatedContext = rule.updateContext(getContext(), undefined);
+
+          await onContextChanged({
+            context: updatedContext,
+          });
+        },
       });
-      acc.push({
-        elementName: `${rule.name}_removeFieldButton`,
-        eventType: UserInputEventType.ButtonClickEvent,
-        handler:
-          handleRemoveFieldButtonClick as UserEventHandler<UserInputEventType>,
-      });
+
+      acc.push(unbindRemoveFieldButtonClick);
     }
 
     return acc;
   }, []);
 
   return () => {
-    handlers.forEach((handler) =>
-      userEventDispatcher.off({
-        elementName: handler.elementName,
-        eventType: handler.eventType,
-        interfaceId,
-        handler: handler.handler,
-      }),
-    );
+    unbinders.forEach((unbind) => unbind());
   };
 }

@@ -5,10 +5,7 @@ import type { AccountController } from '../accountController';
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
-import type {
-  UserEventDispatcher,
-  UserEventHandler,
-} from '../userEventDispatcher';
+import type { UserEventDispatcher } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import {
   PermissionHandlerContent,
@@ -199,19 +196,16 @@ export class PermissionHandler<
       const rerender = async () =>
         await updateContext({ updatedContext: currentContext });
 
-      const showMoreButtonClickHandler: UserEventHandler<
-        UserInputEventType.ButtonClickEvent
-      > = async () => {
-        this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
-        await rerender();
-      };
-
-      this.#userEventDispatcher.on({
-        elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId,
-        handler: showMoreButtonClickHandler,
-      });
+      const { unbind: unbindShowMoreButtonClick } =
+        this.#userEventDispatcher.on({
+          elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
+          eventType: UserInputEventType.ButtonClickEvent,
+          interfaceId,
+          handler: async () => {
+            this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
+            await rerender();
+          },
+        });
 
       const deregisterRuleHandlers = bindRuleHandlers({
         rules: this.#rules,
@@ -227,12 +221,7 @@ export class PermissionHandler<
 
       this.#deregisterHandlers = () => {
         deregisterRuleHandlers();
-        this.#userEventDispatcher.off({
-          elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: showMoreButtonClickHandler,
-        });
+        unbindShowMoreButtonClick();
       };
     };
 
