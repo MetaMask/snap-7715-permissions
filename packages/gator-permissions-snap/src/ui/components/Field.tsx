@@ -82,6 +82,31 @@ const isDisplayFieldProps = (props: FieldProps): props is ViewFieldProps => {
   return props.variant === 'display';
 };
 
+/**
+ * Renders a form field component with optional label, tooltip, error message, icon, and toggle/add/remove buttons.
+ *
+ * The `Field` component supports three main field types:
+ * - Display fields (with children and optional icon)
+ * - Input fields (with children, optional icon, and remove button)
+ * - Generic fields (with children only)
+ *
+ * Toggle functionality is enabled by providing both `addFieldButtonName` and `removeFieldButtonName`.
+ * When toggling is enabled and the field is disabled, only the label section is shown.
+ *
+ * @param props - The properties for the Field component.
+ * @param props.label - The label text for the field.
+ * @param props.tooltip - Optional tooltip text for the label.
+ * @param props.errorMessage - Optional error message to display.
+ * @param props.disabled - Whether the field is disabled.
+ * @param props.isFieldEnabled - Whether the field is currently enabled (default: true).
+ * @param props.addFieldButtonName - Name for the add field button (enables toggle).
+ * @param props.removeFieldButtonName - Name for the remove field button (enables toggle).
+ * @param props.iconData - Optional icon data for display or input fields.
+ * @param props.removeButtonName - Optional name for the remove button (input fields).
+ * @param props.children - The content to render inside the field.
+ *
+ * @returns The rendered Field component.
+ */
 export const Field = (props: FieldProps) => {
   const {
     label,
@@ -95,8 +120,13 @@ export const Field = (props: FieldProps) => {
 
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
 
-  let toggleFieldButton: SnapElement | null = null;
+  /**
+   * The way to enable the toggle feature is to provide both
+   * addFieldButtonName and removeFieldButtonName.
+   */
   const hasToggleButtons = Boolean(addFieldButtonName ?? removeFieldButtonName);
+
+  let toggleFieldButton: SnapElement | null = null;
 
   if (hasToggleButtons && !disabled) {
     const toggleFieldButtonName = isFieldEnabled
@@ -125,6 +155,10 @@ export const Field = (props: FieldProps) => {
     </Box>
   );
 
+  /**
+   * Once the toggle feature is enabled, and the field is disabled,
+   * we only show the label section.
+   */
   if (hasToggleButtons && !isFieldEnabled) {
     return <Box direction="vertical">{labelSection}</Box>;
   }
