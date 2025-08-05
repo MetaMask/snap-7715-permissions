@@ -266,9 +266,9 @@ export class PermissionHandler<
           // send the request to fetch the fiat balance, then re-render the UI while we wait for the response
           const fiatBalanceRequest =
             this.#tokenPricesService.getCryptoToFiatConversion(
-              initialContext.tokenAddressCaip19,
+              context.tokenAddressCaip19,
               bigIntToHex(balance),
-              initialContext.tokenMetadata.decimals,
+              context.tokenMetadata.decimals,
             );
 
           await rerender();
