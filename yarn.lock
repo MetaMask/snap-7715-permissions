@@ -3336,18 +3336,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-core@npm:0.2.0-rc.1":
-  version: 0.2.0-rc.1
-  resolution: "@metamask/delegation-core@npm:0.2.0-rc.1"
-  dependencies:
-    "@metamask/abi-utils": ^3.0.0
-    "@metamask/utils": ^11.4.0
-    "@noble/hashes": ^1.8.0
-  checksum: d14829231644235391e9769d66bc1181391b026500db13700543b4d73cca20d672f719d0e64cd887db3ba0ad19a4e54dba2cc0fd7f3554398dfe089f6d991947
-  languageName: node
-  linkType: hard
-
-"@metamask/delegation-core@npm:^0.2.0-rc.1":
+"@metamask/delegation-core@npm:0.2.0-rc.1, @metamask/delegation-core@npm:^0.2.0-rc.1":
   version: 0.2.0-rc.1
   resolution: "@metamask/delegation-core@npm:0.2.0-rc.1"
   dependencies:
