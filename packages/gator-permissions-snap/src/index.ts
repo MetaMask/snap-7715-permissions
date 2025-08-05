@@ -131,7 +131,6 @@ const profileSyncManager = createProfileSyncManager({
 });
 
 const homepage = new HomePage({
-  accountController,
   snapsProvider: snap,
   profileSyncManager,
 });
