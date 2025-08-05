@@ -293,12 +293,13 @@ describe('erc20TokenStream:context', () => {
       Math.floor(Date.now() / 1000) +
       24 * 60 * 60
     ).toString(); // 24 hours from now
+    const startTime = (Math.floor(Date.now() / 1000) + 12 * 60 * 60).toString(); // 12 hours from now
     const context = {
       ...alreadyPopulatedContext,
       expiry: dateInTheFuture, // 24 hours from now
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: dateInTheFuture,
+        startTime, // 12 hours from now (before expiry)
       },
     };
 
@@ -476,12 +477,12 @@ describe('erc20TokenStream:context', () => {
 
         it.each([['12345678'], ['0x1234'], ['Steve']])(
           'should return a validation error for invalid startTime %s',
-          async (startTime) => {
+          async (startTimeArg) => {
             const contextWithInvalidStartTime = {
               ...context,
               permissionDetails: {
                 ...context.permissionDetails,
-                startTime,
+                startTime: startTimeArg,
               },
             };
 

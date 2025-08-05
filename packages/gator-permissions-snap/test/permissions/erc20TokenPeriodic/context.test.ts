@@ -230,13 +230,14 @@ describe('erc20TokenPeriodic:context', () => {
       Math.floor(Date.now() / 1000) +
       24 * 60 * 60
     ).toString(); // 24 hours from now
+    const startTime = (Math.floor(Date.now() / 1000) + 12 * 60 * 60).toString(); // 12 hours from now
 
     const context = {
       ...alreadyPopulatedContext,
       expiry: dateInTheFuture,
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: dateInTheFuture,
+        startTime, // 12 hours from now (before expiry)
       },
     };
 
@@ -316,7 +317,6 @@ describe('erc20TokenPeriodic:context', () => {
           permissionDetails: {
             ...context.permissionDetails,
             periodDuration: '-1',
-            startTime: dateInTheFuture,
           },
         };
 
