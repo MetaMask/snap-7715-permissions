@@ -6,7 +6,6 @@ import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
-  convertTimestampToReadableDate,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
@@ -154,7 +153,7 @@ export async function buildContext({
     decimals,
   );
 
-  const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
+  const expiry = permissionRequest.expiry.toString();
 
   const initialAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.initialAmount,
@@ -181,10 +180,9 @@ export async function buildContext({
     decimals,
   });
 
-  const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime ??
-      Math.floor(Date.now() / 1000),
-  );
+  const startTime =
+    permissionRequest.permission.data.startTime?.toString() ??
+    Math.floor(Date.now() / 1000).toString();
 
   const balance = bigIntToHex(rawBalance);
 

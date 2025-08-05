@@ -47,6 +47,8 @@ const mockMetadata: TestMetadata = {
   validationErrors: {},
 };
 
+const mockDeriveMetadata = jest.fn(async () => mockMetadata);
+
 const textRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-text-rule',
   label: 'Test Text Rule',
@@ -798,6 +800,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        deriveMetadata: mockDeriveMetadata,
       });
 
       expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(5); // 3 input handlers + 1 toggle on + 1 toggle off
@@ -834,6 +837,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        deriveMetadata: mockDeriveMetadata,
       });
 
       expect(mockUserEventDispatcher.on).toHaveBeenCalledWith({
@@ -853,6 +857,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        deriveMetadata: mockDeriveMetadata,
       });
 
       // Get the handler that was bound
@@ -887,6 +892,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        deriveMetadata: mockDeriveMetadata,
       });
 
       // Get the remove button handler
@@ -921,6 +927,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        deriveMetadata: mockDeriveMetadata,
       });
 
       expect(typeof unbind).toBe('function');
@@ -959,6 +966,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        deriveMetadata: mockDeriveMetadata,
       });
 
       expect(mockUserEventDispatcher.on).not.toHaveBeenCalled();

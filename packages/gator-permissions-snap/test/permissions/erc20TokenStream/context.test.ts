@@ -16,10 +16,7 @@ import type {
 } from '../../../src/permissions/erc20TokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
-import {
-  convertTimestampToReadableDate,
-  convertReadableDateToTimestamp,
-} from '../../../src/utils/time';
+import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 
 const USDC_ADDRESS = '0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F';
 const USDC_DECIMALS = 6;
@@ -29,7 +26,7 @@ const permissionWithoutOptionals: Erc20TokenStreamPermission = {
   data: {
     tokenAddress: USDC_ADDRESS,
     amountPerSecond: numberToHex(500_000), // 0.5 USDC per second (6 decimals)
-    startTime: 499132800, // 10/26/1985,
+    startTime: 1729987200, // 10/26/2024,
     justification: 'Permission to do something important',
   },
 };
@@ -55,11 +52,17 @@ const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
       address: '0x1',
     },
   },
-  permission: alreadyPopulatedPermission,
+  permission: {
+    ...alreadyPopulatedPermission,
+    data: {
+      ...alreadyPopulatedPermission.data,
+      startTime: convertReadableDateToTimestamp('10/26/2024'),
+    },
+  },
 };
 
 const alreadyPopulatedContext: Erc20TokenStreamContext = {
-  expiry: '05/01/2024',
+  expiry: '1714521600',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -76,7 +79,7 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
     initialAmount: '1',
     maxAmount: '10',
     timePeriod: TimePeriod.WEEKLY,
-    startTime: '10/26/1985',
+    startTime: '1729900800',
     amountPerPeriod: '302400',
   },
 } as const;
@@ -286,12 +289,16 @@ describe('erc20TokenStream:context', () => {
   });
 
   describe('createContextMetadata()', () => {
+    const dateInTheFuture = (
+      Math.floor(Date.now() / 1000) +
+      24 * 60 * 60
+    ).toString(); // 24 hours from now
     const context = {
       ...alreadyPopulatedContext,
-      expiry: convertTimestampToReadableDate(Date.now() / 1000 + 24 * 60 * 60), // 24 hours from now
+      expiry: dateInTheFuture, // 24 hours from now
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: convertTimestampToReadableDate(Date.now() / 1000),
+        startTime: dateInTheFuture,
       },
     };
 

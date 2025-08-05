@@ -33,7 +33,7 @@ const permissionWithoutOptionals: Erc20TokenPeriodicPermission = {
       parseUnits({ formatted: '100', decimals: tokenDecimals }),
     ), // 100 USDC per period
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-    startTime: convertReadableDateToTimestamp('10/26/1985'),
+    startTime: convertReadableDateToTimestamp('10/26/2024'),
     tokenAddress,
     justification: 'Permission to do something important',
   },
@@ -56,11 +56,17 @@ const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
       address: '0x1',
     },
   },
-  permission: alreadyPopulatedPermission,
+  permission: {
+    ...alreadyPopulatedPermission,
+    data: {
+      ...alreadyPopulatedPermission.data,
+      startTime: convertReadableDateToTimestamp('10/26/2024'),
+    },
+  },
 };
 
 const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
-  expiry: '05/01/2024',
+  expiry: '1714521600',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -79,7 +85,7 @@ const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
     periodAmount: '100',
     periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
-    startTime: '10/26/1985',
+    startTime: '1729900800',
   },
 } as const;
 
@@ -220,12 +226,17 @@ describe('erc20TokenPeriodic:context', () => {
   });
 
   describe('createContextMetadata()', () => {
+    const dateInTheFuture = (
+      Math.floor(Date.now() / 1000) +
+      24 * 60 * 60
+    ).toString(); // 24 hours from now
+
     const context = {
       ...alreadyPopulatedContext,
-      expiry: convertTimestampToReadableDate(Date.now() / 1000 + 24 * 60 * 60), // 24 hours from now
+      expiry: dateInTheFuture,
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: convertTimestampToReadableDate(Date.now() / 1000),
+        startTime: dateInTheFuture,
       },
     };
 
@@ -305,6 +316,7 @@ describe('erc20TokenPeriodic:context', () => {
           permissionDetails: {
             ...context.permissionDetails,
             periodDuration: '-1',
+            startTime: dateInTheFuture,
           },
         };
 
