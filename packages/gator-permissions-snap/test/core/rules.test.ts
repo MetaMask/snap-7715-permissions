@@ -775,7 +775,7 @@ describe('rules', () => {
     let mockOnContextChanged: jest.MockedFunction<
       (args: { context: TestContext }) => Promise<void>
     >;
-    let mockUnbindFunctions: jest.MockedFunction<() => UserEventDispatcher>[];
+    let mockUnbindFunctions: jest.MockedFunction<() => void>[];
 
     beforeEach(() => {
       // Reset the array of mock unbind functions for each test
@@ -784,9 +784,7 @@ describe('rules', () => {
       mockUserEventDispatcher = {
         on: jest.fn().mockImplementation(() => {
           // Create a new mock unbind function for each call to on()
-          const mockUnbind = jest
-            .fn<() => UserEventDispatcher>()
-            .mockReturnValue(mockUserEventDispatcher);
+          const mockUnbind = jest.fn<() => void>();
           mockUnbindFunctions.push(mockUnbind);
           return { unbind: mockUnbind, dispatcher: mockUserEventDispatcher };
         }),

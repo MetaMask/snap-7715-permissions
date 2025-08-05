@@ -10,7 +10,7 @@ describe('ConfirmationDialog', () => {
   let mockSnaps: jest.Mocked<SnapsProvider>;
   let mockUserEventDispatcher: jest.Mocked<UserEventDispatcher>;
   let confirmationDialog: ConfirmationDialog;
-  let mockUnbindFunctions: jest.MockedFunction<() => UserEventDispatcher>[];
+  let mockUnbindFunctions: jest.MockedFunction<() => void>[];
   const mockInterfaceId = 'test-interface-id';
 
   const mockUi = Text({
@@ -32,9 +32,7 @@ describe('ConfirmationDialog', () => {
     mockUserEventDispatcher = {
       on: jest.fn().mockImplementation(() => {
         // Create a new mock unbind function for each call to on()
-        const mockUnbind = jest
-          .fn<() => UserEventDispatcher>()
-          .mockReturnValue(mockUserEventDispatcher);
+        const mockUnbind = jest.fn<() => void>();
         mockUnbindFunctions.push(mockUnbind);
         return { unbind: mockUnbind, dispatcher: mockUserEventDispatcher };
       }),
