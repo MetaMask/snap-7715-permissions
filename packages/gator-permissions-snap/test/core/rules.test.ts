@@ -196,6 +196,13 @@ describe('rules', () => {
               },
               "type": "Input",
             },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Field",
@@ -268,6 +275,13 @@ describe('rules', () => {
               },
               "type": "Input",
             },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Field",
@@ -296,23 +310,26 @@ describe('rules', () => {
         "key": null,
         "props": {
           "alignment": "space-between",
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
-                  "key": null,
-                  "props": {
-                    "children": "Test Dropdown Rule",
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "children": "Test Dropdown Rule",
+                    },
+                    "type": "Text",
                   },
-                  "type": "Text",
-                },
-                null,
-              ],
-              "direction": "horizontal",
+                  null,
+                ],
+                "direction": "horizontal",
+              },
+              "type": "Box",
             },
-            "type": "Box",
-          },
+            null,
+          ],
           "direction": "horizontal",
         },
         "type": "Box",
@@ -452,6 +469,13 @@ describe('rules', () => {
               },
               "type": "Input",
             },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Field",
@@ -481,36 +505,47 @@ describe('rules', () => {
       {
         "key": null,
         "props": {
+          "alignment": "space-between",
           "children": [
             {
               "key": null,
               "props": {
-                "children": "Test Text Rule",
-              },
-              "type": "Text",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {
-                    "color": "muted",
-                    "name": "question",
-                    "size": "inherit",
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "children": "Test Text Rule",
+                    },
+                    "type": "Text",
                   },
-                  "type": "Icon",
-                },
-                "content": {
-                  "key": null,
-                  "props": {
-                    "children": "This is a test text rule",
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "color": "muted",
+                          "name": "question",
+                          "size": "inherit",
+                        },
+                        "type": "Icon",
+                      },
+                      "content": {
+                        "key": null,
+                        "props": {
+                          "children": "This is a test text rule",
+                        },
+                        "type": "Text",
+                      },
+                    },
+                    "type": "Tooltip",
                   },
-                  "type": "Text",
-                },
+                ],
+                "direction": "horizontal",
               },
-              "type": "Tooltip",
+              "type": "Box",
             },
+            null,
           ],
           "direction": "horizontal",
         },
@@ -625,6 +660,13 @@ describe('rules', () => {
               },
               "type": "Input",
             },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
+            },
           ],
           "error": "This field has an error",
         },
@@ -678,7 +720,36 @@ describe('rules', () => {
         },
         "type": "Box",
       },
-      false,
+      {
+        "key": null,
+        "props": {
+          "children": [
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "name": "undefined-value-rule",
+                "type": "text",
+              },
+              "type": "Input",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
+            },
+          ],
+        },
+        "type": "Field",
+      },
     ],
     "direction": "vertical",
   },

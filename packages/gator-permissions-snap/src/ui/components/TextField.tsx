@@ -1,18 +1,13 @@
-import { Box, Text } from '@metamask/snaps-sdk/jsx';
+import { Text } from '@metamask/snaps-sdk/jsx';
 
-import { TokenIcon } from './TokenIcon';
-import { TooltipIcon } from './TooltipIcon';
+import type { ViewFieldProps } from './Field';
+import { Field } from './Field';
 
-export type TextFieldParams = {
-  label: string;
+export type TextFieldParams = Pick<
+  ViewFieldProps,
+  'label' | 'tooltip' | 'iconData'
+> & {
   value: string;
-  tooltip?: string | undefined;
-  iconData?:
-    | {
-        iconDataBase64: string;
-        iconAltText: string;
-      }
-    | undefined;
 };
 
 export const TextField = ({
@@ -21,24 +16,14 @@ export const TextField = ({
   tooltip,
   iconData,
 }: TextFieldParams) => {
-  const iconElement = iconData ? (
-    <TokenIcon
-      imageDataBase64={iconData.iconDataBase64}
-      altText={iconData.iconAltText}
-    />
-  ) : null;
-  const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
-
   return (
-    <Box direction="horizontal" alignment="space-between">
-      <Box direction="horizontal">
-        <Text>{label}</Text>
-        {tooltipElement}
-      </Box>
-      <Box direction="horizontal">
-        {iconElement}
-        <Text>{value}</Text>
-      </Box>
-    </Box>
+    <Field
+      label={label}
+      tooltip={tooltip}
+      iconData={iconData}
+      variant="display"
+    >
+      <Text>{value}</Text>
+    </Field>
   );
 };
