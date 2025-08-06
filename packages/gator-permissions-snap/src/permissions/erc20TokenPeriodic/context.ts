@@ -14,6 +14,7 @@ import {
   validateStartTime,
   validateExpiry,
   validatePeriodDuration,
+  validateStartTimeVsExpiry,
 } from '../contextValidation';
 import type {
   Erc20TokenPeriodicContext,
@@ -78,6 +79,10 @@ export async function populatePermission({
 }): Promise<PopulatedErc20TokenPeriodicPermission> {
   return {
     ...permission,
+    data: {
+      ...permission.data,
+      startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
+    },
     rules: permission.rules ?? {},
   };
 }
@@ -157,7 +162,9 @@ export async function buildContext({
     periodType = 'Other';
   }
 
-  const startTime = permissionRequest.permission.data.startTime.toString();
+  const startTime =
+    permissionRequest.permission.data.startTime?.toString() ??
+    Math.floor(Date.now() / 1000).toString();
 
   const balance = bigIntToHex(rawBalance);
 
@@ -231,6 +238,17 @@ export async function deriveMetadata({
   const expiryError = validateExpiry(expiry);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
+  }
+
+  // Validate start time vs expiry (only if individual validations passed)
+  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+    const startTimeVsExpiryError = validateStartTimeVsExpiry(
+      permissionDetails.startTime,
+      expiry,
+    );
+    if (startTimeVsExpiryError) {
+      validationErrors.startTimeError = startTimeVsExpiryError;
+    }
   }
 
   return {

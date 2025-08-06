@@ -77,9 +77,11 @@ export type DeepRequired<TParent> = TParent extends (infer U)[]
   ? DeepRequired<U>[]
   : TParent extends object
     ? {
-        [P in keyof TParent]-?: DeepRequired<Exclude<TParent[P], undefined>>;
+        [P in keyof TParent]-?: DeepRequired<
+          Exclude<TParent[P], undefined | null>
+        >;
       }
-    : Exclude<TParent, undefined>;
+    : Exclude<TParent, undefined | null>;
 
 /**
  * An enum representing the time periods for which the stream rate can be calculated.

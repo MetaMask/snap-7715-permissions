@@ -19,7 +19,7 @@ describe('validate utils', () => {
         parsePermissionRequestParam([
           {
             chainId: '0x1',
-            expiry: 1,
+            expiry: Math.floor(Date.now() / 1000) + 3600, // 1 hour in the future
             signer: {
               type: 'account',
               data: {
@@ -47,7 +47,7 @@ describe('validate utils', () => {
       const validResponse = [
         {
           chainId: '0x1',
-          expiry: 1,
+          expiry: Math.floor(Date.now() / 1000) + 3600, // 1 hour in the future
           signer: {
             type: 'account',
             data: {
