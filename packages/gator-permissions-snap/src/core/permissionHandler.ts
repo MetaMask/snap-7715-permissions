@@ -171,7 +171,7 @@ export class PermissionHandler<
         ) {
           throw new Error('Requested address not found');
         }
-        address = requestedAddressLowercase;
+        address = request.address;
       }
 
       return await this.#dependencies.buildContext({
@@ -296,9 +296,10 @@ export class PermissionHandler<
       };
 
       // we explicitly don't await this as it's a background process that will re-render the UI (twice) once it is complete
-      fetchAccountBalance(currentContext).catch((error) =>
-        logger.error(`Fetching account balance failed: ${error.message}`),
-      );
+      fetchAccountBalance(currentContext).catch((error) => {
+        const { message } = error as Error;
+        logger.error(`Fetching account balance failed: ${message}`);
+      });
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
@@ -325,9 +326,10 @@ export class PermissionHandler<
         this.#tokenBalanceFiat = undefined;
 
         // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
-        fetchAccountBalance(currentContext).catch((error) =>
-          logger.error(`Fetching account balance failed: ${error.message}`),
-        );
+        fetchAccountBalance(currentContext).catch((error) => {
+          const { message } = error as Error;
+          logger.error(`Fetching account balance failed: ${message}`);
+        });
 
         await rerender();
       };

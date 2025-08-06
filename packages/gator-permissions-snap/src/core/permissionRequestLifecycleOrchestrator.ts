@@ -5,11 +5,18 @@ import type {
 } from '@metamask/7715-permissions-shared/types';
 import type { Delegation } from '@metamask/delegation-core';
 import {
+  createNonceTerms,
   createTimestampTerms,
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import { bytesToHex, hexToNumber, numberToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  bytesToHex,
+  hexToNumber,
+  numberToHex,
+} from '@metamask/utils';
+import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
@@ -34,18 +41,23 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
+  readonly #nonceCaveatService: NonceCaveatService;
+
   constructor({
     accountController,
     confirmationDialogFactory,
     userEventDispatcher,
+    nonceCaveatService,
   }: {
     accountController: AccountControllerInterface;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
+    nonceCaveatService: NonceCaveatService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#nonceCaveatService = nonceCaveatService;
   }
 
   /**
@@ -273,6 +285,19 @@ export class PermissionRequestLifecycleOrchestrator {
       terms: createTimestampTerms({
         timestampAfterThreshold,
         timestampBeforeThreshold,
+      }),
+      args: '0x',
+    });
+
+    const nonce = await this.#nonceCaveatService.getNonce({
+      chainId,
+      account: address,
+    });
+
+    caveats.push({
+      enforcer: contracts.enforcers.NonceEnforcer,
+      terms: createNonceTerms({
+        nonce: bigIntToHex(nonce),
       }),
       args: '0x',
     });

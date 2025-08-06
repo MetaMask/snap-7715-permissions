@@ -19,6 +19,7 @@ import type {
 
 import { AccountApiClient } from './clients/accountApiClient';
 import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
+import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
@@ -33,6 +34,7 @@ import {
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { NonceCaveatService } from './services/nonceCaveatService';
 import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
@@ -74,6 +76,14 @@ const tokenMetadataClient = new BlockchainTokenMetadataClient({
 const tokenMetadataService = new TokenMetadataService({
   accountApiClient,
   tokenMetadataClient,
+});
+
+const nonceCaveatClient = new NonceCaveatClient({
+  ethereumProvider: ethereum,
+});
+
+const nonceCaveatService = new NonceCaveatService({
+  nonceCaveatClient,
 });
 
 const accountController = new AccountController({
@@ -139,6 +149,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
   userEventDispatcher,
+  nonceCaveatService,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
