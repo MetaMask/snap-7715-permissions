@@ -1,9 +1,13 @@
-import { bigIntToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  parseCaipAccountId,
+  toCaipAssetType,
+  toCaipAccountId,
+  type Hex,
+} from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
@@ -15,6 +19,7 @@ import {
   validateExpiry,
   validateMaxAmountVsInitialAmount,
   calculateAmountPerSecond,
+  validateStartTimeVsExpiry,
 } from '../contextValidation';
 import type {
   NativeTokenStreamContext,
@@ -27,6 +32,9 @@ import type {
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const DEFAULT_INITIAL_AMOUNT = '0x0';
+const ASSET_NAMESPACE = 'slip44';
+const CHAIN_NAMESPACE = 'eip155';
+const ASSET_REFERENCE = '60';
 
 /**
  * Construct an amended NativeTokenStreamPermissionRequest, based on the specified request,
@@ -68,8 +76,11 @@ export async function applyContext({
     justification: originalRequest.permission.data.justification,
   };
 
+  const { address } = parseCaipAccountId(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
+    address: address as Hex,
     expiry,
     permission: {
       type: 'native-token-stream',
@@ -96,6 +107,7 @@ export async function populatePermission({
       ...permission.data,
       initialAmount: permission.data.initialAmount ?? DEFAULT_INITIAL_AMOUNT,
       maxAmount: permission.data.maxAmount ?? DEFAULT_MAX_AMOUNT,
+      startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
     },
     rules: permission.rules ?? {},
   };
@@ -106,37 +118,35 @@ export async function populatePermission({
  * and manage the permission state.
  * @param options0 - The options object containing the request and required services.
  * @param options0.permissionRequest - The native token stream permission request to convert.
- * @param options0.tokenPricesService - Service for fetching token price information.
- * @param options0.accountController - Controller for managing account operations.
  * @param options0.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
-  accountController,
   tokenMetadataService,
 }: {
   permissionRequest: NativeTokenStreamPermissionRequest;
-  tokenPricesService: TokenPricesService;
-  accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenStreamContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const address = await accountController.getAccountAddress({
-    chainId,
-  });
-
   const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: address,
-  });
+    address,
+    isAdjustmentAllowed = true,
+    permission: { data },
+  } = permissionRequest;
+
+  if (!address) {
+    throw new Error(
+      'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
+    );
+  }
+
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: address,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -145,16 +155,10 @@ export async function buildContext({
     ? iconDataResponse.imageDataBase64
     : null;
 
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:1/slip44:60`,
-    bigIntToHex(rawBalance),
-    decimals,
-  );
-
   const expiry = permissionRequest.expiry.toString();
 
   const initialAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.initialAmount,
+    value: data.initialAmount,
     allowUndefined: true,
     decimals,
   });
@@ -162,14 +166,12 @@ export async function buildContext({
   const timePeriod = TimePeriod.WEEKLY;
 
   const maxAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.maxAmount,
+    value: data.maxAmount,
     allowUndefined: true,
     decimals,
   });
 
-  const amountPerSecond = BigInt(
-    permissionRequest.permission.data.amountPerSecond,
-  );
+  const amountPerSecond = BigInt(data.amountPerSecond);
 
   // It may seem strange to convert the amount per second to amount per period, format, and then convert back to amount per second.
   // The user is inputting amount per period, and we derive amount per second, so it makes sense for the context to contain the amount per period.
@@ -178,19 +180,27 @@ export async function buildContext({
     decimals,
   });
 
-  const startTime = permissionRequest.permission.data.startTime.toString();
+  const startTime = data.startTime?.toString() ?? Math.floor(Date.now() / 1000);
 
-  const balance = bigIntToHex(rawBalance);
+  const tokenAddressCaip19 = toCaipAssetType(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    ASSET_NAMESPACE,
+    ASSET_REFERENCE,
+  );
+
+  const accountAddressCaip10 = toCaipAccountId(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    address,
+  );
 
   return {
     expiry,
-    justification: permissionRequest.permission.data.justification,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    justification: data.justification,
+    isAdjustmentAllowed,
+    accountAddressCaip10,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,
@@ -274,6 +284,17 @@ export async function deriveMetadata({
   const expiryError = validateExpiry(expiry);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
+  }
+
+  // Validate start time vs expiry (only if individual validations passed)
+  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+    const startTimeVsExpiryError = validateStartTimeVsExpiry(
+      permissionDetails.startTime,
+      expiry,
+    );
+    if (startTimeVsExpiryError) {
+      validationErrors.startTimeError = startTimeVsExpiryError;
+    }
   }
 
   // Validate max amount vs initial amount

@@ -13,7 +13,7 @@ import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 const TEST_ADDRESS = '0x1234567890123456789012345678901234567890' as const;
 const TEST_SITE_ORIGIN = 'https://example.com';
 const TEST_CHAIN_ID = '0x1' as const;
-const TEST_EXPIRY = 1234567890;
+const TEST_EXPIRY = Math.floor(Date.now() / 1000) + 86400; // 24 hours from now
 const TEST_CONTEXT = '0xabcd' as const;
 
 const VALID_PERMISSION_REQUEST: PermissionRequest = {

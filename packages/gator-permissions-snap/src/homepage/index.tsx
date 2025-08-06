@@ -9,18 +9,17 @@ import {
   Address,
   Row,
   Divider,
+  Skeleton,
 } from '@metamask/snaps-sdk/jsx';
 
-import type { AccountController } from '../accountController';
+import type { AccountControllerInterface } from '../core/types';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../profileSync';
 
-const MAINNET_CHAIN_ID = 1;
-
 export class HomePage {
-  #accountController: AccountController;
+  #accountController: AccountControllerInterface;
 
   #snapsProvider: SnapsProvider;
 
@@ -31,7 +30,7 @@ export class HomePage {
     snapsProvider,
     profileSyncManager,
   }: {
-    accountController: AccountController;
+    accountController: AccountControllerInterface;
     snapsProvider: SnapsProvider;
     profileSyncManager: ProfileSyncManager;
   }) {
@@ -53,10 +52,7 @@ export class HomePage {
   }: {
     showDirectionsToHomepage: boolean;
   }) {
-    const address = await this.#accountController.getAccountAddress({
-      // this chainId actually doesn't matter here, because we're only using it to infer the address
-      chainId: MAINNET_CHAIN_ID,
-    });
+    const [address] = await this.#accountController.getAccountAddresses();
 
     const grantedPermissions: StoredGrantedPermission[] =
       await this.#profileSyncManager.getAllGrantedPermissions();
@@ -72,9 +68,13 @@ export class HomePage {
             be used on Sepolia testnet.
           </Text>
           <Box direction="vertical">
-            <Link href={`https://sepolia.etherscan.io/address/${address}`}>
-              <Address address={address} />
-            </Link>
+            {address ? (
+              <Link href={`https://sepolia.etherscan.io/address/${address}`}>
+                <Address address={address} />
+              </Link>
+            ) : (
+              <Skeleton />
+            )}
           </Box>
           {showDirectionsToHomepage && (
             <Text>
