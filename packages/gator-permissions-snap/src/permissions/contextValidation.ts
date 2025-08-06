@@ -94,6 +94,29 @@ export function validateExpiry(expiry: string): string | undefined {
 }
 
 /**
+ * Validates that start time is before expiry.
+ * @param startTime - The start time string to validate.
+ * @param expiry - The expiry time string to validate.
+ * @returns Validation error message or undefined if valid.
+ */
+export function validateStartTimeVsExpiry(
+  startTime: string,
+  expiry: string,
+): string | undefined {
+  try {
+    const startTimeDate = convertReadableDateToTimestamp(startTime);
+    const expiryDate = convertReadableDateToTimestamp(expiry);
+    if (startTimeDate >= expiryDate) {
+      return 'Start time must be before expiry';
+    }
+    return undefined;
+  } catch (error) {
+    // If date conversion fails, return undefined to let individual validation handle it
+    return undefined;
+  }
+}
+
+/**
  * Validates that max amount is greater than initial amount.
  * @param maxAmount - The maximum amount as BigInt.
  * @param initialAmount - The initial amount as BigInt.

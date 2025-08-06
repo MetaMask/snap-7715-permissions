@@ -115,6 +115,31 @@ describe('erc20TokenPeriodic:context', () => {
 
       expect(populatedPermission).toStrictEqual(permission);
     });
+
+    it('should set startTime to current timestamp when it is null', async () => {
+      const beforeTime = Math.floor(Date.now() / 1000);
+
+      const permission: Erc20TokenPeriodicPermission = {
+        type: 'erc20-token-periodic',
+        data: {
+          tokenAddress,
+          periodAmount: '0x1000000000000000000000000000000000000000',
+          periodDuration: 86400,
+          startTime: null,
+          justification: 'Permission to do something important',
+        },
+        rules: {},
+      };
+
+      const populatedPermission = await populatePermission({ permission });
+
+      const afterTime = Math.floor(Date.now() / 1000);
+
+      expect(populatedPermission.data.startTime).toBeGreaterThanOrEqual(
+        beforeTime,
+      );
+      expect(populatedPermission.data.startTime).toBeLessThanOrEqual(afterTime);
+    });
   });
 
   describe('permissionRequestToContext()', () => {
@@ -173,13 +198,14 @@ describe('erc20TokenPeriodic:context', () => {
       Math.floor(Date.now() / 1000) +
       24 * 60 * 60
     ).toString(); // 24 hours from now
+    const startTime = (Math.floor(Date.now() / 1000) + 12 * 60 * 60).toString(); // 12 hours from now
 
     const context = {
       ...alreadyPopulatedContext,
       expiry: dateInTheFuture,
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: dateInTheFuture,
+        startTime, // 12 hours from now (before expiry)
       },
     };
 
@@ -259,7 +285,6 @@ describe('erc20TokenPeriodic:context', () => {
           permissionDetails: {
             ...context.permissionDetails,
             periodDuration: '-1',
-            startTime: dateInTheFuture,
           },
         };
 
