@@ -14,7 +14,7 @@ import type {
   Erc20TokenStreamMetadata,
 } from './types';
 import { renderRules } from '../../core/rules';
-import { AccountDetails, TokenIcon, TooltipIcon } from '../../ui/components';
+import { TokenIcon, TooltipIcon } from '../../ui/components';
 
 /**
  * Creates the confirmation content for an ERC20 token stream permission request.
@@ -34,12 +34,6 @@ export async function createConfirmationContent({
 
   return (
     <Box>
-      <AccountDetails
-        account={context.accountDetails}
-        tokenMetadata={context.tokenMetadata}
-        title="Stream from"
-        tooltip="The account that the token stream comes from."
-      />
       <Section>
         {renderRules({
           rules: [streamAmountPerPeriodRule, streamPeriodRule],

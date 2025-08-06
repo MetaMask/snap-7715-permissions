@@ -102,15 +102,36 @@ describe('BlockchainTokenMetadataClient', () => {
       expect(mockEthereumProvider.request).not.toHaveBeenCalled();
     });
 
-    it('throws an error if selected chain does not match requested chain', async () => {
-      mockEthereumProvider.request.mockResolvedValueOnce('0x01'); // eth_chainId
+    it('switches chain if selected chain does not match requested chain', async () => {
+      mockEthereumProvider.request
+        .mockResolvedValueOnce('0x01') // eth_chainId
+        .mockResolvedValueOnce('OK') // switch chain
+        .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
+        .mockResolvedValueOnce(
+          '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
+        ) // balanceOf
+        .mockResolvedValueOnce(
+          '0x0000000000000000000000000000000000000000000000000000000000000012',
+        ) // decimals
+        .mockResolvedValueOnce(
+          '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000034441490000000000000000000000000000000000000000000000000000000000',
+        ); // symbol
 
-      await expect(
-        client.getTokenBalanceAndMetadata({
-          chainId: mockChainId,
-          account: mockAccount,
-        }),
-      ).rejects.toThrow('Selected chain does not match the requested chain');
+      const result = await client.getTokenBalanceAndMetadata({
+        chainId: mockChainId,
+        account: mockAccount,
+      });
+
+      expect(result).toStrictEqual({
+        balance: 1000000000000000000n,
+        decimals: 18,
+        symbol: 'ETH',
+      });
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledWith({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: numberToHex(mockChainId) }],
+      });
     });
 
     it('throws an error if native token balance fetch fails', async () => {
