@@ -270,6 +270,13 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                     },
                     "type": "Field",
@@ -287,44 +294,47 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Period duration",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Period duration",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The duration of the period",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The duration of the period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -779,6 +789,13 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                       "error": "Invalid Period amount",
                     },
@@ -797,44 +814,47 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Period duration",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Period duration",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The duration of the period",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The duration of the period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1286,6 +1306,13 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                     },
                     "type": "Field",
@@ -1303,44 +1330,47 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Period duration",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Period duration",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The duration of the period",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The duration of the period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1790,6 +1820,13 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                     },
                     "type": "Field",
@@ -1807,44 +1844,47 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Period duration",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Period duration",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The duration of the period",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The duration of the period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1966,6 +2006,13 @@ describe('erc20TokenPeriodic:content', () => {
                             "value": "123456",
                           },
                           "type": "Input",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
                         },
                       ],
                     },
@@ -2365,6 +2412,13 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                     },
                     "type": "Field",
@@ -2382,44 +2436,47 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Period duration",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Period duration",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The duration of the period",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The duration of the period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -2860,6 +2917,13 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                     },
                     "type": "Field",
@@ -2877,44 +2941,47 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Period duration",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Period duration",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The duration of the period",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The duration of the period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -3372,6 +3439,13 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                       "error": "Invalid period amount",
                     },
@@ -3390,44 +3464,47 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Period duration",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Period duration",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The duration of the period",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The duration of the period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -3876,6 +3953,13 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                     },
                     "type": "Field",
@@ -3893,44 +3977,47 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Period duration",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Period duration",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The duration of the period",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The duration of the period",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",

@@ -135,6 +135,13 @@ describe('erc20TokenStream:content', () => {
                             },
                             "type": "Input",
                           },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
                         ],
                       },
                       "type": "Field",
@@ -152,44 +159,47 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "alignment": "space-between",
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Stream Period",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream Period",
                                   },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The period of the stream.",
-                                    },
-                                    "type": "Text",
-                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The period of the stream.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
+                          null,
+                        ],
                         "direction": "horizontal",
                       },
                       "type": "Box",
@@ -446,6 +456,13 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                     },
                     "type": "Field",
@@ -563,6 +580,13 @@ describe('erc20TokenStream:content', () => {
                             "value": "10",
                           },
                           "type": "Input",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
                         },
                       ],
                     },
@@ -965,6 +989,13 @@ describe('erc20TokenStream:content', () => {
                             },
                             "type": "Input",
                           },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
                         ],
                         "error": "Invalid amount per period",
                       },
@@ -983,44 +1014,47 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "alignment": "space-between",
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Stream Period",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Stream Period",
                                   },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The period of the stream.",
-                                    },
-                                    "type": "Text",
-                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The period of the stream.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
+                          null,
+                        ],
                         "direction": "horizontal",
                       },
                       "type": "Box",
@@ -1277,6 +1311,13 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Input",
                         },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
                       ],
                       "error": "Invalid initial amount",
                     },
@@ -1395,6 +1436,13 @@ describe('erc20TokenStream:content', () => {
                             "value": "10",
                           },
                           "type": "Input",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
                         },
                       ],
                       "error": "Invalid max amount",
