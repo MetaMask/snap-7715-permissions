@@ -17,7 +17,7 @@ import { zNativeTokenPeriodicPermission } from './types';
  */
 function validatePermissionData(
   permission: NativeTokenPeriodicPermission,
-  expiry: number,
+  rules: NativeTokenPeriodicPermissionRequest['rules'],
 ): true {
   const { periodAmount, startTime } = permission.data;
 
@@ -27,6 +27,12 @@ function validatePermissionData(
     required: true,
     allowZero: false,
   });
+
+  const expiryRule = rules?.find((rule) => rule.type === 'expiry');
+  if (!expiryRule) {
+    throw new Error('Expiry rule is required');
+  }
+  const expiry = Number(expiryRule.data.timestamp);
 
   // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
   if (startTime && startTime >= expiry) {
@@ -55,11 +61,11 @@ export function parseAndValidatePermission(
     throw new Error(extractZodError(validationError.errors));
   }
 
-  validatePermissionData(validationResult, permissionRequest.expiry);
+  console.log('permissionRequest', permissionRequest);
+  validatePermissionData(validationResult, permissionRequest.rules);
 
   return {
     ...permissionRequest,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     permission: validationResult,
   };
 }

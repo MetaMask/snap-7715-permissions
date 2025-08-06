@@ -223,6 +223,7 @@ const Index = () => {
       throw new Error('No permission request data');
     }
 
+
     const { type, expiry, isAdjustmentAllowed, ...permissionData } =
       permissionRequest;
 
@@ -236,13 +237,24 @@ const Index = () => {
             address: delegateAccount.address,
           },
         },
-        isAdjustmentAllowed,
         permission: {
           type,
           data: permissionData,
+          isAdjustmentAllowed,
         },
+        rules: [
+          {
+            type: 'expiry',
+            data: {
+              timestamp: expiry,
+            },
+          },
+        ],
       },
     ];
+
+
+    console.log('permissionsRequests', permissionsRequests);
 
     setIsWorking(true);
     setPermissionResponse(null);

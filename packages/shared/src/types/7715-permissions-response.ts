@@ -3,12 +3,12 @@ import { z } from 'zod';
 import { zPermissionRequest } from './7715-permissions-request';
 import { zAddress, zHexStr } from './common';
 
-const zAccountMeta = z.object({
+const zDependencyInfo = z.object({
   factory: zAddress,
   factoryData: zHexStr,
 });
 
-export type AccountMeta = z.infer<typeof zAccountMeta>;
+export type DependencyInfo = z.infer<typeof zDependencyInfo>;
 
 export const zGrantedPermission = z.object({
   /**
@@ -18,13 +18,11 @@ export const zGrantedPermission = z.object({
   context: zHexStr,
 
   /**
-   * The accountMeta field is required and contains information needed to deploy accounts.
-   * Each entry specifies a factory contract and its associated deployment data.
-   * If no account deployment is needed when redeeming the permission, this array must be empty.
-   * When non-empty, DApps MUST deploy the accounts by calling the factory contract with factoryData as the calldata.
-   * Defined in ERC-4337.
+   * The dependencyInfo is an array of objects, each containing fields for `factory` and `factoryData`
+   * as defined in ERC-4337. Either both `factory` and `factoryData` must be specified in an entry, or neither.
+   * This array is used describe accounts that are not yet deployed but MUST be deployed in order for a permission to be successfully redeemed.
    */
-  accountMeta: z.array(zAccountMeta),
+  dependencyInfo: z.array(zDependencyInfo),
 
   /**
    * Account to assign the permissions to and is dependent on the account type.

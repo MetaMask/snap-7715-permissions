@@ -74,12 +74,12 @@ export async function applyContext({
 
   return {
     ...originalRequest,
-    expiry,
     permission: {
       type: 'erc20-token-stream',
       data: permissionData,
-      rules: originalRequest.permission.rules ?? {},
+      isAdjustmentAllowed: originalRequest.permission.isAdjustmentAllowed,
     },
+    rules: originalRequest.rules ?? [],
   };
 }
 
@@ -102,7 +102,6 @@ export async function populatePermission({
       maxAmount: permission.data.maxAmount ?? DEFAULT_MAX_AMOUNT,
       startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
     },
-    rules: permission.rules ?? {},
   };
 }
 
@@ -158,7 +157,8 @@ export async function buildContext({
     decimals,
   );
 
-  const expiry = permissionRequest.expiry.toString();
+  const expiryRule = permissionRequest.rules?.find((rule) => rule.type === 'expiry');
+  const expiry = expiryRule?.data.timestamp.toString();
 
   const initialAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.initialAmount,
@@ -194,7 +194,7 @@ export async function buildContext({
   return {
     expiry,
     justification: permissionRequest.permission.data.justification,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
+    isAdjustmentAllowed: permissionRequest.permission.isAdjustmentAllowed,
     accountDetails: {
       address,
       balance,
