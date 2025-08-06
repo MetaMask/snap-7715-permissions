@@ -18,7 +18,7 @@ export class AccountController implements AccountControllerInterface {
   protected supportedChains: readonly number[];
 
   /**
-   * Initializes a new EoaAccountController instance.
+   * Initializes a new AccountController instance.
    * @param config - The configuration object for the controller.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.ethereumProvider - The provider for interacting with Ethereum.
@@ -69,7 +69,7 @@ export class AccountController implements AccountControllerInterface {
   #assertIsSupportedChainId(chainId: number) {
     if (!this.supportedChains.includes(chainId)) {
       logger.error(
-        'accountController:assertIsSupportedChainId() - unsupported chainId',
+        'AccountController:assertIsSupportedChainId() - unsupported chainId',
         {
           chainId,
         },
@@ -83,7 +83,7 @@ export class AccountController implements AccountControllerInterface {
    * @returns The account addresses in CAIP-10 format.
    */
   public async getAccountAddresses(): Promise<Hex[]> {
-    logger.debug('eoaAccountController:getAccountAddresses()');
+    logger.debug('AccountController:getAccountAddresses()');
 
     const accounts = await this.#ethereumProvider.request<Hex[]>({
       method: 'eth_requestAccounts',
@@ -108,7 +108,7 @@ export class AccountController implements AccountControllerInterface {
   public async signDelegation(
     options: SignDelegationOptions,
   ): Promise<Delegation> {
-    logger.debug('eoaAccountController:signDelegation()');
+    logger.debug('AccountController:signDelegation()');
 
     const { chainId, delegation, address } = options;
 
@@ -169,7 +169,7 @@ export class AccountController implements AccountControllerInterface {
     delegationManager: Hex;
     delegation: Omit<Delegation, 'signature'>;
   }) {
-    logger.debug('eoaAccountController:#getSignDelegationArgs()');
+    logger.debug('AccountController:#getSignDelegationArgs()');
 
     const domain = {
       chainId,

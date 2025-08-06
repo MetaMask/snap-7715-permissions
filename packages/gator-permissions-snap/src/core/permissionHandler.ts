@@ -3,6 +3,7 @@ import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 import {
   bigIntToHex,
+  isStrictHexString,
   parseCaipAccountId,
   parseCaipAssetType,
 } from '@metamask/utils';
@@ -34,6 +35,7 @@ import type {
   AccountControllerInterface,
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
+import { ZERO_ADDRESS } from '../constants';
 import { formatUnits } from '../utils/value';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
@@ -222,6 +224,7 @@ export class PermissionHandler<
         context,
         tokenBalance: this.#tokenBalance,
         tokenBalanceFiat: this.#tokenBalanceFiat,
+        chainId,
       });
     };
 
@@ -243,56 +246,59 @@ export class PermissionHandler<
       let fetchAccountBalanceCallCounter = 0;
       const fetchAccountBalance = async (context: TContext) => {
         fetchAccountBalanceCallCounter += 1;
-        const currentFetchAccountBalanceCallCounter =
-          fetchAccountBalanceCallCounter;
+        const currentCallCounter = fetchAccountBalanceCallCounter;
 
         const { address } = parseCaipAccountId(context.accountAddressCaip10);
 
         const {
-          assetReference: assetAddress,
+          assetReference,
           chain: { reference: chainId },
         } = parseCaipAssetType(context.tokenAddressCaip19);
+
+        const assetAddress = isStrictHexString(assetReference)
+          ? assetReference
+          : ZERO_ADDRESS;
 
         const { balance, decimals } =
           await this.#tokenMetadataService.getTokenBalanceAndMetadata({
             chainId: parseInt(chainId, 10),
             account: address as Hex,
-            assetAddress: assetAddress as Hex,
+            assetAddress,
           });
 
-        // only update the token balance if fetchAccountBalance hasn't been called again
-        if (
-          currentFetchAccountBalanceCallCounter ===
-          fetchAccountBalanceCallCounter
-        ) {
-          this.#tokenBalance = formatUnits({ value: balance, decimals });
-
-          // send the request to fetch the fiat balance, then re-render the UI while we wait for the response
-          const fiatBalanceRequest =
-            this.#tokenPricesService.getCryptoToFiatConversion(
-              context.tokenAddressCaip19,
-              bigIntToHex(balance),
-              context.tokenMetadata.decimals,
-            );
-
-          await rerender();
-
-          const fiatBalance = await fiatBalanceRequest;
-
-          // only update the fiat balance if fetchAccountBalance hasn't been called again
-          if (
-            currentFetchAccountBalanceCallCounter ===
-            fetchAccountBalanceCallCounter
-          ) {
-            this.#tokenBalanceFiat = fiatBalance;
-
-            await rerender();
-          }
+        if (currentCallCounter !== fetchAccountBalanceCallCounter) {
+          // the function was called again, abandon the current call.
+          return;
         }
+
+        this.#tokenBalance = formatUnits({ value: balance, decimals });
+
+        // send the request to fetch the fiat balance, then re-render the UI while we wait for the response
+        const fiatBalanceRequest =
+          this.#tokenPricesService.getCryptoToFiatConversion(
+            context.tokenAddressCaip19,
+            bigIntToHex(balance),
+            context.tokenMetadata.decimals,
+          );
+
+        await rerender();
+
+        const fiatBalance = await fiatBalanceRequest;
+
+        if (currentCallCounter !== fetchAccountBalanceCallCounter) {
+          // the function was called again, abandon the current call.
+          return;
+        }
+
+        this.#tokenBalanceFiat = fiatBalance;
+
+        await rerender();
       };
 
       // we explicitly don't await this as it's a background process that will re-render the UI (twice) once it is complete
-      fetchAccountBalance(currentContext).catch((error) => logger.error(error));
+      fetchAccountBalance(currentContext).catch((error) =>
+        logger.error(`Fetching account balance failed: ${error.message}`),
+      );
 
       const showMoreButtonClickHandler: UserEventHandler<
         UserInputEventType.ButtonClickEvent
@@ -320,7 +326,7 @@ export class PermissionHandler<
 
         // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
         fetchAccountBalance(currentContext).catch((error) =>
-          logger.error(error),
+          logger.error(`Fetching account balance failed: ${error.message}`),
         );
 
         await rerender();

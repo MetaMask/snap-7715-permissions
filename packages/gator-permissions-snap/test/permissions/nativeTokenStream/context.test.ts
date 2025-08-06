@@ -67,8 +67,7 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-  tokenAddressCaip19:
-    'eip155:1/slip44:0x0000000000000000000000000000000000000000',
+  tokenAddressCaip19: 'eip155:1/slip44:60',
   tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,

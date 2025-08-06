@@ -6,7 +6,6 @@ import {
   type Hex,
 } from '@metamask/utils';
 
-import { ZERO_ADDRESS } from '../../constants';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import {
@@ -34,6 +33,7 @@ const DEFAULT_MAX_AMOUNT =
 const DEFAULT_INITIAL_AMOUNT = '0x0';
 const ASSET_NAMESPACE = 'slip44';
 const CHAIN_NAMESPACE = 'eip155';
+const ASSET_REFERENCE = '60';
 
 /**
  * Construct an amended NativeTokenStreamPermissionRequest, based on the specified request,
@@ -134,8 +134,10 @@ export async function buildContext({
     permission: { data },
   } = permissionRequest;
 
-  if (address === undefined) {
-    throw new Error('Address is required');
+  if (!address) {
+    throw new Error(
+      'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
+    );
   }
 
   const { decimals, symbol, iconUrl } =
@@ -182,7 +184,7 @@ export async function buildContext({
     CHAIN_NAMESPACE,
     chainId.toString(),
     ASSET_NAMESPACE,
-    ZERO_ADDRESS,
+    ASSET_REFERENCE,
   );
 
   const accountAddressCaip10 = toCaipAccountId(

@@ -42,6 +42,7 @@ export type PermissionHandlerContentProps = {
   context: BaseContext;
   tokenBalance: string | undefined;
   tokenBalanceFiat: string | undefined;
+  chainId: number;
 };
 
 /**
@@ -58,6 +59,7 @@ export type PermissionHandlerContentProps = {
  * @param options.context - The context of the permission.
  * @param options.tokenBalance - The formatted balance of the token.
  * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
+ * @param options.chainId - The chain ID of the network.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -72,6 +74,7 @@ export const PermissionHandlerContent = ({
   context,
   tokenBalance,
   tokenBalanceFiat,
+  chainId,
 }: PermissionHandlerContentProps): SnapElement => {
   const tokenBalanceComponent = tokenBalance ? (
     <Text>{tokenBalance} available</Text>
@@ -132,7 +135,7 @@ export const PermissionHandlerContent = ({
             </Box>
             <AccountSelector
               name={ACCOUNT_SELECTOR_NAME}
-              chainIds={['eip155:1']}
+              chainIds={[`eip155:${chainId}`]}
               switchGlobalAccount={false}
               value={context.accountAddressCaip10}
             />

@@ -250,7 +250,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const { address } = grantedPermissionRequest;
     // todo: it would be nice if this was concretely typed
-    if (address === undefined) {
+    if (!address) {
       throw new Error('Address is undefined');
     }
 

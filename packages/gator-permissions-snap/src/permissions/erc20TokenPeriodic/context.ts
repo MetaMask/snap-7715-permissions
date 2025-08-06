@@ -114,8 +114,10 @@ export async function buildContext({
     permission: { data },
   } = permissionRequest;
 
-  if (address === undefined) {
-    throw new Error('Address is required');
+  if (!address) {
+    throw new Error(
+      'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
+    );
   }
 
   const { decimals, symbol, iconUrl } =
