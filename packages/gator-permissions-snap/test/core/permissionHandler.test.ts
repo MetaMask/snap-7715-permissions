@@ -638,36 +638,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Recipient",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The site requesting the permission",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -703,36 +714,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Network",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Network",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The network on which the permission is being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The network on which the permission is being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -768,36 +790,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Token",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Token",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The token being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The token being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -1109,36 +1142,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Recipient",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The site requesting the permission",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -1174,36 +1218,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Network",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Network",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The network on which the permission is being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The network on which the permission is being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -1239,36 +1294,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Token",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Token",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The token being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The token being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -1615,36 +1681,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Recipient",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The site requesting the permission",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -1680,36 +1757,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Network",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Network",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The network on which the permission is being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The network on which the permission is being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -1745,36 +1833,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Token",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Token",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The token being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The token being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -2048,36 +2147,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Recipient",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The site requesting the permission",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -2113,36 +2223,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Network",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Network",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The network on which the permission is being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The network on which the permission is being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -2178,36 +2299,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Token",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Token",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The token being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The token being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -2486,36 +2618,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Recipient",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The site requesting the permission",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -2551,36 +2694,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Network",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Network",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The network on which the permission is being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The network on which the permission is being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
@@ -2616,36 +2770,47 @@ describe('PermissionHandler', () => {
                       {
                         "key": null,
                         "props": {
+                          "alignment": "space-between",
                           "children": [
                             {
                               "key": null,
                               "props": {
-                                "children": "Token",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Token",
+                                    },
+                                    "type": "Text",
                                   },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The token being requested",
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The token being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
                                   },
-                                  "type": "Text",
-                                },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Tooltip",
+                              "type": "Box",
                             },
+                            null,
                           ],
                           "direction": "horizontal",
                         },
