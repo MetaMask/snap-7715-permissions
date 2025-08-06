@@ -11,10 +11,7 @@ import {
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
-import type {
-  UserEventDispatcher,
-  UserEventHandler,
-} from '../userEventDispatcher';
+import type { UserEventDispatcher } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import {
   ACCOUNT_SELECTOR_NAME,
@@ -78,7 +75,7 @@ export class PermissionHandler<
 
   #isJustificationCollapsed = true;
 
-  #deregisterHandlers: (() => void) | undefined;
+  #unbindHandlers: (() => void) | undefined;
 
   #hasHandledPermissionRequest = false;
 
@@ -312,40 +309,36 @@ export class PermissionHandler<
           },
         });
 
-      const accountSelectedHandler: UserEventHandler<
-        UserInputEventType.InputChangeEvent
-      > = async ({ event: { value } }) => {
-        const {
-          addresses: [address],
-        } = value as unknown as {
-          addresses: [`${string}:${string}:${string}`];
-        };
-
-        currentContext = {
-          ...currentContext,
-          accountAddressCaip10: address,
-        };
-
-        this.#tokenBalance = undefined;
-        this.#tokenBalanceFiat = undefined;
-
-        // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
-        fetchAccountBalance(currentContext).catch((error) => {
-          const { message } = error as Error;
-          logger.error(`Fetching account balance failed: ${message}`);
-        });
-
-        await rerender();
-      };
-
-      this.#userEventDispatcher.on({
+      const { unbind: unbindAccountSelected } = this.#userEventDispatcher.on({
         elementName: ACCOUNT_SELECTOR_NAME,
         eventType: UserInputEventType.InputChangeEvent,
         interfaceId,
-        handler: accountSelectedHandler,
+        handler: async ({ event: { value } }) => {
+          const {
+            addresses: [address],
+          } = value as unknown as {
+            addresses: [`${string}:${string}:${string}`];
+          };
+
+          currentContext = {
+            ...currentContext,
+            accountAddressCaip10: address,
+          };
+
+          this.#tokenBalance = undefined;
+          this.#tokenBalanceFiat = undefined;
+
+          // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
+          fetchAccountBalance(currentContext).catch((error) => {
+            const { message } = error as Error;
+            logger.error(`Fetching account balance failed: ${message}`);
+          });
+
+          await rerender();
+        },
       });
 
-      const deregisterRuleHandlers = bindRuleHandlers({
+      const unbindRuleHandlers = bindRuleHandlers({
         rules: this.#rules,
         userEventDispatcher: this.#userEventDispatcher,
         interfaceId,
@@ -357,21 +350,15 @@ export class PermissionHandler<
         },
       });
 
-      this.#deregisterHandlers = () => {
-        deregisterRuleHandlers();
+      this.#unbindHandlers = () => {
+        unbindRuleHandlers();
         unbindShowMoreButtonClick();
-
-        this.#userEventDispatcher.off({
-          elementName: ACCOUNT_SELECTOR_NAME,
-          eventType: UserInputEventType.InputChangeEvent,
-          interfaceId,
-          handler: accountSelectedHandler,
-        });
+        unbindAccountSelected();
       };
     };
 
     const onConfirmationResolvedHandler = () => {
-      this.#deregisterHandlers?.();
+      this.#unbindHandlers?.();
     };
 
     const {
