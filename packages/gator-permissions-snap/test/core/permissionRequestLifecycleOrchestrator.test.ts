@@ -46,7 +46,6 @@ const mockSkeletonUiContent = {
 const requestingAccountAddress = randomAddress();
 const mockPermissionRequest = {
   chainId: '0x1',
-  expiry: Math.floor(Date.now() / 1000 + 3600),
   signer: {
     type: 'account',
     data: {
@@ -56,6 +55,7 @@ const mockPermissionRequest = {
   permission: {
     type: 'test-permission',
     data: {},
+    isAdjustmentAllowed: true,
   },
 } as PermissionRequest;
 
@@ -195,7 +195,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result.approved).toBe(true);
         expect(result.approved && result.response).toStrictEqual({
           ...mockPermissionRequest,
-          accountMeta: [mockAccountMetadata],
+          dependencyInfo: [mockAccountMetadata],
           permission: mockPopulatedPermission,
           address: grantingAccountAddress,
           context: expect.stringMatching(/^0x[0-9a-fA-F]+$/u),
@@ -312,10 +312,74 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         const {
           contracts: {
-            enforcers: { TimestampEnforcer, NonceEnforcer },
+            enforcers: { NonceEnforcer },
           },
         } = getChainMetadata({
           chainId: Number(mockPermissionRequest.chainId),
+        });
+
+        const expectedDelegation = {
+          delegate: requestingAccountAddress.toLowerCase(),
+          delegator: grantingAccountAddress.toLowerCase(),
+          authority: ROOT_AUTHORITY,
+          caveats: [
+            {
+              enforcer: NonceEnforcer.toLowerCase(),
+              args: '0x',
+              terms: createNonceTerms({
+                nonce: bigIntToHex(0n),
+              }),
+            },
+          ],
+          salt: expect.any(BigInt),
+          signature: mockSignature,
+        };
+
+        expect(delegationsArray).toStrictEqual([expectedDelegation]);
+        expect(delegationsArray[0]?.salt).not.toBe(0n);
+      });
+
+      it('adds timestamp enforcer when expiry rule is present', async () => {
+        const expiryTimestamp = Math.floor(Date.now() / 1000 + 3600); // 1 hour from now
+        const mockPermissionRequestWithExpiry = {
+          ...mockPermissionRequest,
+          rules: [
+            {
+              type: 'expiry',
+              isAdjustmentAllowed: true,
+              data: {
+                timestamp: expiryTimestamp,
+              },
+            },
+          ],
+        };
+
+        lifecycleHandlerMocks.applyContext.mockImplementation(
+          ({ originalRequest }) => ({
+            ...mockResolvedPermissionRequest,
+            rules: originalRequest.rules,
+          }),
+        );
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequestWithExpiry,
+          lifecycleHandlerMocks,
+        );
+
+        expect(result.approved).toBe(true);
+        if (!result.approved) {
+          throw new Error('Expected the permission request to be approved');
+        }
+
+        const delegationsArray = decodeDelegations(result.response.context);
+
+        const {
+          contracts: {
+            enforcers: { TimestampEnforcer, NonceEnforcer },
+          },
+        } = getChainMetadata({
+          chainId: Number(mockPermissionRequestWithExpiry.chainId),
         });
 
         const expectedDelegation = {
@@ -328,7 +392,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
               args: '0x',
               terms: createTimestampTerms({
                 timestampAfterThreshold: 0,
-                timestampBeforeThreshold: mockPermissionRequest.expiry,
+                timestampBeforeThreshold: expiryTimestamp,
               }),
             },
             {
@@ -421,7 +485,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         const mockPermissionRequestWithAdjustmentNotAllowed = {
           ...mockPermissionRequest,
-          isAdjustmentAllowed: false,
+          permission: {
+            ...mockPermissionRequest.permission,
+            isAdjustmentAllowed: false,
+          },
         };
 
         lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);

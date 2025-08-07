@@ -29,6 +29,7 @@ const permissionWithoutOptionals: NativeTokenStreamPermission = {
     startTime: convertReadableDateToTimestamp('10/26/2024'),
     justification: 'Permission to do something important',
   },
+  isAdjustmentAllowed: true,
 };
 
 const alreadyPopulatedPermission: NativeTokenStreamPermission = {
@@ -40,12 +41,20 @@ const alreadyPopulatedPermission: NativeTokenStreamPermission = {
     // 10 Eth
     maxAmount: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
   },
-  rules: {},
+  isAdjustmentAllowed: true,
 };
 
 const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
   chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: {
@@ -62,7 +71,10 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
 };
 
 const alreadyPopulatedContext: NativeTokenStreamContext = {
-  expiry: '1714521600',
+  expiry: {
+    timestamp: '1714521600',
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -107,28 +119,8 @@ describe('nativeTokenStream:context', () => {
           maxAmount:
             '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       });
-    });
-
-    it('should not override existing rules', async () => {
-      const permission: NativeTokenStreamPermission = {
-        type: 'native-token-stream',
-        data: {
-          initialAmount: '0x1000000000000000000000000000000000000000',
-          maxAmount: '0x1000000000000000000000000000000000000000',
-          amountPerSecond: '0x1000000000000000000000000000000000000000',
-          startTime: 1714531200,
-          justification: 'Permission to do something important',
-        },
-        rules: {
-          some: 'rule',
-        },
-      };
-
-      const populatedPermission = await populatePermission({ permission });
-
-      expect(populatedPermission).toStrictEqual(permission);
     });
 
     it('should set startTime to current timestamp when it is null', async () => {
@@ -143,7 +135,7 @@ describe('nativeTokenStream:context', () => {
           startTime: null,
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const populatedPermission = await populatePermission({ permission });
@@ -237,7 +229,12 @@ describe('nativeTokenStream:context', () => {
   describe('createContextMetadata()', () => {
     const context = {
       ...alreadyPopulatedContext,
-      expiry: convertTimestampToReadableDate(Date.now() / 1000 + 24 * 60 * 60), // 24 hours from now
+      expiry: {
+        timestamp: convertTimestampToReadableDate(
+          Date.now() / 1000 + 24 * 60 * 60,
+        ), // 24 hours from now
+        isAdjustmentAllowed: true,
+      },
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
         startTime: convertTimestampToReadableDate(Date.now() / 1000),
@@ -443,7 +440,10 @@ describe('nativeTokenStream:context', () => {
       it('should return a validation error for expiry in the past', async () => {
         const contextWithExpiryInThePast = {
           ...context,
-          expiry: '10/26/1985',
+          expiry: {
+            timestamp: '10/26/1985',
+            isAdjustmentAllowed: true,
+          },
           permissionDetails: {
             ...context.permissionDetails,
           },
@@ -463,7 +463,10 @@ describe('nativeTokenStream:context', () => {
         async (expiry) => {
           const contextWithInvalidExpiry = {
             ...context,
-            expiry,
+            expiry: {
+              timestamp: expiry,
+              isAdjustmentAllowed: true,
+            },
             permissionDetails: {
               ...context.permissionDetails,
             },

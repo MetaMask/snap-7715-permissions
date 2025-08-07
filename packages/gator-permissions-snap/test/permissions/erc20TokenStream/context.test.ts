@@ -29,6 +29,7 @@ const permissionWithoutOptionals: Erc20TokenStreamPermission = {
     startTime: 1729987200, // 10/26/2024,
     justification: 'Permission to do something important',
   },
+  isAdjustmentAllowed: true,
 };
 
 const alreadyPopulatedPermission: Erc20TokenStreamPermission = {
@@ -40,12 +41,10 @@ const alreadyPopulatedPermission: Erc20TokenStreamPermission = {
     // 10 USDC
     maxAmount: numberToHex(10_000_000),
   },
-  rules: {},
 };
 
 const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
   chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
   signer: {
     type: 'account',
     data: {
@@ -59,10 +58,22 @@ const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
       startTime: convertReadableDateToTimestamp('10/26/2024'),
     },
   },
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
 };
 
 const alreadyPopulatedContext: Erc20TokenStreamContext = {
-  expiry: '1714521600',
+  expiry: {
+    timestamp: '1714521600',
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountDetails: {
@@ -107,29 +118,8 @@ describe('erc20TokenStream:context', () => {
           maxAmount:
             '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       });
-    });
-
-    it('should not override existing rules', async () => {
-      const permission: Erc20TokenStreamPermission = {
-        type: 'erc20-token-stream',
-        data: {
-          initialAmount: '0x1000000000000000000000000000000000000000',
-          maxAmount: '0x1000000000000000000000000000000000000000',
-          amountPerSecond: '0x1000000000000000000000000000000000000000',
-          startTime: 1714531200,
-          justification: 'Permission to do something important',
-          tokenAddress: USDC_ADDRESS,
-        },
-        rules: {
-          some: 'rule',
-        },
-      };
-
-      const populatedPermission = await populatePermission({ permission });
-
-      expect(populatedPermission).toStrictEqual(permission);
     });
 
     it('should set startTime to current timestamp when it is null', async () => {
@@ -145,7 +135,7 @@ describe('erc20TokenStream:context', () => {
           startTime: null,
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const populatedPermission = await populatePermission({ permission });
@@ -252,7 +242,7 @@ describe('erc20TokenStream:context', () => {
           maxAmount: bigIntToHex(10000000000000000000n), // 10 DAI
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const daiPermissionRequest: Erc20TokenStreamPermissionRequest = {
@@ -296,7 +286,10 @@ describe('erc20TokenStream:context', () => {
     const startTime = (Math.floor(Date.now() / 1000) + 12 * 60 * 60).toString(); // 12 hours from now
     const context = {
       ...alreadyPopulatedContext,
-      expiry: dateInTheFuture, // 24 hours from now
+      expiry: {
+        timestamp: dateInTheFuture, // 24 hours from now
+        isAdjustmentAllowed: true,
+      },
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
         startTime, // 12 hours from now (before expiry)
@@ -502,7 +495,10 @@ describe('erc20TokenStream:context', () => {
       it('should return a validation error for expiry in the past', async () => {
         const contextWithExpiryInThePast = {
           ...context,
-          expiry: '10/26/1985',
+          expiry: {
+            timestamp: '10/26/1985',
+            isAdjustmentAllowed: true,
+          },
           permissionDetails: {
             ...context.permissionDetails,
           },
@@ -522,7 +518,10 @@ describe('erc20TokenStream:context', () => {
         async (expiry) => {
           const contextWithInvalidExpiry = {
             ...context,
-            expiry,
+            expiry: {
+              timestamp: expiry,
+              isAdjustmentAllowed: true,
+            },
             permissionDetails: {
               ...context.permissionDetails,
             },

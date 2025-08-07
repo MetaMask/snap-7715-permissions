@@ -167,7 +167,9 @@ export async function buildContext({
     decimals,
   );
 
-  const expiryRule = permissionRequest.rules?.find((rule) => rule.type === 'expiry');
+  const expiryRule = permissionRequest.rules?.find(
+    (rule) => rule.type === 'expiry',
+  );
   const expiry = {
     timestamp: expiryRule?.data.timestamp.toString(),
     isAdjustmentAllowed: expiryRule?.isAdjustmentAllowed ?? true,

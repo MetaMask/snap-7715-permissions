@@ -277,7 +277,9 @@ export class PermissionRequestLifecycleOrchestrator {
       contracts,
     });
 
-    const expiryRule = resolvedRequest.rules?.find((rule) => rule.type === 'expiry');
+    const expiryRule = resolvedRequest.rules?.find(
+      (rule) => rule.type === 'expiry',
+    );
 
     if (expiryRule) {
       const timestampAfterThreshold = 0;

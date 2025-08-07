@@ -11,7 +11,7 @@ import { zErc20TokenPeriodicPermission } from './types';
 /**
  * Validates a permission object data specific to the permission type.
  * @param permission - The ERC20 token periodic permission object to validate.
- * @param expiry - The expiry time of permission request.
+ * @param rules - The rules of the permission request.
  * @returns True if the permission data is valid, throws an error otherwise.
  * @throws {Error} If any validation check fails.
  */

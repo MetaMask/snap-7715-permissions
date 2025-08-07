@@ -1,3 +1,4 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
@@ -14,7 +15,6 @@ import {
   convertTimestampToReadableDate,
   convertTimestampToReadableTime,
 } from '../utils/time';
-import { logger } from '@metamask/7715-permissions-shared/utils';
 
 /**
  * Utility function to access nested properties in an object using dot notation.
