@@ -1,5 +1,4 @@
 import { describe, expect, it } from '@jest/globals';
-import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import { createConfirmationContent } from '../../../src/permissions/erc20TokenStream/content';
@@ -7,7 +6,6 @@ import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
 } from '../../../src/permissions/erc20TokenStream/types';
-import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 10;
 
@@ -15,13 +13,8 @@ const mockContext: Erc20TokenStreamContext = {
   expiry: '05/01/2024',
   isAdjustmentAllowed: true,
   justification: 'Permission to stream ERC20 tokens',
-  accountDetails: {
-    address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: bigIntToHex(
-      parseUnits({ formatted: '10', decimals: tokenDecimals }),
-    ),
-    balanceFormattedAsCurrency: '$🐊10.00',
-  },
+  accountAddressCaip10: `eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`,
+  tokenAddressCaip19: `eip155:1/erc20:0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F`,
   tokenMetadata: {
     decimals: tokenDecimals,
     symbol: 'USDC',
@@ -55,123 +48,6 @@ describe('erc20TokenStream:content', () => {
   "key": null,
   "props": {
     "children": [
-      {
-        "key": null,
-        "props": {
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream from",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The account that the token stream comes from.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                                "size": "sm",
-                              },
-                              "type": "Avatar",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Gator Account",
-                                "color": "default",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "end",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": "$🐊10.00",
-                          "color": "muted",
-                        },
-                        "type": "Text",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            "10",
-                            "available",
-                          ],
-                          "color": "alternative",
-                        },
-                        "type": "Text",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-              ],
-              "direction": "vertical",
-            },
-            "type": "Box",
-          },
-        },
-        "type": "Section",
-      },
       {
         "key": null,
         "props": {
@@ -965,123 +841,6 @@ describe('erc20TokenStream:content', () => {
   "key": null,
   "props": {
     "children": [
-      {
-        "key": null,
-        "props": {
-          "children": {
-            "key": null,
-            "props": {
-              "children": [
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream from",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The account that the token stream comes from.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "address": "eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                                "size": "sm",
-                              },
-                              "type": "Avatar",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Gator Account",
-                                "color": "default",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "end",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": "$🐊10.00",
-                          "color": "muted",
-                        },
-                        "type": "Text",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            "10",
-                            "available",
-                          ],
-                          "color": "alternative",
-                        },
-                        "type": "Text",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-              ],
-              "direction": "vertical",
-            },
-            "type": "Box",
-          },
-        },
-        "type": "Section",
-      },
       {
         "key": null,
         "props": {

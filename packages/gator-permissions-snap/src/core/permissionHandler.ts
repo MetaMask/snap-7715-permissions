@@ -1,16 +1,20 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
+import type { Hex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  isStrictHexString,
+  parseCaipAccountId,
+  parseCaipAssetType,
+} from '@metamask/utils';
 
-import type { AccountController } from '../accountController';
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
-import type {
-  UserEventDispatcher,
-  UserEventHandler,
-} from '../userEventDispatcher';
+import type { UserEventDispatcher } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import {
+  ACCOUNT_SELECTOR_NAME,
   PermissionHandlerContent,
   SkeletonPermissionHandlerContent,
 } from './permissionHandlerContent';
@@ -25,7 +29,11 @@ import type {
   PermissionHandlerType,
   PermissionHandlerDependencies,
   PermissionHandlerParams,
+  AccountControllerInterface,
 } from './types';
+import { logger } from '../../../shared/src/utils/logger';
+import { ZERO_ADDRESS } from '../constants';
+import { formatUnits } from '../utils/value';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 
@@ -41,7 +49,7 @@ export class PermissionHandler<
   TPopulatedPermission extends DeepRequired<TPermission>,
 > implements PermissionHandlerType
 {
-  readonly #accountController: AccountController;
+  readonly #accountController: AccountControllerInterface;
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
@@ -67,9 +75,13 @@ export class PermissionHandler<
 
   #isJustificationCollapsed = true;
 
-  #deregisterHandlers: (() => void) | undefined;
+  #unbindHandlers: (() => void) | undefined;
 
   #hasHandledPermissionRequest = false;
+
+  #tokenBalance: string | undefined = undefined;
+
+  #tokenBalanceFiat: string | undefined = undefined;
 
   constructor({
     accountController,
@@ -134,10 +146,33 @@ export class PermissionHandler<
     TPopulatedPermission
   > {
     const buildContextHandler = async (request: TRequest) => {
+      const requestedAddressLowercase = request.address?.toLowerCase() as
+        | Hex
+        | undefined;
+
+      const allAvailableAddresses =
+        await this.#accountController.getAccountAddresses();
+
+      let address: Hex | undefined;
+
+      if (requestedAddressLowercase === undefined) {
+        // use the first address available for the account
+        address = allAvailableAddresses[0];
+      } else {
+        // validate that the requested address is one of the addresses available for the account
+        if (
+          !allAvailableAddresses.some(
+            (availableAddress) =>
+              availableAddress.toLowerCase() === requestedAddressLowercase,
+          )
+        ) {
+          throw new Error('Requested address not found');
+        }
+        address = request.address;
+      }
+
       return await this.#dependencies.buildContext({
-        permissionRequest: request,
-        tokenPricesService: this.#tokenPricesService,
-        accountController: this.#accountController,
+        permissionRequest: { ...request, address },
         tokenMetadataService: this.#tokenMetadataService,
       });
     };
@@ -183,6 +218,10 @@ export class PermissionHandler<
         isJustificationCollapsed: this.#isJustificationCollapsed,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,
+        context,
+        tokenBalance: this.#tokenBalance,
+        tokenBalanceFiat: this.#tokenBalanceFiat,
+        chainId,
       });
     };
 
@@ -196,24 +235,110 @@ export class PermissionHandler<
       updateContext: (args: { updatedContext: TContext }) => Promise<void>;
     }) => {
       let currentContext = initialContext;
-      const rerender = async () =>
+      const rerender = async () => {
         await updateContext({ updatedContext: currentContext });
+      };
 
-      const showMoreButtonClickHandler: UserEventHandler<
-        UserInputEventType.ButtonClickEvent
-      > = async () => {
-        this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
+      // fetchAccountBalanceCallCounter is used to cancel any previously executed instances of this function.
+      let fetchAccountBalanceCallCounter = 0;
+      const fetchAccountBalance = async (context: TContext) => {
+        fetchAccountBalanceCallCounter += 1;
+        const currentCallCounter = fetchAccountBalanceCallCounter;
+
+        const { address } = parseCaipAccountId(context.accountAddressCaip10);
+
+        const {
+          assetReference,
+          chain: { reference: chainId },
+        } = parseCaipAssetType(context.tokenAddressCaip19);
+
+        const assetAddress = isStrictHexString(assetReference)
+          ? assetReference
+          : ZERO_ADDRESS;
+
+        const { balance, decimals } =
+          await this.#tokenMetadataService.getTokenBalanceAndMetadata({
+            chainId: parseInt(chainId, 10),
+            account: address as Hex,
+            assetAddress,
+          });
+
+        if (currentCallCounter !== fetchAccountBalanceCallCounter) {
+          // the function was called again, abandon the current call.
+          return;
+        }
+
+        this.#tokenBalance = formatUnits({ value: balance, decimals });
+
+        // send the request to fetch the fiat balance, then re-render the UI while we wait for the response
+        const fiatBalanceRequest =
+          this.#tokenPricesService.getCryptoToFiatConversion(
+            context.tokenAddressCaip19,
+            bigIntToHex(balance),
+            context.tokenMetadata.decimals,
+          );
+
+        await rerender();
+
+        const fiatBalance = await fiatBalanceRequest;
+
+        if (currentCallCounter !== fetchAccountBalanceCallCounter) {
+          // the function was called again, abandon the current call.
+          return;
+        }
+
+        this.#tokenBalanceFiat = fiatBalance;
+
         await rerender();
       };
 
-      this.#userEventDispatcher.on({
-        elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId,
-        handler: showMoreButtonClickHandler,
+      // we explicitly don't await this as it's a background process that will re-render the UI (twice) once it is complete
+      fetchAccountBalance(currentContext).catch((error) => {
+        const { message } = error as Error;
+        logger.error(`Fetching account balance failed: ${message}`);
       });
 
-      const deregisterRuleHandlers = bindRuleHandlers({
+      const { unbind: unbindShowMoreButtonClick } =
+        this.#userEventDispatcher.on({
+          elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
+          eventType: UserInputEventType.ButtonClickEvent,
+          interfaceId,
+          handler: async () => {
+            this.#isJustificationCollapsed = !this.#isJustificationCollapsed;
+            await rerender();
+          },
+        });
+
+      const { unbind: unbindAccountSelected } = this.#userEventDispatcher.on({
+        elementName: ACCOUNT_SELECTOR_NAME,
+        eventType: UserInputEventType.InputChangeEvent,
+        interfaceId,
+        handler: async ({ event: { value } }) => {
+          const {
+            addresses: [address],
+          } = value as unknown as {
+            addresses: [`${string}:${string}:${string}`];
+          };
+
+          currentContext = {
+            ...currentContext,
+            accountAddressCaip10: address,
+          };
+
+          this.#tokenBalance = undefined;
+          this.#tokenBalanceFiat = undefined;
+
+          // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
+          fetchAccountBalance(currentContext).catch((error) => {
+            const { message } = error as Error;
+            logger.error(`Fetching account balance failed: ${message}`);
+          });
+
+          await rerender();
+        },
+      });
+
+      const unbindRuleHandlers = bindRuleHandlers({
         rules: this.#rules,
         userEventDispatcher: this.#userEventDispatcher,
         interfaceId,
@@ -225,19 +350,15 @@ export class PermissionHandler<
         },
       });
 
-      this.#deregisterHandlers = () => {
-        deregisterRuleHandlers();
-        this.#userEventDispatcher.off({
-          elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: showMoreButtonClickHandler,
-        });
+      this.#unbindHandlers = () => {
+        unbindRuleHandlers();
+        unbindShowMoreButtonClick();
+        unbindAccountSelected();
       };
     };
 
     const onConfirmationResolvedHandler = () => {
-      this.#deregisterHandlers?.();
+      this.#unbindHandlers?.();
     };
 
     const {

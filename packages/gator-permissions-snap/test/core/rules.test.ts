@@ -27,11 +27,9 @@ const mockContext: TestContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
-  accountDetails: {
-    address: '0x1234567890123456789012345678901234567890',
-    balanceFormattedAsCurrency: '10 ETH',
-    balance: '0xa',
-  },
+  accountAddressCaip10: 'eip155:1:0x1234567890123456789012345678901234567890',
+  tokenAddressCaip19:
+    'eip155:1/erc20:0x1234567890123456789012345678901234567890',
   tokenMetadata: {
     decimals: 18,
     symbol: 'ETH',
@@ -846,10 +844,19 @@ describe('rules', () => {
     let mockOnContextChanged: jest.MockedFunction<
       (args: { context: TestContext }) => Promise<void>
     >;
+    let mockUnbindFunctions: jest.MockedFunction<() => void>[];
 
     beforeEach(() => {
+      // Reset the array of mock unbind functions for each test
+      mockUnbindFunctions = [];
+
       mockUserEventDispatcher = {
-        on: jest.fn().mockReturnThis(),
+        on: jest.fn().mockImplementation(() => {
+          // Create a new mock unbind function for each call to on()
+          const mockUnbind = jest.fn<() => void>();
+          mockUnbindFunctions.push(mockUnbind);
+          return { unbind: mockUnbind, dispatcher: mockUserEventDispatcher };
+        }),
         off: jest.fn().mockReturnThis(),
         createUserInputEventHandler: jest.fn(),
       } as unknown as jest.Mocked<UserEventDispatcher>;
@@ -874,7 +881,7 @@ describe('rules', () => {
         deriveMetadata: mockDeriveMetadata,
       });
 
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(5); // 3 input handlers + 1 toggle on + 1 toggle off
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(5); // 3 input handlers + 1 add button + 1 remove button
 
       // Check input change handlers
       expect(mockUserEventDispatcher.on).toHaveBeenCalledWith({
@@ -1003,30 +1010,16 @@ describe('rules', () => {
 
       expect(typeof unbind).toBe('function');
 
+      // Verify that the expected number of handlers were bound
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(4); // 2 input handlers + 1 add button + 1 remove button
+      expect(mockUnbindFunctions).toHaveLength(4);
+
       // Call unbind
       unbind();
 
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledTimes(4); // 2 input handlers + 1 toggle on + 1 toggle off
-
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
-        elementName: 'test-text-rule',
-        eventType: UserInputEventType.InputChangeEvent,
-        interfaceId: 'test-interface',
-        handler: expect.any(Function),
-      });
-
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
-        elementName: 'test-optional-rule',
-        eventType: UserInputEventType.InputChangeEvent,
-        interfaceId: 'test-interface',
-        handler: expect.any(Function),
-      });
-
-      expect(mockUserEventDispatcher.off).toHaveBeenCalledWith({
-        elementName: 'test-optional-rule_removeFieldButton',
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId: 'test-interface',
-        handler: expect.any(Function),
+      // Verify that all individual unbind functions were called
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
       });
     });
 
@@ -1041,9 +1034,11 @@ describe('rules', () => {
       });
 
       expect(mockUserEventDispatcher.on).not.toHaveBeenCalled();
+      expect(mockUnbindFunctions).toHaveLength(0);
 
       unbind();
-      expect(mockUserEventDispatcher.off).not.toHaveBeenCalled();
+      // No unbind functions should be called since no handlers were bound
+      expect(mockUnbindFunctions).toHaveLength(0);
     });
   });
 });

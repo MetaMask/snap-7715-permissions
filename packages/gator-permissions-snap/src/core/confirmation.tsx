@@ -3,10 +3,7 @@ import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
-import type {
-  UserEventDispatcher,
-  UserEventHandler,
-} from '../userEventDispatcher';
+import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
@@ -68,36 +65,31 @@ export class ConfirmationDialog {
       // eslint-disable-next-line prefer-const
       let cleanup: () => Promise<void>;
 
-      const onGrantButtonClick: UserEventHandler<
-        UserInputEventType.ButtonClickEvent
-      > = async () => {
-        await cleanup();
+      const { unbind: unbindGrantButtonClick } = this.#userEventDispatcher.on({
+        elementName: ConfirmationDialog.#grantButton,
+        eventType: UserInputEventType.ButtonClickEvent,
+        interfaceId,
+        handler: async () => {
+          await cleanup();
 
-        resolve(true);
-      };
+          resolve(true);
+        },
+      });
 
-      const onCancelButtonClick: UserEventHandler<
-        UserInputEventType.ButtonClickEvent
-      > = async () => {
-        await cleanup();
+      const { unbind: unbindCancelButtonClick } = this.#userEventDispatcher.on({
+        elementName: ConfirmationDialog.#cancelButton,
+        eventType: UserInputEventType.ButtonClickEvent,
+        interfaceId,
+        handler: async () => {
+          await cleanup();
 
-        resolve(false);
-      };
+          resolve(false);
+        },
+      });
 
       cleanup = async () => {
-        this.#userEventDispatcher.off({
-          elementName: ConfirmationDialog.#grantButton,
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: onGrantButtonClick,
-        });
-
-        this.#userEventDispatcher.off({
-          elementName: ConfirmationDialog.#cancelButton,
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: onCancelButtonClick,
-        });
+        unbindGrantButtonClick();
+        unbindCancelButtonClick();
 
         try {
           await this.#snaps.request({
@@ -113,20 +105,8 @@ export class ConfirmationDialog {
         }
       };
 
-      this.#userEventDispatcher.on({
-        elementName: ConfirmationDialog.#grantButton,
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId,
-        handler: onGrantButtonClick,
-      });
-
-      this.#userEventDispatcher.on({
-        elementName: ConfirmationDialog.#cancelButton,
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId,
-        handler: onCancelButtonClick,
-      });
-
+      // we don't await this, because we only want to present the dialog, and
+      // not wait for it to be resolved
       this.#snaps
         .request({
           method: 'snap_dialog',

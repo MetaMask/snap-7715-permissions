@@ -18,11 +18,11 @@ import {
 } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
-import type { AccountController } from '../accountController';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
+  AccountControllerInterface,
   BaseContext,
   BaseMetadata,
   DeepRequired,
@@ -35,7 +35,7 @@ import type {
  * Orchestrates the lifecycle of permission requests, confirmation dialogs, and delegation creation.
  */
 export class PermissionRequestLifecycleOrchestrator {
-  readonly #accountController: AccountController;
+  readonly #accountController: AccountControllerInterface;
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
@@ -49,7 +49,7 @@ export class PermissionRequestLifecycleOrchestrator {
     userEventDispatcher,
     nonceCaveatService,
   }: {
-    accountController: AccountController;
+    accountController: AccountControllerInterface;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
@@ -84,6 +84,12 @@ export class PermissionRequestLifecycleOrchestrator {
       TPopulatedPermission
     >,
   ): Promise<PermissionRequestResult> {
+    const chainId = hexToNumber(permissionRequest.chainId);
+
+    // only necessary when not pre-installed, to ensure that the account
+    // permissions are requested before the confirmation dialog is shown.
+    await this.#accountController.getAccountAddresses();
+
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);
 
@@ -95,10 +101,8 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    const decision =
+    const decisionPromise =
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
-
-    const chainId = hexToNumber(permissionRequest.chainId);
 
     let context = await lifecycleHandlers.buildContext(
       validatedPermissionRequest,
@@ -165,7 +169,7 @@ export class PermissionRequestLifecycleOrchestrator {
     }
 
     try {
-      const { isConfirmationGranted } = await decision;
+      const { isConfirmationGranted } = await decisionPromise;
 
       if (isConfirmationGranted) {
         // Wait for any pending context updates to complete before granting permission
@@ -257,14 +261,11 @@ export class PermissionRequestLifecycleOrchestrator {
       isAdjustmentAllowed,
     };
 
-    const [address, accountMetadata] = await Promise.all([
-      this.#accountController.getAccountAddress({
-        chainId,
-      }),
-      this.#accountController.getAccountMetadata({
-        chainId,
-      }),
-    ]);
+    const { address } = grantedPermissionRequest;
+    // todo: it would be nice if this was concretely typed
+    if (!address) {
+      throw new Error('Address is undefined');
+    }
 
     const { contracts } = getChainMetadata({ chainId });
     const {
@@ -324,19 +325,13 @@ export class PermissionRequestLifecycleOrchestrator {
       await this.#accountController.signDelegation({
         chainId,
         delegation,
+        address,
       });
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
-    const dependencyInfo: DependencyInfo[] =
-      accountMetadata.factory && accountMetadata.factoryData
-        ? [
-            {
-              factory: accountMetadata.factory,
-              factoryData: accountMetadata.factoryData,
-            },
-          ]
-        : [];
+    // dependencyInfo is always empty for EIP-7702 accounts
+    const dependencyInfo: DependencyInfo[] = [];
 
     const response: PermissionResponse = {
       ...grantedPermissionRequest,

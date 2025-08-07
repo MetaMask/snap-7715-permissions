@@ -1,7 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
 
-import type { AccountController } from '../accountController';
 import { erc20TokenPeriodicPermissionDefinition } from '../permissions/erc20TokenPeriodic';
 import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
 import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
@@ -12,6 +11,7 @@ import type { UserEventDispatcher } from '../userEventDispatcher';
 import { PermissionHandler } from './permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type {
+  AccountControllerInterface,
   BaseContext,
   DeepRequired,
   PermissionDefinition,
@@ -23,7 +23,7 @@ import type {
  * Each permission type has its own orchestrator that handles the specific logic for that permission.
  */
 export class PermissionHandlerFactory {
-  readonly #accountController: AccountController;
+  readonly #accountController: AccountControllerInterface;
 
   readonly #tokenPricesService: TokenPricesService;
 
@@ -40,7 +40,7 @@ export class PermissionHandlerFactory {
     userEventDispatcher,
     orchestrator,
   }: {
-    accountController: AccountController;
+    accountController: AccountControllerInterface;
     tokenPricesService: TokenPricesService;
     tokenMetadataService: TokenMetadataService;
     userEventDispatcher: UserEventDispatcher;

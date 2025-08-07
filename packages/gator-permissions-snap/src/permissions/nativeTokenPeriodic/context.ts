@@ -1,9 +1,13 @@
-import { bigIntToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  parseCaipAccountId,
+  toCaipAccountId,
+  toCaipAssetType,
+  type Hex,
+} from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
   TIME_PERIOD_TO_SECONDS,
@@ -23,6 +27,10 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
+
+const ASSET_NAMESPACE = 'slip44';
+const CHAIN_NAMESPACE = 'eip155';
+const ASSET_REFERENCE = '60';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -65,8 +73,11 @@ export async function applyContext({
     justification: originalRequest.permission.data.justification,
   };
 
+  const { address } = parseCaipAccountId(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
+    address: address as Hex,
     permission: {
       type: 'native-token-periodic',
       data: permissionData,
@@ -101,37 +112,34 @@ export async function populatePermission({
  * and manage the permission state.
  * @param args - The options object containing the request and required services.
  * @param args.permissionRequest - The native token periodic permission request to convert.
- * @param args.tokenPricesService - Service for fetching token price information.
- * @param args.accountController - Controller for managing account operations.
  * @param args.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
-  accountController,
   tokenMetadataService,
 }: {
   permissionRequest: NativeTokenPeriodicPermissionRequest;
-  tokenPricesService: TokenPricesService;
-  accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const address = await accountController.getAccountAddress({
-    chainId,
-  });
-
   const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: address,
-  });
+    address,
+    permission: { data },
+  } = permissionRequest;
+
+  if (!address) {
+    throw new Error(
+      'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
+    );
+  }
+
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: address,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -139,12 +147,6 @@ export async function buildContext({
   const iconDataBase64 = iconDataResponse.success
     ? iconDataResponse.imageDataBase64
     : null;
-
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:1/slip44:60`,
-    bigIntToHex(rawBalance),
-    decimals,
-  );
 
   const expiryRule = permissionRequest.rules?.find(
     (rule) => rule.type === 'expiry',
@@ -155,13 +157,12 @@ export async function buildContext({
   };
 
   const periodAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.periodAmount,
+    value: data.periodAmount,
     allowUndefined: false,
     decimals,
   });
 
-  const periodDuration =
-    permissionRequest.permission.data.periodDuration.toString();
+  const periodDuration = data.periodDuration.toString();
 
   // Determine the period type based on the duration
   let periodType: TimePeriod | 'Other';
@@ -176,20 +177,27 @@ export async function buildContext({
   }
 
   const startTime =
-    permissionRequest.permission.data.startTime?.toString() ??
-    Math.floor(Date.now() / 1000).toString();
+    data.startTime?.toString() ?? Math.floor(Date.now() / 1000).toString();
 
-  const balance = bigIntToHex(rawBalance);
+  const tokenAddressCaip19 = toCaipAssetType(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    ASSET_NAMESPACE,
+    ASSET_REFERENCE,
+  );
+
+  const accountAddressCaip10 = toCaipAccountId(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    address,
+  );
 
   return {
     expiry,
-    justification: permissionRequest.permission.data.justification,
-    isAdjustmentAllowed: permissionRequest.permission.isAdjustmentAllowed,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    justification: data.justification,
+    isAdjustmentAllowed: data.isAdjustmentAllowed,
+    accountAddressCaip10,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,
