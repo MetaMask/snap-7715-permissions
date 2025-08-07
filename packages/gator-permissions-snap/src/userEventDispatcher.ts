@@ -103,10 +103,10 @@ export class UserEventDispatcher {
    */
   public on<TUserInputEventType extends UserInputEventType>(args: {
     elementName: string;
-    eventType: UserInputEventType;
+    eventType: TUserInputEventType;
     interfaceId: string;
     handler: UserEventHandler<TUserInputEventType>;
-  }): UserEventDispatcher {
+  }): { dispatcher: UserEventDispatcher; unbind: () => void } {
     const { elementName, eventType, handler, interfaceId } = args;
 
     const eventKey = getUserInputEventKey({
@@ -125,7 +125,12 @@ export class UserEventDispatcher {
       ];
     }
 
-    return this;
+    return {
+      dispatcher: this,
+      unbind: () => {
+        this.off<TUserInputEventType>(args);
+      },
+    };
   }
 
   /**

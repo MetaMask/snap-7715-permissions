@@ -25,14 +25,15 @@ describe('UserEventDispatcher', () => {
     it('should register an event handler for a specific event type', () => {
       const handler = createHandlerMock();
 
-      const result = userEventDispatcher.on({
+      const { unbind, dispatcher } = userEventDispatcher.on({
         elementName,
         eventType,
         interfaceId,
         handler,
       });
 
-      expect(result).toBe(userEventDispatcher);
+      expect(unbind).toBeInstanceOf(Function);
+      expect(dispatcher).toBe(userEventDispatcher);
     });
 
     it('should call the handler when the event is triggered', async () => {
@@ -97,19 +98,18 @@ describe('UserEventDispatcher', () => {
       const handler2 = createHandlerMock();
       const handleEvent = userEventDispatcher.createUserInputEventHandler();
 
-      userEventDispatcher
-        .on({
-          elementName,
-          eventType,
-          interfaceId,
-          handler: handler1,
-        })
-        .on({
-          elementName,
-          eventType,
-          interfaceId,
-          handler: handler2,
-        });
+      userEventDispatcher.on({
+        elementName,
+        eventType,
+        interfaceId,
+        handler: handler1,
+      });
+      userEventDispatcher.on({
+        elementName,
+        eventType,
+        interfaceId,
+        handler: handler2,
+      });
 
       await handleEvent({
         event: {
@@ -204,6 +204,28 @@ describe('UserEventDispatcher', () => {
 
       expect(handler).toHaveBeenCalled();
     });
+
+    it('should return a function that can be called to remove the handler', () => {
+      const handler = createHandlerMock();
+      const spy = jest.spyOn(userEventDispatcher, 'off');
+      const { unbind } = userEventDispatcher.on({
+        elementName,
+        eventType,
+        interfaceId,
+        handler,
+      });
+
+      expect(spy).not.toHaveBeenCalled();
+
+      unbind();
+
+      expect(spy).toHaveBeenCalledWith({
+        elementName,
+        eventType,
+        interfaceId,
+        handler,
+      });
+    });
   });
 
   describe('off()', () => {
@@ -243,19 +265,18 @@ describe('UserEventDispatcher', () => {
       const handler2 = createHandlerMock();
       const handleEvent = userEventDispatcher.createUserInputEventHandler();
 
-      userEventDispatcher
-        .on({
-          elementName,
-          eventType,
-          interfaceId,
-          handler: handler1,
-        })
-        .on({
-          elementName,
-          eventType,
-          interfaceId,
-          handler: handler2,
-        });
+      userEventDispatcher.on({
+        elementName,
+        eventType,
+        interfaceId,
+        handler: handler1,
+      });
+      userEventDispatcher.on({
+        elementName,
+        eventType,
+        interfaceId,
+        handler: handler2,
+      });
 
       userEventDispatcher.off({
         elementName,

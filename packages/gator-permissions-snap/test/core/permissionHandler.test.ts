@@ -79,11 +79,14 @@ const mockTokenBalanceAndMetadata: TokenBalanceAndMetadata = {
 };
 const mockMetadata: TestMetadataType = {};
 
-const setupDependencies = () => {
+const setupTest = () => {
   const title = 'Test permission';
 
   const boundEvents = new Map<string, UserEventHandler<UserInputEventType>>();
+  const unboundEvents = new Map<string, UserEventHandler<UserInputEventType>>();
 
+  // eslint-disable-next-line prefer-const
+  let userEventDispatcher: jest.Mocked<UserEventDispatcher>;
   const bindEvent = ({
     elementName,
     eventType,
@@ -96,6 +99,16 @@ const setupDependencies = () => {
     handler: UserEventHandler<UserInputEventType>;
   }) => {
     boundEvents.set(`${elementName}:${eventType}:${interfaceId}`, handler);
+
+    return {
+      unbind: () => {
+        unboundEvents.set(
+          `${elementName}:${eventType}:${interfaceId}`,
+          handler,
+        );
+      },
+      dispatcher: userEventDispatcher,
+    };
   };
 
   const getBoundEvent = (args: {
@@ -108,12 +121,22 @@ const setupDependencies = () => {
     );
   };
 
+  const getUnboundEvent = (args: {
+    elementName: string;
+    eventType: string;
+    interfaceId: string;
+  }) => {
+    return unboundEvents.get(
+      `${args.elementName}:${args.eventType}:${args.interfaceId}`,
+    );
+  };
+
   const accountController = {
     signDelegation: jest.fn(),
     getAccountAddresses: jest.fn(),
   } as unknown as jest.Mocked<AccountControllerInterface>;
 
-  const userEventDispatcher = {
+  userEventDispatcher = {
     on: jest.fn(bindEvent),
     off: jest.fn(),
     createUserInputEventHandler: jest.fn(),
@@ -152,8 +175,8 @@ const setupDependencies = () => {
     fetchIconDataAsBase64: jest.fn(),
   } as unknown as jest.Mocked<TokenMetadataService>;
   const rules: RuleDefinition<any, any>[] = [];
-  return {
-    getBoundEvent,
+
+  const permissionHandlerDependencies = {
     title,
     accountController,
     userEventDispatcher,
@@ -164,52 +187,64 @@ const setupDependencies = () => {
     tokenMetadataService,
     rules,
   };
-};
 
-const getLifecycleHandlersFromOrchestrator = (
-  orchestrator: jest.Mocked<PermissionRequestLifecycleOrchestrator>,
-) => {
-  const call = orchestrator.orchestrate.mock.calls[0];
-  if (!call) {
-    throw new Error('No call found');
-  }
-  return call[2] as TestLifecycleHandlersType;
+  const permissionHandler = new PermissionHandler(
+    permissionHandlerDependencies,
+  );
+
+  const getLifecycleHandlers = () => {
+    const call = orchestrator.orchestrate.mock.calls[0];
+    if (!call) {
+      throw new Error('No call found');
+    }
+    return call[2] as TestLifecycleHandlersType;
+  };
+
+  const updateContext =
+    jest.fn<(args: { updatedContext: TestContextType }) => Promise<void>>();
+
+  return {
+    permissionHandler,
+    getLifecycleHandlers,
+    updateContext,
+    getBoundEvent,
+    getUnboundEvent,
+    ...permissionHandlerDependencies,
+  };
 };
 
 describe('PermissionHandler', () => {
   describe('constructor', () => {
     it('creates a PermissionHandler', () => {
-      const handler = new PermissionHandler(setupDependencies());
+      const { permissionHandler } = setupTest();
 
-      expect(handler).toBeInstanceOf(PermissionHandler);
+      expect(permissionHandler).toBeInstanceOf(PermissionHandler);
     });
   });
 
   describe('handlePermissionRequest', () => {
     it('calls orchestrate on the orchestrator', async () => {
-      const setup = setupDependencies();
-      const handler = new PermissionHandler(setup);
+      const { permissionHandler, orchestrator, permissionRequest } =
+        setupTest();
 
-      await handler.handlePermissionRequest(mockOrigin);
+      await permissionHandler.handlePermissionRequest(mockOrigin);
 
-      expect(setup.orchestrator.orchestrate).toHaveBeenCalledWith(
+      expect(orchestrator.orchestrate).toHaveBeenCalledWith(
         mockOrigin,
-        setup.permissionRequest,
+        permissionRequest,
         expect.any(Object),
       );
     });
 
     it('provides the lifecycle handlers to the orchestrator', async () => {
-      const setup = setupDependencies();
-      const handler = new PermissionHandler(setup);
+      const { permissionHandler, orchestrator, getLifecycleHandlers } =
+        setupTest();
 
-      await handler.handlePermissionRequest(mockOrigin);
+      await permissionHandler.handlePermissionRequest(mockOrigin);
 
-      expect(setup.orchestrator.orchestrate).toHaveBeenCalledTimes(1);
+      expect(orchestrator.orchestrate).toHaveBeenCalledTimes(1);
 
-      const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-        setup.orchestrator,
-      );
+      const lifecycleHandlers = getLifecycleHandlers();
 
       expect(lifecycleHandlers).toHaveProperty('parseAndValidatePermission');
       expect(lifecycleHandlers).toHaveProperty('applyContext');
@@ -243,18 +278,22 @@ describe('PermissionHandler', () => {
     });
 
     it('resolves the address if one is not provided', async () => {
-      const setup = setupDependencies();
-      setup.accountController.getAccountAddresses.mockResolvedValue([
+      const {
+        permissionHandler,
+        accountController,
+        getLifecycleHandlers,
+        dependencies,
+        tokenMetadataService,
+      } = setupTest();
+
+      accountController.getAccountAddresses.mockResolvedValue([
         mockAddress,
         mockAddress2,
       ]);
-      const handler = new PermissionHandler(setup);
 
-      await handler.handlePermissionRequest(mockOrigin);
+      await permissionHandler.handlePermissionRequest(mockOrigin);
 
-      const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-        setup.orchestrator,
-      );
+      const lifecycleHandlers = getLifecycleHandlers();
 
       await lifecycleHandlers.buildContext({
         ...mockPermissionRequest,
@@ -262,71 +301,70 @@ describe('PermissionHandler', () => {
         address: undefined,
       });
 
-      expect(setup.accountController.getAccountAddresses).toHaveBeenCalledTimes(
-        1,
-      );
+      expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
 
       const permissionRequestWithResolvedAddress = {
         ...mockPermissionRequest,
         address: mockAddress,
       };
 
-      expect(setup.dependencies.buildContext).toHaveBeenCalledWith({
+      expect(dependencies.buildContext).toHaveBeenCalledWith({
         permissionRequest: permissionRequestWithResolvedAddress,
-        tokenMetadataService: setup.tokenMetadataService,
+        tokenMetadataService,
       });
     });
 
     it.each([mockAddress, mockAddress2])(
       'accepts the address if one is provided',
       async (specifiedAddress) => {
-        const setup = setupDependencies();
-        setup.accountController.getAccountAddresses.mockResolvedValue([
+        const {
+          permissionHandler,
+          accountController,
+          getLifecycleHandlers,
+          dependencies,
+          tokenMetadataService,
+        } = setupTest();
+
+        accountController.getAccountAddresses.mockResolvedValue([
           mockAddress,
           mockAddress2,
         ]);
-        const handler = new PermissionHandler(setup);
 
-        await handler.handlePermissionRequest(mockOrigin);
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         await lifecycleHandlers.buildContext({
           ...mockPermissionRequest,
           address: specifiedAddress,
         });
 
-        expect(
-          setup.accountController.getAccountAddresses,
-        ).toHaveBeenCalledTimes(1);
+        expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
 
         const permissionRequestWithResolvedAddress = {
           ...mockPermissionRequest,
           address: specifiedAddress,
         };
 
-        expect(setup.dependencies.buildContext).toHaveBeenCalledWith({
+        expect(dependencies.buildContext).toHaveBeenCalledWith({
           permissionRequest: permissionRequestWithResolvedAddress,
-          tokenMetadataService: setup.tokenMetadataService,
+          tokenMetadataService,
         });
       },
     );
 
     it('rejects the address if it is not one of the addresses available for the account', async () => {
-      const setup = setupDependencies();
-      setup.accountController.getAccountAddresses.mockResolvedValue([
+      const { permissionHandler, accountController, getLifecycleHandlers } =
+        setupTest();
+
+      accountController.getAccountAddresses.mockResolvedValue([
         mockAddress,
         mockAddress2,
       ]);
-      const handler = new PermissionHandler(setup);
 
-      await handler.handlePermissionRequest(mockOrigin);
+      await permissionHandler.handlePermissionRequest(mockOrigin);
 
-      const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-        setup.orchestrator,
-      );
+      const lifecycleHandlers = getLifecycleHandlers();
 
       await expect(
         lifecycleHandlers.buildContext({
@@ -335,34 +373,29 @@ describe('PermissionHandler', () => {
         }),
       ).rejects.toThrow('Requested address not found');
 
-      expect(setup.accountController.getAccountAddresses).toHaveBeenCalledTimes(
-        1,
-      );
+      expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
     });
 
     it('throws error when called multiple times', async () => {
-      const setup = setupDependencies();
-      const handler = new PermissionHandler(setup);
+      const { permissionHandler } = setupTest();
 
-      await handler.handlePermissionRequest(mockOrigin);
+      await permissionHandler.handlePermissionRequest(mockOrigin);
 
-      await expect(handler.handlePermissionRequest(mockOrigin)).rejects.toThrow(
-        'Permission request already handled',
-      );
+      await expect(
+        permissionHandler.handlePermissionRequest(mockOrigin),
+      ).rejects.toThrow('Permission request already handled');
     });
   });
 
   describe('lifecycleHandlers', () => {
     describe('createConfirmationContent', () => {
       it('calls createConfirmationContent to produce the permission specific content', async () => {
-        const setup = setupDependencies();
-        const handler = new PermissionHandler(setup);
+        const { permissionHandler, getLifecycleHandlers, dependencies } =
+          setupTest();
 
-        await handler.handlePermissionRequest(mockOrigin);
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         await lifecycleHandlers.createConfirmationContent({
           context: mockContext,
@@ -371,23 +404,18 @@ describe('PermissionHandler', () => {
           chainId: 1,
         });
 
-        expect(
-          setup.dependencies.createConfirmationContent,
-        ).toHaveBeenCalledWith({
+        expect(dependencies.createConfirmationContent).toHaveBeenCalledWith({
           context: mockContext,
           metadata: mockMetadata,
         });
       });
 
       it('creates a PermissionHandlerContent', async () => {
-        const setup = setupDependencies();
-        const handler = new PermissionHandler(setup);
+        const { permissionHandler, getLifecycleHandlers } = setupTest();
 
-        await handler.handlePermissionRequest(mockOrigin);
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         const result = await lifecycleHandlers.createConfirmationContent({
           context: mockContext,
@@ -403,19 +431,16 @@ describe('PermissionHandler', () => {
 
     describe('onConfirmationCreated', () => {
       it('registers event handlers for account selection and justification toggle', async () => {
-        const setup = setupDependencies();
-        const handler = new PermissionHandler(setup);
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getBoundEvent,
+          updateContext,
+        } = setupTest();
 
-        const updateContext =
-          jest.fn<
-            (args: { updatedContext: TestContextType }) => Promise<void>
-          >();
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        await handler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
@@ -423,39 +448,33 @@ describe('PermissionHandler', () => {
           updateContext,
         });
 
-        expect(setup.userEventDispatcher.on).toHaveBeenCalledWith(
-          expect.objectContaining({
-            elementName: 'account-selector',
-            eventType: 'InputChangeEvent',
-            interfaceId: mockInterfaceId,
-            handler: expect.any(Function),
-          }),
-        );
+        const accountSelectorBoundEvent = getBoundEvent({
+          elementName: 'account-selector',
+          eventType: 'InputChangeEvent',
+          interfaceId: mockInterfaceId,
+        });
 
-        expect(setup.userEventDispatcher.on).toHaveBeenCalledWith(
-          expect.objectContaining({
-            elementName: 'show-more-justification',
-            eventType: 'ButtonClickEvent',
-            interfaceId: mockInterfaceId,
-            handler: expect.any(Function),
-          }),
-        );
+        const showMoreButtonBoundEvent = getBoundEvent({
+          elementName: 'show-more-justification',
+          eventType: 'ButtonClickEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        expect(accountSelectorBoundEvent).toBeDefined();
+        expect(showMoreButtonBoundEvent).toBeDefined();
       });
 
       it('loads the balance for the selected account', async () => {
-        const setup = setupDependencies();
-        const handler = new PermissionHandler(setup);
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          tokenMetadataService,
+          updateContext,
+        } = setupTest();
 
-        const updateContext =
-          jest.fn<
-            (args: { updatedContext: TestContextType }) => Promise<void>
-          >();
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        await handler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
@@ -464,7 +483,7 @@ describe('PermissionHandler', () => {
         });
 
         expect(
-          setup.tokenMetadataService.getTokenBalanceAndMetadata,
+          tokenMetadataService.getTokenBalanceAndMetadata,
         ).toHaveBeenCalledWith({
           chainId: 1,
           account: mockAddress,
@@ -473,19 +492,16 @@ describe('PermissionHandler', () => {
       });
 
       it('updates the context when the account is changed', async () => {
-        const setup = setupDependencies();
-        const handler = new PermissionHandler(setup);
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getBoundEvent,
+          updateContext,
+        } = setupTest();
 
-        const updateContext =
-          jest.fn<
-            (args: { updatedContext: TestContextType }) => Promise<void>
-          >();
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        await handler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
@@ -493,7 +509,7 @@ describe('PermissionHandler', () => {
           updateContext,
         });
 
-        const accountSelectorChangeHandler = setup.getBoundEvent({
+        const accountSelectorChangeHandler = getBoundEvent({
           elementName: 'account-selector',
           eventType: 'InputChangeEvent',
           interfaceId: mockInterfaceId,
@@ -523,19 +539,17 @@ describe('PermissionHandler', () => {
       });
 
       it('updates the balance when the account is changed', async () => {
-        const setup = setupDependencies();
-        const handler = new PermissionHandler(setup);
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getBoundEvent,
+          tokenMetadataService,
+          updateContext,
+        } = setupTest();
 
-        const updateContext =
-          jest.fn<
-            (args: { updatedContext: TestContextType }) => Promise<void>
-          >();
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        await handler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
@@ -543,7 +557,7 @@ describe('PermissionHandler', () => {
           updateContext,
         });
 
-        const accountSelectorChangeHandler = setup.getBoundEvent({
+        const accountSelectorChangeHandler = getBoundEvent({
           elementName: 'account-selector',
           eventType: 'InputChangeEvent',
           interfaceId: mockInterfaceId,
@@ -563,11 +577,11 @@ describe('PermissionHandler', () => {
         });
 
         expect(
-          setup.tokenMetadataService.getTokenBalanceAndMetadata,
+          tokenMetadataService.getTokenBalanceAndMetadata,
         ).toHaveBeenCalledTimes(2);
 
         expect(
-          setup.tokenMetadataService.getTokenBalanceAndMetadata,
+          tokenMetadataService.getTokenBalanceAndMetadata,
         ).toHaveBeenCalledWith({
           chainId: 1,
           account: mockAddress2,
@@ -576,19 +590,12 @@ describe('PermissionHandler', () => {
       });
 
       it('renders the balance in the confirmation content', async () => {
-        const setup = setupDependencies();
-        const handler = new PermissionHandler(setup);
+        const { permissionHandler, getLifecycleHandlers, updateContext } =
+          setupTest();
 
-        const updateContext =
-          jest.fn<
-            (args: { updatedContext: TestContextType }) => Promise<void>
-          >();
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        await handler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
@@ -1056,19 +1063,17 @@ describe('PermissionHandler', () => {
       });
 
       it('updates the balance in the confirmation content when the account is changed', async () => {
-        const setup = setupDependencies();
-        const handler = new PermissionHandler(setup);
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getBoundEvent,
+          tokenPricesService,
+          updateContext,
+        } = setupTest();
 
-        const updateContext =
-          jest.fn<
-            (args: { updatedContext: TestContextType }) => Promise<void>
-          >();
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        await handler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
@@ -1076,7 +1081,7 @@ describe('PermissionHandler', () => {
           updateContext,
         });
 
-        const accountSelectorChangeHandler = setup.getBoundEvent({
+        const accountSelectorChangeHandler = getBoundEvent({
           elementName: 'account-selector',
           eventType: 'InputChangeEvent',
           interfaceId: mockInterfaceId,
@@ -1086,9 +1091,7 @@ describe('PermissionHandler', () => {
 
         const mockAddress2Caip10 = `eip155:1:${mockAddress2}`;
 
-        setup.tokenPricesService.getCryptoToFiatConversion.mockResolvedValue(
-          '$2000',
-        );
+        tokenPricesService.getCryptoToFiatConversion.mockResolvedValue('$2000');
 
         await accountSelectorChangeHandler?.({
           event: {
@@ -1565,12 +1568,14 @@ describe('PermissionHandler', () => {
       });
 
       it('renders skeletons while the balance is loading', async () => {
-        const setup = setupDependencies();
-
-        const updateContext =
-          jest.fn<
-            (args: { updatedContext: TestContextType }) => Promise<void>
-          >();
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getBoundEvent,
+          tokenMetadataService,
+          tokenPricesService,
+          updateContext,
+        } = setupTest();
 
         let resolveTokenBalancePromise: () => void = () => {
           throw new Error('Function should never be called');
@@ -1582,7 +1587,7 @@ describe('PermissionHandler', () => {
           },
         );
 
-        setup.tokenMetadataService.getTokenBalanceAndMetadata.mockReturnValue(
+        tokenMetadataService.getTokenBalanceAndMetadata.mockReturnValue(
           tokenBalancePromise,
         );
 
@@ -1592,16 +1597,13 @@ describe('PermissionHandler', () => {
         const fiatBalancePromise = new Promise<string>((resolve) => {
           resolveFiatBalancePromise = () => resolve(mockTokenBalanceFiat);
         });
-        setup.tokenPricesService.getCryptoToFiatConversion.mockReturnValue(
+        tokenPricesService.getCryptoToFiatConversion.mockReturnValue(
           fiatBalancePromise,
         );
-        const handler = new PermissionHandler(setup);
 
-        await handler.handlePermissionRequest(mockOrigin);
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
@@ -1609,7 +1611,7 @@ describe('PermissionHandler', () => {
           updateContext,
         });
 
-        const accountSelectorChangeHandler = setup.getBoundEvent({
+        const accountSelectorChangeHandler = getBoundEvent({
           elementName: 'account-selector',
           eventType: 'InputChangeEvent',
           interfaceId: mockInterfaceId,
@@ -3043,12 +3045,13 @@ describe('PermissionHandler', () => {
       });
 
       it('cancels the balance loading when the account is changed', async () => {
-        const setup = setupDependencies();
-
-        const updateContext =
-          jest.fn<
-            (args: { updatedContext: TestContextType }) => Promise<void>
-          >();
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getBoundEvent,
+          tokenMetadataService,
+          updateContext,
+        } = setupTest();
 
         let resolveTokenBalancePromise: () => void = () => {
           throw new Error('Function should never be called');
@@ -3060,17 +3063,13 @@ describe('PermissionHandler', () => {
           },
         );
 
-        setup.tokenMetadataService.getTokenBalanceAndMetadata.mockReturnValueOnce(
+        tokenMetadataService.getTokenBalanceAndMetadata.mockReturnValueOnce(
           tokenBalancePromise,
         );
 
-        const handler = new PermissionHandler(setup);
+        await permissionHandler.handlePermissionRequest(mockOrigin);
 
-        await handler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlersFromOrchestrator(
-          setup.orchestrator,
-        );
+        const lifecycleHandlers = getLifecycleHandlers();
 
         lifecycleHandlers.onConfirmationCreated?.({
           interfaceId: mockInterfaceId,
@@ -3078,7 +3077,7 @@ describe('PermissionHandler', () => {
           updateContext,
         });
 
-        const accountSelectorChangeHandler = setup.getBoundEvent({
+        const accountSelectorChangeHandler = getBoundEvent({
           elementName: 'account-selector',
           eventType: 'InputChangeEvent',
           interfaceId: mockInterfaceId,
@@ -3108,6 +3107,59 @@ describe('PermissionHandler', () => {
         // 4. After the original token balance is resolved for the first account
         // 5. After the original fiat balance is resolved for the first account
         expect(updateContext).toHaveBeenCalledTimes(3);
+      });
+
+      it('unbinds the event handlers when the confirmation is resolved', async () => {
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getUnboundEvent,
+          getBoundEvent,
+          updateContext,
+        } = setupTest();
+
+        await permissionHandler.handlePermissionRequest(mockOrigin);
+
+        const { onConfirmationResolved, onConfirmationCreated } =
+          getLifecycleHandlers();
+
+        onConfirmationCreated?.({
+          interfaceId: mockInterfaceId,
+          initialContext: mockContext,
+          updateContext,
+        });
+
+        const accountSelectorBoundEvent = getBoundEvent({
+          elementName: 'account-selector',
+          eventType: 'InputChangeEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        const showMoreButtonBoundEvent = getBoundEvent({
+          elementName: 'show-more-justification',
+          eventType: 'ButtonClickEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        expect(accountSelectorBoundEvent).toBeDefined();
+        expect(showMoreButtonBoundEvent).toBeDefined();
+
+        onConfirmationResolved?.();
+
+        const accountSelectorUnboundEvent = getUnboundEvent({
+          elementName: 'account-selector',
+          eventType: 'InputChangeEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        const showMoreButtonUnboundEvent = getUnboundEvent({
+          elementName: 'show-more-justification',
+          eventType: 'ButtonClickEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        expect(accountSelectorUnboundEvent).toBeDefined();
+        expect(showMoreButtonUnboundEvent).toBeDefined();
       });
     });
   });
