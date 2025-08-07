@@ -31,27 +31,27 @@ This document outlines the architecture of the Permissions Provider Snap system 
 - **EntryPoint (index.ts)**: The main entrypoint for the snap. Sets up all services, dependencies, and lifecycle handlers. Connects RPC handlers and UserEventDispatcher to the Snaps runtime.
 - **RpcHandler**: Functional RPC handler created by `createRpcHandler()` that responds to JSON-RPC requests from external systems. Supports three methods: grantPermission, getPermissionOffers, getGrantedPermissions.
 - **PermissionHandlerFactory**: Creates and manages specific permission handlers using a generic PermissionHandler class with permission-specific type parameters and dependencies.
-- **PermissionHandler**: A generic class used for all permission types, instantiated with permission-specific types and dependencies to handle the complete permission lifecycle.
+- **PermissionHandler**: A generic class used for all permission types, instantiated with permission-specific configuration and implementations to handle the complete permission lifecycle.
 - **PermissionRequestLifecycleOrchestrator**: Orchestrates the complete permission request lifecycle across all permission types using handler-provided functions.
 - **UserEventDispatcher**: Manages user input events from the snaps environment, providing event registration, cleanup, and sequential event processing.
 
 ### Service Components
 
-- **AccountController**: Manages smart accounts, delegations, and blockchain interactions.
+- **AccountController**: Manages interactions with the user's EIP-7702 enabled EOA via the ethereum provider.
 - **TokenPricesService**: Fetches token prices and calculates fiat conversions using user preferences.
 - **TokenMetadataService**: Retrieves token balance and metadata from various sources (Account API, blockchain clients).
-- **ProfileSyncManager**: Manages syncing of granted permissions to encrypted user storage for cross-device synchronization.
+- **ProfileSyncManager**: Manages persistence of granted permissions to support syncronization across a user's devices, and permission revocation (revocation is implemented in MetaMask extension).
 - **StateManager**: Handles persistent snap state storage and retrieval.
 
 ### Client Components
 
-- **AccountApiClient**: Interfaces with the Account API for token metadata and balances on supported chains.
-- **BlockchainTokenMetadataClient**: Directly queries blockchain for token metadata on unsupported chains.
+- **AccountApiClient**: Interfaces with the Account API for token metadata and balances on chains supported by the Account API.
+- **BlockchainTokenMetadataClient**: Directly queries blockchain for token metadata on chains unsupported by the Account API.
 - **PriceApiClient**: Fetches real-time token price data.
 
 ### UI Components
 
-- **HomePage**: Class-based component that builds the snap's homepage, showing user accounts and granted permissions.
+- **HomePage**: Component that builds the snap's homepage, showing feature introduction, as well as granted permissions. This is only part of the pre-production feature, as the snap will be pre-installed in which case the homepage is not accessible.
 - **ConfirmationDialogFactory**: Creates confirmation dialogs for permission requests.
 - **ConfirmationDialog**: Manages the lifecycle and user interaction of confirmation dialogs.
 
