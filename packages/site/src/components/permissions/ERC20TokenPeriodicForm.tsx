@@ -23,6 +23,7 @@ export const ERC20TokenPeriodicForm = ({
     'This is a very important request for periodic ERC20 token allowance for some very important thing',
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
+  const [expiryIsAdjustmentAllowed, setExpiryIsAdjustmentAllowed] = useState(true);
   const [tokenAddress, setTokenAddress] = useState<Hex>(
     '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // Consensys USDC
   );
@@ -83,6 +84,13 @@ export const ERC20TokenPeriodicForm = ({
     [],
   );
 
+  const handleExpiryIsAdjustmentAllowedChange = useCallback(
+    ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
+      setExpiryIsAdjustmentAllowed(checked);
+    },
+    [],
+  );
+
   const handleTokenAddressChange = useCallback(
     ({
       target: { value: inputValue },
@@ -101,6 +109,7 @@ export const ERC20TokenPeriodicForm = ({
       expiry,
       justification,
       isAdjustmentAllowed,
+      expiryIsAdjustmentAllowed,
       tokenAddress,
     });
   }, [
@@ -111,6 +120,7 @@ export const ERC20TokenPeriodicForm = ({
     expiry,
     justification,
     isAdjustmentAllowed,
+    expiryIsAdjustmentAllowed,
     tokenAddress,
   ]);
 
@@ -167,15 +177,28 @@ export const ERC20TokenPeriodicForm = ({
           onChange={handleJustificationChange}
         ></textarea>
       </div>
-      <div>
-        <label htmlFor="expiry">Expiry:</label>
-        <input
-          type="number"
-          id="expiry"
-          name="expiry"
-          value={expiry}
-          onChange={handleExpiryChange}
-        />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div>
+          <label htmlFor="expiry">Expiry:</label>
+          <input
+            type="number"
+            id="expiry"
+            name="expiry"
+            value={expiry}
+            onChange={handleExpiryChange}
+          />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+          <input
+            type="checkbox"
+            id="expiryIsAdjustmentAllowed"
+            name="expiryIsAdjustmentAllowed"
+            checked={expiryIsAdjustmentAllowed}
+            onChange={handleExpiryIsAdjustmentAllowedChange}
+            style={{ width: 'auto', marginRight: '0.5rem' }}
+          />
+          <label htmlFor="expiryIsAdjustmentAllowed">Allow Expiry Adjustments</label>
+        </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>

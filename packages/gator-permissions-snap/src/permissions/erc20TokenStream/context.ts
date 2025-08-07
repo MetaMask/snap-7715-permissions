@@ -48,7 +48,17 @@ export async function applyContext({
     permissionDetails,
     tokenMetadata: { decimals },
   } = context;
-  const expiry = convertReadableDateToTimestamp(context.expiry);
+  const expiry = convertReadableDateToTimestamp(context.expiry.timestamp);
+
+  const rules = originalRequest.rules?.map((rule) => {
+    if (rule.type === 'expiry') {
+      return {
+        ...rule,
+        data: { ...rule.data, timestamp: expiry },
+      };
+    }
+    return rule;
+  });
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
@@ -79,7 +89,7 @@ export async function applyContext({
       data: permissionData,
       isAdjustmentAllowed: originalRequest.permission.isAdjustmentAllowed,
     },
-    rules: originalRequest.rules ?? [],
+    rules,
   };
 }
 
@@ -158,7 +168,10 @@ export async function buildContext({
   );
 
   const expiryRule = permissionRequest.rules?.find((rule) => rule.type === 'expiry');
-  const expiry = expiryRule?.data.timestamp.toString();
+  const expiry = {
+    timestamp: expiryRule?.data.timestamp.toString(),
+    isAdjustmentAllowed: expiryRule?.isAdjustmentAllowed ?? true,
+  };
 
   const initialAmount = formatUnitsFromHex({
     value: permissionRequest.permission.data.initialAmount,
@@ -280,7 +293,7 @@ export async function deriveMetadata({
   }
 
   // Validate expiry
-  const expiryError = validateExpiry(expiry);
+  const expiryError = validateExpiry(expiry.timestamp);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
   }
@@ -289,7 +302,7 @@ export async function deriveMetadata({
   if (!validationErrors.startTimeError && !validationErrors.expiryError) {
     const startTimeVsExpiryError = validateStartTimeVsExpiry(
       permissionDetails.startTime,
-      expiry,
+      expiry.timestamp,
     );
     if (startTimeVsExpiryError) {
       validationErrors.startTimeError = startTimeVsExpiryError;

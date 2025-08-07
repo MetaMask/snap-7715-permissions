@@ -54,8 +54,6 @@ export function createRpcHandler(config: {
     params?: Json;
   }): Promise<Json> => {
     logger.debug({ options }, 'grantPermissions()');
-    console.log('grantPermissions()');
-    console.log('params', JSON.stringify(options.params, null, 2));
     const parsedPermissionsRequest = parsePermissionRequestParam(
       options.params,
     );

@@ -14,6 +14,7 @@ import {
   convertTimestampToReadableDate,
   convertTimestampToReadableTime,
 } from '../utils/time';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 
 /**
  * Utility function to access nested properties in an object using dot notation.
@@ -266,7 +267,7 @@ export function bindRuleHandlers<
         currentValues.timestamp = timestamp.toString();
       } catch (error) {
         currentValues.timestamp = '';
-        console.log('Error combining date and time', error);
+        logger.error('Error combining date and time', error);
       }
 
       // Fix race condition: Use the stored context reference instead of calling getContext() again

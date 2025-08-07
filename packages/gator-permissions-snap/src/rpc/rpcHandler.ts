@@ -55,8 +55,6 @@ export function createRpcHandler(config: {
    */
   const grantPermission = async (params?: Json): Promise<Json> => {
     logger.debug('grantPermissions()', params);
-    console.log('grantPermissions()');
-    console.log('params', JSON.stringify(params, null, 2));
     const { permissionsRequest, siteOrigin } =
       validatePermissionRequestParam(params);
 

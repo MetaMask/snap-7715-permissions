@@ -8,6 +8,7 @@ import {
   createPublicClient,
   extractChain,
   Chain,
+  toHex,
 } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
 import * as chains from 'viem/chains';
@@ -53,6 +54,7 @@ import type {
   NativeTokenPeriodicPermissionRequest,
   ERC20TokenPeriodicPermissionRequest,
 } from '../components/permissions/types';
+import { PermissionTypes } from '@metamask/permission-types';
 
 /* eslint-disable no-restricted-globals */
 const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
@@ -223,16 +225,14 @@ const Index = () => {
       throw new Error('No permission request data');
     }
 
-
-    const { type, expiry, isAdjustmentAllowed, ...permissionData } =
+    const { type, expiry, isAdjustmentAllowed, expiryIsAdjustmentAllowed, ...permissionData } =
       permissionRequest;
 
     const permissionsRequests = [
       {
-        chainId,
-        expiry,
+        chainId: toHex(chainId),
         signer: {
-          type: 'account',
+          type: 'account' as const,
           data: {
             address: delegateAccount.address,
           },
@@ -241,10 +241,11 @@ const Index = () => {
           type,
           data: permissionData,
           isAdjustmentAllowed,
-        },
+        } as PermissionTypes,
         rules: [
           {
             type: 'expiry',
+            isAdjustmentAllowed: expiryIsAdjustmentAllowed,
             data: {
               timestamp: expiry,
             },
@@ -252,9 +253,6 @@ const Index = () => {
         ],
       },
     ];
-
-
-    console.log('permissionsRequests', permissionsRequests);
 
     setIsWorking(true);
     setPermissionResponse(null);
@@ -274,7 +272,7 @@ const Index = () => {
 
   const handleCopyToClipboard = () => {
     if (permissionResponse) {
-      navigator.clipboard
+      navigator.clipboard 
         .writeText(JSON.stringify(permissionResponse, null, 2))
         .then(() => {
           setIsCopied(true);

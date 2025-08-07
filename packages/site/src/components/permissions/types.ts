@@ -5,6 +5,7 @@ export type BasePermissionRequest = {
   startTime: number | null;
   expiry: number;
   isAdjustmentAllowed: boolean;
+  expiryIsAdjustmentAllowed: boolean;
 };
 
 export type NativeTokenStreamPermissionRequest = BasePermissionRequest & {

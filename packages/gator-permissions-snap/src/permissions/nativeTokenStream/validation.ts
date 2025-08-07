@@ -80,8 +80,6 @@ export function parseAndValidatePermission(
     throw new Error(extractZodError(validationError.errors));
   }
 
-  console.log('permissionRequest', permissionRequest);
-
   validatePermissionData(validationResult, permissionRequest.rules);
 
   return {
