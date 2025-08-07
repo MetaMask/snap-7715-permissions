@@ -125,7 +125,7 @@ export async function buildContext({
   const chainId = Number(permissionRequest.chainId);
   const {
     address,
-    permission: { data },
+    permission: { data, isAdjustmentAllowed },
   } = permissionRequest;
 
   if (!address) {
@@ -195,7 +195,7 @@ export async function buildContext({
   return {
     expiry,
     justification: data.justification,
-    isAdjustmentAllowed: data.isAdjustmentAllowed,
+    isAdjustmentAllowed,
     accountAddressCaip10,
     tokenAddressCaip19,
     tokenMetadata: {

@@ -184,7 +184,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result.approved).toBe(true);
         expect(result.approved && result.response).toStrictEqual({
           ...mockPermissionRequest,
-          dependencyInfo: [mockAccountMetadata],
+          dependencyInfo: [],
           permission: mockPopulatedPermission,
           address: grantingAccountAddress,
           context: expect.stringMatching(/^0x[0-9a-fA-F]+$/u),

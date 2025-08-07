@@ -141,7 +141,7 @@ export async function buildContext({
 
   const {
     address,
-    permission: { data },
+    permission: { data, isAdjustmentAllowed },
   } = permissionRequest;
 
   if (!address) {
@@ -213,7 +213,7 @@ export async function buildContext({
   return {
     expiry,
     justification: data.justification,
-    isAdjustmentAllowed: data.isAdjustmentAllowed,
+    isAdjustmentAllowed,
     accountAddressCaip10,
     tokenAddressCaip19,
     tokenMetadata: {
