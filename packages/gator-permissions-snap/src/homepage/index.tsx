@@ -6,35 +6,27 @@ import {
   Section,
   Heading,
   Link,
-  Address,
   Row,
   Divider,
-  Skeleton,
 } from '@metamask/snaps-sdk/jsx';
 
-import type { AccountControllerInterface } from '../core/types';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../profileSync';
 
 export class HomePage {
-  #accountController: AccountControllerInterface;
-
   #snapsProvider: SnapsProvider;
 
   #profileSyncManager: ProfileSyncManager;
 
   constructor({
-    accountController,
     snapsProvider,
     profileSyncManager,
   }: {
-    accountController: AccountControllerInterface;
     snapsProvider: SnapsProvider;
     profileSyncManager: ProfileSyncManager;
   }) {
-    this.#accountController = accountController;
     this.#snapsProvider = snapsProvider;
     this.#profileSyncManager = profileSyncManager;
   }
@@ -52,8 +44,6 @@ export class HomePage {
   }: {
     showDirectionsToHomepage: boolean;
   }) {
-    const [address] = await this.#accountController.getAccountAddresses();
-
     const grantedPermissions: StoredGrantedPermission[] =
       await this.#profileSyncManager.getAllGrantedPermissions();
 
@@ -62,20 +52,11 @@ export class HomePage {
         <Section>
           <Heading>Welcome to Gator Permissions!</Heading>
           <Text>
-            Thanks for joining our preview phase! We've set up a dedicated Smart
-            Account for you to easily experiment with permissions. This account
-            won't appear alongside your usual MetaMask accounts and should only
-            be used on Sepolia testnet.
+            Thanks for joining our preview phase! This snap currently only works
+            with a special build of MetaMask Flask - if you need help getting
+            started, reach out to us on{' '}
+            <Link href="https://t.me/+I2dliwXiqqYyYjMx">Telegram</Link>.
           </Text>
-          <Box direction="vertical">
-            {address ? (
-              <Link href={`https://sepolia.etherscan.io/address/${address}`}>
-                <Address address={address} />
-              </Link>
-            ) : (
-              <Skeleton />
-            )}
-          </Box>
           {showDirectionsToHomepage && (
             <Text>
               You'll be able to find this screen again by clicking ⋮ &gt; Snaps
