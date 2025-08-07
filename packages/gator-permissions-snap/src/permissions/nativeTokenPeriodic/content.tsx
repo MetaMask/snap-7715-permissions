@@ -13,7 +13,6 @@ import type {
   NativeTokenPeriodicMetadata,
 } from './types';
 import { renderRules } from '../../core/rules';
-import { AccountDetails } from '../../ui/components';
 
 /**
  * Creates UI content for a native token periodic permission confirmation.
@@ -31,12 +30,6 @@ export async function createConfirmationContent({
 }): Promise<SnapElement> {
   return (
     <Box>
-      <AccountDetails
-        account={context.accountDetails}
-        tokenMetadata={context.tokenMetadata}
-        title="Transfer from"
-        tooltip="The account that the token transfers come from."
-      />
       <Section>
         {renderRules({
           rules: [

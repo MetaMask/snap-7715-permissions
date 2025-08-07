@@ -1,7 +1,6 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
 import { bigIntToHex, numberToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
 import {
   populatePermission,
@@ -15,9 +14,9 @@ import type {
   Erc20TokenStreamPermissionRequest,
 } from '../../../src/permissions/erc20TokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 
+const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 const USDC_ADDRESS = '0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F';
 const USDC_DECIMALS = 6;
 
@@ -44,6 +43,7 @@ const alreadyPopulatedPermission: Erc20TokenStreamPermission = {
 };
 
 const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
+  address: ACCOUNT_ADDRESS,
   chainId: '0x1',
   expiry: convertReadableDateToTimestamp('05/01/2024'),
   signer: {
@@ -65,11 +65,8 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
   expiry: '1714521600',
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
-  accountDetails: {
-    address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: numberToHex(100_000_000), // 100 USDC (6 decimals)
-    balanceFormattedAsCurrency: '$🐊100.00',
-  },
+  accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
+  tokenAddressCaip19: `eip155:1/erc20:${USDC_ADDRESS}`,
   tokenMetadata: {
     symbol: 'USDC',
     decimals: USDC_DECIMALS,
@@ -131,30 +128,43 @@ describe('erc20TokenStream:context', () => {
 
       expect(populatedPermission).toStrictEqual(permission);
     });
+
+    it('should set startTime to current timestamp when it is null', async () => {
+      const beforeTime = Math.floor(Date.now() / 1000);
+
+      const permission: Erc20TokenStreamPermission = {
+        type: 'erc20-token-stream',
+        data: {
+          tokenAddress: USDC_ADDRESS,
+          initialAmount: '0x1000000000000000000000000000000000000000',
+          maxAmount: '0x1000000000000000000000000000000000000000',
+          amountPerSecond: '0x1000000000000000000000000000000000000000',
+          startTime: null,
+          justification: 'Permission to do something important',
+        },
+        rules: {},
+      };
+
+      const populatedPermission = await populatePermission({ permission });
+
+      const afterTime = Math.floor(Date.now() / 1000);
+
+      expect(populatedPermission.data.startTime).toBeGreaterThanOrEqual(
+        beforeTime,
+      );
+      expect(populatedPermission.data.startTime).toBeLessThanOrEqual(afterTime);
+    });
   });
 
   describe('buildContext()', () => {
-    let mockTokenPricesService: jest.Mocked<TokenPricesService>;
-    let mockAccountController: jest.Mocked<AccountController>;
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
 
     beforeEach(() => {
-      mockTokenPricesService = {
-        getCryptoToFiatConversion: jest.fn(
-          () =>
-            alreadyPopulatedContext.accountDetails.balanceFormattedAsCurrency,
-        ),
-      } as unknown as jest.Mocked<TokenPricesService>;
-
-      mockAccountController = {
-        getAccountAddress: jest.fn(
-          () => alreadyPopulatedContext.accountDetails.address,
-        ),
-      } as unknown as jest.Mocked<AccountController>;
-
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(() => ({
-          balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
+          balance: BigInt(
+            alreadyPopulatedContext.permissionDetails.initialAmount ?? 0,
+          ),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: USDC_DECIMALS,
           iconUrl: 'https://example.com/icon.png',
@@ -177,8 +187,6 @@ describe('erc20TokenStream:context', () => {
 
       const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
-        tokenPricesService: mockTokenPricesService,
-        accountController: mockAccountController,
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -190,25 +198,13 @@ describe('erc20TokenStream:context', () => {
         },
       });
 
-      expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
-        chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-      });
-
       expect(
         mockTokenMetadataService.getTokenBalanceAndMetadata,
       ).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-        account: alreadyPopulatedContext.accountDetails.address,
+        account: ACCOUNT_ADDRESS,
         assetAddress: USDC_ADDRESS,
       });
-
-      expect(
-        mockTokenPricesService.getCryptoToFiatConversion,
-      ).toHaveBeenCalledWith(
-        `eip155:1/erc20:${USDC_ADDRESS}`,
-        alreadyPopulatedContext.accountDetails.balance,
-        USDC_DECIMALS,
-      );
     });
 
     it('should create a context with different token decimals', async () => {
@@ -245,8 +241,6 @@ describe('erc20TokenStream:context', () => {
 
       const context = await buildContext({
         permissionRequest: daiPermissionRequest,
-        tokenPricesService: mockTokenPricesService,
-        accountController: mockAccountController,
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -256,7 +250,6 @@ describe('erc20TokenStream:context', () => {
         iconDataBase64: null,
       });
 
-      expect(context.accountDetails.balance).toBe(DAI_BALANCE);
       expect(context.permissionDetails.initialAmount).toBe('1');
       expect(context.permissionDetails.maxAmount).toBe('10');
     });
@@ -267,12 +260,13 @@ describe('erc20TokenStream:context', () => {
       Math.floor(Date.now() / 1000) +
       24 * 60 * 60
     ).toString(); // 24 hours from now
+    const startTime = (Math.floor(Date.now() / 1000) + 12 * 60 * 60).toString(); // 12 hours from now
     const context = {
       ...alreadyPopulatedContext,
       expiry: dateInTheFuture, // 24 hours from now
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: dateInTheFuture,
+        startTime, // 12 hours from now (before expiry)
       },
     };
 
@@ -450,12 +444,12 @@ describe('erc20TokenStream:context', () => {
 
         it.each([['12345678'], ['0x1234'], ['Steve']])(
           'should return a validation error for invalid startTime %s',
-          async (startTime) => {
+          async (startTimeArg) => {
             const contextWithInvalidStartTime = {
               ...context,
               permissionDetails: {
                 ...context.permissionDetails,
-                startTime,
+                startTime: startTimeArg,
               },
             };
 

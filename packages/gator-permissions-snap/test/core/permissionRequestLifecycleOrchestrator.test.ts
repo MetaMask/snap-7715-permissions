@@ -1,11 +1,14 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import type { Delegation } from '@metamask/delegation-core';
 import {
   decodeDelegations,
   ROOT_AUTHORITY,
   createTimestampTerms,
+  createNonceTerms,
 } from '@metamask/delegation-core';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { bytesToHex } from '@metamask/utils';
+import { bigIntToHex, bytesToHex } from '@metamask/utils';
+import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { AccountController } from '../../src/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
@@ -23,10 +26,12 @@ const randomAddress = () => {
 
 const mockSignature = '0x1234';
 const mockInterfaceId = 'test-interface-id';
+const grantingAccountAddress = randomAddress();
 
 const mockContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
+  address: grantingAccountAddress,
 };
 
 const mockMetadata = {
@@ -59,6 +64,7 @@ const mockPermissionRequest = {
 
 const mockResolvedPermissionRequest = {
   ...mockPermissionRequest,
+  address: grantingAccountAddress,
   permission: {
     ...mockPermissionRequest.permission,
     data: { resolved: true },
@@ -70,17 +76,9 @@ const mockPopulatedPermission = {
   data: { populated: true },
 };
 
-const grantingAccountAddress = randomAddress();
-
-const mockAccountMetadata = {
-  factory: randomAddress(),
-  factoryData: '0xabc',
-} as const;
-
 const mockAccountController = {
-  getAccountAddress: jest.fn(),
-  getAccountMetadata: jest.fn(),
   signDelegation: jest.fn(),
+  getAccountAddresses: jest.fn(),
 } as unknown as jest.Mocked<AccountController>;
 
 const mockConfirmationDialog = {
@@ -99,6 +97,10 @@ const mockUserEventDispatcher = {
   createUserInputEventHandler: jest.fn(),
   waitForPendingHandlers: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<UserEventDispatcher>;
+
+const mockNonceCaveatService = {
+  getNonce: jest.fn(),
+} as unknown as jest.Mocked<NonceCaveatService>;
 
 type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
@@ -135,15 +137,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       createPermissionCaveats: jest.fn(() => []),
     };
 
-    mockAccountController.getAccountAddress.mockResolvedValue(
-      grantingAccountAddress,
-    );
-    mockAccountController.getAccountMetadata.mockResolvedValue(
-      mockAccountMetadata,
-    );
-
     mockAccountController.signDelegation.mockImplementation(
-      async ({ delegation }) => ({
+      async ({ delegation }: { delegation: Delegation }) => ({
         ...delegation,
         signature: mockSignature,
       }),
@@ -160,11 +155,14 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     );
     mockConfirmationDialog.updateContent.mockResolvedValue(undefined);
 
+    mockNonceCaveatService.getNonce.mockResolvedValue(0n);
+
     permissionRequestLifecycleOrchestrator =
       new PermissionRequestLifecycleOrchestrator({
         accountController: mockAccountController,
         confirmationDialogFactory: mockConfirmationDialogFactory,
         userEventDispatcher: mockUserEventDispatcher,
+        nonceCaveatService: mockNonceCaveatService,
       });
   });
 
@@ -186,7 +184,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result.approved).toBe(true);
         expect(result.approved && result.response).toStrictEqual({
           ...mockPermissionRequest,
-          accountMeta: [mockAccountMetadata],
+          accountMeta: [],
           permission: mockPopulatedPermission,
           address: grantingAccountAddress,
           context: expect.stringMatching(/^0x[0-9a-fA-F]+$/u),
@@ -218,11 +216,15 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           lifecycleHandlerMocks,
         );
 
+        // allow the call to getAccountAddresses to complete
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
         expect(mockConfirmationDialog.updateContent).not.toHaveBeenCalled();
 
         expect(
           lifecycleHandlerMocks.createSkeletonConfirmationContent,
         ).toHaveBeenCalledTimes(1);
+
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
         ).not.toHaveBeenCalled();
@@ -303,7 +305,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         const {
           contracts: {
-            enforcers: { TimestampEnforcer },
+            enforcers: { TimestampEnforcer, NonceEnforcer },
           },
         } = getChainMetadata({
           chainId: Number(mockPermissionRequest.chainId),
@@ -322,6 +324,13 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
                 timestampBeforeThreshold: mockPermissionRequest.expiry,
               }),
             },
+            {
+              enforcer: NonceEnforcer.toLowerCase(),
+              args: '0x',
+              terms: createNonceTerms({
+                nonce: bigIntToHex(0n),
+              }),
+            },
           ],
           salt: expect.any(BigInt),
           signature: mockSignature,
@@ -336,11 +345,25 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           foo: 'original',
           expiry: '2024-12-31',
           isAdjustmentAllowed: true,
+          accountAddressCaip10: grantingAccountAddress,
+          tokenAddressCaip19: 'eip155:1:0x1234',
+          tokenMetadata: {
+            decimals: 18,
+            symbol: 'TEST',
+            iconDataBase64: null,
+          },
         };
         const modifiedContext = {
           foo: 'updated',
           expiry: '2025-01-01',
           isAdjustmentAllowed: true,
+          accountAddressCaip10: grantingAccountAddress,
+          tokenAddressCaip19: 'eip155:1:0x1234',
+          tokenMetadata: {
+            decimals: 18,
+            symbol: 'TEST',
+            iconDataBase64: null,
+          },
         };
 
         lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
@@ -455,9 +478,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
        * 3. Builds context, derives metadata and updates the UI content for confirmation.
        * 4. Applies context to resolve the permission request.
        * 5. Populates the permission with required values.
-       * 6. Retrieves account information.
-       * 7. Appends caveats to the permission.
-       * 8. Signs the delegation for the permission.
+       * 6. Appends caveats to the permission.
+       * 7. Signs the delegation for the permission.
        */
 
       beforeEach(async () => {
@@ -546,19 +568,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 6. Retrieves account information.
-       */
-      it('retrieves account information', async () => {
-        expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
-          chainId: 1,
-        });
-        expect(mockAccountController.getAccountMetadata).toHaveBeenCalledWith({
-          chainId: 1,
-        });
-      });
-
-      /*
-       * 7. Appends caveats to the permission.
+       * 6. Appends caveats to the permission.
        */
       it('appends caveats to the permission', async () => {
         expect(
@@ -570,7 +580,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 8. Signs the delegation for the permission.
+       * 7. Signs the delegation for the permission.
        */
       it('signs the delegation for the permission', async () => {
         expect(mockAccountController.signDelegation).toHaveBeenCalledWith(

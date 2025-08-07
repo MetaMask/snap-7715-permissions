@@ -3,16 +3,15 @@ import type {
   Permission,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import type { Hex, Caveat } from '@metamask/delegation-core';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
+import type { Hex, Caveat, Delegation } from '@metamask/delegation-core';
+import type { CaipAssetType, SnapsProvider } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { AccountController } from '../accountController';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
-import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
+import type { TokenPricesService } from '../services/tokenPricesService';
 
 /**
  * Represents the result of a permission request.
@@ -39,11 +38,8 @@ export type BaseContext = {
   expiry: string;
   isAdjustmentAllowed: boolean;
   justification: string;
-  accountDetails: {
-    address: Hex;
-    balanceFormattedAsCurrency: string;
-    balance: Hex; // it would be nice if this was Hex, but must be Json serializable for Snaps JSX
-  };
+  accountAddressCaip10: Caip10Address;
+  tokenAddressCaip19: CaipAssetType;
   tokenMetadata: {
     decimals: number;
     symbol: string;
@@ -77,9 +73,11 @@ export type DeepRequired<TParent> = TParent extends (infer U)[]
   ? DeepRequired<U>[]
   : TParent extends object
     ? {
-        [P in keyof TParent]-?: DeepRequired<Exclude<TParent[P], undefined>>;
+        [P in keyof TParent]-?: DeepRequired<
+          Exclude<TParent[P], undefined | null>
+        >;
       }
-    : Exclude<TParent, undefined>;
+    : Exclude<TParent, undefined | null>;
 
 /**
  * An enum representing the time periods for which the stream rate can be calculated.
@@ -268,7 +266,7 @@ export type PermissionHandlerParams<
   TPermission extends TRequest['permission'],
   TPopulatedPermission extends DeepRequired<TPermission>,
 > = {
-  accountController: AccountController;
+  accountController: AccountControllerInterface;
   userEventDispatcher: UserEventDispatcher;
   orchestrator: PermissionRequestLifecycleOrchestrator;
   permissionRequest: PermissionRequest;
@@ -303,8 +301,6 @@ export type PermissionHandlerDependencies<
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (args: {
     permissionRequest: TRequest;
-    tokenPricesService: TokenPricesService;
-    accountController: AccountController;
     tokenMetadataService: TokenMetadataService;
   }) => Promise<TContext>;
   deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
@@ -323,4 +319,36 @@ export type PermissionHandlerDependencies<
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
   }) => Promise<Caveat[]>;
+};
+
+/**
+ * Options for signing a delegation.
+ */
+export type SignDelegationOptions = {
+  chainId: number;
+  delegation: Omit<Delegation, 'signature'>;
+  address: Hex;
+};
+
+/**
+ * Factory arguments for smart account deployment.
+ */
+export type FactoryArgs = {
+  factory: Hex | undefined;
+  factoryData: Hex | undefined;
+};
+
+/**
+ * Interface for account controller implementations.
+ */
+export type AccountControllerInterface = {
+  /**
+   * Signs a delegation using the smart account.
+   */
+  signDelegation(options: SignDelegationOptions): Promise<Delegation>;
+
+  /**
+   * Retrieves the account addresses available for this current account.
+   */
+  getAccountAddresses(): Promise<Hex[]>;
 };

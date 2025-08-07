@@ -2,6 +2,7 @@ import {
   zHexStr,
   zPermission,
   zMetaMaskPermissionData,
+  zAddress,
 } from '@metamask/7715-permissions-shared/types';
 import { z } from 'zod';
 
@@ -12,6 +13,7 @@ import type {
   TimePeriod,
   BaseMetadata,
 } from '../../core/types';
+import { validateStartTimeZod } from '../../utils/validate';
 
 export type Erc20TokenPeriodicMetadata = BaseMetadata & {
   validationErrors: {
@@ -38,9 +40,25 @@ export const zErc20TokenPeriodicPermission = zPermission.extend({
     zMetaMaskPermissionData,
     z.object({
       periodAmount: zHexStr,
-      periodDuration: z.number(),
-      startTime: z.number(),
-      tokenAddress: zHexStr,
+      periodDuration: z.number().int().positive(),
+      startTime: z
+        .number()
+        .int()
+        .positive()
+        .nullable()
+        .optional()
+        .refine(
+          (value) => {
+            if (value === undefined || value === null) {
+              return true;
+            }
+            return validateStartTimeZod(value);
+          },
+          {
+            message: 'Start time must be today or later',
+          },
+        ),
+      tokenAddress: zAddress,
     }),
   ),
 });
