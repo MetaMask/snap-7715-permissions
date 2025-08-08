@@ -1,3 +1,4 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
@@ -8,7 +9,6 @@ import type {
   UserEventHandler,
 } from '../userEventDispatcher';
 import type { BaseContext, RuleDefinition } from './types';
-import { logger } from '../../../shared/src/utils/logger';
 import { DateTimeField } from '../ui/components/DateTimeField';
 import {
   combineDateAndTimeToTimestamp,
@@ -261,7 +261,7 @@ export function bindRuleHandlers<
         currentValues.timestamp = timestamp.toString();
       } catch (error) {
         currentValues.timestamp = '';
-        logger.log('Error combining date and time', error);
+        logger.error('Error combining date and time', error);
       }
 
       // Fix race condition: Use the stored context reference instead of calling getContext() again

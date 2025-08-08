@@ -17,11 +17,28 @@ export const zPermission = z.object({
   type: zTypeDescriptor,
 
   /**
+   * Whether the permission can be adjusted
+   */
+  isAdjustmentAllowed: z.boolean(),
+
+  /**
    * Data structure varies by permission type.
    */
   data: z.record(any()),
+});
 
-  rules: z.record(any()).optional(),
+export const zRule = z.object({
+  type: zTypeDescriptor,
+
+  /**
+   * Whether the rule can be adjusted
+   */
+  isAdjustmentAllowed: z.boolean(),
+
+  /**
+   * Data structure varies by rule type.
+   */
+  data: z.record(any()),
 });
 
 /**
@@ -157,7 +174,6 @@ export const zErc1155TokenTransferPermission = zPermission.extend({
 export type NativeTokenTransferPermission = z.infer<
   typeof zNativeTokenTransferPermission
 >;
-
 export type Erc20TokenTransferPermission = z.infer<
   typeof zErc20TokenTransferPermission
 >;

@@ -9,8 +9,15 @@ import { parseUnits } from '../../../src/utils/value';
 
 const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
   chainId: '0x1',
-  expiry: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
-  isAdjustmentAllowed: true,
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: {
@@ -25,7 +32,7 @@ const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
       startTime: Math.floor(Date.now() / 1000) + 86400, // Tomorrow
       justification: 'test',
     },
-    rules: {},
+    isAdjustmentAllowed: true,
   },
 };
 
@@ -228,7 +235,15 @@ describe('nativeTokenPeriodic:validation', () => {
         const currentTime = Math.floor(Date.now() / 1000);
         const startTimeVsExpiryRequest = {
           ...validPermissionRequest,
-          expiry: currentTime + 86400, // 1 day from now
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400, // 1 day from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           permission: {
             ...validPermissionRequest.permission,
             data: {
@@ -247,7 +262,15 @@ describe('nativeTokenPeriodic:validation', () => {
         const currentTime = Math.floor(Date.now() / 1000);
         const startTimeAfterExpiryRequest = {
           ...validPermissionRequest,
-          expiry: currentTime + 86400, // 1 day from now
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400, // 1 day from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           permission: {
             ...validPermissionRequest.permission,
             data: {
@@ -266,7 +289,15 @@ describe('nativeTokenPeriodic:validation', () => {
         const currentTime = Math.floor(Date.now() / 1000);
         const validStartTimeVsExpiryRequest = {
           ...validPermissionRequest,
-          expiry: currentTime + 86400 * 2, // 2 days from now
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400 * 2, // 2 days from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           permission: {
             ...validPermissionRequest.permission,
             data: {

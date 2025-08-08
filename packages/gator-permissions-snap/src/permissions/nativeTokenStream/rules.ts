@@ -146,20 +146,23 @@ export const expiryRule: NativeTokenStreamRuleDefinition = {
   label: 'Expiry',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.expiry,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    value: context.expiry.timestamp,
+    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',
     error: metadata.validationErrors.expiryError,
     dateTimeParameterNames: {
-      timestampName: 'expiry',
+      timestampName: 'expiry.timestamp',
       dateName: 'expiryDate.date',
       timeName: 'expiryDate.time',
     },
   }),
   updateContext: (context: NativeTokenStreamContext, value: any) => ({
     ...context,
-    expiry: value.timestamp,
+    expiry: {
+      ...context.expiry,
+      timestamp: value.timestamp,
+    },
     expiryDate: {
       date: value.date,
       time: value.time,

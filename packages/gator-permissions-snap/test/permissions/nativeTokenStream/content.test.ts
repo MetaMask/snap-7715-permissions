@@ -704,6 +704,7 @@ describe('nativeTokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -748,77 +749,8 @@ describe('nativeTokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "01/01/1970",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:05",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -828,13 +760,20 @@ describe('nativeTokenStream:content', () => {
                     "props": {
                       "children": [
                         null,
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "undefined undefined UTC",
+                          },
+                          "type": "Text",
+                        },
                       ],
+                      "direction": "horizontal",
                     },
                     "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -1527,6 +1466,7 @@ describe('nativeTokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1571,77 +1511,8 @@ describe('nativeTokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "01/01/1970",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:05",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1651,13 +1522,20 @@ describe('nativeTokenStream:content', () => {
                     "props": {
                       "children": [
                         null,
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "undefined undefined UTC",
+                          },
+                          "type": "Text",
+                        },
                       ],
+                      "direction": "horizontal",
                     },
                     "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -2228,7 +2106,7 @@ describe('nativeTokenStream:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": "01/01/1970 00:00:05 UTC",
+                            "children": "undefined undefined UTC",
                           },
                           "type": "Text",
                         },
@@ -2864,6 +2742,7 @@ describe('nativeTokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2908,77 +2787,8 @@ describe('nativeTokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "01/01/1970",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:05",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -2988,13 +2798,20 @@ describe('nativeTokenStream:content', () => {
                     "props": {
                       "children": [
                         null,
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "undefined undefined UTC",
+                          },
+                          "type": "Text",
+                        },
                       ],
+                      "direction": "horizontal",
                     },
                     "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -3685,6 +3502,7 @@ describe('nativeTokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -3729,77 +3547,8 @@ describe('nativeTokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "01/01/1970",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:05",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -3809,13 +3558,20 @@ describe('nativeTokenStream:content', () => {
                     "props": {
                       "children": [
                         null,
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "undefined undefined UTC",
+                          },
+                          "type": "Text",
+                        },
                       ],
+                      "direction": "horizontal",
                     },
                     "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
