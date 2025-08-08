@@ -155,7 +155,7 @@ export class PermissionHandler<
 
       let address: Hex | undefined;
 
-      if (requestedAddressLowercase === undefined) {
+      if (!requestedAddressLowercase) {
         // use the first address available for the account
         address = allAvailableAddresses[0];
       } else {
@@ -168,7 +168,7 @@ export class PermissionHandler<
         ) {
           throw new Error('Requested address not found');
         }
-        address = request.address;
+        address = request.address as Hex;
       }
 
       return await this.#dependencies.buildContext({

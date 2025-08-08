@@ -5,7 +5,7 @@ export enum RpcMethod {
   /**
    * This method is used by sites to request permissions where the kernel will map the request to the appropriate permissions provider.
    */
-  WalletGrantPermissions = 'wallet_grantPermissions',
+  WalletGrantPermissions = 'wallet_requestExecutionPermissions',
 }
 
 export enum ExternalMethod {

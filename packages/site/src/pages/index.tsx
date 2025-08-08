@@ -1,4 +1,7 @@
-import { erc7715ProviderActions } from '@metamask/delegation-toolkit/experimental';
+import {
+  erc7715ProviderActions,
+  RequestExecutionPermissionsParameters,
+} from '@metamask/delegation-toolkit/experimental';
 import { useCallback, useMemo, useState } from 'react';
 import {
   type Hex,
@@ -225,33 +228,31 @@ const Index = () => {
       throw new Error('No permission request data');
     }
 
-    const { type, expiry, isAdjustmentAllowed, expiryIsAdjustmentAllowed, ...permissionData } =
-      permissionRequest;
+    const {
+      type,
+      expiry,
+      isAdjustmentAllowed,
+      expiryIsAdjustmentAllowed,
+      ...permissionData
+    } = permissionRequest;
 
-    const permissionsRequests = [
+    const permissionsRequests: RequestExecutionPermissionsParameters = [
       {
-        chainId: toHex(chainId),
+        chainId,
         signer: {
-          type: 'account' as const,
+          type: 'account',
           data: {
             address: delegateAccount.address,
           },
         },
+        expiry,
+        isAdjustmentAllowed,
         permission: {
           type,
-          data: permissionData,
-          isAdjustmentAllowed,
-        } as PermissionTypes,
-        rules: [
-          {
-            type: 'expiry',
-            isAdjustmentAllowed: expiryIsAdjustmentAllowed,
-            data: {
-              timestamp: expiry,
-            },
-          },
-        ],
-      },
+          // permission types that are _not_ native token stream are using Hex for token amount types
+          data: permissionData as any,
+        },
+      } as const,
     ];
 
     setIsWorking(true);
@@ -261,7 +262,7 @@ const Index = () => {
 
     try {
       const response =
-        await metaMaskClient?.grantPermissions(permissionsRequests);
+        await metaMaskClient?.requestExecutionPermissions(permissionsRequests);
       setPermissionResponse(response);
     } catch (error) {
       setPermissionResponse(null);
@@ -272,7 +273,7 @@ const Index = () => {
 
   const handleCopyToClipboard = () => {
     if (permissionResponse) {
-      navigator.clipboard 
+      navigator.clipboard
         .writeText(JSON.stringify(permissionResponse, null, 2))
         .then(() => {
           setIsCopied(true);
