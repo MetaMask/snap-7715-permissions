@@ -18,7 +18,7 @@ sequenceDiagram
   participant List of permission provider snapIds
   participant PermissionProviderSnap
 
-  DApp->>KernelSnap: wallet_grantPermissions(request)
+  DApp->>KernelSnap: wallet_requestExecutionPermissions(request)
   KernelSnap->>List of permission provider snapIds: Fetch list of all permission provider snaps
 
   loop For each snap
@@ -44,7 +44,7 @@ sequenceDiagram
 
 **Steps**
 
-1. DApp calls `wallet_grantPermissions` on the Kernel Snap.
+1. DApp calls `wallet_requestExecutionPermissions` on the Kernel Snap.
 2. Kernel makes async RPC calls to all registered permission provider snaps using `permissionProvider_getPermissionOffers` to fetch permission offers.
    1. A standard `permissionProvider_getPermissionOffers` rpc must be implemented by the permission provider snap to participate in the permission system.
       1. If the permission provider snap returns with an error, it does not support the RPC and will not participate in the permission system.

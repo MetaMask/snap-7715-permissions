@@ -93,7 +93,7 @@ describe('RpcHandler', () => {
       );
 
       await expect(
-        handler.grantPermissions({
+        handler.requestExecutionPermissions({
           siteOrigin,
           params: mockPartialPermissions as unknown as Json,
         }),
@@ -151,7 +151,7 @@ describe('RpcHandler', () => {
         mockGrantedPermissions as unknown as Json,
       );
 
-      const result = await handler.grantPermissions({
+      const result = await handler.requestExecutionPermissions({
         siteOrigin,
         params: mockPermissions as unknown as Json,
       });
@@ -190,7 +190,7 @@ describe('RpcHandler', () => {
       mockSnapsProvider.request.mockRejectedValueOnce(new Error('Test error'));
 
       await expect(
-        handler.grantPermissions({
+        handler.requestExecutionPermissions({
           siteOrigin,
           params: mockPermissions as unknown as Json,
         }),
