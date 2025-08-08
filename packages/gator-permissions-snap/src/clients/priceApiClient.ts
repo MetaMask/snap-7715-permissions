@@ -2,6 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { CaipAssetType } from '@metamask/utils';
 
 import type { SpotPricesRes, VsCurrencyParam } from './types';
+import { InvalidInputError, ResourceNotFoundError, ResourceUnavailableError } from '@metamask/snaps-sdk';
 
 /**
  * Class responsible for fetching price data from the Price API.
@@ -34,7 +35,7 @@ export class PriceApiClient {
 
     if (!caipAssetType) {
       logger.error(`No caipAssetType provided to fetch spot price`);
-      throw new Error(`No caipAssetType provided to fetch spot price`);
+      throw new InvalidInputError(`No caipAssetType provided to fetch spot price`);
     }
 
     const response = await this.#fetch(
@@ -47,7 +48,7 @@ export class PriceApiClient {
       logger.error(
         `HTTP error! Failed to fetch spot price for caipAssetType(${caipAssetType}) and vsCurrency(${vsCurrency}): ${response.status}`,
       );
-      throw new Error(
+      throw new ResourceUnavailableError(
         `HTTP error! Failed to fetch spot price for caipAssetType(${caipAssetType}) and vsCurrency(${vsCurrency}): ${response.status}`,
       );
     }
@@ -59,7 +60,7 @@ export class PriceApiClient {
       logger.error(
         `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
       );
-      throw new Error(
+      throw new ResourceNotFoundError(
         `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
       );
     }
@@ -69,7 +70,7 @@ export class PriceApiClient {
       logger.error(
         `No spot price found in result for the currency: ${vsCurrency}`,
       );
-      throw new Error(
+      throw new ResourceNotFoundError(
         `No spot price found in result for the currency: ${vsCurrency}`,
       );
     }

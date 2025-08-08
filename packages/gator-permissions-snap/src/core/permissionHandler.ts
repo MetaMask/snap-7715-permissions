@@ -1,5 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { InvalidRequestError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 import {
   bigIntToHex,
@@ -120,7 +120,7 @@ export class PermissionHandler<
     origin: string,
   ): Promise<PermissionRequestResult> {
     if (this.#hasHandledPermissionRequest) {
-      throw new Error('Permission request already handled');
+      throw new InvalidRequestError('Permission request already handled');
     }
 
     this.#hasHandledPermissionRequest = true;
@@ -166,7 +166,7 @@ export class PermissionHandler<
               availableAddress.toLowerCase() === requestedAddressLowercase,
           )
         ) {
-          throw new Error('Requested address not found');
+          throw new InvalidRequestError('Requested address not found');
         }
         address = request.address;
       }

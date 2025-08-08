@@ -7,6 +7,7 @@ import type {
   Erc20TokenStreamPermissionRequest,
 } from './types';
 import { zErc20TokenStreamPermission } from './types';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Validates a permission object data specific to the permission type.
@@ -44,12 +45,12 @@ function validatePermissionData(
   });
 
   if (initialAmount && maxAmount && BigInt(maxAmount) < BigInt(initialAmount)) {
-    throw new Error('Invalid maxAmount: must be greater than initialAmount');
+    throw new InvalidInputError('Invalid maxAmount: must be greater than initialAmount');
   }
 
   // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
   if (startTime && startTime >= expiry) {
-    throw new Error('Invalid startTime: must be before expiry');
+    throw new InvalidInputError('Invalid startTime: must be before expiry');
   }
 
   return true;
@@ -71,7 +72,7 @@ export function parseAndValidatePermission(
   } = zErc20TokenStreamPermission.safeParse(permissionRequest.permission);
 
   if (!success) {
-    throw new Error(extractZodError(validationError.errors));
+    throw new InvalidInputError(extractZodError(validationError.errors));
   }
 
   validatePermissionData(validationResult, permissionRequest.expiry);

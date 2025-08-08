@@ -28,6 +28,7 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -137,7 +138,7 @@ export async function buildContext({
   } = permissionRequest;
 
   if (!address) {
-    throw new Error(
+    throw new InvalidInputError(
       'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
     );
   }
@@ -233,6 +234,7 @@ export async function deriveMetadata({
     tokenMetadata: { decimals },
   } = context;
 
+
   const validationErrors: NativeTokenStreamMetadata['validationErrors'] = {};
 
   // Validate max amount
@@ -305,7 +307,7 @@ export async function deriveMetadata({
   if (maxVsInitialError) {
     validationErrors.maxAmountError = maxVsInitialError;
   }
-
+  
   return {
     amountPerSecond,
     validationErrors,

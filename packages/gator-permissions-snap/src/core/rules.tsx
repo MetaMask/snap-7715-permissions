@@ -1,4 +1,4 @@
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
 import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { DropdownField } from '../ui/components/DropdownField';
@@ -94,10 +94,10 @@ export function renderRule<
     case 'dropdown': {
       if (!options) {
         // todo: type constraint on this would be nice
-        throw new Error('Dropdown rule must have options');
+        throw new InvalidInputError('Dropdown rule must have options');
       }
       if (isOptional) {
-        throw new Error('Dropdown rule must not be optional');
+        throw new InvalidInputError('Dropdown rule must not be optional');
       }
 
       return (
@@ -114,7 +114,7 @@ export function renderRule<
     }
     case 'datetime': {
       if (!dateTimeParameterNames) {
-        throw new Error('DateTime rule must have dateTimeParameterNames');
+        throw new InvalidInputError('DateTime rule must have dateTimeParameterNames');
       }
 
       const dateTimeValue = {
@@ -140,7 +140,7 @@ export function renderRule<
       );
     }
     default: {
-      throw new Error(`Unknown rule type: ${type as string}`);
+      throw new InvalidInputError(`Unknown rule type: ${type as string}`);
     }
   }
 }

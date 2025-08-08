@@ -1,6 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
-import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
+import { ChainDisconnectedError, InvalidInputError, ResourceUnavailableError, type SnapsEthereumProvider, type SnapsProvider } from '@metamask/snaps-sdk';
 import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from './chainMetadata';
@@ -44,7 +44,7 @@ export class AccountController implements AccountControllerInterface {
   #validateSupportedChains(supportedChains: readonly number[]) {
     if (supportedChains.length === 0) {
       logger.error('No supported chains specified');
-      throw new Error('No supported chains specified');
+      throw new InvalidInputError('No supported chains specified');
     }
 
     // ensure that there is chain metadata for all specified chains
@@ -55,7 +55,7 @@ export class AccountController implements AccountControllerInterface {
         supportedChains,
         error,
       });
-      throw new Error(
+      throw new InvalidInputError(
         `Unsupported chains specified: ${supportedChains.join(', ')}`,
       );
     }
@@ -74,7 +74,7 @@ export class AccountController implements AccountControllerInterface {
           chainId,
         },
       );
-      throw new Error(`Unsupported ChainId: ${chainId}`);
+      throw new InvalidInputError(`Unsupported ChainId: ${chainId}`);
     }
   }
 
@@ -94,7 +94,7 @@ export class AccountController implements AccountControllerInterface {
       accounts.length === 0 ||
       accounts.some((account) => account === undefined)
     ) {
-      throw new Error('No accounts found');
+      throw new ResourceUnavailableError('No accounts found');
     }
 
     return accounts as Hex[];
@@ -131,7 +131,7 @@ export class AccountController implements AccountControllerInterface {
       });
 
       if (updatedChain && hexToNumber(updatedChain) !== chainId) {
-        throw new Error('Selected chain does not match the requested chain');
+        throw new ChainDisconnectedError('Selected chain does not match the requested chain');
       }
     }
 
@@ -151,7 +151,7 @@ export class AccountController implements AccountControllerInterface {
     });
 
     if (!signature) {
-      throw new Error('Failed to sign delegation');
+      throw new ResourceUnavailableError('Failed to sign delegation');
     }
 
     return {

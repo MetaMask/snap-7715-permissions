@@ -5,6 +5,7 @@ import {
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 
 import { getStartOfTodayLocal } from './time';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 export const validatePermissionRequestParam = (
   params: any | any[],
@@ -12,7 +13,7 @@ export const validatePermissionRequestParam = (
   const validateGrantAttenuatedPermissionsParams =
     zGrantAttenuatedPermissionsParams.safeParse(params);
   if (!validateGrantAttenuatedPermissionsParams.success) {
-    throw new Error(
+    throw new InvalidInputError(
       extractZodError(validateGrantAttenuatedPermissionsParams.error.errors),
     );
   }

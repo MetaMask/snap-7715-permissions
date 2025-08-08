@@ -7,6 +7,7 @@ import type {
   Erc20TokenPeriodicPermissionRequest,
 } from './types';
 import { zErc20TokenPeriodicPermission } from './types';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Validates a permission object data specific to the permission type.
@@ -30,7 +31,7 @@ function validatePermissionData(
 
   // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
   if (startTime && startTime >= expiry) {
-    throw new Error('Invalid startTime: must be before expiry');
+    throw new InvalidInputError('Invalid startTime: must be before expiry');
   }
 
   return true;
@@ -52,7 +53,7 @@ export function parseAndValidatePermission(
   } = zErc20TokenPeriodicPermission.safeParse(permissionRequest.permission);
 
   if (!success) {
-    throw new Error(extractZodError(validationError.errors));
+    throw new InvalidInputError(extractZodError(validationError.errors));
   }
 
   validatePermissionData(validationResult, permissionRequest.expiry);

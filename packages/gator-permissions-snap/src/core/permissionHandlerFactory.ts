@@ -17,6 +17,7 @@ import type {
   PermissionDefinition,
   PermissionHandlerType,
 } from './types';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Factory for creating permission-specific orchestrators.
@@ -111,7 +112,7 @@ export class PermissionHandlerFactory {
         );
         break;
       default:
-        throw new Error(`Unsupported permission type: ${type}`);
+        throw new InvalidInputError(`Unsupported permission type: ${type}`);
     }
 
     return handler;
