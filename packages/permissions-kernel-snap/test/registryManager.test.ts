@@ -159,7 +159,7 @@ describe('PermissionOfferRegistryManager', () => {
     const mockPermissionsToGrant: PermissionsRequest = [
       {
         chainId: '0x1' as `0x${string}`,
-        expiry: 1234567890,
+        expiry: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
         signer: {
           type: 'account' as const,
           data: {
@@ -174,7 +174,7 @@ describe('PermissionOfferRegistryManager', () => {
       },
       {
         chainId: '0x1' as `0x${string}`,
-        expiry: 1234567890,
+        expiry: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
         signer: {
           type: 'account' as const,
           data: {

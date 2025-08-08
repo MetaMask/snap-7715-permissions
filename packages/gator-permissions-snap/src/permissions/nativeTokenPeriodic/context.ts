@@ -1,12 +1,15 @@
-import { bigIntToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  parseCaipAccountId,
+  toCaipAccountId,
+  toCaipAssetType,
+  type Hex,
+} from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
-  convertTimestampToReadableDate,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
@@ -15,6 +18,7 @@ import {
   validateStartTime,
   validateExpiry,
   validatePeriodDuration,
+  validateStartTimeVsExpiry,
 } from '../contextValidation';
 import type {
   NativeTokenPeriodicContext,
@@ -23,6 +27,11 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
+import { InvalidInputError } from '@metamask/snaps-sdk';
+
+const ASSET_NAMESPACE = 'slip44';
+const CHAIN_NAMESPACE = 'eip155';
+const ASSET_REFERENCE = '60';
 
 /**
  * Construct an amended NativeTokenPeriodicPermissionRequest, based on the specified request,
@@ -54,8 +63,11 @@ export async function applyContext({
     justification: originalRequest.permission.data.justification,
   };
 
+  const { address } = parseCaipAccountId(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
+    address: address as Hex,
     expiry,
     permission: {
       type: 'native-token-periodic',
@@ -78,6 +90,10 @@ export async function populatePermission({
 }): Promise<PopulatedNativeTokenPeriodicPermission> {
   return {
     ...permission,
+    data: {
+      ...permission.data,
+      startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
+    },
     rules: permission.rules ?? {},
   };
 }
@@ -87,37 +103,35 @@ export async function populatePermission({
  * and manage the permission state.
  * @param args - The options object containing the request and required services.
  * @param args.permissionRequest - The native token periodic permission request to convert.
- * @param args.tokenPricesService - Service for fetching token price information.
- * @param args.accountController - Controller for managing account operations.
  * @param args.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
-  accountController,
   tokenMetadataService,
 }: {
   permissionRequest: NativeTokenPeriodicPermissionRequest;
-  tokenPricesService: TokenPricesService;
-  accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
 }): Promise<NativeTokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
 
-  const address = await accountController.getAccountAddress({
-    chainId,
-  });
-
   const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: address,
-  });
+    address,
+    isAdjustmentAllowed = true,
+    permission: { data },
+  } = permissionRequest;
+
+  if (!address) {
+    throw new InvalidInputError(
+      'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
+    );
+  }
+
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: address,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -126,22 +140,15 @@ export async function buildContext({
     ? iconDataResponse.imageDataBase64
     : null;
 
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:1/slip44:60`,
-    bigIntToHex(rawBalance),
-    decimals,
-  );
-
-  const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
+  const expiry = permissionRequest.expiry.toString();
 
   const periodAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.periodAmount,
+    value: data.periodAmount,
     allowUndefined: false,
     decimals,
   });
 
-  const periodDuration =
-    permissionRequest.permission.data.periodDuration.toString();
+  const periodDuration = data.periodDuration.toString();
 
   // Determine the period type based on the duration
   let periodType: TimePeriod | 'Other';
@@ -155,21 +162,27 @@ export async function buildContext({
     periodType = 'Other';
   }
 
-  const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
+  const startTime = data.startTime?.toString() ?? Math.floor(Date.now() / 1000);
+
+  const tokenAddressCaip19 = toCaipAssetType(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    ASSET_NAMESPACE,
+    ASSET_REFERENCE,
   );
 
-  const balance = bigIntToHex(rawBalance);
+  const accountAddressCaip10 = toCaipAccountId(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    address,
+  );
 
   return {
     expiry,
-    justification: permissionRequest.permission.data.justification,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    justification: data.justification,
+    isAdjustmentAllowed,
+    accountAddressCaip10,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,
@@ -231,6 +244,17 @@ export async function deriveMetadata({
   const expiryError = validateExpiry(expiry);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
+  }
+
+  // Validate start time vs expiry (only if individual validations passed)
+  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+    const startTimeVsExpiryError = validateStartTimeVsExpiry(
+      permissionDetails.startTime,
+      expiry,
+    );
+    if (startTimeVsExpiryError) {
+      validationErrors.startTimeError = startTimeVsExpiryError;
+    }
   }
 
   return {

@@ -7,14 +7,19 @@ import type {
   NativeTokenStreamPermissionRequest,
 } from './types';
 import { zNativeTokenStreamPermission } from './types';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Validates a permission object data specific to the permission type.
  * @param permission - The native token stream permission object to validate.
+ * @param expiry - The expiry time of permission request.
  * @returns True if the permission data is valid, throws an error otherwise.
  * @throws {Error} If any validation check fails.
  */
-function validatePermissionData(permission: NativeTokenStreamPermission): true {
+function validatePermissionData(
+  permission: NativeTokenStreamPermission,
+  expiry: number,
+): true {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
 
@@ -40,15 +45,12 @@ function validatePermissionData(permission: NativeTokenStreamPermission): true {
   });
 
   if (initialAmount && maxAmount && BigInt(maxAmount) < BigInt(initialAmount)) {
-    throw new Error('Invalid maxAmount: must be greater than initialAmount');
+    throw new InvalidInputError('Invalid maxAmount: must be greater than initialAmount');
   }
 
-  if (startTime <= 0) {
-    throw new Error('Invalid startTime: must be a positive number');
-  }
-
-  if (startTime !== Math.floor(startTime)) {
-    throw new Error('Invalid startTime: must be an integer');
+  // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
+  if (startTime && startTime >= expiry) {
+    throw new InvalidInputError('Invalid startTime: must be before expiry');
   }
 
   return true;
@@ -70,10 +72,10 @@ export function parseAndValidatePermission(
   } = zNativeTokenStreamPermission.safeParse(permissionRequest.permission);
 
   if (!success) {
-    throw new Error(extractZodError(validationError.errors));
+    throw new InvalidInputError(extractZodError(validationError.errors));
   }
 
-  validatePermissionData(validationResult);
+  validatePermissionData(validationResult, permissionRequest.expiry);
 
   return {
     ...permissionRequest,

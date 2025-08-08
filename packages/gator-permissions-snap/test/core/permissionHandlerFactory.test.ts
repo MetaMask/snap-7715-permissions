@@ -21,7 +21,7 @@ describe('PermissionHandlerFactory', () => {
 
   const mockPermissionRequest: PermissionRequest = {
     chainId: '0x1',
-    expiry: 1234567890,
+    expiry: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
     signer: {
       type: 'account',
       data: {
@@ -32,7 +32,7 @@ describe('PermissionHandlerFactory', () => {
       type: 'native-token-stream',
       data: {
         amountPerSecond: '0x1',
-        startTime: 1234567890,
+        startTime: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
         justification: 'test',
       },
     },
@@ -40,7 +40,7 @@ describe('PermissionHandlerFactory', () => {
 
   const mockUnsupportedPermissionRequest: PermissionRequest = {
     chainId: '0x1',
-    expiry: 1234567890,
+    expiry: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
     signer: {
       type: 'account',
       data: {

@@ -10,9 +10,11 @@ import type {
   TypedPermissionRequest,
   BaseContext,
   TimePeriod,
+  BaseMetadata,
 } from '../../core/types';
+import { validateStartTimeZod } from '../../utils/validate';
 
-export type NativeTokenPeriodicMetadata = {
+export type NativeTokenPeriodicMetadata = BaseMetadata & {
   validationErrors: {
     periodAmountError?: string;
     periodDurationError?: string;
@@ -37,8 +39,24 @@ export const zNativeTokenPeriodicPermission = zPermission.extend({
     zMetaMaskPermissionData,
     z.object({
       periodAmount: zHexStr,
-      periodDuration: z.number(),
-      startTime: z.number(),
+      periodDuration: z.number().int().positive(),
+      startTime: z
+        .number()
+        .int()
+        .positive()
+        .nullable()
+        .optional()
+        .refine(
+          (value) => {
+            if (value === undefined || value === null) {
+              return true;
+            }
+            return validateStartTimeZod(value);
+          },
+          {
+            message: 'Start time must be today or later',
+          },
+        ),
     }),
   ),
 });

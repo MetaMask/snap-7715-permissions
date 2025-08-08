@@ -8,23 +8,23 @@ import {
   Platform,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
-import type {
-  OnHomePageHandler,
-  OnInstallHandler,
-  Json,
-  JsonRpcParams,
-  OnRpcRequestHandler,
-  OnUserInputHandler,
+import {
+  type OnHomePageHandler,
+  type OnInstallHandler,
+  type Json,
+  type JsonRpcParams,
+  type OnRpcRequestHandler,
+  type OnUserInputHandler,
+  MethodNotFoundError,
+  InvalidRequestError,
+  InternalError,
 } from '@metamask/snaps-sdk';
 
-import {
-  EoaAccountController,
-  SmartAccountController,
-  type AccountController,
-} from './accountController';
 import { AccountApiClient } from './clients/accountApiClient';
 import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
+import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
+import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
@@ -37,6 +37,7 @@ import {
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { NonceCaveatService } from './services/nonceCaveatService';
 import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
@@ -45,24 +46,22 @@ import { UserEventDispatcher } from './userEventDispatcher';
 const isStorePermissionsFeatureEnabled =
   process.env.STORE_PERMISSIONS_ENABLED === 'true';
 
-const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
-
 const snapEnv = process.env.SNAP_ENV;
 
 const accountApiBaseUrl = process.env.ACCOUNT_API_BASE_URL;
 
 if (!accountApiBaseUrl) {
-  throw new Error('ACCOUNT_API_BASE_URL is not set');
+  throw new InternalError('ACCOUNT_API_BASE_URL is not set');
 }
 
 const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
 if (!priceApiBaseUrl) {
-  throw new Error('PRICE_API_BASE_URL is not set');
+  throw new InternalError('PRICE_API_BASE_URL is not set');
 }
 
 const supportedChainsString = process.env.SUPPORTED_CHAINS;
 if (!supportedChainsString) {
-  throw new Error('SUPPORTED_CHAINS is not set');
+  throw new InternalError('SUPPORTED_CHAINS is not set');
 }
 
 const supportedChains = supportedChainsString.split(',').map(Number);
@@ -82,17 +81,19 @@ const tokenMetadataService = new TokenMetadataService({
   tokenMetadataClient,
 });
 
-const accountController: AccountController = useEoaAccountController
-  ? new EoaAccountController({
-      snapsProvider: snap,
-      ethereumProvider: ethereum,
-      supportedChains,
-    })
-  : new SmartAccountController({
-      snapsProvider: snap,
-      supportedChains,
-      deploymentSalt: '0x',
-    });
+const nonceCaveatClient = new NonceCaveatClient({
+  ethereumProvider: ethereum,
+});
+
+const nonceCaveatService = new NonceCaveatService({
+  nonceCaveatClient,
+});
+
+const accountController = new AccountController({
+  snapsProvider: snap,
+  ethereumProvider: ethereum,
+  supportedChains,
+});
 
 const stateManager = createStateManager(snap);
 
@@ -131,7 +132,6 @@ const profileSyncManager = createProfileSyncManager({
 });
 
 const homepage = new HomePage({
-  accountController,
   snapsProvider: snap,
   profileSyncManager,
 });
@@ -151,6 +151,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
   userEventDispatcher,
+  nonceCaveatService,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
@@ -198,15 +199,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   );
 
   if (!isMethodAllowedForOrigin(origin, request.method)) {
-    throw new Error(
-      `Origin '${origin}' is not allowed to call '${request.method}'`,
-    );
+    throw new InvalidRequestError(`Origin '${origin}' is not allowed to call '${request.method}'`);
   }
 
   const handler = boundRpcHandlers[request.method];
 
   if (!handler) {
-    throw new Error(`Method ${request.method} not found.`);
+    throw new MethodNotFoundError(`Method ${request.method} not found.`);
   }
 
   const result = await handler(request.params);

@@ -12,6 +12,7 @@ import type {
   JwtBearerAuth,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
+import { UnsupportedMethodError } from '@metamask/snaps-sdk';
 
 export type ProfileSyncManager = {
   getAllGrantedPermissions: () => Promise<StoredGrantedPermission[]>;
@@ -53,7 +54,7 @@ export function createProfileSyncManager(
       return [];
     },
     getGrantedPermission: async (_: Hex) => {
-      throw new Error(
+      throw new UnsupportedMethodError(
         'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
       );
     },

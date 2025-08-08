@@ -1,7 +1,7 @@
 import type { TimePeriod } from '../core/types';
 import {
   convertReadableDateToTimestamp,
-  getStartOfTodayUTC,
+  getStartOfTodayLocal,
   TIME_PERIOD_TO_SECONDS,
 } from '../utils/time';
 import { parseUnits, formatUnits } from '../utils/value';
@@ -65,7 +65,8 @@ export function validateAndParseAmount(
 export function validateStartTime(startTime: string): string | undefined {
   try {
     const startTimeDate = convertReadableDateToTimestamp(startTime);
-    if (startTimeDate < getStartOfTodayUTC()) {
+
+    if (startTimeDate < getStartOfTodayLocal()) {
       return 'Start time must be today or later';
     }
     return undefined;
@@ -89,6 +90,29 @@ export function validateExpiry(expiry: string): string | undefined {
     return undefined;
   } catch (error) {
     return 'Invalid expiry';
+  }
+}
+
+/**
+ * Validates that start time is before expiry.
+ * @param startTime - The start time string to validate.
+ * @param expiry - The expiry time string to validate.
+ * @returns Validation error message or undefined if valid.
+ */
+export function validateStartTimeVsExpiry(
+  startTime: string,
+  expiry: string,
+): string | undefined {
+  try {
+    const startTimeDate = convertReadableDateToTimestamp(startTime);
+    const expiryDate = convertReadableDateToTimestamp(expiry);
+    if (startTimeDate >= expiryDate) {
+      return 'Start time must be before expiry';
+    }
+    return undefined;
+  } catch (error) {
+    // If date conversion fails, return undefined to let individual validation handle it
+    return undefined;
   }
 }
 

@@ -1,5 +1,4 @@
 import { describe, expect, it } from '@jest/globals';
-import type { Hex } from '@metamask/delegation-core';
 
 import type { BaseContext } from '../../src/core/types';
 import { getIconData } from '../../src/permissions/iconUtil';
@@ -13,11 +12,10 @@ describe('iconUtil', () => {
       expiry: '05/01/2024',
       isAdjustmentAllowed: true,
       justification: 'Test permission',
-      accountDetails: {
-        address: '0x1234567890123456789012345678901234567890' as Hex,
-        balance: '0x1000000' as Hex,
-        balanceFormattedAsCurrency: '$100.00',
-      },
+      accountAddressCaip10:
+        'eip155:1:0x1234567890123456789012345678901234567890',
+      tokenAddressCaip19:
+        'eip155:1/erc20:0x1234567890123456789012345678901234567890',
       tokenMetadata: {
         symbol,
         decimals: 6,
