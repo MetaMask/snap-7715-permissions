@@ -28,7 +28,6 @@ export const NativeTokenStreamForm = ({
     'This is a very important request for streaming allowance for some very important thing',
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
-  const [expiryIsAdjustmentAllowed, setExpiryIsAdjustmentAllowed] = useState(true);
 
   const handleInitialAmountChange = useCallback(
     ({
@@ -103,13 +102,6 @@ export const NativeTokenStreamForm = ({
     [],
   );
 
-  const handleExpiryIsAdjustmentAllowedChange = useCallback(
-    ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
-      setExpiryIsAdjustmentAllowed(checked);
-    },
-    [],
-  );
-
   useEffect(() => {
     onChange({
       type: 'native-token-stream',
@@ -120,7 +112,6 @@ export const NativeTokenStreamForm = ({
       expiry,
       justification,
       isAdjustmentAllowed,
-      expiryIsAdjustmentAllowed,
     });
   }, [
     onChange,
@@ -131,7 +122,6 @@ export const NativeTokenStreamForm = ({
     expiry,
     justification,
     isAdjustmentAllowed,
-    expiryIsAdjustmentAllowed,
   ]);
 
   return (
@@ -186,28 +176,15 @@ export const NativeTokenStreamForm = ({
           onChange={handleJustificationChange}
         ></textarea>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div>
-          <label htmlFor="expiry">Expiry:</label>
-          <input
-            type="number"
-            id="expiry"
-            name="expiry"
-            value={expiry}
-            onChange={handleExpiryChange}
-          />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-          <input
-            type="checkbox"
-            id="expiryIsAdjustmentAllowed"
-            name="expiryIsAdjustmentAllowed"
-            checked={expiryIsAdjustmentAllowed}
-            onChange={handleExpiryIsAdjustmentAllowedChange}
-            style={{ width: 'auto', marginRight: '0.5rem' }}
-          />
-          <label htmlFor="expiryIsAdjustmentAllowed">Allow Expiry Adjustments</label>
-        </div>
+      <div>
+        <label htmlFor="expiry">Expiry:</label>
+        <input
+          type="number"
+          id="expiry"
+          name="expiry"
+          value={expiry}
+          onChange={handleExpiryChange}
+        />
       </div>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>

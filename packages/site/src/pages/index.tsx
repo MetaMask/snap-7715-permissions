@@ -57,7 +57,6 @@ import type {
   NativeTokenPeriodicPermissionRequest,
   ERC20TokenPeriodicPermissionRequest,
 } from '../components/permissions/types';
-import { PermissionTypes } from '@metamask/permission-types';
 
 /* eslint-disable no-restricted-globals */
 const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
@@ -232,7 +231,6 @@ const Index = () => {
       type,
       expiry,
       isAdjustmentAllowed,
-      expiryIsAdjustmentAllowed,
       ...permissionData
     } = permissionRequest;
 
