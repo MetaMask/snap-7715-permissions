@@ -851,9 +851,17 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
-                                "children": "ETH",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "ETH",
+                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
+                                  },
+                                  "type": "Link",
+                                },
+                                "content": "0x38c4A...611F3",
                               },
-                              "type": "Text",
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -1351,9 +1359,17 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
-                                "children": "ETH",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "ETH",
+                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
+                                  },
+                                  "type": "Link",
+                                },
+                                "content": "0x38c4A...611F3",
                               },
-                              "type": "Text",
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -1889,9 +1905,17 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
-                                "children": "ETH",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "ETH",
+                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
+                                  },
+                                  "type": "Link",
+                                },
+                                "content": "0x38c4A...611F3",
                               },
-                              "type": "Text",
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -2355,9 +2379,17 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
-                                "children": "ETH",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "ETH",
+                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
+                                  },
+                                  "type": "Link",
+                                },
+                                "content": "0x38c4A...611F3",
                               },
-                              "type": "Text",
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -2826,9 +2858,17 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
-                                "children": "ETH",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "ETH",
+                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
+                                  },
+                                  "type": "Link",
+                                },
+                                "content": "0x38c4A...611F3",
                               },
-                              "type": "Text",
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",

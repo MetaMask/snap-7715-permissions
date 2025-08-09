@@ -10,12 +10,15 @@ import {
 
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
+import { logger } from '../../../shared/src/utils/logger';
 import {
   ShowMoreText,
   SkeletonField,
   TextField,
   TooltipIcon,
+  TokenField,
 } from '../ui/components';
+import { getExplorerUrlAndAddress } from '../utils/explorer';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 
@@ -88,6 +91,16 @@ export const PermissionHandlerContent = ({
     <Skeleton />
   );
 
+  let explorerUrl, tokenAddress;
+  try {
+    const result = getExplorerUrlAndAddress(context.tokenAddressCaip19);
+    explorerUrl = result.url;
+    tokenAddress = result.address;
+  } catch (error) {
+    const { message } = error as Error;
+    logger.error(`Fetching token explorer URL and address failed: ${message}`);
+  }
+
   return (
     <Box>
       <Box direction="vertical">
@@ -105,9 +118,11 @@ export const PermissionHandlerContent = ({
             value={networkName}
             tooltip={NETWORK_TOOLTIP}
           />
-          <TextField
+          <TokenField
             label={TOKEN_LABEL}
-            value={tokenSymbol}
+            tokenSymbol={tokenSymbol}
+            tokenAddress={tokenAddress}
+            explorerUrl={explorerUrl}
             tooltip={TOKEN_TOOLTIP}
             iconData={tokenIconData}
           />
