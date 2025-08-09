@@ -15,7 +15,9 @@ import {
   SkeletonField,
   TextField,
   TooltipIcon,
+  TokenField,
 } from '../ui/components';
+import { getExplorerUrlAndAddress } from '../utils/explorer';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 
@@ -88,6 +90,10 @@ export const PermissionHandlerContent = ({
     <Skeleton />
   );
 
+  const { url: explorerUrl, address: tokenAddress } = getExplorerUrlAndAddress(
+    context.tokenAddressCaip19,
+  );
+
   return (
     <Box>
       <Box direction="vertical">
@@ -105,9 +111,11 @@ export const PermissionHandlerContent = ({
             value={networkName}
             tooltip={NETWORK_TOOLTIP}
           />
-          <TextField
+          <TokenField
             label={TOKEN_LABEL}
-            value={tokenSymbol}
+            tokenSymbol={tokenSymbol}
+            tokenAddress={tokenAddress}
+            explorerUrl={explorerUrl}
             tooltip={TOKEN_TOOLTIP}
             iconData={tokenIconData}
           />
