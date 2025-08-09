@@ -10,6 +10,7 @@ import {
 
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
+import { logger } from '../../../shared/src/utils/logger';
 import {
   ShowMoreText,
   SkeletonField,
@@ -18,7 +19,6 @@ import {
   TokenField,
 } from '../ui/components';
 import { getExplorerUrlAndAddress } from '../utils/explorer';
-import { logger } from '../../../shared/src/utils/logger';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 
