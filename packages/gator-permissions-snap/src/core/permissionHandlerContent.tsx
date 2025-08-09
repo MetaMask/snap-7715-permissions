@@ -18,6 +18,7 @@ import {
   TokenField,
 } from '../ui/components';
 import { getExplorerUrlAndAddress } from '../utils/explorer';
+import { logger } from '../../../shared/src/utils/logger';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 
@@ -90,9 +91,15 @@ export const PermissionHandlerContent = ({
     <Skeleton />
   );
 
-  const { url: explorerUrl, address: tokenAddress } = getExplorerUrlAndAddress(
-    context.tokenAddressCaip19,
-  );
+  let explorerUrl, tokenAddress;
+  try {
+    const result = getExplorerUrlAndAddress(context.tokenAddressCaip19);
+    explorerUrl = result.url;
+    tokenAddress = result.address;
+  } catch (error) {
+    const { message } = error as Error;
+    logger.error(`Fetching token explorer URL and address failed: ${message}`);
+  }
 
   return (
     <Box>
