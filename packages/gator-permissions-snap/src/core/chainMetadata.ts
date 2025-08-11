@@ -50,6 +50,7 @@ const metadataByChainId: Record<number, ChainMetadata> = {
     name: 'Ethereum Mainnet',
     symbol: 'ETH',
     decimals: 18,
+    explorerUrl: 'https://etherscan.io',
   },
   // sepolia
   11155111: {
@@ -57,6 +58,7 @@ const metadataByChainId: Record<number, ChainMetadata> = {
     name: 'Sepolia',
     symbol: 'ETH',
     decimals: 18,
+    explorerUrl: 'https://sepolia.etherscan.io',
   },
 };
 
@@ -65,6 +67,7 @@ export type ChainMetadata = {
   name: string;
   symbol: string;
   decimals: number;
+  explorerUrl: string;
 };
 
 export const getChainMetadata = ({
