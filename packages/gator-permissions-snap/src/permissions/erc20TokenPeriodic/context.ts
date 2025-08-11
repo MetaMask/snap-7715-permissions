@@ -50,7 +50,28 @@ export async function applyContext({
     permissionDetails,
     tokenMetadata: { decimals },
   } = context;
-  const expiry = convertReadableDateToTimestamp(context.expiry);
+
+  const expiry = convertReadableDateToTimestamp(context.expiry.timestamp);
+
+  let isExpiryRuleFound = false;
+
+  const rules: Erc20TokenPeriodicPermissionRequest['rules'] =
+    originalRequest.rules?.map((rule) => {
+      if (rule.type === 'expiry') {
+        isExpiryRuleFound = true;
+        return {
+          ...rule,
+          data: { ...rule.data, timestamp: expiry },
+        };
+      }
+      return rule;
+    }) ?? [];
+
+  if (!isExpiryRuleFound) {
+    throw new Error(
+      'Expiry rule not found. An expiry is required on all permissions.',
+    );
+  }
 
   const permissionData = {
     periodAmount: bigIntToHex(
@@ -67,12 +88,12 @@ export async function applyContext({
   return {
     ...originalRequest,
     address: address as Hex,
-    expiry,
     permission: {
       type: 'erc20-token-periodic',
       data: permissionData,
-      rules: originalRequest.permission.rules ?? {},
+      isAdjustmentAllowed: originalRequest.permission.isAdjustmentAllowed,
     },
+    rules,
   };
 }
 
@@ -93,7 +114,6 @@ export async function populatePermission({
       ...permission.data,
       startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
     },
-    rules: permission.rules ?? {},
   };
 }
 
@@ -115,8 +135,7 @@ export async function buildContext({
   const chainId = Number(permissionRequest.chainId);
   const {
     address,
-    isAdjustmentAllowed = true,
-    permission: { data },
+    permission: { data, isAdjustmentAllowed },
   } = permissionRequest;
 
   if (!address) {
@@ -139,7 +158,20 @@ export async function buildContext({
     ? iconDataResponse.imageDataBase64
     : null;
 
-  const expiry = permissionRequest.expiry.toString();
+  const expiryRule = permissionRequest.rules?.find(
+    (rule) => rule.type === 'expiry',
+  );
+
+  if (!expiryRule) {
+    throw new Error(
+      'Expiry rule not found. An expiry is required on all permissions.',
+    );
+  }
+
+  const expiry = {
+    timestamp: expiryRule.data.timestamp.toString(),
+    isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
+  };
 
   const periodAmount = formatUnitsFromHex({
     value: data.periodAmount,
@@ -161,7 +193,8 @@ export async function buildContext({
     periodType = 'Other';
   }
 
-  const startTime = data.startTime?.toString() ?? Math.floor(Date.now() / 1000);
+  const startTime =
+    data.startTime?.toString() ?? Math.floor(Date.now() / 1000).toString();
 
   const tokenAddressCaip19 = toCaipAssetType(
     CHAIN_NAMESPACE,
@@ -240,7 +273,7 @@ export async function deriveMetadata({
   }
 
   // Validate expiry
-  const expiryError = validateExpiry(expiry);
+  const expiryError = validateExpiry(expiry.timestamp);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
   }
@@ -249,7 +282,7 @@ export async function deriveMetadata({
   if (!validationErrors.startTimeError && !validationErrors.expiryError) {
     const startTimeVsExpiryError = validateStartTimeVsExpiry(
       permissionDetails.startTime,
-      expiry,
+      expiry.timestamp,
     );
     if (startTimeVsExpiryError) {
       validationErrors.startTimeError = startTimeVsExpiryError;

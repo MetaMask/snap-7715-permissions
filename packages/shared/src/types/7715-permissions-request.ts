@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { zPermission } from './7715-permissions-types';
+import { zPermission, zRule } from './7715-permissions-types';
 import { zAddress, zHexStr } from './common';
 
 export const zAccountSigner = z.object({
@@ -37,23 +37,7 @@ export const zPermissionRequest = z.object({
    * The account being targeted for this permission request.
    * It is optional to let the user choose which account to grant permission for.
    */
-  address: zAddress.optional(),
-
-  /**
-   * unix timestamp in seconds
-   */
-  expiry: z
-    .number()
-    .int()
-    .refine(
-      (timestamp) => timestamp > Math.floor(Date.now() / 1000),
-      'Expiry must be in the future',
-    ),
-
-  /**
-   * Whether the permission can be adjusted
-   */
-  isAdjustmentAllowed: z.boolean().optional(),
+  address: zAddress.optional().nullable(),
 
   /**
    * An account that can be granted with permissions as in ERC-7710
@@ -64,6 +48,11 @@ export const zPermissionRequest = z.object({
    * Defines the allowed behavior the signer can do on behalf of the account.
    */
   permission: zPermission,
+
+  /**
+   * Defines the allowed behavior the signer can do on behalf of the account.
+   */
+  rules: z.array(zRule).optional().nullable(),
 });
 export const zPermissionsRequest = z.array(zPermissionRequest);
 

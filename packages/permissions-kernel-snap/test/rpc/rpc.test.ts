@@ -32,7 +32,6 @@ describe('RpcHandler', () => {
     const mockPermissions: PermissionsRequest = [
       {
         chainId: '0x1',
-        expiry: Date.now() + 3600000,
         signer: {
           type: 'account',
           data: {
@@ -41,6 +40,7 @@ describe('RpcHandler', () => {
         },
         permission: {
           type: 'native-token-transfer',
+          isAdjustmentAllowed: true,
           data: {
             justification: 'Test permission',
             allowance: '0x1000',
@@ -53,7 +53,6 @@ describe('RpcHandler', () => {
       const mockPartialPermissions: PermissionsRequest = [
         {
           chainId: '0x1',
-          expiry: Date.now() + 3600000,
           signer: {
             type: 'account',
             data: {
@@ -62,6 +61,7 @@ describe('RpcHandler', () => {
           },
           permission: {
             type: 'native-token-transfer',
+            isAdjustmentAllowed: true,
             data: {
               justification: 'Test permission',
               allowance: '0x1000',
@@ -93,7 +93,7 @@ describe('RpcHandler', () => {
       );
 
       await expect(
-        handler.grantPermissions({
+        handler.requestExecutionPermissions({
           siteOrigin,
           params: mockPartialPermissions as unknown as Json,
         }),
@@ -106,7 +106,6 @@ describe('RpcHandler', () => {
       const mockGrantedPermissions: PermissionsResponse = [
         {
           chainId: '0x1',
-          expiry: Date.now() + 3600000,
           signer: {
             type: 'account',
             data: {
@@ -115,15 +114,20 @@ describe('RpcHandler', () => {
           },
           permission: {
             type: 'native-token-transfer',
+            isAdjustmentAllowed: true,
             data: {
               justification: 'Test permission',
               allowance: '0x1000',
             },
           },
           address: '0x1234567890123456789012345678901234567890',
-          isAdjustmentAllowed: true,
           context: '0x1',
-          accountMeta: [],
+          dependencyInfo: [
+            {
+              factory: '0x1234567890123456789012345678901234567890',
+              factoryData: '0x',
+            },
+          ],
           signerMeta: {
             delegationManager: '0x1234567890123456789012345678901234567890',
           },
@@ -147,7 +151,7 @@ describe('RpcHandler', () => {
         mockGrantedPermissions as unknown as Json,
       );
 
-      const result = await handler.grantPermissions({
+      const result = await handler.requestExecutionPermissions({
         siteOrigin,
         params: mockPermissions as unknown as Json,
       });
@@ -186,7 +190,7 @@ describe('RpcHandler', () => {
       mockSnapsProvider.request.mockRejectedValueOnce(new Error('Test error'));
 
       await expect(
-        handler.grantPermissions({
+        handler.requestExecutionPermissions({
           siteOrigin,
           params: mockPermissions as unknown as Json,
         }),

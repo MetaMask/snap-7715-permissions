@@ -22,8 +22,8 @@ const boundRpcHandlers: {
     params?: JsonRpcParams;
   }) => Promise<Json>;
 } = {
-  [RpcMethod.WalletGrantPermissions]:
-    rpcHandler.grantPermissions.bind(rpcHandler),
+  [RpcMethod.WalletRequestExecutionPermissions]:
+    rpcHandler.requestExecutionPermissions.bind(rpcHandler),
 };
 
 /**

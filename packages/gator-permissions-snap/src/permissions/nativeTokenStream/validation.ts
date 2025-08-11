@@ -11,13 +11,13 @@ import { zNativeTokenStreamPermission } from './types';
 /**
  * Validates a permission object data specific to the permission type.
  * @param permission - The native token stream permission object to validate.
- * @param expiry - The expiry time of permission request.
+ * @param rules - The rules of the permission request.
  * @returns True if the permission data is valid, throws an error otherwise.
  * @throws {Error} If any validation check fails.
  */
 function validatePermissionData(
   permission: NativeTokenStreamPermission,
-  expiry: number,
+  rules: NativeTokenStreamPermissionRequest['rules'],
 ): true {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
@@ -47,6 +47,12 @@ function validatePermissionData(
     throw new Error('Invalid maxAmount: must be greater than initialAmount');
   }
 
+  const expiryRule = rules?.find((rule) => rule.type === 'expiry');
+  if (!expiryRule) {
+    throw new Error('Expiry rule is required');
+  }
+  const expiry = Number(expiryRule.data.timestamp);
+
   // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
   if (startTime && startTime >= expiry) {
     throw new Error('Invalid startTime: must be before expiry');
@@ -74,11 +80,10 @@ export function parseAndValidatePermission(
     throw new Error(extractZodError(validationError.errors));
   }
 
-  validatePermissionData(validationResult, permissionRequest.expiry);
+  validatePermissionData(validationResult, permissionRequest.rules);
 
   return {
     ...permissionRequest,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     permission: {
       ...validationResult,
       data: {

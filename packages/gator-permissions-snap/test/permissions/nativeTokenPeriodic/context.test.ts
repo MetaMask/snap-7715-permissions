@@ -28,6 +28,7 @@ const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
     startTime: convertReadableDateToTimestamp('10/26/2024'),
     justification: 'Permission to do something important',
   },
+  isAdjustmentAllowed: true,
 };
 
 const alreadyPopulatedPermission: NativeTokenPeriodicPermission = {
@@ -35,7 +36,6 @@ const alreadyPopulatedPermission: NativeTokenPeriodicPermission = {
   data: {
     ...permissionWithoutOptionals.data,
   },
-  rules: {},
 };
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
@@ -44,7 +44,15 @@ const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
   {
     address: ACCOUNT_ADDRESS,
     chainId: '0x1',
-    expiry: convertReadableDateToTimestamp('05/01/2024'),
+    rules: [
+      {
+        type: 'expiry',
+        data: {
+          timestamp: convertReadableDateToTimestamp('05/01/2024'),
+        },
+        isAdjustmentAllowed: true,
+      },
+    ],
     signer: {
       type: 'account',
       data: {
@@ -61,7 +69,10 @@ const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
   };
 
 const alreadyPopulatedContext: NativeTokenPeriodicContext = {
-  expiry: '1714521600',
+  expiry: {
+    timestamp: '1714521600',
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
@@ -98,9 +109,7 @@ describe('nativeTokenPeriodic:context', () => {
           startTime: 1714531200,
           justification: 'Permission to do something important',
         },
-        rules: {
-          some: 'rule',
-        },
+        isAdjustmentAllowed: true,
       };
 
       const populatedPermission = await populatePermission({ permission });
@@ -119,7 +128,7 @@ describe('nativeTokenPeriodic:context', () => {
           startTime: null,
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const populatedPermission = await populatePermission({ permission });
@@ -133,7 +142,7 @@ describe('nativeTokenPeriodic:context', () => {
     });
   });
 
-  describe('permissionRequestToContext()', () => {
+  describe('buildContext()', () => {
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
     beforeEach(() => {
       mockTokenMetadataService = {
@@ -181,9 +190,41 @@ describe('nativeTokenPeriodic:context', () => {
         account: ACCOUNT_ADDRESS,
       });
     });
+
+    it('throws an error if the expiry rule is not found', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: [],
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    });
+
+    it('throws an error if the permission request has no rules', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: undefined,
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    });
   });
 
-  describe('createContextMetadata()', () => {
+  describe('deriveMetadata()', () => {
     const dateInTheFuture = (
       Math.floor(Date.now() / 1000) +
       24 * 60 * 60
@@ -192,7 +233,10 @@ describe('nativeTokenPeriodic:context', () => {
 
     const context = {
       ...alreadyPopulatedContext,
-      expiry: dateInTheFuture,
+      expiry: {
+        timestamp: dateInTheFuture,
+        isAdjustmentAllowed: true,
+      },
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
         startTime, // 12 hours from now (before expiry)
@@ -330,7 +374,10 @@ describe('nativeTokenPeriodic:context', () => {
       it('should return a validation error for expiry in the past', async () => {
         const contextWithExpiryInThePast = {
           ...context,
-          expiry: '10/26/1985',
+          expiry: {
+            timestamp: '10/26/1985',
+            isAdjustmentAllowed: true,
+          },
           permissionDetails: {
             ...context.permissionDetails,
           },
@@ -350,7 +397,10 @@ describe('nativeTokenPeriodic:context', () => {
         async (expiry) => {
           const contextWithInvalidExpiry = {
             ...context,
-            expiry,
+            expiry: {
+              timestamp: expiry,
+              isAdjustmentAllowed: true,
+            },
             permissionDetails: {
               ...context.permissionDetails,
             },
@@ -366,18 +416,32 @@ describe('nativeTokenPeriodic:context', () => {
         },
       );
     });
+  });
 
-    describe('contextToPermissionRequest()', () => {
-      it('should convert a context to a permission request', async () => {
-        const permissionRequest = await applyContext({
-          context: alreadyPopulatedContext,
-          originalRequest: alreadyPopulatedPermissionRequest,
-        });
-
-        expect(permissionRequest).toStrictEqual(
-          alreadyPopulatedPermissionRequest,
-        );
+  describe('applyContext()', () => {
+    it('converts a context to a permission request', async () => {
+      const permissionRequest = await applyContext({
+        context: alreadyPopulatedContext,
+        originalRequest: alreadyPopulatedPermissionRequest,
       });
+
+      expect(permissionRequest).toStrictEqual(
+        alreadyPopulatedPermissionRequest,
+      );
+    });
+
+    it('throws an error if the expiry rule is not found in the original request', async () => {
+      const applyingContext = applyContext({
+        context: alreadyPopulatedContext,
+        originalRequest: {
+          ...alreadyPopulatedPermissionRequest,
+          rules: [],
+        },
+      });
+
+      await expect(applyingContext).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
     });
   });
 });

@@ -36,6 +36,7 @@ const permissionWithoutOptionals: Erc20TokenPeriodicPermission = {
     tokenAddress,
     justification: 'Permission to do something important',
   },
+  isAdjustmentAllowed: true,
 };
 
 const alreadyPopulatedPermission: Erc20TokenPeriodicPermission = {
@@ -43,13 +44,20 @@ const alreadyPopulatedPermission: Erc20TokenPeriodicPermission = {
   data: {
     ...permissionWithoutOptionals.data,
   },
-  rules: {},
 };
 
 const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
   address: ACCOUNT_ADDRESS,
   chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: {
@@ -62,11 +70,15 @@ const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
       ...alreadyPopulatedPermission.data,
       startTime: convertReadableDateToTimestamp('10/26/2024'),
     },
+    isAdjustmentAllowed: true,
   },
 };
 
 const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
-  expiry: '1714521600',
+  expiry: {
+    timestamp: '1714521600',
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
@@ -106,9 +118,7 @@ describe('erc20TokenPeriodic:context', () => {
           tokenAddress,
           justification: 'Permission to do something important',
         },
-        rules: {
-          some: 'rule',
-        },
+        isAdjustmentAllowed: true,
       };
 
       const populatedPermission = await populatePermission({ permission });
@@ -128,7 +138,7 @@ describe('erc20TokenPeriodic:context', () => {
           startTime: null,
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const populatedPermission = await populatePermission({ permission });
@@ -142,7 +152,7 @@ describe('erc20TokenPeriodic:context', () => {
     });
   });
 
-  describe('permissionRequestToContext()', () => {
+  describe('buildContext()', () => {
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
     beforeEach(() => {
       mockTokenMetadataService = {
@@ -191,9 +201,41 @@ describe('erc20TokenPeriodic:context', () => {
         assetAddress: tokenAddress,
       });
     });
+
+    it('throws an error if the expiry rule is not found', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: [],
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    });
+
+    it('throws an error if the permission request has no rules', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: undefined,
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    });
   });
 
-  describe('createContextMetadata()', () => {
+  describe('deriveMetadata()', () => {
     const dateInTheFuture = (
       Math.floor(Date.now() / 1000) +
       24 * 60 * 60
@@ -202,7 +244,10 @@ describe('erc20TokenPeriodic:context', () => {
 
     const context = {
       ...alreadyPopulatedContext,
-      expiry: dateInTheFuture,
+      expiry: {
+        timestamp: dateInTheFuture,
+        isAdjustmentAllowed: true,
+      },
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
         startTime, // 12 hours from now (before expiry)
@@ -340,7 +385,10 @@ describe('erc20TokenPeriodic:context', () => {
       it('should return a validation error for expiry in the past', async () => {
         const contextWithExpiryInThePast = {
           ...context,
-          expiry: '10/26/1985',
+          expiry: {
+            timestamp: '10/26/1985',
+            isAdjustmentAllowed: true,
+          },
           permissionDetails: {
             ...context.permissionDetails,
           },
@@ -360,7 +408,10 @@ describe('erc20TokenPeriodic:context', () => {
         async (expiry) => {
           const contextWithInvalidExpiry = {
             ...context,
-            expiry,
+            expiry: {
+              timestamp: expiry,
+              isAdjustmentAllowed: true,
+            },
             permissionDetails: {
               ...context.permissionDetails,
             },
@@ -388,9 +439,12 @@ describe('erc20TokenPeriodic:context', () => {
           periodDuration: '604800', // 1 week
           startTime: convertTimestampToReadableDate(Date.now() / 1000),
         },
-        expiry: convertTimestampToReadableDate(
-          Date.now() / 1000 + 30 * 24 * 60 * 60,
-        ), // 30 days from now
+        expiry: {
+          timestamp: convertTimestampToReadableDate(
+            Date.now() / 1000 + 30 * 24 * 60 * 60,
+          ), // 30 days from now
+          isAdjustmentAllowed: true,
+        },
       };
 
       const result = await applyContext({

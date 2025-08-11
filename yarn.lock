@@ -3160,6 +3160,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/7715-permission-types@npm:0.2.0, @metamask/7715-permission-types@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@metamask/7715-permission-types@npm:0.2.0"
+  checksum: db464415f7f9946dcdc0c9cd30896b83eaa5a4b01ae1990bf66b7c0ba464b15f28fe353bbc694aeb1fdfbf42c02fa5bb56e41b2a32d3b4b22d40c4b6533defba
+  languageName: node
+  linkType: hard
+
 "@metamask/7715-permissions-shared@workspace:*, @metamask/7715-permissions-shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "@metamask/7715-permissions-shared@workspace:packages/shared"
@@ -3375,10 +3382,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-toolkit@npm:0.13.0-rc.1":
-  version: 0.13.0-rc.1
-  resolution: "@metamask/delegation-toolkit@npm:0.13.0-rc.1"
+"@metamask/delegation-toolkit@npm:0.13.0-rc.2":
+  version: 0.13.0-rc.2
+  resolution: "@metamask/delegation-toolkit@npm:0.13.0-rc.2"
   dependencies:
+    "@metamask/7715-permission-types": ^0.2.0
     "@metamask/delegation-abis": ^0.11.0
     "@metamask/delegation-core": ^0.2.0-rc.1
     "@metamask/delegation-deployments": ^0.12.0
@@ -3386,7 +3394,7 @@ __metadata:
     webauthn-p256: ^0.0.10
   peerDependencies:
     viem: ^2.31.4
-  checksum: 53f0c6d74800b08b14ffda95815ae198bae01a8e3cd5db1e6909e5ff3fdcbdb44d155a4c3053d315ae1abf25f53950c482ba0ad9467b35df331c13eee59093b0
+  checksum: 283e9f54f15d7aaf528ed6c7c98d821baf52958dfd008c2a04a8e313081978236d207416c930fcf38400ddc09dba6b5e13485e96baf21c812e383a0a735a61b2
   languageName: node
   linkType: hard
 
@@ -18640,7 +18648,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask/delegation-toolkit": 0.13.0-rc.1
+    "@metamask/7715-permission-types": 0.2.0
+    "@metamask/delegation-toolkit": 0.13.0-rc.2
     "@metamask/eslint-config": 12.2.0
     "@metamask/eslint-config-browser": 12.1.0
     "@metamask/eslint-config-jest": 12.1.0
