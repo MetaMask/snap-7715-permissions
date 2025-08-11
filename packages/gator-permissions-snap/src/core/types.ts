@@ -4,7 +4,11 @@ import type {
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import type { Hex, Caveat, Delegation } from '@metamask/delegation-core';
-import type { CaipAssetType, SnapsProvider } from '@metamask/snaps-sdk';
+import type {
+  CaipAccountId,
+  CaipAssetType,
+  SnapsProvider,
+} from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { TokenMetadataService } from '../services/tokenMetadataService';
@@ -41,7 +45,7 @@ export type BaseContext = {
   };
   isAdjustmentAllowed: boolean;
   justification: string;
-  accountAddressCaip10: Caip10Address;
+  accountAddressCaip10: CaipAccountId;
   tokenAddressCaip19: CaipAssetType;
   tokenMetadata: {
     decimals: number;

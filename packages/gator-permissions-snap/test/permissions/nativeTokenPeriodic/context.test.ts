@@ -190,6 +190,38 @@ describe('nativeTokenPeriodic:context', () => {
         account: ACCOUNT_ADDRESS,
       });
     });
+
+    it('throws an error if the expiry rule is not found', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: [],
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    });
+
+    it('throws an error if the permission request has no rules', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: undefined,
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    });
   });
 
   describe('deriveMetadata()', () => {

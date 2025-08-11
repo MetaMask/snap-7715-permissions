@@ -68,7 +68,7 @@ export async function applyContext({
         };
       }
       return rule;
-    }) || [];
+    }) ?? [];
 
   if (!isExpiryRuleFound) {
     throw new Error(
@@ -179,9 +179,16 @@ export async function buildContext({
   const expiryRule = permissionRequest.rules?.find(
     (rule) => rule.type === 'expiry',
   );
+
+  if (!expiryRule) {
+    throw new Error(
+      'Expiry rule not found. An expiry is required on all permissions.',
+    );
+  }
+
   const expiry = {
-    timestamp: expiryRule?.data.timestamp.toString(),
-    isAdjustmentAllowed: expiryRule?.isAdjustmentAllowed ?? true,
+    timestamp: expiryRule.data.timestamp.toString(),
+    isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
   };
 
   const initialAmount = formatUnitsFromHex({
