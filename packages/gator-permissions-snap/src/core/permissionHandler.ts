@@ -155,10 +155,7 @@ export class PermissionHandler<
 
       let address: Hex | undefined;
 
-      if (requestedAddressLowercase === undefined) {
-        // use the first address available for the account
-        address = allAvailableAddresses[0];
-      } else {
+      if (requestedAddressLowercase) {
         // validate that the requested address is one of the addresses available for the account
         if (
           !allAvailableAddresses.some(
@@ -168,7 +165,10 @@ export class PermissionHandler<
         ) {
           throw new InvalidRequestError('Requested address not found');
         }
-        address = request.address;
+        address = request.address as Hex;
+      } else {
+        // use the first address available for the account
+        address = allAvailableAddresses[0];
       }
 
       return await this.#dependencies.buildContext({
@@ -200,7 +200,7 @@ export class PermissionHandler<
           metadata,
         });
 
-      const { name: networkName } = getChainMetadata({ chainId });
+      const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
       const tokenIconData = getIconData(context);
 
@@ -222,6 +222,7 @@ export class PermissionHandler<
         tokenBalance: this.#tokenBalance,
         tokenBalanceFiat: this.#tokenBalanceFiat,
         chainId,
+        explorerUrl,
       });
     };
 

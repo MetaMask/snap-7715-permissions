@@ -1,5 +1,5 @@
 import type {
-  AccountMeta,
+  DependencyInfo,
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
@@ -154,7 +154,8 @@ export class PermissionRequestLifecycleOrchestrator {
       throw error;
     }
 
-    const isAdjustmentAllowed = permissionRequest.isAdjustmentAllowed ?? true;
+    const isAdjustmentAllowed =
+      permissionRequest.permission.isAdjustmentAllowed ?? true;
 
     if (lifecycleHandlers.onConfirmationCreated) {
       const updateContext = async ({
@@ -297,17 +298,27 @@ export class PermissionRequestLifecycleOrchestrator {
       contracts,
     });
 
-    const timestampAfterThreshold = 0;
-    const timestampBeforeThreshold = grantedPermissionRequest.expiry;
+    const expiryRule = resolvedRequest.rules?.find(
+      (rule) => rule.type === 'expiry',
+    );
 
-    caveats.push({
-      enforcer: TimestampEnforcer,
-      terms: createTimestampTerms({
-        timestampAfterThreshold,
-        timestampBeforeThreshold,
-      }),
-      args: '0x',
-    });
+    if (expiryRule) {
+      const timestampAfterThreshold = 0;
+      const timestampBeforeThreshold = expiryRule.data.timestamp;
+
+      caveats.push({
+        enforcer: TimestampEnforcer,
+        terms: createTimestampTerms({
+          timestampAfterThreshold,
+          timestampBeforeThreshold,
+        }),
+        args: '0x',
+      });
+    } else {
+      throw new Error(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    }
 
     const nonce = await this.#nonceCaveatService.getNonce({
       chainId,
@@ -343,14 +354,14 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
-    // accountMetadata is always empty for EIP-7702 accounts
-    const accountMeta: AccountMeta[] = [];
+    // dependencyInfo is always empty for EIP-7702 accounts
+    const dependencyInfo: DependencyInfo[] = [];
 
     const response: PermissionResponse = {
       ...grantedPermissionRequest,
       chainId: numberToHex(chainId),
       address,
-      accountMeta,
+      dependencyInfo,
       context,
       signerMeta: {
         delegationManager,

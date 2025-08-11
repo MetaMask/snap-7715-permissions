@@ -11,8 +11,15 @@ const tokenDecimals = 6;
 
 const validPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
   chainId: '0x1',
-  expiry: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
-  isAdjustmentAllowed: true,
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: {
@@ -30,7 +37,7 @@ const validPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
       tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
       justification: 'test',
     },
-    rules: {},
+    isAdjustmentAllowed: true,
   },
 };
 
@@ -309,7 +316,15 @@ describe('erc20TokenPeriodic:validation', () => {
         const currentTime = Math.floor(Date.now() / 1000);
         const startTimeVsExpiryRequest = {
           ...validPermissionRequest,
-          expiry: currentTime + 86400, // 1 day from now
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400, // 1 day from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           permission: {
             ...validPermissionRequest.permission,
             data: {
@@ -328,7 +343,15 @@ describe('erc20TokenPeriodic:validation', () => {
         const currentTime = Math.floor(Date.now() / 1000);
         const startTimeAfterExpiryRequest = {
           ...validPermissionRequest,
-          expiry: currentTime + 86400, // 1 day from now
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400, // 1 day from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           permission: {
             ...validPermissionRequest.permission,
             data: {
@@ -347,7 +370,15 @@ describe('erc20TokenPeriodic:validation', () => {
         const currentTime = Math.floor(Date.now() / 1000);
         const validStartTimeVsExpiryRequest = {
           ...validPermissionRequest,
-          expiry: currentTime + 86400 * 2, // 2 days from now
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400 * 2, // 2 days from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           permission: {
             ...validPermissionRequest.permission,
             data: {
@@ -363,14 +394,18 @@ describe('erc20TokenPeriodic:validation', () => {
       });
     });
 
-    it('should set isAdjustmentAllowed to true by default', () => {
+    it('should require isAdjustmentAllowed to be a boolean', () => {
       const requestWithoutAdjustmentFlag = {
         ...validPermissionRequest,
-        isAdjustmentAllowed: undefined,
-      };
+        permission: {
+          ...validPermissionRequest.permission,
+          isAdjustmentAllowed: undefined,
+        },
+      } as any;
 
-      const result = parseAndValidatePermission(requestWithoutAdjustmentFlag);
-      expect(result.isAdjustmentAllowed).toBe(true);
+      expect(() =>
+        parseAndValidatePermission(requestWithoutAdjustmentFlag),
+      ).toThrow('Failed type validation: isAdjustmentAllowed: Required');
     });
   });
 });

@@ -10,7 +10,7 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
-import type { AccountController } from '../../src/accountController';
+import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
@@ -47,9 +47,9 @@ const mockSkeletonUiContent = {
 } as SnapElement;
 
 const requestingAccountAddress = randomAddress();
-const mockPermissionRequest = {
+const expiryTimestamp = Math.floor(Date.now() / 1000 + 3600);
+const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
-  expiry: Math.floor(Date.now() / 1000 + 3600),
   signer: {
     type: 'account',
     data: {
@@ -59,8 +59,18 @@ const mockPermissionRequest = {
   permission: {
     type: 'test-permission',
     data: {},
+    isAdjustmentAllowed: true,
   },
-} as PermissionRequest;
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: expiryTimestamp,
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
+};
 
 const mockResolvedPermissionRequest = {
   ...mockPermissionRequest,
@@ -184,7 +194,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result.approved).toBe(true);
         expect(result.approved && result.response).toStrictEqual({
           ...mockPermissionRequest,
-          accountMeta: [],
+          dependencyInfo: [],
           permission: mockPopulatedPermission,
           address: grantingAccountAddress,
           context: expect.stringMatching(/^0x[0-9a-fA-F]+$/u),
@@ -295,7 +305,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           mockPermissionRequest,
           lifecycleHandlerMocks,
         );
-
         expect(result.approved).toBe(true);
         if (!result.approved) {
           throw new Error('Expected the permission request to be approved');
@@ -305,7 +314,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         const {
           contracts: {
-            enforcers: { TimestampEnforcer, NonceEnforcer },
+            enforcers: { NonceEnforcer, TimestampEnforcer },
           },
         } = getChainMetadata({
           chainId: Number(mockPermissionRequest.chainId),
@@ -321,7 +330,66 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
               args: '0x',
               terms: createTimestampTerms({
                 timestampAfterThreshold: 0,
-                timestampBeforeThreshold: mockPermissionRequest.expiry,
+                timestampBeforeThreshold: expiryTimestamp,
+              }),
+            },
+            {
+              enforcer: NonceEnforcer.toLowerCase(),
+              args: '0x',
+              terms: createNonceTerms({
+                nonce: bigIntToHex(0n),
+              }),
+            },
+          ],
+
+          salt: expect.any(BigInt),
+          signature: mockSignature,
+        };
+
+        expect(delegationsArray).toStrictEqual([expectedDelegation]);
+        expect(delegationsArray[0]?.salt).not.toBe(0n);
+      });
+
+      it('adds timestamp enforcer when expiry rule is present', async () => {
+        lifecycleHandlerMocks.applyContext.mockImplementation(
+          ({ originalRequest }) => ({
+            ...mockResolvedPermissionRequest,
+            rules: originalRequest.rules,
+          }),
+        );
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockResolvedPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(result.approved).toBe(true);
+        if (!result.approved) {
+          throw new Error('Expected the permission request to be approved');
+        }
+
+        const delegationsArray = decodeDelegations(result.response.context);
+
+        const {
+          contracts: {
+            enforcers: { TimestampEnforcer, NonceEnforcer },
+          },
+        } = getChainMetadata({
+          chainId: Number(mockResolvedPermissionRequest.chainId),
+        });
+
+        const expectedDelegation = {
+          delegate: requestingAccountAddress.toLowerCase(),
+          delegator: grantingAccountAddress.toLowerCase(),
+          authority: ROOT_AUTHORITY,
+          caveats: [
+            {
+              enforcer: TimestampEnforcer.toLowerCase(),
+              args: '0x',
+              terms: createTimestampTerms({
+                timestampAfterThreshold: 0,
+                timestampBeforeThreshold: expiryTimestamp,
               }),
             },
             {
@@ -340,6 +408,61 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(delegationsArray[0]?.salt).not.toBe(0n);
       });
 
+      it('throws an error when expiry rule is not present', async () => {
+        const mockPermissionRequestWithRandomRule = {
+          ...mockPermissionRequest,
+          rules: [
+            {
+              type: 'random-rule',
+              isAdjustmentAllowed: true,
+              data: {},
+            },
+          ],
+        };
+
+        lifecycleHandlerMocks.applyContext.mockImplementation(
+          ({ originalRequest }) => ({
+            ...mockResolvedPermissionRequest,
+            rules: originalRequest.rules,
+          }),
+        );
+
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequestWithRandomRule,
+            lifecycleHandlerMocks,
+          );
+
+        await expect(orchestrationPromise).rejects.toThrow(
+          'Expiry rule not found. An expiry is required on all permissions.',
+        );
+      });
+
+      it('throws an error when rules are not defined', async () => {
+        const mockPermissionRequestWithRandomRule = {
+          ...mockPermissionRequest,
+          rules: undefined,
+        };
+
+        lifecycleHandlerMocks.applyContext.mockImplementation(
+          ({ originalRequest }) => ({
+            ...mockResolvedPermissionRequest,
+            rules: originalRequest.rules,
+          }),
+        );
+
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequestWithRandomRule,
+            lifecycleHandlerMocks,
+          );
+
+        await expect(orchestrationPromise).rejects.toThrow(
+          'Expiry rule not found. An expiry is required on all permissions.',
+        );
+      });
       it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
         const initialContext = {
           foo: 'original',
@@ -428,7 +551,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         const mockPermissionRequestWithAdjustmentNotAllowed = {
           ...mockPermissionRequest,
-          isAdjustmentAllowed: false,
+          permission: {
+            ...mockPermissionRequest.permission,
+            isAdjustmentAllowed: false,
+          },
         };
 
         lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
