@@ -36,9 +36,7 @@ describe('PriceApiClient', () => {
 
       await expect(
         client.getSpotPrice('eip155:1/slip44:60', 'usd'),
-      ).rejects.toThrow(
-        'Spot price not found for eip155:1/slip44:60',
-      );
+      ).rejects.toThrow('Spot price not found for eip155:1/slip44:60');
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:8003/v3/spot-prices?includeMarketData=false&vsCurrency=usd&assetIds=eip155:1/slip44:60',
       );
