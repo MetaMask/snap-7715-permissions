@@ -1,12 +1,15 @@
-import { bigIntToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  parseCaipAccountId,
+  toCaipAssetType,
+  toCaipAccountId,
+  type Hex,
+} from '@metamask/utils';
 
-import type { AccountController } from '../../accountController';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import {
   convertReadableDateToTimestamp,
-  convertTimestampToReadableDate,
   TIME_PERIOD_TO_SECONDS,
 } from '../../utils/time';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
@@ -15,6 +18,7 @@ import {
   validateStartTime,
   validateExpiry,
   validatePeriodDuration,
+  validateStartTimeVsExpiry,
 } from '../contextValidation';
 import type {
   Erc20TokenPeriodicContext,
@@ -23,6 +27,9 @@ import type {
   PopulatedErc20TokenPeriodicPermission,
   Erc20TokenPeriodicPermission,
 } from './types';
+
+const ASSET_NAMESPACE = 'erc20';
+const CHAIN_NAMESPACE = 'eip155';
 
 /**
  * Construct an amended Erc20TokenPeriodicPermissionRequest, based on the specified request,
@@ -43,7 +50,28 @@ export async function applyContext({
     permissionDetails,
     tokenMetadata: { decimals },
   } = context;
-  const expiry = convertReadableDateToTimestamp(context.expiry);
+
+  const expiry = convertReadableDateToTimestamp(context.expiry.timestamp);
+
+  let isExpiryRuleFound = false;
+
+  const rules: Erc20TokenPeriodicPermissionRequest['rules'] =
+    originalRequest.rules?.map((rule) => {
+      if (rule.type === 'expiry') {
+        isExpiryRuleFound = true;
+        return {
+          ...rule,
+          data: { ...rule.data, timestamp: expiry },
+        };
+      }
+      return rule;
+    }) ?? [];
+
+  if (!isExpiryRuleFound) {
+    throw new Error(
+      'Expiry rule not found. An expiry is required on all permissions.',
+    );
+  }
 
   const permissionData = {
     periodAmount: bigIntToHex(
@@ -55,14 +83,17 @@ export async function applyContext({
     tokenAddress: originalRequest.permission.data.tokenAddress,
   };
 
+  const { address } = parseCaipAccountId(context.accountAddressCaip10);
+
   return {
     ...originalRequest,
-    expiry,
+    address: address as Hex,
     permission: {
       type: 'erc20-token-periodic',
       data: permissionData,
-      rules: originalRequest.permission.rules ?? {},
+      isAdjustmentAllowed: originalRequest.permission.isAdjustmentAllowed,
     },
+    rules,
   };
 }
 
@@ -79,7 +110,10 @@ export async function populatePermission({
 }): Promise<PopulatedErc20TokenPeriodicPermission> {
   return {
     ...permission,
-    rules: permission.rules ?? {},
+    data: {
+      ...permission.data,
+      startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
+    },
   };
 }
 
@@ -88,39 +122,34 @@ export async function populatePermission({
  * and manage the permission state.
  * @param args - The options object containing the request and required services.
  * @param args.permissionRequest - The ERC20 token periodic permission request to convert.
- * @param args.tokenPricesService - Service for fetching token price information.
- * @param args.accountController - Controller for managing account operations.
  * @param args.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
-  tokenPricesService,
-  accountController,
   tokenMetadataService,
 }: {
   permissionRequest: Erc20TokenPeriodicPermissionRequest;
-  tokenPricesService: TokenPricesService;
-  accountController: AccountController;
   tokenMetadataService: TokenMetadataService;
 }): Promise<Erc20TokenPeriodicContext> {
   const chainId = Number(permissionRequest.chainId);
-  const { tokenAddress } = permissionRequest.permission.data;
-
-  const address = await accountController.getAccountAddress({
-    chainId,
-  });
-
   const {
-    balance: rawBalance,
-    decimals,
-    symbol,
-    iconUrl,
-  } = await tokenMetadataService.getTokenBalanceAndMetadata({
-    chainId,
-    account: address,
-    assetAddress: tokenAddress,
-  });
+    address,
+    permission: { data, isAdjustmentAllowed },
+  } = permissionRequest;
+
+  if (!address) {
+    throw new Error(
+      'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
+    );
+  }
+
+  const { decimals, symbol, iconUrl } =
+    await tokenMetadataService.getTokenBalanceAndMetadata({
+      chainId,
+      account: address,
+      assetAddress: data.tokenAddress,
+    });
 
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
@@ -129,22 +158,28 @@ export async function buildContext({
     ? iconDataResponse.imageDataBase64
     : null;
 
-  const balanceFormatted = await tokenPricesService.getCryptoToFiatConversion(
-    `eip155:${chainId}/erc20:${tokenAddress}`,
-    bigIntToHex(rawBalance),
-    decimals,
+  const expiryRule = permissionRequest.rules?.find(
+    (rule) => rule.type === 'expiry',
   );
 
-  const expiry = convertTimestampToReadableDate(permissionRequest.expiry);
+  if (!expiryRule) {
+    throw new Error(
+      'Expiry rule not found. An expiry is required on all permissions.',
+    );
+  }
+
+  const expiry = {
+    timestamp: expiryRule.data.timestamp.toString(),
+    isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
+  };
 
   const periodAmount = formatUnitsFromHex({
-    value: permissionRequest.permission.data.periodAmount,
+    value: data.periodAmount,
     allowUndefined: false,
     decimals,
   });
 
-  const periodDuration =
-    permissionRequest.permission.data.periodDuration.toString();
+  const periodDuration = data.periodDuration.toString();
 
   // Determine the period type based on the duration
   let periodType: TimePeriod | 'Other';
@@ -158,21 +193,28 @@ export async function buildContext({
     periodType = 'Other';
   }
 
-  const startTime = convertTimestampToReadableDate(
-    permissionRequest.permission.data.startTime,
+  const startTime =
+    data.startTime?.toString() ?? Math.floor(Date.now() / 1000).toString();
+
+  const tokenAddressCaip19 = toCaipAssetType(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    ASSET_NAMESPACE,
+    data.tokenAddress,
   );
 
-  const balance = bigIntToHex(rawBalance);
+  const accountAddressCaip10 = toCaipAccountId(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    address,
+  );
 
   return {
     expiry,
-    justification: permissionRequest.permission.data.justification,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
-    accountDetails: {
-      address,
-      balance,
-      balanceFormattedAsCurrency: balanceFormatted,
-    },
+    justification: data.justification,
+    isAdjustmentAllowed,
+    accountAddressCaip10,
+    tokenAddressCaip19,
     tokenMetadata: {
       symbol,
       decimals,
@@ -231,9 +273,20 @@ export async function deriveMetadata({
   }
 
   // Validate expiry
-  const expiryError = validateExpiry(expiry);
+  const expiryError = validateExpiry(expiry.timestamp);
   if (expiryError) {
     validationErrors.expiryError = expiryError;
+  }
+
+  // Validate start time vs expiry (only if individual validations passed)
+  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+    const startTimeVsExpiryError = validateStartTimeVsExpiry(
+      permissionDetails.startTime,
+      expiry.timestamp,
+    );
+    if (startTimeVsExpiryError) {
+      validationErrors.startTimeError = startTimeVsExpiryError;
+    }
   }
 
   return {

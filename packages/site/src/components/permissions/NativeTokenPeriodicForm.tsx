@@ -14,7 +14,7 @@ export const NativeTokenPeriodicForm = ({
     BigInt(bigIntToHex(parseUnits('1', 18))),
   );
   const [periodDuration, setPeriodDuration] = useState(2592000); // 30 days in seconds
-  const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
+  const [startTime, setStartTime] = useState<number | null>(Math.floor(Date.now() / 1000));
   const [expiry, setExpiry] = useState(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
   );
@@ -45,7 +45,11 @@ export const NativeTokenPeriodicForm = ({
     ({
       target: { value: inputValue },
     }: React.ChangeEvent<HTMLInputElement>) => {
-      setStartTime(Number(inputValue));
+      if (inputValue.trim() === '') {
+        setStartTime(null);
+      } else {
+        setStartTime(Number(inputValue));
+      }
     },
     [],
   );
@@ -123,7 +127,7 @@ export const NativeTokenPeriodicForm = ({
           type="number"
           id="startTime"
           name="startTime"
-          value={startTime}
+          value={startTime ?? ''}
           onChange={handleStartTimeChange}
         />
       </div>

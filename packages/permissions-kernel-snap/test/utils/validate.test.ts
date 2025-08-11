@@ -19,7 +19,6 @@ describe('validate utils', () => {
         parsePermissionRequestParam([
           {
             chainId: '0x1',
-            expiry: 1,
             signer: {
               type: 'account',
               data: {
@@ -47,7 +46,6 @@ describe('validate utils', () => {
       const validResponse = [
         {
           chainId: '0x1',
-          expiry: 1,
           signer: {
             type: 'account',
             data: {
@@ -56,12 +54,13 @@ describe('validate utils', () => {
           },
           permission: {
             type: 'eth_signTransaction',
+            isAdjustmentAllowed: true,
             data: {
               allowed: true,
             },
           },
           context: '0x1234',
-          accountMeta: [
+          dependencyInfo: [
             {
               factory: '0x016562aA41A8697720ce0943F003141f5dEAe006',
               factoryData: '0x',

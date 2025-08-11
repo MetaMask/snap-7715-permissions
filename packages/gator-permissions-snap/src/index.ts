@@ -17,14 +17,11 @@ import type {
   OnUserInputHandler,
 } from '@metamask/snaps-sdk';
 
-import {
-  EoaAccountController,
-  SmartAccountController,
-  type AccountController,
-} from './accountController';
 import { AccountApiClient } from './clients/accountApiClient';
 import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
+import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
+import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
@@ -37,6 +34,7 @@ import {
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { NonceCaveatService } from './services/nonceCaveatService';
 import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
@@ -44,8 +42,6 @@ import { UserEventDispatcher } from './userEventDispatcher';
 
 const isStorePermissionsFeatureEnabled =
   process.env.STORE_PERMISSIONS_ENABLED === 'true';
-
-const useEoaAccountController = process.env.USE_EOA_ACCOUNT === 'true';
 
 const snapEnv = process.env.SNAP_ENV;
 
@@ -82,17 +78,19 @@ const tokenMetadataService = new TokenMetadataService({
   tokenMetadataClient,
 });
 
-const accountController: AccountController = useEoaAccountController
-  ? new EoaAccountController({
-      snapsProvider: snap,
-      ethereumProvider: ethereum,
-      supportedChains,
-    })
-  : new SmartAccountController({
-      snapsProvider: snap,
-      supportedChains,
-      deploymentSalt: '0x',
-    });
+const nonceCaveatClient = new NonceCaveatClient({
+  ethereumProvider: ethereum,
+});
+
+const nonceCaveatService = new NonceCaveatService({
+  nonceCaveatClient,
+});
+
+const accountController = new AccountController({
+  snapsProvider: snap,
+  ethereumProvider: ethereum,
+  supportedChains,
+});
 
 const stateManager = createStateManager(snap);
 
@@ -131,7 +129,6 @@ const profileSyncManager = createProfileSyncManager({
 });
 
 const homepage = new HomePage({
-  accountController,
   snapsProvider: snap,
   profileSyncManager,
 });
@@ -151,6 +148,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
   userEventDispatcher,
+  nonceCaveatService,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({

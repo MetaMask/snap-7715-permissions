@@ -72,21 +72,32 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
 export const startTimeRule: NativeTokenStreamRuleDefinition = {
   name: START_TIME_ELEMENT,
   label: 'Start Time',
-  type: 'text',
+  type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.startTime,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The start time of the stream.',
+    tooltip: 'The start time of the stream(mm/dd/yyyy hh:mm:ss).',
     error: metadata.validationErrors.startTimeError,
-  }),
-  updateContext: (context: NativeTokenStreamContext, value: string) => ({
-    ...context,
-    permissionDetails: {
-      ...context.permissionDetails,
-      startTime: value,
+    dateTimeParameterNames: {
+      timestampName: 'permissionDetails.startTime',
+      dateName: 'startTime.date',
+      timeName: 'startTime.time',
     },
   }),
+  updateContext: (context: NativeTokenStreamContext, value: any) => {
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        startTime: value.timestamp,
+      },
+      startTime: {
+        date: value.date,
+        time: value.time,
+      },
+    };
+  },
 };
 
 export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
@@ -133,17 +144,29 @@ export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
 export const expiryRule: NativeTokenStreamRuleDefinition = {
   name: EXPIRY_ELEMENT,
   label: 'Expiry',
-  type: 'text',
+  type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.expiry,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    value: context.expiry.timestamp,
+    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The expiry date of the permission.',
+    tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',
     error: metadata.validationErrors.expiryError,
+    dateTimeParameterNames: {
+      timestampName: 'expiry.timestamp',
+      dateName: 'expiryDate.date',
+      timeName: 'expiryDate.time',
+    },
   }),
-  updateContext: (context: NativeTokenStreamContext, value: string) => ({
+  updateContext: (context: NativeTokenStreamContext, value: any) => ({
     ...context,
-    expiry: value,
+    expiry: {
+      ...context.expiry,
+      timestamp: value.timestamp,
+    },
+    expiryDate: {
+      date: value.date,
+      time: value.time,
+    },
   }),
 };
 

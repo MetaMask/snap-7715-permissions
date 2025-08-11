@@ -1,35 +1,22 @@
-import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Text,
-  Input,
-  Field,
-  Button,
-  Image,
-} from '@metamask/snaps-sdk/jsx';
+import { Input } from '@metamask/snaps-sdk/jsx';
 
+import type { InputFieldProps } from './Field';
+import { Field } from './Field';
 import { TextField } from './TextField';
-import { TokenIcon } from './TokenIcon';
-import { TooltipIcon } from './TooltipIcon';
-import toggleDisabledImage from '../../../images/toggle_disabled.svg';
-import toggleEnabledImage from '../../../images/toggle_enabled.svg';
 
-export type InputFieldParams = {
-  label: string;
+export type InputFieldParams = Pick<
+  InputFieldProps,
+  | 'label'
+  | 'tooltip'
+  | 'addFieldButtonName'
+  | 'removeFieldButtonName'
+  | 'disabled'
+  | 'iconData'
+  | 'errorMessage'
+> & {
   name: string;
-  addFieldButtonName?: string | undefined;
-  removeFieldButtonName?: string | undefined;
-  tooltip?: string | undefined;
   value: string | undefined;
   type: 'text' | 'number';
-  disabled?: boolean;
-  errorMessage?: string | undefined;
-  iconData?:
-    | {
-        iconDataBase64: string;
-        iconAltText: string;
-      }
-    | undefined;
 };
 
 export const InputField = ({
@@ -44,13 +31,6 @@ export const InputField = ({
   errorMessage,
   iconData,
 }: InputFieldParams) => {
-  const iconElement = iconData ? (
-    <TokenIcon
-      imageDataBase64={iconData.iconDataBase64}
-      altText={iconData.iconAltText}
-    />
-  ) : null;
-
   if (disabled) {
     return (
       <TextField
@@ -62,41 +42,21 @@ export const InputField = ({
     );
   }
 
-  const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
   const isFieldEnabled = value !== null && value !== undefined;
 
-  let toggleFieldButton: SnapElement | null = null;
-
-  const toggleFieldButtonName = isFieldEnabled
-    ? removeFieldButtonName
-    : addFieldButtonName;
-
-  if (toggleFieldButtonName) {
-    toggleFieldButton = (
-      <Button name={toggleFieldButtonName}>
-        <Image
-          src={isFieldEnabled ? toggleEnabledImage : toggleDisabledImage}
-          alt={isFieldEnabled ? `Remove ${label}` : `Add ${label}`}
-        />
-      </Button>
-    );
-  }
-
   return (
-    <Box direction="vertical">
-      <Box direction="horizontal" alignment="space-between">
-        <Box direction="horizontal">
-          <Text>{label}</Text>
-          {tooltipElement}
-        </Box>
-        {toggleFieldButton && <Box>{toggleFieldButton}</Box>}
-      </Box>
-      {isFieldEnabled && (
-        <Field error={errorMessage}>
-          <Box>{iconElement}</Box>
-          <Input name={name} type={type} value={value} />
-        </Field>
-      )}
-    </Box>
+    <Field
+      label={label}
+      tooltip={tooltip}
+      errorMessage={errorMessage}
+      disabled={disabled}
+      addFieldButtonName={addFieldButtonName}
+      removeFieldButtonName={removeFieldButtonName}
+      isFieldEnabled={isFieldEnabled}
+      iconData={iconData}
+      variant="form"
+    >
+      <Input name={name} type={type} value={value} />
+    </Field>
   );
 };

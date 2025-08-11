@@ -1,22 +1,30 @@
 import type {
-  AccountMeta,
+  DependencyInfo,
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import type { Delegation } from '@metamask/delegation-core';
 import {
+  createNonceTerms,
   createTimestampTerms,
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import { bytesToHex, hexToNumber, numberToHex } from '@metamask/utils';
+import {
+  bigIntToHex,
+  bytesToHex,
+  hexToNumber,
+  numberToHex,
+} from '@metamask/utils';
+import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
-import type { AccountController } from '../accountController';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
+  AccountControllerInterface,
   BaseContext,
+  BaseMetadata,
   DeepRequired,
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
@@ -27,24 +35,29 @@ import type {
  * Orchestrates the lifecycle of permission requests, confirmation dialogs, and delegation creation.
  */
 export class PermissionRequestLifecycleOrchestrator {
-  readonly #accountController: AccountController;
+  readonly #accountController: AccountControllerInterface;
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
+  readonly #nonceCaveatService: NonceCaveatService;
+
   constructor({
     accountController,
     confirmationDialogFactory,
     userEventDispatcher,
+    nonceCaveatService,
   }: {
-    accountController: AccountController;
+    accountController: AccountControllerInterface;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
+    nonceCaveatService: NonceCaveatService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#nonceCaveatService = nonceCaveatService;
   }
 
   /**
@@ -57,7 +70,7 @@ export class PermissionRequestLifecycleOrchestrator {
   async orchestrate<
     TRequest extends PermissionRequest,
     TContext extends BaseContext,
-    TMetadata extends object,
+    TMetadata extends BaseMetadata,
     TPermission extends TRequest['permission'],
     TPopulatedPermission extends DeepRequired<TPermission>,
   >(
@@ -71,6 +84,12 @@ export class PermissionRequestLifecycleOrchestrator {
       TPopulatedPermission
     >,
   ): Promise<PermissionRequestResult> {
+    const chainId = hexToNumber(permissionRequest.chainId);
+
+    // only necessary when not pre-installed, to ensure that the account
+    // permissions are requested before the confirmation dialog is shown.
+    await this.#accountController.getAccountAddresses();
+
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);
 
@@ -82,10 +101,8 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    const decision =
+    const decisionPromise =
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
-
-    const chainId = hexToNumber(permissionRequest.chainId);
 
     let context = await lifecycleHandlers.buildContext(
       validatedPermissionRequest,
@@ -102,6 +119,10 @@ export class PermissionRequestLifecycleOrchestrator {
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
+      const hasValidationErrors = Object.values(
+        metadata?.validationErrors ?? {},
+      ).some((message) => typeof message === 'string');
+
       const ui = await lifecycleHandlers.createConfirmationContent({
         context,
         metadata,
@@ -109,7 +130,10 @@ export class PermissionRequestLifecycleOrchestrator {
         chainId,
       });
 
-      await confirmationDialog.updateContent({ ui, isGrantDisabled });
+      await confirmationDialog.updateContent({
+        ui,
+        isGrantDisabled: isGrantDisabled || hasValidationErrors,
+      });
     };
 
     // replace the skeleton content with the actual content rendered with the resolved context
@@ -118,7 +142,8 @@ export class PermissionRequestLifecycleOrchestrator {
       isGrantDisabled: false,
     });
 
-    const isAdjustmentAllowed = permissionRequest.isAdjustmentAllowed ?? true;
+    const isAdjustmentAllowed =
+      permissionRequest.permission.isAdjustmentAllowed ?? true;
 
     if (lifecycleHandlers.onConfirmationCreated) {
       const updateContext = async ({
@@ -144,7 +169,7 @@ export class PermissionRequestLifecycleOrchestrator {
     }
 
     try {
-      const { isConfirmationGranted } = await decision;
+      const { isConfirmationGranted } = await decisionPromise;
 
       if (isConfirmationGranted) {
         // Wait for any pending context updates to complete before granting permission
@@ -236,14 +261,11 @@ export class PermissionRequestLifecycleOrchestrator {
       isAdjustmentAllowed,
     };
 
-    const [address, accountMetadata] = await Promise.all([
-      this.#accountController.getAccountAddress({
-        chainId,
-      }),
-      this.#accountController.getAccountMetadata({
-        chainId,
-      }),
-    ]);
+    const { address } = grantedPermissionRequest;
+    // todo: it would be nice if this was concretely typed
+    if (!address) {
+      throw new Error('Address is undefined');
+    }
 
     const { contracts } = getChainMetadata({ chainId });
     const {
@@ -256,14 +278,37 @@ export class PermissionRequestLifecycleOrchestrator {
       contracts,
     });
 
-    const timestampAfterThreshold = 0;
-    const timestampBeforeThreshold = grantedPermissionRequest.expiry;
+    const expiryRule = resolvedRequest.rules?.find(
+      (rule) => rule.type === 'expiry',
+    );
+
+    if (expiryRule) {
+      const timestampAfterThreshold = 0;
+      const timestampBeforeThreshold = expiryRule.data.timestamp;
+
+      caveats.push({
+        enforcer: TimestampEnforcer,
+        terms: createTimestampTerms({
+          timestampAfterThreshold,
+          timestampBeforeThreshold,
+        }),
+        args: '0x',
+      });
+    } else {
+      throw new Error(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    }
+
+    const nonce = await this.#nonceCaveatService.getNonce({
+      chainId,
+      account: address,
+    });
 
     caveats.push({
-      enforcer: TimestampEnforcer,
-      terms: createTimestampTerms({
-        timestampAfterThreshold,
-        timestampBeforeThreshold,
+      enforcer: contracts.enforcers.NonceEnforcer,
+      terms: createNonceTerms({
+        nonce: bigIntToHex(nonce),
       }),
       args: '0x',
     });
@@ -284,25 +329,19 @@ export class PermissionRequestLifecycleOrchestrator {
       await this.#accountController.signDelegation({
         chainId,
         delegation,
+        address,
       });
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
-    const accountMeta: AccountMeta[] =
-      accountMetadata.factory && accountMetadata.factoryData
-        ? [
-            {
-              factory: accountMetadata.factory,
-              factoryData: accountMetadata.factoryData,
-            },
-          ]
-        : [];
+    // dependencyInfo is always empty for EIP-7702 accounts
+    const dependencyInfo: DependencyInfo[] = [];
 
     const response: PermissionResponse = {
       ...grantedPermissionRequest,
       chainId: numberToHex(chainId),
       address,
-      accountMeta,
+      dependencyInfo,
       context,
       signerMeta: {
         delegationManager,

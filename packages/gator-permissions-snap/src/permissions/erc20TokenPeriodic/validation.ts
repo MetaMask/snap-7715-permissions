@@ -11,14 +11,15 @@ import { zErc20TokenPeriodicPermission } from './types';
 /**
  * Validates a permission object data specific to the permission type.
  * @param permission - The ERC20 token periodic permission object to validate.
+ * @param rules - The rules of the permission request.
  * @returns True if the permission data is valid, throws an error otherwise.
  * @throws {Error} If any validation check fails.
  */
 function validatePermissionData(
   permission: Erc20TokenPeriodicPermission,
+  rules: Erc20TokenPeriodicPermissionRequest['rules'],
 ): true {
-  const { periodAmount, periodDuration, startTime, tokenAddress } =
-    permission.data;
+  const { periodAmount, startTime } = permission.data;
 
   validateHexInteger({
     name: 'periodAmount',
@@ -27,26 +28,17 @@ function validatePermissionData(
     allowZero: false,
   });
 
-  if (periodDuration <= 0) {
-    throw new Error('Invalid periodDuration: must be a positive number');
+  const expiryRule = rules?.find((rule) => rule.type === 'expiry');
+
+  if (!expiryRule) {
+    throw new Error('Expiry rule is required');
   }
 
-  if (periodDuration !== Math.floor(periodDuration)) {
-    throw new Error('Invalid periodDuration: must be an integer');
-  }
+  const expiry = Number(expiryRule.data.timestamp);
 
-  if (startTime <= 0) {
-    throw new Error('Invalid startTime: must be a positive number');
-  }
-
-  if (startTime !== Math.floor(startTime)) {
-    throw new Error('Invalid startTime: must be an integer');
-  }
-
-  if (!tokenAddress || tokenAddress === '0x') {
-    throw new Error(
-      'Invalid tokenAddress: must be a valid ERC20 token address',
-    );
+  // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
+  if (startTime && startTime >= expiry) {
+    throw new Error('Invalid startTime: must be before expiry');
   }
 
   return true;
@@ -71,11 +63,10 @@ export function parseAndValidatePermission(
     throw new Error(extractZodError(validationError.errors));
   }
 
-  validatePermissionData(validationResult);
+  validatePermissionData(validationResult, permissionRequest.rules);
 
   return {
     ...permissionRequest,
-    isAdjustmentAllowed: permissionRequest.isAdjustmentAllowed ?? true,
     permission: validationResult,
   };
 }

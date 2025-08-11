@@ -4,18 +4,22 @@ import { bigIntToHex } from '@metamask/utils';
 import { TimePeriod } from '../../../src/core/types';
 import type { Erc20TokenPeriodicPermissionRequest } from '../../../src/permissions/erc20TokenPeriodic/types';
 import { parseAndValidatePermission } from '../../../src/permissions/erc20TokenPeriodic/validation';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../../src/utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 6;
 
 const validPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
   chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
-  isAdjustmentAllowed: true,
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: {
@@ -29,11 +33,11 @@ const validPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
         parseUnits({ formatted: '100', decimals: tokenDecimals }),
       ), // 100 USDC per period
       periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
-      tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
+      startTime: Math.floor(Date.now() / 1000) + 86400, // Tomorrow
+      tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
       justification: 'test',
     },
-    rules: {},
+    isAdjustmentAllowed: true,
   },
 };
 
@@ -117,7 +121,9 @@ describe('erc20TokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(zeroPeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.periodDuration: Number must be greater than 0',
+        );
       });
 
       it('should throw for negative periodDuration', () => {
@@ -134,7 +140,9 @@ describe('erc20TokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(negativePeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.periodDuration: Number must be greater than 0',
+        );
       });
 
       it('should throw for non-integer periodDuration', () => {
@@ -151,7 +159,9 @@ describe('erc20TokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(floatPeriodDurationRequest),
-        ).toThrow('Invalid periodDuration: must be an integer');
+        ).toThrow(
+          'Failed type validation: data.periodDuration: Expected integer, received float',
+        );
       });
 
       it('should validate periodDuration for daily period', () => {
@@ -204,7 +214,9 @@ describe('erc20TokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(negativeStartTimeRequest),
-        ).toThrow('Invalid startTime: must be a positive number');
+        ).toThrow(
+          'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
+        );
       });
 
       it('should throw for zero startTime', () => {
@@ -220,7 +232,7 @@ describe('erc20TokenPeriodic:validation', () => {
         };
 
         expect(() => parseAndValidatePermission(zeroStartTimeRequest)).toThrow(
-          'Invalid startTime: must be a positive number',
+          'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
         );
       });
 
@@ -231,13 +243,13 @@ describe('erc20TokenPeriodic:validation', () => {
             ...validPermissionRequest.permission,
             data: {
               ...validPermissionRequest.permission.data,
-              startTime: 1.5,
+              startTime: Math.floor(Date.now() / 1000) + 86400 + 0.5, // Tomorrow + 0.5 seconds
             },
           },
         };
 
         expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
-          'Invalid startTime: must be an integer',
+          'Failed type validation: data.startTime: Expected integer, received float',
         );
       });
     });
@@ -258,7 +270,7 @@ describe('erc20TokenPeriodic:validation', () => {
         expect(() =>
           parseAndValidatePermission(emptyTokenAddressRequest),
         ).toThrow(
-          'Failed type validation: data.tokenAddress: Invalid hex value',
+          'Failed type validation: data.tokenAddress: Invalid Ethereum address',
         );
       });
 
@@ -276,7 +288,9 @@ describe('erc20TokenPeriodic:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(invalidTokenAddressRequest),
-        ).toThrow('Invalid tokenAddress: must be a valid ERC20 token address');
+        ).toThrow(
+          'Failed type validation: data.tokenAddress: Invalid Ethereum address',
+        );
       });
 
       it('should validate a valid tokenAddress', () => {
@@ -297,14 +311,101 @@ describe('erc20TokenPeriodic:validation', () => {
       });
     });
 
-    it('should set isAdjustmentAllowed to true by default', () => {
+    describe('startTime vs expiry validation', () => {
+      it('should throw when startTime is equal to expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const startTimeVsExpiryRequest = {
+          ...validPermissionRequest,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400, // 1 day from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400, // Same as expiry
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(startTimeVsExpiryRequest),
+        ).toThrow('Invalid startTime: must be before expiry');
+      });
+
+      it('should throw when startTime is after expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const startTimeAfterExpiryRequest = {
+          ...validPermissionRequest,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400, // 1 day from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400 * 2, // 2 days from now (after expiry)
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(startTimeAfterExpiryRequest),
+        ).toThrow('Invalid startTime: must be before expiry');
+      });
+
+      it('should validate when startTime is before expiry', () => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const validStartTimeVsExpiryRequest = {
+          ...validPermissionRequest,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: currentTime + 86400 * 2, // 2 days from now
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: currentTime + 86400, // 1 day from now (before expiry)
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(validStartTimeVsExpiryRequest),
+        ).not.toThrow();
+      });
+    });
+
+    it('should require isAdjustmentAllowed to be a boolean', () => {
       const requestWithoutAdjustmentFlag = {
         ...validPermissionRequest,
-        isAdjustmentAllowed: undefined,
-      };
+        permission: {
+          ...validPermissionRequest.permission,
+          isAdjustmentAllowed: undefined,
+        },
+      } as any;
 
-      const result = parseAndValidatePermission(requestWithoutAdjustmentFlag);
-      expect(result.isAdjustmentAllowed).toBe(true);
+      expect(() =>
+        parseAndValidatePermission(requestWithoutAdjustmentFlag),
+      ).toThrow('Failed type validation: isAdjustmentAllowed: Required');
     });
   });
 });

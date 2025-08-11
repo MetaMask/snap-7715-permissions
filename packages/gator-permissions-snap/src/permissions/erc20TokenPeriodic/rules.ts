@@ -99,21 +99,32 @@ export const startTimeRule: RuleDefinition<
 > = {
   name: START_TIME_ELEMENT,
   label: 'Start Time',
-  type: 'text',
+  type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.startTime,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The time at which the first period begins',
+    tooltip: 'The time at which the first period begins(mm/dd/yyyy hh:mm:ss).',
     error: metadata.validationErrors.startTimeError,
-  }),
-  updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({
-    ...context,
-    permissionDetails: {
-      ...context.permissionDetails,
-      startTime: value,
+    dateTimeParameterNames: {
+      timestampName: 'permissionDetails.startTime',
+      dateName: 'startTime.date',
+      timeName: 'startTime.time',
     },
   }),
+  updateContext: (context: Erc20TokenPeriodicContext, value: any) => {
+    return {
+      ...context,
+      permissionDetails: {
+        ...context.permissionDetails,
+        startTime: value.timestamp,
+      },
+      startTime: {
+        date: value.date,
+        time: value.time,
+      },
+    };
+  },
 };
 
 export const expiryRule: RuleDefinition<
@@ -122,16 +133,29 @@ export const expiryRule: RuleDefinition<
 > = {
   name: EXPIRY_ELEMENT,
   label: 'Expiry',
-  type: 'text',
+  type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.expiry,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    value: context.expiry.timestamp,
+    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
+    tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',
     error: metadata.validationErrors.expiryError,
+    dateTimeParameterNames: {
+      timestampName: 'expiry.timestamp',
+      dateName: 'expiryDate.date',
+      timeName: 'expiryDate.time',
+    },
   }),
-  updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({
+  updateContext: (context: Erc20TokenPeriodicContext, value: any) => ({
     ...context,
-    expiry: value,
+    expiry: {
+      ...context.expiry,
+      timestamp: value.timestamp,
+    },
+    expiryDate: {
+      date: value.date,
+      time: value.time,
+    },
   }),
 };
 

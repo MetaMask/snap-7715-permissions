@@ -1,54 +1,174 @@
 import { TimePeriod } from '../core/types';
 
 /**
- * Converts a unix timestamp(in seconds) to a human-readable date format (MM/DD/YYYY).
+ * Converts a unix timestamp(in seconds) to a human-readable date format.
+ *
  * @param timestamp - The unix timestamp in seconds.
- * @returns The formatted date string.
+ * @returns The formatted date string in mm/dd/yyyy format.
  */
 export const convertTimestampToReadableDate = (timestamp: number) => {
   const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
 
   if (isNaN(date.getTime())) {
-    throw new Error('Invalid date format');
+    throw new Error('convertTimestampToReadableDate: Invalid date format');
   }
 
-  // Get UTC components
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-  const day = String(date.getUTCDate()).padStart(2, '0');
+  // Always format as mm/dd/yyyy using local time
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // JavaScript months are 0-indexed
+  const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
 
-  // Format the date as MM/DD/YYYY in UTC
   return `${month}/${day}/${year}`;
 };
 
 /**
- * Converts a human-readable date (MM/DD/YYYY) to a Unix timestamp at 12:00:00 AM UTC.
- * @param date - The human-readable date string.
- * @returns The unix timestamp in seconds.
+ * Converts a unix timestamp(in seconds) to a human-readable time format (HH:MM:SS).
+ *
+ * @param timestamp - The unix timestamp in seconds.
+ * @returns The formatted time string.
  */
-export const convertReadableDateToTimestamp = (date: string) => {
-  const [month, day, year] = date.split('/');
-  if (!month || !day || !year) {
-    throw new Error('Invalid date format');
+export const convertTimestampToReadableTime = (timestamp: number) => {
+  const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
+
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid time format');
   }
 
-  const utcDate = new Date(
-    Date.UTC(Number(year), Number(month) - 1, Number(day), 0, 0, 0),
-  );
-  return Math.floor(utcDate.getTime() / 1000);
+  // Get local components instead of UTC
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  // Format the time as HH:MM:SS in local time
+  return `${hours}:${minutes}:${seconds}`;
 };
 
 /**
- * Checks if a human-readable date format (MM/DD/YYYY) is in the correct format.
- * @param date - The human-readable date string.
- * @returns True if the date is in the correct format, otherwise false.
+ * Converts a human-readable date string to a Unix timestamp.
+ * This function expects dates in mm/dd/yyyy format.
+ *
+ * @param date - The human-readable date string in mm/dd/yyyy format.
+ * @returns The unix timestamp in seconds.
  */
-export const isHumanReadableInCorrectFormat = (date: string) => {
-  const [month, day, year] = date.split('/');
-  if (!month || !day || !year) {
-    return false;
+export const convertReadableDateToTimestamp = (date: string) => {
+  // Check if the input is already a timestamp (numeric string)
+  const numericValue = Number(date);
+  if (
+    !isNaN(numericValue) &&
+    numericValue > 0 &&
+    Number.isInteger(numericValue)
+  ) {
+    // Validate that the timestamp represents a reasonable date (1/1/2000)
+    if (numericValue < 1262304000) {
+      throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+    }
+
+    // Validate that the timestamp represents a reasonable date
+    const timestampDate = new Date(numericValue * 1000);
+    if (isNaN(timestampDate.getTime())) {
+      throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+    }
+
+    // If it's a valid positive integer representing a reasonable date, assume it's already a timestamp
+    return numericValue;
   }
-  return true;
+
+  // Parse mm/dd/yyyy format
+  const parts = date.split('/');
+  if (parts.length !== 3) {
+    throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+  }
+
+  const [monthStr, dayStr, yearStr] = parts;
+
+  if (!monthStr || !dayStr || !yearStr) {
+    throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+  }
+
+  const month = parseInt(monthStr, 10);
+  const day = parseInt(dayStr, 10);
+  const year = parseInt(yearStr, 10);
+
+  // Validate that all parts are valid numbers
+  if (isNaN(month) || isNaN(day) || isNaN(year)) {
+    throw new Error('Invalid date format. Expected format: mm/dd/yyyy');
+  }
+
+  // Validate ranges
+  if (month < 1 || month > 12) {
+    throw new Error('Invalid month. Month must be between 1 and 12.');
+  }
+
+  if (day < 1 || day > 31) {
+    throw new Error('Invalid day. Day must be between 1 and 31.');
+  }
+
+  if (year < 1900) {
+    throw new Error('Invalid year.');
+  }
+
+  // Create the date using local time (JavaScript months are 0-indexed)
+  const parsedDate = new Date(year, month - 1, day);
+
+  // Validate the date (handles edge cases like February 30th)
+  if (
+    parsedDate.getFullYear() !== year ||
+    parsedDate.getMonth() !== month - 1 ||
+    parsedDate.getDate() !== day
+  ) {
+    throw new Error('Invalid date. The specified date does not exist.');
+  }
+
+  // Return the local timestamp (at 00:00:00 local time)
+  return Math.floor(parsedDate.getTime() / 1000);
+};
+
+/**
+ * Converts a human-readable time (HH:MM:SS) to seconds since midnight UTC.
+ *
+ * @param time - The human-readable time string.
+ * @returns The seconds since midnight UTC.
+ */
+export const convertReadableTimeToSeconds = (time: string) => {
+  const [hours, minutes, seconds] = time.split(':');
+  if (!hours || !minutes || !seconds) {
+    throw new Error('Invalid time format');
+  }
+
+  const hoursNum = Number(hours);
+  const minutesNum = Number(minutes);
+  const secondsNum = Number(seconds);
+
+  // Validate that all parts are valid numbers
+  if (isNaN(hoursNum) || isNaN(minutesNum) || isNaN(secondsNum)) {
+    throw new Error('Invalid time format: all parts must be numbers');
+  }
+
+  // Validate ranges
+  if (hoursNum < 0 || hoursNum > 23) {
+    throw new Error('Invalid time format: hours must be between 0 and 23');
+  }
+  if (minutesNum < 0 || minutesNum > 59) {
+    throw new Error('Invalid time format: minutes must be between 0 and 59');
+  }
+  if (secondsNum < 0 || secondsNum > 59) {
+    throw new Error('Invalid time format: seconds must be between 0 and 59');
+  }
+
+  return hoursNum * 3600 + minutesNum * 60 + secondsNum;
+};
+
+/**
+ * Combines a date string (mm/dd/yyyy) and time string (HH:MM:SS) into a Unix timestamp.
+ *
+ * @param date - The human-readable date string in mm/dd/yyyy format.
+ * @param time - The human-readable time string.
+ * @returns The unix timestamp in seconds.
+ */
+export const combineDateAndTimeToTimestamp = (date: string, time: string) => {
+  const dateTimestamp = convertReadableDateToTimestamp(date);
+  const timeSeconds = convertReadableTimeToSeconds(time);
+  return dateTimestamp + timeSeconds;
 };
 
 /**
@@ -66,6 +186,24 @@ export const getStartOfTodayUTC = (): number => {
     0,
   );
   return Math.floor(startOfTodayUTC / 1000);
+};
+
+/**
+ * Returns the Unix timestamp (in seconds) for the start of today (12:00 AM local time).
+ *
+ * @returns Unix timestamp at 12:00:00 AM local time of today.
+ */
+export const getStartOfTodayLocal = (): number => {
+  const now = new Date();
+  const startOfTodayLocal = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0,
+    0,
+    0,
+  );
+  return Math.floor(startOfTodayLocal.getTime() / 1000);
 };
 
 /**

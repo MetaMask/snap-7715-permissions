@@ -1,7 +1,6 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
 import {
   populatePermission,
@@ -15,7 +14,6 @@ import type {
   NativeTokenStreamPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
@@ -26,9 +24,10 @@ const permissionWithoutOptionals: NativeTokenStreamPermission = {
   type: 'native-token-stream',
   data: {
     amountPerSecond: bigIntToHex(parseUnits({ formatted: '.5', decimals: 18 })), // 0.5 eth per second
-    startTime: convertReadableDateToTimestamp('10/26/1985'),
+    startTime: convertReadableDateToTimestamp('10/26/2024'),
     justification: 'Permission to do something important',
   },
+  isAdjustmentAllowed: true,
 };
 
 const alreadyPopulatedPermission: NativeTokenStreamPermission = {
@@ -40,30 +39,47 @@ const alreadyPopulatedPermission: NativeTokenStreamPermission = {
     // 10 Eth
     maxAmount: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
   },
-  rules: {},
+  isAdjustmentAllowed: true,
 };
 
+const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+
 const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
+  address: ACCOUNT_ADDRESS,
   chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: {
       address: '0x1',
     },
   },
-  permission: alreadyPopulatedPermission,
+  permission: {
+    ...alreadyPopulatedPermission,
+    data: {
+      ...alreadyPopulatedPermission.data,
+      startTime: convertReadableDateToTimestamp('10/26/2024'),
+    },
+  },
 };
 
 const alreadyPopulatedContext: NativeTokenStreamContext = {
-  expiry: '05/01/2024',
+  expiry: {
+    timestamp: '1714521600',
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
-  accountDetails: {
-    address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: bigIntToHex(parseUnits({ formatted: '10', decimals: 18 })),
-    balanceFormattedAsCurrency: '$🐊10.00',
-  },
+  accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
+  tokenAddressCaip19: 'eip155:1/slip44:60',
   tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,
@@ -73,7 +89,7 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
     initialAmount: '1',
     maxAmount: '10',
     timePeriod: TimePeriod.WEEKLY,
-    startTime: '10/26/1985',
+    startTime: '1729900800',
     amountPerPeriod: '302400',
   },
 } as const;
@@ -101,52 +117,44 @@ describe('nativeTokenStream:context', () => {
           maxAmount:
             '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       });
     });
 
-    it('should not override existing rules', async () => {
+    it('should set startTime to current timestamp when it is null', async () => {
+      const beforeTime = Math.floor(Date.now() / 1000);
+
       const permission: NativeTokenStreamPermission = {
         type: 'native-token-stream',
         data: {
           initialAmount: '0x1000000000000000000000000000000000000000',
           maxAmount: '0x1000000000000000000000000000000000000000',
           amountPerSecond: '0x1000000000000000000000000000000000000000',
-          startTime: 1714531200,
+          startTime: null,
           justification: 'Permission to do something important',
         },
-        rules: {
-          some: 'rule',
-        },
+        isAdjustmentAllowed: true,
       };
 
       const populatedPermission = await populatePermission({ permission });
 
-      expect(populatedPermission).toStrictEqual(permission);
+      const afterTime = Math.floor(Date.now() / 1000);
+
+      expect(populatedPermission.data.startTime).toBeGreaterThanOrEqual(
+        beforeTime,
+      );
+      expect(populatedPermission.data.startTime).toBeLessThanOrEqual(afterTime);
     });
   });
 
-  describe('permissionRequestToContext()', () => {
-    let mockTokenPricesService: jest.Mocked<TokenPricesService>;
-    let mockAccountController: jest.Mocked<AccountController>;
+  describe('buildContext()', () => {
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
     beforeEach(() => {
-      mockTokenPricesService = {
-        getCryptoToFiatConversion: jest.fn(
-          () =>
-            alreadyPopulatedContext.accountDetails.balanceFormattedAsCurrency,
-        ),
-      } as unknown as jest.Mocked<TokenPricesService>;
-
-      mockAccountController = {
-        getAccountAddress: jest.fn(
-          () => alreadyPopulatedContext.accountDetails.address,
-        ),
-      } as unknown as jest.Mocked<AccountController>;
-
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(() => ({
-          balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
+          balance: BigInt(
+            alreadyPopulatedContext.permissionDetails.initialAmount ?? 0,
+          ),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: 18,
           iconUrl: 'https://example.com/icon.png',
@@ -169,8 +177,6 @@ describe('nativeTokenStream:context', () => {
 
       const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
-        tokenPricesService: mockTokenPricesService,
-        accountController: mockAccountController,
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -182,31 +188,56 @@ describe('nativeTokenStream:context', () => {
         },
       });
 
-      expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
-        chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-      });
-
       expect(
         mockTokenMetadataService.getTokenBalanceAndMetadata,
       ).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-        account: alreadyPopulatedContext.accountDetails.address,
+        account: ACCOUNT_ADDRESS,
       });
+    });
 
-      expect(
-        mockTokenPricesService.getCryptoToFiatConversion,
-      ).toHaveBeenCalledWith(
-        `eip155:1/slip44:60`,
-        alreadyPopulatedContext.accountDetails.balance,
-        18,
+    it('throws an error if the expiry rule is not found', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: [],
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    });
+
+    it('throws an error if the permission request has no rules', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: undefined,
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
       );
     });
   });
 
-  describe('createContextMetadata()', () => {
+  describe('deriveMetadata()', () => {
     const context = {
       ...alreadyPopulatedContext,
-      expiry: convertTimestampToReadableDate(Date.now() / 1000 + 24 * 60 * 60), // 24 hours from now
+      expiry: {
+        timestamp: convertTimestampToReadableDate(
+          Date.now() / 1000 + 24 * 60 * 60,
+        ), // 24 hours from now
+        isAdjustmentAllowed: true,
+      },
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
         startTime: convertTimestampToReadableDate(Date.now() / 1000),
@@ -365,54 +396,57 @@ describe('nativeTokenStream:context', () => {
           amountPerPeriodError: 'Amount per period must be greater than 0',
         });
       });
+    });
 
-      describe('startTime validation', () => {
-        it('should return a validation error for startTime in the past', async () => {
-          const contextWithStartTimeInThePast = {
+    describe('startTime validation', () => {
+      it('should return a validation error for startTime in the past', async () => {
+        const contextWithStartTimeInThePast = {
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            startTime: '10/26/1985',
+          },
+        };
+
+        const metadata = await deriveMetadata({
+          context: contextWithStartTimeInThePast,
+        });
+
+        expect(metadata.validationErrors).toStrictEqual({
+          startTimeError: 'Start time must be today or later',
+        });
+      });
+
+      it.each([['12345678'], ['0x1234'], ['Steve']])(
+        'should return a validation error for invalid startTime %s',
+        async (startTime) => {
+          const contextWithInvalidStartTime = {
             ...context,
             permissionDetails: {
               ...context.permissionDetails,
-              startTime: '10/26/1985',
+              startTime,
             },
           };
 
           const metadata = await deriveMetadata({
-            context: contextWithStartTimeInThePast,
+            context: contextWithInvalidStartTime,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
-            startTimeError: 'Start time must be today or later',
+            startTimeError: 'Invalid start time',
           });
-        });
-
-        it.each([['12345678'], ['0x1234'], ['Steve']])(
-          'should return a validation error for invalid startTime %s',
-          async (startTime) => {
-            const contextWithInvalidStartTime = {
-              ...context,
-              permissionDetails: {
-                ...context.permissionDetails,
-                startTime,
-              },
-            };
-
-            const metadata = await deriveMetadata({
-              context: contextWithInvalidStartTime,
-            });
-
-            expect(metadata.validationErrors).toStrictEqual({
-              startTimeError: 'Invalid start time',
-            });
-          },
-        );
-      });
+        },
+      );
     });
 
     describe('expiry validation', () => {
       it('should return a validation error for expiry in the past', async () => {
         const contextWithExpiryInThePast = {
           ...context,
-          expiry: '10/26/1985',
+          expiry: {
+            timestamp: '10/26/1985',
+            isAdjustmentAllowed: true,
+          },
           permissionDetails: {
             ...context.permissionDetails,
           },
@@ -432,7 +466,10 @@ describe('nativeTokenStream:context', () => {
         async (expiry) => {
           const contextWithInvalidExpiry = {
             ...context,
-            expiry,
+            expiry: {
+              timestamp: expiry,
+              isAdjustmentAllowed: true,
+            },
             permissionDetails: {
               ...context.permissionDetails,
             },
@@ -448,18 +485,32 @@ describe('nativeTokenStream:context', () => {
         },
       );
     });
+  });
 
-    describe('contextToPermissionRequest()', () => {
-      it('should convert a context to a permission request', async () => {
-        const permissionRequest = await applyContext({
-          context: alreadyPopulatedContext,
-          originalRequest: alreadyPopulatedPermissionRequest,
-        });
-
-        expect(permissionRequest).toStrictEqual(
-          alreadyPopulatedPermissionRequest,
-        );
+  describe('applyContext()', () => {
+    it('converts a context to a permission request', async () => {
+      const permissionRequest = await applyContext({
+        context: alreadyPopulatedContext,
+        originalRequest: alreadyPopulatedPermissionRequest,
       });
+
+      expect(permissionRequest).toStrictEqual(
+        alreadyPopulatedPermissionRequest,
+      );
+    });
+
+    it('throws an error if the expiry rule is not found in the original request', async () => {
+      const applyingContext = applyContext({
+        context: alreadyPopulatedContext,
+        originalRequest: {
+          ...alreadyPopulatedPermissionRequest,
+          rules: [],
+        },
+      });
+
+      await expect(applyingContext).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
     });
   });
 });

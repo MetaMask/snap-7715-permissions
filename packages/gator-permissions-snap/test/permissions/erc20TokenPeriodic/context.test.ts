@@ -1,7 +1,6 @@
 import { describe, expect, beforeEach, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
-import type { AccountController } from '../../../src/accountController';
 import { TimePeriod } from '../../../src/core/types';
 import {
   populatePermission,
@@ -15,7 +14,6 @@ import type {
   Erc20TokenPeriodicPermissionRequest,
 } from '../../../src/permissions/erc20TokenPeriodic/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import {
   convertTimestampToReadableDate,
   convertReadableDateToTimestamp,
@@ -23,6 +21,7 @@ import {
 } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
+const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 const tokenDecimals = 6;
 const tokenAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'; // USDC
 
@@ -33,10 +32,11 @@ const permissionWithoutOptionals: Erc20TokenPeriodicPermission = {
       parseUnits({ formatted: '100', decimals: tokenDecimals }),
     ), // 100 USDC per period
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-    startTime: convertReadableDateToTimestamp('10/26/1985'),
+    startTime: convertReadableDateToTimestamp('10/26/2024'),
     tokenAddress,
     justification: 'Permission to do something important',
   },
+  isAdjustmentAllowed: true,
 };
 
 const alreadyPopulatedPermission: Erc20TokenPeriodicPermission = {
@@ -44,32 +44,45 @@ const alreadyPopulatedPermission: Erc20TokenPeriodicPermission = {
   data: {
     ...permissionWithoutOptionals.data,
   },
-  rules: {},
 };
 
 const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
+  address: ACCOUNT_ADDRESS,
   chainId: '0x1',
-  expiry: convertReadableDateToTimestamp('05/01/2024'),
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: {
       address: '0x1',
     },
   },
-  permission: alreadyPopulatedPermission,
+  permission: {
+    ...alreadyPopulatedPermission,
+    data: {
+      ...alreadyPopulatedPermission.data,
+      startTime: convertReadableDateToTimestamp('10/26/2024'),
+    },
+    isAdjustmentAllowed: true,
+  },
 };
 
 const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
-  expiry: '05/01/2024',
+  expiry: {
+    timestamp: '1714521600',
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
-  accountDetails: {
-    address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    balance: bigIntToHex(
-      parseUnits({ formatted: '1000', decimals: tokenDecimals }),
-    ),
-    balanceFormattedAsCurrency: '$🐊1,000.00',
-  },
+  accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
+  tokenAddressCaip19: `eip155:1/erc20:${tokenAddress}`,
   tokenMetadata: {
     symbol: 'USDC',
     decimals: tokenDecimals,
@@ -79,7 +92,7 @@ const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
     periodAmount: '100',
     periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
-    startTime: '10/26/1985',
+    startTime: '1729900800',
   },
 } as const;
 
@@ -105,38 +118,48 @@ describe('erc20TokenPeriodic:context', () => {
           tokenAddress,
           justification: 'Permission to do something important',
         },
-        rules: {
-          some: 'rule',
-        },
+        isAdjustmentAllowed: true,
       };
 
       const populatedPermission = await populatePermission({ permission });
 
       expect(populatedPermission).toStrictEqual(permission);
     });
+
+    it('should set startTime to current timestamp when it is null', async () => {
+      const beforeTime = Math.floor(Date.now() / 1000);
+
+      const permission: Erc20TokenPeriodicPermission = {
+        type: 'erc20-token-periodic',
+        data: {
+          tokenAddress,
+          periodAmount: '0x1000000000000000000000000000000000000000',
+          periodDuration: 86400,
+          startTime: null,
+          justification: 'Permission to do something important',
+        },
+        isAdjustmentAllowed: true,
+      };
+
+      const populatedPermission = await populatePermission({ permission });
+
+      const afterTime = Math.floor(Date.now() / 1000);
+
+      expect(populatedPermission.data.startTime).toBeGreaterThanOrEqual(
+        beforeTime,
+      );
+      expect(populatedPermission.data.startTime).toBeLessThanOrEqual(afterTime);
+    });
   });
 
-  describe('permissionRequestToContext()', () => {
-    let mockTokenPricesService: jest.Mocked<TokenPricesService>;
-    let mockAccountController: jest.Mocked<AccountController>;
+  describe('buildContext()', () => {
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
     beforeEach(() => {
-      mockTokenPricesService = {
-        getCryptoToFiatConversion: jest.fn(
-          () =>
-            alreadyPopulatedContext.accountDetails.balanceFormattedAsCurrency,
-        ),
-      } as unknown as jest.Mocked<TokenPricesService>;
-
-      mockAccountController = {
-        getAccountAddress: jest
-          .fn()
-          .mockResolvedValue(alreadyPopulatedContext.accountDetails.address),
-      } as unknown as jest.Mocked<AccountController>;
-
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(() => ({
-          balance: BigInt(alreadyPopulatedContext.accountDetails.balance),
+          balance: BigInt(
+            alreadyPopulatedContext.permissionDetails.periodAmount,
+          ),
           symbol: alreadyPopulatedContext.tokenMetadata.symbol,
           decimals: tokenDecimals,
           iconUrl: 'https://example.com/icon.png',
@@ -159,8 +182,6 @@ describe('erc20TokenPeriodic:context', () => {
 
       const context = await buildContext({
         permissionRequest: alreadyPopulatedPermissionRequest,
-        tokenPricesService: mockTokenPricesService,
-        accountController: mockAccountController,
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -172,35 +193,64 @@ describe('erc20TokenPeriodic:context', () => {
         },
       });
 
-      expect(mockAccountController.getAccountAddress).toHaveBeenCalledWith({
-        chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-      });
-
       expect(
         mockTokenMetadataService.getTokenBalanceAndMetadata,
       ).toHaveBeenCalledWith({
         chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-        account: alreadyPopulatedContext.accountDetails.address,
+        account: ACCOUNT_ADDRESS,
         assetAddress: tokenAddress,
       });
+    });
 
-      expect(
-        mockTokenPricesService.getCryptoToFiatConversion,
-      ).toHaveBeenCalledWith(
-        `eip155:1/erc20:${tokenAddress}`,
-        alreadyPopulatedContext.accountDetails.balance,
-        tokenDecimals,
+    it('throws an error if the expiry rule is not found', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: [],
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
+    });
+
+    it('throws an error if the permission request has no rules', async () => {
+      const permissionRequest = {
+        ...alreadyPopulatedPermissionRequest,
+        rules: undefined,
+      };
+
+      await expect(
+        buildContext({
+          permissionRequest,
+          tokenMetadataService: mockTokenMetadataService,
+        }),
+      ).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
       );
     });
   });
 
-  describe('createContextMetadata()', () => {
+  describe('deriveMetadata()', () => {
+    const dateInTheFuture = (
+      Math.floor(Date.now() / 1000) +
+      24 * 60 * 60
+    ).toString(); // 24 hours from now
+    const startTime = (Math.floor(Date.now() / 1000) + 12 * 60 * 60).toString(); // 12 hours from now
+
     const context = {
       ...alreadyPopulatedContext,
-      expiry: convertTimestampToReadableDate(Date.now() / 1000 + 24 * 60 * 60), // 24 hours from now
+      expiry: {
+        timestamp: dateInTheFuture,
+        isAdjustmentAllowed: true,
+      },
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: convertTimestampToReadableDate(Date.now() / 1000),
+        startTime, // 12 hours from now (before expiry)
       },
     };
 
@@ -335,7 +385,10 @@ describe('erc20TokenPeriodic:context', () => {
       it('should return a validation error for expiry in the past', async () => {
         const contextWithExpiryInThePast = {
           ...context,
-          expiry: '10/26/1985',
+          expiry: {
+            timestamp: '10/26/1985',
+            isAdjustmentAllowed: true,
+          },
           permissionDetails: {
             ...context.permissionDetails,
           },
@@ -355,7 +408,10 @@ describe('erc20TokenPeriodic:context', () => {
         async (expiry) => {
           const contextWithInvalidExpiry = {
             ...context,
-            expiry,
+            expiry: {
+              timestamp: expiry,
+              isAdjustmentAllowed: true,
+            },
             permissionDetails: {
               ...context.permissionDetails,
             },
@@ -383,9 +439,12 @@ describe('erc20TokenPeriodic:context', () => {
           periodDuration: '604800', // 1 week
           startTime: convertTimestampToReadableDate(Date.now() / 1000),
         },
-        expiry: convertTimestampToReadableDate(
-          Date.now() / 1000 + 30 * 24 * 60 * 60,
-        ), // 30 days from now
+        expiry: {
+          timestamp: convertTimestampToReadableDate(
+            Date.now() / 1000 + 30 * 24 * 60 * 60,
+          ), // 30 days from now
+          isAdjustmentAllowed: true,
+        },
       };
 
       const result = await applyContext({

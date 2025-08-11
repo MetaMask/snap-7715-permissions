@@ -9,6 +9,7 @@ export enum Enforcers {
   ValueLteEnforcer = 'ValueLteEnforcer',
   TimestampEnforcer = 'TimestampEnforcer',
   ExactCalldataEnforcer = 'ExactCalldataEnforcer',
+  NonceEnforcer = 'NonceEnforcer',
 }
 
 export type DelegationContracts = {
@@ -38,6 +39,7 @@ const CONTRACTS_1_3_0: DelegationContracts = {
     [Enforcers.TimestampEnforcer]: '0x1046bb45C8d673d4ea75321280DB34899413c069',
     [Enforcers.ExactCalldataEnforcer]:
       '0x99F2e9bF15ce5eC84685604836F71aB835DBBdED',
+    [Enforcers.NonceEnforcer]: '0xDE4f2FAC4B3D87A1d9953Ca5FC09FCa7F366254f',
   },
 };
 
@@ -48,6 +50,7 @@ const metadataByChainId: Record<number, ChainMetadata> = {
     name: 'Ethereum Mainnet',
     symbol: 'ETH',
     decimals: 18,
+    explorerUrl: 'https://etherscan.io',
   },
   // sepolia
   11155111: {
@@ -55,6 +58,7 @@ const metadataByChainId: Record<number, ChainMetadata> = {
     name: 'Sepolia',
     symbol: 'ETH',
     decimals: 18,
+    explorerUrl: 'https://sepolia.etherscan.io',
   },
 };
 
@@ -63,6 +67,7 @@ export type ChainMetadata = {
   name: string;
   symbol: string;
   decimals: number;
+  explorerUrl: string;
 };
 
 export const getChainMetadata = ({

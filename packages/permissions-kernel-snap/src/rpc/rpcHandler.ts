@@ -14,14 +14,14 @@ import { ExternalMethod } from './rpcMethod';
  */
 export type RpcHandler = {
   /**
-   * Handles grant permission requests.
+   * Handles request execution permission requests.
    *
    * @param options - The configuration for the grant permission request.
    * @param options.siteOrigin - The origin of the site requesting the permissions.
    * @param options.params - The parameters for the grant permission request.
    * @returns The result of the grant permission request.
    */
-  grantPermissions(options: {
+  requestExecutionPermissions(options: {
     siteOrigin: string;
     params?: Json;
   }): Promise<Json>;
@@ -49,7 +49,7 @@ export function createRpcHandler(config: {
    * @param options.params - The parameters for the grant permission request.
    * @returns The result of the grant permission request.
    */
-  const grantPermissions = async (options: {
+  const requestExecutionPermissions = async (options: {
     siteOrigin: string;
     params?: Json;
   }): Promise<Json> => {
@@ -96,6 +96,6 @@ export function createRpcHandler(config: {
   };
 
   return {
-    grantPermissions,
+    requestExecutionPermissions,
   };
 }

@@ -13,12 +13,20 @@ import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 const TEST_ADDRESS = '0x1234567890123456789012345678901234567890' as const;
 const TEST_SITE_ORIGIN = 'https://example.com';
 const TEST_CHAIN_ID = '0x1' as const;
-const TEST_EXPIRY = 1234567890;
+const TEST_EXPIRY = Math.floor(Date.now() / 1000) + 86400; // 24 hours from now
 const TEST_CONTEXT = '0xabcd' as const;
 
 const VALID_PERMISSION_REQUEST: PermissionRequest = {
   chainId: TEST_CHAIN_ID,
-  expiry: TEST_EXPIRY,
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: TEST_EXPIRY,
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: { address: TEST_ADDRESS },
@@ -28,6 +36,7 @@ const VALID_PERMISSION_REQUEST: PermissionRequest = {
     data: {
       justification: 'Testing permission request',
     },
+    isAdjustmentAllowed: true,
   },
 };
 
@@ -38,7 +47,15 @@ const VALID_REQUEST: Json = {
 
 const VALID_PERMISSION_RESPONSE: PermissionResponse = {
   chainId: TEST_CHAIN_ID,
-  expiry: TEST_EXPIRY,
+  rules: [
+    {
+      type: 'expiry',
+      data: {
+        timestamp: TEST_EXPIRY,
+      },
+      isAdjustmentAllowed: true,
+    },
+  ],
   signer: {
     type: 'account',
     data: { address: TEST_ADDRESS },
@@ -46,9 +63,10 @@ const VALID_PERMISSION_RESPONSE: PermissionResponse = {
   permission: {
     type: 'test-permission',
     data: { justification: 'Testing permission request' },
+    isAdjustmentAllowed: true,
   },
   context: TEST_CONTEXT,
-  accountMeta: [],
+  dependencyInfo: [],
   signerMeta: {
     delegationManager: TEST_ADDRESS,
   },
@@ -337,6 +355,7 @@ describe('RpcHandler', () => {
           data: {
             justification: 'Testing different permission type',
           },
+          isAdjustmentAllowed: true,
         },
       };
 
@@ -347,6 +366,7 @@ describe('RpcHandler', () => {
           data: {
             justification: 'Testing different permission type',
           },
+          isAdjustmentAllowed: true,
         },
       };
 
@@ -439,9 +459,10 @@ describe('RpcHandler', () => {
             permission: {
               type: 'test-permission',
               data: { justification: 'Testing permission request' },
+              isAdjustmentAllowed: true,
             },
             context: TEST_CONTEXT,
-            accountMeta: [],
+            dependencyInfo: [],
             signerMeta: {
               delegationManager: TEST_ADDRESS,
             },
@@ -461,9 +482,10 @@ describe('RpcHandler', () => {
             permission: {
               type: 'different-permission',
               data: { justification: 'Another permission' },
+              isAdjustmentAllowed: true,
             },
             context: '0xefgh' as const,
-            accountMeta: [],
+            dependencyInfo: [],
             signerMeta: {
               delegationManager:
                 '0x0987654321098765432109876543210987654321' as const,

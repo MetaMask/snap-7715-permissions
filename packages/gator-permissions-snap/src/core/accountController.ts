@@ -1,30 +1,24 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
 import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
-import { bigIntToHex } from '@metamask/utils';
+import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
-import { BaseAccountController } from './baseAccountController';
+import { getChainMetadata } from './chainMetadata';
 import type {
-  AccountController,
-  AccountOptionsBase,
+  AccountControllerInterface,
   SignDelegationOptions,
-  FactoryArgs,
 } from './types';
-import { getChainMetadata } from '../core/chainMetadata';
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
  */
-export class EoaAccountController
-  extends BaseAccountController
-  implements AccountController
-{
-  #accountAddress: Hex | null = null;
-
+export class AccountController implements AccountControllerInterface {
   #ethereumProvider: SnapsEthereumProvider;
 
+  protected supportedChains: readonly number[];
+
   /**
-   * Initializes a new EoaAccountController instance.
+   * Initializes a new AccountController instance.
    * @param config - The configuration object for the controller.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.ethereumProvider - The provider for interacting with Ethereum.
@@ -35,49 +29,75 @@ export class EoaAccountController
     ethereumProvider: SnapsEthereumProvider;
     supportedChains: readonly number[];
   }) {
-    super(config);
+    this.#validateSupportedChains(config.supportedChains);
+
+    this.supportedChains = config.supportedChains;
 
     this.#ethereumProvider = config.ethereumProvider;
   }
 
   /**
-   * Gets the connected account address, requesting access if needed.
-   * @returns The account address.
+   * Validates that the specified chains are supported.
+   * @param supportedChains - The chains to validate.
+   * @throws If no chains are specified or if any chain is not supported.
    */
-  async #getAccountAddress(): Promise<Hex> {
-    logger.debug('eoaAccountController:#getAccountAddress()');
-
-    if (this.#accountAddress) {
-      return this.#accountAddress;
+  #validateSupportedChains(supportedChains: readonly number[]) {
+    if (supportedChains.length === 0) {
+      logger.error('No supported chains specified');
+      throw new Error('No supported chains specified');
     }
+
+    // ensure that there is chain metadata for all specified chains
+    try {
+      supportedChains.map((chainId) => getChainMetadata({ chainId }));
+    } catch (error) {
+      logger.error('Unsupported chains specified', {
+        supportedChains,
+        error,
+      });
+      throw new Error(
+        `Unsupported chains specified: ${supportedChains.join(', ')}`,
+      );
+    }
+  }
+
+  /**
+   * Asserts that the specified chain ID is supported.
+   * @param chainId - The chain ID to validate.
+   * @throws If the chain ID is not supported.
+   */
+  #assertIsSupportedChainId(chainId: number) {
+    if (!this.supportedChains.includes(chainId)) {
+      logger.error(
+        'AccountController:assertIsSupportedChainId() - unsupported chainId',
+        {
+          chainId,
+        },
+      );
+      throw new Error(`Unsupported ChainId: ${chainId}`);
+    }
+  }
+
+  /**
+   * Retrieves the account addresses available for this current account.
+   * @returns The account addresses in CAIP-10 format.
+   */
+  public async getAccountAddresses(): Promise<Hex[]> {
+    logger.debug('AccountController:getAccountAddresses()');
 
     const accounts = await this.#ethereumProvider.request<Hex[]>({
       method: 'eth_requestAccounts',
     });
 
-    if (!accounts || accounts.length === 0) {
+    if (
+      !accounts ||
+      accounts.length === 0 ||
+      accounts.some((account) => account === undefined)
+    ) {
       throw new Error('No accounts found');
     }
 
-    this.#accountAddress = accounts[0] as Hex;
-
-    return this.#accountAddress;
-  }
-
-  /**
-   * Retrieves the account address for the current account.
-   * @param options0 - The options object containing chain information.
-   * @param options0.chainId - The ID of the blockchain chain.
-   * @returns The account address.
-   */
-  public async getAccountAddress({
-    chainId,
-  }: AccountOptionsBase): Promise<Hex> {
-    logger.debug('eoaAccountController:getAccountAddress()');
-
-    this.assertIsSupportedChainId(chainId);
-
-    return this.#getAccountAddress();
+    return accounts as Hex[];
   }
 
   /**
@@ -88,21 +108,31 @@ export class EoaAccountController
   public async signDelegation(
     options: SignDelegationOptions,
   ): Promise<Delegation> {
-    logger.debug('eoaAccountController:signDelegation()');
+    logger.debug('AccountController:signDelegation()');
 
-    const { chainId, delegation } = options;
+    const { chainId, delegation, address } = options;
 
-    this.assertIsSupportedChainId(chainId);
-
-    const address = await this.#getAccountAddress();
+    this.#assertIsSupportedChainId(chainId);
 
     const selectedChain = await this.#ethereumProvider.request<Hex>({
       method: 'eth_chainId',
       params: [],
     });
 
-    if (Number(selectedChain) !== chainId) {
-      throw new Error('Selected chain does not match the requested chain');
+    if (selectedChain && hexToNumber(selectedChain) !== chainId) {
+      await this.#ethereumProvider.request<Hex>({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: numberToHex(chainId) }],
+      });
+
+      const updatedChain = await this.#ethereumProvider.request<Hex>({
+        method: 'eth_chainId',
+        params: [],
+      });
+
+      if (updatedChain && hexToNumber(updatedChain) !== chainId) {
+        throw new Error('Selected chain does not match the requested chain');
+      }
     }
 
     const {
@@ -139,7 +169,7 @@ export class EoaAccountController
     delegationManager: Hex;
     delegation: Omit<Delegation, 'signature'>;
   }) {
-    logger.debug('eoaAccountController:#getSignDelegationArgs()');
+    logger.debug('AccountController:#getSignDelegationArgs()');
 
     const domain = {
       chainId,
@@ -173,25 +203,5 @@ export class EoaAccountController
     const message = { ...delegation, salt: bigIntToHex(delegation.salt) };
 
     return { domain, types, primaryType, message };
-  }
-
-  /**
-   * Retrieves the metadata for deploying a smart account.
-   * Not applicable for EOA accounts.
-   * @param options0 - The options object containing chain information.
-   * @param options0.chainId - The ID of the blockchain chain.
-   * @returns The factory arguments (undefined for EOA accounts).
-   */
-  public async getAccountMetadata({
-    chainId,
-  }: AccountOptionsBase): Promise<FactoryArgs> {
-    logger.debug('eoaAccountController:getAccountMetadata()');
-
-    this.assertIsSupportedChainId(chainId);
-
-    return {
-      factory: undefined,
-      factoryData: undefined,
-    };
   }
 }

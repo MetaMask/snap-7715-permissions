@@ -10,9 +10,11 @@ import type {
   TimePeriod,
   TypedPermissionRequest,
   BaseContext,
+  BaseMetadata,
 } from '../../core/types';
+import { validateStartTimeZod } from '../../utils/validate';
 
-export type NativeTokenStreamMetadata = {
+export type NativeTokenStreamMetadata = BaseMetadata & {
   amountPerSecond: string;
   validationErrors: {
     initialAmountError?: string;
@@ -41,7 +43,23 @@ export const zNativeTokenStreamPermission = zPermission.extend({
       initialAmount: zHexStr.optional(),
       maxAmount: zHexStr.optional(),
       amountPerSecond: zHexStr,
-      startTime: z.number(),
+      startTime: z
+        .number()
+        .int()
+        .positive()
+        .nullable()
+        .optional()
+        .refine(
+          (value) => {
+            if (value === undefined || value === null) {
+              return true;
+            }
+            return validateStartTimeZod(value);
+          },
+          {
+            message: 'Start time must be today or later',
+          },
+        ),
     }),
   ),
 });
