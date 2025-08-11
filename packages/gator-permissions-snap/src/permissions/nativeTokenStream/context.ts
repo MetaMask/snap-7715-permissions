@@ -57,15 +57,25 @@ export async function applyContext({
   } = context;
   const expiry = convertReadableDateToTimestamp(context.expiry.timestamp);
 
-  const rules = originalRequest.rules?.map((rule) => {
-    if (rule.type === 'expiry') {
-      return {
-        ...rule,
-        data: { ...rule.data, timestamp: expiry },
-      };
-    }
-    return rule;
-  });
+  let isExpiryRuleFound = false;
+
+  const rules: NativeTokenStreamPermissionRequest['rules'] =
+    originalRequest.rules?.map((rule) => {
+      if (rule.type === 'expiry') {
+        isExpiryRuleFound = true;
+        return {
+          ...rule,
+          data: { ...rule.data, timestamp: expiry },
+        };
+      }
+      return rule;
+    }) || [];
+
+  if (!isExpiryRuleFound) {
+    throw new Error(
+      'Expiry rule not found. An expiry is required on all permissions.',
+    );
+  }
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount

@@ -147,7 +147,7 @@ describe('nativeTokenStream:context', () => {
     });
   });
 
-  describe('permissionRequestToContext()', () => {
+  describe('buildContext()', () => {
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
     beforeEach(() => {
       mockTokenMetadataService = {
@@ -197,7 +197,7 @@ describe('nativeTokenStream:context', () => {
     });
   });
 
-  describe('createContextMetadata()', () => {
+  describe('deriveMetadata()', () => {
     const context = {
       ...alreadyPopulatedContext,
       expiry: {
@@ -364,47 +364,47 @@ describe('nativeTokenStream:context', () => {
           amountPerPeriodError: 'Amount per period must be greater than 0',
         });
       });
+    });
 
-      describe('startTime validation', () => {
-        it('should return a validation error for startTime in the past', async () => {
-          const contextWithStartTimeInThePast = {
+    describe('startTime validation', () => {
+      it('should return a validation error for startTime in the past', async () => {
+        const contextWithStartTimeInThePast = {
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            startTime: '10/26/1985',
+          },
+        };
+
+        const metadata = await deriveMetadata({
+          context: contextWithStartTimeInThePast,
+        });
+
+        expect(metadata.validationErrors).toStrictEqual({
+          startTimeError: 'Start time must be today or later',
+        });
+      });
+
+      it.each([['12345678'], ['0x1234'], ['Steve']])(
+        'should return a validation error for invalid startTime %s',
+        async (startTime) => {
+          const contextWithInvalidStartTime = {
             ...context,
             permissionDetails: {
               ...context.permissionDetails,
-              startTime: '10/26/1985',
+              startTime,
             },
           };
 
           const metadata = await deriveMetadata({
-            context: contextWithStartTimeInThePast,
+            context: contextWithInvalidStartTime,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
-            startTimeError: 'Start time must be today or later',
+            startTimeError: 'Invalid start time',
           });
-        });
-
-        it.each([['12345678'], ['0x1234'], ['Steve']])(
-          'should return a validation error for invalid startTime %s',
-          async (startTime) => {
-            const contextWithInvalidStartTime = {
-              ...context,
-              permissionDetails: {
-                ...context.permissionDetails,
-                startTime,
-              },
-            };
-
-            const metadata = await deriveMetadata({
-              context: contextWithInvalidStartTime,
-            });
-
-            expect(metadata.validationErrors).toStrictEqual({
-              startTimeError: 'Invalid start time',
-            });
-          },
-        );
-      });
+        },
+      );
     });
 
     describe('expiry validation', () => {
@@ -453,18 +453,32 @@ describe('nativeTokenStream:context', () => {
         },
       );
     });
+  });
 
-    describe('contextToPermissionRequest()', () => {
-      it('should convert a context to a permission request', async () => {
-        const permissionRequest = await applyContext({
-          context: alreadyPopulatedContext,
-          originalRequest: alreadyPopulatedPermissionRequest,
-        });
-
-        expect(permissionRequest).toStrictEqual(
-          alreadyPopulatedPermissionRequest,
-        );
+  describe('applyContext()', () => {
+    it('converts a context to a permission request', async () => {
+      const permissionRequest = await applyContext({
+        context: alreadyPopulatedContext,
+        originalRequest: alreadyPopulatedPermissionRequest,
       });
+
+      expect(permissionRequest).toStrictEqual(
+        alreadyPopulatedPermissionRequest,
+      );
+    });
+
+    it('throws an error if the expiry rule is not found in the original request', async () => {
+      const applyingContext = applyContext({
+        context: alreadyPopulatedContext,
+        originalRequest: {
+          ...alreadyPopulatedPermissionRequest,
+          rules: [],
+        },
+      });
+
+      await expect(applyingContext).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
     });
   });
 });

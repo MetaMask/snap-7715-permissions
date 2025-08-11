@@ -142,7 +142,7 @@ describe('nativeTokenPeriodic:context', () => {
     });
   });
 
-  describe('permissionRequestToContext()', () => {
+  describe('buildContext()', () => {
     let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
     beforeEach(() => {
       mockTokenMetadataService = {
@@ -192,7 +192,7 @@ describe('nativeTokenPeriodic:context', () => {
     });
   });
 
-  describe('createContextMetadata()', () => {
+  describe('deriveMetadata()', () => {
     const dateInTheFuture = (
       Math.floor(Date.now() / 1000) +
       24 * 60 * 60
@@ -384,18 +384,32 @@ describe('nativeTokenPeriodic:context', () => {
         },
       );
     });
+  });
 
-    describe('contextToPermissionRequest()', () => {
-      it('should convert a context to a permission request', async () => {
-        const permissionRequest = await applyContext({
-          context: alreadyPopulatedContext,
-          originalRequest: alreadyPopulatedPermissionRequest,
-        });
-
-        expect(permissionRequest).toStrictEqual(
-          alreadyPopulatedPermissionRequest,
-        );
+  describe('applyContext()', () => {
+    it('converts a context to a permission request', async () => {
+      const permissionRequest = await applyContext({
+        context: alreadyPopulatedContext,
+        originalRequest: alreadyPopulatedPermissionRequest,
       });
+
+      expect(permissionRequest).toStrictEqual(
+        alreadyPopulatedPermissionRequest,
+      );
+    });
+
+    it('throws an error if the expiry rule is not found in the original request', async () => {
+      const applyingContext = applyContext({
+        context: alreadyPopulatedContext,
+        originalRequest: {
+          ...alreadyPopulatedPermissionRequest,
+          rules: [],
+        },
+      });
+
+      await expect(applyingContext).rejects.toThrow(
+        'Expiry rule not found. An expiry is required on all permissions.',
+      );
     });
   });
 });
