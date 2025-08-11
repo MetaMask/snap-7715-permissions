@@ -101,7 +101,7 @@ export const startTimeRule: RuleDefinition<
   label: 'Start Time',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.startTime,
+    value: context.permissionDetails.startTime.toString(),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The time at which the first period begins(mm/dd/yyyy hh:mm:ss).',
@@ -135,7 +135,7 @@ export const expiryRule: RuleDefinition<
   label: 'Expiry',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.expiry.timestamp,
+    value: context.expiry.timestamp.toString(),
     isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',

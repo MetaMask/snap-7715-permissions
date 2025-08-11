@@ -73,7 +73,7 @@ export const startTimeRule: Erc20TokenStreamRuleDefinition = {
   label: 'Start Time',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.startTime,
+    value: context.permissionDetails.startTime.toString(),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The start time of the stream(mm/dd/yyyy hh:mm:ss).',
@@ -145,7 +145,7 @@ export const expiryRule: Erc20TokenStreamRuleDefinition = {
   label: 'Expiry',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.expiry.timestamp,
+    value: context.expiry.timestamp.toString(),
     isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',
