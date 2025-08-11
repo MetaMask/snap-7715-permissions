@@ -37,7 +37,7 @@ describe('PriceApiClient', () => {
       await expect(
         client.getSpotPrice('eip155:1/slip44:60', 'usd'),
       ).rejects.toThrow(
-        'HTTP error! Failed to fetch spot price for caipAssetType(eip155:1/slip44:60) and vsCurrency(usd): 404',
+        'Spot price not found for eip155:1/slip44:60',
       );
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:8003/v3/spot-prices?includeMarketData=false&vsCurrency=usd&assetIds=eip155:1/slip44:60',
