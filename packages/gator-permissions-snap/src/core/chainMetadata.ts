@@ -1,6 +1,4 @@
 import type { Hex } from '@metamask/delegation-core';
-import type { CaipAssetType, CaipChainId } from '@metamask/utils';
-import { parseCaipAssetType } from '@metamask/utils';
 
 export enum Enforcers {
   LimitedCallsEnforcer = 'LimitedCallsEnforcer',

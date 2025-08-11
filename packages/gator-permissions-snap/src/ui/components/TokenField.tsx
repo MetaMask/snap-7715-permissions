@@ -43,7 +43,7 @@ export const TokenField = ({
       iconData={iconData}
       variant="display"
     >
-      {explorerUrl ? (
+      {explorerUrl && tokenAddress ? (
         // Not using the Address component because the Tooltip component
         // does not allow the Address component as its content.
         // See: https://github.com/MetaMask/snaps/blob/7d8c1e6fe66a5d949ba54c9ae30ffe8f1faaf5ab/packages/snaps-sdk/src/jsx/components/Tooltip.ts#L25
