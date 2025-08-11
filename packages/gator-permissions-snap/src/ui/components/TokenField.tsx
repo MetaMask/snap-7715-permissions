@@ -43,13 +43,20 @@ export const TokenField = ({
       iconData={iconData}
       variant="display"
     >
-      <Tooltip content={shortenAddress(tokenAddress)}>
-        {explorerUrl ? (
+      {explorerUrl ? (
+        // Not using the Address component because the Tooltip component
+        // does not allow the Address component as its content.
+        // See: https://github.com/MetaMask/snaps/blob/7d8c1e6fe66a5d949ba54c9ae30ffe8f1faaf5ab/packages/snaps-sdk/src/jsx/components/Tooltip.ts#L25
+        //
+        // Using shortenAddress from the MetaMask repo because the SDK does not provide an API for this.
+        // Copied the implementation from MetaMask's codebase.
+        // Will switch to the SDK's official function if one becomes available in the future.
+        <Tooltip content={shortenAddress(tokenAddress)}>
           <Link href={explorerUrl}>{tokenSymbol}</Link>
-        ) : (
-          <Text>{tokenSymbol}</Text>
-        )}
-      </Tooltip>
+        </Tooltip>
+      ) : (
+        <Text>{tokenSymbol}</Text>
+      )}
     </Field>
   );
 };

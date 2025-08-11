@@ -7,10 +7,10 @@ import {
   Skeleton,
   AccountSelector,
 } from '@metamask/snaps-sdk/jsx';
+import { parseCaipAssetType } from '@metamask/utils';
 
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
-import { logger } from '../../../shared/src/utils/logger';
 import {
   ShowMoreText,
   SkeletonField,
@@ -18,7 +18,6 @@ import {
   TooltipIcon,
   TokenField,
 } from '../ui/components';
-import { getExplorerUrlAndAddress } from '../utils/explorer';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 
@@ -46,6 +45,7 @@ export type PermissionHandlerContentProps = {
   tokenBalance: string | undefined;
   tokenBalanceFiat: string | undefined;
   chainId: number;
+  explorerUrl: string;
 };
 
 /**
@@ -63,6 +63,7 @@ export type PermissionHandlerContentProps = {
  * @param options.tokenBalance - The formatted balance of the token.
  * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
  * @param options.chainId - The chain ID of the network.
+ * @param options.explorerUrl - The URL of the block explorer for the token.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -78,6 +79,7 @@ export const PermissionHandlerContent = ({
   tokenBalance,
   tokenBalanceFiat,
   chainId,
+  explorerUrl,
 }: PermissionHandlerContentProps): SnapElement => {
   const tokenBalanceComponent = tokenBalance ? (
     <Text>{tokenBalance} available</Text>
@@ -91,14 +93,13 @@ export const PermissionHandlerContent = ({
     <Skeleton />
   );
 
-  let explorerUrl, tokenAddress;
-  try {
-    const result = getExplorerUrlAndAddress(context.tokenAddressCaip19);
-    explorerUrl = result.url;
-    tokenAddress = result.address;
-  } catch (error) {
-    const { message } = error as Error;
-    logger.error(`Fetching token explorer URL and address failed: ${message}`);
+  let tokenExplorerUrl, tokenAddress;
+  const { assetReference, assetNamespace } = parseCaipAssetType(
+    context.tokenAddressCaip19,
+  );
+  if (assetNamespace === 'erc20') {
+    tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
+    tokenAddress = assetReference;
   }
 
   return (
@@ -122,7 +123,7 @@ export const PermissionHandlerContent = ({
             label={TOKEN_LABEL}
             tokenSymbol={tokenSymbol}
             tokenAddress={tokenAddress}
-            explorerUrl={explorerUrl}
+            explorerUrl={tokenExplorerUrl}
             tooltip={TOKEN_TOOLTIP}
             iconData={tokenIconData}
           />
