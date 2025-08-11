@@ -200,7 +200,7 @@ export class PermissionHandler<
           metadata,
         });
 
-      const { name: networkName } = getChainMetadata({ chainId });
+      const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
       const tokenIconData = getIconData(context);
 
@@ -222,6 +222,7 @@ export class PermissionHandler<
         tokenBalance: this.#tokenBalance,
         tokenBalanceFiat: this.#tokenBalanceFiat,
         chainId,
+        explorerUrl,
       });
     };
 
