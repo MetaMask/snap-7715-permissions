@@ -79,7 +79,9 @@ export const getChainMetadata = ({
   const metadata = metadataByChainId[chainId];
 
   if (!metadata) {
-    throw new ResourceNotFoundError(`No chain metadata found for chainId: ${chainId}`);
+    throw new ResourceNotFoundError(
+      `No chain metadata found for chainId: ${chainId}`,
+    );
   }
 
   return metadata;

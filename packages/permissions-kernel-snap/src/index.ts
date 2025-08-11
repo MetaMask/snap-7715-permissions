@@ -40,8 +40,7 @@ const boundRpcHandlers: {
 export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
-}) => { 
-
+}) => {
   logger.info(
     `Custom request (origin="${origin}"):`,
     JSON.stringify(request, undefined, 2),

@@ -1,6 +1,13 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
-import { ChainDisconnectedError, InvalidInputError, ResourceUnavailableError, type SnapsEthereumProvider, type SnapsProvider } from '@metamask/snaps-sdk';
+import {
+  ChainDisconnectedError,
+  InvalidInputError,
+  ResourceNotFoundError,
+  ResourceUnavailableError,
+  type SnapsEthereumProvider,
+  type SnapsProvider,
+} from '@metamask/snaps-sdk';
 import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from './chainMetadata';
@@ -94,7 +101,7 @@ export class AccountController implements AccountControllerInterface {
       accounts.length === 0 ||
       accounts.some((account) => account === undefined)
     ) {
-      throw new ResourceUnavailableError('No accounts found');
+      throw new ResourceNotFoundError('No accounts found');
     }
 
     return accounts as Hex[];
@@ -131,7 +138,9 @@ export class AccountController implements AccountControllerInterface {
       });
 
       if (updatedChain && hexToNumber(updatedChain) !== chainId) {
-        throw new ChainDisconnectedError('Selected chain does not match the requested chain');
+        throw new ChainDisconnectedError(
+          'Selected chain does not match the requested chain',
+        );
       }
     }
 

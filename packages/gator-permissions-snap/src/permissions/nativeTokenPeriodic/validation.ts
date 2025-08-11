@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import { validateHexInteger } from '../validation';
 import type {
@@ -7,7 +8,6 @@ import type {
   NativeTokenPeriodicPermissionRequest,
 } from './types';
 import { zNativeTokenPeriodicPermission } from './types';
-import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Validates a permission object data specific to the permission type.
@@ -31,7 +31,7 @@ function validatePermissionData(
 
   const expiryRule = rules?.find((rule) => rule.type === 'expiry');
   if (!expiryRule) {
-    throw new Error('Expiry rule is required');
+    throw new InvalidInputError('Expiry rule is required');
   }
   const expiry = Number(expiryRule.data.timestamp);
 

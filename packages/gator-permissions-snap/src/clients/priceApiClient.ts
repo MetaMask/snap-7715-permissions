@@ -1,8 +1,12 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  InvalidInputError,
+  ResourceNotFoundError,
+  ResourceUnavailableError,
+} from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
 
 import type { SpotPricesRes, VsCurrencyParam } from './types';
-import { InvalidInputError, ResourceNotFoundError, ResourceUnavailableError } from '@metamask/snaps-sdk';
 
 /**
  * Class responsible for fetching price data from the Price API.
@@ -35,7 +39,9 @@ export class PriceApiClient {
 
     if (!caipAssetType) {
       logger.error(`No caipAssetType provided to fetch spot price`);
-      throw new InvalidInputError(`No caipAssetType provided to fetch spot price`);
+      throw new InvalidInputError(
+        `No caipAssetType provided to fetch spot price`,
+      );
     }
 
     const response = await this.#fetch(
@@ -48,9 +54,20 @@ export class PriceApiClient {
       logger.error(
         `HTTP error! Failed to fetch spot price for caipAssetType(${caipAssetType}) and vsCurrency(${vsCurrency}): ${response.status}`,
       );
-      throw new ResourceUnavailableError(
-        `HTTP error! Failed to fetch spot price for caipAssetType(${caipAssetType}) and vsCurrency(${vsCurrency}): ${response.status}`,
-      );
+
+      if (response.status === 404) {
+        throw new ResourceNotFoundError(
+          `Spot price not found for ${caipAssetType}`,
+        );
+      } else if (response.status >= 500) {
+        throw new ResourceUnavailableError(
+          `Price service temporarily unavailable (HTTP ${response.status})`,
+        );
+      } else {
+        throw new ResourceUnavailableError(
+          `HTTP error ${response.status}: Failed to fetch spot price for ${caipAssetType}`,
+        );
+      }
     }
 
     const spotPricesRes = (await response.json()) as SpotPricesRes;

@@ -1,9 +1,13 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
+import {
+  InvalidInputError,
+  ResourceNotFoundError,
+  ResourceUnavailableError,
+} from '@metamask/snaps-sdk';
 
 import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata } from './types';
-import { InvalidInputError, ResourceNotFoundError, ResourceUnavailableError } from '@metamask/snaps-sdk';
 
 /**
  * Response type for token balance data

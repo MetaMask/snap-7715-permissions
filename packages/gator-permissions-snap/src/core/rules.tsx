@@ -1,5 +1,5 @@
-import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
 import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { DropdownField } from '../ui/components/DropdownField';
@@ -114,7 +114,9 @@ export function renderRule<
     }
     case 'datetime': {
       if (!dateTimeParameterNames) {
-        throw new InvalidInputError('DateTime rule must have dateTimeParameterNames');
+        throw new InvalidInputError(
+          'DateTime rule must have dateTimeParameterNames',
+        );
       }
 
       const dateTimeValue = {

@@ -3,9 +3,9 @@ import {
   zGrantAttenuatedPermissionsParams,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import { getStartOfTodayLocal } from './time';
-import { InvalidInputError } from '@metamask/snaps-sdk';
 
 export const validatePermissionRequestParam = (
   params: any | any[],

@@ -63,7 +63,9 @@ export class ConfirmationDialog {
     isConfirmationGranted: boolean;
   }> {
     if (!this.#interfaceId) {
-      throw new MethodNotFoundError(ConfirmationDialog.#interfaceNotCreatedError);
+      throw new MethodNotFoundError(
+        ConfirmationDialog.#interfaceNotCreatedError,
+      );
     }
     const interfaceId = this.#interfaceId;
 
@@ -171,7 +173,9 @@ export class ConfirmationDialog {
     isGrantDisabled: boolean;
   }): Promise<void> {
     if (!this.#interfaceId) {
-      throw new MethodNotFoundError(ConfirmationDialog.#interfaceNotCreatedError);
+      throw new MethodNotFoundError(
+        ConfirmationDialog.#interfaceNotCreatedError,
+      );
     }
 
     this.#ui = ui;
@@ -190,6 +194,7 @@ export class ConfirmationDialog {
   /**
    * Programmatically close the confirmation dialog due to an error and reject the pending decision promise.
    * Safe to call multiple times.
+   * @param reason - The error to reject the pending decision promise with.
    */
   async closeWithError(reason: Error): Promise<void> {
     if (!this.#interfaceId) {

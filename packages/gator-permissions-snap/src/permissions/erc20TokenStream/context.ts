@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   parseCaipAccountId,
@@ -28,7 +29,6 @@ import type {
   PopulatedErc20TokenStreamPermission,
   Erc20TokenStreamPermission,
 } from './types';
-import { InvalidInputError } from '@metamask/snaps-sdk';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -72,7 +72,7 @@ export async function applyContext({
     }) ?? [];
 
   if (!isExpiryRuleFound) {
-    throw new Error(
+    throw new InvalidInputError(
       'Expiry rule not found. An expiry is required on all permissions.',
     );
   }
@@ -182,7 +182,7 @@ export async function buildContext({
   );
 
   if (!expiryRule) {
-    throw new Error(
+    throw new InvalidInputError(
       'Expiry rule not found. An expiry is required on all permissions.',
     );
   }

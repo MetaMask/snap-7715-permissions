@@ -19,7 +19,9 @@ if (!SNAP_ENV) {
 }
 
 if (!PRICE_API_BASE_URL) {
-  throw new InternalError('PRICE_API_BASE_URL must be set as an environment variable.');
+  throw new InternalError(
+    'PRICE_API_BASE_URL must be set as an environment variable.',
+  );
 }
 
 if (!STORE_PERMISSIONS_ENABLED) {
@@ -44,7 +46,9 @@ if (!ACCOUNT_API_BASE_URL) {
 }
 
 if (!SUPPORTED_CHAINS) {
-  throw new InternalError('SUPPORTED_CHAINS must be set as an environment variable.');
+  throw new InternalError(
+    'SUPPORTED_CHAINS must be set as an environment variable.',
+  );
 }
 
 const config: SnapConfig = {

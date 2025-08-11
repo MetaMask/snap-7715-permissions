@@ -10,6 +10,7 @@ import {
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   bytesToHex,
@@ -29,7 +30,6 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
-import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -315,7 +315,7 @@ export class PermissionRequestLifecycleOrchestrator {
         args: '0x',
       });
     } else {
-      throw new Error(
+      throw new InvalidInputError(
         'Expiry rule not found. An expiry is required on all permissions.',
       );
     }

@@ -228,7 +228,9 @@ export class UserEventDispatcher {
     id: string;
   }) => Promise<void> {
     if (this.#hasEventHandler) {
-      throw new InternalError('User input event handler has already been created');
+      throw new InternalError(
+        'User input event handler has already been created',
+      );
     }
     this.#hasEventHandler = true;
 

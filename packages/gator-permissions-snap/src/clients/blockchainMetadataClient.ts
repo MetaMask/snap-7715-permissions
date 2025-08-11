@@ -1,7 +1,12 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { decodeSingle } from '@metamask/abi-utils';
 import type { Hex } from '@metamask/delegation-core';
-import { ChainDisconnectedError, InvalidInputError, ResourceNotFoundError, type SnapsEthereumProvider } from '@metamask/snaps-sdk';
+import {
+  ChainDisconnectedError,
+  InvalidInputError,
+  ResourceNotFoundError,
+  type SnapsEthereumProvider,
+} from '@metamask/snaps-sdk';
 import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import { ZERO_ADDRESS } from '../constants';
@@ -85,7 +90,9 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       });
 
       if (updatedChain && hexToNumber(updatedChain) !== chainId) {
-        throw new ChainDisconnectedError('Selected chain does not match the requested chain');
+        throw new ChainDisconnectedError(
+          'Selected chain does not match the requested chain',
+        );
       }
     }
 
@@ -156,7 +163,9 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       ]);
     } catch (error) {
       logger.error('Failed to fetch token balance and metadata', error);
-      throw new ResourceNotFoundError('Failed to fetch token balance and metadata');
+      throw new ResourceNotFoundError(
+        'Failed to fetch token balance and metadata',
+      );
     }
 
     if (!symbolEncoded) {
@@ -199,7 +208,9 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         `Failed to fetch token balance and metadata: ${(error as Error).message}.`,
       );
 
-      throw new ResourceNotFoundError(`Failed to fetch token balance and metadata`);
+      throw new ResourceNotFoundError(
+        `Failed to fetch token balance and metadata`,
+      );
     }
   }
 }

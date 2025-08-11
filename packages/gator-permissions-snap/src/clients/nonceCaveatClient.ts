@@ -1,7 +1,12 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { decodeSingle } from '@metamask/abi-utils';
 import type { Hex } from '@metamask/delegation-core';
-import { ChainDisconnectedError, InvalidInputError, ResourceUnavailableError, type SnapsEthereumProvider } from '@metamask/snaps-sdk';
+import {
+  ChainDisconnectedError,
+  InvalidInputError,
+  ResourceUnavailableError,
+  type SnapsEthereumProvider,
+} from '@metamask/snaps-sdk';
 import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from '../core/chainMetadata';
@@ -71,7 +76,9 @@ export class NonceCaveatClient {
       });
 
       if (updatedChain && hexToNumber(updatedChain) !== chainId) {
-        throw new ChainDisconnectedError('Selected chain does not match the requested chain');
+        throw new ChainDisconnectedError(
+          'Selected chain does not match the requested chain',
+        );
       }
     }
 

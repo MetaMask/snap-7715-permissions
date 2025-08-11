@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@metamask/snaps-sdk';
+
 import { TimePeriod } from '../core/types';
 
 /**
@@ -11,7 +12,9 @@ export const convertTimestampToReadableDate = (timestamp: number) => {
   const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
 
   if (isNaN(date.getTime())) {
-    throw new InvalidInputError('convertTimestampToReadableDate: Invalid date format');
+    throw new InvalidInputError(
+      'convertTimestampToReadableDate: Invalid date format',
+    );
   }
 
   // Always format as mm/dd/yyyy using local time
@@ -61,13 +64,17 @@ export const convertReadableDateToTimestamp = (date: string) => {
   ) {
     // Validate that the timestamp represents a reasonable date (1/1/2000)
     if (numericValue < 1262304000) {
-      throw new InvalidInputError('Invalid date format. Expected format: mm/dd/yyyy');
+      throw new InvalidInputError(
+        'Invalid date format. Expected format: mm/dd/yyyy',
+      );
     }
 
     // Validate that the timestamp represents a reasonable date
     const timestampDate = new Date(numericValue * 1000);
     if (isNaN(timestampDate.getTime())) {
-      throw new InvalidInputError('Invalid date format. Expected format: mm/dd/yyyy');
+      throw new InvalidInputError(
+        'Invalid date format. Expected format: mm/dd/yyyy',
+      );
     }
 
     // If it's a valid positive integer representing a reasonable date, assume it's already a timestamp
@@ -77,13 +84,17 @@ export const convertReadableDateToTimestamp = (date: string) => {
   // Parse mm/dd/yyyy format
   const parts = date.split('/');
   if (parts.length !== 3) {
-    throw new InvalidInputError('Invalid date format. Expected format: mm/dd/yyyy');
+    throw new InvalidInputError(
+      'Invalid date format. Expected format: mm/dd/yyyy',
+    );
   }
 
   const [monthStr, dayStr, yearStr] = parts;
 
   if (!monthStr || !dayStr || !yearStr) {
-    throw new InvalidInputError('Invalid date format. Expected format: mm/dd/yyyy');
+    throw new InvalidInputError(
+      'Invalid date format. Expected format: mm/dd/yyyy',
+    );
   }
 
   const month = parseInt(monthStr, 10);
@@ -92,12 +103,16 @@ export const convertReadableDateToTimestamp = (date: string) => {
 
   // Validate that all parts are valid numbers
   if (isNaN(month) || isNaN(day) || isNaN(year)) {
-    throw new InvalidInputError('Invalid date format. Expected format: mm/dd/yyyy');
+    throw new InvalidInputError(
+      'Invalid date format. Expected format: mm/dd/yyyy',
+    );
   }
 
   // Validate ranges
   if (month < 1 || month > 12) {
-    throw new InvalidInputError('Invalid month. Month must be between 1 and 12.');
+    throw new InvalidInputError(
+      'Invalid month. Month must be between 1 and 12.',
+    );
   }
 
   if (day < 1 || day > 31) {
@@ -117,7 +132,9 @@ export const convertReadableDateToTimestamp = (date: string) => {
     parsedDate.getMonth() !== month - 1 ||
     parsedDate.getDate() !== day
   ) {
-    throw new InvalidInputError('Invalid date. The specified date does not exist.');
+    throw new InvalidInputError(
+      'Invalid date. The specified date does not exist.',
+    );
   }
 
   // Return the local timestamp (at 00:00:00 local time)
@@ -142,18 +159,26 @@ export const convertReadableTimeToSeconds = (time: string) => {
 
   // Validate that all parts are valid numbers
   if (isNaN(hoursNum) || isNaN(minutesNum) || isNaN(secondsNum)) {
-    throw new InvalidInputError('Invalid time format: all parts must be numbers');
+    throw new InvalidInputError(
+      'Invalid time format: all parts must be numbers',
+    );
   }
 
   // Validate ranges
   if (hoursNum < 0 || hoursNum > 23) {
-    throw new InvalidInputError('Invalid time format: hours must be between 0 and 23');
+    throw new InvalidInputError(
+      'Invalid time format: hours must be between 0 and 23',
+    );
   }
   if (minutesNum < 0 || minutesNum > 59) {
-    throw new InvalidInputError('Invalid time format: minutes must be between 0 and 59');
+    throw new InvalidInputError(
+      'Invalid time format: minutes must be between 0 and 59',
+    );
   }
   if (secondsNum < 0 || secondsNum > 59) {
-    throw new InvalidInputError('Invalid time format: seconds must be between 0 and 59');
+    throw new InvalidInputError(
+      'Invalid time format: seconds must be between 0 and 59',
+    );
   }
 
   return hoursNum * 3600 + minutesNum * 60 + secondsNum;

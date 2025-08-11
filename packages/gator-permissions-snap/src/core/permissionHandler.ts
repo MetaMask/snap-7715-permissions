@@ -1,5 +1,9 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { InvalidRequestError, UserInputEventType } from '@metamask/snaps-sdk';
+import {
+  InvalidRequestError,
+  ResourceNotFoundError,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 import {
   bigIntToHex,
@@ -163,7 +167,7 @@ export class PermissionHandler<
               availableAddress.toLowerCase() === requestedAddressLowercase,
           )
         ) {
-          throw new InvalidRequestError('Requested address not found');
+          throw new ResourceNotFoundError('Requested address not found');
         }
         address = request.address as Hex;
       } else {

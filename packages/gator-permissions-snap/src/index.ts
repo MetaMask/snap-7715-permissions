@@ -199,7 +199,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   );
 
   if (!isMethodAllowedForOrigin(origin, request.method)) {
-    throw new InvalidRequestError(`Origin '${origin}' is not allowed to call '${request.method}'`);
+    throw new InvalidRequestError(
+      `Origin '${origin}' is not allowed to call '${request.method}'`,
+    );
   }
 
   const handler = boundRpcHandlers[request.method];
