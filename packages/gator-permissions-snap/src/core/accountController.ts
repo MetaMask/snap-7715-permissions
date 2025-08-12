@@ -82,7 +82,7 @@ export class AccountController implements AccountControllerInterface {
    * Retrieves the account addresses available for this current account.
    * @returns The account addresses in CAIP-10 format.
    */
-  public async getAccountAddresses(): Promise<Hex[]> {
+  public async getAccountAddresses(): Promise<[Hex, ...Hex[]]> {
     logger.debug('AccountController:getAccountAddresses()');
 
     const accounts = await this.#ethereumProvider.request<Hex[]>({
@@ -97,7 +97,7 @@ export class AccountController implements AccountControllerInterface {
       throw new Error('No accounts found');
     }
 
-    return accounts as Hex[];
+    return accounts as [Hex, ...Hex[]];
   }
 
   /**
