@@ -4,15 +4,12 @@ import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
 import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from './chainMetadata';
-import type {
-  AccountControllerInterface,
-  SignDelegationOptions,
-} from './types';
+import type { SignDelegationOptions } from './types';
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
  */
-export class AccountController implements AccountControllerInterface {
+export class AccountController {
   #ethereumProvider: SnapsEthereumProvider;
 
   protected supportedChains: readonly number[];

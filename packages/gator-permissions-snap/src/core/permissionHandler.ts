@@ -12,6 +12,7 @@ import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import {
   ACCOUNT_SELECTOR_NAME,
@@ -29,7 +30,6 @@ import type {
   PermissionHandlerType,
   PermissionHandlerDependencies,
   PermissionHandlerParams,
-  AccountControllerInterface,
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
 import { ZERO_ADDRESS } from '../constants';
@@ -49,7 +49,7 @@ export class PermissionHandler<
   TPopulatedPermission extends DeepRequired<TPermission>,
 > implements PermissionHandlerType
 {
-  readonly #accountController: AccountControllerInterface;
+  readonly #accountController: AccountController;
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
@@ -153,7 +153,7 @@ export class PermissionHandler<
       const allAvailableAddresses =
         await this.#accountController.getAccountAddresses();
 
-      let address: Hex | undefined;
+      let address: Hex;
 
       if (requestedAddressLowercase) {
         // validate that the requested address is one of the addresses available for the account
