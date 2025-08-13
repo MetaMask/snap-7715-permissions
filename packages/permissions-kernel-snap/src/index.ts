@@ -42,7 +42,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   logger.info(
     `Custom request (origin="${origin}"):`,
-    JSON.stringify(request, undefined, 2),
+    JSON.stringify(request, null, 2),
   );
 
   const handler = boundRpcHandlers[request.method];
