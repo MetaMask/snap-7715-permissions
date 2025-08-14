@@ -27,8 +27,6 @@ export class ConfirmationDialog {
   // Track handlers and promise hooks so we can programmatically close the dialog on error
   #unbindHandlers: (() => void) | undefined;
 
-  #decisionResolve: ((isGranted: boolean) => void) | undefined;
-
   #decisionReject: ((reason: Error) => void) | undefined;
 
   constructor({
@@ -122,7 +120,6 @@ export class ConfirmationDialog {
         unbindGrantButtonClick();
         unbindCancelButtonClick();
       };
-      this.#decisionResolve = resolve;
       this.#decisionReject = reject;
 
       // we don't await this, because we only want to present the dialog, and
@@ -202,7 +199,6 @@ export class ConfirmationDialog {
       if (this.#decisionReject) {
         this.#decisionReject(reason);
         this.#decisionReject = undefined;
-        this.#decisionResolve = undefined;
       }
       return;
     }
@@ -235,7 +231,6 @@ export class ConfirmationDialog {
     if (this.#decisionReject) {
       this.#decisionReject(reason);
       this.#decisionReject = undefined;
-      this.#decisionResolve = undefined;
     }
   }
 }
