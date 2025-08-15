@@ -13,6 +13,7 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { AccountController } from './accountController';
 import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type { TokenPricesService } from '../services/tokenPricesService';
@@ -273,7 +274,7 @@ export type PermissionHandlerParams<
   TPermission extends TRequest['permission'],
   TPopulatedPermission extends DeepRequired<TPermission>,
 > = {
-  accountController: AccountControllerInterface;
+  accountController: AccountController;
   userEventDispatcher: UserEventDispatcher;
   orchestrator: PermissionRequestLifecycleOrchestrator;
   permissionRequest: PermissionRequest;
@@ -343,19 +344,4 @@ export type SignDelegationOptions = {
 export type FactoryArgs = {
   factory: Hex | undefined;
   factoryData: Hex | undefined;
-};
-
-/**
- * Interface for account controller implementations.
- */
-export type AccountControllerInterface = {
-  /**
-   * Signs a delegation using the smart account.
-   */
-  signDelegation(options: SignDelegationOptions): Promise<Delegation>;
-
-  /**
-   * Retrieves the account addresses available for this current account.
-   */
-  getAccountAddresses(): Promise<Hex[]>;
 };
