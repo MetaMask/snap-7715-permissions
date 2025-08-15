@@ -29,7 +29,7 @@ export type NativeTokenPeriodicContext = BaseContext & {
     periodAmount: string;
     periodType: TimePeriod | 'Other';
     periodDuration: string;
-    startTime: string;
+    startTime: number;
   };
 };
 

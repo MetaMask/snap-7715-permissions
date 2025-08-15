@@ -8,10 +8,7 @@ import {
 
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
@@ -51,7 +48,7 @@ export async function applyContext({
     tokenMetadata: { decimals },
   } = context;
 
-  const expiry = convertReadableDateToTimestamp(context.expiry.timestamp);
+  const expiry = context.expiry.timestamp;
 
   let isExpiryRuleFound = false;
 
@@ -78,7 +75,7 @@ export async function applyContext({
       parseUnits({ formatted: permissionDetails.periodAmount, decimals }),
     ),
     periodDuration: parseInt(permissionDetails.periodDuration, 10),
-    startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
+    startTime: permissionDetails.startTime,
     justification: originalRequest.permission.data.justification,
     tokenAddress: originalRequest.permission.data.tokenAddress,
   };
@@ -169,7 +166,7 @@ export async function buildContext({
   }
 
   const expiry = {
-    timestamp: expiryRule.data.timestamp.toString(),
+    timestamp: expiryRule.data.timestamp,
     isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
   };
 
@@ -193,8 +190,7 @@ export async function buildContext({
     periodType = 'Other';
   }
 
-  const startTime =
-    data.startTime?.toString() ?? Math.floor(Date.now() / 1000).toString();
+  const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
 
   const tokenAddressCaip19 = toCaipAssetType(
     CHAIN_NAMESPACE,

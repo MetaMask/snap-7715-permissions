@@ -31,7 +31,7 @@ export type Erc20TokenStreamContext = BaseContext & {
     initialAmount: string | undefined;
     maxAmount: string | undefined;
     timePeriod: TimePeriod;
-    startTime: string;
+    startTime: number;
     amountPerPeriod: string;
   };
 };

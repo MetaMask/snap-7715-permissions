@@ -14,10 +14,7 @@ import type {
   NativeTokenStreamPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import {
-  convertTimestampToReadableDate,
-  convertReadableDateToTimestamp,
-} from '../../../src/utils/time';
+import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const permissionWithoutOptionals: NativeTokenStreamPermission = {
@@ -73,7 +70,7 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
 
 const alreadyPopulatedContext: NativeTokenStreamContext = {
   expiry: {
-    timestamp: '1714521600',
+    timestamp: 1714521600,
     isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
@@ -89,7 +86,7 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
     initialAmount: '1',
     maxAmount: '10',
     timePeriod: TimePeriod.WEEKLY,
-    startTime: '1729900800',
+    startTime: 1729900800,
     amountPerPeriod: '302400',
   },
 } as const;
@@ -233,14 +230,12 @@ describe('nativeTokenStream:context', () => {
     const context = {
       ...alreadyPopulatedContext,
       expiry: {
-        timestamp: convertTimestampToReadableDate(
-          Date.now() / 1000 + 24 * 60 * 60,
-        ), // 24 hours from now
+        timestamp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours from now
         isAdjustmentAllowed: true,
       },
       permissionDetails: {
         ...alreadyPopulatedContext.permissionDetails,
-        startTime: convertTimestampToReadableDate(Date.now() / 1000),
+        startTime: Math.floor(Date.now() / 1000), // now
       },
     };
 
@@ -404,7 +399,7 @@ describe('nativeTokenStream:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            startTime: '10/26/1985',
+            startTime: 499161600, // 10/26/1985
           },
         };
 
@@ -417,7 +412,25 @@ describe('nativeTokenStream:context', () => {
         });
       });
 
-      it.each([['12345678'], ['0x1234'], ['Steve']])(
+      it('should return a validation error for invalid startTime -1', async () => {
+        const contextWithInvalidStartTime = {
+          ...context,
+          permissionDetails: {
+            ...context.permissionDetails,
+            startTime: -1,
+          },
+        };
+
+        const metadata = await deriveMetadata({
+          context: contextWithInvalidStartTime,
+        });
+
+        expect(metadata.validationErrors).toStrictEqual({
+          startTimeError: 'Invalid start time',
+        });
+      });
+
+      it.each([[12345678], [0x1234], [999999999]])(
         'should return a validation error for invalid startTime %s',
         async (startTime) => {
           const contextWithInvalidStartTime = {
@@ -433,7 +446,7 @@ describe('nativeTokenStream:context', () => {
           });
 
           expect(metadata.validationErrors).toStrictEqual({
-            startTimeError: 'Invalid start time',
+            startTimeError: 'Start time must be today or later',
           });
         },
       );
@@ -444,7 +457,7 @@ describe('nativeTokenStream:context', () => {
         const contextWithExpiryInThePast = {
           ...context,
           expiry: {
-            timestamp: '10/26/1985',
+            timestamp: 499161600, // 10/26/1985
             isAdjustmentAllowed: true,
           },
           permissionDetails: {
@@ -461,7 +474,28 @@ describe('nativeTokenStream:context', () => {
         });
       });
 
-      it.each([['12345678'], ['0x1234'], ['Steve']])(
+      it('should return a validation error for invalid expiry -1', async () => {
+        const contextWithInvalidExpiry = {
+          ...context,
+          expiry: {
+            timestamp: -1,
+            isAdjustmentAllowed: true,
+          },
+          permissionDetails: {
+            ...context.permissionDetails,
+          },
+        };
+
+        const metadata = await deriveMetadata({
+          context: contextWithInvalidExpiry,
+        });
+
+        expect(metadata.validationErrors).toStrictEqual({
+          expiryError: 'Invalid expiry',
+        });
+      });
+
+      it.each([[12345678], [0x1234], [999999999]])(
         'should return a validation error for invalid expiry %s',
         async (expiry) => {
           const contextWithInvalidExpiry = {
@@ -480,7 +514,7 @@ describe('nativeTokenStream:context', () => {
           });
 
           expect(metadata.validationErrors).toStrictEqual({
-            expiryError: 'Invalid expiry',
+            expiryError: 'Expiry must be in the future',
           });
         },
       );
