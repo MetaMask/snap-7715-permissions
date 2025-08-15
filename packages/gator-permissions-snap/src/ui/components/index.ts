@@ -7,3 +7,4 @@ export { TextField } from './TextField';
 export { TokenIcon } from './TokenIcon';
 export { TooltipIcon } from './TooltipIcon';
 export { TokenField } from './TokenField';
+export { TokenBalanceField } from './TokenBalanceField';
