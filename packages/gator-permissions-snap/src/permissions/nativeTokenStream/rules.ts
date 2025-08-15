@@ -25,7 +25,7 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
   type: 'number',
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.initialAmount,
+    value: context.permissionDetails.initialAmount ?? undefined,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     iconData: getIconData(context),
@@ -50,7 +50,7 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
   type: 'number',
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.maxAmount,
+    value: context.permissionDetails.maxAmount ?? undefined,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The maximum amount of tokens that can be streamed.',

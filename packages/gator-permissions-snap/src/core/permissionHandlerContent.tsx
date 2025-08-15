@@ -42,8 +42,8 @@ export type PermissionHandlerContentProps = {
   isJustificationCollapsed: boolean;
   origin: string;
   context: BaseContext;
-  tokenBalance: string | undefined;
-  tokenBalanceFiat: string | undefined;
+  tokenBalance: string | null;
+  tokenBalanceFiat: string | null;
   chainId: number;
   explorerUrl: string;
 };

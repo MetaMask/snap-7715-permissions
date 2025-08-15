@@ -177,7 +177,7 @@ const Index = () => {
     }
     setIsWorking(true);
     setReceipt(null);
-    setPermissionResponseError(undefined);
+    setPermissionResponseError(null);
 
     const feePerGas = await getFeePerGas();
 

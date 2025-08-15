@@ -110,6 +110,40 @@ describe('erc20TokenStream:validation', () => {
           parseAndValidatePermission(invalidMaxAmountRequest),
         ).toThrow('Invalid maxAmount: must be greater than initialAmount');
       });
+
+      it('should allow missing maxAmount', () => {
+        const noMaxAmountRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+            },
+          },
+        };
+        delete noMaxAmountRequest.permission.data.maxAmount;
+
+        expect(() =>
+          parseAndValidatePermission(noMaxAmountRequest),
+        ).not.toThrow();
+      });
+
+      it('should allow null maxAmount', () => {
+        const nullMaxAmountRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              maxAmount: null,
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(nullMaxAmountRequest),
+        ).not.toThrow();
+      });
     });
 
     describe('initialAmount validation', () => {
@@ -145,6 +179,26 @@ describe('erc20TokenStream:validation', () => {
         expect(() =>
           parseAndValidatePermission(noInitialAmountRequest),
         ).not.toThrow();
+      });
+
+      it('should allow null initialAmount', () => {
+        const nullInitialAmountRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              initialAmount: null,
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(nullInitialAmountRequest),
+        ).not.toThrow();
+
+        const result = parseAndValidatePermission(nullInitialAmountRequest);
+        expect(result).toBeDefined();
       });
     });
 
@@ -219,6 +273,43 @@ describe('erc20TokenStream:validation', () => {
         expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
           'Failed type validation: data.startTime: Expected integer, received float',
         );
+      });
+
+      it('should allow missing startTime', () => {
+        const noStartTimeRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+            },
+          },
+        };
+        delete noStartTimeRequest.permission.data.startTime;
+
+        expect(() =>
+          parseAndValidatePermission(noStartTimeRequest),
+        ).not.toThrow();
+      });
+
+      it('should allow null startTime', () => {
+        const nullStartTimeRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: null,
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(nullStartTimeRequest),
+        ).not.toThrow();
+
+        const result = parseAndValidatePermission(nullStartTimeRequest);
+        expect(result).toBeDefined();
       });
     });
 
