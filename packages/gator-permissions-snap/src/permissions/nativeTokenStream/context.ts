@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   parseCaipAccountId,
@@ -72,7 +73,7 @@ export async function applyContext({
     }) ?? [];
 
   if (!isExpiryRuleFound) {
-    throw new Error(
+    throw new InvalidInputError(
       'Expiry rule not found. An expiry is required on all permissions.',
     );
   }
@@ -155,7 +156,7 @@ export async function buildContext({
   } = permissionRequest;
 
   if (!address) {
-    throw new Error(
+    throw new InvalidInputError(
       'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
     );
   }
@@ -178,7 +179,7 @@ export async function buildContext({
   );
 
   if (!expiryRule) {
-    throw new Error(
+    throw new InvalidInputError(
       'Expiry rule not found. An expiry is required on all permissions.',
     );
   }

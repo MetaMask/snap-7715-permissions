@@ -6,7 +6,7 @@ import type {
   InputChangeEvent,
   UserInputEvent,
 } from '@metamask/snaps-sdk';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { InternalError, UserInputEventType } from '@metamask/snaps-sdk';
 
 export type DialogContentEventHandlers = {
   elementName: string;
@@ -228,7 +228,9 @@ export class UserEventDispatcher {
     id: string;
   }) => Promise<void> {
     if (this.#hasEventHandler) {
-      throw new Error('User input event handler has already been created');
+      throw new InternalError(
+        'User input event handler has already been created',
+      );
     }
     this.#hasEventHandler = true;
 

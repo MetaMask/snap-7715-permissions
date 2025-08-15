@@ -1,4 +1,5 @@
 import type { Hex } from '@metamask/delegation-core';
+import { ResourceNotFoundError } from '@metamask/snaps-sdk';
 
 export enum Enforcers {
   LimitedCallsEnforcer = 'LimitedCallsEnforcer',
@@ -78,7 +79,9 @@ export const getChainMetadata = ({
   const metadata = metadataByChainId[chainId];
 
   if (!metadata) {
-    throw new Error(`No chain metadata found for chainId: ${chainId}`);
+    throw new ResourceNotFoundError(
+      `No chain metadata found for chainId: ${chainId}`,
+    );
   }
 
   return metadata;

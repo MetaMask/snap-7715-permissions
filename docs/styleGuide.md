@@ -37,6 +37,7 @@ Example:
 - Use descriptive error messages
 - Prefer custom error classes for specific error types
 - Handle errors appropriately
+- Use errors as defined in https://docs.metamask.io/snaps/how-to/communicate-errors/
 
 ## Testing
 

@@ -16,6 +16,10 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       extends: ['@metamask/eslint-config-typescript'],
+      rules: {
+        // Allow throwing Snap SDK error objects
+        '@typescript-eslint/no-throw-literal': 'off',
+      },
     },
 
     {

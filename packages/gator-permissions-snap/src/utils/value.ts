@@ -1,4 +1,5 @@
 import type { Hex } from '@metamask/delegation-core';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Formats a token value to a human-readable string.
@@ -51,7 +52,7 @@ export const formatUnitsFromHex = <
       return undefined as TAllowUndefined extends true ? Hex | undefined : Hex;
     }
 
-    throw new Error('Value is undefined');
+    throw new InvalidInputError('Value is undefined');
   }
 
   return formatUnits({ value: BigInt(value), decimals });
@@ -72,7 +73,7 @@ export function parseUnits({
   decimals: number;
 }) {
   if (!/^(-?)([0-9]*)\.?([0-9]*)$/u.test(formatted)) {
-    throw new Error(`Invalid numeric value: ${formatted}`);
+    throw new InvalidInputError(`Invalid numeric value: ${formatted}`);
   }
 
   let [integerPart = '0', fractionPart = '0'] = formatted.split('.');

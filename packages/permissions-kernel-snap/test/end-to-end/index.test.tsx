@@ -25,7 +25,7 @@ describe('Kernel Snap', () => {
         });
 
         expect(response).toRespondWithError({
-          code: -32603,
+          code: -32601,
           message: 'Method foo not found.',
           stack: expect.any(String),
         });

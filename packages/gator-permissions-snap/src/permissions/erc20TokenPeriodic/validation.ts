@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import { validateHexInteger } from '../validation';
 import type {
@@ -31,14 +32,14 @@ function validatePermissionData(
   const expiryRule = rules?.find((rule) => rule.type === 'expiry');
 
   if (!expiryRule) {
-    throw new Error('Expiry rule is required');
+    throw new InvalidInputError('Expiry rule is required');
   }
 
   const expiry = Number(expiryRule.data.timestamp);
 
   // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
   if (startTime && startTime >= expiry) {
-    throw new Error('Invalid startTime: must be before expiry');
+    throw new InvalidInputError('Invalid startTime: must be before expiry');
   }
 
   return true;
@@ -60,7 +61,7 @@ export function parseAndValidatePermission(
   } = zErc20TokenPeriodicPermission.safeParse(permissionRequest.permission);
 
   if (!success) {
-    throw new Error(extractZodError(validationError.errors));
+    throw new InvalidInputError(extractZodError(validationError.errors));
   }
 
   validatePermissionData(validationResult, permissionRequest.rules);

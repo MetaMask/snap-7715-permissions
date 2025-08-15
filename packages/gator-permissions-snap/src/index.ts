@@ -8,13 +8,16 @@ import {
   Platform,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
-import type {
-  OnHomePageHandler,
-  OnInstallHandler,
-  Json,
-  JsonRpcParams,
-  OnRpcRequestHandler,
-  OnUserInputHandler,
+import {
+  type OnHomePageHandler,
+  type OnInstallHandler,
+  type Json,
+  type JsonRpcParams,
+  type OnRpcRequestHandler,
+  type OnUserInputHandler,
+  MethodNotFoundError,
+  InvalidRequestError,
+  InternalError,
 } from '@metamask/snaps-sdk';
 
 import { AccountApiClient } from './clients/accountApiClient';
@@ -48,17 +51,17 @@ const snapEnv = process.env.SNAP_ENV;
 const accountApiBaseUrl = process.env.ACCOUNT_API_BASE_URL;
 
 if (!accountApiBaseUrl) {
-  throw new Error('ACCOUNT_API_BASE_URL is not set');
+  throw new InternalError('ACCOUNT_API_BASE_URL is not set');
 }
 
 const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
 if (!priceApiBaseUrl) {
-  throw new Error('PRICE_API_BASE_URL is not set');
+  throw new InternalError('PRICE_API_BASE_URL is not set');
 }
 
 const supportedChainsString = process.env.SUPPORTED_CHAINS;
 if (!supportedChainsString) {
-  throw new Error('SUPPORTED_CHAINS is not set');
+  throw new InternalError('SUPPORTED_CHAINS is not set');
 }
 
 const supportedChains = supportedChainsString.split(',').map(Number);
@@ -196,7 +199,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   );
 
   if (!isMethodAllowedForOrigin(origin, request.method)) {
-    throw new Error(
+    throw new InvalidRequestError(
       `Origin '${origin}' is not allowed to call '${request.method}'`,
     );
   }
@@ -204,7 +207,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   const handler = boundRpcHandlers[request.method];
 
   if (!handler) {
-    throw new Error(`Method ${request.method} not found.`);
+    throw new MethodNotFoundError(`Method ${request.method} not found.`);
   }
 
   const result = await handler(request.params);

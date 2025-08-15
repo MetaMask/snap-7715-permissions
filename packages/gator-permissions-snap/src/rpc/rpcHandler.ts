@@ -1,5 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { Json } from '@metamask/snaps-sdk';
+import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
@@ -67,7 +67,7 @@ export function createRpcHandler(config: {
           await handler.handlePermissionRequest(siteOrigin);
 
         if (!permissionResponse.approved) {
-          throw new Error(permissionResponse.reason);
+          throw new InvalidInputError(permissionResponse.reason);
         }
 
         if (permissionResponse.response) {

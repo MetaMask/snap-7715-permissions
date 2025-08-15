@@ -1,8 +1,9 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type {
-  Json,
-  JsonRpcParams,
-  OnRpcRequestHandler,
+import {
+  MethodNotFoundError,
+  type Json,
+  type JsonRpcParams,
+  type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
 
 import { createPermissionOfferRegistryManager } from './registryManager';
@@ -48,7 +49,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   const handler = boundRpcHandlers[request.method];
 
   if (!handler) {
-    throw new Error(`Method ${request.method} not found.`);
+    throw new MethodNotFoundError(`Method ${request.method} not found.`);
   }
 
   const result = await handler({

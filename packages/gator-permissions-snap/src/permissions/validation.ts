@@ -1,4 +1,5 @@
 import type { Hex } from '@metamask/delegation-core';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Validates a hex integer value with configurable constraints.
@@ -25,17 +26,17 @@ export function validateHexInteger({
       return;
     }
 
-    throw new Error(`Invalid ${name}: must be defined`);
+    throw new InvalidInputError(`Invalid ${name}: must be defined`);
   }
   let parsedValue: bigint;
 
   try {
     parsedValue = BigInt(value);
   } catch (error) {
-    throw new Error(`Invalid ${name}: must be a valid hex integer`);
+    throw new InvalidInputError(`Invalid ${name}: must be a valid hex integer`);
   }
 
   if (parsedValue === 0n && !allowZero) {
-    throw new Error(`Invalid ${name}: must be greater than 0`);
+    throw new InvalidInputError(`Invalid ${name}: must be greater than 0`);
   }
 }
