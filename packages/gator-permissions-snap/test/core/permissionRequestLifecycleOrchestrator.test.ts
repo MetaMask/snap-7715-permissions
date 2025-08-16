@@ -9,6 +9,7 @@ import {
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
+import type { Hex } from 'viem';
 
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
@@ -406,6 +407,33 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(delegationsArray).toStrictEqual([expectedDelegation]);
         expect(delegationsArray[0]?.salt).not.toBe(0n);
+      });
+
+      it('rejects permission request for unsupported chain early', async () => {
+        const unsupportedChainRequest = {
+          ...mockPermissionRequest,
+          chainId: '0x64' as Hex, // 100 - unsupported chain
+        };
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          unsupportedChainRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(result.approved).toBe(false);
+        expect(!result.approved && result.reason).toBe(
+          'Chain 100 is not supported',
+        );
+
+        // Ensure that no confirmation dialog was created
+        expect(
+          mockConfirmationDialogFactory.createConfirmation,
+        ).not.toHaveBeenCalled();
+        expect(mockConfirmationDialog.createInterface).not.toHaveBeenCalled();
+        expect(
+          mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision,
+        ).not.toHaveBeenCalled();
       });
 
       it('throws an error when expiry rule is not present', async () => {
