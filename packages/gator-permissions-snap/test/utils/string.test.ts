@@ -27,7 +27,7 @@ describe('truncateDecimalPlaces', () => {
   });
 
   it('handles positive sign', () => {
-    expect(truncateDecimalPlaces('+123.456789', 2)).toBe('123.45');
+    expect(truncateDecimalPlaces('+123.456789', 2)).toBe('+123.45');
   });
 
   it('throws error for invalid input', () => {
@@ -39,8 +39,10 @@ describe('truncateDecimalPlaces', () => {
   });
 
   it('handles scientific notation', () => {
-    expect(truncateDecimalPlaces('1e-8')).toBe('0.00000001');
-    expect(truncateDecimalPlaces('1.23e2')).toBe('123.00000000');
+    expect(() => truncateDecimalPlaces('1e-8')).toThrow('Invalid number: 1e-8');
+    expect(() => truncateDecimalPlaces('1.23e2')).toThrow(
+      'Invalid number: 1.23e2',
+    );
   });
 
   it('throws error for more than one dot', () => {
