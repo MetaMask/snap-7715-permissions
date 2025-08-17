@@ -19,10 +19,10 @@ import {
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type {
-  AccountControllerInterface,
   BaseContext,
   BaseMetadata,
   DeepRequired,
@@ -35,7 +35,7 @@ import type {
  * Orchestrates the lifecycle of permission requests, confirmation dialogs, and delegation creation.
  */
 export class PermissionRequestLifecycleOrchestrator {
-  readonly #accountController: AccountControllerInterface;
+  readonly #accountController: AccountController;
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
@@ -49,7 +49,7 @@ export class PermissionRequestLifecycleOrchestrator {
     userEventDispatcher,
     nonceCaveatService,
   }: {
-    accountController: AccountControllerInterface;
+    accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;

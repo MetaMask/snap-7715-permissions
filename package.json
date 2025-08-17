@@ -57,5 +57,8 @@
       "@lavamoat/preinstall-always-fail": false,
       "sharp": true
     }
+  },
+  "resolutions": {
+    "gatsby/path-to-regexp": "0.1.12"
   }
 }

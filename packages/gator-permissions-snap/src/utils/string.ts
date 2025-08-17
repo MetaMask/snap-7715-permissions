@@ -60,30 +60,35 @@ export function shortenAddress(address = '') {
 }
 
 /**
- * Truncates the decimal part of a numeric string to a specified number of digits.
- * If the input is not a valid number, returns the original value.
+ * Truncates the decimal places of a numeric string to a specified number of digits.
  *
- * @param value - The numeric string to truncate (e.g., "123.456789").
- * @param decimalPlaces - The maximum number of decimal places to keep. Defaults to 8.
- * @returns The truncated numeric string, or the original value if not a valid number.
+ * Converts the input string to a number, handling scientific notation, and returns
+ * a string representation with at most `decimalPlaces` digits after the decimal point.
+ * If the input is not a valid number, an error is thrown.
  *
- * @example
- * truncateDecimalPlaces("123.456789123", 4); // "123.4567"
- * truncateDecimalPlaces("100", 4); // "100"
- * truncateDecimalPlaces("abc", 4); // "abc"
+ * @param value - The numeric string to truncate.
+ * @param decimalPlaces - The maximum number of decimal places to retain (default: 8).
+ * @returns The truncated numeric string.
+ * @throws {Error} If the input value is not a valid number.
  */
 export function truncateDecimalPlaces(
   value: string,
   decimalPlaces = 8,
 ): string {
   const trimmedValue = value.trim();
-  // Only allow optional minus, digits, optional decimal and digits
-  if (!/^[-+]?\d+(\.\d+)?$/u.test(trimmedValue)) {
-    return value;
+  const numValue = Number(trimmedValue);
+
+  if (isNaN(numValue)) {
+    throw new Error(`Invalid number: ${value}`);
   }
-  const [whole = '', decimals = ''] = trimmedValue.split('.');
-  if (!decimals) {
-    return whole;
+
+  // Convert to fixed notation if in scientific notation
+  const stringValue = numValue.toFixed(20); // Use high precision
+  const [whole = '', decimals = ''] = stringValue.split('.');
+
+  if (!decimals || decimals.length <= decimalPlaces) {
+    return trimmedValue; // Return original if no truncation needed
   }
+
   return `${whole}.${decimals.slice(0, decimalPlaces)}`;
 }
