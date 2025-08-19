@@ -24,6 +24,8 @@ module.exports = {
         ],
         // Disable jsdoc/tag-lines rule to allow lines after block descriptions
         'jsdoc/tag-lines': 'off',
+        // Allow throwing Snap SDK error objects
+        '@typescript-eslint/no-throw-literal': 'off',
       },
     },
 

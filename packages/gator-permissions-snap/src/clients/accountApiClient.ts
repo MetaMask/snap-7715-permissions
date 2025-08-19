@@ -1,5 +1,10 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
+import {
+  InvalidInputError,
+  ResourceNotFoundError,
+  ResourceUnavailableError,
+} from '@metamask/snaps-sdk';
 
 import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata } from './types';
@@ -87,14 +92,14 @@ export class AccountApiClient {
       const message = 'No chainId provided to fetch token balance';
       logger.error(message);
 
-      throw new Error(message);
+      throw new InvalidInputError(message);
     }
 
     if (!account) {
       const message = 'No account address provided to fetch token balance';
       logger.error(message);
 
-      throw new Error(message);
+      throw new InvalidInputError(message);
     }
 
     const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
@@ -107,7 +112,7 @@ export class AccountApiClient {
       const message = `HTTP error. Failed to fetch token balance for account(${account}) and token(${tokenAddress}) on chain(${chainId}): ${response.status}`;
       logger.error(message);
 
-      throw new Error(message);
+      throw new ResourceUnavailableError(message);
     }
 
     const { accounts, type, iconUrl, symbol, decimals } =
@@ -122,7 +127,7 @@ export class AccountApiClient {
       const message = `No balance data found for the account: ${account}`;
       logger.error(message);
 
-      throw new Error(message);
+      throw new ResourceNotFoundError(message);
     }
 
     if (
@@ -132,7 +137,7 @@ export class AccountApiClient {
       const message = `Unsupported token type: ${type}`;
       logger.error(message);
 
-      throw new Error(message);
+      throw new InvalidInputError(message);
     }
 
     const balance = BigInt(accountData.rawBalance);

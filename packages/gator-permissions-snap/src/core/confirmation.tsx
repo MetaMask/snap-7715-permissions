@@ -1,5 +1,5 @@
 import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { MethodNotFoundError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
@@ -23,6 +23,11 @@ export class ConfirmationDialog {
   #interfaceId: string | undefined;
 
   #isGrantDisabled: boolean;
+
+  // Track handlers and promise hooks so we can programmatically close the dialog on error
+  #unbindHandlers: (() => void) | undefined;
+
+  #decisionReject: ((reason: Error) => void) | undefined;
 
   constructor({
     ui,
@@ -56,7 +61,9 @@ export class ConfirmationDialog {
     isConfirmationGranted: boolean;
   }> {
     if (!this.#interfaceId) {
-      throw new Error(ConfirmationDialog.#interfaceNotCreatedError);
+      throw new MethodNotFoundError(
+        ConfirmationDialog.#interfaceNotCreatedError,
+      );
     }
     const interfaceId = this.#interfaceId;
 
@@ -91,6 +98,9 @@ export class ConfirmationDialog {
         unbindGrantButtonClick();
         unbindCancelButtonClick();
 
+        // clear our stored unbind handler reference
+        this.#unbindHandlers = undefined;
+
         try {
           await this.#snaps.request({
             method: 'snap_resolveInterface',
@@ -104,6 +114,13 @@ export class ConfirmationDialog {
           reject(reason);
         }
       };
+
+      // store hooks so we can close/reject programmatically on error
+      this.#unbindHandlers = () => {
+        unbindGrantButtonClick();
+        unbindCancelButtonClick();
+      };
+      this.#decisionReject = reject;
 
       // we don't await this, because we only want to present the dialog, and
       // not wait for it to be resolved
@@ -153,7 +170,9 @@ export class ConfirmationDialog {
     isGrantDisabled: boolean;
   }): Promise<void> {
     if (!this.#interfaceId) {
-      throw new Error(ConfirmationDialog.#interfaceNotCreatedError);
+      throw new MethodNotFoundError(
+        ConfirmationDialog.#interfaceNotCreatedError,
+      );
     }
 
     this.#ui = ui;
@@ -167,5 +186,51 @@ export class ConfirmationDialog {
         ui: this.#buildConfirmation(),
       },
     });
+  }
+
+  /**
+   * Programmatically close the confirmation dialog due to an error and reject the pending decision promise.
+   * Safe to call multiple times.
+   * @param reason - The error to reject the pending decision promise with.
+   */
+  async closeWithError(reason: Error): Promise<void> {
+    if (!this.#interfaceId) {
+      // nothing to close
+      if (this.#decisionReject) {
+        this.#decisionReject(reason);
+        this.#decisionReject = undefined;
+      }
+      return;
+    }
+
+    // Unbind any listeners to avoid leaks
+    if (this.#unbindHandlers) {
+      try {
+        this.#unbindHandlers();
+      } catch {
+        // ignore
+      } finally {
+        this.#unbindHandlers = undefined;
+      }
+    }
+
+    try {
+      await this.#snaps.request({
+        method: 'snap_resolveInterface',
+        params: {
+          id: this.#interfaceId,
+          value: {},
+        },
+      });
+    } catch (error) {
+      // If closing fails, still reject with the original reason
+    } finally {
+      this.#interfaceId = undefined;
+    }
+
+    if (this.#decisionReject) {
+      this.#decisionReject(reason);
+      this.#decisionReject = undefined;
+    }
   }
 }

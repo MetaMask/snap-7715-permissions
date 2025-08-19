@@ -24,7 +24,7 @@ describe('Kernel Snap', () => {
         });
 
         expect(response).toRespondWithError({
-          code: -32603,
+          code: -32600,
           message: `Origin 'npm:@metamask/not-kernel' is not allowed to call 'foo'`,
           stack: expect.any(String),
         });
@@ -37,7 +37,7 @@ describe('Kernel Snap', () => {
         });
 
         expect(response).toRespondWithError({
-          code: -32603,
+          code: -32600,
           message: `Origin 'npm:@metamask/not-metamask' is not allowed to call 'permissionsProvider_getGrantedPermissions'`,
           stack: expect.any(String),
         });
