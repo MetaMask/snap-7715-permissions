@@ -52,7 +52,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     throw new MethodNotFoundError(`Method ${request.method} not found.`);
   }
 
-  const handler = boundRpcHandlers[request.method]!;
+  // We know that the method exists, so we can cast to NonNullable
+  const handler = boundRpcHandlers[request.method] as NonNullable<
+    (typeof boundRpcHandlers)[string]
+  >;
 
   const result = await handler({
     siteOrigin: origin,
