@@ -30,7 +30,7 @@ export type NativeTokenStreamContext = BaseContext & {
     initialAmount: string | undefined | null;
     maxAmount: string | undefined | null;
     timePeriod: TimePeriod;
-    startTime: string;
+    startTime: number;
     amountPerPeriod: string;
   };
 };
