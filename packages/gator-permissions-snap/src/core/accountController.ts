@@ -12,67 +12,17 @@ import type { SignDelegationOptions } from './types';
 export class AccountController {
   #ethereumProvider: SnapsEthereumProvider;
 
-  protected supportedChains: readonly number[];
-
   /**
    * Initializes a new AccountController instance.
    * @param config - The configuration object for the controller.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.ethereumProvider - The provider for interacting with Ethereum.
-   * @param config.supportedChains - Optional list of supported blockchain chains.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
     ethereumProvider: SnapsEthereumProvider;
-    supportedChains: readonly number[];
   }) {
-    this.#validateSupportedChains(config.supportedChains);
-
-    this.supportedChains = config.supportedChains;
-
     this.#ethereumProvider = config.ethereumProvider;
-  }
-
-  /**
-   * Validates that the specified chains are supported.
-   * @param supportedChains - The chains to validate.
-   * @throws If no chains are specified or if any chain is not supported.
-   */
-  #validateSupportedChains(supportedChains: readonly number[]) {
-    if (supportedChains.length === 0) {
-      logger.error('No supported chains specified');
-      throw new Error('No supported chains specified');
-    }
-
-    // ensure that there is chain metadata for all specified chains
-    try {
-      supportedChains.map((chainId) => getChainMetadata({ chainId }));
-    } catch (error) {
-      logger.error('Unsupported chains specified', {
-        supportedChains,
-        error,
-      });
-      throw new Error(
-        `Unsupported chains specified: ${supportedChains.join(', ')}`,
-      );
-    }
-  }
-
-  /**
-   * Asserts that the specified chain ID is supported.
-   * @param chainId - The chain ID to validate.
-   * @throws If the chain ID is not supported.
-   */
-  #assertIsSupportedChainId(chainId: number) {
-    if (!this.supportedChains.includes(chainId)) {
-      logger.error(
-        'AccountController:assertIsSupportedChainId() - unsupported chainId',
-        {
-          chainId,
-        },
-      );
-      throw new Error(`Unsupported ChainId: ${chainId}`);
-    }
   }
 
   /**
@@ -108,8 +58,6 @@ export class AccountController {
     logger.debug('AccountController:signDelegation()');
 
     const { chainId, delegation, address } = options;
-
-    this.#assertIsSupportedChainId(chainId);
 
     const selectedChain = await this.#ethereumProvider.request<Hex>({
       method: 'eth_chainId',

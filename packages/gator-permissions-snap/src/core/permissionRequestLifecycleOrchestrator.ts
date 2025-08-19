@@ -3,6 +3,7 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Delegation } from '@metamask/delegation-core';
 import {
   createNonceTerms,
@@ -10,6 +11,7 @@ import {
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   bytesToHex,
@@ -43,21 +45,70 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #nonceCaveatService: NonceCaveatService;
 
+  protected supportedChains: readonly number[];
+
   constructor({
     accountController,
     confirmationDialogFactory,
     userEventDispatcher,
     nonceCaveatService,
+    supportedChains,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
+    supportedChains: readonly number[];
   }) {
+    this.#validateSupportedChains(supportedChains);
+
+    this.supportedChains = supportedChains;
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
+  }
+
+  /**
+   * Validates that the specified chains are supported.
+   * @param supportedChains - The chains to validate.
+   * @throws If no chains are specified or if any chain is not supported.
+   */
+  #validateSupportedChains(supportedChains: readonly number[]) {
+    if (supportedChains.length === 0) {
+      logger.error('No supported chains specified');
+      throw new InvalidParamsError('No supported chains specified');
+    }
+
+    // ensure that there is chain metadata for all specified chains
+    try {
+      supportedChains.map((chainId) => getChainMetadata({ chainId }));
+    } catch (error) {
+      logger.error('Unsupported chains specified', {
+        supportedChains,
+        error,
+      });
+      throw new InvalidParamsError(
+        `Unsupported chains specified: ${supportedChains.join(', ')}`,
+      );
+    }
+  }
+
+  /**
+   * Asserts that the specified chain ID is supported.
+   * @param chainId - The chain ID to validate.
+   * @throws If the chain ID is not supported.
+   */
+  #assertIsSupportedChainId(chainId: number) {
+    if (!this.supportedChains.includes(chainId)) {
+      logger.error(
+        'PermissionRequestLifecycleOrchestrator:assertIsSupportedChainId() - unsupported chainId',
+        {
+          chainId,
+        },
+      );
+      throw new InvalidParamsError(`Unsupported ChainId: ${chainId}`);
+    }
   }
 
   /**
@@ -88,7 +139,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
     // Validate chain support early, before showing confirmation dialog
     try {
-      getChainMetadata({ chainId });
+      this.#assertIsSupportedChainId(chainId);
     } catch (error) {
       return {
         approved: false,
