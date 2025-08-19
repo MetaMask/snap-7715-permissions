@@ -46,11 +46,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     JSON.stringify(request, undefined, 2),
   );
 
-  const handler = boundRpcHandlers[request.method];
-
-  if (!handler) {
+  // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
+  // This ensures we only access methods that exist on boundRpcHandlers itself
+  if (!Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)) {
     throw new MethodNotFoundError(`Method ${request.method} not found.`);
   }
+
+  const handler = boundRpcHandlers[request.method]!;
 
   const result = await handler({
     siteOrigin: origin,
