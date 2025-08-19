@@ -99,7 +99,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         params: [account, 'latest'],
       });
 
-      if (!balance) {
+      if (balance == null) {
         throw new Error('Failed to fetch native token balance');
       }
 
