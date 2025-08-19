@@ -71,7 +71,7 @@ const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
 
 const alreadyPopulatedContext: Erc20TokenStreamContext = {
   expiry: {
-    timestamp: '1714521600',
+    timestamp: 1714521600,
     isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
@@ -87,7 +87,7 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
     initialAmount: '1',
     maxAmount: '10',
     timePeriod: TimePeriod.WEEKLY,
-    startTime: '1729900800',
+    startTime: 1729900800,
     amountPerPeriod: '302400',
   },
 } as const;
@@ -278,11 +278,8 @@ describe('erc20TokenStream:context', () => {
   });
 
   describe('deriveMetadata()', () => {
-    const dateInTheFuture = (
-      Math.floor(Date.now() / 1000) +
-      24 * 60 * 60
-    ).toString(); // 24 hours from now
-    const startTime = (Math.floor(Date.now() / 1000) + 12 * 60 * 60).toString(); // 12 hours from now
+    const dateInTheFuture = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // 24 hours from now
+    const startTime = Math.floor(Date.now() / 1000) + 12 * 60 * 60; // 12 hours from now
     const context = {
       ...alreadyPopulatedContext,
       expiry: {
@@ -454,7 +451,7 @@ describe('erc20TokenStream:context', () => {
             ...context,
             permissionDetails: {
               ...context.permissionDetails,
-              startTime: '10/26/1985',
+              startTime: 499161600, // 10/26/1985
             },
           };
 
@@ -467,7 +464,25 @@ describe('erc20TokenStream:context', () => {
           });
         });
 
-        it.each([['12345678'], ['0x1234'], ['Steve']])(
+        it('should return a validation error for invalid startTime -1', async () => {
+          const contextWithInvalidStartTime = {
+            ...context,
+            permissionDetails: {
+              ...context.permissionDetails,
+              startTime: -1,
+            },
+          };
+
+          const metadata = await deriveMetadata({
+            context: contextWithInvalidStartTime,
+          });
+
+          expect(metadata.validationErrors).toStrictEqual({
+            startTimeError: 'Invalid start time',
+          });
+        });
+
+        it.each([[12345678], [0x1234], [999999999]])(
           'should return a validation error for invalid startTime %s',
           async (startTimeArg) => {
             const contextWithInvalidStartTime = {
@@ -483,7 +498,7 @@ describe('erc20TokenStream:context', () => {
             });
 
             expect(metadata.validationErrors).toStrictEqual({
-              startTimeError: 'Invalid start time',
+              startTimeError: 'Start time must be today or later',
             });
           },
         );
@@ -495,7 +510,7 @@ describe('erc20TokenStream:context', () => {
         const contextWithExpiryInThePast = {
           ...context,
           expiry: {
-            timestamp: '10/26/1985',
+            timestamp: 499161600, // 10/26/1985
             isAdjustmentAllowed: true,
           },
           permissionDetails: {
@@ -512,7 +527,28 @@ describe('erc20TokenStream:context', () => {
         });
       });
 
-      it.each([['12345678'], ['0x1234'], ['Steve']])(
+      it('should return a validation error for invalid expiry -1', async () => {
+        const contextWithInvalidExpiry = {
+          ...context,
+          expiry: {
+            timestamp: -1,
+            isAdjustmentAllowed: true,
+          },
+          permissionDetails: {
+            ...context.permissionDetails,
+          },
+        };
+
+        const metadata = await deriveMetadata({
+          context: contextWithInvalidExpiry,
+        });
+
+        expect(metadata.validationErrors).toStrictEqual({
+          expiryError: 'Invalid expiry',
+        });
+      });
+
+      it.each([[12345678], [0x1234], [999999999]])(
         'should return a validation error for invalid expiry %s',
         async (expiry) => {
           const contextWithInvalidExpiry = {
@@ -531,7 +567,7 @@ describe('erc20TokenStream:context', () => {
           });
 
           expect(metadata.validationErrors).toStrictEqual({
-            expiryError: 'Invalid expiry',
+            expiryError: 'Expiry must be in the future',
           });
         },
       );
