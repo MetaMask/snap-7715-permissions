@@ -16,7 +16,7 @@ export const TokenBalanceField = ({ tokenBalance }: TokenBalanceFieldProps) => {
   if (!tokenBalance) {
     return <Skeleton />;
   }
-  const truncatedTokenBalance = truncateDecimalPlaces(tokenBalance);
+  const truncatedTokenBalance = truncateDecimalPlaces(tokenBalance, 5);
   if (truncatedTokenBalance === tokenBalance) {
     return <Text>{truncatedTokenBalance} available</Text>;
   }
