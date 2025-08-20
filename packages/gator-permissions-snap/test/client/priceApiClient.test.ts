@@ -135,7 +135,7 @@ describe('PriceApiClient', () => {
         } as any);
 
         const price = await client.getSpotPrice('eip155:1/slip44:60', 'usd', {
-          attempts: 2,
+          retries: 2,
           delayMs: 500,
         });
 
@@ -180,7 +180,7 @@ describe('PriceApiClient', () => {
 
         await expect(
           client.getSpotPrice('eip155:1/slip44:60', 'usd', {
-            attempts: 3,
+            retries: 3,
             delayMs: 100,
           }),
         ).rejects.toThrow('Price service temporarily unavailable (HTTP 500)');
@@ -222,7 +222,7 @@ describe('PriceApiClient', () => {
         } as any);
 
         const price = await client.getSpotPrice('eip155:1/slip44:60', 'usd', {
-          attempts: 2,
+          retries: 2,
           delayMs: 1000,
         });
 
