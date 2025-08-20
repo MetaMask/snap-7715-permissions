@@ -1,6 +1,10 @@
 import { GATOR_PERMISSIONS_PROVIDER_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
+import {
+  InvalidInputError,
+  type Json,
+  type SnapsProvider,
+} from '@metamask/snaps-sdk';
 
 import type { PermissionOfferRegistryManager } from '../registryManager';
 import {
@@ -75,7 +79,7 @@ export function createRpcHandler(config: {
       });
 
     if (errorMessage) {
-      throw new Error(errorMessage);
+      throw new InvalidInputError(errorMessage);
     }
 
     const grantedPermissions = await snapsProvider.request({

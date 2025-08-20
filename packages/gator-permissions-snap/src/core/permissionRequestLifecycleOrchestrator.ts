@@ -11,7 +11,7 @@ import {
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import { InvalidParamsError } from '@metamask/snaps-sdk';
+import { InvalidInputError, InvalidParamsError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   bytesToHex,
@@ -157,9 +157,15 @@ export class PermissionRequestLifecycleOrchestrator {
     const decisionPromise =
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
-    let context = await lifecycleHandlers.buildContext(
-      validatedPermissionRequest,
-    );
+    let context: TContext;
+    try {
+      context = await lifecycleHandlers.buildContext(
+        validatedPermissionRequest,
+      );
+    } catch (error) {
+      await confirmationDialog.closeWithError(error as Error);
+      throw error;
+    }
 
     const updateConfirmation = async ({
       newContext,
@@ -190,10 +196,15 @@ export class PermissionRequestLifecycleOrchestrator {
     };
 
     // replace the skeleton content with the actual content rendered with the resolved context
-    await updateConfirmation({
-      newContext: context,
-      isGrantDisabled: false,
-    });
+    try {
+      await updateConfirmation({
+        newContext: context,
+        isGrantDisabled: false,
+      });
+    } catch (error) {
+      await confirmationDialog.closeWithError(error as Error);
+      throw error;
+    }
 
     const isAdjustmentAllowed =
       permissionRequest.permission.isAdjustmentAllowed ?? true;
@@ -205,13 +216,18 @@ export class PermissionRequestLifecycleOrchestrator {
         updatedContext: TContext;
       }) => {
         if (!isAdjustmentAllowed) {
-          throw new Error('Adjustment is not allowed');
+          throw new InvalidInputError('Adjustment is not allowed');
         }
 
-        await updateConfirmation({
-          newContext: updatedContext,
-          isGrantDisabled: false,
-        });
+        try {
+          await updateConfirmation({
+            newContext: updatedContext,
+            isGrantDisabled: false,
+          });
+        } catch (error) {
+          await confirmationDialog.closeWithError(error as Error);
+          throw error;
+        }
       };
 
       lifecycleHandlers.onConfirmationCreated({
@@ -248,6 +264,10 @@ export class PermissionRequestLifecycleOrchestrator {
         approved: false,
         reason: 'Permission request denied',
       };
+    } catch (error) {
+      // Any unexpected error during the flow should immediately close the dialog
+      await confirmationDialog.closeWithError(error as Error);
+      throw error;
     } finally {
       if (lifecycleHandlers.onConfirmationResolved) {
         lifecycleHandlers.onConfirmationResolved();
@@ -315,9 +335,8 @@ export class PermissionRequestLifecycleOrchestrator {
     };
 
     const { address } = grantedPermissionRequest;
-    // todo: it would be nice if this was concretely typed
     if (!address) {
-      throw new Error('Address is undefined');
+      throw new InvalidInputError('Address is undefined');
     }
 
     const { contracts } = getChainMetadata({ chainId });
@@ -348,7 +367,7 @@ export class PermissionRequestLifecycleOrchestrator {
         args: '0x',
       });
     } else {
-      throw new Error(
+      throw new InvalidInputError(
         'Expiry rule not found. An expiry is required on all permissions.',
       );
     }

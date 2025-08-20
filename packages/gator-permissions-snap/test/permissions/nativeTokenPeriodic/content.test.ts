@@ -9,7 +9,10 @@ import type {
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 
 const mockContext: NativeTokenPeriodicContext = {
-  expiry: '05/01/2024',
+  expiry: {
+    timestamp: 1714521600, // 05/01/2024
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: true,
   justification: 'Permission to do periodic native token transfers',
   accountAddressCaip10: 'eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
@@ -24,7 +27,7 @@ const mockContext: NativeTokenPeriodicContext = {
     periodAmount: '1',
     periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
-    startTime: '10/26/1985',
+    startTime: 499161600, // 10/26/1985
   },
 };
 
@@ -132,7 +135,7 @@ describe('nativeTokenPeriodic:content', () => {
                                 "name": "native-token-periodic-start-date_date",
                                 "placeholder": "mm/dd/yyyy",
                                 "type": "text",
-                                "value": "01/01/1970",
+                                "value": "10/26/1985",
                               },
                               "type": "Input",
                             },
@@ -142,7 +145,7 @@ describe('nativeTokenPeriodic:content', () => {
                                 "name": "native-token-periodic-start-date_time",
                                 "placeholder": "HH:MM:SS",
                                 "type": "text",
-                                "value": "00:00:10",
+                                "value": "08:00:00",
                               },
                               "type": "Input",
                             },
@@ -385,7 +388,6 @@ describe('nativeTokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
-                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -430,8 +432,77 @@ describe('nativeTokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
                       ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-expiry_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "05/01/2024",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-expiry_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "00:00:00",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -441,20 +512,13 @@ describe('nativeTokenPeriodic:content', () => {
                     "props": {
                       "children": [
                         null,
-                        {
-                          "key": null,
-                          "props": {
-                            "children": "undefined undefined UTC",
-                          },
-                          "type": "Text",
-                        },
+                        null,
                       ],
-                      "direction": "horizontal",
                     },
                     "type": "Box",
                   },
                 ],
-                "direction": "horizontal",
+                "direction": "vertical",
               },
               "type": "Box",
             },
@@ -574,7 +638,7 @@ describe('nativeTokenPeriodic:content', () => {
                                 "name": "native-token-periodic-start-date_date",
                                 "placeholder": "mm/dd/yyyy",
                                 "type": "text",
-                                "value": "01/01/1970",
+                                "value": "10/26/1985",
                               },
                               "type": "Input",
                             },
@@ -584,7 +648,7 @@ describe('nativeTokenPeriodic:content', () => {
                                 "name": "native-token-periodic-start-date_time",
                                 "placeholder": "HH:MM:SS",
                                 "type": "text",
-                                "value": "00:00:10",
+                                "value": "08:00:00",
                               },
                               "type": "Input",
                             },
@@ -915,7 +979,6 @@ describe('nativeTokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
-                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -960,8 +1023,77 @@ describe('nativeTokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
                       ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-expiry_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "05/01/2024",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-expiry_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "00:00:00",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -971,20 +1103,13 @@ describe('nativeTokenPeriodic:content', () => {
                     "props": {
                       "children": [
                         null,
-                        {
-                          "key": null,
-                          "props": {
-                            "children": "undefined undefined UTC",
-                          },
-                          "type": "Text",
-                        },
+                        null,
                       ],
-                      "direction": "horizontal",
                     },
                     "type": "Box",
                   },
                 ],
-                "direction": "horizontal",
+                "direction": "vertical",
               },
               "type": "Box",
             },

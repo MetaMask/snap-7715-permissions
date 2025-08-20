@@ -96,6 +96,7 @@ const mockConfirmationDialog = {
   createInterface: jest.fn(),
   displayConfirmationDialogAndAwaitUserDecision: jest.fn(),
   updateContent: jest.fn(),
+  closeWithError: jest.fn(),
 } as unknown as jest.Mocked<ConfirmationDialog>;
 
 const mockConfirmationDialogFactory = {
