@@ -6,8 +6,16 @@ import { resolve } from 'path';
 dotenv.config();
 
 // eslint-disable-next-line n/no-process-env
-if (!process.env.SNAP_ENV) {
+const { SNAP_ENV, GATOR_PERMISSIONS_PROVIDER_SNAP_ID } = process.env;
+
+if (!SNAP_ENV) {
   throw new InternalError('SNAP_ENV must be set as an environment variable.');
+}
+
+if (!GATOR_PERMISSIONS_PROVIDER_SNAP_ID) {
+  throw new InternalError(
+    'GATOR_PERMISSIONS_PROVIDER_SNAP_ID must be set as an environment variable.',
+  );
 }
 
 const config: SnapConfig = {
@@ -20,8 +28,8 @@ const config: SnapConfig = {
     crypto: true,
   },
   environment: {
-    // eslint-disable-next-line n/no-process-env
-    SNAP_ENV: process.env.SNAP_ENV,
+    SNAP_ENV,
+    GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
   },
 };
 

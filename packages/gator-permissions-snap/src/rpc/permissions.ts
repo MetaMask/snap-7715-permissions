@@ -1,12 +1,14 @@
-import { KERNEL_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
-
 import { RpcMethod } from './rpcMethod';
 
 const allowedPermissionsByOrigin: { [origin: string]: string[] } = {
-  [KERNEL_SNAP_ID]: [
-    RpcMethod.PermissionProviderGrantPermissions,
-    RpcMethod.PermissionProviderGetPermissionOffers,
-  ],
+  // eslint-disable-next-line no-restricted-globals
+  ...(process.env.KERNEL_SNAP_ID && {
+    // eslint-disable-next-line no-restricted-globals
+    [process.env.KERNEL_SNAP_ID]: [
+      RpcMethod.PermissionProviderGrantPermissions,
+      RpcMethod.PermissionProviderGetPermissionOffers,
+    ],
+  }),
   metamask: [RpcMethod.PermissionProviderGetGrantedPermissions],
 };
 

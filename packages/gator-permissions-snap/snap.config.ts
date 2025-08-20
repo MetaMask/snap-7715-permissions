@@ -12,10 +12,24 @@ const {
   STORE_PERMISSIONS_ENABLED,
   ACCOUNT_API_BASE_URL,
   SUPPORTED_CHAINS,
+  KERNEL_SNAP_ID,
+  MESSAGE_SIGNING_SNAP_ID,
 } = process.env;
 
 if (!SNAP_ENV) {
   throw new InternalError('SNAP_ENV must be set as an environment variable.');
+}
+
+if (!KERNEL_SNAP_ID) {
+  throw new InternalError(
+    'KERNEL_SNAP_ID must be set as an environment variable.',
+  );
+}
+
+if (!MESSAGE_SIGNING_SNAP_ID) {
+  throw new InternalError(
+    'MESSAGE_SIGNING_SNAP_ID must be set as an environment variable.',
+  );
 }
 
 if (!PRICE_API_BASE_URL) {
@@ -66,6 +80,8 @@ const config: SnapConfig = {
     STORE_PERMISSIONS_ENABLED,
     ACCOUNT_API_BASE_URL,
     SUPPORTED_CHAINS,
+    KERNEL_SNAP_ID,
+    MESSAGE_SIGNING_SNAP_ID,
   },
 };
 
