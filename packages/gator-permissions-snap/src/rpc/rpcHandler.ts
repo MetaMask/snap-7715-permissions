@@ -58,28 +58,29 @@ export function createRpcHandler(config: {
     const { permissionsRequest, siteOrigin } =
       validatePermissionRequestParam(params);
 
-    const responses = await Promise.all(
-      permissionsRequest.map(async (request) => {
-        const handler =
-          permissionHandlerFactory.createPermissionHandler(request);
+    const responses: Json[] = [];
 
-        const permissionResponse =
-          await handler.handlePermissionRequest(siteOrigin);
+    for (const request of permissionsRequest) {
+      const handler =
+        permissionHandlerFactory.createPermissionHandler(request);
 
-        if (!permissionResponse.approved) {
-          throw new InvalidInputError(permissionResponse.reason);
-        }
+      const permissionResponse = await handler.handlePermissionRequest(
+        siteOrigin,
+      );
 
-        if (permissionResponse.response) {
-          await profileSyncManager.storeGrantedPermission({
-            permissionResponse: permissionResponse.response,
-            siteOrigin,
-          });
-        }
+      if (!permissionResponse.approved) {
+        throw new InvalidInputError(permissionResponse.reason);
+      }
 
-        return permissionResponse.response;
-      }),
-    );
+      if (permissionResponse.response) {
+        await profileSyncManager.storeGrantedPermission({
+          permissionResponse: permissionResponse.response,
+          siteOrigin,
+        });
+      }
+
+      responses.push(permissionResponse.response as Json);
+    }
 
     return responses as Json[];
   };
