@@ -24,32 +24,32 @@ const toSentenceCase = (str: string) => {
  * @returns Object containing the parsed amount and any validation error.
  */
 export function validateAndParseAmount(
-  amount: string | undefined,
+  amount: string | null,
   decimals: number,
   fieldName: string,
   allowZero = false,
-): { amount: bigint | undefined; error: string | undefined } {
+): { amount: bigint | null; error: string | null } {
   if (amount === null || amount === undefined) {
-    return { amount: undefined, error: undefined };
+    return { amount: null, error: null };
   }
 
   try {
     const parsedAmount = parseUnits({ formatted: amount, decimals });
     if (!allowZero && parsedAmount <= 0n) {
       return {
-        amount: undefined,
+        amount: null,
         error: `${toSentenceCase(fieldName)} must be greater than 0`,
       };
     }
     if (allowZero && parsedAmount < 0n) {
       return {
-        amount: undefined,
+        amount: null,
         error: `${toSentenceCase(fieldName)} must be greater than or equal to 0`,
       };
     }
-    return { amount: parsedAmount, error: undefined };
+    return { amount: parsedAmount, error: null };
   } catch (error) {
-    return { amount: undefined, error: `Invalid ${fieldName}` };
+    return { amount: null, error: `Invalid ${fieldName}` };
   }
 }
 
@@ -121,17 +121,17 @@ export function validateStartTimeVsExpiry(
  * @returns Validation error message or undefined if valid.
  */
 export function validateMaxAmountVsInitialAmount(
-  maxAmount: bigint | undefined,
-  initialAmount: bigint | undefined,
-): string | undefined {
+  maxAmount: bigint | null,
+  initialAmount: bigint | null,
+): string | null {
   if (
-    maxAmount !== undefined &&
-    initialAmount !== undefined &&
+    maxAmount &&
+    initialAmount &&
     maxAmount < initialAmount
   ) {
     return 'Max amount must be greater than initial amount';
   }
-  return undefined;
+  return null;
 }
 
 /**

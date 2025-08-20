@@ -28,8 +28,8 @@ export type Erc20TokenStreamMetadata = BaseMetadata & {
 
 export type Erc20TokenStreamContext = BaseContext & {
   permissionDetails: {
-    initialAmount: string | undefined | null;
-    maxAmount: string | undefined | null;
+    initialAmount: string | null;
+    maxAmount: string | null;
     timePeriod: TimePeriod;
     startTime: number;
     amountPerPeriod: string;

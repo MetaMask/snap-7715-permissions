@@ -27,8 +27,8 @@ export type NativeTokenStreamMetadata = BaseMetadata & {
 
 export type NativeTokenStreamContext = BaseContext & {
   permissionDetails: {
-    initialAmount: string | undefined | null;
-    maxAmount: string | undefined | null;
+    initialAmount: string | null;
+    maxAmount: string | null;
     timePeriod: TimePeriod;
     startTime: number;
     amountPerPeriod: string;
