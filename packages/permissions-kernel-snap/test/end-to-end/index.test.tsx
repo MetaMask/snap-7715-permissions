@@ -30,6 +30,23 @@ describe('Kernel Snap', () => {
           stack: expect.any(String),
         });
       });
+
+      it('prevents prototype pollution attacks by rejecting prototype method names', async () => {
+        // Test various prototype method names that could be used for prototype pollution
+        const prototypeMethods = ['toString', 'valueOf', 'constructor', 'hasOwnProperty', '__proto__'];
+        
+        for (const method of prototypeMethods) {
+          const response = await snapRequest({
+            method,
+          });
+
+          expect(response).toRespondWithError({
+            code: -32601,
+            message: `Method ${method} not found.`,
+            stack: expect.any(String),
+          });
+        }
+      });
     });
   });
 });
