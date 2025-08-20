@@ -5,7 +5,6 @@ import type { Delegation } from '@metamask/delegation-core';
 import { AccountController } from '../../src/core/accountController';
 
 const sepolia = 11155111;
-// const mainnet = 1;
 
 describe('AccountController', () => {
   const mockAddress = '0x1234567890abcdef1234567890abcdef12345678';

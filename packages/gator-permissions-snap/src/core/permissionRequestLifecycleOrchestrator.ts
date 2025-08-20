@@ -137,15 +137,7 @@ export class PermissionRequestLifecycleOrchestrator {
   ): Promise<PermissionRequestResult> {
     const chainId = hexToNumber(permissionRequest.chainId);
 
-    // Validate chain support early, before showing confirmation dialog
-    try {
-      this.#assertIsSupportedChainId(chainId);
-    } catch (error) {
-      return {
-        approved: false,
-        reason: `Chain ${chainId} is not supported`,
-      };
-    }
+    this.#assertIsSupportedChainId(chainId);
 
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.

@@ -475,18 +475,26 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           chainId: '0x64' as Hex, // 100 - unsupported chain
         };
 
-        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          unsupportedChainRequest,
-          lifecycleHandlerMocks,
-        );
+        await expect(
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            unsupportedChainRequest,
+            lifecycleHandlerMocks,
+          ),
+        ).rejects.toThrow(InvalidParamsError);
 
-        expect(result.approved).toBe(false);
-        expect(!result.approved && result.reason).toBe(
-          'Chain 100 is not supported',
-        );
+        await expect(
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            unsupportedChainRequest,
+            lifecycleHandlerMocks,
+          ),
+        ).rejects.toThrow('Unsupported ChainId: 100');
 
-        // Ensure that no confirmation dialog was created
+        // Ensure that no operations were performed after the chain validation failed
+        expect(
+          mockAccountController.getAccountAddresses,
+        ).not.toHaveBeenCalled();
         expect(
           mockConfirmationDialogFactory.createConfirmation,
         ).not.toHaveBeenCalled();
