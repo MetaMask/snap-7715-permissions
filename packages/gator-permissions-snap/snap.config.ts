@@ -1,5 +1,6 @@
 /* eslint-disable n/no-process-env */
 import { type SnapConfig } from '@metamask/snaps-cli';
+import { InternalError } from '@metamask/snaps-sdk';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
 
@@ -14,15 +15,17 @@ const {
 } = process.env;
 
 if (!SNAP_ENV) {
-  throw new Error('SNAP_ENV must be set as an environment variable.');
+  throw new InternalError('SNAP_ENV must be set as an environment variable.');
 }
 
 if (!PRICE_API_BASE_URL) {
-  throw new Error('PRICE_API_BASE_URL must be set as an environment variable.');
+  throw new InternalError(
+    'PRICE_API_BASE_URL must be set as an environment variable.',
+  );
 }
 
 if (!STORE_PERMISSIONS_ENABLED) {
-  throw new Error(
+  throw new InternalError(
     'STORE_PERMISSIONS_ENABLED must be set as an environment variable.',
   );
 }
@@ -31,19 +34,21 @@ if (
   STORE_PERMISSIONS_ENABLED !== 'true' &&
   STORE_PERMISSIONS_ENABLED !== 'false'
 ) {
-  throw new Error(
+  throw new InternalError(
     'STORE_PERMISSIONS_ENABLED must be set as an environment variable and must be set to "true" or "false".',
   );
 }
 
 if (!ACCOUNT_API_BASE_URL) {
-  throw new Error(
+  throw new InternalError(
     'ACCOUNT_API_BASE_URL must be set as an environment variable.',
   );
 }
 
 if (!SUPPORTED_CHAINS) {
-  throw new Error('SUPPORTED_CHAINS must be set as an environment variable.');
+  throw new InternalError(
+    'SUPPORTED_CHAINS must be set as an environment variable.',
+  );
 }
 
 const config: SnapConfig = {

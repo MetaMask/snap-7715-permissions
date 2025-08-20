@@ -1,4 +1,5 @@
 import { type SnapConfig } from '@metamask/snaps-cli';
+import { InternalError } from '@metamask/snaps-sdk';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
 
@@ -6,7 +7,7 @@ dotenv.config();
 
 // eslint-disable-next-line n/no-process-env
 if (!process.env.SNAP_ENV) {
-  throw new Error('SNAP_ENV must be set as an environment variable.');
+  throw new InternalError('SNAP_ENV must be set as an environment variable.');
 }
 
 const config: SnapConfig = {
