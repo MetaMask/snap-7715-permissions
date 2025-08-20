@@ -124,11 +124,7 @@ export function validateMaxAmountVsInitialAmount(
   maxAmount: bigint | null,
   initialAmount: bigint | null,
 ): string | null {
-  if (
-    maxAmount &&
-    initialAmount &&
-    maxAmount < initialAmount
-  ) {
+  if (maxAmount && initialAmount && maxAmount < initialAmount) {
     return 'Max amount must be greater than initial amount';
   }
   return null;
