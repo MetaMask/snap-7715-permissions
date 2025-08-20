@@ -61,12 +61,10 @@ export function createRpcHandler(config: {
     const responses: Json[] = [];
 
     for (const request of permissionsRequest) {
-      const handler =
-        permissionHandlerFactory.createPermissionHandler(request);
+      const handler = permissionHandlerFactory.createPermissionHandler(request);
 
-      const permissionResponse = await handler.handlePermissionRequest(
-        siteOrigin,
-      );
+      const permissionResponse =
+        await handler.handlePermissionRequest(siteOrigin);
 
       if (!permissionResponse.approved) {
         throw new InvalidInputError(permissionResponse.reason);
@@ -82,7 +80,7 @@ export function createRpcHandler(config: {
       responses.push(permissionResponse.response as Json);
     }
 
-    return responses as Json[];
+    return responses;
   };
 
   /**
