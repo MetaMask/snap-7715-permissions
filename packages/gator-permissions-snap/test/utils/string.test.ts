@@ -1,8 +1,8 @@
 import { truncateDecimalPlaces } from '../../src/utils/string';
 
 describe('truncateDecimalPlaces', () => {
-  it('truncates decimals to default 8 places', () => {
-    expect(truncateDecimalPlaces('123.456789123')).toBe('123.45678912');
+  it('truncates decimals to default 5 places', () => {
+    expect(truncateDecimalPlaces('123.456789123')).toBe('123.45678');
   });
 
   it('truncates decimals to specified places', () => {

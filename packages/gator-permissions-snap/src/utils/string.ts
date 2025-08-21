@@ -63,8 +63,8 @@ export function shortenAddress(address = '') {
  * Truncates the decimal part of a numeric string to a specified number of digits.
  * If the input is not a valid number, returns the original value.
  *
- * @param value - The numeric string to truncate (e.g., "123.456789").
- * @param decimalPlaces - The maximum number of decimal places to keep. Defaults to 8.
+ * @param value - The numeric string to truncate (e.g., "123.45678").
+ * @param decimalPlaces - The maximum number of decimal places to keep. Defaults to 5.
  * @returns The truncated numeric string.
  * @throws {Error} If the input value is not a valid number.
  *
@@ -75,7 +75,7 @@ export function shortenAddress(address = '') {
  */
 export function truncateDecimalPlaces(
   value: string,
-  decimalPlaces = 8,
+  decimalPlaces = 5,
 ): string {
   const trimmedValue = value.trim();
   // Only allow optional minus, digits, optional decimal and digits
