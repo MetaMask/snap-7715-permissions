@@ -7,7 +7,7 @@
     "url": "https://github.com/MetaMask/snap-7715-permissions.git"
   },
   "source": {
-    "shasum": "kv9aSU1HpGqXgCJoesdx70RBTtKEMzqvj/HvLwkqhcs=",
+    "shasum": "2qk+5LT6qXaTxoZfoZrNG7jWF4IhqgyaY0GZ50qYeMM=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -22,7 +22,6 @@
     "npm:@metamask/gator-permissions-snap": {}
   },
   "initialPermissions": {
-    "snap_dialog": {},
     "endowment:rpc": {
       "dapps": true,
       "snaps": true
