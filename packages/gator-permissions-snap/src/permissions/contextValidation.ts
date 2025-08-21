@@ -1,9 +1,5 @@
 import type { TimePeriod } from '../core/types';
-import {
-  convertReadableDateToTimestamp,
-  getStartOfTodayLocal,
-  TIME_PERIOD_TO_SECONDS,
-} from '../utils/time';
+import { getStartOfTodayLocal, TIME_PERIOD_TO_SECONDS } from '../utils/time';
 import { parseUnits, formatUnits } from '../utils/value';
 
 export type ValidationErrors = {
@@ -59,14 +55,16 @@ export function validateAndParseAmount(
 
 /**
  * Validates a start time to ensure it's today or later.
- * @param startTime - The start time string to validate.
+ * @param startTime - The start time number to validate. Start time -1 is used to indicate that something is wrong with the start time date field.
  * @returns Validation error message or undefined if valid.
  */
-export function validateStartTime(startTime: string): string | undefined {
-  try {
-    const startTimeDate = convertReadableDateToTimestamp(startTime);
+export function validateStartTime(startTime: number): string | undefined {
+  if (startTime === -1) {
+    return 'Invalid start time';
+  }
 
-    if (startTimeDate < getStartOfTodayLocal()) {
+  try {
+    if (startTime < getStartOfTodayLocal()) {
       return 'Start time must be today or later';
     }
     return undefined;
@@ -77,14 +75,17 @@ export function validateStartTime(startTime: string): string | undefined {
 
 /**
  * Validates an expiry time to ensure it's in the future.
- * @param expiry - The expiry time string to validate.
+ * @param expiry - The expiry time to validate. Expiry -1 is used to indicate that something is wrong with the expiry date field.
  * @returns Validation error message or undefined if valid.
  */
-export function validateExpiry(expiry: string): string | undefined {
+export function validateExpiry(expiry: number): string | undefined {
+  if (expiry === -1) {
+    return 'Invalid expiry';
+  }
+
   try {
-    const expiryDate = convertReadableDateToTimestamp(expiry);
     const nowSeconds = Math.floor(Date.now() / 1000);
-    if (expiryDate < nowSeconds) {
+    if (expiry < nowSeconds) {
       return 'Expiry must be in the future';
     }
     return undefined;
@@ -100,18 +101,15 @@ export function validateExpiry(expiry: string): string | undefined {
  * @returns Validation error message or undefined if valid.
  */
 export function validateStartTimeVsExpiry(
-  startTime: string,
-  expiry: string,
+  startTime: number,
+  expiry: number,
 ): string | undefined {
   try {
-    const startTimeDate = convertReadableDateToTimestamp(startTime);
-    const expiryDate = convertReadableDateToTimestamp(expiry);
-    if (startTimeDate >= expiryDate) {
+    if (startTime >= expiry) {
       return 'Start time must be before expiry';
     }
     return undefined;
   } catch (error) {
-    // If date conversion fails, return undefined to let individual validation handle it
     return undefined;
   }
 }

@@ -1,8 +1,9 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type {
-  Json,
-  JsonRpcParams,
-  OnRpcRequestHandler,
+import {
+  MethodNotFoundError,
+  type Json,
+  type JsonRpcParams,
+  type OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
 
 import { createPermissionOfferRegistryManager } from './registryManager';
@@ -45,11 +46,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     JSON.stringify(request, undefined, 2),
   );
 
-  const handler = boundRpcHandlers[request.method];
-
-  if (!handler) {
-    throw new Error(`Method ${request.method} not found.`);
+  // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
+  // This ensures we only access methods that exist on boundRpcHandlers itself
+  if (!Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)) {
+    throw new MethodNotFoundError(`Method ${request.method} not found.`);
   }
+
+  // We know that the method exists, so we can cast to NonNullable
+  const handler = boundRpcHandlers[request.method] as NonNullable<
+    (typeof boundRpcHandlers)[string]
+  >;
 
   const result = await handler({
     siteOrigin: origin,

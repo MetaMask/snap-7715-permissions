@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { AccountController } from './accountController';
 import { erc20TokenPeriodicPermissionDefinition } from '../permissions/erc20TokenPeriodic';
@@ -111,7 +112,7 @@ export class PermissionHandlerFactory {
         );
         break;
       default:
-        throw new Error(`Unsupported permission type: ${type}`);
+        throw new InvalidInputError(`Unsupported permission type: ${type}`);
     }
 
     return handler;

@@ -41,7 +41,7 @@ export type TypedPermissionRequest<TPermission extends Permission> =
  */
 export type BaseContext = {
   expiry: {
-    timestamp: string;
+    timestamp: number;
     isAdjustmentAllowed: boolean;
   };
   isAdjustmentAllowed: boolean;

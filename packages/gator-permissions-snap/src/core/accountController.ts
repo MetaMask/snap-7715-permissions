@@ -1,6 +1,12 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
-import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
+import {
+  ChainDisconnectedError,
+  ResourceNotFoundError,
+  ResourceUnavailableError,
+  type SnapsEthereumProvider,
+  type SnapsProvider,
+} from '@metamask/snaps-sdk';
 import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from './chainMetadata';
@@ -12,67 +18,17 @@ import type { SignDelegationOptions } from './types';
 export class AccountController {
   #ethereumProvider: SnapsEthereumProvider;
 
-  protected supportedChains: readonly number[];
-
   /**
    * Initializes a new AccountController instance.
    * @param config - The configuration object for the controller.
    * @param config.snapsProvider - The provider for interacting with snaps.
    * @param config.ethereumProvider - The provider for interacting with Ethereum.
-   * @param config.supportedChains - Optional list of supported blockchain chains.
    */
   constructor(config: {
     snapsProvider: SnapsProvider;
     ethereumProvider: SnapsEthereumProvider;
-    supportedChains: readonly number[];
   }) {
-    this.#validateSupportedChains(config.supportedChains);
-
-    this.supportedChains = config.supportedChains;
-
     this.#ethereumProvider = config.ethereumProvider;
-  }
-
-  /**
-   * Validates that the specified chains are supported.
-   * @param supportedChains - The chains to validate.
-   * @throws If no chains are specified or if any chain is not supported.
-   */
-  #validateSupportedChains(supportedChains: readonly number[]) {
-    if (supportedChains.length === 0) {
-      logger.error('No supported chains specified');
-      throw new Error('No supported chains specified');
-    }
-
-    // ensure that there is chain metadata for all specified chains
-    try {
-      supportedChains.map((chainId) => getChainMetadata({ chainId }));
-    } catch (error) {
-      logger.error('Unsupported chains specified', {
-        supportedChains,
-        error,
-      });
-      throw new Error(
-        `Unsupported chains specified: ${supportedChains.join(', ')}`,
-      );
-    }
-  }
-
-  /**
-   * Asserts that the specified chain ID is supported.
-   * @param chainId - The chain ID to validate.
-   * @throws If the chain ID is not supported.
-   */
-  #assertIsSupportedChainId(chainId: number) {
-    if (!this.supportedChains.includes(chainId)) {
-      logger.error(
-        'AccountController:assertIsSupportedChainId() - unsupported chainId',
-        {
-          chainId,
-        },
-      );
-      throw new Error(`Unsupported ChainId: ${chainId}`);
-    }
   }
 
   /**
@@ -91,7 +47,7 @@ export class AccountController {
       accounts.length === 0 ||
       accounts.some((account) => account === undefined)
     ) {
-      throw new Error('No accounts found');
+      throw new ResourceNotFoundError('No accounts found');
     }
 
     return accounts as [Hex, ...Hex[]];
@@ -108,8 +64,6 @@ export class AccountController {
     logger.debug('AccountController:signDelegation()');
 
     const { chainId, delegation, address } = options;
-
-    this.#assertIsSupportedChainId(chainId);
 
     const selectedChain = await this.#ethereumProvider.request<Hex>({
       method: 'eth_chainId',
@@ -128,7 +82,9 @@ export class AccountController {
       });
 
       if (updatedChain && hexToNumber(updatedChain) !== chainId) {
-        throw new Error('Selected chain does not match the requested chain');
+        throw new ChainDisconnectedError(
+          'Selected chain does not match the requested chain',
+        );
       }
     }
 
@@ -148,7 +104,7 @@ export class AccountController {
     });
 
     if (!signature) {
-      throw new Error('Failed to sign delegation');
+      throw new ResourceUnavailableError('Failed to sign delegation');
     }
 
     return {

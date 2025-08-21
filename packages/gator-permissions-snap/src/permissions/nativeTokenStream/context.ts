@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   parseCaipAccountId,
@@ -8,10 +9,7 @@ import {
 
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
@@ -55,7 +53,7 @@ export async function applyContext({
     permissionDetails,
     tokenMetadata: { decimals },
   } = context;
-  const expiry = convertReadableDateToTimestamp(context.expiry.timestamp);
+  const expiry = context.expiry.timestamp;
 
   let isExpiryRuleFound = false;
 
@@ -72,7 +70,7 @@ export async function applyContext({
     }) ?? [];
 
   if (!isExpiryRuleFound) {
-    throw new Error(
+    throw new InvalidInputError(
       'Expiry rule not found. An expiry is required on all permissions.',
     );
   }
@@ -92,7 +90,7 @@ export async function applyContext({
       parseUnits({ formatted: permissionDetails.amountPerPeriod, decimals }) /
         TIME_PERIOD_TO_SECONDS[permissionDetails.timePeriod],
     ),
-    startTime: convertReadableDateToTimestamp(permissionDetails.startTime),
+    startTime: permissionDetails.startTime,
     justification: originalRequest.permission.data.justification,
   };
 
@@ -155,7 +153,7 @@ export async function buildContext({
   } = permissionRequest;
 
   if (!address) {
-    throw new Error(
+    throw new InvalidInputError(
       'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
     );
   }
@@ -178,13 +176,13 @@ export async function buildContext({
   );
 
   if (!expiryRule) {
-    throw new Error(
+    throw new InvalidInputError(
       'Expiry rule not found. An expiry is required on all permissions.',
     );
   }
 
   const expiry = {
-    timestamp: expiryRule.data.timestamp.toString(),
+    timestamp: expiryRule.data.timestamp,
     isAdjustmentAllowed: expiryRule?.isAdjustmentAllowed ?? true,
   };
 
@@ -211,8 +209,7 @@ export async function buildContext({
     decimals,
   });
 
-  const startTime =
-    data.startTime?.toString() ?? Math.floor(Date.now() / 1000).toString();
+  const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
 
   const tokenAddressCaip19 = toCaipAssetType(
     CHAIN_NAMESPACE,
