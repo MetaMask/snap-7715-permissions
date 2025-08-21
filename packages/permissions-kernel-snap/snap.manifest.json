@@ -22,7 +22,6 @@
     "npm:@metamask/gator-permissions-snap": {}
   },
   "initialPermissions": {
-    "snap_dialog": {},
     "endowment:rpc": {
       "dapps": true,
       "snaps": true

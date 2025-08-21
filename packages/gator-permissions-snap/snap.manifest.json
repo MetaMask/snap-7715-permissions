@@ -18,8 +18,8 @@
     }
   },
   "initialConnections": {
-    "local:http://localhost:8081": {},
-    "npm:@metamask/permissions-kernel-snap": {}
+    "npm:@metamask/permissions-kernel-snap": {},
+    "local:http://localhost:8081": {}
   },
   "initialPermissions": {
     "endowment:rpc": {
@@ -29,7 +29,6 @@
     "snap_manageState": {},
     "endowment:ethereum-provider": {},
     "endowment:network-access": {},
-    "snap_getEntropy": {},
     "snap_dialog": {},
     "endowment:lifecycle-hooks": {},
     "snap_getPreferences": {},
