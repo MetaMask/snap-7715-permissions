@@ -83,16 +83,6 @@ The package.json scripts automatically run this before building:
 | `production` | Production build (default) | Only kernel snap connection | No connections |
 | Other/Unset | Defaults to production | Production config | Production config |
 
-## Future Considerations
-
-### Gator Permissions Snap
-- The `endowment:page-home` permission should be removed after the testing phase is complete
-- Update the manifest and rebuild when removing this permission
-
-### Permissions Kernel Snap
-- The `endowment:rpc` configuration may need adjustment based on whether dapps access is required
-- Currently set to `"dapps": true` but this may not be necessary if RPC requests only come from MetaMask directly
-
 ## CI/CD Integration
 
 For CI/CD pipelines, ensure the appropriate environment is set:
