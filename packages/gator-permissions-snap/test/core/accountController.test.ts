@@ -5,7 +5,6 @@ import type { Delegation } from '@metamask/delegation-core';
 import { AccountController } from '../../src/core/accountController';
 
 const sepolia = 11155111;
-const mainnet = 1;
 
 describe('AccountController', () => {
   const mockAddress = '0x1234567890abcdef1234567890abcdef12345678';
@@ -70,31 +69,12 @@ describe('AccountController', () => {
     accountController = new AccountController({
       snapsProvider: mockSnapsProvider,
       ethereumProvider: mockEthereumProvider,
-      supportedChains: [mainnet, sepolia],
     });
   });
 
   describe('constructor()', () => {
-    it('should throw if no supported chains are specified', () => {
-      expect(
-        () =>
-          new AccountController({
-            snapsProvider: mockSnapsProvider,
-            ethereumProvider: mockEthereumProvider,
-            supportedChains: [],
-          }),
-      ).toThrow('No supported chains specified');
-    });
-
-    it('should throw if an unsupported chain is specified', () => {
-      expect(
-        () =>
-          new AccountController({
-            snapsProvider: mockSnapsProvider,
-            ethereumProvider: mockEthereumProvider,
-            supportedChains: [123],
-          }),
-      ).toThrow('Unsupported chains specified: 123');
+    it('should create an instance', () => {
+      expect(accountController).toBeDefined();
     });
   });
 
@@ -167,18 +147,6 @@ describe('AccountController', () => {
           address: mockAddress,
         }),
       ).rejects.toThrow('Failed to sign delegation');
-    });
-
-    it('should reject if an invalid chainId is supplied', async () => {
-      const invalidChainId = 12345;
-
-      await expect(
-        accountController.signDelegation({
-          chainId: invalidChainId,
-          delegation: unsignedDelegation,
-          address: mockAddress,
-        }),
-      ).rejects.toThrow(`Unsupported ChainId: ${invalidChainId}`);
     });
 
     it('calls eth_signTypedData_v4 with the correct params', async () => {
