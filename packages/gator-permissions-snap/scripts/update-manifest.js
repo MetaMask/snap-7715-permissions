@@ -5,9 +5,9 @@ const path = require('path');
 require('dotenv').config();
 
 /**
- * Updates the snap.manifest.json based on SNAP_ENV environment variable.
- * - local: Adds localhost connections for development
- * - production: Uses minimal connections for production
+ * Updates the snap.manifest.json file based on the SNAP_ENV environment variable.
+ * - local: Adds localhost connections for development.
+ * - production: Uses minimal connections for production.
  */
 function updateManifest() {
   const manifestPath = path.join(__dirname, '..', 'snap.manifest.json');
