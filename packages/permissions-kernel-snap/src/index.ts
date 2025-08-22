@@ -43,7 +43,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   logger.info(
     `Custom request (origin="${origin}"):`,
-    JSON.stringify(request, undefined, 2),
+    JSON.stringify(request, null, 2),
   );
 
   // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks

@@ -228,6 +228,43 @@ describe('nativeTokenPeriodic:validation', () => {
           'Failed type validation: data.startTime: Expected integer, received float',
         );
       });
+
+      it('should allow missing startTime', () => {
+        const noStartTimeRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+            },
+          },
+        };
+        delete noStartTimeRequest.permission.data.startTime;
+
+        expect(() =>
+          parseAndValidatePermission(noStartTimeRequest),
+        ).not.toThrow();
+      });
+
+      it('should allow null startTime', () => {
+        const nullStartTimeRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              startTime: null,
+            },
+          },
+        };
+
+        expect(() =>
+          parseAndValidatePermission(nullStartTimeRequest),
+        ).not.toThrow();
+
+        const result = parseAndValidatePermission(nullStartTimeRequest);
+        expect(result).toBeDefined();
+      });
     });
 
     describe('startTime vs expiry validation', () => {

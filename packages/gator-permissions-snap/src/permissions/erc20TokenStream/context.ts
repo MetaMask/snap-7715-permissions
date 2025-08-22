@@ -79,12 +79,12 @@ export async function applyContext({
       ? bigIntToHex(
           parseUnits({ formatted: permissionDetails.maxAmount, decimals }),
         )
-      : undefined,
+      : null,
     initialAmount: permissionDetails.initialAmount
       ? bigIntToHex(
           parseUnits({ formatted: permissionDetails.initialAmount, decimals }),
         )
-      : undefined,
+      : null,
     amountPerSecond: bigIntToHex(
       parseUnits({
         formatted: permissionDetails.amountPerPeriod,
@@ -191,7 +191,7 @@ export async function buildContext({
 
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,
-    allowUndefined: true,
+    allowNull: true,
     decimals,
   });
 
@@ -199,7 +199,7 @@ export async function buildContext({
 
   const maxAmount = formatUnitsFromHex({
     value: data.maxAmount,
-    allowUndefined: true,
+    allowNull: true,
     decimals,
   });
 
