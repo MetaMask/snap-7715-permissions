@@ -31,8 +31,7 @@
     "endowment:network-access": {},
     "snap_dialog": {},
     "endowment:lifecycle-hooks": {},
-    "snap_getPreferences": {},
-    "endowment:page-home": {}
+    "snap_getPreferences": {}
   },
   "platformVersion": "8.1.0",
   "manifestVersion": "0.1"
