@@ -29,7 +29,8 @@ const boundRpcHandlers: {
 };
 
 // Processing lock to ensure only one RPC request is processed at a time
-let isProcessing = false;
+// Use a token-based lock to avoid race conditions across async boundaries
+let activeProcessingLock: symbol | null = null;
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -46,14 +47,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }) => {
   // Check if another request is already being processed
-  if (isProcessing) {
-    logger.warn(`RPC request rejected (origin="${origin}"): another request is already being processed`);
+  if (activeProcessingLock !== null) {
+    logger.warn(
+      `RPC request rejected (origin="${origin}"): another request is already being processed`,
+    );
     throw new LimitExceededError('Another request is already being processed.');
   }
 
   // Acquire the processing lock
-  isProcessing = true;
-  
+  const myLock = Symbol('processing-lock');
+  activeProcessingLock = myLock;
+
   try {
     logger.info(
       `Custom request (origin="${origin}"):`,
@@ -62,7 +66,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
     // This ensures we only access methods that exist on boundRpcHandlers itself
-    if (!Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)
+    ) {
       throw new MethodNotFoundError(`Method ${request.method} not found.`);
     }
 
@@ -78,7 +84,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     return result;
   } finally {
-    // Always release the processing lock, regardless of success or failure
-    isProcessing = false;
+    // Always release the processing lock we acquired, regardless of success or failure
+    // Only release if we still hold the lock to avoid clobbering a newer lock
+    if (activeProcessingLock === myLock) {
+      activeProcessingLock = null;
+    }
   }
 };
