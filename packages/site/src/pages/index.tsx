@@ -183,7 +183,7 @@ const Index = () => {
     setPendingPermissionRequests(prev => new Set(prev).add(requestId));
     
     setReceipt(null);
-    setPermissionResponseError(undefined);
+    setPermissionResponseError(null);
 
     const feePerGas = await getFeePerGas();
 
