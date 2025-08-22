@@ -159,7 +159,7 @@ describe('TokenPricesService', () => {
             18,
           );
 
-        expect(humanReadableValue).toBe('$<-->');
+        expect(humanReadableValue).toBe(' ');
         expect(mockPriceApiClient.getSpotPrice).toHaveBeenCalledWith(
           'eip155:1/slip44:60',
           'usd',
