@@ -1,3 +1,4 @@
+import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 
@@ -58,8 +59,12 @@ export function createRpcHandler(config: {
     const { permissionsRequest, siteOrigin } =
       validatePermissionRequestParam(params);
 
-    const responses: Json[] = [];
+    const permissionsToStore: {
+      permissionResponse: PermissionResponse;
+      siteOrigin: string;
+    }[] = [];
 
+    // First, process all permissions to collect responses and validate all are approved
     for (const request of permissionsRequest) {
       const handler = permissionHandlerFactory.createPermissionHandler(request);
 
@@ -71,16 +76,22 @@ export function createRpcHandler(config: {
       }
 
       if (permissionResponse.response) {
-        await profileSyncManager.storeGrantedPermission({
+        permissionsToStore.push({
           permissionResponse: permissionResponse.response,
           siteOrigin,
         });
       }
-
-      responses.push(permissionResponse.response as Json);
     }
 
-    return responses;
+    // Only after all permissions have been successfully processed, store them all in batch
+    if (permissionsToStore.length > 0) {
+      await profileSyncManager.storeGrantedPermissionBatch(permissionsToStore);
+    }
+
+    // Return the permission responses
+    return permissionsToStore.map(
+      (permission) => permission.permissionResponse as Json,
+    );
   };
 
   /**
