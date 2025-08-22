@@ -188,7 +188,7 @@ export async function buildContext({
 
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,
-    allowUndefined: true,
+    allowNull: true,
     decimals,
   });
 
@@ -196,7 +196,7 @@ export async function buildContext({
 
   const maxAmount = formatUnitsFromHex({
     value: data.maxAmount,
-    allowUndefined: true,
+    allowNull: true,
     decimals,
   });
 

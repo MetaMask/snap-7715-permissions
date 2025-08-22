@@ -195,7 +195,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   logger.debug(
     `RPC request (origin="${origin}"):`,
-    JSON.stringify(request, undefined, 2),
+    JSON.stringify(request, null, 2),
   );
 
   if (!isMethodAllowedForOrigin(origin, request.method)) {
