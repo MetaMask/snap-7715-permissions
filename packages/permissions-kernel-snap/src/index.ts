@@ -1,5 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
+  LimitExceededError,
   MethodNotFoundError,
   type Json,
   type JsonRpcParams,
@@ -27,6 +28,9 @@ const boundRpcHandlers: {
     rpcHandler.requestExecutionPermissions.bind(rpcHandler),
 };
 
+// Processing lock to ensure only one RPC request is processed at a time
+let isProcessing = false;
+
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
  *
@@ -41,26 +45,40 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  logger.info(
-    `Custom request (origin="${origin}"):`,
-    JSON.stringify(request, undefined, 2),
-  );
-
-  // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
-  // This ensures we only access methods that exist on boundRpcHandlers itself
-  if (!Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)) {
-    throw new MethodNotFoundError(`Method ${request.method} not found.`);
+  // Check if another request is already being processed
+  if (isProcessing) {
+    logger.warn(`RPC request rejected (origin="${origin}"): another request is already being processed`);
+    throw new LimitExceededError('Another request is already being processed.');
   }
 
-  // We know that the method exists, so we can cast to NonNullable
-  const handler = boundRpcHandlers[request.method] as NonNullable<
-    (typeof boundRpcHandlers)[string]
-  >;
+  // Acquire the processing lock
+  isProcessing = true;
+  
+  try {
+    logger.info(
+      `Custom request (origin="${origin}"):`,
+      JSON.stringify(request, undefined, 2),
+    );
 
-  const result = await handler({
-    siteOrigin: origin,
-    params: request.params as JsonRpcParams,
-  });
+    // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
+    // This ensures we only access methods that exist on boundRpcHandlers itself
+    if (!Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)) {
+      throw new MethodNotFoundError(`Method ${request.method} not found.`);
+    }
 
-  return result;
+    // We know that the method exists, so we can cast to NonNullable
+    const handler = boundRpcHandlers[request.method] as NonNullable<
+      (typeof boundRpcHandlers)[string]
+    >;
+
+    const result = await handler({
+      siteOrigin: origin,
+      params: request.params as JsonRpcParams,
+    });
+
+    return result;
+  } finally {
+    // Always release the processing lock, regardless of success or failure
+    isProcessing = false;
+  }
 };
