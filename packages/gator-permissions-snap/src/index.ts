@@ -9,7 +9,6 @@ import {
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 import {
-  type OnHomePageHandler,
   type OnInstallHandler,
   type Json,
   type JsonRpcParams,
@@ -28,7 +27,6 @@ import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
-import { HomePage } from './homepage';
 import {
   createProfileSyncOptions,
   getProfileSyncSdkEnv,
@@ -131,11 +129,6 @@ const profileSyncManager = createProfileSyncManager({
   ),
 });
 
-const homepage = new HomePage({
-  snapsProvider: snap,
-  profileSyncManager,
-});
-
 const userEventDispatcher = new UserEventDispatcher();
 
 const priceApiClient = new PriceApiClient(priceApiBaseUrl);
@@ -226,12 +219,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 export const onUserInput: OnUserInputHandler =
   userEventDispatcher.createUserInputEventHandler();
 
-export const onHomePage: OnHomePageHandler = async () => {
-  return {
-    content: await homepage.buildHomepage(),
-  };
-};
-
 export const onInstall: OnInstallHandler = async () => {
   /**
    * Local Development Only
@@ -257,6 +244,4 @@ export const onInstall: OnInstallHandler = async () => {
       });
     }
   }
-
-  await homepage.showWelcomeScreen();
 };
