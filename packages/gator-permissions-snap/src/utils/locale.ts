@@ -25,7 +25,7 @@ export const formatAsCurrency = (
   value: number,
   decimalPlaces = 2,
 ): string => {
-  return new Intl.NumberFormat(preferences.locale, {
+  return new Intl.NumberFormat(preferences.locale.replace('_', '-'), {
     style: 'currency',
     currency: preferences.currency,
     minimumFractionDigits: decimalPlaces,
