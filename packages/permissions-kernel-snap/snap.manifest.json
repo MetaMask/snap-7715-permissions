@@ -17,10 +17,6 @@
       }
     }
   },
-  "initialConnections": {
-    "local:http://localhost:8082": {},
-    "npm:@metamask/gator-permissions-snap": {}
-  },
   "initialPermissions": {
     "endowment:rpc": {
       "dapps": true,
@@ -28,5 +24,9 @@
     }
   },
   "platformVersion": "8.1.0",
-  "manifestVersion": "0.1"
+  "manifestVersion": "0.1",
+  "initialConnections": {
+    "local:http://localhost:8082": {},
+    "npm:@metamask/gator-permissions-snap": {}
+  }
 }
