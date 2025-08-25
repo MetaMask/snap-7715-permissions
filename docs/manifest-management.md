@@ -26,16 +26,37 @@ SNAP_ENV=production yarn build
 
 | Environment | Gator Snap | Kernel Snap |
 |------------|------------|-------------|
-| `local` | Adds localhost:8081 | Adds localhost:8082 + gator snap |
+| `local`/`development` | Adds localhost:8081 | Adds localhost:8082 + gator snap |
 | `production` (default) | Only kernel snap connection | No connections |
 
 
 ## How It Works
 
-1. Each snap has `scripts/update-manifest.js` that modifies `snap.manifest.json` based on `SNAP_ENV`
-2. The build/start commands automatically run this script
-3. Connections are added/removed based on environment
-4. The script also removes deprecated permissions
+1. Each snap has a `snap.manifest.ts` file that defines the manifest using the `defineSnapManifest` helper
+2. The `scripts/generate-manifest.js` script compiles and executes the TypeScript file to generate `snap.manifest.json`
+3. The build/start commands automatically run this generation script
+
+
+## File Structure
+
+```
+packages/
+├── gator-permissions-snap/
+│   ├── snap.manifest.ts              # TypeScript manifest definition (source of truth)
+│   ├── snap.manifest.json           # Generated from .ts file (git ignored)
+│   └── scripts/generate-manifest.js # Compiles .ts and generates .json
+└── permissions-kernel-snap/
+    ├── snap.manifest.ts              # TypeScript manifest definition (source of truth)
+    ├── snap.manifest.json           # Generated from .ts file (git ignored)
+    └── scripts/generate-manifest.js # Compiles .ts and generates .json
+```
+
+## Environment Variables
+
+- `SNAP_ENV` - Controls which manifest template to use
+  - `local` or `development` - Uses dev manifest
+  - `production` (default) - Uses production manifest
+  - Any other value - Falls back to production
 
 ## CI/CD Example
 
