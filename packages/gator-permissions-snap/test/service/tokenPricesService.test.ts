@@ -21,7 +21,7 @@ describe('TokenPricesService', () => {
   });
 
   describe('getCryptoToFiatConversion', () => {
-    describe('ETH -> usd', () => {
+    describe('ETH -> Multiple currencies', () => {
       it('should use usd as fallback currency when no user preferences are found', async () => {
         mockPriceApiClient.getSpotPrice.mockResolvedValueOnce(1000);
 
@@ -167,6 +167,95 @@ describe('TokenPricesService', () => {
         expect(mockSnapsProvider.request).toHaveBeenCalledWith({
           method: 'snap_getPreferences',
         });
+      });
+
+      it('should respect EUR currency for French users', async () => {
+        mockPriceApiClient.getSpotPrice.mockResolvedValueOnce(900); // 900 EUR per ETH
+
+        mockSnapsProvider.request.mockResolvedValueOnce({
+          locale: 'fr',
+          currency: 'EUR',
+        });
+
+        const humanReadableValue =
+          await tokenPricesService.getCryptoToFiatConversion(
+            'eip155:1/slip44:60',
+            bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })), // 1 ETH
+            18,
+          );
+
+        // French locale uses non-breaking space between number and currency symbol
+        expect(humanReadableValue).toBe('900,00\u00A0€'); // French locale format
+        expect(mockPriceApiClient.getSpotPrice).toHaveBeenCalledWith(
+          'eip155:1/slip44:60',
+          'eur',
+        );
+      });
+
+      it('should respect GBP currency for British users', async () => {
+        mockPriceApiClient.getSpotPrice.mockResolvedValueOnce(800); // 800 GBP per ETH
+
+        mockSnapsProvider.request.mockResolvedValueOnce({
+          locale: 'en-GB',
+          currency: 'GBP',
+        });
+
+        const humanReadableValue =
+          await tokenPricesService.getCryptoToFiatConversion(
+            'eip155:1/slip44:60',
+            bigIntToHex(parseUnits({ formatted: '0.5', decimals: 18 })), // 0.5 ETH
+            18,
+          );
+
+        expect(humanReadableValue).toBe('£400.00');
+        expect(mockPriceApiClient.getSpotPrice).toHaveBeenCalledWith(
+          'eip155:1/slip44:60',
+          'gbp',
+        );
+      });
+
+      it('should fall back to USD for unsupported currencies', async () => {
+        mockPriceApiClient.getSpotPrice.mockResolvedValueOnce(1000); // 1000 USD per ETH
+
+        mockSnapsProvider.request.mockResolvedValueOnce({
+          locale: 'xx',
+          currency: 'XXX', // Not a supported currency
+        });
+
+        const humanReadableValue =
+          await tokenPricesService.getCryptoToFiatConversion(
+            'eip155:1/slip44:60',
+            bigIntToHex(parseUnits({ formatted: '0.1', decimals: 18 })), // 0.1 ETH
+            18,
+          );
+
+        expect(humanReadableValue).toBe('US$100.00');
+        expect(mockPriceApiClient.getSpotPrice).toHaveBeenCalledWith(
+          'eip155:1/slip44:60',
+          'usd', // Falls back to USD
+        );
+      });
+
+      it('should handle case-insensitive currency codes', async () => {
+        mockPriceApiClient.getSpotPrice.mockResolvedValueOnce(3500); // 3500 CAD per ETH
+
+        mockSnapsProvider.request.mockResolvedValueOnce({
+          locale: 'en-CA',
+          currency: 'CAD', // Uppercase
+        });
+
+        const humanReadableValue =
+          await tokenPricesService.getCryptoToFiatConversion(
+            'eip155:1/slip44:60',
+            bigIntToHex(parseUnits({ formatted: '0.2', decimals: 18 })), // 0.2 ETH
+            18,
+          );
+
+        expect(humanReadableValue).toBe('$700.00'); // CAD uses $ symbol
+        expect(mockPriceApiClient.getSpotPrice).toHaveBeenCalledWith(
+          'eip155:1/slip44:60',
+          'cad', // Lowercase
+        );
       });
     });
   });
