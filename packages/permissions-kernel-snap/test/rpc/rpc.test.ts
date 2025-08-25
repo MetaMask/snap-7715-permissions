@@ -1,4 +1,3 @@
-import { GATOR_PERMISSIONS_PROVIDER_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type {
   PermissionsRequest,
@@ -159,7 +158,8 @@ describe('RpcHandler', () => {
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'wallet_invokeSnap',
         params: {
-          snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+          // eslint-disable-next-line no-restricted-globals
+          snapId: process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
           request: {
             method: ExternalMethod.PermissionProviderGrantPermissions,
             params: {

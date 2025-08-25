@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
@@ -64,6 +63,11 @@ if (!supportedChainsString) {
   throw new InternalError('SUPPORTED_CHAINS is not set');
 }
 
+const messageSigningSnapId = process.env.MESSAGE_SIGNING_SNAP_ID;
+if (!messageSigningSnapId) {
+  throw new InternalError('MESSAGE_SIGNING_SNAP_ID is not set');
+}
+
 const supportedChains = supportedChainsString.split(',').map(Number);
 
 // set up dependencies
@@ -99,7 +103,7 @@ const stateManager = createStateManager(snap);
 const profileSyncOptions = createProfileSyncOptions(
   stateManager,
   snap,
-  MESSAGE_SIGNING_SNAP_ID,
+  messageSigningSnapId,
 );
 
 const profileSyncSdkEnv = getProfileSyncSdkEnv(snapEnv);
@@ -247,12 +251,12 @@ export const onInstall: OnInstallHandler = async () => {
     const installedSnaps = (await snap.request({
       method: 'wallet_getSnaps',
     })) as unknown as GetSnapsResponse;
-    if (!installedSnaps[MESSAGE_SIGNING_SNAP_ID]) {
+    if (!installedSnaps[messageSigningSnapId]) {
       logger.debug('Installing local message signing snap');
       await snap.request({
         method: 'wallet_requestSnaps',
         params: {
-          [MESSAGE_SIGNING_SNAP_ID]: {},
+          [messageSigningSnapId]: {},
         },
       });
     }

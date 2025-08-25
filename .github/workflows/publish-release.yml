@@ -19,6 +19,9 @@ jobs:
       PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
       STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
       SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
+      GATOR_PERMISSIONS_PROVIDER_SNAP_ID: ${{ vars.GATOR_PERMISSIONS_PROVIDER_SNAP_ID }}
+      MESSAGE_SIGNING_SNAP_ID: ${{ vars.MESSAGE_SIGNING_SNAP_ID }}
+      KERNEL_SNAP_ID: ${{ vars.KERNEL_SNAP_ID }}
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
