@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint-disable n/no-process-env */
 /* eslint-disable n/no-process-exit */
 /* eslint-disable n/no-sync */
@@ -8,11 +9,20 @@ require('dotenv').config();
 
 /**
  * Generates snap.manifest.json from the TypeScript manifest file.
+ * @param {string} packageDir - The directory of the package for which to generate the manifest.
  * @returns {void}
  */
-function generateManifest() {
-  const targetPath = path.join(__dirname, '..', 'snap.manifest.json');
-  const tsPath = path.join(__dirname, '..', 'snap.manifest.ts');
+function generateManifest(packageDir) {
+  if (!packageDir) {
+    console.error('❌ Error: Package directory is required');
+    console.error('Usage: generate-manifest.js <package-directory>');
+    process.exit(1);
+  }
+
+  // Resolve the package directory to an absolute path
+  const resolvedPackageDir = path.resolve(packageDir);
+  const targetPath = path.join(resolvedPackageDir, 'snap.manifest.json');
+  const tsPath = path.join(resolvedPackageDir, 'snap.manifest.ts');
 
   try {
     // Check if TypeScript manifest exists
@@ -33,6 +43,7 @@ function generateManifest() {
         env: Object.assign({}, process.env, {
           NODE_OPTIONS: '--no-warnings',
         }),
+        cwd: resolvedPackageDir,
       },
     );
 
@@ -47,6 +58,20 @@ function generateManifest() {
     );
 
     console.log('✅ Generated snap.manifest.json from TypeScript manifest');
+
+    // Try to get package name from package.json, fallback to directory name
+    let packageName = path.basename(resolvedPackageDir);
+    try {
+      const pkgJsonPath = path.join(resolvedPackageDir, 'package.json');
+      if (fs.existsSync(pkgJsonPath)) {
+        const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+        packageName = pkgJson.name || packageName;
+      }
+    } catch (error) {
+      // Fallback to directory name if package.json can't be read
+    }
+
+    console.log(`   Package: ${packageName}`);
     console.log(`   Environment: ${process.env.SNAP_ENV || 'production'}`);
   } catch (error) {
     console.error('❌ Failed to generate manifest:', error.message);
@@ -60,5 +85,8 @@ function generateManifest() {
   }
 }
 
+// Get package directory from command line arguments
+const packageDir = process.argv[2];
+
 // Run the manifest generation
-generateManifest();
+generateManifest(packageDir);
