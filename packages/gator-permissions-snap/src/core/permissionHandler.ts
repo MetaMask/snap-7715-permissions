@@ -79,13 +79,13 @@ export class PermissionHandler<
 
   #isJustificationCollapsed = true;
 
-  #unbindHandlers: (() => void) | undefined;
+  #unbindHandlers: (() => void) | null = null;
 
   #hasHandledPermissionRequest = false;
 
-  #tokenBalance: string | undefined = undefined;
+  #tokenBalance: string | null = null;
 
-  #tokenBalanceFiat: string | undefined = undefined;
+  #tokenBalanceFiat: string | null = null;
 
   constructor({
     accountController,
@@ -330,8 +330,8 @@ export class PermissionHandler<
             accountAddressCaip10: address,
           };
 
-          this.#tokenBalance = undefined;
-          this.#tokenBalanceFiat = undefined;
+          this.#tokenBalance = null;
+          this.#tokenBalanceFiat = null;
 
           // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
           fetchAccountBalance(currentContext).catch((error) => {

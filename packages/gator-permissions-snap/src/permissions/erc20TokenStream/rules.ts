@@ -24,7 +24,7 @@ export const initialAmountRule: Erc20TokenStreamRuleDefinition = {
   type: 'number',
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.initialAmount,
+    value: context.permissionDetails.initialAmount ?? undefined,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The initial amount of tokens that can be streamed.',
@@ -49,7 +49,7 @@ export const maxAmountRule: Erc20TokenStreamRuleDefinition = {
   type: 'number',
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.maxAmount,
+    value: context.permissionDetails.maxAmount ?? undefined,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The maximum amount of tokens that can be streamed.',

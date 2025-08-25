@@ -17,6 +17,7 @@ import {
   TextField,
   TooltipIcon,
   TokenField,
+  TokenBalanceField,
 } from '../ui/components';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
@@ -42,8 +43,8 @@ export type PermissionHandlerContentProps = {
   isJustificationCollapsed: boolean;
   origin: string;
   context: BaseContext;
-  tokenBalance: string | undefined;
-  tokenBalanceFiat: string | undefined;
+  tokenBalance: string | null;
+  tokenBalanceFiat: string | null;
   chainId: number;
   explorerUrl: string;
 };
@@ -81,11 +82,7 @@ export const PermissionHandlerContent = ({
   chainId,
   explorerUrl,
 }: PermissionHandlerContentProps): SnapElement => {
-  const tokenBalanceComponent = tokenBalance ? (
-    <Text>{tokenBalance} available</Text>
-  ) : (
-    <Skeleton />
-  );
+  const tokenBalanceComponent = TokenBalanceField({ tokenBalance });
 
   const fiatBalanceComponent = tokenBalanceFiat ? (
     <Text>{tokenBalanceFiat}</Text>

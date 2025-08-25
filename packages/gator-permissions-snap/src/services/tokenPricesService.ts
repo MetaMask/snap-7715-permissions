@@ -101,9 +101,8 @@ export class TokenPricesService {
         error,
       );
 
-      // TODO: Return a more user-friendly error message so failed calls to the Price API are handled gracefully
-      // and do not make the entire permission request fail. We can use cached prices as a fallback to prevent this issue message in UI.
-      return '$<-->';
+      // If we can't fetch the price then show nothing.
+      return ' ';
     }
   }
 }

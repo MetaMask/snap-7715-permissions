@@ -173,7 +173,7 @@ export async function buildContext({
 
   const periodAmount = formatUnitsFromHex({
     value: data.periodAmount,
-    allowUndefined: false,
+    allowNull: false,
     decimals,
   });
 

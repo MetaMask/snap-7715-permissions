@@ -1,14 +1,15 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import type { Delegation } from '@metamask/delegation-core';
 import {
   decodeDelegations,
   ROOT_AUTHORITY,
   createTimestampTerms,
   createNonceTerms,
 } from '@metamask/delegation-core';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
+import type { Hex } from 'viem';
 
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
@@ -149,7 +150,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     };
 
     mockAccountController.signDelegation.mockImplementation(
-      async ({ delegation }: { delegation: Delegation }) => ({
+      async ({ delegation }) => ({
         ...delegation,
         signature: mockSignature,
       }),
@@ -174,7 +175,67 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         confirmationDialogFactory: mockConfirmationDialogFactory,
         userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
+        supportedChains: [1, 11155111], // mainnet and sepolia
       });
+  });
+
+  describe('constructor', () => {
+    it('should throw InvalidParamsError if no supported chains are specified', () => {
+      expect(
+        () =>
+          new PermissionRequestLifecycleOrchestrator({
+            accountController: mockAccountController,
+            confirmationDialogFactory: mockConfirmationDialogFactory,
+            userEventDispatcher: mockUserEventDispatcher,
+            nonceCaveatService: mockNonceCaveatService,
+            supportedChains: [],
+          }),
+      ).toThrow(InvalidParamsError);
+      expect(
+        () =>
+          new PermissionRequestLifecycleOrchestrator({
+            accountController: mockAccountController,
+            confirmationDialogFactory: mockConfirmationDialogFactory,
+            userEventDispatcher: mockUserEventDispatcher,
+            nonceCaveatService: mockNonceCaveatService,
+            supportedChains: [],
+          }),
+      ).toThrow('No supported chains specified');
+    });
+
+    it('should throw InvalidParamsError if an unsupported chain is specified', () => {
+      expect(
+        () =>
+          new PermissionRequestLifecycleOrchestrator({
+            accountController: mockAccountController,
+            confirmationDialogFactory: mockConfirmationDialogFactory,
+            userEventDispatcher: mockUserEventDispatcher,
+            nonceCaveatService: mockNonceCaveatService,
+            supportedChains: [999999], // unsupported chain ID
+          }),
+      ).toThrow(InvalidParamsError);
+      expect(
+        () =>
+          new PermissionRequestLifecycleOrchestrator({
+            accountController: mockAccountController,
+            confirmationDialogFactory: mockConfirmationDialogFactory,
+            userEventDispatcher: mockUserEventDispatcher,
+            nonceCaveatService: mockNonceCaveatService,
+            supportedChains: [999999], // unsupported chain ID
+          }),
+      ).toThrow('Unsupported chains specified: 999999');
+    });
+
+    it('should create an instance with valid supported chains', () => {
+      const instance = new PermissionRequestLifecycleOrchestrator({
+        accountController: mockAccountController,
+        confirmationDialogFactory: mockConfirmationDialogFactory,
+        userEventDispatcher: mockUserEventDispatcher,
+        nonceCaveatService: mockNonceCaveatService,
+        supportedChains: [1, 11155111], // mainnet and sepolia
+      });
+      expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
+    });
   });
 
   describe('orchestrate', () => {
@@ -407,6 +468,41 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(delegationsArray).toStrictEqual([expectedDelegation]);
         expect(delegationsArray[0]?.salt).not.toBe(0n);
+      });
+
+      it('rejects permission request for unsupported chain early', async () => {
+        const unsupportedChainRequest = {
+          ...mockPermissionRequest,
+          chainId: '0x64' as Hex, // 100 - unsupported chain
+        };
+
+        await expect(
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            unsupportedChainRequest,
+            lifecycleHandlerMocks,
+          ),
+        ).rejects.toThrow(InvalidParamsError);
+
+        await expect(
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            unsupportedChainRequest,
+            lifecycleHandlerMocks,
+          ),
+        ).rejects.toThrow('Unsupported ChainId: 100');
+
+        // Ensure that no operations were performed after the chain validation failed
+        expect(
+          mockAccountController.getAccountAddresses,
+        ).not.toHaveBeenCalled();
+        expect(
+          mockConfirmationDialogFactory.createConfirmation,
+        ).not.toHaveBeenCalled();
+        expect(mockConfirmationDialog.createInterface).not.toHaveBeenCalled();
+        expect(
+          mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision,
+        ).not.toHaveBeenCalled();
       });
 
       it('throws an error when expiry rule is not present', async () => {

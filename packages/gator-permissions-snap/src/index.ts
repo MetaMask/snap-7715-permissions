@@ -96,7 +96,6 @@ const nonceCaveatService = new NonceCaveatService({
 const accountController = new AccountController({
   snapsProvider: snap,
   ethereumProvider: ethereum,
-  supportedChains,
 });
 
 const stateManager = createStateManager(snap);
@@ -156,6 +155,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   confirmationDialogFactory,
   userEventDispatcher,
   nonceCaveatService,
+  supportedChains,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
@@ -199,7 +199,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   logger.debug(
     `RPC request (origin="${origin}"):`,
-    JSON.stringify(request, undefined, 2),
+    JSON.stringify(request, null, 2),
   );
 
   if (!isMethodAllowedForOrigin(origin, request.method)) {
