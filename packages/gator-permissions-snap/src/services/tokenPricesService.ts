@@ -126,15 +126,10 @@ export class TokenPricesService {
 
       return humanReadableValue;
     } catch (error) {
-      logger.debug(
-        'TokenPricesService:getCryptoToFiatConversion() - failed to fetch token spot price',
-        error,
-      );
       logger.error(
         'TokenPricesService:getCryptoToFiatConversion() - failed to fetch token spot price',
         error,
       );
-
       // If we can't fetch the price then show nothing.
       return ' ';
     }
