@@ -1,6 +1,6 @@
-import { GATOR_PERMISSIONS_PROVIDER_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
+  InternalError,
   InvalidInputError,
   type Json,
   type SnapsProvider,
@@ -62,10 +62,20 @@ export function createRpcHandler(config: {
       options.params,
     );
 
+    const gatorPermissionsProviderSnapId =
+      // eslint-disable-next-line no-restricted-globals
+      process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
+
+    if (!gatorPermissionsProviderSnapId) {
+      throw new InternalError(
+        'GATOR_PERMISSIONS_PROVIDER_SNAP_ID must be set as an environment variable.',
+      );
+    }
+
     // We only want gator-permissions-snap for now but we will use more snaps in the future
     const permissionOfferRegistry =
       await permissionOfferRegistryManager.buildPermissionOffersRegistry(
-        GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
+        gatorPermissionsProviderSnapId,
       );
 
     // Find the relevant permissions to grant by filtering against the registered offers
@@ -85,7 +95,7 @@ export function createRpcHandler(config: {
     const grantedPermissions = await snapsProvider.request({
       method: 'wallet_invokeSnap',
       params: {
-        snapId: GATOR_PERMISSIONS_PROVIDER_SNAP_ID, // We only want gator-permissions-snap for now but we will use more snaps in the future
+        snapId: gatorPermissionsProviderSnapId, // We only want gator-permissions-snap for now but we will use more snaps in the future
         request: {
           method: ExternalMethod.PermissionProviderGrantPermissions,
           params: {
