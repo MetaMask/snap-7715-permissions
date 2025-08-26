@@ -218,7 +218,7 @@ describe('TokenPricesService', () => {
         mockPriceApiClient.getSpotPrice.mockResolvedValueOnce(1000); // 1000 USD per ETH
 
         mockSnapsProvider.request.mockResolvedValueOnce({
-          locale: 'xx',
+          locale: 'en',
           currency: 'XXX', // Not a supported currency
         });
 
@@ -229,7 +229,7 @@ describe('TokenPricesService', () => {
             18,
           );
 
-        expect(humanReadableValue).toBe('US$100.00');
+        expect(humanReadableValue).toBe('$100.00');
         expect(mockPriceApiClient.getSpotPrice).toHaveBeenCalledWith(
           'eip155:1/slip44:60',
           'usd', // Falls back to USD
