@@ -3186,7 +3186,7 @@ __metadata:
     jest: 29.7.0
     rimraf: 6.0.1
     ts-jest: 29.4.0
-    tsx: ^4.0.0
+    tsx: 4.20.5
     typescript: 5.8.3
     viem: 2.31.7
     zod: 3.25.76
@@ -19941,7 +19941,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^4.0.0":
+"tsx@npm:4.20.5":
   version: 4.20.5
   resolution: "tsx@npm:4.20.5"
   dependencies:
