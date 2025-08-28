@@ -92,11 +92,3 @@ packages/
   run: yarn build
 ```
 
-## Migration from Previous Approach
-
-If migrating from individual scripts to the shared approach:
-
-1. Remove individual `scripts/generate-manifest.js` files from snap packages
-2. Update `package.json` scripts to use `yarn generate-snap-manifest .`
-3. Run `yarn install` to link the shared package
-4. Test both development and production builds
