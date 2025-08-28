@@ -5,6 +5,7 @@ import type { CaipAssetType } from '@metamask/utils';
 
 import { type PriceApiClient } from '../clients/priceApiClient';
 import type { VsCurrencyParam } from '../clients/types';
+import { SUPPORTED_CURRENCIES } from '../constants';
 import {
   FALLBACK_PREFERENCE,
   formatAsCurrency,
@@ -28,15 +29,32 @@ export class TokenPricesService {
   }
 
   /**
+   * Check if a currency is supported by the Price API.
+   * @param currency - The currency to check.
+   * @returns True if the currency is supported, false otherwise.
+   */
+  #isSupportedCurrency(currency: string): boolean {
+    return SUPPORTED_CURRENCIES.includes(currency);
+  }
+
+  /**
    * Safely parse the user's preferences to determine the currency to use for the token prices.
    * @param preferences - The user's preferences.
    * @returns The currency to use for the token prices.
    */
   #safeParsePreferences(preferences: Preferences): VsCurrencyParam {
-    const { currency, locale } = preferences;
-    return locale === 'en'
-      ? (currency.toLowerCase() as VsCurrencyParam)
-      : (FALLBACK_PREFERENCE.currency.toLowerCase() as VsCurrencyParam);
+    const { currency } = preferences;
+    const normalizedCurrency = currency.toLowerCase();
+
+    // Check if the currency is supported by the Price API
+    if (this.#isSupportedCurrency(normalizedCurrency)) {
+      return normalizedCurrency as VsCurrencyParam;
+    }
+
+    logger.debug(
+      `TokenPricesService:#safeParsePreferences() - Currency "${currency}" not supported, falling back to USD`,
+    );
+    return FALLBACK_PREFERENCE.currency.toLowerCase() as VsCurrencyParam;
   }
 
   /**
@@ -78,17 +96,29 @@ export class TokenPricesService {
       logger.debug('TokenPricesService:getCryptoToFiatConversion()');
       const preferences = await this.#getPreferences();
 
+      // Get the currency to use for fetching prices
+      const vsCurrency = this.#safeParsePreferences(preferences);
+
+      // If we're falling back to USD, we need to update the preferences for formatting
+      const formattingPreferences =
+        vsCurrency === 'usd' && preferences.currency.toLowerCase() !== 'usd'
+          ? { ...preferences, currency: 'USD' }
+          : preferences;
+
       // Value in fiat=(Amount in crypto)×(Spot price)
       const tokenSpotPrice = await this.#priceApiClient.getSpotPrice(
         tokenCaip19Type,
-        this.#safeParsePreferences(preferences),
+        vsCurrency,
       );
       const formattedBalance = Number(
         formatUnits({ value: BigInt(balance), decimals }),
       );
       const valueInFiat = formattedBalance * tokenSpotPrice;
 
-      const humanReadableValue = formatAsCurrency(preferences, valueInFiat);
+      const humanReadableValue = formatAsCurrency(
+        formattingPreferences,
+        valueInFiat,
+      );
       logger.debug(
         'TokenPricesService:formatAsCurrency() - formatted balance to currency',
         humanReadableValue,
@@ -100,7 +130,6 @@ export class TokenPricesService {
         'TokenPricesService:getCryptoToFiatConversion() - failed to fetch token spot price',
         error,
       );
-
       // If we can't fetch the price then show nothing.
       return ' ';
     }
