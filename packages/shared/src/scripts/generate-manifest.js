@@ -34,7 +34,7 @@ function generateManifest(packageDir) {
     // tsx handles TypeScript execution without separate compilation
     const manifestJson = execSync(
       `SNAP_ENV="${process.env.SNAP_ENV || 'production'}" npx tsx -e "
-        const manifest = require('${tsPath}').default;
+        const manifest = require('${tsPath.replace(/\\/gu, '\\\\').replace(/'/gu, "\\'")}').default;
         console.log(JSON.stringify(manifest, null, 2));
       "`,
       {
