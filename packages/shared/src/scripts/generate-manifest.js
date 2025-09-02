@@ -57,22 +57,9 @@ function generateManifest(packageDir) {
       'utf8',
     );
 
-    console.log('✅ Generated snap.manifest.json from TypeScript manifest');
-
-    // Try to get package name from package.json, fallback to directory name
-    let packageName = path.basename(resolvedPackageDir);
-    try {
-      const pkgJsonPath = path.join(resolvedPackageDir, 'package.json');
-      if (fs.existsSync(pkgJsonPath)) {
-        const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
-        packageName = pkgJson.name || packageName;
-      }
-    } catch (error) {
-      // Fallback to directory name if package.json can't be read
-    }
-
-    console.log(`   Package: ${packageName}`);
-    console.log(`   Environment: ${process.env.SNAP_ENV || 'production'}`);
+    console.log(
+      `✅ Generated ${targetPath} (${process.env.SNAP_ENV || 'production'})`,
+    );
   } catch (error) {
     console.error('❌ Failed to generate manifest:', error.message);
 
