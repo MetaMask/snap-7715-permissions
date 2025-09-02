@@ -75,12 +75,10 @@ export function createRpcHandler(config: {
         throw new InvalidInputError(permissionResponse.reason);
       }
 
-      if (permissionResponse.response) {
-        permissionsToStore.push({
-          permissionResponse: permissionResponse.response,
-          siteOrigin,
-        });
-      }
+      permissionsToStore.push({
+        permissionResponse: permissionResponse.response,
+        siteOrigin,
+      });
     }
 
     // Only after all permissions have been successfully processed, store them all in batch
