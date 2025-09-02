@@ -80,6 +80,13 @@ jobs:
         with:
           path: ./packages/gator-permissions-snap/dist
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
+      - name: Cache manifests
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./packages/gator-permissions-snap/snap.manifest.json
+            ./packages/permissions-kernel-snap/snap.manifest.json
+          key: snap-manifests-${{ runner.os }}-${{ github.sha }}
       - name: Require clean working directory
         shell: bash
         run: |
@@ -134,6 +141,14 @@ jobs:
         with:
           path: ./packages/gator-permissions-snap/dist
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
+      - name: Restore manifests
+        uses: actions/cache@v4
+        if: ${{ github.base_ref == 'dev' }}
+        with:
+          path: |
+            ./packages/gator-permissions-snap/snap.manifest.json
+            ./packages/permissions-kernel-snap/snap.manifest.json
+          key: snap-manifests-${{ runner.os }}-${{ github.sha }}
       - name: Run e2e tests
         run: yarn test
       - name: Require clean working directory
