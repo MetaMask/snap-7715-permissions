@@ -196,13 +196,23 @@ export class PriceApiClient {
         throw new ResourceUnavailableError(message);
       }
 
-      // Normalize CAIP asset type to lowercase for case-insensitive lookup
-      const normalizedCaipAssetType =
-        caipAssetType.toLowerCase() as CaipAssetType;
-      const assetTypeData = validatedResponse[normalizedCaipAssetType];
+      // Try exact match first, then case-insensitive lookup
+      let assetTypeData = validatedResponse[caipAssetType];
+      if (!assetTypeData) {
+        // If exact match fails, try case-insensitive lookup
+        const responseKeys = Object.keys(validatedResponse);
+        const matchingKey = responseKeys.find(
+          (key) => key.toLowerCase() === caipAssetType.toLowerCase(),
+        );
+
+        if (matchingKey) {
+          assetTypeData = validatedResponse[matchingKey as CaipAssetType];
+        }
+      }
+
       if (!assetTypeData) {
         logger.error(
-          `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType} (normalized: ${normalizedCaipAssetType})`,
+          `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}. Available keys: ${Object.keys(validatedResponse).join(', ')}`,
         );
         throw new ResourceNotFoundError(
           `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
