@@ -3589,7 +3589,6 @@ __metadata:
     rimraf: 6.0.1
     ts-jest: 29.4.0
     typescript: 5.8.3
-    viem: 2.31.7
     zod: 3.25.76
   languageName: unknown
   linkType: soft
@@ -3734,7 +3733,6 @@ __metadata:
     rimraf: 6.0.1
     ts-jest: 29.4.0
     typescript: 5.8.3
-    viem: 2.31.7
   languageName: unknown
   linkType: soft
 
