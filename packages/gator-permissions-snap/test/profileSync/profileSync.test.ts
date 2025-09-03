@@ -197,10 +197,10 @@ describe('profileSync', () => {
 
     describe('storeGrantedPermission', () => {
       it('should store granted permission successfully in profile sync', async () => {
+        mockPassAuth();
         await profileSyncManager.storeGrantedPermission(
           mockStoredGrantedPermission,
         );
-        mockPassAuth();
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
@@ -227,10 +227,11 @@ describe('profileSync', () => {
             context: encodeDelegations([mockDelegation, mockDelegationTwo]),
           },
         };
+
+        mockPassAuth();
         await profileSyncManager.storeGrantedPermission(
           mockStoredGrantedPermissionWithMultipleDelegations,
         );
-        mockPassAuth();
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo.slice(2)}`,
