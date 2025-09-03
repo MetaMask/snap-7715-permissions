@@ -2,12 +2,26 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
   InternalError,
   InvalidInputError,
+  LimitExceededError,
+  ParseError,
   ResourceNotFoundError,
   ResourceUnavailableError,
 } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
+import { z } from 'zod';
 
 import type { SpotPricesRes, VsCurrencyParam } from './types';
+
+/**
+ * Zod schema for validating spot prices response
+ */
+const SpotPricesResponseSchema = z.record(
+  z.string().min(1).max(200), // CAIP asset type validation
+  z.record(
+    z.string().min(1).max(10), // Currency code validation
+    z.number().finite().min(0).max(1e12), // Price validation (0 to 1 trillion)
+  ),
+);
 
 /**
  * Options for configuring retry behavior.
@@ -20,19 +34,87 @@ export type RetryOptions = {
 };
 
 /**
+ * Configuration options for PriceApiClient
+ */
+export type PriceApiClientConfig = {
+  baseUrl: string;
+  fetch?: typeof globalThis.fetch;
+  timeoutMs?: number;
+  maxResponseSizeBytes?: number;
+};
+
+/**
  * Class responsible for fetching price data from the Price API.
  */
 export class PriceApiClient {
+  static readonly #defaultTimeoutMs = 10000; // 10 seconds
+
+  static readonly #defaultMaxResponseSizeBytes = 1024 * 1024; // 1MB
+
   readonly #fetch: typeof globalThis.fetch;
 
   readonly #baseUrl: string;
 
-  constructor(
-    baseUrl: string,
-    fetch: typeof globalThis.fetch = globalThis.fetch,
-  ) {
+  readonly #timeoutMs: number;
+
+  readonly #maxResponseSizeBytes: number;
+
+  constructor({
+    baseUrl,
+    fetch = globalThis.fetch,
+    timeoutMs = PriceApiClient.#defaultTimeoutMs,
+    maxResponseSizeBytes = PriceApiClient.#defaultMaxResponseSizeBytes,
+  }: PriceApiClientConfig) {
     this.#fetch = fetch;
     this.#baseUrl = baseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
+    this.#timeoutMs = timeoutMs;
+    this.#maxResponseSizeBytes = maxResponseSizeBytes;
+  }
+
+  /**
+   * Makes a secure HTTP request with timeout and response size limits.
+   * @param url - The URL to fetch.
+   * @returns A promise that resolves to the response.
+   * @throws {ResourceUnavailableError} If the request times out or exceeds size limits.
+   */
+  async #makeSecureRequest(url: string): Promise<globalThis.Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.#timeoutMs);
+
+    try {
+      const response = await this.#fetch(url, {
+        signal: controller.signal,
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'MetaMask-Snap/1.0',
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      // Check response size before processing
+      const contentLength = response.headers.get('content-length');
+      if (
+        contentLength &&
+        parseInt(contentLength, 10) > this.#maxResponseSizeBytes
+      ) {
+        throw new LimitExceededError(
+          `Response too large: ${contentLength} bytes exceeds limit of ${this.#maxResponseSizeBytes} bytes`,
+        );
+      }
+
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new ResourceUnavailableError(
+          `Request timed out after ${this.#timeoutMs}ms`,
+        );
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -94,13 +176,33 @@ export class PriceApiClient {
         }
       }
 
-      // Parse and validate the response
-      const spotPricesRes = (await response.json()) as SpotPricesRes;
+      // Parse and validate the response with zod
+      let responseData: unknown;
+      try {
+        responseData = await response.json();
+      } catch (error) {
+        const message = 'Failed to parse JSON response from spot price API';
+        logger.error(message, error);
+        throw new ParseError(message);
+      }
 
-      const assetTypeData = spotPricesRes[caipAssetType];
+      // Validate response structure and content with zod
+      let validatedResponse: SpotPricesRes;
+      try {
+        validatedResponse = SpotPricesResponseSchema.parse(responseData);
+      } catch (error) {
+        const message = 'Invalid response structure from spot price API';
+        logger.error(message, error);
+        throw new ResourceUnavailableError(message);
+      }
+
+      // Normalize CAIP asset type to lowercase for case-insensitive lookup
+      const normalizedCaipAssetType =
+        caipAssetType.toLowerCase() as CaipAssetType;
+      const assetTypeData = validatedResponse[normalizedCaipAssetType];
       if (!assetTypeData) {
         logger.error(
-          `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
+          `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType} (normalized: ${normalizedCaipAssetType})`,
         );
         throw new ResourceNotFoundError(
           `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
@@ -136,7 +238,7 @@ export class PriceApiClient {
     vsCurrency: VsCurrencyParam,
   ): Promise<globalThis.Response> {
     try {
-      return this.#fetch(
+      return this.#makeSecureRequest(
         `${
           this.#baseUrl
         }/v3/spot-prices?includeMarketData=false&vsCurrency=${vsCurrency}&assetIds=${caipAssetType}`,
