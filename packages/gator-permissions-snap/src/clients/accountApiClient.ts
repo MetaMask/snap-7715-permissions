@@ -2,37 +2,75 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
 import {
   InvalidInputError,
+  LimitExceededError,
+  ParseError,
   ResourceNotFoundError,
   ResourceUnavailableError,
 } from '@metamask/snaps-sdk';
+import { z } from 'zod';
 
 import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata } from './types';
 
 /**
+ * Zod schema for validating token balance response
+ */
+const TokenBalanceResponseSchema = z.object({
+  name: z.string().min(1).max(100),
+  symbol: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^[A-Z0-9]+$/iu, 'Symbol must contain only alphanumeric characters'),
+  decimals: z.number().int().min(0).max(77), // ERC-20 standard allows up to 77 decimals
+  type: z.string().min(1).max(20).optional(),
+  iconUrl: z.string().url().max(2048).optional(), // Limit URL length and validate format
+  coingeckoId: z.string().min(1).max(100),
+  address: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{40}$/u, 'Invalid hex address format'),
+  occurrences: z.number().int().min(0),
+  sources: z.array(z.string().min(1).max(100)).max(50), // Limit number of sources
+  chainId: z.number().int().positive(),
+  blockNumber: z
+    .string()
+    .regex(
+      /^(latest|\d+)$/u,
+      'Block number must be "latest" or numeric string',
+    ),
+  updatedAt: z.string().datetime(),
+  value: z.record(z.unknown()),
+  price: z.number().finite().min(0),
+  accounts: z
+    .array(
+      z.object({
+        accountAddress: z
+          .string()
+          .regex(/^0x[a-fA-F0-9]{40}$/u, 'Invalid hex address format'),
+        chainId: z.number().int().positive(),
+        rawBalance: z
+          .string()
+          .regex(/^\d+$/u, 'Raw balance must be numeric string'),
+        balance: z.number().finite().min(0),
+      }),
+    )
+    .min(1)
+    .max(1000), // Ensure accounts is an array with reasonable limits
+});
+
+/**
  * Response type for token balance data
  */
-type TokenBalanceResponse = {
-  name: string;
-  symbol: string;
-  decimals: number;
-  type: string;
-  iconUrl: string;
-  coingeckoId: string;
-  address: Hex;
-  occurrences: number;
-  sources: string[];
-  chainId: number;
-  blockNumber: string;
-  updatedAt: string;
-  value: Record<string, unknown>;
-  price: number;
-  accounts: {
-    accountAddress: Hex;
-    chainId: number;
-    rawBalance: string;
-    balance: number;
-  }[];
+type TokenBalanceResponse = z.infer<typeof TokenBalanceResponseSchema>;
+
+/**
+ * Configuration options for AccountApiClient
+ */
+export type AccountApiClientConfig = {
+  baseUrl: string;
+  fetch?: typeof globalThis.fetch;
+  timeoutMs?: number;
+  maxResponseSizeBytes?: number;
 };
 
 /**
@@ -43,19 +81,28 @@ export class AccountApiClient {
 
   static readonly #nativeTokenAddress = ZERO_ADDRESS;
 
+  static readonly #defaultTimeoutMs = 10000; // 10 seconds
+
+  static readonly #defaultMaxResponseSizeBytes = 1024 * 1024; // 1MB
+
   readonly #fetch: typeof globalThis.fetch;
 
   readonly #baseUrl: string;
 
+  readonly #timeoutMs: number;
+
+  readonly #maxResponseSizeBytes: number;
+
   constructor({
     baseUrl,
     fetch = globalThis.fetch,
-  }: {
-    baseUrl: string;
-    fetch?: typeof globalThis.fetch;
-  }) {
+    timeoutMs = AccountApiClient.#defaultTimeoutMs,
+    maxResponseSizeBytes = AccountApiClient.#defaultMaxResponseSizeBytes,
+  }: AccountApiClientConfig) {
     this.#fetch = fetch;
     this.#baseUrl = baseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
+    this.#timeoutMs = timeoutMs;
+    this.#maxResponseSizeBytes = maxResponseSizeBytes;
   }
 
   /**
@@ -68,6 +115,52 @@ export class AccountApiClient {
    */
   public isChainIdSupported({ chainId }: { chainId: number }): boolean {
     return chainId === 1;
+  }
+
+  /**
+   * Makes a secure HTTP request with timeout and response size limits.
+   * @param url - The URL to fetch.
+   * @returns A promise that resolves to the response.
+   * @throws {ResourceUnavailableError} If the request times out or exceeds size limits.
+   */
+  async #makeSecureRequest(url: string): Promise<globalThis.Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.#timeoutMs);
+
+    try {
+      const response = await this.#fetch(url, {
+        signal: controller.signal,
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'MetaMask-Snap/1.0',
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      // Check response size before processing
+      const contentLength = response.headers.get('content-length');
+      if (
+        contentLength &&
+        parseInt(contentLength, 10) > this.#maxResponseSizeBytes
+      ) {
+        throw new LimitExceededError(
+          `Response too large: ${contentLength} bytes exceeds limit of ${this.#maxResponseSizeBytes} bytes`,
+        );
+      }
+
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new ResourceUnavailableError(
+          `Request timed out after ${this.#timeoutMs}ms`,
+        );
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -104,7 +197,7 @@ export class AccountApiClient {
 
     const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
 
-    const response = await this.#fetch(
+    const response = await this.#makeSecureRequest(
       `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
     );
 
@@ -115,8 +208,27 @@ export class AccountApiClient {
       throw new ResourceUnavailableError(message);
     }
 
-    const { accounts, type, iconUrl, symbol, decimals } =
-      (await response.json()) as TokenBalanceResponse;
+    // Parse and validate the response with zod
+    let responseData: unknown;
+    try {
+      responseData = await response.json();
+    } catch (error) {
+      const message = 'Failed to parse JSON response from token balance API';
+      logger.error(message, error);
+      throw new ParseError(message);
+    }
+
+    // Validate response structure and content with zod
+    let validatedResponse: TokenBalanceResponse;
+    try {
+      validatedResponse = TokenBalanceResponseSchema.parse(responseData);
+    } catch (error) {
+      const message = 'Invalid response structure from token balance API';
+      logger.error(message, error);
+      throw new ResourceUnavailableError(message);
+    }
+
+    const { accounts, type, iconUrl, symbol, decimals } = validatedResponse;
 
     const accountLowercase = account.toLowerCase();
     const accountData = accounts.find(
@@ -140,13 +252,71 @@ export class AccountApiClient {
       throw new InvalidInputError(message);
     }
 
-    const balance = BigInt(accountData.rawBalance);
+    // Additional validation for balance conversion
+    let balance: bigint;
+    try {
+      balance = BigInt(accountData.rawBalance);
+    } catch (error) {
+      const message = `Invalid balance format: ${accountData.rawBalance}`;
+      logger.error(message, error);
+      throw new InvalidInputError(message);
+    }
 
-    return {
+    // Sanitize iconUrl if present
+    const sanitizedIconUrl = iconUrl
+      ? this.#sanitizeIconUrl(iconUrl)
+      : undefined;
+
+    const result: TokenBalanceAndMetadata = {
       balance,
       decimals,
       symbol,
-      iconUrl,
     };
+
+    if (sanitizedIconUrl) {
+      result.iconUrl = sanitizedIconUrl;
+    }
+
+    return result;
+  }
+
+  /**
+   * Sanitizes an icon URL to prevent potential security issues.
+   * @param iconUrl - The icon URL to sanitize.
+   * @returns The sanitized icon URL or undefined if invalid.
+   */
+  #sanitizeIconUrl(iconUrl: string): string | undefined {
+    try {
+      const url = new URL(iconUrl);
+
+      // Only allow HTTPS URLs
+      if (url.protocol !== 'https:') {
+        logger.warn(`Rejecting non-HTTPS icon URL: ${iconUrl}`);
+        return undefined;
+      }
+
+      // Only allow common image formats
+      const allowedExtensions = [
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.gif',
+        '.svg',
+        '.webp',
+      ];
+      const hasValidExtension = allowedExtensions.some((ext) =>
+        url.pathname.toLowerCase().endsWith(ext),
+      );
+
+      if (!hasValidExtension) {
+        logger.warn(`Rejecting icon URL with invalid extension: ${iconUrl}`);
+        return undefined;
+      }
+
+      return url.toString();
+    } catch (error) {
+      logger.warn(`Invalid icon URL format: ${iconUrl}`, error);
+      return undefined;
+    }
   }
 }

@@ -74,6 +74,8 @@ const supportedChains = supportedChainsString.split(',').map(Number);
 
 const accountApiClient = new AccountApiClient({
   baseUrl: accountApiBaseUrl,
+  timeoutMs: 10000, // 10 seconds timeout
+  maxResponseSizeBytes: 1024 * 1024, // 1MB max response size
 });
 
 const tokenMetadataClient = new BlockchainTokenMetadataClient({
