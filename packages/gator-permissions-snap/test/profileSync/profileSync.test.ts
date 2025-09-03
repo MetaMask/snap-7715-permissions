@@ -204,8 +204,19 @@ describe('profileSync', () => {
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
-          expect.stringContaining('"permissionResponse"'),
+          expect.stringMatching(
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+          ),
         );
+        // Verify the stored data can be parsed and contains expected fields
+        const storedData = userStorageMock.setItem.mock.calls[0]?.[1];
+        expect(storedData).toBeDefined();
+        const parsed = JSON.parse(storedData as string);
+        expect(parsed.permissionResponse.chainId).toBe('0xaa36a7');
+        expect(parsed.permissionResponse.address).toBe(
+          '0x1234567890123456789012345678901234567890',
+        );
+        expect(parsed.siteOrigin).toBe('https://example.com');
       });
 
       it('should concatenate all delegation hashes together when store granted permission that has multiple delegations in profile sync', async () => {
@@ -223,8 +234,19 @@ describe('profileSync', () => {
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo.slice(2)}`,
-          expect.stringContaining('"permissionResponse"'),
+          expect.stringMatching(
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+          ),
         );
+        // Verify the stored data can be parsed and contains expected fields
+        const storedData = userStorageMock.setItem.mock.calls[0]?.[1];
+        expect(storedData).toBeDefined();
+        const parsed = JSON.parse(storedData as string);
+        expect(parsed.permissionResponse.chainId).toBe('0xaa36a7');
+        expect(parsed.permissionResponse.address).toBe(
+          '0x1234567890123456789012345678901234567890',
+        );
+        expect(parsed.siteOrigin).toBe('https://example.com');
       });
 
       it('should throw error when profile sync storage throws error', async () => {
@@ -290,13 +312,31 @@ describe('profileSync', () => {
           [
             [
               mockDelegationHash,
-              expect.stringContaining('"permissionResponse"'),
+              expect.stringMatching(
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+              ),
             ],
             [
               mockDelegationHashTwo,
-              expect.stringContaining('"permissionResponse"'),
+              expect.stringMatching(
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+              ),
             ],
           ],
+        );
+        // Verify the stored data can be parsed and contains expected fields
+        const batchCalls = userStorageMock.batchSetItems.mock.calls[0]?.[1];
+        expect(batchCalls).toBeDefined();
+        expect(batchCalls).toHaveLength(2);
+        const firstStored = JSON.parse((batchCalls as any)[0]?.[1] as string);
+        const secondStored = JSON.parse((batchCalls as any)[1]?.[1] as string);
+        expect(firstStored.permissionResponse.chainId).toBe('0xaa36a7');
+        expect(firstStored.permissionResponse.address).toBe(
+          '0x1234567890123456789012345678901234567890',
+        );
+        expect(secondStored.permissionResponse.chainId).toBe('0xaa36a7');
+        expect(secondStored.permissionResponse.address).toBe(
+          '0x1234567890123456789012345678901234567891',
         );
       });
 
@@ -402,8 +442,25 @@ describe('profileSync', () => {
 
       expect(userStorageMock.batchSetItems).toHaveBeenCalledWith(
         'gator_7715_permissions',
-        [[mockDelegationHash, expect.stringContaining('"permissionResponse"')]],
+        [
+          [
+            mockDelegationHash,
+            expect.stringMatching(
+              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+            ),
+          ],
+        ],
       );
+      // Verify the stored data can be parsed and contains expected fields
+      const batchCalls = userStorageMock.batchSetItems.mock.calls[0]?.[1];
+      expect(batchCalls).toBeDefined();
+      expect(batchCalls).toHaveLength(1);
+      const storedData = JSON.parse((batchCalls as any)[0]?.[1] as string);
+      expect(storedData.permissionResponse.chainId).toBe('0xaa36a7');
+      expect(storedData.permissionResponse.address).toBe(
+        '0x1234567890123456789012345678901234567890',
+      );
+      expect(storedData.siteOrigin).toBe('https://example.com');
     });
   });
 
