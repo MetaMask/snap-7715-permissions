@@ -11,7 +11,27 @@ import {
 } from '@metamask/7715-permissions-shared/utils';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
 import { z } from 'zod';
+
 import { RpcMethod } from '../rpc/rpcMethod';
+
+/**
+ * Checks if an object contains prototype pollution keys.
+ *
+ * @param obj - The object to check.
+ * @returns True if the object is safe (no prototype pollution keys).
+ */
+function isSafeObject(obj: unknown): boolean {
+  if (typeof obj !== 'object' || obj === null) {
+    return true;
+  }
+
+  const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
+  return !Object.keys(obj).some((key) =>
+    dangerousKeys.some(
+      (dangerousKey) => key === dangerousKey || key.includes(dangerousKey),
+    ),
+  );
+}
 
 /**
  * Safely parses the grant permissions request parameters, validating them using Zod schema.
@@ -84,8 +104,12 @@ export const zJsonRpcRequest = z.object({
       z.number(),
       z.boolean(),
       z.null(),
-      z.array(z.unknown()),
-      z.record(z.unknown()),
+      z.array(z.unknown()).refine((arr) => arr.every(isSafeObject), {
+        message: 'Invalid key in array: potential prototype pollution attempt',
+      }),
+      z.record(z.unknown()).refine(isSafeObject, {
+        message: 'Invalid key: potential prototype pollution attempt',
+      }),
     ])
     .optional(),
 
@@ -111,11 +135,6 @@ export type ValidatedJsonRpcRequest = z.infer<typeof zJsonRpcRequest>;
 export function validateJsonRpcRequest(
   request: unknown,
 ): ValidatedJsonRpcRequest {
-  // First, ensure the request is an object
-  if (typeof request !== 'object' || request === null) {
-    throw new InvalidParamsError('Request must be a valid JSON-RPC object');
-  }
-
   // Validate the JSON-RPC structure using Zod
   const validationResult = zJsonRpcRequest.safeParse(request);
 
@@ -136,23 +155,4 @@ export function validateJsonRpcRequest(
   }
 
   return validationResult.data;
-}
-
-/**
- * Validates that the request method exists in the bound handlers.
- * This provides an additional layer of security beyond the Zod schema.
- *
- * @param method - The method name to validate.
- * @param boundHandlers - The object containing bound RPC handlers.
- * @throws InvalidParamsError if method is not found.
- */
-export function validateMethodExists(
-  method: string,
-  boundHandlers: Record<string, unknown>,
-): void {
-  // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
-  if (!Object.prototype.hasOwnProperty.call(boundHandlers, method)) {
-    logger.warn('Method not found in bound handlers:', { method });
-    throw new InvalidParamsError(`Method ${method} not found`);
-  }
 }

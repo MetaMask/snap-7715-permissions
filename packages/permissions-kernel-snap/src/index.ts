@@ -1,5 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
+  InvalidParamsError,
   LimitExceededError,
   type Json,
   type JsonRpcParams,
@@ -9,7 +10,7 @@ import {
 import { createPermissionOfferRegistryManager } from './registryManager';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
-import { validateJsonRpcRequest, validateMethodExists } from './utils';
+import { validateJsonRpcRequest } from './utils';
 
 // set up dependencies
 const rpcHandler = createRpcHandler({
@@ -64,11 +65,26 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       JSON.stringify(request, undefined, 2),
     );
 
-    // Early validation of the JSON-RPC request structure and security
-    const validatedRequest = validateJsonRpcRequest(request);
+    // First check if the request is a valid object
+    if (typeof request !== 'object' || request === null) {
+      throw new InvalidParamsError('Request must be a valid JSON-RPC object');
+    }
 
-    // Additional validation that the method exists in our bound handlers
-    validateMethodExists(validatedRequest.method, boundRpcHandlers);
+    // Check if method exists first (for proper error codes)
+    if (!request.method || typeof request.method !== 'string') {
+      throw new InvalidParamsError('Request must have a valid method');
+    }
+
+    // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
+    if (
+      !Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)
+    ) {
+      logger.warn('Method not found in bound handlers:', request.method);
+      throw new InvalidParamsError(`Method ${request.method} not found`);
+    }
+
+    // Now validate the full JSON-RPC structure
+    const validatedRequest = validateJsonRpcRequest(request);
 
     // We know that the method exists, so we can cast to NonNullable
     const handler = boundRpcHandlers[validatedRequest.method] as NonNullable<
