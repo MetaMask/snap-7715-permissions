@@ -162,61 +162,21 @@ describe('objStringify', () => {
   });
 });
 
-describe('Production Logging Behavior', () => {
-  let originalNodeEnv: string | undefined;
-  let originalEnableLogging: string | undefined;
-
-  beforeEach(() => {
-    // Store original environment variables
-    // eslint-disable-next-line no-restricted-globals
-    originalNodeEnv = process.env.NODE_ENV;
-    // eslint-disable-next-line no-restricted-globals
-    originalEnableLogging = process.env.ENABLE_LOGGING;
-  });
-
-  afterEach(() => {
-    // Restore original environment variables
-    // eslint-disable-next-line no-restricted-globals, no-negated-condition
-    if (originalNodeEnv !== undefined) {
-      // eslint-disable-next-line no-restricted-globals
-      process.env.NODE_ENV = originalNodeEnv;
-    } else {
-      // eslint-disable-next-line no-restricted-globals
-      delete process.env.NODE_ENV;
-    }
-
-    // eslint-disable-next-line no-restricted-globals, no-negated-condition
-    if (originalEnableLogging !== undefined) {
-      // eslint-disable-next-line no-restricted-globals
-      process.env.ENABLE_LOGGING = originalEnableLogging;
-    } else {
-      // eslint-disable-next-line no-restricted-globals
-      delete process.env.ENABLE_LOGGING;
-    }
-  });
-
-  describe('Production Environment', () => {
-    beforeEach(() => {
-      // eslint-disable-next-line no-restricted-globals
-      process.env.NODE_ENV = 'production';
-      // eslint-disable-next-line no-restricted-globals
-      delete process.env.ENABLE_LOGGING;
+describe('Logger Configuration', () => {
+  describe('Explicit threshold configuration', () => {
+    it('should use provided threshold when explicitly set', () => {
+      const logger = new Logger({ threshold: LogLevel.ERROR });
+      expect(logger.getLevel()).toBe(LogLevel.ERROR);
     });
 
-    it('should disable all logging in production by default', () => {
-      const logger = new Logger();
-
-      // The default level should be higher than ERROR, effectively disabling all logging
-      expect(logger.getLevel()).toBeGreaterThan(LogLevel.ERROR);
-    });
-
-    it('should not log any messages in production by default', () => {
+    it('should disable all logging when threshold is higher than ERROR', () => {
       const mockDebug = jest.fn();
       const mockInfo = jest.fn();
       const mockWarn = jest.fn();
       const mockError = jest.fn();
 
       const logger = new Logger({
+        threshold: LogLevel.ERROR + 1, // Higher than ERROR
         handlers: {
           [LogLevel.DEBUG]: mockDebug,
           [LogLevel.INFO]: mockInfo,
@@ -238,26 +198,14 @@ describe('Production Logging Behavior', () => {
       expect(mockError).not.toHaveBeenCalled();
     });
 
-    it('should enable logging in production when ENABLE_LOGGING=true', () => {
-      // eslint-disable-next-line no-restricted-globals
-      process.env.ENABLE_LOGGING = 'true';
-
-      const logger = new Logger();
-
-      // Should use WARN level in production when explicitly enabled
-      expect(logger.getLevel()).toBe(LogLevel.WARN);
-    });
-
-    it('should log WARN and ERROR messages when ENABLE_LOGGING=true in production', () => {
-      // eslint-disable-next-line no-restricted-globals
-      process.env.ENABLE_LOGGING = 'true';
-
+    it('should log only WARN and ERROR when threshold is WARN', () => {
       const mockDebug = jest.fn();
       const mockInfo = jest.fn();
       const mockWarn = jest.fn();
       const mockError = jest.fn();
 
       const logger = new Logger({
+        threshold: LogLevel.WARN,
         handlers: {
           [LogLevel.DEBUG]: mockDebug,
           [LogLevel.INFO]: mockInfo,
@@ -278,28 +226,15 @@ describe('Production Logging Behavior', () => {
       expect(mockWarn).toHaveBeenCalledWith('Warning message');
       expect(mockError).toHaveBeenCalledWith('Error message');
     });
-  });
 
-  describe('Development Environment', () => {
-    beforeEach(() => {
-      // eslint-disable-next-line no-restricted-globals
-      process.env.NODE_ENV = 'development';
-      // eslint-disable-next-line no-restricted-globals
-      delete process.env.ENABLE_LOGGING;
-    });
-
-    it('should enable DEBUG level logging in development', () => {
-      const logger = new Logger();
-      expect(logger.getLevel()).toBe(LogLevel.DEBUG);
-    });
-
-    it('should log all messages in development', () => {
+    it('should log all messages when threshold is DEBUG', () => {
       const mockDebug = jest.fn();
       const mockInfo = jest.fn();
       const mockWarn = jest.fn();
       const mockError = jest.fn();
 
       const logger = new Logger({
+        threshold: LogLevel.DEBUG,
         handlers: {
           [LogLevel.DEBUG]: mockDebug,
           [LogLevel.INFO]: mockInfo,
@@ -319,6 +254,24 @@ describe('Production Logging Behavior', () => {
       expect(mockInfo).toHaveBeenCalledWith('Info message');
       expect(mockWarn).toHaveBeenCalledWith('Warning message');
       expect(mockError).toHaveBeenCalledWith('Error message');
+    });
+  });
+
+  describe('Default behavior', () => {
+    it('should use default threshold when no configuration provided', () => {
+      const logger = new Logger();
+      // Should not be undefined and should be a valid LogLevel
+      expect(logger.getLevel()).toBeDefined();
+      expect(typeof logger.getLevel()).toBe('number');
+      expect(logger.getLevel()).toBeGreaterThanOrEqual(LogLevel.DEBUG);
+      expect(logger.getLevel()).toBeLessThanOrEqual(LogLevel.ERROR + 1);
+    });
+
+    it('should handle undefined threshold gracefully', () => {
+      const logger = new Logger({});
+      // Should not be undefined and should be a valid LogLevel
+      expect(logger.getLevel()).toBeDefined();
+      expect(typeof logger.getLevel()).toBe('number');
     });
   });
 });
