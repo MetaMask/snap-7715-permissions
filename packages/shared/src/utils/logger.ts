@@ -28,17 +28,24 @@ type LoggerContext = {
  * @returns The default logging level.
  */
 function getDefaultLevel(): LogLevel {
+  // Disable all logging in production unless explicitly enabled
   // eslint-disable-next-line no-restricted-globals
-  return process.env.NODE_ENV === 'development'
-    ? LogLevel.DEBUG
-    : LogLevel.WARN;
+  const nodeEnv = process.env.NODE_ENV;
+  // eslint-disable-next-line no-restricted-globals
+  const enableLogging = process.env.ENABLE_LOGGING;
+
+  if (nodeEnv === 'production' && enableLogging !== 'true') {
+    return LogLevel.ERROR + 1; // Higher than ERROR to disable all logging
+  }
+
+  return nodeEnv === 'development' ? LogLevel.DEBUG : LogLevel.WARN;
 }
 
 /**
  * Logger internal context.
  */
 const DEFAULT_CONTEXT: LoggerContext = {
-  threshold: getDefaultLevel(),
+  threshold: LogLevel.DEBUG, // Will be overridden in constructor
   handlers: {
     [LogLevel.DEBUG]: console.debug,
     [LogLevel.INFO]: console.info,
@@ -68,6 +75,7 @@ export class Logger {
   constructor(context: Partial<LoggerContext> = {}) {
     this.#context = {
       ...DEFAULT_CONTEXT,
+      threshold: context.threshold ?? getDefaultLevel(),
       ...context,
     };
   }

@@ -161,3 +161,164 @@ describe('objStringify', () => {
     expect(result).toBe('{"bigIntValue":"0x24cb016ea","message":"hello"}');
   });
 });
+
+describe('Production Logging Behavior', () => {
+  let originalNodeEnv: string | undefined;
+  let originalEnableLogging: string | undefined;
+
+  beforeEach(() => {
+    // Store original environment variables
+    // eslint-disable-next-line no-restricted-globals
+    originalNodeEnv = process.env.NODE_ENV;
+    // eslint-disable-next-line no-restricted-globals
+    originalEnableLogging = process.env.ENABLE_LOGGING;
+  });
+
+  afterEach(() => {
+    // Restore original environment variables
+    // eslint-disable-next-line no-restricted-globals, no-negated-condition
+    if (originalNodeEnv !== undefined) {
+      // eslint-disable-next-line no-restricted-globals
+      process.env.NODE_ENV = originalNodeEnv;
+    } else {
+      // eslint-disable-next-line no-restricted-globals
+      delete process.env.NODE_ENV;
+    }
+
+    // eslint-disable-next-line no-restricted-globals, no-negated-condition
+    if (originalEnableLogging !== undefined) {
+      // eslint-disable-next-line no-restricted-globals
+      process.env.ENABLE_LOGGING = originalEnableLogging;
+    } else {
+      // eslint-disable-next-line no-restricted-globals
+      delete process.env.ENABLE_LOGGING;
+    }
+  });
+
+  describe('Production Environment', () => {
+    beforeEach(() => {
+      // eslint-disable-next-line no-restricted-globals
+      process.env.NODE_ENV = 'production';
+      // eslint-disable-next-line no-restricted-globals
+      delete process.env.ENABLE_LOGGING;
+    });
+
+    it('should disable all logging in production by default', () => {
+      const logger = new Logger();
+
+      // The default level should be higher than ERROR, effectively disabling all logging
+      expect(logger.getLevel()).toBeGreaterThan(LogLevel.ERROR);
+    });
+
+    it('should not log any messages in production by default', () => {
+      const mockDebug = jest.fn();
+      const mockInfo = jest.fn();
+      const mockWarn = jest.fn();
+      const mockError = jest.fn();
+
+      const logger = new Logger({
+        handlers: {
+          [LogLevel.DEBUG]: mockDebug,
+          [LogLevel.INFO]: mockInfo,
+          [LogLevel.WARN]: mockWarn,
+          [LogLevel.ERROR]: mockError,
+        },
+      });
+
+      // Try to log at all levels
+      logger.debug('Debug message');
+      logger.info('Info message');
+      logger.warn('Warning message');
+      logger.error('Error message');
+
+      // None should be called
+      expect(mockDebug).not.toHaveBeenCalled();
+      expect(mockInfo).not.toHaveBeenCalled();
+      expect(mockWarn).not.toHaveBeenCalled();
+      expect(mockError).not.toHaveBeenCalled();
+    });
+
+    it('should enable logging in production when ENABLE_LOGGING=true', () => {
+      // eslint-disable-next-line no-restricted-globals
+      process.env.ENABLE_LOGGING = 'true';
+
+      const logger = new Logger();
+
+      // Should use WARN level in production when explicitly enabled
+      expect(logger.getLevel()).toBe(LogLevel.WARN);
+    });
+
+    it('should log WARN and ERROR messages when ENABLE_LOGGING=true in production', () => {
+      // eslint-disable-next-line no-restricted-globals
+      process.env.ENABLE_LOGGING = 'true';
+
+      const mockDebug = jest.fn();
+      const mockInfo = jest.fn();
+      const mockWarn = jest.fn();
+      const mockError = jest.fn();
+
+      const logger = new Logger({
+        handlers: {
+          [LogLevel.DEBUG]: mockDebug,
+          [LogLevel.INFO]: mockInfo,
+          [LogLevel.WARN]: mockWarn,
+          [LogLevel.ERROR]: mockError,
+        },
+      });
+
+      // Try to log at all levels
+      logger.debug('Debug message');
+      logger.info('Info message');
+      logger.warn('Warning message');
+      logger.error('Error message');
+
+      // Only WARN and ERROR should be called
+      expect(mockDebug).not.toHaveBeenCalled();
+      expect(mockInfo).not.toHaveBeenCalled();
+      expect(mockWarn).toHaveBeenCalledWith('Warning message');
+      expect(mockError).toHaveBeenCalledWith('Error message');
+    });
+  });
+
+  describe('Development Environment', () => {
+    beforeEach(() => {
+      // eslint-disable-next-line no-restricted-globals
+      process.env.NODE_ENV = 'development';
+      // eslint-disable-next-line no-restricted-globals
+      delete process.env.ENABLE_LOGGING;
+    });
+
+    it('should enable DEBUG level logging in development', () => {
+      const logger = new Logger();
+      expect(logger.getLevel()).toBe(LogLevel.DEBUG);
+    });
+
+    it('should log all messages in development', () => {
+      const mockDebug = jest.fn();
+      const mockInfo = jest.fn();
+      const mockWarn = jest.fn();
+      const mockError = jest.fn();
+
+      const logger = new Logger({
+        handlers: {
+          [LogLevel.DEBUG]: mockDebug,
+          [LogLevel.INFO]: mockInfo,
+          [LogLevel.WARN]: mockWarn,
+          [LogLevel.ERROR]: mockError,
+        },
+      });
+
+      // Try to log at all levels
+      logger.debug('Debug message');
+      logger.info('Info message');
+      logger.warn('Warning message');
+      logger.error('Error message');
+
+      // All should be called
+      expect(mockDebug).toHaveBeenCalledWith('Debug message');
+      expect(mockInfo).toHaveBeenCalledWith('Info message');
+      expect(mockWarn).toHaveBeenCalledWith('Warning message');
+      expect(mockError).toHaveBeenCalledWith('Error message');
+    });
+  });
+});
