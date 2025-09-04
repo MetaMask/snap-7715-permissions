@@ -252,11 +252,20 @@ describe('validate utils', () => {
       const dangerousParams2 = { prototype: 'pollution' };
       // Create an object with __proto__ as an actual property (not the special __proto__ property)
       const dangerousParams3 = Object.create(null);
-      dangerousParams3['__proto__'] = 'pollution';
+      // eslint-disable-next-line no-proto
+      dangerousParams3.__proto__ = 'pollution';
 
       const dangerousRequests = [
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: dangerousParams1 },
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: dangerousParams2 },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: dangerousParams1,
+        },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: dangerousParams2,
+        },
         // Note: dangerousParams3 won't work with z.record as it converts Object.create(null) to {}
         // This is actually correct behavior - Object.create(null) objects are safe from prototype pollution
       ];
@@ -270,11 +279,34 @@ describe('validate utils', () => {
 
     it('should allow objects with keys that contain dangerous substrings', () => {
       const safeRequests = [
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: { my__proto__field: 'safe' } },
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: { constructorHelper: 'safe' } },
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: { prototypeData: 'safe' } },
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: { __proto__test: 'safe' } },
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: { test__proto__: 'safe' } },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          params: { my__proto__field: 'safe' },
+        },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: { constructorHelper: 'safe' },
+        },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: { prototypeData: 'safe' },
+        },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          params: { __proto__test: 'safe' },
+        },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          params: { test__proto__: 'safe' },
+        },
       ];
 
       safeRequests.forEach((request) => {
@@ -286,39 +318,40 @@ describe('validate utils', () => {
     it('should reject nested objects with dangerous keys', () => {
       // Create nested objects with dangerous keys that will actually be detected
       const nestedProto = Object.create(null);
-      nestedProto['__proto__'] = 'pollution';
-      
+      // eslint-disable-next-line no-proto
+      nestedProto.__proto__ = 'pollution';
+
       const dangerousNestedRequests = [
-        { 
-          jsonrpc: '2.0' as const, 
-          method: RpcMethod.WalletRequestExecutionPermissions, 
-          params: { 
-            level1: nestedProto
-          } 
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: {
+            level1: nestedProto,
+          },
         },
-        { 
-          jsonrpc: '2.0' as const, 
-          method: RpcMethod.WalletRequestExecutionPermissions, 
-          params: { 
-            level1: { 
-              level2: { 
-                constructor: 'pollution' 
-              }
-            } 
-          } 
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: {
+            level1: {
+              level2: {
+                constructor: 'pollution',
+              },
+            },
+          },
         },
-        { 
-          jsonrpc: '2.0' as const, 
-          method: RpcMethod.WalletRequestExecutionPermissions, 
-          params: { 
-            level1: { 
-              level2: { 
-                level3: { 
-                  prototype: 'pollution' 
-                }
-              } 
-            } 
-          } 
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: {
+            level1: {
+              level2: {
+                level3: {
+                  prototype: 'pollution',
+                },
+              },
+            },
+          },
         },
       ];
 
@@ -356,10 +389,7 @@ describe('validate utils', () => {
                 level4: {
                   level5: {
                     safe: 'deep value',
-                    array: [
-                      { nested: 'safe' },
-                      { another: 'safe' },
-                    ],
+                    array: [{ nested: 'safe' }, { another: 'safe' }],
                   },
                 },
               },
@@ -389,10 +419,26 @@ describe('validate utils', () => {
 
     it('should handle primitive values safely', () => {
       const primitiveRequests = [
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: 'string' },
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: 123 },
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: true },
-        { jsonrpc: '2.0' as const, method: RpcMethod.WalletRequestExecutionPermissions, params: null },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: 'string',
+        },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: 123,
+        },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: true,
+        },
+        {
+          jsonrpc: '2.0' as const,
+          method: RpcMethod.WalletRequestExecutionPermissions,
+          params: null,
+        },
       ];
 
       primitiveRequests.forEach((request) => {

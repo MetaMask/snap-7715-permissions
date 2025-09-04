@@ -29,10 +29,10 @@ function isSafeObject(obj: unknown): boolean {
 
   // Check for exact dangerous keys (not substrings)
   const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
-  
+
   // Check if any dangerous keys exist as own properties
-  const hasDangerousKey = dangerousKeys.some((dangerousKey) => 
-    Object.prototype.hasOwnProperty.call(obj, dangerousKey)
+  const hasDangerousKey = dangerousKeys.some((dangerousKey) =>
+    Object.prototype.hasOwnProperty.call(obj, dangerousKey),
   );
 
   if (hasDangerousKey) {
