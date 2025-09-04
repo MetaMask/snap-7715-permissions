@@ -75,8 +75,8 @@ export class Logger {
   constructor(context: Partial<LoggerContext> = {}) {
     this.#context = {
       ...DEFAULT_CONTEXT,
-      threshold: context.threshold ?? getDefaultLevel(),
       ...context,
+      threshold: context.threshold ?? getDefaultLevel(),
     };
   }
 
