@@ -47,6 +47,96 @@ describe('Kernel Snap', () => {
           });
         }
       });
+
+      it('validates JSON-RPC request structure', async () => {
+        // Test missing jsonrpc field
+        const response1 = await snapRequest({
+          method: 'wallet_requestExecutionPermissions',
+        });
+
+        expect(response1).toRespondWithError({
+          code: -32602,
+          message: expect.stringContaining('Invalid JSON-RPC request'),
+          stack: expect.any(String),
+        });
+
+        // Test invalid jsonrpc version
+        const response2 = await snapRequest({
+          jsonrpc: '1.0',
+          method: 'wallet_requestExecutionPermissions',
+        } as any);
+
+        expect(response2).toRespondWithError({
+          code: -32602,
+          message: expect.stringContaining('Invalid JSON-RPC request'),
+          stack: expect.any(String),
+        });
+      });
+
+      it('validates request method against allowed methods', async () => {
+        const response = await snapRequest({
+          jsonrpc: '2.0',
+          method: 'invalid_method',
+        } as any);
+
+        expect(response).toRespondWithError({
+          code: -32602,
+          message: expect.stringContaining('Invalid JSON-RPC request'),
+          stack: expect.any(String),
+        });
+      });
+
+      it('prevents prototype pollution in request params', async () => {
+        const response = await snapRequest({
+          jsonrpc: '2.0',
+          method: 'wallet_requestExecutionPermissions',
+          params: {
+            '__proto__': 'malicious',
+            normalKey: 'value',
+          },
+        } as any);
+
+        expect(response).toRespondWithError({
+          code: -32602,
+          message: expect.stringContaining('Invalid JSON-RPC request'),
+          stack: expect.any(String),
+        });
+      });
+
+      it('prevents prototype pollution in nested request params', async () => {
+        const response = await snapRequest({
+          jsonrpc: '2.0',
+          method: 'wallet_requestExecutionPermissions',
+          params: {
+            normalKey: {
+              '__proto__': 'malicious',
+            },
+          },
+        } as any);
+
+        expect(response).toRespondWithError({
+          code: -32602,
+          message: expect.stringContaining('Invalid JSON-RPC request'),
+          stack: expect.any(String),
+        });
+      });
+
+      it('allows valid JSON-RPC request structure', async () => {
+        const response = await snapRequest({
+          jsonrpc: '2.0',
+          method: 'wallet_requestExecutionPermissions',
+          params: {
+            test: 'value',
+          },
+          id: 1,
+        } as any);
+
+        // The request should be processed (may fail later due to test setup, but not due to validation)
+        expect(response).not.toRespondWithError({
+          code: -32602,
+          message: expect.stringContaining('Invalid JSON-RPC request'),
+        });
+      });
     });
 
     describe('processing lock', () => {

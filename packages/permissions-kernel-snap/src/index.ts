@@ -1,7 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
   LimitExceededError,
-  MethodNotFoundError,
   type Json,
   type JsonRpcParams,
   type OnRpcRequestHandler,
@@ -10,6 +9,7 @@ import {
 import { createPermissionOfferRegistryManager } from './registryManager';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { validateJsonRpcRequest, validateMethodExists } from './utils';
 
 // set up dependencies
 const rpcHandler = createRpcHandler({
@@ -38,9 +38,9 @@ let activeProcessingLock: symbol | null = null;
  * @param args - The request handler args as object.
  * @param args.origin - The origin of the request, e.g., the website that
  * invoked the snap.
- * @param args.request - A validated JSON-RPC request object.
- * @returns The result of `snap_dialog`.
- * @throws If the request method is not valid for this snap.
+ * @param args.request - A JSON-RPC request object that will be validated.
+ * @returns The result of the RPC method execution.
+ * @throws If the request is invalid, method is not found, or processing fails.
  */
 export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
@@ -64,22 +64,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       JSON.stringify(request, undefined, 2),
     );
 
-    // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
-    // This ensures we only access methods that exist on boundRpcHandlers itself
-    if (
-      !Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)
-    ) {
-      throw new MethodNotFoundError(`Method ${request.method} not found.`);
-    }
+    // Early validation of the JSON-RPC request structure and security
+    const validatedRequest = validateJsonRpcRequest(request);
+
+    // Additional validation that the method exists in our bound handlers
+    validateMethodExists(validatedRequest.method, boundRpcHandlers);
 
     // We know that the method exists, so we can cast to NonNullable
-    const handler = boundRpcHandlers[request.method] as NonNullable<
+    const handler = boundRpcHandlers[validatedRequest.method] as NonNullable<
       (typeof boundRpcHandlers)[string]
     >;
 
     const result = await handler({
       siteOrigin: origin,
-      params: request.params as JsonRpcParams,
+      params: validatedRequest.params as JsonRpcParams,
     });
 
     return result;
