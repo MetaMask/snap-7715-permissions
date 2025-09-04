@@ -16,6 +16,8 @@ import { RpcMethod } from '../rpc/rpcMethod';
 
 /**
  * Checks if an object contains prototype pollution keys.
+ * Recursively validates nested objects and arrays to prevent prototype pollution
+ * at any depth in the object structure.
  *
  * @param obj - The object to check.
  * @returns True if the object is safe (no prototype pollution keys).
@@ -25,12 +27,26 @@ function isSafeObject(obj: unknown): boolean {
     return true;
   }
 
+  // Check for exact dangerous keys (not substrings)
   const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
-  return !Object.keys(obj).some((key) =>
-    dangerousKeys.some(
-      (dangerousKey) => key === dangerousKey || key.includes(dangerousKey),
-    ),
+  
+  // Check if any dangerous keys exist as own properties
+  const hasDangerousKey = dangerousKeys.some((dangerousKey) => 
+    Object.prototype.hasOwnProperty.call(obj, dangerousKey)
   );
+
+  if (hasDangerousKey) {
+    return false;
+  }
+
+  // Recursively check nested objects and arrays
+  for (const value of Object.values(obj)) {
+    if (!isSafeObject(value)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
@@ -107,7 +123,7 @@ export const zJsonRpcRequest = z.object({
       z.array(z.unknown()).refine((arr) => arr.every(isSafeObject), {
         message: 'Invalid key in array: potential prototype pollution attempt',
       }),
-      z.record(z.unknown()).refine(isSafeObject, {
+      z.record(z.unknown()).refine((obj) => isSafeObject(obj), {
         message: 'Invalid key: potential prototype pollution attempt',
       }),
     ])
