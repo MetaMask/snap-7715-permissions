@@ -6,11 +6,8 @@ The 7715 permissions snaps use environment-based manifest configuration via `SNA
 
 ### Local Development
 ```bash
-# Set environment
-echo "SNAP_ENV=local" > .env
-
-# Build or start
-yarn start
+# Build or start with development environment
+SNAP_ENV=local yarn start
 ```
 
 ### Production Build
@@ -50,16 +47,6 @@ yarn build
 yarn start
 ```
 
-### From root directory:
-```bash
-# Generate manifest for specific package
-yarn generate-snap-manifest packages/gator-permissions-snap
-yarn generate-snap-manifest packages/permissions-kernel-snap
-
-# With environment variable
-SNAP_ENV=development yarn generate-snap-manifest packages/gator-permissions-snap
-```
-
 ## File Structure
 
 ```
@@ -67,7 +54,7 @@ packages/
 ├── shared/
 │   └── src/
 │       └── scripts/
-│           └── generate-manifest.js  # Shared manifest generation script
+│           └── generate-manifest.ts  # Shared manifest generation script
 ├── gator-permissions-snap/
 │   ├── snap.manifest.ts              # TypeScript manifest definition (source of truth)
 │   └── snap.manifest.json           # Generated from .ts file (git ignored)

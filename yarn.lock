@@ -3191,7 +3191,7 @@ __metadata:
     viem: 2.31.7
     zod: 3.25.76
   bin:
-    generate-snap-manifest: ./src/scripts/generate-manifest.js
+    generate-snap-manifest: ./src/scripts/generate-manifest.ts
   languageName: unknown
   linkType: soft
 

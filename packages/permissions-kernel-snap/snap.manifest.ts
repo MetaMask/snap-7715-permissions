@@ -1,9 +1,12 @@
-import { defineSnapManifest } from '@metamask/7715-permissions-shared/utils';
+/* eslint-disable no-restricted-globals */
+import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 
-// eslint-disable-next-line no-restricted-globals
 const snapEnv = process.env.SNAP_ENV ?? 'production';
+const gatorSnapId =
+  process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID ??
+  'npm:@metamask/gator-permissions-snap';
 
-const manifest = defineSnapManifest({
+const manifest: SnapManifest = {
   version: '0.2.0',
   description: 'Manage onchain 7715 permissions',
   proposedName: 'MetaMask Permissions Kernel',
@@ -30,13 +33,13 @@ const manifest = defineSnapManifest({
   },
   platformVersion: '8.1.0',
   manifestVersion: '0.1',
-});
+};
 
 if (snapEnv === 'local' || snapEnv === 'development') {
   // No initial connections in production - kernel initiates all
   manifest.initialConnections = {
     'local:http://localhost:8082': {},
-    'npm:@metamask/gator-permissions-snap': {},
+    [gatorSnapId]: {},
   };
 }
 

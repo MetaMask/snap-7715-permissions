@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { defineSnapManifest } from '@metamask/7715-permissions-shared/utils';
+/* eslint-disable no-restricted-globals */
 
-// eslint-disable-next-line no-restricted-globals
+import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
+
 const snapEnv = process.env.SNAP_ENV ?? 'production';
+const kernelSnapId =
+  process.env.KERNEL_SNAP_ID ?? 'npm:@metamask/permissions-kernel-snap';
 
-export default defineSnapManifest({
+const manifest: SnapManifest = {
   version: '0.2.1',
   description: 'Grants 7715 permissions from a DeleGator smart account',
   proposedName: 'Gator Permissions',
@@ -26,11 +29,11 @@ export default defineSnapManifest({
   initialConnections:
     snapEnv === 'local' || snapEnv === 'development'
       ? {
-          'npm:@metamask/permissions-kernel-snap': {},
+          [kernelSnapId]: {},
           'local:http://localhost:8081': {},
         }
       : {
-          'npm:@metamask/permissions-kernel-snap': {},
+          [kernelSnapId]: {},
         },
   initialPermissions: {
     'endowment:rpc': {
@@ -46,4 +49,6 @@ export default defineSnapManifest({
   },
   platformVersion: '8.1.0',
   manifestVersion: '0.1',
-});
+};
+
+export default manifest;

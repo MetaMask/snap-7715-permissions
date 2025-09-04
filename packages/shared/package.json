@@ -17,7 +17,7 @@
   "main": "./src",
   "types": "./src",
   "bin": {
-    "generate-snap-manifest": "./src/scripts/generate-manifest.js"
+    "generate-snap-manifest": "./src/scripts/generate-manifest.ts"
   },
   "scripts": {
     "allow-scripts": "yarn workspace root allow-scripts",
