@@ -6,7 +6,6 @@ import {
   parsePermissionRequestParam,
   parsePermissionsResponseParam,
   validateJsonRpcRequest,
-  validateMethodExists,
 } from '../../src/utils/validate';
 import { MOCK_PERMISSIONS_REQUEST_SINGLE } from '../constants';
 
@@ -42,7 +41,7 @@ describe('validate utils', () => {
             },
           },
         ]),
-      ).toThrow('Failed type validation: 0.permission: Required');
+      ).toThrow('Invalid method parameter(s).');
     });
 
     it('throw error if params is empty', async () => {
@@ -51,7 +50,7 @@ describe('validate utils', () => {
 
     it('throw error if params is invalid type', async () => {
       expect(() => parsePermissionRequestParam('invalid')).toThrow(
-        'Failed type validation',
+        'Invalid method parameter(s).',
       );
     });
   });
@@ -99,7 +98,7 @@ describe('validate utils', () => {
             // Missing permission object
           },
         ]),
-      ).toThrow('Failed type validation');
+      ).toThrow('Invalid method parameter(s).');
     });
 
     it('throw error if params is empty', async () => {
@@ -110,7 +109,7 @@ describe('validate utils', () => {
 
     it('throw error if params is invalid type', async () => {
       expect(() => parsePermissionsResponseParam('invalid')).toThrow(
-        'Failed type validation',
+        'Invalid method parameter(s).',
       );
     });
   });
@@ -246,43 +245,6 @@ describe('validate utils', () => {
     });
   });
 
-  describe('validateMethodExists', () => {
-    const mockBoundHandlers = {
-      [RpcMethod.WalletRequestExecutionPermissions]: jest.fn(),
-    };
-
-    it('should not throw for existing method', () => {
-      expect(() =>
-        validateMethodExists(
-          RpcMethod.WalletRequestExecutionPermissions,
-          mockBoundHandlers,
-        ),
-      ).not.toThrow();
-    });
-
-    it('should throw InvalidParamsError for non-existing method', () => {
-      expect(() =>
-        validateMethodExists('non_existing_method', mockBoundHandlers),
-      ).toThrow(InvalidParamsError);
-    });
-
-    it('should not be vulnerable to prototype pollution', () => {
-      // Test that the function uses Object.prototype.hasOwnProperty.call correctly
-      // by ensuring it doesn't find methods that don't actually exist on the object
-      expect(() =>
-        validateMethodExists('nonExistentMethod', mockBoundHandlers),
-      ).toThrow(InvalidParamsError);
-
-      // Test that it correctly finds existing methods
-      expect(() =>
-        validateMethodExists(
-          RpcMethod.WalletRequestExecutionPermissions,
-          mockBoundHandlers,
-        ),
-      ).not.toThrow();
-    });
-  });
-
   describe('Integration tests', () => {
     it('should handle complete valid request flow', () => {
       const validRequest = {
@@ -292,15 +254,8 @@ describe('validate utils', () => {
         id: 1,
       };
 
-      const mockBoundHandlers = {
-        [RpcMethod.WalletRequestExecutionPermissions]: jest.fn(),
-      };
-
       // Validate request
       const validatedRequest = validateJsonRpcRequest(validRequest);
-
-      // Validate method exists
-      validateMethodExists(validatedRequest.method, mockBoundHandlers);
 
       expect(validatedRequest).toStrictEqual(validRequest);
     });

@@ -2,6 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
   InvalidParamsError,
   LimitExceededError,
+  MethodNotFoundError,
   type Json,
   type JsonRpcParams,
   type OnRpcRequestHandler,
@@ -80,7 +81,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       !Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)
     ) {
       logger.warn('Method not found in bound handlers:', request.method);
-      throw new InvalidParamsError(`Method ${request.method} not found`);
+      throw new MethodNotFoundError(`Method ${request.method} not found.`);
     }
 
     // Now validate the full JSON-RPC structure

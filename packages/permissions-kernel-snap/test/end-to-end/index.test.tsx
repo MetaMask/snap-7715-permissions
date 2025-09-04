@@ -56,7 +56,7 @@ describe('Kernel Snap', () => {
 
         expect(response1).toRespondWithError({
           code: -32602,
-          message: expect.stringContaining('Invalid JSON-RPC request'),
+          message: expect.stringContaining('Failed type validation'),
           stack: expect.any(String),
         });
 
@@ -68,7 +68,21 @@ describe('Kernel Snap', () => {
 
         expect(response2).toRespondWithError({
           code: -32602,
-          message: expect.stringContaining('Invalid JSON-RPC request'),
+          data: expect.objectContaining({
+            cause: null,
+            method: 'snapRpc',
+            params: expect.arrayContaining([
+              expect.stringMatching(/^local:http:\/\/localhost:\d+$/),
+              'onRpcRequest',
+              'https://metamask.io',
+              expect.objectContaining({
+                id: 1,
+                jsonrpc: '1.0',
+                method: 'wallet_requestExecutionPermissions',
+              }),
+            ]),
+          }),
+          message: expect.stringContaining('Invalid parameters for method "snapRpc": At path: 3.jsonrpc -- Expected the literal `"2.0"`, but received: "1.0"'),
           stack: expect.any(String),
         });
       });
@@ -80,8 +94,8 @@ describe('Kernel Snap', () => {
         } as any);
 
         expect(response).toRespondWithError({
-          code: -32602,
-          message: expect.stringContaining('Invalid JSON-RPC request'),
+          code: -32601,
+          message: 'Method invalid_method not found.',
           stack: expect.any(String),
         });
       });
@@ -98,7 +112,7 @@ describe('Kernel Snap', () => {
 
         expect(response).toRespondWithError({
           code: -32602,
-          message: expect.stringContaining('Invalid JSON-RPC request'),
+          message: expect.stringContaining('Failed type validation'),
           stack: expect.any(String),
         });
       });
@@ -116,7 +130,7 @@ describe('Kernel Snap', () => {
 
         expect(response).toRespondWithError({
           code: -32602,
-          message: expect.stringContaining('Invalid JSON-RPC request'),
+          message: expect.stringContaining('Failed type validation'),
           stack: expect.any(String),
         });
       });
@@ -134,7 +148,7 @@ describe('Kernel Snap', () => {
         // The request should be processed (may fail later due to test setup, but not due to validation)
         expect(response).not.toRespondWithError({
           code: -32602,
-          message: expect.stringContaining('Invalid JSON-RPC request'),
+          message: expect.stringContaining('Failed type validation'),
         });
       });
     });
