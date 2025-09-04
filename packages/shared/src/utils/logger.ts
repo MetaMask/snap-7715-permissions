@@ -30,14 +30,14 @@ type LoggerContext = {
 function getDefaultLevel(): LogLevel {
   if (
     // eslint-disable-next-line no-restricted-globals
-    process.env.NODE_ENV === 'production' &&
+    process?.env?.NODE_ENV === 'production' &&
     // eslint-disable-next-line no-restricted-globals
-    process.env.ENABLE_LOGGING !== 'true'
+    process?.env?.ENABLE_LOGGING !== 'true'
   ) {
     return LogLevel.ERROR + 1;
   }
   // eslint-disable-next-line no-restricted-globals
-  if (process.env.NODE_ENV === 'development') {
+  if (process?.env?.NODE_ENV === 'development') {
     return LogLevel.DEBUG;
   }
   return LogLevel.WARN;
