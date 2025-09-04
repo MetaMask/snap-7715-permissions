@@ -3,9 +3,7 @@
 
 import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 
-const snapEnv = process.env.SNAP_ENV ?? 'production';
-const kernelSnapId =
-  process.env.KERNEL_SNAP_ID ?? 'npm:@metamask/permissions-kernel-snap';
+const kernelSnapId = process.env.KERNEL_SNAP_ID;
 
 const manifest: SnapManifest = {
   version: '0.2.1',
@@ -26,15 +24,6 @@ const manifest: SnapManifest = {
       },
     },
   },
-  initialConnections:
-    snapEnv === 'local' || snapEnv === 'development'
-      ? {
-          [kernelSnapId]: {},
-          'local:http://localhost:8081': {},
-        }
-      : {
-          [kernelSnapId]: {},
-        },
   initialPermissions: {
     'endowment:rpc': {
       dapps: false,
@@ -50,5 +39,11 @@ const manifest: SnapManifest = {
   platformVersion: '8.1.0',
   manifestVersion: '0.1',
 };
+
+if (kernelSnapId) {
+  manifest.initialConnections = {
+    [kernelSnapId]: {},
+  };
+}
 
 export default manifest;

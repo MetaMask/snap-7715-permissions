@@ -1,10 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 
-const snapEnv = process.env.SNAP_ENV ?? 'production';
-const gatorSnapId =
-  process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID ??
-  'npm:@metamask/gator-permissions-snap';
+const gatorSnapId = process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
 
 const manifest: SnapManifest = {
   version: '0.2.0',
@@ -35,12 +32,9 @@ const manifest: SnapManifest = {
   manifestVersion: '0.1',
 };
 
-if (snapEnv === 'local' || snapEnv === 'development') {
-  // No initial connections in production - kernel initiates all
+if (gatorSnapId) {
   manifest.initialConnections = {
-    'local:http://localhost:8082': {},
     [gatorSnapId]: {},
   };
 }
-
 export default manifest;
