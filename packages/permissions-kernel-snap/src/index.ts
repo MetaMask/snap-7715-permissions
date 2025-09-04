@@ -39,7 +39,7 @@ let activeProcessingLock: symbol | null = null;
  * @param args.origin - The origin of the request, e.g., the website that
  * invoked the snap.
  * @param args.request - A JSON-RPC request object that will be validated.
- * @returns The result of the RPC method execution.
+ * @returns The result of the RPC method execution (The 7715 permissions response from the permissions provider).
  * @throws If the request is invalid, method is not found, or processing fails.
  */
 export const onRpcRequest: OnRpcRequestHandler = async ({
