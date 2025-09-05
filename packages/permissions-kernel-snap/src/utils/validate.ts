@@ -155,19 +155,14 @@ export function validateJsonRpcRequest(
   const validationResult = zJsonRpcRequest.safeParse(request);
 
   if (!validationResult.success) {
-    const errorMessages = validationResult.error.errors.map((error) => {
-      const path = error.path.length > 0 ? error.path.join('.') : 'root';
-      return `${path}: ${error.message}`;
-    });
+    const errorMessage = extractZodError(validationResult.error.errors);
 
     logger.warn('Invalid JSON-RPC request structure:', {
-      errors: errorMessages,
+      errors: errorMessage,
       request: JSON.stringify(request, null, 2),
     });
 
-    throw new InvalidParamsError(
-      `Invalid JSON-RPC request: ${errorMessages.join(', ')}`,
-    );
+    throw new InvalidParamsError(`Invalid JSON-RPC request: ${errorMessage}`);
   }
 
   return validationResult.data;

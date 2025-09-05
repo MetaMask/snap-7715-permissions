@@ -1,3 +1,4 @@
+// Mock the logger to avoid console output during tests
 import { describe, it, expect, jest } from '@jest/globals';
 import { InvalidParamsError } from '@metamask/snaps-sdk';
 
@@ -9,16 +10,16 @@ import {
 } from '../../src/utils/validate';
 import { MOCK_PERMISSIONS_REQUEST_SINGLE } from '../constants';
 
-// Mock the logger to avoid console output during tests
-jest.mock('@metamask/7715-permissions-shared/utils', () => ({
-  logger: {
-    warn: jest.fn(),
-    debug: jest.fn(),
-  },
-  extractZodError: jest.fn((errors: unknown[]) =>
-    errors.map((error: any) => error.message).join(', '),
-  ),
-}));
+jest.mock('@metamask/7715-permissions-shared/utils', () => {
+  const actual = jest.requireActual('@metamask/7715-permissions-shared/utils');
+  return {
+    ...(actual || {}),
+    logger: {
+      warn: jest.fn(),
+      debug: jest.fn(),
+    },
+  };
+});
 
 describe('validate utils', () => {
   describe('parsePermissionRequestParam', () => {
@@ -41,7 +42,7 @@ describe('validate utils', () => {
             },
           },
         ]),
-      ).toThrow('Invalid method parameter(s).');
+      ).toThrow('Failed type validation: 0.permission: Required');
     });
 
     it('throw error if params is empty', async () => {
@@ -50,7 +51,7 @@ describe('validate utils', () => {
 
     it('throw error if params is invalid type', async () => {
       expect(() => parsePermissionRequestParam('invalid')).toThrow(
-        'Invalid method parameter(s).',
+        'Failed type validation: : Expected array, received string',
       );
     });
   });
@@ -98,7 +99,9 @@ describe('validate utils', () => {
             // Missing permission object
           },
         ]),
-      ).toThrow('Invalid method parameter(s).');
+      ).toThrow(
+        'Failed type validation: 0.signer: Required, 0.permission: Required, 0.context: Required, 0.dependencyInfo: Required, 0.signerMeta: Required',
+      );
     });
 
     it('throw error if params is empty', async () => {
@@ -109,7 +112,7 @@ describe('validate utils', () => {
 
     it('throw error if params is invalid type', async () => {
       expect(() => parsePermissionsResponseParam('invalid')).toThrow(
-        'Invalid method parameter(s).',
+        'Failed type validation: : Expected array, received string',
       );
     });
   });
@@ -272,7 +275,7 @@ describe('validate utils', () => {
 
       dangerousRequests.forEach((request) => {
         expect(() => validateJsonRpcRequest(request)).toThrow(
-          'Invalid key: potential prototype pollution attempt',
+          'Invalid JSON-RPC request: Failed type validation: params: Invalid key: potential prototype pollution attempt',
         );
       });
     });
@@ -357,7 +360,7 @@ describe('validate utils', () => {
 
       dangerousNestedRequests.forEach((request) => {
         expect(() => validateJsonRpcRequest(request)).toThrow(
-          'Invalid key: potential prototype pollution attempt',
+          'Invalid JSON-RPC request: Failed type validation: params: Invalid key: potential prototype pollution attempt',
         );
       });
     });
@@ -374,7 +377,7 @@ describe('validate utils', () => {
       };
 
       expect(() => validateJsonRpcRequest(dangerousArrayRequest)).toThrow(
-        'Invalid key in array: potential prototype pollution attempt',
+        'Invalid JSON-RPC request: Failed type validation: params: Invalid key in array: potential prototype pollution attempt',
       );
     });
 
