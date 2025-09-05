@@ -8,6 +8,7 @@ export enum LogLevel {
   INFO = 1,
   WARN = 2,
   ERROR = 3,
+  DISABLED = 4,
 }
 
 /**
@@ -34,7 +35,7 @@ function getDefaultLevel(): LogLevel {
     // eslint-disable-next-line no-restricted-globals
     process?.env?.ENABLE_LOGGING !== 'true'
   ) {
-    return LogLevel.ERROR + 1;
+    return LogLevel.DISABLED;
   }
   // eslint-disable-next-line no-restricted-globals
   if (process?.env?.NODE_ENV === 'development') {
@@ -53,6 +54,9 @@ const DEFAULT_CONTEXT: LoggerContext = {
     [LogLevel.INFO]: console.info,
     [LogLevel.WARN]: console.warn,
     [LogLevel.ERROR]: console.error,
+    [LogLevel.DISABLED]: () => {
+      /* intentionally empty - logging disabled */
+    },
   },
 } as const;
 
