@@ -135,10 +135,7 @@ export const createPermissionOfferRegistryManager = (
       return [];
     }
 
-    return Object.values(permissionOfferRegistry).reduce(
-      (acc, offers) => [...acc, ...offers],
-      [],
-    );
+    return Object.values(permissionOfferRegistry).flat();
   }
 
   /**
