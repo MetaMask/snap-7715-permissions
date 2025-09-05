@@ -1,3 +1,4 @@
+import { ChainDisconnectedError } from '@metamask/snaps-sdk';
 import { numberToHex } from '@metamask/utils';
 
 import { NonceCaveatClient } from '../../src/clients/nonceCaveatClient';
@@ -204,9 +205,9 @@ describe('NonceCaveatClient', () => {
 
       it('does not retry on ChainDisconnectedError', async () => {
         // Mock the error to be a ChainDisconnectedError
-        const chainDisconnectedError = new Error('Chain disconnected');
-        Object.setPrototypeOf(chainDisconnectedError, Error.prototype);
-        (chainDisconnectedError as any).name = 'ChainDisconnectedError';
+        const chainDisconnectedError = new ChainDisconnectedError(
+          'Chain disconnected',
+        );
 
         mockEthereumProvider.request
           .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
@@ -217,9 +218,9 @@ describe('NonceCaveatClient', () => {
             chainId: mockChainId,
             account: mockAccount,
           }),
-        ).rejects.toThrow('Failed to fetch nonce');
+        ).rejects.toThrow('Chain disconnected');
 
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(4);
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
       });
 
       it('retries up to the specified number of attempts', async () => {
