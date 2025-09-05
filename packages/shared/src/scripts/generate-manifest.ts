@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 /* eslint-disable import/no-unassigned-import */
 /* eslint-disable import/no-nodejs-modules */
 /* eslint-disable no-restricted-globals */
