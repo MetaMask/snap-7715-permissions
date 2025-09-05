@@ -375,7 +375,7 @@ describe('profileSync', () => {
         profileSyncManager.getGrantedPermission(
           mockStoredGrantedPermission.permissionResponse.context,
         ),
-      ).rejects.toThrow('Invalid permission data structure');
+      ).rejects.toThrow('Failed type validation');
     });
 
     it('should enforce 400kb size limit and reject oversized data', async () => {

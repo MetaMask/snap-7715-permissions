@@ -2,7 +2,10 @@
 /* eslint-disable no-restricted-globals */
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { zPermissionResponse } from '@metamask/7715-permissions-shared/types';
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  logger,
+  extractZodError,
+} from '@metamask/7715-permissions-shared/utils';
 import {
   hashDelegation,
   decodeDelegations,
@@ -47,9 +50,7 @@ function safeDeserializeStoredGrantedPermission(
   } catch (error) {
     logger.error('Error deserializing stored granted permission:', error);
     if (error instanceof z.ZodError) {
-      throw new InvalidInputError(
-        `Invalid permission data structure: ${error.errors.map((zodError) => `${zodError.path.join('.')}: ${zodError.message}`).join(', ')}`,
-      );
+      throw new InvalidInputError(extractZodError(error.errors));
     }
     throw new ParseError(`Failed to parse JSON`);
   }
@@ -82,9 +83,7 @@ function safeSerializeStoredGrantedPermission(
     return jsonString;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new InvalidInputError(
-        `Invalid permission data structure: ${error.errors.map((zodError) => `${zodError.path.join('.')}: ${zodError.message}`).join(', ')}`,
-      );
+      throw new InvalidInputError(extractZodError(error.errors));
     }
     throw error;
   }
