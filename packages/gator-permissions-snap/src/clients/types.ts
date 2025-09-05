@@ -2,6 +2,16 @@ import type { Hex } from '@metamask/delegation-core';
 import type { CaipAssetType } from '@metamask/utils';
 
 /**
+ * Options for configuring retry behavior.
+ */
+export type RetryOptions = {
+  /** Number of retry attempts. */
+  retries?: number;
+  /** Delay between retries in milliseconds. */
+  delayMs?: number;
+};
+
+/**
  * The params for the price API client to fetch spot prices.
  */
 export type VsCurrencyParam =

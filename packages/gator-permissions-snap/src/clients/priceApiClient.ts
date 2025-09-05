@@ -7,17 +7,8 @@ import {
 } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
 
-import type { SpotPricesRes, VsCurrencyParam } from './types';
-
-/**
- * Options for configuring retry behavior.
- */
-export type RetryOptions = {
-  /** Number of retry attempts. */
-  retries?: number;
-  /** Delay between retries in milliseconds. */
-  delayMs?: number;
-};
+import type { RetryOptions, SpotPricesRes, VsCurrencyParam } from './types';
+import { isResourceUnavailableStatus, sleep } from '../utils/retry';
 
 /**
  * Class responsible for fetching price data from the Price API.
@@ -70,11 +61,8 @@ export class PriceApiClient {
         );
 
         // Check if this is a retryable error
-        if (
-          this.#isResourceUnavailableStatus(response.status) &&
-          attempt < retries
-        ) {
-          await this.#sleep(delayMs);
+        if (isResourceUnavailableStatus(response.status) && attempt < retries) {
+          await sleep(delayMs);
           continue;
         }
 
@@ -83,7 +71,7 @@ export class PriceApiClient {
           throw new ResourceNotFoundError(
             `Spot price not found for ${caipAssetType}`,
           );
-        } else if (this.#isResourceUnavailableStatus(response.status)) {
+        } else if (isResourceUnavailableStatus(response.status)) {
           throw new ResourceUnavailableError(
             `Price service temporarily unavailable (HTTP ${response.status})`,
           );
@@ -147,23 +135,5 @@ export class PriceApiClient {
       logger.error(`Error fetching spot price: ${errorMessage}`);
       throw new InternalError(`Error fetching spot price: ${errorMessage}`);
     }
-  }
-
-  /**
-   * Determines if an HTTP status code indicates a resource unavailable error.
-   * @param statusCode - The HTTP status code to check.
-   * @returns True if the status code indicates a resource unavailable error.
-   */
-  #isResourceUnavailableStatus(statusCode: number): boolean {
-    return statusCode >= 500 || statusCode === 429 || statusCode === 408;
-  }
-
-  /**
-   * Utility method to sleep for a specified number of milliseconds.
-   * @param ms - The number of milliseconds to sleep.
-   * @returns A promise that resolves after the specified delay.
-   */
-  async #sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
