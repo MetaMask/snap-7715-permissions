@@ -287,6 +287,67 @@ describe('RpcHandler', () => {
       expect(mockHandler.handlePermissionRequest).toHaveBeenCalledTimes(2);
     });
 
+    it('should process multiple permission requests sequentially (no concurrency)', async () => {
+      const secondPermissionRequest = {
+        ...VALID_PERMISSION_REQUEST,
+        chainId: '0x2' as const,
+      };
+
+      const secondResponse = {
+        ...VALID_PERMISSION_RESPONSE,
+        chainId: '0x2' as const,
+      };
+
+      const request: Json = {
+        permissionsRequest: [
+          VALID_PERMISSION_REQUEST,
+          secondPermissionRequest,
+        ] as unknown as Json[],
+        siteOrigin: TEST_SITE_ORIGIN,
+      };
+
+      let resolveFirst: (value: unknown) => void;
+      const firstPromise = new Promise((resolve) => {
+        resolveFirst = resolve;
+      });
+
+      const firstMockHandler: jest.Mocked<PermissionHandlerType> = {
+        handlePermissionRequest: jest
+          .fn()
+          .mockImplementation(
+            async () => firstPromise as unknown as Promise<any>,
+          ),
+      } as unknown as jest.Mocked<PermissionHandlerType>;
+
+      const secondMockHandler: jest.Mocked<PermissionHandlerType> = {
+        handlePermissionRequest: jest.fn().mockImplementation(async () => ({
+          approved: true,
+          response: secondResponse,
+        })),
+      } as unknown as jest.Mocked<PermissionHandlerType>;
+
+      mockHandlerFactory.createPermissionHandler
+        .mockImplementationOnce(() => firstMockHandler)
+        .mockImplementationOnce(() => secondMockHandler);
+
+      const resultPromise = handler.grantPermission(request);
+
+      // Yield to allow the first await to be hit
+      await Promise.resolve();
+      expect(secondMockHandler.handlePermissionRequest).not.toHaveBeenCalled();
+
+      // Resolve the first request and then ensure the second starts
+      // @ts-expect-error - resolveFirst is assigned above
+      resolveFirst({ approved: true, response: VALID_PERMISSION_RESPONSE });
+      const result = await resultPromise;
+
+      expect(firstMockHandler.handlePermissionRequest).toHaveBeenCalledTimes(1);
+      expect(secondMockHandler.handlePermissionRequest).toHaveBeenCalledTimes(
+        1,
+      );
+      expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
+    });
+
     it('should throw an error if orchestrator creation fails', async () => {
       mockHandlerFactory.createPermissionHandler.mockImplementation(() => {
         throw new Error('Failed to create orchestrator');
