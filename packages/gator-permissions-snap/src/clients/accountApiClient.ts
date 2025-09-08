@@ -1,16 +1,12 @@
+import { zAddress } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
-import {
-  InvalidInputError,
-  LimitExceededError,
-  ParseError,
-  ResourceNotFoundError,
-  ResourceUnavailableError,
-} from '@metamask/snaps-sdk';
+import { InvalidInputError, ResourceNotFoundError } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
 import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata } from './types';
+import { makeRequestWithLimits } from '../utils/httpClient';
 
 /**
  * Zod schema for validating token balance response
@@ -26,10 +22,8 @@ const TokenBalanceResponseSchema = z.object({
   type: z.string().min(1).max(20).optional(),
   iconUrl: z.string().url().max(2048).optional(), // Limit URL length and validate format
   coingeckoId: z.string().min(1).max(100),
-  address: z
-    .string()
-    .regex(/^0x[a-fA-F0-9]{40}$/u, 'Invalid hex address format'),
-  occurrences: z.number().int().min(0),
+  address: zAddress,
+  occurrences: z.number().nonnegative(),
   sources: z.array(z.string().min(1).max(100)).max(50), // Limit number of sources
   chainId: z.number().int().positive(),
   blockNumber: z
@@ -44,9 +38,7 @@ const TokenBalanceResponseSchema = z.object({
   accounts: z
     .array(
       z.object({
-        accountAddress: z
-          .string()
-          .regex(/^0x[a-fA-F0-9]{40}$/u, 'Invalid hex address format'),
+        accountAddress: zAddress,
         chainId: z.number().int().positive(),
         rawBalance: z
           .string()
@@ -59,18 +51,13 @@ const TokenBalanceResponseSchema = z.object({
 });
 
 /**
- * Response type for token balance data
- */
-type TokenBalanceResponse = z.infer<typeof TokenBalanceResponseSchema>;
-
-/**
  * Configuration options for AccountApiClient
  */
 export type AccountApiClientConfig = {
   baseUrl: string;
   fetch?: typeof globalThis.fetch;
-  timeoutMs?: number;
-  maxResponseSizeBytes?: number;
+  timeoutMs: number;
+  maxResponseSizeBytes: number;
 };
 
 /**
@@ -80,10 +67,6 @@ export class AccountApiClient {
   static readonly #supportedTokenTypes = ['native', 'erc20'];
 
   static readonly #nativeTokenAddress = ZERO_ADDRESS;
-
-  static readonly #defaultTimeoutMs = 10000; // 10 seconds
-
-  static readonly #defaultMaxResponseSizeBytes = 1024 * 1024; // 1MB
 
   readonly #fetch: typeof globalThis.fetch;
 
@@ -96,8 +79,8 @@ export class AccountApiClient {
   constructor({
     baseUrl,
     fetch = globalThis.fetch,
-    timeoutMs = AccountApiClient.#defaultTimeoutMs,
-    maxResponseSizeBytes = AccountApiClient.#defaultMaxResponseSizeBytes,
+    timeoutMs,
+    maxResponseSizeBytes,
   }: AccountApiClientConfig) {
     this.#fetch = fetch;
     this.#baseUrl = baseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
@@ -115,52 +98,6 @@ export class AccountApiClient {
    */
   public isChainIdSupported({ chainId }: { chainId: number }): boolean {
     return chainId === 1;
-  }
-
-  /**
-   * Makes a secure HTTP request with timeout and response size limits.
-   * @param url - The URL to fetch.
-   * @returns A promise that resolves to the response.
-   * @throws {ResourceUnavailableError} If the request times out or exceeds size limits.
-   */
-  async #makeSecureRequest(url: string): Promise<globalThis.Response> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.#timeoutMs);
-
-    try {
-      const response = await this.#fetch(url, {
-        signal: controller.signal,
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': 'MetaMask-Snap/1.0',
-        },
-      });
-
-      clearTimeout(timeoutId);
-
-      // Check response size before processing
-      const contentLength = response.headers.get('content-length');
-      if (
-        contentLength &&
-        parseInt(contentLength, 10) > this.#maxResponseSizeBytes
-      ) {
-        throw new LimitExceededError(
-          `Response too large: ${contentLength} bytes exceeds limit of ${this.#maxResponseSizeBytes} bytes`,
-        );
-      }
-
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new ResourceUnavailableError(
-          `Request timed out after ${this.#timeoutMs}ms`,
-        );
-      }
-
-      throw error;
-    }
   }
 
   /**
@@ -197,36 +134,15 @@ export class AccountApiClient {
 
     const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
 
-    const response = await this.#makeSecureRequest(
+    const validatedResponse = await makeRequestWithLimits(
       `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
+      {
+        timeoutMs: this.#timeoutMs,
+        maxResponseSizeBytes: this.#maxResponseSizeBytes,
+        fetch: this.#fetch,
+      },
+      TokenBalanceResponseSchema,
     );
-
-    if (!response.ok) {
-      const message = `HTTP error. Failed to fetch token balance for account(${account}) and token(${tokenAddress}) on chain(${chainId}): ${response.status}`;
-      logger.error(message);
-
-      throw new ResourceUnavailableError(message);
-    }
-
-    // Parse and validate the response with zod
-    let responseData: unknown;
-    try {
-      responseData = await response.json();
-    } catch (error) {
-      const message = 'Failed to parse JSON response from token balance API';
-      logger.error(message, error);
-      throw new ParseError(message);
-    }
-
-    // Validate response structure and content with zod
-    let validatedResponse: TokenBalanceResponse;
-    try {
-      validatedResponse = TokenBalanceResponseSchema.parse(responseData);
-    } catch (error) {
-      const message = 'Invalid response structure from token balance API';
-      logger.error(message, error);
-      throw new ResourceUnavailableError(message);
-    }
 
     const { accounts, type, iconUrl, symbol, decimals } = validatedResponse;
 

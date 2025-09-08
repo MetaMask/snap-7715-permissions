@@ -156,9 +156,7 @@ describe('AccountApiClient', () => {
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow(
-        `HTTP error. Failed to fetch token balance for account(${mockAccount}) and token(0x0000000000000000000000000000000000000000) on chain(${mockChainId}): 404`,
-      );
+      ).rejects.toThrow('Resource not found: 404');
     });
 
     it('throws an error if account data not found in response', async () => {
@@ -194,7 +192,7 @@ describe('AccountApiClient', () => {
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow('Invalid response structure from token balance API');
+      ).rejects.toThrow('Invalid response structure');
     });
 
     it('throws if chainId is not provided', async () => {
@@ -278,7 +276,7 @@ describe('AccountApiClient', () => {
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow('Failed to parse JSON response from token balance API');
+      ).rejects.toThrow('Failed to parse JSON response');
     });
 
     it('throws an error for invalid response structure', async () => {
@@ -303,7 +301,7 @@ describe('AccountApiClient', () => {
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow('Invalid response structure from token balance API');
+      ).rejects.toThrow('Invalid response structure');
     });
 
     it('throws an error for response that exceeds size limit', async () => {
@@ -427,7 +425,7 @@ describe('AccountApiClient', () => {
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow('Invalid response structure from token balance API');
+      ).rejects.toThrow('Invalid response structure');
     });
   });
 });

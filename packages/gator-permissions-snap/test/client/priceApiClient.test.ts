@@ -56,7 +56,7 @@ describe('PriceApiClient', () => {
 
       await expect(
         client.getSpotPrice('eip155:1/slip44:60', 'usd'),
-      ).rejects.toThrow('Spot price not found for eip155:1/slip44:60');
+      ).rejects.toThrow('Resource not found: 404');
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:8003/v3/spot-prices?includeMarketData=false&vsCurrency=usd&assetIds=eip155:1/slip44:60',
         expect.objectContaining({
@@ -231,7 +231,7 @@ describe('PriceApiClient', () => {
 
         await expect(
           client.getSpotPrice('eip155:1/slip44:60', 'usd'),
-        ).rejects.toThrow('Spot price not found for eip155:1/slip44:60');
+        ).rejects.toThrow('Resource not found: 404');
 
         expect(mockFetch).toHaveBeenCalledTimes(1);
       });
@@ -247,9 +247,7 @@ describe('PriceApiClient', () => {
 
         await expect(
           client.getSpotPrice('eip155:1/slip44:60', 'usd'),
-        ).rejects.toThrow(
-          'HTTP error 400: Failed to fetch spot price for eip155:1/slip44:60',
-        );
+        ).rejects.toThrow('Client error: 400');
 
         expect(mockFetch).toHaveBeenCalledTimes(1);
       });
@@ -269,7 +267,7 @@ describe('PriceApiClient', () => {
             retries: 3,
             delayMs: 100,
           }),
-        ).rejects.toThrow('Price service temporarily unavailable (HTTP 500)');
+        ).rejects.toThrow('Server error: 500');
 
         expect(mockFetch).toHaveBeenCalledTimes(4); // Initial + 3 retries
       });
@@ -341,7 +339,7 @@ describe('PriceApiClient', () => {
 
       await expect(
         client.getSpotPrice('eip155:1/slip44:60', 'usd'),
-      ).rejects.toThrow('Failed to parse JSON response from spot price API');
+      ).rejects.toThrow('Failed to parse JSON response');
     });
 
     it('throws an error for invalid response structure', async () => {
@@ -360,7 +358,7 @@ describe('PriceApiClient', () => {
 
       await expect(
         client.getSpotPrice('eip155:1/slip44:60', 'usd'),
-      ).rejects.toThrow('Invalid response structure from spot price API');
+      ).rejects.toThrow('Invalid response structure');
     });
 
     it('throws an error for response that exceeds size limit', async () => {
@@ -381,16 +379,11 @@ describe('PriceApiClient', () => {
     });
 
     it('throws an error for request timeout', async () => {
-      mockFetch.mockImplementationOnce(
-        async () =>
-          new Promise((_, reject) => {
-            setTimeout(() => {
-              const error = new Error('Request timed out');
-              error.name = 'AbortError';
-              reject(error);
-            }, 100);
-          }),
-      );
+      // Mock the fetch to reject with AbortError for both calls
+      const abortError = Object.assign(new Error('Request timed out'), {
+        name: 'AbortError',
+      });
+      mockFetch.mockRejectedValue(abortError);
 
       await expect(
         client.getSpotPrice('eip155:1/slip44:60', 'usd'),
@@ -414,7 +407,7 @@ describe('PriceApiClient', () => {
 
       await expect(
         client.getSpotPrice('eip155:1/slip44:60', 'usd'),
-      ).rejects.toThrow('Invalid response structure from spot price API');
+      ).rejects.toThrow('Invalid response structure');
     });
   });
 });
