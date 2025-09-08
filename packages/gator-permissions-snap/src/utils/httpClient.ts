@@ -85,6 +85,7 @@ export async function makeValidatedRequest<TResponse>(
       headers: {
         Accept: 'application/json',
         'User-Agent': 'MetaMask-Snap/1.0',
+        'x-mmcx-internal-application': 'gator-permissions-snap',
       },
     });
   } catch (error) {
@@ -115,7 +116,7 @@ export async function makeValidatedRequest<TResponse>(
   }
 
   // Check response size before processing
-  const contentLength = response.headers.get('content-length');
+  const contentLength = response.headers?.get('content-length');
   if (contentLength && parseInt(contentLength, 10) > maxResponseSizeBytes) {
     throw new LimitExceededError(
       `Response too large: ${contentLength} bytes exceeds limit of ${maxResponseSizeBytes} bytes`,
