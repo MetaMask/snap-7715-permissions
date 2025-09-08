@@ -9,7 +9,7 @@ import type { CaipAssetType } from '@metamask/utils';
 import { z } from 'zod';
 
 import type { SpotPricesRes, VsCurrencyParam } from './types';
-import { makeRequestWithLimits } from '../utils/httpClient';
+import { makeValidatedRequest } from '../utils/httpClient';
 
 /**
  * Zod schema for validating spot prices response
@@ -160,7 +160,7 @@ export class PriceApiClient {
     caipAssetType: CaipAssetType,
     vsCurrency: VsCurrencyParam,
   ): Promise<SpotPricesRes> {
-    return await makeRequestWithLimits(
+    return await makeValidatedRequest(
       `${
         this.#baseUrl
       }/v3/spot-prices?includeMarketData=false&vsCurrency=${vsCurrency}&assetIds=${caipAssetType}`,

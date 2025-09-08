@@ -29,7 +29,7 @@ export type HttpClientConfig = {
  * @throws {ParseError} If the response cannot be parsed as JSON.
  * @throws {ResourceUnavailableError} If the response structure is invalid according to the schema.
  */
-export async function makeRequestWithLimits<TResponse>(
+export async function makeValidatedRequest<TResponse>(
   url: string,
   config: HttpClientConfig,
   responseSchema: z.ZodSchema<TResponse>,

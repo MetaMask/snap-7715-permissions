@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata } from './types';
-import { makeRequestWithLimits } from '../utils/httpClient';
+import { makeValidatedRequest } from '../utils/httpClient';
 
 /**
  * Zod schema for validating token balance response
@@ -134,7 +134,7 @@ export class AccountApiClient {
 
     const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
 
-    const validatedResponse = await makeRequestWithLimits(
+    const validatedResponse = await makeValidatedRequest(
       `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
       {
         timeoutMs: this.#timeoutMs,
