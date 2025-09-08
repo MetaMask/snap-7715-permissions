@@ -1,17 +1,12 @@
 import { zAddress } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
-import {
-  InternalError,
-  InvalidInputError,
-  ResourceNotFoundError,
-  ResourceUnavailableError,
-} from '@metamask/snaps-sdk';
+import { InvalidInputError, ResourceNotFoundError } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
 import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata, RetryOptions } from './types';
-import { makeValidatedRequest, sleep } from '../utils/httpClient';
+import { makeValidatedRequestWithRetry } from '../utils/httpClient';
 
 /**
  * Zod schema for validating token balance response
@@ -142,65 +137,47 @@ export class AccountApiClient {
 
       throw new InvalidInputError(message);
     }
-
-    const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
     const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
 
     // Try up to initial attempt + retry attempts
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        const response = await this.#fetchTokenBalance(
-          tokenAddress,
-          account,
-          chainId,
-        );
+    const response = await this.#fetchTokenBalance(
+      tokenAddress,
+      account,
+      chainId,
+      retryOptions,
+    );
 
-        // Parse and validate the response
-        const { accounts, type, iconUrl, symbol, decimals } = response;
+    // Parse and validate the response
+    const { accounts, type, iconUrl, symbol, decimals } = response;
 
-        const accountLowercase = account.toLowerCase();
-        const accountData = accounts.find(
-          (acc) => acc.accountAddress.toLowerCase() === accountLowercase,
-        );
+    const accountLowercase = account.toLowerCase();
+    const accountData = accounts.find(
+      (acc) => acc.accountAddress.toLowerCase() === accountLowercase,
+    );
 
-        if (!accountData) {
-          logger.error(`No balance data found for the account: ${account}`);
-          throw new ResourceNotFoundError(
-            `No balance data found for the account: ${account}`,
-          );
-        }
-
-        if (
-          type !== undefined &&
-          !AccountApiClient.#supportedTokenTypes.includes(type)
-        ) {
-          logger.error(`Unsupported token type: ${type}`);
-          throw new InvalidInputError(`Unsupported token type: ${type}`);
-        }
-
-        const balance = BigInt(accountData.rawBalance);
-
-        return {
-          balance,
-          decimals,
-          symbol,
-          iconUrl,
-        } as TokenBalanceAndMetadata;
-      } catch (error) {
-        // Check if this is a retryable error
-        if (error instanceof ResourceUnavailableError && attempt < retries) {
-          await sleep(delayMs);
-          continue;
-        }
-
-        // If it's not retryable or we've exhausted retries, re-throw
-        throw error;
-      }
+    if (!accountData) {
+      logger.error(`No balance data found for the account: ${account}`);
+      throw new ResourceNotFoundError(
+        `No balance data found for the account: ${account}`,
+      );
     }
 
-    throw new InternalError(
-      `Failed to fetch token balance after ${retries + 1} attempts`,
-    );
+    if (
+      type !== undefined &&
+      !AccountApiClient.#supportedTokenTypes.includes(type)
+    ) {
+      logger.error(`Unsupported token type: ${type}`);
+      throw new InvalidInputError(`Unsupported token type: ${type}`);
+    }
+
+    const balance = BigInt(accountData.rawBalance);
+
+    return {
+      balance,
+      decimals,
+      symbol,
+      iconUrl,
+    } as TokenBalanceAndMetadata;
   }
 
   /**
@@ -208,14 +185,16 @@ export class AccountApiClient {
    * @param tokenAddress - The token address to fetch the balance for.
    * @param account - The account address to fetch the balance for.
    * @param chainId - The chain ID to fetch the balance from.
+   * @param retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
    * @returns The validated token balance response.
    */
   async #fetchTokenBalance(
     tokenAddress: Hex,
     account: Hex,
     chainId: number,
+    retryOptions?: RetryOptions,
   ): Promise<TokenBalanceResponse> {
-    return (await makeValidatedRequest(
+    return (await makeValidatedRequestWithRetry(
       `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
       {
         timeoutMs: this.#timeoutMs,
@@ -223,6 +202,7 @@ export class AccountApiClient {
         fetch: this.#fetch,
       },
       TokenBalanceResponseSchema,
+      retryOptions,
     )) as TokenBalanceResponse;
   }
 }

@@ -1,15 +1,10 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import {
-  InternalError,
-  InvalidInputError,
-  ResourceNotFoundError,
-  ResourceUnavailableError,
-} from '@metamask/snaps-sdk';
+import { InvalidInputError, ResourceNotFoundError } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
 import { z } from 'zod';
 
 import type { RetryOptions, SpotPricesRes, VsCurrencyParam } from './types';
-import { makeValidatedRequest, sleep } from '../utils/httpClient';
+import { makeValidatedRequestWithRetry } from '../utils/httpClient';
 
 /**
  * Zod schema for validating spot prices response
@@ -79,78 +74,62 @@ export class PriceApiClient {
       );
     }
 
-    const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
-
     // Try up to initial attempt + retry attempts
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        const validatedResponse = await this.#fetchSpotPrice(
-          caipAssetType,
-          vsCurrency,
-        );
+    const validatedResponse = await this.#fetchSpotPrice(
+      caipAssetType,
+      vsCurrency,
+      retryOptions,
+    );
 
-        // Try exact match first, then case-insensitive lookup
-        let assetTypeData = validatedResponse[caipAssetType];
-        if (!assetTypeData) {
-          // If exact match fails, try case-insensitive lookup
-          const responseKeys = Object.keys(validatedResponse);
-          const matchingKey = responseKeys.find(
-            (key) => key.toLowerCase() === caipAssetType.toLowerCase(),
-          );
+    // Try exact match first, then case-insensitive lookup
+    let assetTypeData = validatedResponse[caipAssetType];
+    if (!assetTypeData) {
+      // If exact match fails, try case-insensitive lookup
+      const responseKeys = Object.keys(validatedResponse);
+      const matchingKey = responseKeys.find(
+        (key) => key.toLowerCase() === caipAssetType.toLowerCase(),
+      );
 
-          if (matchingKey) {
-            assetTypeData = validatedResponse[matchingKey as CaipAssetType];
-          }
-        }
-
-        if (!assetTypeData) {
-          logger.error(
-            `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}. Available keys: ${Object.keys(validatedResponse).join(', ')}`,
-          );
-          throw new ResourceNotFoundError(
-            `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
-          );
-        }
-
-        const vsCurrencyData = assetTypeData[vsCurrency];
-        if (!vsCurrencyData) {
-          logger.error(
-            `No spot price found in result for the currency: ${vsCurrency}`,
-          );
-          throw new ResourceNotFoundError(
-            `No spot price found in result for the currency: ${vsCurrency}`,
-          );
-        }
-
-        return vsCurrencyData;
-      } catch (error) {
-        // Check if this is a retryable error
-        if (error instanceof ResourceUnavailableError && attempt < retries) {
-          await sleep(delayMs);
-          continue;
-        }
-
-        // If it's not retryable or we've exhausted retries, re-throw
-        throw error;
+      if (matchingKey) {
+        assetTypeData = validatedResponse[matchingKey as CaipAssetType];
       }
     }
 
-    throw new InternalError(
-      `Failed to fetch spot price after ${retries + 1} attempts`,
-    );
+    if (!assetTypeData) {
+      logger.error(
+        `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}. Available keys: ${Object.keys(validatedResponse).join(', ')}`,
+      );
+      throw new ResourceNotFoundError(
+        `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
+      );
+    }
+
+    const vsCurrencyData = assetTypeData[vsCurrency];
+    if (!vsCurrencyData) {
+      logger.error(
+        `No spot price found in result for the currency: ${vsCurrency}`,
+      );
+      throw new ResourceNotFoundError(
+        `No spot price found in result for the currency: ${vsCurrency}`,
+      );
+    }
+
+    return vsCurrencyData;
   }
 
   /**
    * Internal method to fetch spot price and return the validated response.
    * @param caipAssetType - The token CAIP-19 asset type to fetch spot prices for.
    * @param vsCurrency - The currency to fetch the spot prices in.
+   * @param retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
    * @returns The validated spot prices response.
    */
   async #fetchSpotPrice(
     caipAssetType: CaipAssetType,
     vsCurrency: VsCurrencyParam,
+    retryOptions?: RetryOptions,
   ): Promise<SpotPricesRes> {
-    return await makeValidatedRequest(
+    return await makeValidatedRequestWithRetry(
       `${
         this.#baseUrl
       }/v3/spot-prices?includeMarketData=false&vsCurrency=${vsCurrency}&assetIds=${caipAssetType}`,
@@ -160,6 +139,7 @@ export class PriceApiClient {
         fetch: this.#fetch,
       },
       SpotPricesResponseSchema,
+      retryOptions,
     );
   }
 }
