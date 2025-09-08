@@ -1,40 +1,70 @@
+import { zAddress } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
 import {
-  InvalidInputError,
   InternalError,
+  InvalidInputError,
   ResourceNotFoundError,
   ResourceUnavailableError,
 } from '@metamask/snaps-sdk';
+import { z } from 'zod';
 
 import { ZERO_ADDRESS } from '../constants';
-import type { RetryOptions, TokenBalanceAndMetadata } from './types';
-import { isResourceUnavailableStatus, sleep } from '../utils/retry';
+import type { TokenBalanceAndMetadata, RetryOptions } from './types';
+import { makeValidatedRequest, sleep } from '../utils/httpClient';
 
 /**
- * Response type for token balance data
+ * Zod schema for validating token balance response
  */
-type TokenBalanceResponse = {
-  name: string;
-  symbol: string;
-  decimals: number;
-  type: string;
-  iconUrl: string;
-  coingeckoId: string;
-  address: Hex;
-  occurrences: number;
-  sources: string[];
-  chainId: number;
-  blockNumber: string;
-  updatedAt: string;
-  value: Record<string, unknown>;
-  price: number;
-  accounts: {
-    accountAddress: Hex;
-    chainId: number;
-    rawBalance: string;
-    balance: number;
-  }[];
+const TokenBalanceResponseSchema = z.object({
+  name: z.string().min(1).max(100),
+  symbol: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^[A-Z0-9]+$/iu, 'Symbol must contain only alphanumeric characters'),
+  decimals: z.number().int().min(0).max(77), // ERC-20 standard allows up to 77 decimals
+  type: z.string().min(1).max(20).optional(),
+  iconUrl: z.string().url().max(2048).optional(), // Limit URL length and validate format
+  coingeckoId: z.string().min(1).max(100),
+  address: zAddress,
+  occurrences: z.number().nonnegative(),
+  sources: z.array(z.string().min(1).max(100)).max(50), // Limit number of sources
+  chainId: z.number().int().positive(),
+  blockNumber: z
+    .string()
+    .regex(
+      /^(latest|\d+)$/u,
+      'Block number must be "latest" or numeric string',
+    ),
+  updatedAt: z.string().datetime(),
+  value: z.record(z.unknown()),
+  price: z.number().finite().min(0),
+  accounts: z
+    .array(
+      z.object({
+        accountAddress: zAddress,
+        chainId: z.number().int().positive(),
+        rawBalance: z
+          .string()
+          .regex(/^\d+$/u, 'Raw balance must be numeric string'),
+        balance: z.number().finite().min(0),
+      }),
+    )
+    .min(1)
+    .max(1000), // Ensure accounts is an array with reasonable limits
+});
+
+export type TokenBalanceResponse = z.infer<typeof TokenBalanceResponseSchema>;
+
+/**
+ * Configuration options for AccountApiClient
+ */
+export type AccountApiClientConfig = {
+  baseUrl: string;
+  fetch?: typeof globalThis.fetch;
+  timeoutMs: number;
+  maxResponseSizeBytes: number;
 };
 
 /**
@@ -49,15 +79,20 @@ export class AccountApiClient {
 
   readonly #baseUrl: string;
 
+  readonly #timeoutMs: number;
+
+  readonly #maxResponseSizeBytes: number;
+
   constructor({
     baseUrl,
     fetch = globalThis.fetch,
-  }: {
-    baseUrl: string;
-    fetch?: typeof globalThis.fetch;
-  }) {
+    timeoutMs,
+    maxResponseSizeBytes,
+  }: AccountApiClientConfig) {
     this.#fetch = fetch;
     this.#baseUrl = baseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
+    this.#timeoutMs = timeoutMs;
+    this.#maxResponseSizeBytes = maxResponseSizeBytes;
   }
 
   /**
@@ -113,72 +148,54 @@ export class AccountApiClient {
 
     // Try up to initial attempt + retry attempts
     for (let attempt = 0; attempt <= retries; attempt++) {
-      const response = await this.#fetchTokenBalance(
-        tokenAddress,
-        account,
-        chainId,
-      );
-
-      // Process the response
-      if (!response.ok) {
-        logger.error(
-          `HTTP error! Failed to fetch token balance for account(${account}) and token(${tokenAddress}) on chain(${chainId}): ${response.status}`,
+      try {
+        const response = await this.#fetchTokenBalance(
+          tokenAddress,
+          account,
+          chainId,
         );
 
+        // Parse and validate the response
+        const { accounts, type, iconUrl, symbol, decimals } = response;
+
+        const accountLowercase = account.toLowerCase();
+        const accountData = accounts.find(
+          (acc) => acc.accountAddress.toLowerCase() === accountLowercase,
+        );
+
+        if (!accountData) {
+          logger.error(`No balance data found for the account: ${account}`);
+          throw new ResourceNotFoundError(
+            `No balance data found for the account: ${account}`,
+          );
+        }
+
+        if (
+          type !== undefined &&
+          !AccountApiClient.#supportedTokenTypes.includes(type)
+        ) {
+          logger.error(`Unsupported token type: ${type}`);
+          throw new InvalidInputError(`Unsupported token type: ${type}`);
+        }
+
+        const balance = BigInt(accountData.rawBalance);
+
+        return {
+          balance,
+          decimals,
+          symbol,
+          iconUrl,
+        } as TokenBalanceAndMetadata;
+      } catch (error) {
         // Check if this is a retryable error
-        if (isResourceUnavailableStatus(response.status) && attempt < retries) {
+        if (error instanceof ResourceUnavailableError && attempt < retries) {
           await sleep(delayMs);
           continue;
         }
 
-        // Throw appropriate error based on status code
-        if (response.status === 404) {
-          throw new ResourceNotFoundError(
-            `Token balance not found for account ${account} and token ${tokenAddress}`,
-          );
-        } else if (isResourceUnavailableStatus(response.status)) {
-          throw new ResourceUnavailableError(
-            `Account service temporarily unavailable (HTTP ${response.status})`,
-          );
-        } else {
-          throw new InvalidInputError(
-            `HTTP error ${response.status}: Failed to fetch token balance for account ${account} and token ${tokenAddress}`,
-          );
-        }
+        // If it's not retryable or we've exhausted retries, re-throw
+        throw error;
       }
-
-      // Parse and validate the response
-      const { accounts, type, iconUrl, symbol, decimals } =
-        (await response.json()) as TokenBalanceResponse;
-
-      const accountLowercase = account.toLowerCase();
-      const accountData = accounts.find(
-        (acc) => acc.accountAddress.toLowerCase() === accountLowercase,
-      );
-
-      if (!accountData) {
-        logger.error(`No balance data found for the account: ${account}`);
-        throw new ResourceNotFoundError(
-          `No balance data found for the account: ${account}`,
-        );
-      }
-
-      if (
-        type !== undefined &&
-        !AccountApiClient.#supportedTokenTypes.includes(type)
-      ) {
-        logger.error(`Unsupported token type: ${type}`);
-        throw new InvalidInputError(`Unsupported token type: ${type}`);
-      }
-
-      const balance = BigInt(accountData.rawBalance);
-
-      return {
-        balance,
-        decimals,
-        symbol,
-        iconUrl,
-      };
     }
 
     throw new InternalError(
@@ -191,22 +208,21 @@ export class AccountApiClient {
    * @param tokenAddress - The token address to fetch the balance for.
    * @param account - The account address to fetch the balance for.
    * @param chainId - The chain ID to fetch the balance from.
-   * @returns The raw fetch response.
+   * @returns The validated token balance response.
    */
   async #fetchTokenBalance(
     tokenAddress: Hex,
     account: Hex,
     chainId: number,
-  ): Promise<globalThis.Response> {
-    try {
-      return this.#fetch(
-        `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
-      );
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.error(`Error fetching token balance: ${errorMessage}`);
-      throw new InternalError(`Error fetching token balance: ${errorMessage}`);
-    }
+  ): Promise<TokenBalanceResponse> {
+    return (await makeValidatedRequest(
+      `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
+      {
+        timeoutMs: this.#timeoutMs,
+        maxResponseSizeBytes: this.#maxResponseSizeBytes,
+        fetch: this.#fetch,
+      },
+      TokenBalanceResponseSchema,
+    )) as TokenBalanceResponse;
   }
 }

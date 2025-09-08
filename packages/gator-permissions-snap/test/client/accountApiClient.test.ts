@@ -4,16 +4,15 @@ const mockApiBaseUrl = 'https://mock-account-api.com';
 
 describe('AccountApiClient', () => {
   const mockFetch = jest.fn();
-  let client = new AccountApiClient({
-    baseUrl: mockApiBaseUrl,
-    fetch: mockFetch,
-  });
+  let client: AccountApiClient;
 
   beforeEach(() => {
     mockFetch.mockClear();
     client = new AccountApiClient({
       baseUrl: mockApiBaseUrl,
       fetch: mockFetch,
+      timeoutMs: 5000, // Shorter timeout for tests
+      maxResponseSizeBytes: 1024 * 1024, // 1MB
     });
   });
 
@@ -23,7 +22,7 @@ describe('AccountApiClient', () => {
     const mockChainId = 11155111;
 
     it('fetches native token balance and metadata successfully', async () => {
-      mockFetch.mockResolvedValueOnce({
+      const mockResponse = {
         ok: true,
         json: async () => ({
           name: 'Ethereum',
@@ -37,7 +36,7 @@ describe('AccountApiClient', () => {
           occurrences: 100,
           sources: [],
           chainId: mockChainId,
-          blockNumber: 'latest',
+          blockNumber: '12345678',
           updatedAt: '2025-05-29T23:14:08.118Z',
           value: {},
           price: 0,
@@ -50,7 +49,12 @@ describe('AccountApiClient', () => {
             },
           ],
         }),
-      });
+        headers: {
+          get: jest.fn().mockReturnValue('1024'), // Mock content-length header
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce(mockResponse);
 
       const result = await client.getTokenBalanceAndMetadata({
         chainId: mockChainId,
@@ -67,11 +71,18 @@ describe('AccountApiClient', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         `${mockApiBaseUrl}/tokens/0x0000000000000000000000000000000000000000?accountAddresses=${mockAccount}&chainId=${mockChainId}`,
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+          headers: expect.objectContaining({
+            Accept: 'application/json',
+            'User-Agent': 'MetaMask-Snap/1.0',
+          }),
+        }),
       );
     });
 
     it('fetches ERC20 token balance and metadata successfully', async () => {
-      mockFetch.mockResolvedValueOnce({
+      const mockResponse = {
         ok: true,
         json: async () => ({
           name: 'Dai Stablecoin',
@@ -85,7 +96,7 @@ describe('AccountApiClient', () => {
           occurrences: 100,
           sources: [],
           chainId: 1,
-          blockNumber: 'latest',
+          blockNumber: '12345678',
           updatedAt: '2025-05-29T23:14:08.118Z',
           value: {},
           price: 0,
@@ -98,7 +109,12 @@ describe('AccountApiClient', () => {
             },
           ],
         }),
-      });
+        headers: {
+          get: jest.fn().mockReturnValue('1024'), // Mock content-length header
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce(mockResponse);
 
       const result = await client.getTokenBalanceAndMetadata({
         chainId: mockChainId,
@@ -116,6 +132,13 @@ describe('AccountApiClient', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         `${mockApiBaseUrl}/tokens/${mockTokenAddress}?accountAddresses=${mockAccount}&chainId=${mockChainId}`,
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+          headers: expect.objectContaining({
+            Accept: 'application/json',
+            'User-Agent': 'MetaMask-Snap/1.0',
+          }),
+        }),
       );
     });
 
@@ -123,6 +146,9 @@ describe('AccountApiClient', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
+        headers: {
+          get: jest.fn().mockReturnValue('1024'),
+        },
       });
 
       await expect(
@@ -130,13 +156,11 @@ describe('AccountApiClient', () => {
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow(
-        `Token balance not found for account ${mockAccount} and token 0x0000000000000000000000000000000000000000`,
-      );
+      ).rejects.toThrow('Resource not found: 404');
     });
 
     it('throws an error if account data not found in response', async () => {
-      mockFetch.mockResolvedValueOnce({
+      const mockResponse = {
         ok: true,
         json: async () => ({
           name: 'Ethereum',
@@ -150,22 +174,25 @@ describe('AccountApiClient', () => {
           occurrences: 100,
           sources: [],
           chainId: 1,
-          blockNumber: 'latest',
+          blockNumber: '12345678',
           updatedAt: '2025-05-29T23:14:08.118Z',
           value: {},
           price: 0,
-          accounts: [], // Empty accounts array
+          accounts: [], // Empty accounts array - this will fail zod validation
         }),
-      });
+        headers: {
+          get: jest.fn().mockReturnValue('1024'),
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce(mockResponse);
 
       await expect(
         client.getTokenBalanceAndMetadata({
           chainId: mockChainId,
           account: mockAccount,
         }),
-      ).rejects.toThrow(
-        `No balance data found for the account: ${mockAccount}`,
-      );
+      ).rejects.toThrow('Invalid response structure');
     });
 
     it('throws if chainId is not provided', async () => {
@@ -189,7 +216,7 @@ describe('AccountApiClient', () => {
     });
 
     it('throws if unsupported token type is returned', async () => {
-      mockFetch.mockResolvedValueOnce({
+      const mockResponse = {
         ok: true,
         json: async () => ({
           name: 'Some Token',
@@ -202,7 +229,7 @@ describe('AccountApiClient', () => {
           occurrences: 100,
           sources: [],
           chainId: 1,
-          blockNumber: 'latest',
+          blockNumber: '12345678',
           updatedAt: '2025-05-29T23:14:08.118Z',
           value: {},
           price: 0,
@@ -215,7 +242,12 @@ describe('AccountApiClient', () => {
             },
           ],
         }),
-      });
+        headers: {
+          get: jest.fn().mockReturnValue('1024'),
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce(mockResponse);
 
       await expect(
         client.getTokenBalanceAndMetadata({
@@ -232,11 +264,17 @@ describe('AccountApiClient', () => {
         mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 500,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
         } as any);
 
         // Second call succeeds
         mockFetch.mockResolvedValueOnce({
           ok: true,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
           json: async () => ({
             name: 'Ethereum',
             symbol: 'ETH',
@@ -281,10 +319,24 @@ describe('AccountApiClient', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(
           1,
           `${mockApiBaseUrl}/tokens/0x0000000000000000000000000000000000000000?accountAddresses=${mockAccount}&chainId=${mockChainId}`,
+          expect.objectContaining({
+            headers: expect.objectContaining({
+              Accept: 'application/json',
+              'User-Agent': 'MetaMask-Snap/1.0',
+            }),
+            signal: expect.any(AbortSignal),
+          }),
         );
         expect(mockFetch).toHaveBeenNthCalledWith(
           2,
           `${mockApiBaseUrl}/tokens/0x0000000000000000000000000000000000000000?accountAddresses=${mockAccount}&chainId=${mockChainId}`,
+          expect.objectContaining({
+            headers: expect.objectContaining({
+              Accept: 'application/json',
+              'User-Agent': 'MetaMask-Snap/1.0',
+            }),
+            signal: expect.any(AbortSignal),
+          }),
         );
       });
 
@@ -293,11 +345,17 @@ describe('AccountApiClient', () => {
         mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 500,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
         } as any);
 
         // Second call succeeds
         mockFetch.mockResolvedValueOnce({
           ok: true,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
           json: async () => ({
             name: 'Ethereum',
             symbol: 'ETH',
@@ -349,6 +407,9 @@ describe('AccountApiClient', () => {
         mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 404,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
         } as any);
 
         await expect(
@@ -356,9 +417,7 @@ describe('AccountApiClient', () => {
             chainId: mockChainId,
             account: mockAccount,
           }),
-        ).rejects.toThrow(
-          `Token balance not found for account ${mockAccount} and token 0x0000000000000000000000000000000000000000`,
-        );
+        ).rejects.toThrow('Resource not found: 404');
 
         expect(mockFetch).toHaveBeenCalledTimes(1);
       });
@@ -367,6 +426,9 @@ describe('AccountApiClient', () => {
         mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 400,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
         } as any);
 
         await expect(
@@ -374,9 +436,7 @@ describe('AccountApiClient', () => {
             chainId: mockChainId,
             account: mockAccount,
           }),
-        ).rejects.toThrow(
-          `HTTP error 400: Failed to fetch token balance for account ${mockAccount} and token 0x0000000000000000000000000000000000000000`,
-        );
+        ).rejects.toThrow('Client error: 400');
 
         expect(mockFetch).toHaveBeenCalledTimes(1);
       });
@@ -386,6 +446,9 @@ describe('AccountApiClient', () => {
         mockFetch.mockResolvedValue({
           ok: false,
           status: 500,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
         } as any);
 
         await expect(
@@ -397,7 +460,7 @@ describe('AccountApiClient', () => {
               delayMs: 100,
             },
           }),
-        ).rejects.toThrow('Account service temporarily unavailable (HTTP 500)');
+        ).rejects.toThrow('Server error: 500');
 
         expect(mockFetch).toHaveBeenCalledTimes(4); // Initial + 3 retries
       });
@@ -407,11 +470,17 @@ describe('AccountApiClient', () => {
         mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 500,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
         } as any);
 
         // Second call succeeds
         mockFetch.mockResolvedValueOnce({
           ok: true,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
           json: async () => ({
             name: 'Ethereum',
             symbol: 'ETH',
@@ -458,6 +527,9 @@ describe('AccountApiClient', () => {
       it('succeeds on first attempt when no retry is needed', async () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
+          headers: {
+            get: jest.fn().mockReturnValue(null),
+          },
           json: async () => ({
             name: 'Ethereum',
             symbol: 'ETH',

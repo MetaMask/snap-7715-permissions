@@ -12,7 +12,7 @@ import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import type { RetryOptions } from './types';
 import { getChainMetadata } from '../core/chainMetadata';
-import { sleep } from '../utils/retry';
+import { sleep } from '../utils/httpClient';
 
 /**
  * Client that fetches nonce from nonce caveat enforcer.

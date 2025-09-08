@@ -16,7 +16,7 @@ import type {
   TokenBalanceAndMetadata,
   TokenMetadataClient,
 } from './types';
-import { sleep } from '../utils/retry';
+import { sleep } from '../utils/httpClient';
 
 /**
  * Client that fetches token metadata directly from the blockchain using the ethereum provider
