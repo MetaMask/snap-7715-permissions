@@ -3,7 +3,8 @@
 /* eslint-disable import/no-nodejs-modules */
 /* eslint-disable no-restricted-globals */
 
-import { existsSync, writeFileSync } from 'fs';
+import { existsSync } from 'fs';
+import { writeFile } from 'fs/promises';
 import { join, resolve } from 'path';
 import 'dotenv/config';
 
@@ -32,7 +33,11 @@ async function generateManifest(packageDir: string): Promise<void> {
     const manifest: SnapManifest = manifestFromModule as SnapManifest;
 
     // Write the manifest to snap.manifest.json
-    writeFileSync(targetPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+    await writeFile(
+      targetPath,
+      `${JSON.stringify(manifest, null, 2)}\n`,
+      'utf8',
+    );
 
     console.log(
       `✅ Generated ${targetPath} (${process.env.SNAP_ENV ?? 'production'})`,
