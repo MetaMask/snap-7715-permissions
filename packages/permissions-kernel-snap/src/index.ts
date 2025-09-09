@@ -1,5 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
+  InvalidParamsError,
   LimitExceededError,
   MethodNotFoundError,
   type Json,
@@ -10,6 +11,7 @@ import {
 import { createPermissionOfferRegistryManager } from './registryManager';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { validateJsonRpcRequest } from './utils';
 
 // set up dependencies
 const rpcHandler = createRpcHandler({
@@ -38,9 +40,9 @@ let activeProcessingLock: symbol | null = null;
  * @param args - The request handler args as object.
  * @param args.origin - The origin of the request, e.g., the website that
  * invoked the snap.
- * @param args.request - A validated JSON-RPC request object.
- * @returns The result of `snap_dialog`.
- * @throws If the request method is not valid for this snap.
+ * @param args.request - A JSON-RPC request object that will be validated.
+ * @returns The result of the RPC method execution (The 7715 permissions response from the permissions provider).
+ * @throws If the request is invalid, method is not found, or processing fails.
  */
 export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
@@ -64,22 +66,35 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       JSON.stringify(request, undefined, 2),
     );
 
+    // First check if the request is a valid object
+    if (typeof request !== 'object' || request === null) {
+      throw new InvalidParamsError('Request must be a valid JSON-RPC object');
+    }
+
+    // Check if method exists first (for proper error codes)
+    if (!request.method || typeof request.method !== 'string') {
+      throw new InvalidParamsError('Request must have a valid method');
+    }
+
     // Use Object.prototype.hasOwnProperty.call() to prevent prototype pollution attacks
-    // This ensures we only access methods that exist on boundRpcHandlers itself
     if (
       !Object.prototype.hasOwnProperty.call(boundRpcHandlers, request.method)
     ) {
+      logger.warn('Method not found in bound handlers:', request.method);
       throw new MethodNotFoundError(`Method ${request.method} not found.`);
     }
 
+    // Now validate the full JSON-RPC structure
+    const validatedRequest = validateJsonRpcRequest(request);
+
     // We know that the method exists, so we can cast to NonNullable
-    const handler = boundRpcHandlers[request.method] as NonNullable<
+    const handler = boundRpcHandlers[validatedRequest.method] as NonNullable<
       (typeof boundRpcHandlers)[string]
     >;
 
     const result = await handler({
       siteOrigin: origin,
-      params: request.params as JsonRpcParams,
+      params: validatedRequest.params as JsonRpcParams,
     });
 
     return result;
