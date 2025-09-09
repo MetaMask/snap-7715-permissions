@@ -194,7 +194,10 @@ export class AccountApiClient {
     chainId: number,
     retryOptions?: RetryOptions,
   ): Promise<TokenBalanceResponse> {
-    return (await makeValidatedRequestWithRetry(
+    return await makeValidatedRequestWithRetry<
+      TokenBalanceResponse,
+      typeof TokenBalanceResponseSchema
+    >(
       `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
       {
         timeoutMs: this.#timeoutMs,
@@ -203,6 +206,6 @@ export class AccountApiClient {
       },
       TokenBalanceResponseSchema,
       retryOptions,
-    )) as TokenBalanceResponse;
+    );
   }
 }
