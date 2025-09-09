@@ -31,10 +31,13 @@ export type HttpClientConfig = {
  * @throws {ParseError} If the response cannot be parsed as JSON.
  * @throws {ResourceUnavailableError} If the response structure is invalid according to the schema.
  */
-export async function makeValidatedRequestWithRetry<TResponse>(
+export async function makeValidatedRequestWithRetry<
+  TResponse,
+  TSchema extends z.ZodType<TResponse, any, any>,
+>(
   url: string,
   config: HttpClientConfig,
-  responseSchema: z.ZodSchema<TResponse>,
+  responseSchema: TSchema,
   retryOptions?: RetryOptions,
 ): Promise<TResponse> {
   const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
@@ -68,10 +71,13 @@ export async function makeValidatedRequestWithRetry<TResponse>(
  * @throws {ParseError} If the response cannot be parsed as JSON.
  * @throws {ResourceUnavailableError} If the response structure is invalid according to the schema.
  */
-export async function makeValidatedRequest<TResponse>(
+async function makeValidatedRequest<
+  TResponse,
+  TSchema extends z.ZodType<TResponse, any, any>,
+>(
   url: string,
   config: HttpClientConfig,
-  responseSchema: z.ZodSchema<TResponse>,
+  responseSchema: TSchema,
 ): Promise<TResponse> {
   const { timeoutMs, maxResponseSizeBytes, fetch = globalThis.fetch } = config;
 
@@ -89,8 +95,6 @@ export async function makeValidatedRequest<TResponse>(
       },
     });
   } catch (error) {
-    clearTimeout(timeoutId);
-
     if (error instanceof Error && error.name === 'AbortError') {
       throw new ResourceUnavailableError(
         `Request timed out after ${timeoutMs}ms`,
@@ -100,9 +104,9 @@ export async function makeValidatedRequest<TResponse>(
     throw new InternalError(
       `Failed to fetch resource: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  clearTimeout(timeoutId);
 
   // Check HTTP status code
   if (!response.ok) {

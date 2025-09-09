@@ -290,7 +290,10 @@ export class AccountApiClient {
   ): Promise<TokenBalanceResponse> {
     const url = `${this.#accountBaseUrl}/v2/accounts/${account}/balances?networks=${chainId}&filterSupportedTokens=false&includeTokenAddresses=${tokenAddress}&includeStakedAssets=false`;
 
-    return (await makeValidatedRequestWithRetry(
+    return await makeValidatedRequestWithRetry<
+      TokenBalanceResponse,
+      typeof TokenBalanceResponseSchema
+    >(
       url,
       {
         timeoutMs: this.#timeoutMs,
@@ -299,7 +302,7 @@ export class AccountApiClient {
       },
       TokenBalanceResponseSchema,
       retryOptions,
-    )) as TokenBalanceResponse;
+    );
   }
 
   /**
@@ -316,7 +319,10 @@ export class AccountApiClient {
   ): Promise<TokenMetadataResponse> {
     const url = `${this.#tokensBaseUrl}/token/${chainId}?address=${tokenAddress}&includeEnrichedData=false&includeCoingeckoId=false&includeAggregators=false&includeOccurrences=false&includeIconUrl=true&includeAssetType=false&includeTokenFees=false&includeHoneypotStatus=false&includeContractVerificationStatus=false&includeStorage=false&includeERC20Permit=false&includeDescription=false`;
 
-    return (await makeValidatedRequestWithRetry(
+    return await makeValidatedRequestWithRetry<
+      TokenMetadataResponse,
+      typeof TokenMetadataResponseSchema
+    >(
       url,
       {
         timeoutMs: this.#timeoutMs,
@@ -325,6 +331,6 @@ export class AccountApiClient {
       },
       TokenMetadataResponseSchema,
       retryOptions,
-    )) as TokenMetadataResponse;
+    );
   }
 }
