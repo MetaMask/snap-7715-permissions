@@ -9,7 +9,6 @@ import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
@@ -17,6 +16,7 @@ import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
+import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 const randomAddress = () => {

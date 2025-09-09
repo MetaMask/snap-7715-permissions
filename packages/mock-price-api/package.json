@@ -9,11 +9,11 @@
   },
   "license": "(MIT-0 OR Apache-2.0)",
   "scripts": {
-    "allow-scripts": "yarn workspace root allow-scripts",
+    "allow-scripts": "yarn --cwd ../.. allow-scripts",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
-    "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
+    "lint:misc": "../../node_modules/.bin/prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
     "start": "tsx ./src/server.ts"
   },
   "dependencies": {
@@ -26,7 +26,6 @@
     "@metamask/eslint-config-jest": "12.1.0",
     "@metamask/eslint-config-nodejs": "12.1.0",
     "@metamask/eslint-config-typescript": "12.1.0",
-    "@metamask/snaps-cli": "8.1.1",
     "@metamask/snaps-jest": "9.3.0",
     "@types/cors": "2.8.19",
     "@types/express": "4.17.23",

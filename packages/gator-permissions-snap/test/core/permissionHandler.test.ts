@@ -1,8 +1,8 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import type { TokenBalanceAndMetadata } from 'src/clients/types';
 
+import type { TokenBalanceAndMetadata } from '../../src/clients/types';
 import type { AccountController } from '../../src/core/accountController';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';

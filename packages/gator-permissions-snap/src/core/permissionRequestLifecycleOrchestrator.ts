@@ -18,8 +18,8 @@ import {
   hexToNumber,
   numberToHex,
 } from '@metamask/utils';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
+import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
