@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata, RetryOptions } from './types';
 import { makeValidatedRequestWithRetry } from '../utils/httpClient';
+import { parseUnits } from '../utils/value';
 
 /**
  * Zod schema for validating individual token balance item
@@ -185,10 +186,13 @@ export class AccountApiClient {
     }
 
     // Convert balance string to BigInt
-    // The balance comes as a decimal string in the smallest unit (e.g., wei for ETH, smallest unit for tokens)
-    // We need to handle the decimal part properly
-    const balanceValue = parseFloat(tokenData.balance);
-    return BigInt(Math.floor(balanceValue));
+    // The balance comes as a decimal string in human-readable format (e.g., "1.5" for 1.5 ETH)
+    // We need to convert it to the smallest unit by multiplying by 10^decimals
+    const balanceInSmallestUnit = parseUnits({
+      formatted: tokenData.balance,
+      decimals: tokenData.decimals,
+    });
+    return balanceInSmallestUnit;
   }
 
   /**
@@ -299,6 +303,10 @@ export class AccountApiClient {
         timeoutMs: this.#timeoutMs,
         maxResponseSizeBytes: this.#maxResponseSizeBytes,
         fetch: this.#fetch,
+        headers: {
+          'x-mmcx-internal-application': 'gator-permissions-snap',
+          'x-metamask-clientproduct': 'gator-permissions-snap',
+        },
       },
       TokenBalanceResponseSchema,
       retryOptions,

@@ -16,6 +16,7 @@ export type HttpClientConfig = {
   timeoutMs: number;
   maxResponseSizeBytes: number;
   fetch?: typeof globalThis.fetch;
+  headers?: Record<string, string>;
 };
 
 /**
@@ -89,9 +90,9 @@ async function makeValidatedRequest<
     response = await fetch(url, {
       signal: controller.signal,
       headers: {
+        ...config.headers,
         Accept: 'application/json',
         'User-Agent': 'MetaMask-Snap/1.0',
-        'x-mmcx-internal-application': 'gator-permissions-snap',
       },
     });
   } catch (error) {
