@@ -855,12 +855,20 @@ describe('AccountApiClient', () => {
           }),
         });
 
-        await expect(
-          client.getTokenBalanceAndMetadata({
-            chainId: mockChainId,
-            account: mockAccount,
-          }),
-        ).rejects.toThrow('Invalid response structure');
+        const result = await client.getTokenBalanceAndMetadata({
+          chainId: mockChainId,
+          account: mockAccount,
+        });
+
+        expect(result).toStrictEqual({
+          balance: BigInt('1000000000000000000'),
+          decimals: 18,
+          symbol: 'ETH',
+          iconUrl:
+            'https://dev-static.cx.metamask.io/api/v1/tokenIcons/1/0x0000000000000000000000000000000000000000.png',
+        });
+
+        expect(mockFetch).toHaveBeenCalledTimes(4); // 2 balance calls + 2 metadata calls
       });
 
       it('succeeds on first attempt when no retry is needed', async () => {
