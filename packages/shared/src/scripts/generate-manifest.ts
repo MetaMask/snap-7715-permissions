@@ -3,8 +3,7 @@
 /* eslint-disable import/no-nodejs-modules */
 /* eslint-disable no-restricted-globals */
 
-import { existsSync } from 'fs';
-import { writeFile } from 'fs/promises';
+import { access, writeFile } from 'fs/promises';
 import { join, resolve } from 'path';
 import 'dotenv/config';
 
@@ -22,7 +21,9 @@ async function generateManifest(packageDir: string): Promise<void> {
 
   try {
     // Check if TypeScript manifest exists
-    if (!existsSync(tsPath)) {
+    try {
+      await access(tsPath);
+    } catch {
       throw new Error(`TypeScript manifest not found: ${tsPath}`);
     }
 
