@@ -88,8 +88,6 @@ export async function makeValidatedRequest<TResponse>(
       },
     });
   } catch (error) {
-    clearTimeout(timeoutId);
-
     if (error instanceof Error && error.name === 'AbortError') {
       throw new ResourceUnavailableError(
         `Request timed out after ${timeoutMs}ms`,
@@ -99,9 +97,9 @@ export async function makeValidatedRequest<TResponse>(
     throw new InternalError(
       `Failed to fetch resource: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  clearTimeout(timeoutId);
 
   // Check HTTP status code
   if (!response.ok) {
