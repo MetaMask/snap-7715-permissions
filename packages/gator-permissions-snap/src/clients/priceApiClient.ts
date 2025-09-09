@@ -66,7 +66,7 @@ export class PriceApiClient {
       // Process the response
       if (!response.ok) {
         logger.error(
-          `HTTP error! Failed to fetch spot price for caipAssetType(${caipAssetType}) and vsCurrency(${vsCurrency}): ${response.status}`,
+          `HTTP error! Failed to fetch spot price: ${response.status}`,
         );
 
         // Check if this is a retryable error
@@ -100,7 +100,7 @@ export class PriceApiClient {
       const assetTypeData = spotPricesRes[caipAssetType];
       if (!assetTypeData) {
         logger.error(
-          `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
+          'No spot price found in result for the token CAIP-19 asset type',
         );
         throw new ResourceNotFoundError(
           `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
@@ -109,9 +109,7 @@ export class PriceApiClient {
 
       const vsCurrencyData = assetTypeData[vsCurrency];
       if (!vsCurrencyData) {
-        logger.error(
-          `No spot price found in result for the currency: ${vsCurrency}`,
-        );
+        logger.error('No spot price found in result for the currency');
         throw new ResourceNotFoundError(
           `No spot price found in result for the currency: ${vsCurrency}`,
         );

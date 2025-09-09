@@ -88,10 +88,6 @@ describe('PermissionOfferRegistryManager', () => {
           mockSnapId,
         );
       expect(logger.error).toHaveBeenCalledWith(
-        {
-          snapId: mockSnapId,
-          error: expect.any(Error),
-        },
         expect.stringContaining('does not support'),
       );
       expect(result).toStrictEqual({});

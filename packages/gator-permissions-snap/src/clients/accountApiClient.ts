@@ -110,7 +110,9 @@ export class AccountApiClient {
 
     if (!response.ok) {
       const message = `HTTP error. Failed to fetch token balance for account(${account}) and token(${tokenAddress}) on chain(${chainId}): ${response.status}`;
-      logger.error(message);
+      logger.error(
+        `HTTP error. Failed to fetch token balance: ${response.status}`,
+      );
 
       throw new ResourceUnavailableError(message);
     }

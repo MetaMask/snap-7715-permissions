@@ -119,7 +119,7 @@ export class TokenMetadataService {
 
       return { success: true, imageDataBase64 };
     } catch (error) {
-      logger.error('Error fetching icon data', error);
+      logger.error('Error fetching icon data');
       return { success: false };
     }
   }

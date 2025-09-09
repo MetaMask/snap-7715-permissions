@@ -107,17 +107,13 @@ export const createPermissionOfferRegistryManager = (
         }
       } catch (error) {
         logger.error(
-          {
-            snapId,
-            error,
-          },
           `Snap ${snapId} does not support ${ExternalMethod.PermissionProviderGetPermissionOffers}, or returned an invalid response, skipping...`,
         );
       }
 
       return ephemeralPermissionOfferRegistry;
     } catch (error) {
-      logger.error('Error building permission offer registry:', error);
+      logger.error('Error building permission offer registry');
       return ephemeralPermissionOfferRegistry;
     }
   }
