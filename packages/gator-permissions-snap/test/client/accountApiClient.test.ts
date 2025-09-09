@@ -766,8 +766,8 @@ describe('AccountApiClient', () => {
       });
 
       it('retries up to the specified number of attempts', async () => {
-        // All calls fail with 500 status - provide 8 mock responses (4 for balance API + 4 for metadata API)
-        for (let i = 0; i < 8; i++) {
+        // All calls fail with 500 status - provide 7 mock responses (4 for balance API + 3 for metadata API)
+        for (let i = 0; i < 7; i++) {
           mockFetch.mockResolvedValueOnce({
             ok: false,
             status: 500,
@@ -793,28 +793,44 @@ describe('AccountApiClient', () => {
       });
 
       it('uses default retry options when none provided', async () => {
+        // Create a completely fresh mock for this test to avoid interference
+        const freshMockFetch = jest.fn();
+
+        // Recreate the client with the fresh mock
+        client = new AccountApiClient({
+          accountBaseUrl: mockApiBaseUrl,
+          tokensBaseUrl: mockTokensApiBaseUrl,
+          fetch: freshMockFetch,
+          timeoutMs: 5000, // Shorter timeout for tests
+          maxResponseSizeBytes: 1024 * 1024, // 1MB
+        });
+
         // Mock balance API - first call fails with 500 status
-        mockFetch.mockResolvedValueOnce({
+        freshMockFetch.mockResolvedValueOnce({
           ok: false,
           status: 500,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
-          // No json method - this will cause the httpClient to throw the 500 error before trying to parse JSON
+          json: async () => {
+            throw new Error('Server error: 500');
+          },
         });
 
         // Mock metadata API - first call fails with 500 status
-        mockFetch.mockResolvedValueOnce({
+        freshMockFetch.mockResolvedValueOnce({
           ok: false,
           status: 500,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
-          // No json method - this will cause the httpClient to throw the 500 error before trying to parse JSON
+          json: async () => {
+            throw new Error('Server error: 500');
+          },
         });
 
         // Mock balance API - second call succeeds
-        mockFetch.mockResolvedValueOnce({
+        freshMockFetch.mockResolvedValueOnce({
           ok: true,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
@@ -839,7 +855,7 @@ describe('AccountApiClient', () => {
         });
 
         // Mock metadata API - second call succeeds
-        mockFetch.mockResolvedValueOnce({
+        freshMockFetch.mockResolvedValueOnce({
           ok: true,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
@@ -868,7 +884,7 @@ describe('AccountApiClient', () => {
             'https://dev-static.cx.metamask.io/api/v1/tokenIcons/1/0x0000000000000000000000000000000000000000.png',
         });
 
-        expect(mockFetch).toHaveBeenCalledTimes(4); // 2 balance calls + 2 metadata calls
+        expect(freshMockFetch).toHaveBeenCalledTimes(4); // 2 balance calls + 2 metadata calls (with default retry)
       });
 
       it('succeeds on first attempt when no retry is needed', async () => {
