@@ -6,8 +6,21 @@ import {
   ResourceUnavailableError,
 } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
+import { z } from 'zod';
 
 import type { SpotPricesRes, VsCurrencyParam } from './types';
+import { makeValidatedRequest } from '../utils/httpClient';
+
+/**
+ * Zod schema for validating spot prices response
+ */
+const SpotPricesResponseSchema = z.record(
+  z.string().min(1).max(200), // CAIP asset type validation
+  z.record(
+    z.string().min(1).max(10), // Currency code validation
+    z.number().finite().min(0).max(1e12), // Price validation (0 to 1 trillion)
+  ),
+);
 
 /**
  * Options for configuring retry behavior.
@@ -20,6 +33,16 @@ export type RetryOptions = {
 };
 
 /**
+ * Configuration options for PriceApiClient
+ */
+export type PriceApiClientConfig = {
+  baseUrl: string;
+  fetch?: typeof globalThis.fetch;
+  timeoutMs: number;
+  maxResponseSizeBytes: number;
+};
+
+/**
  * Class responsible for fetching price data from the Price API.
  */
 export class PriceApiClient {
@@ -27,12 +50,20 @@ export class PriceApiClient {
 
   readonly #baseUrl: string;
 
-  constructor(
-    baseUrl: string,
-    fetch: typeof globalThis.fetch = globalThis.fetch,
-  ) {
+  readonly #timeoutMs: number;
+
+  readonly #maxResponseSizeBytes: number;
+
+  constructor({
+    baseUrl,
+    fetch = globalThis.fetch,
+    timeoutMs,
+    maxResponseSizeBytes,
+  }: PriceApiClientConfig) {
     this.#fetch = fetch;
     this.#baseUrl = baseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
+    this.#timeoutMs = timeoutMs;
+    this.#maxResponseSizeBytes = maxResponseSizeBytes;
   }
 
   /**
@@ -62,60 +93,56 @@ export class PriceApiClient {
 
     // Try up to initial attempt + retry attempts
     for (let attempt = 0; attempt <= retries; attempt++) {
-      const response = await this.#fetchSpotPrice(caipAssetType, vsCurrency);
-      // Process the response
-      if (!response.ok) {
-        logger.error(
-          `HTTP error! Failed to fetch spot price: ${response.status}`,
+      try {
+        const validatedResponse = await this.#fetchSpotPrice(
+          caipAssetType,
+          vsCurrency,
         );
 
+        // Try exact match first, then case-insensitive lookup
+        let assetTypeData = validatedResponse[caipAssetType];
+        if (!assetTypeData) {
+          // If exact match fails, try case-insensitive lookup
+          const responseKeys = Object.keys(validatedResponse);
+          const matchingKey = responseKeys.find(
+            (key) => key.toLowerCase() === caipAssetType.toLowerCase(),
+          );
+
+          if (matchingKey) {
+            assetTypeData = validatedResponse[matchingKey as CaipAssetType];
+          }
+        }
+
+        if (!assetTypeData) {
+          logger.error(
+            `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}. Available keys: ${Object.keys(validatedResponse).join(', ')}`,
+          );
+          throw new ResourceNotFoundError(
+            `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
+          );
+        }
+
+        const vsCurrencyData = assetTypeData[vsCurrency];
+        if (!vsCurrencyData) {
+          logger.error(
+            `No spot price found in result for the currency: ${vsCurrency}`,
+          );
+          throw new ResourceNotFoundError(
+            `No spot price found in result for the currency: ${vsCurrency}`,
+          );
+        }
+
+        return vsCurrencyData;
+      } catch (error) {
         // Check if this is a retryable error
-        if (
-          this.#isResourceUnavailableStatus(response.status) &&
-          attempt < retries
-        ) {
+        if (error instanceof ResourceUnavailableError && attempt < retries) {
           await this.#sleep(delayMs);
           continue;
         }
 
-        // Throw appropriate error based on status code
-        if (response.status === 404) {
-          throw new ResourceNotFoundError(
-            `Spot price not found for ${caipAssetType}`,
-          );
-        } else if (this.#isResourceUnavailableStatus(response.status)) {
-          throw new ResourceUnavailableError(
-            `Price service temporarily unavailable (HTTP ${response.status})`,
-          );
-        } else {
-          throw new InvalidInputError(
-            `HTTP error ${response.status}: Failed to fetch spot price for ${caipAssetType}`,
-          );
-        }
+        // If it's not retryable or we've exhausted retries, re-throw
+        throw error;
       }
-
-      // Parse and validate the response
-      const spotPricesRes = (await response.json()) as SpotPricesRes;
-
-      const assetTypeData = spotPricesRes[caipAssetType];
-      if (!assetTypeData) {
-        logger.error(
-          'No spot price found in result for the token CAIP-19 asset type',
-        );
-        throw new ResourceNotFoundError(
-          `No spot price found in result for the token CAIP-19 asset type: ${caipAssetType}`,
-        );
-      }
-
-      const vsCurrencyData = assetTypeData[vsCurrency];
-      if (!vsCurrencyData) {
-        logger.error('No spot price found in result for the currency');
-        throw new ResourceNotFoundError(
-          `No spot price found in result for the currency: ${vsCurrency}`,
-        );
-      }
-
-      return vsCurrencyData;
     }
 
     throw new InternalError(
@@ -124,36 +151,26 @@ export class PriceApiClient {
   }
 
   /**
-   * Internal method to fetch spot price and return the raw response.
+   * Internal method to fetch spot price and return the validated response.
    * @param caipAssetType - The token CAIP-19 asset type to fetch spot prices for.
    * @param vsCurrency - The currency to fetch the spot prices in.
-   * @returns The raw fetch response.
+   * @returns The validated spot prices response.
    */
   async #fetchSpotPrice(
     caipAssetType: CaipAssetType,
     vsCurrency: VsCurrencyParam,
-  ): Promise<globalThis.Response> {
-    try {
-      return this.#fetch(
-        `${
-          this.#baseUrl
-        }/v3/spot-prices?includeMarketData=false&vsCurrency=${vsCurrency}&assetIds=${caipAssetType}`,
-      );
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.error(`Error fetching spot price: ${errorMessage}`);
-      throw new InternalError(`Error fetching spot price: ${errorMessage}`);
-    }
-  }
-
-  /**
-   * Determines if an HTTP status code indicates a resource unavailable error.
-   * @param statusCode - The HTTP status code to check.
-   * @returns True if the status code indicates a resource unavailable error.
-   */
-  #isResourceUnavailableStatus(statusCode: number): boolean {
-    return statusCode >= 500 || statusCode === 429 || statusCode === 408;
+  ): Promise<SpotPricesRes> {
+    return await makeValidatedRequest(
+      `${
+        this.#baseUrl
+      }/v3/spot-prices?includeMarketData=false&vsCurrency=${vsCurrency}&assetIds=${caipAssetType}`,
+      {
+        timeoutMs: this.#timeoutMs,
+        maxResponseSizeBytes: this.#maxResponseSizeBytes,
+        fetch: this.#fetch,
+      },
+      SpotPricesResponseSchema,
+    );
   }
 
   /**

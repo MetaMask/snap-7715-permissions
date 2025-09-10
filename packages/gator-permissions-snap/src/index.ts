@@ -72,6 +72,8 @@ const supportedChains = supportedChainsString.split(',').map(Number);
 
 const accountApiClient = new AccountApiClient({
   baseUrl: accountApiBaseUrl,
+  timeoutMs: 10000, // 10 seconds timeout
+  maxResponseSizeBytes: 1024 * 1024, // 1MB max response size
 });
 
 const tokenMetadataClient = new BlockchainTokenMetadataClient({
@@ -134,7 +136,11 @@ const profileSyncManager = createProfileSyncManager({
 
 const userEventDispatcher = new UserEventDispatcher();
 
-const priceApiClient = new PriceApiClient(priceApiBaseUrl);
+const priceApiClient = new PriceApiClient({
+  baseUrl: priceApiBaseUrl,
+  timeoutMs: 10000, // 10 seconds timeout
+  maxResponseSizeBytes: 1024 * 1024, // 1MB max response size
+});
 
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
