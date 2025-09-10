@@ -42,7 +42,7 @@ export class NonceCaveatClient {
     chainId: number;
     account: Hex;
   }): Promise<bigint> {
-    logger.debug('BlockchainTokenMetadataClient:getTokenBalanceAndMetadata()');
+    logger.debug('NonceCaveatClient:getNonce()');
 
     if (!chainId) {
       const message = 'No chainId provided to fetch nonce';

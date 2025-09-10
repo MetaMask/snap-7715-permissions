@@ -51,7 +51,6 @@ This document outlines the architecture of the Permissions Provider Snap system 
 
 ### UI Components
 
-- **HomePage**: Component that builds the snap's homepage, showing feature introduction, as well as granted permissions. This is only part of the pre-production feature, as the snap will be pre-installed in which case the homepage is not accessible.
 - **ConfirmationDialogFactory**: Creates confirmation dialogs for permission requests.
 - **ConfirmationDialog**: Manages the lifecycle and user interaction of confirmation dialogs.
 
@@ -80,7 +79,6 @@ src/
 ├── services/                  # Business logic services (token prices, metadata)
 ├── clients/                   # External API clients (Account API, Price API, blockchain)
 ├── profileSync/               # Cross-device permission storage synchronization
-├── homepage/                  # Snap homepage UI component
 ├── ui/                        # Reusable UI components and utilities
 ├── utils/                     # Static utility functions
 └── permissions/               # Permission-specific implementations
@@ -102,8 +100,6 @@ src/
 - **`clients/`**: External API client implementations for interacting with the Account API, Price API, and blockchain providers.
 
 - **`profileSync/`**: Manages encrypted storage and synchronization of granted permissions across devices using MetaMask's profile sync infrastructure.
-
-- **`homepage/`**: Class-based component that builds the snap's homepage interface, displaying account information and granted permissions.
 
 - **`ui/`**: Reusable UI components and utilities used across different permission types and dialogs.
 
@@ -201,7 +197,7 @@ The EntryPoint serves as the main initialization and configuration point for the
    - Core services (TokenMetadataService, TokenPricesService, AccountController)
    - State management (StateManager for snap persistence)
    - Profile sync (ProfileSyncManager for cross-device permission sync)
-   - UI components (HomePage, ConfirmationDialogFactory, UserEventDispatcher)
+   - UI components (ConfirmationDialogFactory, UserEventDispatcher)
    - Permission handling (PermissionHandlerFactory, PermissionRequestLifecycleOrchestrator)
    - RPC handling (createRpcHandler for processing requests)
 
@@ -212,8 +208,7 @@ The EntryPoint serves as the main initialization and configuration point for the
 3. Handling lifecycle events:
    - `onRpcRequest`: Processes incoming JSON-RPC requests with origin validation
    - `onUserInput`: Handles user input events via UserEventDispatcher
-   - `onHomePage`: Returns the snap's homepage content
-   - `onInstall`: Shows welcome screen and handles local development setup
+   - `onInstall`: Handles local development setup
 
 4. Managing dependencies and configuration:
    - Uses dependency injection to create and wire up components

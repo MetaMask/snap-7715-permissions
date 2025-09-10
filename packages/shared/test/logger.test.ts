@@ -161,3 +161,117 @@ describe('objStringify', () => {
     expect(result).toBe('{"bigIntValue":"0x24cb016ea","message":"hello"}');
   });
 });
+
+describe('Logger Configuration', () => {
+  describe('Explicit threshold configuration', () => {
+    it('should use provided threshold when explicitly set', () => {
+      const logger = new Logger({ threshold: LogLevel.ERROR });
+      expect(logger.getLevel()).toBe(LogLevel.ERROR);
+    });
+
+    it('should disable all logging when threshold is higher than ERROR', () => {
+      const mockDebug = jest.fn();
+      const mockInfo = jest.fn();
+      const mockWarn = jest.fn();
+      const mockError = jest.fn();
+
+      const logger = new Logger({
+        threshold: LogLevel.ERROR + 1, // Higher than ERROR
+        handlers: {
+          [LogLevel.DEBUG]: mockDebug,
+          [LogLevel.INFO]: mockInfo,
+          [LogLevel.WARN]: mockWarn,
+          [LogLevel.ERROR]: mockError,
+        },
+      });
+
+      // Try to log at all levels
+      logger.debug('Debug message');
+      logger.info('Info message');
+      logger.warn('Warning message');
+      logger.error('Error message');
+
+      // None should be called
+      expect(mockDebug).not.toHaveBeenCalled();
+      expect(mockInfo).not.toHaveBeenCalled();
+      expect(mockWarn).not.toHaveBeenCalled();
+      expect(mockError).not.toHaveBeenCalled();
+    });
+
+    it('should log only WARN and ERROR when threshold is WARN', () => {
+      const mockDebug = jest.fn();
+      const mockInfo = jest.fn();
+      const mockWarn = jest.fn();
+      const mockError = jest.fn();
+
+      const logger = new Logger({
+        threshold: LogLevel.WARN,
+        handlers: {
+          [LogLevel.DEBUG]: mockDebug,
+          [LogLevel.INFO]: mockInfo,
+          [LogLevel.WARN]: mockWarn,
+          [LogLevel.ERROR]: mockError,
+        },
+      });
+
+      // Try to log at all levels
+      logger.debug('Debug message');
+      logger.info('Info message');
+      logger.warn('Warning message');
+      logger.error('Error message');
+
+      // Only WARN and ERROR should be called
+      expect(mockDebug).not.toHaveBeenCalled();
+      expect(mockInfo).not.toHaveBeenCalled();
+      expect(mockWarn).toHaveBeenCalledWith('Warning message');
+      expect(mockError).toHaveBeenCalledWith('Error message');
+    });
+
+    it('should log all messages when threshold is DEBUG', () => {
+      const mockDebug = jest.fn();
+      const mockInfo = jest.fn();
+      const mockWarn = jest.fn();
+      const mockError = jest.fn();
+
+      const logger = new Logger({
+        threshold: LogLevel.DEBUG,
+        handlers: {
+          [LogLevel.DEBUG]: mockDebug,
+          [LogLevel.INFO]: mockInfo,
+          [LogLevel.WARN]: mockWarn,
+          [LogLevel.ERROR]: mockError,
+        },
+      });
+
+      // Try to log at all levels
+      logger.debug('Debug message');
+      logger.info('Info message');
+      logger.warn('Warning message');
+      logger.error('Error message');
+
+      // All should be called
+      expect(mockDebug).toHaveBeenCalledWith('Debug message');
+      expect(mockInfo).toHaveBeenCalledWith('Info message');
+      expect(mockWarn).toHaveBeenCalledWith('Warning message');
+      expect(mockError).toHaveBeenCalledWith('Error message');
+    });
+  });
+
+  describe('Default behavior', () => {
+    it('should use default threshold when no configuration provided', () => {
+      const logger = new Logger();
+      // Should not be undefined and should be a valid LogLevel
+      expect(logger.getLevel()).toBeDefined();
+      expect(typeof logger.getLevel()).toBe('number');
+      expect(logger.getLevel()).toBeGreaterThanOrEqual(LogLevel.DEBUG);
+      expect(logger.getLevel()).toBeLessThanOrEqual(LogLevel.ERROR + 1);
+    });
+
+    it('should handle undefined threshold gracefully', () => {
+      const logger = new Logger({});
+      // Should not be undefined and should be a valid LogLevel
+      expect(logger.getLevel()).toBeDefined();
+      expect(typeof logger.getLevel()).toBe('number');
+    });
+  });
+});

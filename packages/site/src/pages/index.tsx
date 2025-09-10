@@ -135,7 +135,7 @@ const Index = () => {
   const [data, setData] = useState<Hex>('0x');
   const [value, setValue] = useState<bigint>(0n);
   const [receipt, setReceipt] = useState<UserOperationReceipt | null>(null);
-  const [isWorking, setIsWorking] = useState(false);
+  const [pendingPermissionRequests, setPendingPermissionRequests] = useState<Set<string>>(new Set());
 
   const handleChainChange = ({
     target: { value: inputValue },
@@ -175,7 +175,13 @@ const Index = () => {
     if (!delegateAccount) {
       throw new Error('Delegate account not found');
     }
-    setIsWorking(true);
+    
+    // Generate a unique identifier for this redemption request
+    const requestId = `redeem-${Date.now()}-${Math.random()}`;
+    
+    // Add this request to pending requests
+    setPendingPermissionRequests(prev => new Set(prev).add(requestId));
+    
     setReceipt(null);
     setPermissionResponseError(null);
 
@@ -214,8 +220,14 @@ const Index = () => {
       setReceipt(operationReceipt);
     } catch (error) {
       setPermissionResponseError(error as Error);
+    } finally {
+      // Remove this request from pending requests
+      setPendingPermissionRequests(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(requestId);
+        return newSet;
+      });
     }
-    setIsWorking(false);
   };
 
   const handleGrantPermissions = async () => {
@@ -253,7 +265,12 @@ const Index = () => {
       } as const,
     ];
 
-    setIsWorking(true);
+    // Generate a unique identifier for this permission request
+    const requestId = `${type}-${Date.now()}-${Math.random()}`;
+    
+    // Add this request to pending requests
+    setPendingPermissionRequests(prev => new Set(prev).add(requestId));
+    
     setPermissionResponse(null);
     setReceipt(null);
     setPermissionResponseError(null);
@@ -265,8 +282,14 @@ const Index = () => {
     } catch (error) {
       setPermissionResponse(null);
       setPermissionResponseError(error as Error);
+    } finally {
+      // Remove this request from pending requests
+      setPendingPermissionRequests(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(requestId);
+        return newSet;
+      });
     }
-    setIsWorking(false);
   };
 
   const handleCopyToClipboard = () => {
@@ -304,7 +327,6 @@ const Index = () => {
       <Subtitle>
         Get started by installing snaps and sending permissions requests.
       </Subtitle>
-      {isWorking && <p>Loading...</p>}
       <CardContainer>
         {errors.map((error, idx) => (
           <ErrorMessage key={idx}>
@@ -372,7 +394,7 @@ const Index = () => {
             <CustomMessageButton
               $text="Redeem Permission"
               onClick={handleRedeemPermission}
-              disabled={isWorking}
+              disabled={pendingPermissionRequests.size > 0}
             />
           </Box>
         )}
@@ -459,7 +481,6 @@ const Index = () => {
             <CustomMessageButton
               $text="Grant Permission"
               onClick={handleGrantPermissions}
-              disabled={isWorking}
             />
           </Box>
         )}
