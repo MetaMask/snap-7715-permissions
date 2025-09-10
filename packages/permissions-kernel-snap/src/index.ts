@@ -62,8 +62,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   try {
     logger.info(
-      `Custom request (origin="${origin}"):`,
-      JSON.stringify(request, undefined, 2),
+      `Custom request (origin="${origin}"): method="${request.method}"`,
     );
 
     // First check if the request is a valid object

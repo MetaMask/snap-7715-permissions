@@ -48,7 +48,7 @@ function safeDeserializeStoredGrantedPermission(
     const validated = zStoredGrantedPermission.parse(parsed);
     return validated;
   } catch (error) {
-    logger.error('Error deserializing stored granted permission:', error);
+    logger.error('Error deserializing stored granted permission');
     if (error instanceof z.ZodError) {
       throw new InvalidInputError(extractZodError(error.errors));
     }
@@ -167,7 +167,7 @@ export function createProfileSyncManager(
     try {
       await auth.getAccessToken();
     } catch (error) {
-      logger.error('Error fetching access token:', error);
+      logger.error('Error fetching access token');
       throw error;
     }
   }
@@ -195,13 +195,13 @@ export function createProfileSyncManager(
           const permission = safeDeserializeStoredGrantedPermission(item);
           validPermissions.push(permission);
         } catch (error) {
-          logger.warn('Skipping invalid permission data:', error);
+          logger.warn('Skipping invalid permission data');
         }
       }
 
       return validPermissions;
     } catch (error) {
-      logger.error('Error fetching all granted permissions:', error);
+      logger.error('Error fetching all granted permissions');
       throw error;
     }
   }
@@ -227,7 +227,7 @@ export function createProfileSyncManager(
 
       return safeDeserializeStoredGrantedPermission(permission);
     } catch (error) {
-      logger.error('Error fetching granted permissions:', error);
+      logger.error('Error fetching granted permissions');
       throw error;
     }
   }
@@ -256,7 +256,7 @@ export function createProfileSyncManager(
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(storedGrantedPermission.permissionResponse.context)}`;
       await userStorage.setItem(path, serializedPermission);
     } catch (error) {
-      logger.error('Error storing granted permission:', error);
+      logger.error('Error storing granted permission');
       throw error;
     }
   }
@@ -289,7 +289,7 @@ export function createProfileSyncManager(
             serializedPermission, // value
           ]);
         } catch (error) {
-          logger.warn('Skipping invalid permission in batch:', error);
+          logger.warn('Skipping invalid permission in batch');
         }
       }
 
@@ -301,7 +301,7 @@ export function createProfileSyncManager(
 
       await userStorage.batchSetItems(FEATURE, validatedItems);
     } catch (error) {
-      logger.error('Error storing granted permission batch:', error);
+      logger.error('Error storing granted permission batch');
       throw error;
     }
   }

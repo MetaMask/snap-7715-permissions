@@ -159,7 +159,6 @@ export function validateJsonRpcRequest(
 
     logger.warn('Invalid JSON-RPC request structure:', {
       errors: errorMessage,
-      request: JSON.stringify(request, null, 2),
     });
 
     throw new InvalidParamsError(`Invalid JSON-RPC request: ${errorMessage}`);
