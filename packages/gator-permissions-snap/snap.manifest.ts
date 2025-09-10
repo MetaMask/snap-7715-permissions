@@ -4,6 +4,7 @@
 import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 
 const kernelSnapId = process.env.KERNEL_SNAP_ID;
+const snapEnv = process.env.SNAP_ENV;
 
 const manifest: SnapManifest = {
   version: '0.2.1',
@@ -33,12 +34,16 @@ const manifest: SnapManifest = {
     'endowment:ethereum-provider': {},
     'endowment:network-access': {},
     snap_dialog: {},
-    'endowment:lifecycle-hooks': {},
     snap_getPreferences: {},
   },
   platformVersion: '8.1.0',
   manifestVersion: '0.1',
 };
+
+// Only include lifecycle hooks permission in local development
+if (snapEnv === 'local') {
+  manifest.initialPermissions['endowment:lifecycle-hooks'] = {};
+}
 
 if (kernelSnapId) {
   manifest.initialConnections = {
