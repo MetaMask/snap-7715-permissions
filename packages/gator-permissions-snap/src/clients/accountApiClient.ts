@@ -270,12 +270,63 @@ export class AccountApiClient {
       metadataPromise,
     ]);
 
-    return {
+    // Sanitize iconUrl if present
+    const sanitizedIconUrl = metadata.iconUrl
+      ? this.#sanitizeIconUrl(metadata.iconUrl)
+      : undefined;
+
+    const result: TokenBalanceAndMetadata = {
       balance,
       decimals: metadata.decimals,
       symbol: metadata.symbol,
       ...(metadata.iconUrl && { iconUrl: metadata.iconUrl }),
     };
+
+    if (sanitizedIconUrl) {
+      result.iconUrl = sanitizedIconUrl;
+    }
+
+    return result;
+  }
+
+  /**
+   * Sanitizes an icon URL to prevent potential security issues.
+   * @param iconUrl - The icon URL to sanitize.
+   * @returns The sanitized icon URL or undefined if invalid.
+   */
+  #sanitizeIconUrl(iconUrl: string): string | undefined {
+    try {
+      const url = new URL(iconUrl);
+
+      // Only allow HTTPS URLs
+      if (url.protocol !== 'https:') {
+        logger.warn(`Rejecting non-HTTPS icon URL: ${iconUrl}`);
+        return undefined;
+      }
+
+      // Only allow common image formats
+      const allowedExtensions = [
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.gif',
+        '.svg',
+        '.webp',
+      ];
+      const hasValidExtension = allowedExtensions.some((ext) =>
+        url.pathname.toLowerCase().endsWith(ext),
+      );
+
+      if (!hasValidExtension) {
+        logger.warn(`Rejecting icon URL with invalid extension: ${iconUrl}`);
+        return undefined;
+      }
+
+      return url.toString();
+    } catch (error) {
+      logger.warn(`Invalid icon URL format: ${iconUrl}`, error);
+      return undefined;
+    }
   }
 
   /**

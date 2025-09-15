@@ -412,6 +412,9 @@ describe('AccountApiClient', () => {
         headers: {
           get: jest.fn().mockReturnValue('1024'),
         },
+        headers: {
+          get: jest.fn().mockReturnValue('1024'),
+        },
       });
 
       await expect(

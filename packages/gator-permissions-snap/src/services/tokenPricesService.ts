@@ -128,7 +128,6 @@ export class TokenPricesService {
     } catch (error) {
       logger.error(
         'TokenPricesService:getCryptoToFiatConversion() - failed to fetch token spot price',
-        error,
       );
       // If we can't fetch the price then show nothing.
       return ' ';
