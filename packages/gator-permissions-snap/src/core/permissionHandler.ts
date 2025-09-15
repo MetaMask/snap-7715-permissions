@@ -1,5 +1,9 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import {
+  InvalidRequestError,
+  ResourceNotFoundError,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 import {
   bigIntToHex,
@@ -12,6 +16,7 @@ import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import {
   ACCOUNT_SELECTOR_NAME,
@@ -29,7 +34,6 @@ import type {
   PermissionHandlerType,
   PermissionHandlerDependencies,
   PermissionHandlerParams,
-  AccountControllerInterface,
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
 import { ZERO_ADDRESS } from '../constants';
@@ -49,7 +53,7 @@ export class PermissionHandler<
   TPopulatedPermission extends DeepRequired<TPermission>,
 > implements PermissionHandlerType
 {
-  readonly #accountController: AccountControllerInterface;
+  readonly #accountController: AccountController;
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
@@ -75,13 +79,13 @@ export class PermissionHandler<
 
   #isJustificationCollapsed = true;
 
-  #unbindHandlers: (() => void) | undefined;
+  #unbindHandlers: (() => void) | null = null;
 
   #hasHandledPermissionRequest = false;
 
-  #tokenBalance: string | undefined = undefined;
+  #tokenBalance: string | null = null;
 
-  #tokenBalanceFiat: string | undefined = undefined;
+  #tokenBalanceFiat: string | null = null;
 
   constructor({
     accountController,
@@ -120,7 +124,7 @@ export class PermissionHandler<
     origin: string,
   ): Promise<PermissionRequestResult> {
     if (this.#hasHandledPermissionRequest) {
-      throw new Error('Permission request already handled');
+      throw new InvalidRequestError('Permission request already handled');
     }
 
     this.#hasHandledPermissionRequest = true;
@@ -153,7 +157,7 @@ export class PermissionHandler<
       const allAvailableAddresses =
         await this.#accountController.getAccountAddresses();
 
-      let address: Hex | undefined;
+      let address: Hex;
 
       if (requestedAddressLowercase) {
         // validate that the requested address is one of the addresses available for the account
@@ -163,7 +167,7 @@ export class PermissionHandler<
               availableAddress.toLowerCase() === requestedAddressLowercase,
           )
         ) {
-          throw new Error('Requested address not found');
+          throw new ResourceNotFoundError('Requested address not found');
         }
         address = request.address as Hex;
       } else {
@@ -326,8 +330,8 @@ export class PermissionHandler<
             accountAddressCaip10: address,
           };
 
-          this.#tokenBalance = undefined;
-          this.#tokenBalanceFiat = undefined;
+          this.#tokenBalance = null;
+          this.#tokenBalanceFiat = null;
 
           // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
           fetchAccountBalance(currentContext).catch((error) => {

@@ -1,4 +1,3 @@
-import { GATOR_PERMISSIONS_PROVIDER_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
@@ -12,7 +11,10 @@ import { ExternalMethod } from '../src/rpc/rpcMethod';
 describe('PermissionOfferRegistryManager', () => {
   let permissionOfferRegistryManager: PermissionOfferRegistryManager;
   const mockSnapsProvider = createMockSnapsProvider();
-  const mockSnapId = GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
+  const mockSnapId =
+    // eslint-disable-next-line no-restricted-globals
+    process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID ??
+    'local:http://localhost:8082';
 
   beforeEach(() => {
     mockSnapsProvider.request.mockReset();
@@ -86,10 +88,6 @@ describe('PermissionOfferRegistryManager', () => {
           mockSnapId,
         );
       expect(logger.error).toHaveBeenCalledWith(
-        {
-          snapId: mockSnapId,
-          error: expect.any(Error),
-        },
         expect.stringContaining('does not support'),
       );
       expect(result).toStrictEqual({});

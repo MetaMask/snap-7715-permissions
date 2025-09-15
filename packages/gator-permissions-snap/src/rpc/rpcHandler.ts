@@ -1,5 +1,6 @@
+import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import type { Json } from '@metamask/snaps-sdk';
+import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
@@ -58,30 +59,37 @@ export function createRpcHandler(config: {
     const { permissionsRequest, siteOrigin } =
       validatePermissionRequestParam(params);
 
-    const responses = await Promise.all(
-      permissionsRequest.map(async (request) => {
-        const handler =
-          permissionHandlerFactory.createPermissionHandler(request);
+    const permissionsToStore: {
+      permissionResponse: PermissionResponse;
+      siteOrigin: string;
+    }[] = [];
 
-        const permissionResponse =
-          await handler.handlePermissionRequest(siteOrigin);
+    // First, process all permissions to collect responses and validate all are approved
+    for (const request of permissionsRequest) {
+      const handler = permissionHandlerFactory.createPermissionHandler(request);
 
-        if (!permissionResponse.approved) {
-          throw new Error(permissionResponse.reason);
-        }
+      const permissionResponse =
+        await handler.handlePermissionRequest(siteOrigin);
 
-        if (permissionResponse.response) {
-          await profileSyncManager.storeGrantedPermission({
-            permissionResponse: permissionResponse.response,
-            siteOrigin,
-          });
-        }
+      if (!permissionResponse.approved) {
+        throw new InvalidInputError(permissionResponse.reason);
+      }
 
-        return permissionResponse.response;
-      }),
+      permissionsToStore.push({
+        permissionResponse: permissionResponse.response,
+        siteOrigin,
+      });
+    }
+
+    // Only after all permissions have been successfully processed, store them all in batch
+    if (permissionsToStore.length > 0) {
+      await profileSyncManager.storeGrantedPermissionBatch(permissionsToStore);
+    }
+
+    // Return the permission responses
+    return permissionsToStore.map(
+      (permission) => permission.permissionResponse as Json,
     );
-
-    return responses as Json[];
   };
 
   /**

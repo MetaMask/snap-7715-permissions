@@ -1,4 +1,5 @@
 import type { Hex } from '@metamask/delegation-core';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 /**
  * Formats a token value to a human-readable string.
@@ -30,28 +31,28 @@ export const formatUnits = ({
  * Formats a token value to a human-readable string, from a hex string.
  * @param args - The arguments to format.
  * @param args.value - The value to format.
- * @param args.allowUndefined - Whether to allow undefined values.
+ * @param args.allowNull - Whether to allow null values.
  * @param args.decimals - The number of decimal places the token uses.
  * @returns The formatted value.
  */
 export const formatUnitsFromHex = <
-  TAllowUndefined extends boolean,
+  TAllowNull extends boolean,
   TDecimals extends number,
 >({
   value,
-  allowUndefined,
+  allowNull,
   decimals,
 }: {
-  value: TAllowUndefined extends true ? Hex | undefined : Hex;
-  allowUndefined: TAllowUndefined;
+  value: TAllowNull extends true ? Hex | undefined | null : Hex;
+  allowNull: TAllowNull;
   decimals: TDecimals;
-}): TAllowUndefined extends true ? string | undefined : string => {
-  if (value === undefined) {
-    if (allowUndefined) {
-      return undefined as TAllowUndefined extends true ? Hex | undefined : Hex;
+}): TAllowNull extends true ? string | null : string => {
+  if (value === undefined || value === null) {
+    if (allowNull) {
+      return null as TAllowNull extends true ? Hex | null : Hex;
     }
 
-    throw new Error('Value is undefined');
+    throw new InvalidInputError('Value is undefined');
   }
 
   return formatUnits({ value: BigInt(value), decimals });
@@ -72,7 +73,7 @@ export function parseUnits({
   decimals: number;
 }) {
   if (!/^(-?)([0-9]*)\.?([0-9]*)$/u.test(formatted)) {
-    throw new Error(`Invalid numeric value: ${formatted}`);
+    throw new InvalidInputError(`Invalid numeric value: ${formatted}`);
   }
 
   let [integerPart = '0', fractionPart = '0'] = formatted.split('.');

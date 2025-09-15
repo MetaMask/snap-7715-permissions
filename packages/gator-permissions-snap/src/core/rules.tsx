@@ -1,5 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
 import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { DropdownField } from '../ui/components/DropdownField';
@@ -94,10 +94,10 @@ export function renderRule<
     case 'dropdown': {
       if (!options) {
         // todo: type constraint on this would be nice
-        throw new Error('Dropdown rule must have options');
+        throw new InvalidInputError('Dropdown rule must have options');
       }
       if (isOptional) {
-        throw new Error('Dropdown rule must not be optional');
+        throw new InvalidInputError('Dropdown rule must not be optional');
       }
 
       return (
@@ -114,7 +114,9 @@ export function renderRule<
     }
     case 'datetime': {
       if (!dateTimeParameterNames) {
-        throw new Error('DateTime rule must have dateTimeParameterNames');
+        throw new InvalidInputError(
+          'DateTime rule must have dateTimeParameterNames',
+        );
       }
 
       const dateTimeValue = {
@@ -140,7 +142,7 @@ export function renderRule<
       );
     }
     default: {
-      throw new Error(`Unknown rule type: ${type as string}`);
+      throw new InvalidInputError(`Unknown rule type: ${type as string}`);
     }
   }
 }
@@ -241,15 +243,17 @@ export function bindRuleHandlers<
         currentValues.time = event.value as string;
       }
 
-      // Fix type mismatch: Convert string timestamp to number before passing to utility functions
-      const timestampNumber = Number(currentValues.timestamp);
-      if (!isNaN(timestampNumber) && timestampNumber > 0) {
+      if (!isNaN(currentValues.timestamp) && currentValues.timestamp > 0) {
         if (!currentValues.date) {
-          currentValues.date = convertTimestampToReadableDate(timestampNumber);
+          currentValues.date = convertTimestampToReadableDate(
+            currentValues.timestamp,
+          );
         }
 
         if (!currentValues.time) {
-          currentValues.time = convertTimestampToReadableTime(timestampNumber);
+          currentValues.time = convertTimestampToReadableTime(
+            currentValues.timestamp,
+          );
         }
       }
 
@@ -258,13 +262,13 @@ export function bindRuleHandlers<
           currentValues.date,
           currentValues.time,
         );
-        currentValues.timestamp = timestamp.toString();
+        currentValues.timestamp = timestamp;
       } catch (error) {
-        currentValues.timestamp = '';
+        // this is to trigger an error state on the date time field - "Invalid date" handled in validation
+        currentValues.timestamp = -1;
         logger.error('Error combining date and time', error);
       }
 
-      // Fix race condition: Use the stored context reference instead of calling getContext() again
       const updatedContext = rule.updateContext(context, currentValues);
       await onContextChanged({ context: updatedContext });
     };

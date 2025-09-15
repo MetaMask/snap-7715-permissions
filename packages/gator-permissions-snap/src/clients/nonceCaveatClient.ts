@@ -1,7 +1,12 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { decodeSingle } from '@metamask/abi-utils';
 import type { Hex } from '@metamask/delegation-core';
-import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
+import {
+  ChainDisconnectedError,
+  InvalidInputError,
+  ResourceUnavailableError,
+  type SnapsEthereumProvider,
+} from '@metamask/snaps-sdk';
 import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from '../core/chainMetadata';
@@ -37,12 +42,12 @@ export class NonceCaveatClient {
     chainId: number;
     account: Hex;
   }): Promise<bigint> {
-    logger.debug('BlockchainTokenMetadataClient:getTokenBalanceAndMetadata()');
+    logger.debug('NonceCaveatClient:getNonce()');
 
     if (!chainId) {
       const message = 'No chainId provided to fetch nonce';
       logger.error(message);
-      throw new Error(message);
+      throw new InvalidInputError(message);
     }
 
     const { contracts } = getChainMetadata({ chainId });
@@ -50,7 +55,7 @@ export class NonceCaveatClient {
     if (!account) {
       const message = 'No account address provided to fetch nonce';
       logger.error(message);
-      throw new Error(message);
+      throw new InvalidInputError(message);
     }
 
     // Check if we're on the correct chain and switch if not
@@ -71,7 +76,9 @@ export class NonceCaveatClient {
       });
 
       if (updatedChain && hexToNumber(updatedChain) !== chainId) {
-        throw new Error('Selected chain does not match the requested chain');
+        throw new ChainDisconnectedError(
+          'Selected chain does not match the requested chain',
+        );
       }
     }
 
@@ -92,12 +99,12 @@ export class NonceCaveatClient {
       });
     } catch (error) {
       logger.error(`Failed to fetch nonce: ${(error as Error).message}.`);
-      throw new Error('Failed to fetch nonce');
+      throw new ResourceUnavailableError('Failed to fetch nonce');
     }
 
     if (!nonceEncoded) {
       logger.error('Failed to fetch nonce');
-      throw new Error('Failed to fetch nonce');
+      throw new ResourceUnavailableError('Failed to fetch nonce');
     }
 
     try {
@@ -106,7 +113,7 @@ export class NonceCaveatClient {
     } catch (error) {
       logger.error(`Failed to fetch nonce: ${(error as Error).message}.`);
 
-      throw new Error('Failed to fetch nonce');
+      throw new ResourceUnavailableError('Failed to fetch nonce');
     }
   }
 }

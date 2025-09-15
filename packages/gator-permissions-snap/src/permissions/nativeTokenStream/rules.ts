@@ -25,7 +25,7 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
   type: 'number',
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.initialAmount,
+    value: context.permissionDetails.initialAmount ?? undefined,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     iconData: getIconData(context),
@@ -50,7 +50,7 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
   type: 'number',
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.maxAmount,
+    value: context.permissionDetails.maxAmount ?? undefined,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The maximum amount of tokens that can be streamed.',
@@ -74,7 +74,7 @@ export const startTimeRule: NativeTokenStreamRuleDefinition = {
   label: 'Start Time',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.startTime,
+    value: context.permissionDetails.startTime.toString(),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The start time of the stream(mm/dd/yyyy hh:mm:ss).',
@@ -146,7 +146,7 @@ export const expiryRule: NativeTokenStreamRuleDefinition = {
   label: 'Expiry',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.expiry.timestamp,
+    value: context.expiry.timestamp.toLocaleString(),
     isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
     tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',

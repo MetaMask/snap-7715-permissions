@@ -84,7 +84,7 @@ export const createProfileSyncOptions = (
         })) as string;
         return signature;
       } catch (error: any) {
-        logger.error('Error getting identifier:', error);
+        logger.error('Error getting identifier');
         throw error;
       }
     },
@@ -102,7 +102,7 @@ export const createProfileSyncOptions = (
         })) as string;
         return publicKey;
       } catch (error: any) {
-        logger.error('Error getting identifier:', error);
+        logger.error('Error getting identifier');
         throw error;
       }
     },

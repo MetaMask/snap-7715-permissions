@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import { MESSAGE_SIGNING_SNAP_ID } from '@metamask/7715-permissions-shared/constants';
 import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
@@ -8,13 +7,15 @@ import {
   Platform,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
-import type {
-  OnHomePageHandler,
-  OnInstallHandler,
-  Json,
-  JsonRpcParams,
-  OnRpcRequestHandler,
-  OnUserInputHandler,
+import {
+  type OnInstallHandler,
+  type Json,
+  type JsonRpcParams,
+  type OnRpcRequestHandler,
+  type OnUserInputHandler,
+  MethodNotFoundError,
+  InvalidRequestError,
+  InternalError,
 } from '@metamask/snaps-sdk';
 
 import { AccountApiClient } from './clients/accountApiClient';
@@ -25,7 +26,6 @@ import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
-import { HomePage } from './homepage';
 import {
   createProfileSyncOptions,
   getProfileSyncSdkEnv,
@@ -48,17 +48,22 @@ const snapEnv = process.env.SNAP_ENV;
 const accountApiBaseUrl = process.env.ACCOUNT_API_BASE_URL;
 
 if (!accountApiBaseUrl) {
-  throw new Error('ACCOUNT_API_BASE_URL is not set');
+  throw new InternalError('ACCOUNT_API_BASE_URL is not set');
 }
 
 const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
 if (!priceApiBaseUrl) {
-  throw new Error('PRICE_API_BASE_URL is not set');
+  throw new InternalError('PRICE_API_BASE_URL is not set');
 }
 
 const supportedChainsString = process.env.SUPPORTED_CHAINS;
 if (!supportedChainsString) {
-  throw new Error('SUPPORTED_CHAINS is not set');
+  throw new InternalError('SUPPORTED_CHAINS is not set');
+}
+
+const messageSigningSnapId = process.env.MESSAGE_SIGNING_SNAP_ID;
+if (!messageSigningSnapId) {
+  throw new InternalError('MESSAGE_SIGNING_SNAP_ID is not set');
 }
 
 const supportedChains = supportedChainsString.split(',').map(Number);
@@ -67,6 +72,8 @@ const supportedChains = supportedChainsString.split(',').map(Number);
 
 const accountApiClient = new AccountApiClient({
   baseUrl: accountApiBaseUrl,
+  timeoutMs: 10000, // 10 seconds timeout
+  maxResponseSizeBytes: 1024 * 1024, // 1MB max response size
 });
 
 const tokenMetadataClient = new BlockchainTokenMetadataClient({
@@ -89,7 +96,6 @@ const nonceCaveatService = new NonceCaveatService({
 const accountController = new AccountController({
   snapsProvider: snap,
   ethereumProvider: ethereum,
-  supportedChains,
 });
 
 const stateManager = createStateManager(snap);
@@ -97,7 +103,7 @@ const stateManager = createStateManager(snap);
 const profileSyncOptions = createProfileSyncOptions(
   stateManager,
   snap,
-  MESSAGE_SIGNING_SNAP_ID,
+  messageSigningSnapId,
 );
 
 const profileSyncSdkEnv = getProfileSyncSdkEnv(snapEnv);
@@ -128,14 +134,13 @@ const profileSyncManager = createProfileSyncManager({
   ),
 });
 
-const homepage = new HomePage({
-  snapsProvider: snap,
-  profileSyncManager,
-});
-
 const userEventDispatcher = new UserEventDispatcher();
 
-const priceApiClient = new PriceApiClient(priceApiBaseUrl);
+const priceApiClient = new PriceApiClient({
+  baseUrl: priceApiBaseUrl,
+  timeoutMs: 10000, // 10 seconds timeout
+  maxResponseSizeBytes: 1024 * 1024, // 1MB max response size
+});
 
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
@@ -149,6 +154,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   confirmationDialogFactory,
   userEventDispatcher,
   nonceCaveatService,
+  supportedChains,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
@@ -190,13 +196,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  logger.debug(
-    `RPC request (origin="${origin}"):`,
-    JSON.stringify(request, undefined, 2),
-  );
+  logger.debug(`RPC request (origin="${origin}"): method="${request.method}"`);
 
   if (!isMethodAllowedForOrigin(origin, request.method)) {
-    throw new Error(
+    throw new InvalidRequestError(
       `Origin '${origin}' is not allowed to call '${request.method}'`,
     );
   }
@@ -204,7 +207,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   const handler = boundRpcHandlers[request.method];
 
   if (!handler) {
-    throw new Error(`Method ${request.method} not found.`);
+    throw new MethodNotFoundError(`Method ${request.method} not found.`);
   }
 
   const result = await handler(request.params);
@@ -223,12 +226,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 export const onUserInput: OnUserInputHandler =
   userEventDispatcher.createUserInputEventHandler();
 
-export const onHomePage: OnHomePageHandler = async () => {
-  return {
-    content: await homepage.buildHomepage(),
-  };
-};
-
 export const onInstall: OnInstallHandler = async () => {
   /**
    * Local Development Only
@@ -244,16 +241,14 @@ export const onInstall: OnInstallHandler = async () => {
     const installedSnaps = (await snap.request({
       method: 'wallet_getSnaps',
     })) as unknown as GetSnapsResponse;
-    if (!installedSnaps[MESSAGE_SIGNING_SNAP_ID]) {
+    if (!installedSnaps[messageSigningSnapId]) {
       logger.debug('Installing local message signing snap');
       await snap.request({
         method: 'wallet_requestSnaps',
         params: {
-          [MESSAGE_SIGNING_SNAP_ID]: {},
+          [messageSigningSnapId]: {},
         },
       });
     }
   }
-
-  await homepage.showWelcomeScreen();
 };

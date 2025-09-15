@@ -1,6 +1,8 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import type { AccountController } from './accountController';
 import { erc20TokenPeriodicPermissionDefinition } from '../permissions/erc20TokenPeriodic';
 import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
 import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
@@ -11,7 +13,6 @@ import type { UserEventDispatcher } from '../userEventDispatcher';
 import { PermissionHandler } from './permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type {
-  AccountControllerInterface,
   BaseContext,
   DeepRequired,
   PermissionDefinition,
@@ -23,7 +24,7 @@ import type {
  * Each permission type has its own orchestrator that handles the specific logic for that permission.
  */
 export class PermissionHandlerFactory {
-  readonly #accountController: AccountControllerInterface;
+  readonly #accountController: AccountController;
 
   readonly #tokenPricesService: TokenPricesService;
 
@@ -40,7 +41,7 @@ export class PermissionHandlerFactory {
     userEventDispatcher,
     orchestrator,
   }: {
-    accountController: AccountControllerInterface;
+    accountController: AccountController;
     tokenPricesService: TokenPricesService;
     tokenMetadataService: TokenMetadataService;
     userEventDispatcher: UserEventDispatcher;
@@ -111,7 +112,7 @@ export class PermissionHandlerFactory {
         );
         break;
       default:
-        throw new Error(`Unsupported permission type: ${type}`);
+        throw new InvalidInputError(`Unsupported permission type: ${type}`);
     }
 
     return handler;

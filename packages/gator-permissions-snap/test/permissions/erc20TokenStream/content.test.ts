@@ -10,22 +10,25 @@ import type {
 const tokenDecimals = 10;
 
 const mockContext: Erc20TokenStreamContext = {
-  expiry: '05/01/2024',
+  expiry: {
+    timestamp: 1714521600, // 05/01/2024
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: true,
   justification: 'Permission to stream ERC20 tokens',
   accountAddressCaip10: `eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`,
   tokenAddressCaip19: `eip155:1/erc20:0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F`,
   tokenMetadata: {
-    decimals: tokenDecimals,
     symbol: 'USDC',
+    decimals: tokenDecimals,
     iconDataBase64:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
   },
   permissionDetails: {
     initialAmount: '1',
     maxAmount: '10',
     timePeriod: TimePeriod.WEEKLY,
-    startTime: '10/26/1985',
+    startTime: 499161600, // 10/26/1985
     amountPerPeriod: '302400',
   },
 };
@@ -118,7 +121,7 @@ describe('erc20TokenStream:content', () => {
                                 "props": {
                                   "alt": "USDC",
                                   "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
                                 },
                                 "type": "Image",
@@ -312,7 +315,7 @@ describe('erc20TokenStream:content', () => {
                               "props": {
                                 "alt": "USDC",
                                 "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
                               },
                               "type": "Image",
@@ -439,7 +442,7 @@ describe('erc20TokenStream:content', () => {
                               "props": {
                                 "alt": "USDC",
                                 "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
                               },
                               "type": "Image",
@@ -564,7 +567,7 @@ describe('erc20TokenStream:content', () => {
                               "props": {
                                 "alt": "USDC",
                                 "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
                               },
                               "type": "Image",
@@ -680,7 +683,7 @@ describe('erc20TokenStream:content', () => {
                                 "name": "erc20-token-stream-start-time_date",
                                 "placeholder": "mm/dd/yyyy",
                                 "type": "text",
-                                "value": "01/01/1970",
+                                "value": "10/26/1985",
                               },
                               "type": "Input",
                             },
@@ -690,7 +693,7 @@ describe('erc20TokenStream:content', () => {
                                 "name": "erc20-token-stream-start-time_time",
                                 "placeholder": "HH:MM:SS",
                                 "type": "text",
-                                "value": "00:00:10",
+                                "value": "08:00:00",
                               },
                               "type": "Input",
                             },
@@ -737,7 +740,6 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
-                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -782,8 +784,77 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
                       ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-expiry_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "05/01/2024",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-expiry_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "00:00:00",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -793,20 +864,13 @@ describe('erc20TokenStream:content', () => {
                     "props": {
                       "children": [
                         null,
-                        {
-                          "key": null,
-                          "props": {
-                            "children": "undefined undefined UTC",
-                          },
-                          "type": "Text",
-                        },
+                        null,
                       ],
-                      "direction": "horizontal",
                     },
                     "type": "Box",
                   },
                 ],
-                "direction": "horizontal",
+                "direction": "vertical",
               },
               "type": "Box",
             },
@@ -911,7 +975,7 @@ describe('erc20TokenStream:content', () => {
                                 "props": {
                                   "alt": "USDC",
                                   "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
                                 },
                                 "type": "Image",
@@ -1106,7 +1170,7 @@ describe('erc20TokenStream:content', () => {
                               "props": {
                                 "alt": "USDC",
                                 "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
                               },
                               "type": "Image",
@@ -1233,7 +1297,7 @@ describe('erc20TokenStream:content', () => {
                               "props": {
                                 "alt": "USDC",
                                 "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
                               },
                               "type": "Image",
@@ -1359,7 +1423,7 @@ describe('erc20TokenStream:content', () => {
                               "props": {
                                 "alt": "USDC",
                                 "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="24" height="24" />
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
                               },
                               "type": "Image",
@@ -1476,7 +1540,7 @@ describe('erc20TokenStream:content', () => {
                                 "name": "erc20-token-stream-start-time_date",
                                 "placeholder": "mm/dd/yyyy",
                                 "type": "text",
-                                "value": "01/01/1970",
+                                "value": "10/26/1985",
                               },
                               "type": "Input",
                             },
@@ -1486,7 +1550,7 @@ describe('erc20TokenStream:content', () => {
                                 "name": "erc20-token-stream-start-time_time",
                                 "placeholder": "HH:MM:SS",
                                 "type": "text",
-                                "value": "00:00:10",
+                                "value": "08:00:00",
                               },
                               "type": "Input",
                             },
@@ -1541,7 +1605,6 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
-                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1586,8 +1649,77 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
                       ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-expiry_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "05/01/2024",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "erc20-token-stream-expiry_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "00:00:00",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1600,17 +1732,18 @@ describe('erc20TokenStream:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": "undefined undefined UTC",
+                            "children": "Invalid expiry",
+                            "color": "error",
+                            "size": "sm",
                           },
                           "type": "Text",
                         },
                       ],
-                      "direction": "horizontal",
                     },
                     "type": "Box",
                   },
                 ],
-                "direction": "horizontal",
+                "direction": "vertical",
               },
               "type": "Box",
             },

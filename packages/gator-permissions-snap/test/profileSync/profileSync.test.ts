@@ -3,7 +3,7 @@ import {
   hashDelegation,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import type { Hex, type Delegation } from '@metamask/delegation-core';
+import type { Hex, Delegation } from '@metamask/delegation-core';
 import type {
   JwtBearerAuth,
   UserStorage,
@@ -55,17 +55,12 @@ describe('profileSync', () => {
 
   const mockStoredGrantedPermission: StoredGrantedPermission = {
     permissionResponse: {
-      address,
-      accountMeta: [
-        {
-          factory: '0x1234567890123456789012345678901234567890',
-          factoryData: '0x000000000000000000000000000000_factory_data',
-        },
-      ],
       chainId: '0xaa36a7',
-      context: encodeDelegations([mockDelegation]),
-      expiry: 1,
-      isAdjustmentAllowed: true,
+      address,
+      signer: {
+        data: { address: sessionAccount },
+        type: 'account',
+      },
       permission: {
         data: {
           justification: 'shh...permission',
@@ -76,13 +71,19 @@ describe('profileSync', () => {
             '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
         },
         type: 'native-token-stream',
+        isAdjustmentAllowed: true,
       },
-
-      signer: {
-        data: { address: sessionAccount },
-        type: 'account',
+      context: encodeDelegations([mockDelegation]),
+      dependencyInfo: [
+        {
+          factory: '0x1234567890123456789012345678901234567890',
+          factoryData:
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+        },
+      ],
+      signerMeta: {
+        delegationManager: '0x1234567890123456789012345678901234567890',
       },
-      signerMeta: { delegationManager: '0x000000_delegation_manager' },
     },
     siteOrigin: 'https://example.com',
   };
@@ -196,15 +197,26 @@ describe('profileSync', () => {
 
     describe('storeGrantedPermission', () => {
       it('should store granted permission successfully in profile sync', async () => {
+        mockPassAuth();
         await profileSyncManager.storeGrantedPermission(
           mockStoredGrantedPermission,
         );
-        mockPassAuth();
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
-          JSON.stringify(mockStoredGrantedPermission),
+          expect.stringMatching(
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+          ),
         );
+        // Verify the stored data can be parsed and contains expected fields
+        const storedData = userStorageMock.setItem.mock.calls[0]?.[1];
+        expect(storedData).toBeDefined();
+        const parsed = JSON.parse(storedData as string);
+        expect(parsed.permissionResponse.chainId).toBe('0xaa36a7');
+        expect(parsed.permissionResponse.address).toBe(
+          '0x1234567890123456789012345678901234567890',
+        );
+        expect(parsed.siteOrigin).toBe('https://example.com');
       });
 
       it('should concatenate all delegation hashes together when store granted permission that has multiple delegations in profile sync', async () => {
@@ -215,15 +227,27 @@ describe('profileSync', () => {
             context: encodeDelegations([mockDelegation, mockDelegationTwo]),
           },
         };
+
+        mockPassAuth();
         await profileSyncManager.storeGrantedPermission(
           mockStoredGrantedPermissionWithMultipleDelegations,
         );
-        mockPassAuth();
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo.slice(2)}`,
-          JSON.stringify(mockStoredGrantedPermissionWithMultipleDelegations),
+          expect.stringMatching(
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+          ),
         );
+        // Verify the stored data can be parsed and contains expected fields
+        const storedData = userStorageMock.setItem.mock.calls[0]?.[1];
+        expect(storedData).toBeDefined();
+        const parsed = JSON.parse(storedData as string);
+        expect(parsed.permissionResponse.chainId).toBe('0xaa36a7');
+        expect(parsed.permissionResponse.address).toBe(
+          '0x1234567890123456789012345678901234567890',
+        );
+        expect(parsed.siteOrigin).toBe('https://example.com');
       });
 
       it('should throw error when profile sync storage throws error', async () => {
@@ -246,17 +270,12 @@ describe('profileSync', () => {
           mockStoredGrantedPermission,
           {
             permissionResponse: {
-              address: addressTwo,
-              accountMeta: [
-                {
-                  factory: '0x1234567890123456789012345678901234567890',
-                  factoryData: '0x000000000000000000000000000000_factory_data',
-                },
-              ],
               chainId: '0xaa36a7',
-              context: encodeDelegations([mockDelegationTwo]),
-              expiry: 1,
-              isAdjustmentAllowed: true,
+              address: addressTwo,
+              signer: {
+                data: { address: sessionAccount },
+                type: 'account',
+              },
               permission: {
                 data: {
                   justification: 'shh...permission',
@@ -267,13 +286,19 @@ describe('profileSync', () => {
                     '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
                 },
                 type: 'native-token-stream',
+                isAdjustmentAllowed: true,
               },
-
-              signer: {
-                data: { address: sessionAccount },
-                type: 'account',
+              context: encodeDelegations([mockDelegationTwo]),
+              dependencyInfo: [
+                {
+                  factory: '0x1234567890123456789012345678901234567890',
+                  factoryData:
+                    '0x0000000000000000000000000000000000000000000000000000000000000000',
+                },
+              ],
+              signerMeta: {
+                delegationManager: '0x1234567890123456789012345678901234567890',
               },
-              signerMeta: { delegationManager: '0x000000_delegation_manager' },
             },
             siteOrigin: 'https://example.com',
           },
@@ -288,13 +313,31 @@ describe('profileSync', () => {
           [
             [
               mockDelegationHash,
-              JSON.stringify(mockStoredGrantedPermissions[0]),
+              expect.stringMatching(
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+              ),
             ],
             [
               mockDelegationHashTwo,
-              JSON.stringify(mockStoredGrantedPermissions[1]),
+              expect.stringMatching(
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+              ),
             ],
           ],
+        );
+        // Verify the stored data can be parsed and contains expected fields
+        const batchCalls = userStorageMock.batchSetItems.mock.calls[0]?.[1];
+        expect(batchCalls).toBeDefined();
+        expect(batchCalls).toHaveLength(2);
+        const firstStored = JSON.parse((batchCalls as any)[0]?.[1] as string);
+        const secondStored = JSON.parse((batchCalls as any)[1]?.[1] as string);
+        expect(firstStored.permissionResponse.chainId).toBe('0xaa36a7');
+        expect(firstStored.permissionResponse.address).toBe(
+          '0x1234567890123456789012345678901234567890',
+        );
+        expect(secondStored.permissionResponse.chainId).toBe('0xaa36a7');
+        expect(secondStored.permissionResponse.address).toBe(
+          '0x1234567890123456789012345678901234567891',
         );
       });
 
@@ -311,6 +354,114 @@ describe('profileSync', () => {
         );
         await expect(promise).rejects.toThrow('Storage error');
       });
+    });
+  });
+
+  describe('Validation and Error Handling', () => {
+    beforeEach(() => {
+      profileSyncManager = createProfileSyncManager({
+        isFeatureEnabled: true,
+        auth: jwtBearerAuthMock,
+        userStorage: userStorageMock,
+      });
+    });
+
+    it('should validate permission data structure and reject invalid data', async () => {
+      const invalidData = '{"invalid": "structure"}';
+      userStorageMock.getItem.mockResolvedValueOnce(invalidData);
+      mockPassAuth();
+
+      await expect(
+        profileSyncManager.getGrantedPermission(
+          mockStoredGrantedPermission.permissionResponse.context,
+        ),
+      ).rejects.toThrow('Failed type validation');
+    });
+
+    it('should enforce 400kb size limit and reject oversized data', async () => {
+      const largePermission = {
+        ...mockStoredGrantedPermission,
+        permissionResponse: {
+          ...mockStoredGrantedPermission.permissionResponse,
+          permission: {
+            ...mockStoredGrantedPermission.permissionResponse.permission,
+            data: {
+              ...mockStoredGrantedPermission.permissionResponse.permission.data,
+              largeData: 'x'.repeat(500 * 1024), // 500kb of data
+            },
+          },
+        },
+      };
+
+      mockPassAuth();
+
+      await expect(
+        profileSyncManager.storeGrantedPermission(largePermission),
+      ).rejects.toThrow('Permission data exceeds size limit');
+    });
+
+    it('should skip invalid items and return only valid ones in getAllGrantedPermissions', async () => {
+      const validItem = JSON.stringify(mockStoredGrantedPermission);
+      const invalidItem = '{"invalid": "structure"}';
+      const validItem2 = JSON.stringify({
+        ...mockStoredGrantedPermission,
+        permissionResponse: {
+          ...mockStoredGrantedPermission.permissionResponse,
+          context: encodeDelegations([mockDelegationTwo]),
+        },
+      });
+
+      userStorageMock.getAllFeatureItems.mockResolvedValueOnce([
+        validItem,
+        invalidItem,
+        validItem2,
+      ]);
+      mockPassAuth();
+
+      const result = await profileSyncManager.getAllGrantedPermissions();
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toStrictEqual(mockStoredGrantedPermission);
+      expect(result[1]?.permissionResponse.context).toBe(
+        encodeDelegations([mockDelegationTwo]),
+      );
+    });
+
+    it('should skip invalid permissions in batch operations', async () => {
+      const validPermission = mockStoredGrantedPermission;
+      const invalidPermission = {
+        permissionResponse: { chainId: '0xaa36a7' }, // Missing required fields
+        siteOrigin: 'https://example.com',
+      } as any;
+
+      mockPassAuth();
+
+      await profileSyncManager.storeGrantedPermissionBatch([
+        validPermission,
+        invalidPermission,
+      ]);
+
+      expect(userStorageMock.batchSetItems).toHaveBeenCalledWith(
+        'gator_7715_permissions',
+        [
+          [
+            mockDelegationHash,
+            expect.stringMatching(
+              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
+            ),
+          ],
+        ],
+      );
+      // Verify the stored data can be parsed and contains expected fields
+      const batchCalls = userStorageMock.batchSetItems.mock.calls[0]?.[1];
+      expect(batchCalls).toBeDefined();
+      expect(batchCalls).toHaveLength(1);
+      const storedData = JSON.parse((batchCalls as any)[0]?.[1] as string);
+      expect(storedData.permissionResponse.chainId).toBe('0xaa36a7');
+      expect(storedData.permissionResponse.address).toBe(
+        '0x1234567890123456789012345678901234567890',
+      );
+      expect(storedData.siteOrigin).toBe('https://example.com');
     });
   });
 

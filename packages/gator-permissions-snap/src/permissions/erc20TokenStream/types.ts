@@ -28,10 +28,10 @@ export type Erc20TokenStreamMetadata = BaseMetadata & {
 
 export type Erc20TokenStreamContext = BaseContext & {
   permissionDetails: {
-    initialAmount: string | undefined;
-    maxAmount: string | undefined;
+    initialAmount: string | null;
+    maxAmount: string | null;
     timePeriod: TimePeriod;
-    startTime: string;
+    startTime: number;
     amountPerPeriod: string;
   };
 };
@@ -41,8 +41,8 @@ export const zErc20TokenStreamPermission = zPermission.extend({
   data: z.intersection(
     zMetaMaskPermissionData,
     z.object({
-      initialAmount: zHexStr.optional(),
-      maxAmount: zHexStr.optional(),
+      initialAmount: zHexStr.optional().nullable(),
+      maxAmount: zHexStr.optional().nullable(),
       amountPerSecond: zHexStr,
       startTime: z
         .number()

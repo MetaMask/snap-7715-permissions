@@ -9,6 +9,9 @@ env:
   STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
   ACCOUNT_API_BASE_URL: ${{ vars.ACCOUNT_API_BASE_URL }}
   SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
+  GATOR_PERMISSIONS_PROVIDER_SNAP_ID: ${{ vars.GATOR_PERMISSIONS_PROVIDER_SNAP_ID }}
+  MESSAGE_SIGNING_SNAP_ID: ${{ vars.MESSAGE_SIGNING_SNAP_ID }}
+  KERNEL_SNAP_ID: ${{ vars.KERNEL_SNAP_ID }}
 
 jobs:
   prepare:
@@ -16,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [21.x]
+        node-version: [22.x]
     outputs:
       child-workspace-package-names: ${{ steps.workspace-package-names.outputs.child-workspace-package-names }}
     steps:
@@ -24,7 +27,7 @@ jobs:
         uses: MetaMask/action-checkout-and-setup@v1
         with:
           is-high-risk-environment: false
-          cache-node-modules: ${{ matrix.node-version == '21.x' }}
+          cache-node-modules: ${{ matrix.node-version == '22.x' }}
       - name: Fetch workspace package names
         id: workspace-package-names
         run: |
@@ -38,7 +41,7 @@ jobs:
       - prepare
     strategy:
       matrix:
-        node-version: [21.x]
+        node-version: [22.x]
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
@@ -60,7 +63,7 @@ jobs:
       - prepare
     strategy:
       matrix:
-        node-version: [21.x]
+        node-version: [22.x]
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
@@ -79,7 +82,6 @@ jobs:
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
       - name: Cache manifests
         uses: actions/cache@v4
-        if: ${{ github.base_ref == 'dev' }}
         with:
           path: |
             ./packages/gator-permissions-snap/snap.manifest.json
@@ -88,18 +90,9 @@ jobs:
       - name: Require clean working directory
         shell: bash
         run: |
-          # Check if target branch is 'dev' and exclude snap.manifest.json files if so
-          if [[ "${{ github.base_ref }}" == "dev" || "${{ github.ref_name }}" == "dev" ]]; then
-            echo "Target branch is 'dev', ignoring changes to snap.manifest.json files"
-            if ! git diff --exit-code -- . ':!**/snap.manifest.json'; then
-              echo "Working tree dirty at end of job (excluding snap.manifest.json)"
-              exit 1
-            fi
-          else
-            if ! git diff --exit-code; then
-              echo "Working tree dirty at end of job"
-              exit 1
-            fi
+          if ! git diff --exit-code; then
+            echo "Working tree dirty at end of job"
+            exit 1
           fi
 
   lint:
@@ -109,7 +102,7 @@ jobs:
       - prepare
     strategy:
       matrix:
-        node-version: [21.x]
+        node-version: [22.x]
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
@@ -132,7 +125,7 @@ jobs:
       - build
     strategy:
       matrix:
-        node-version: [21.x]
+        node-version: [22.x]
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
@@ -150,7 +143,6 @@ jobs:
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
       - name: Restore manifests
         uses: actions/cache@v4
-        if: ${{ github.base_ref == 'dev' }}
         with:
           path: |
             ./packages/gator-permissions-snap/snap.manifest.json
@@ -161,16 +153,7 @@ jobs:
       - name: Require clean working directory
         shell: bash
         run: |
-          # Check if target branch is 'dev' and exclude snap.manifest.json files if so
-          if [[ "${{ github.base_ref }}" == "dev" || "${{ github.ref_name }}" == "dev" ]]; then
-            echo "Target branch is 'dev', ignoring changes to snap.manifest.json files"
-            if ! git diff --exit-code -- . ':!**/snap.manifest.json'; then
-              echo "Working tree dirty at end of job (excluding snap.manifest.json)"
-              exit 1
-            fi
-          else
-            if ! git diff --exit-code; then
-              echo "Working tree dirty at end of job"
-              exit 1
-            fi
+          if ! git diff --exit-code; then
+            echo "Working tree dirty at end of job"
+            exit 1
           fi

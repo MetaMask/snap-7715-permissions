@@ -26,7 +26,7 @@
   ],
   "scripts": {
     "allow-scripts": "yarn workspace root allow-scripts",
-    "build": "mm-snap build && yarn build:preinstalled-snap",
+    "build": "yarn generate-snap-manifest . && mm-snap build && yarn build:preinstalled-snap",
     "build:clean": "yarn clean && yarn build",
     "build:pack": "yarn build:clean && yarn pack --filename ../../deps/snap-a-0.1.0.tgz",
     "build:preinstalled-snap": "node scripts/build-preinstalled-snap.js",
@@ -43,12 +43,12 @@
     "lint:misc": "prettier '**/*.json' '**/*.md' '**/*.yml' '!.yarnrc.yml' --ignore-path .gitignore --no-error-on-unmatched-pattern",
     "prepublishOnly": "mm-snap manifest",
     "serve": "mm-snap serve",
-    "start": "mm-snap watch",
+    "start": "yarn generate-snap-manifest . && mm-snap watch",
     "test": "jest"
   },
   "dependencies": {
     "@metamask/snaps-sdk": "8.1.0",
-    "viem": "2.31.7"
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@jest/globals": "29.7.0",
