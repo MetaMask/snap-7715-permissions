@@ -279,7 +279,7 @@ export class AccountApiClient {
       balance,
       decimals: metadata.decimals,
       symbol: metadata.symbol,
-      ...(metadata.iconUrl && { iconUrl: metadata.iconUrl }),
+      ...(sanitizedIconUrl && { iconUrl: sanitizedIconUrl }),
     };
 
     if (sanitizedIconUrl) {
