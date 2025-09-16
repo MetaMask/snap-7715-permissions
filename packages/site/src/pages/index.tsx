@@ -18,6 +18,7 @@ import * as chains from 'viem/chains';
 
 import {
   ConnectButton,
+  InstallButton,
   InstallFlaskButton,
   CustomMessageButton,
   Card,
@@ -30,6 +31,11 @@ import {
   ERC20TokenPeriodicForm,
 } from '../components/permissions';
 import {
+  kernelSnapOrigin,
+  gatorSnapOrigin,
+  messageSigningSnapOrigin,
+} from '../config';
+import {
   Container,
   Heading,
   Span,
@@ -41,7 +47,6 @@ import {
   ResponseContainer,
   CopyButton,
 } from '../styles';
-import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import {
   useMetaMask,
   useMetaMaskContext,
@@ -97,6 +102,8 @@ const Index = () => {
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
+  const requestMessageSigningSnap = useRequestSnap(messageSigningSnapOrigin);
+
   const { delegateAccount } = useDelegateAccount({ chain: selectedChain });
   const { bundlerClient, getFeePerGas } = useBundlerClient({
     chain: selectedChain,
@@ -124,6 +131,9 @@ const Index = () => {
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
+  const isMessageSigningSnapReady = Boolean(
+    installedSnaps[messageSigningSnapOrigin],
+  );
 
   const chainId = selectedChain.id;
   const [permissionType, setPermissionType] = useState('native-token-stream');
@@ -175,13 +185,13 @@ const Index = () => {
     if (!delegateAccount) {
       throw new Error('Delegate account not found');
     }
-    
+
     // Generate a unique identifier for this redemption request
     const requestId = `redeem-${Date.now()}-${Math.random()}`;
-    
+
     // Add this request to pending requests
     setPendingPermissionRequests(prev => new Set(prev).add(requestId));
-    
+
     setReceipt(null);
     setPermissionResponseError(null);
 
@@ -267,10 +277,10 @@ const Index = () => {
 
     // Generate a unique identifier for this permission request
     const requestId = `${type}-${Date.now()}-${Math.random()}`;
-    
+
     // Add this request to pending requests
     setPendingPermissionRequests(prev => new Set(prev).add(requestId));
-    
+
     setPermissionResponse(null);
     setReceipt(null);
     setPermissionResponseError(null);
@@ -496,6 +506,23 @@ const Index = () => {
             fullWidth
           />
         )}
+
+        <Card
+          content={{
+            title: 'Message Signing Snap',
+            description:
+              'Set up by installing and authorizing the message signing snap.',
+            button: (
+              <InstallButton
+                onClick={requestMessageSigningSnap}
+                disabled={!isMetaMaskReady || isMessageSigningSnapReady}
+                $isInstalled={isMessageSigningSnapReady}
+              />
+            ),
+          }}
+          fullWidth
+          disabled={!isMetaMaskReady}
+        />
 
         <Card
           content={{
