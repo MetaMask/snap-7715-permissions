@@ -1,8 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 
-const gatorSnapId = process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
-
 const manifest: SnapManifest = {
   version: '0.2.0',
   description: 'Manage onchain 7715 permissions',
@@ -25,16 +23,11 @@ const manifest: SnapManifest = {
   initialPermissions: {
     'endowment:rpc': {
       dapps: true,
-      snaps: true,
+      snaps: false,
     },
   },
   platformVersion: '8.1.0',
   manifestVersion: '0.1',
 };
 
-if (gatorSnapId) {
-  manifest.initialConnections = {
-    [gatorSnapId]: {},
-  };
-}
 export default manifest;
