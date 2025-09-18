@@ -32,13 +32,13 @@ describe('Kernel Snap', () => {
 
       it('throws an error if the origin is not metamask for getGrantedPermissions', async () => {
         const response = await snapRequest({
-          method: 'permissionsProvider_getGrantedPermissions',
+          method: 'permissionProvider_getGrantedPermissions',
           origin: 'npm:@metamask/not-metamask',
         });
 
         expect(response).toRespondWithError({
           code: -32600,
-          message: `Origin 'npm:@metamask/not-metamask' is not allowed to call 'permissionsProvider_getGrantedPermissions'`,
+          message: `Origin 'npm:@metamask/not-metamask' is not allowed to call 'permissionProvider_getGrantedPermissions'`,
           stack: expect.any(String),
         });
       });
