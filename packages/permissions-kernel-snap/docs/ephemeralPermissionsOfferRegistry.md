@@ -60,7 +60,7 @@ sequenceDiagram
 ### **The requirement for permission provider snaps to opt into the permission system**
 
 1. Support `permissionProvider_getPermissionOffers` RPC
-2. Support `permissionsProvider_grantPermissions` RPC to allow the kernel to forward `wallet_grantPermission` payload.
+2. Support `permissionProvider_grantPermissions` RPC to allow the kernel to forward `wallet_grantPermission` payload.
 
 ### **The requirement to leave the permission system**
 

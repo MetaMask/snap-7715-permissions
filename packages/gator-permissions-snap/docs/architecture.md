@@ -203,7 +203,7 @@ The EntryPoint serves as the main initialization and configuration point for the
 
 2. Configuring RPC method bindings:
    - Maps RPC methods to their corresponding handlers
-   - Supports `permissionsProvider_grantAttenuatedPermissions`, `permissionsProvider_getPermissionOffers`, and `permissionsProvider_getGrantedPermissions`
+   - Supports `permissionProvider_grantPermissions`, `permissionProvider_getPermissionOffers`, and `permissionProvider_getGrantedPermissions`
 
 3. Handling lifecycle events:
    - `onRpcRequest`: Processes incoming JSON-RPC requests with origin validation

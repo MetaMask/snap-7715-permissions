@@ -10,10 +10,10 @@ export enum RpcMethod {
   /**
    * This method is used by the kernel to request a permissions provider to grant attenuated permissions to a site.
    */
-  PermissionProviderGrantPermissions = 'permissionsProvider_grantPermissions',
+  PermissionProviderGrantPermissions = 'permissionProvider_grantPermissions',
 
   /**
    * This method is used by Metamask clients to retrieve granted permissions for all sites.
    */
-  PermissionProviderGetGrantedPermissions = 'permissionsProvider_getGrantedPermissions',
+  PermissionProviderGetGrantedPermissions = 'permissionProvider_getGrantedPermissions',
 }
