@@ -11,6 +11,7 @@ const {
   PRICE_API_BASE_URL,
   STORE_PERMISSIONS_ENABLED,
   ACCOUNT_API_BASE_URL,
+  TOKENS_API_BASE_URL,
   SUPPORTED_CHAINS,
   KERNEL_SNAP_ID,
   MESSAGE_SIGNING_SNAP_ID,
@@ -59,6 +60,12 @@ if (!ACCOUNT_API_BASE_URL) {
   );
 }
 
+if (!TOKENS_API_BASE_URL) {
+  throw new InternalError(
+    'TOKENS_API_BASE_URL must be set as an environment variable.',
+  );
+}
+
 if (!SUPPORTED_CHAINS) {
   throw new InternalError(
     'SUPPORTED_CHAINS must be set as an environment variable.',
@@ -79,6 +86,7 @@ const config: SnapConfig = {
     PRICE_API_BASE_URL,
     STORE_PERMISSIONS_ENABLED,
     ACCOUNT_API_BASE_URL,
+    TOKENS_API_BASE_URL,
     SUPPORTED_CHAINS,
     KERNEL_SNAP_ID,
     MESSAGE_SIGNING_SNAP_ID,
