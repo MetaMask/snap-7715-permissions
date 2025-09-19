@@ -33,7 +33,6 @@ const manifest: SnapManifest = {
     'endowment:ethereum-provider': {},
     'endowment:network-access': {},
     snap_dialog: {},
-    'endowment:lifecycle-hooks': {},
     snap_getPreferences: {},
   },
   platformVersion: '8.1.0',
