@@ -170,12 +170,13 @@ export class AccountApiClient {
       logger.info(
         `No balance found for token ${tokenAddress} on account ${account}`,
       );
-      return BigInt(0);
+      return 0n;
     }
 
     // Find the token in the balances array
+    const tokenAddressLowerCase = tokenAddress.toLowerCase();
     const tokenData = balances.find(
-      (token) => token.address.toLowerCase() === tokenAddress.toLowerCase(),
+      (token) => token.address.toLowerCase() === tokenAddressLowerCase,
     );
 
     if (!tokenData) {
