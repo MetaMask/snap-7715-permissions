@@ -5,15 +5,15 @@ export enum RpcMethod {
   /**
    * This method is used by the kernel to request a permissions provider to get its permission offers.
    */
-  PermissionProviderGetPermissionOffers = 'permissionProvider_getPermissionOffers',
+  PermissionsProviderGetPermissionOffers = 'permissionsProvider_getPermissionOffers',
 
   /**
    * This method is used by the kernel to request a permissions provider to grant attenuated permissions to a site.
    */
-  PermissionProviderGrantPermissions = 'permissionProvider_grantPermissions',
+  PermissionsProviderGrantPermissions = 'permissionsProvider_grantPermissions',
 
   /**
    * This method is used by Metamask clients to retrieve granted permissions for all sites.
    */
-  PermissionProviderGetGrantedPermissions = 'permissionProvider_getGrantedPermissions',
+  PermissionsProviderGetGrantedPermissions = 'permissionsProvider_getGrantedPermissions',
 }
