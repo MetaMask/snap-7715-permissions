@@ -12,6 +12,8 @@ describe('AccountController', () => {
   const mockSignature =
     '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef11';
   const expectedBalance = '0x1000000000000000000';
+  const origin = 'https://example.com';
+  const justification = 'Test justification';
 
   let accountController: AccountController;
   let mockSnapsProvider: ReturnType<typeof createMockSnapsProvider>;
@@ -103,6 +105,8 @@ describe('AccountController', () => {
         chainId: sepolia,
         delegation: unsignedDelegation,
         address: mockAddress,
+        origin,
+        justification,
       });
 
       expect(signedDelegation).toStrictEqual({
@@ -123,6 +127,8 @@ describe('AccountController', () => {
         chainId: sepolia,
         delegation: unsignedDelegation,
         address: mockAddress,
+        origin,
+        justification,
       });
 
       expect(signature).toStrictEqual({
@@ -145,6 +151,8 @@ describe('AccountController', () => {
           chainId: sepolia,
           delegation: unsignedDelegation,
           address: mockAddress,
+          origin,
+          justification,
         }),
       ).rejects.toThrow('Failed to sign delegation');
     });
@@ -154,6 +162,8 @@ describe('AccountController', () => {
         chainId: sepolia,
         delegation: unsignedDelegation,
         address: mockAddress,
+        origin,
+        justification,
       });
 
       expect(mockEthereumProvider.request).toHaveBeenCalledWith({
@@ -217,6 +227,10 @@ describe('AccountController', () => {
             message: {
               ...unsignedDelegation,
               salt: '0x1',
+            },
+            metadata: {
+              origin,
+              justification,
             },
           },
         ],
