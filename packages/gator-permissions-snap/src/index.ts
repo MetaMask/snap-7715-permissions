@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
   AuthType,
@@ -8,7 +7,6 @@ import {
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 import {
-  type OnInstallHandler,
   type Json,
   type JsonRpcParams,
   type OnRpcRequestHandler,
@@ -230,30 +228,3 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  */
 export const onUserInput: OnUserInputHandler =
   userEventDispatcher.createUserInputEventHandler();
-
-export const onInstall: OnInstallHandler = async () => {
-  /**
-   * Local Development Only
-   *
-   * The message signing snap must be installed and the gator permissions snap must
-   * have permission to communicate with the message signing snap, or the request is rejected.
-   *
-   * Since the message signing snap is preinstalled in production, and has
-   * initialConnections configured to automatically connect to the gator snap, this is not needed in production.
-   */
-  // eslint-disable-next-line no-restricted-globals
-  if (snapEnv === 'local' && isStorePermissionsFeatureEnabled) {
-    const installedSnaps = (await snap.request({
-      method: 'wallet_getSnaps',
-    })) as unknown as GetSnapsResponse;
-    if (!installedSnaps[messageSigningSnapId]) {
-      logger.debug('Installing local message signing snap');
-      await snap.request({
-        method: 'wallet_requestSnaps',
-        params: {
-          [messageSigningSnapId]: {},
-        },
-      });
-    }
-  }
-};
