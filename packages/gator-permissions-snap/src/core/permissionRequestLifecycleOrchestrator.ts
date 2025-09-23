@@ -252,6 +252,7 @@ export class PermissionRequestLifecycleOrchestrator {
           lifecycleHandlers,
           isAdjustmentAllowed,
           chainId,
+          origin,
         });
 
         return {
@@ -286,9 +287,10 @@ export class PermissionRequestLifecycleOrchestrator {
    * @param params - Parameters for resolving the response.
    * @param params.originalRequest - The original unmodified permission request.
    * @param params.modifiedContext - The possibly modified context after user interaction.
-   * @param params.lifecycleHandlers - Handlers for the permission lifecycle.
    * @param params.isAdjustmentAllowed - Whether the permission can be adjusted.
    * @param params.chainId - The chain ID for the permission.
+   * @param params.origin - The origin of the permission request.
+   * @param params.lifecycleHandlers - Handlers for the permission lifecycle.
    * @returns The resolved permission response.
    */
   async #resolveResponse<
@@ -300,14 +302,16 @@ export class PermissionRequestLifecycleOrchestrator {
   >({
     originalRequest,
     modifiedContext,
-    lifecycleHandlers,
     isAdjustmentAllowed,
     chainId,
+    origin,
+    lifecycleHandlers,
   }: {
     originalRequest: TRequest;
     modifiedContext: TContext;
     isAdjustmentAllowed: boolean;
     chainId: number;
+    origin: string;
     lifecycleHandlers: LifecycleOrchestrationHandlers<
       TRequest,
       TContext,
@@ -397,11 +401,15 @@ export class PermissionRequestLifecycleOrchestrator {
       salt: BigInt(salt),
     } as const;
 
+    const { justification } = modifiedContext;
+
     const signedDelegation: Delegation =
       await this.#accountController.signDelegation({
         chainId,
         delegation,
         address,
+        origin,
+        justification,
       });
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });

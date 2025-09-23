@@ -336,6 +336,8 @@ export type SignDelegationOptions = {
   chainId: number;
   delegation: Omit<Delegation, 'signature'>;
   address: Hex;
+  origin: string;
+  justification: string;
 };
 
 /**
