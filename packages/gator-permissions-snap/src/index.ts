@@ -141,6 +141,7 @@ const profileSyncManager = createProfileSyncManager({
       storage: profileSyncOptions.keyStorageOptions,
     },
   ),
+  ethereumProvider: ethereum,
 });
 
 const userEventDispatcher = new UserEventDispatcher();
@@ -189,6 +190,9 @@ const boundRpcHandlers: {
     rpcHandler.getPermissionOffers.bind(rpcHandler),
   [RpcMethod.PermissionsProviderGetGrantedPermissions]:
     rpcHandler.getGrantedPermissions.bind(rpcHandler),
+  [RpcMethod.PermissionProviderSubmitRevocation]: async (
+    params?: JsonRpcParams,
+  ) => rpcHandler.submitRevocation(params as Json),
 };
 
 /**
