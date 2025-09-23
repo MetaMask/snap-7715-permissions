@@ -44,12 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor: extract common field components into reusable Field component ([#122](https://github.com/MetaMask/snap-7715-permissions/pull/122))
 - style: fix indentation in package.json files and docs
 - build: downgrade @types/react from 18.3.23 to 18.2.4
-- update error message
-- update manifest
 - Update linter rule for empty line is js docs and update comments to have an empty line
-- Update snap manifest
-- bump major version on dependencies
-- update node version, bump dependencies
 - Reduce usage of @metamask/delegation-toolkit and viem ([#107](https://github.com/MetaMask/snap-7715-permissions/pull/107))
 - Bump the npm_and_yarn group across 1 directory with 3 updates ([#78](https://github.com/MetaMask/snap-7715-permissions/pull/78))
 - refactor: reduce boilerplate in permission definitions
@@ -62,7 +57,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - improve permission request orchestration and code quality
 - Split permission request validation and hydration
 - Iterate on nativetokenstream confirmation to be closer to design requirements. Add origin, network, token to confirmation.
-- Release/4.0.0 ([#81](https://github.com/MetaMask/snap-7715-permissions/pull/81))
 
 ### Fixed
 
@@ -70,7 +64,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - feat: Incorrect token currency shown ([#152](https://github.com/MetaMask/snap-7715-permissions/pull/152))
 - Prevent prototype pollution ([#147](https://github.com/MetaMask/snap-7715-permissions/pull/147))
 - fix(gator-permissions-snap): fix return type for account addresses ([#141](https://github.com/MetaMask/snap-7715-permissions/pull/141))
-- linter fixes
 - Fix typos ([#98](https://github.com/MetaMask/snap-7715-permissions/pull/98))
 - Fix linting: - add eslint packages to packages - fix linting errors in gator permissions snap
 - Fix issue where accountMeta was not being included on the response object correctly. ([#95](https://github.com/MetaMask/snap-7715-permissions/pull/95))
