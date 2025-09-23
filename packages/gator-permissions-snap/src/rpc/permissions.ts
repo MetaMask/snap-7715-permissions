@@ -5,11 +5,11 @@ const allowedPermissionsByOrigin: { [origin: string]: string[] } = {
   ...(process.env.KERNEL_SNAP_ID && {
     // eslint-disable-next-line no-restricted-globals
     [process.env.KERNEL_SNAP_ID]: [
-      RpcMethod.PermissionProviderGrantPermissions,
-      RpcMethod.PermissionProviderGetPermissionOffers,
+      RpcMethod.PermissionsProviderGrantPermissions,
+      RpcMethod.PermissionsProviderGetPermissionOffers,
     ],
   }),
-  metamask: [RpcMethod.PermissionProviderGetGrantedPermissions],
+  metamask: [RpcMethod.PermissionsProviderGetGrantedPermissions],
 };
 
 /**

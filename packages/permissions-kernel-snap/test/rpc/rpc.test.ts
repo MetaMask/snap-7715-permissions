@@ -48,7 +48,7 @@ describe('RpcHandler', () => {
       },
     ];
 
-    it('should throw error when permission provider does not support all requested permissions', async () => {
+    it('should throw error when permissions provider does not support all requested permissions', async () => {
       const mockPartialPermissions: PermissionsRequest = [
         {
           chainId: '0x1',
@@ -87,7 +87,7 @@ describe('RpcHandler', () => {
             mockPartialPermissions[1],
           ] as unknown as PermissionsRequest,
           errorMessage:
-            'The following permissions can not be granted by the permission provider: native-token-stream',
+            'The following permissions can not be granted by the permissions provider: native-token-stream',
         },
       );
 
@@ -97,7 +97,7 @@ describe('RpcHandler', () => {
           params: mockPartialPermissions as unknown as Json,
         }),
       ).rejects.toThrow(
-        'The following permissions can not be granted by the permission provider: native-token-stream',
+        'The following permissions can not be granted by the permissions provider: native-token-stream',
       );
     });
 
@@ -161,7 +161,7 @@ describe('RpcHandler', () => {
           // eslint-disable-next-line no-restricted-globals
           snapId: process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID,
           request: {
-            method: ExternalMethod.PermissionProviderGrantPermissions,
+            method: ExternalMethod.PermissionsProviderGrantPermissions,
             params: {
               permissionsRequest: mockPermissions,
               siteOrigin,
@@ -172,7 +172,7 @@ describe('RpcHandler', () => {
       expect(result).toStrictEqual(mockGrantedPermissions);
     });
 
-    it('should handle errors thrown during call to permission provider when granting permissions', async () => {
+    it('should handle errors thrown during call to permissions provider when granting permissions', async () => {
       mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
         {
           'test-provider': [],

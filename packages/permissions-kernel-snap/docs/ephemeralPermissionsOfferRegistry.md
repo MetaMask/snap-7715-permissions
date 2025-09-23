@@ -16,17 +16,17 @@ sequenceDiagram
   participant DApp
   participant KernelSnap
   participant List of permission provider snapIds
-  participant PermissionProviderSnap
+  participant PermissionsProviderSnap
 
   DApp->>KernelSnap: wallet_requestExecutionPermissions(request)
   KernelSnap->>List of permission provider snapIds: Fetch list of all permission provider snaps
 
   loop For each snap
-    KernelSnap->>PermissionProviderSnap: permissions_offerPermissions()
+    KernelSnap->>PermissionsProviderSnap: permissions_offerPermissions()
     alt Snap supports RPC
-      PermissionProviderSnap-->>KernelSnap: Valid permission offers
+      PermissionsProviderSnap-->>KernelSnap: Valid permission offers
     else RPC unsupported or invalid
-      PermissionProviderSnap-->>KernelSnap: Error or invalid response
+      PermissionsProviderSnap-->>KernelSnap: Error or invalid response
     end
   end
 
@@ -35,8 +35,8 @@ sequenceDiagram
   KernelSnap->>KernelSnap: Filter offers matching requested permissions
 
   loop For each matched permission
-    KernelSnap->>PermissionProviderSnap: Forward permission request
-    PermissionProviderSnap-->>KernelSnap: Attenuated permission response
+    KernelSnap->>PermissionsProviderSnap: Forward permission request
+    PermissionsProviderSnap-->>KernelSnap: Attenuated permission response
   end
 
   KernelSnap-->>DApp: Return aggregated granted permissions
@@ -45,8 +45,8 @@ sequenceDiagram
 **Steps**
 
 1. DApp calls `wallet_requestExecutionPermissions` on the Kernel Snap.
-2. Kernel makes async RPC calls to all registered permission provider snaps using `permissionProvider_getPermissionOffers` to fetch permission offers.
-   1. A standard `permissionProvider_getPermissionOffers` rpc must be implemented by the permission provider snap to participate in the permission system.
+2. Kernel makes async RPC calls to all registered permission provider snaps using `permissionsProvider_getPermissionOffers` to fetch permission offers.
+   1. A standard `permissionsProvider_getPermissionOffers` rpc must be implemented by the permission provider snap to participate in the permission system.
       1. If the permission provider snap returns with an error, it does not support the RPC and will not participate in the permission system.
       2. If the permission provider snap returns an invalid result, it will not participate in the permission system.
 3. The kernel will aggregate all valid responses from the permission provider snap as an in-memory registry.
@@ -59,12 +59,12 @@ sequenceDiagram
 
 ### **The requirement for permission provider snaps to opt into the permission system**
 
-1. Support `permissionProvider_getPermissionOffers` RPC
+1. Support `permissionsProvider_getPermissionOffers` RPC
 2. Support `permissionsProvider_grantPermissions` RPC to allow the kernel to forward `wallet_grantPermission` payload.
 
 ### **The requirement to leave the permission system**
 
-1. The permission provider snap will no longer return a valid response for the `permissionProvider_getPermissionOffers` RPC.
+1. The permission provider snap will no longer return a valid response for the `permissionsProvider_getPermissionOffers` RPC.
    1. Opt-out can be implemented as an update to the developer's permission provider snap or through more dynamic solutions that support HTTPS network calls to toggle support.
 
 ### **Known Bottlenecks**
