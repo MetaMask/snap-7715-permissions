@@ -52,10 +52,15 @@ const metadataByChainId: Record<number, ChainMetadata> = {
     explorerUrl: 'https://etherscan.io',
   },
   // Testnets:
-  11155111: {
+  97: {
     contracts: CONTRACTS_1_3_0,
-    name: 'Sepolia Testnet',
-    explorerUrl: 'https://sepolia.etherscan.io',
+    name: 'BNB Smart Chain Testnet',
+    explorerUrl: 'https://testnet.bscscan.com',
+  },
+  1301: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Unichain Sepolia Testnet',
+    explorerUrl: 'https://sepolia.uniscan.xyz',
   },
   5115: {
     contracts: CONTRACTS_1_3_0,
@@ -72,25 +77,15 @@ const metadataByChainId: Record<number, ChainMetadata> = {
     name: 'Gnosis Chiado Testnet',
     explorerUrl: 'https://gnosis-chiado.blockscout.com',
   },
+  80002: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Polygon Amoy Testnet',
+    explorerUrl: 'https://amoy.polygonscan.com/',
+  },
   80069: {
     contracts: CONTRACTS_1_3_0,
     name: 'Berachain Bepolia Testnet',
     explorerUrl: 'https://bepolia.beratrail.io',
-  },
-  11155420: {
-    contracts: CONTRACTS_1_3_0,
-    name: 'OP Sepolia Testnet',
-    explorerUrl: 'https://sepolia-optimism.etherscan.io',
-  },
-  763373: {
-    contracts: CONTRACTS_1_3_0,
-    name: 'Ink Sepolia Testnet',
-    explorerUrl: 'https://explorer-sepolia.inkonchain.com',
-  },
-  97: {
-    contracts: CONTRACTS_1_3_0,
-    name: 'BNB Smart Chain Testnet',
-    explorerUrl: 'https://testnet.bscscan.com',
   },
   84532: {
     contracts: CONTRACTS_1_3_0,
@@ -102,15 +97,20 @@ const metadataByChainId: Record<number, ChainMetadata> = {
     name: 'Arbitrum Sepolia Testnet',
     explorerUrl: 'https://sepolia.arbiscan.io',
   },
-  1301: {
+  763373: {
     contracts: CONTRACTS_1_3_0,
-    name: 'Unichain Sepolia Testnet',
-    explorerUrl: 'https://sepolia.uniscan.xyz',
+    name: 'Ink Sepolia Testnet',
+    explorerUrl: 'https://explorer-sepolia.inkonchain.com',
   },
-  80002: {
+  11155111: {
     contracts: CONTRACTS_1_3_0,
-    name: 'Polygon Amoy Testnet',
-    explorerUrl: 'https://amoy.polygonscan.com/',
+    name: 'Sepolia Testnet',
+    explorerUrl: 'https://sepolia.etherscan.io',
+  },
+  11155420: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'OP Sepolia Testnet',
+    explorerUrl: 'https://sepolia-optimism.etherscan.io',
   },
 };
 
