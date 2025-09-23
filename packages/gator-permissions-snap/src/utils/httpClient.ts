@@ -6,6 +6,7 @@ import {
   ResourceNotFoundError,
   ResourceUnavailableError,
 } from '@metamask/snaps-sdk';
+import type { RetryOptions } from 'src/clients/types';
 import type { z } from 'zod';
 
 /**
@@ -15,7 +16,49 @@ export type HttpClientConfig = {
   timeoutMs: number;
   maxResponseSizeBytes: number;
   fetch?: typeof globalThis.fetch;
+  headers?: Record<string, string>;
 };
+
+/**
+ * Makes an HTTP request with timeout and response size limits, and validates the response with Zod, with retry logic.
+ * @param url - The URL to fetch.
+ * @param config - Configuration for timeout, response size limits, and fetch function.
+ * @param responseSchema - Zod schema to validate the response against.
+ * @param retryOptions - Retry options.
+ * @returns A promise that resolves to the validated response data.
+ * @throws {ResourceUnavailableError} If the request times out, exceeds size limits, or server is unavailable.
+ * @throws {ResourceNotFoundError} If the resource is not found (404).
+ * @throws {InvalidInputError} If the request is invalid (4xx errors).
+ * @throws {ParseError} If the response cannot be parsed as JSON.
+ * @throws {ResourceUnavailableError} If the response structure is invalid according to the schema.
+ */
+export async function makeValidatedRequestWithRetry<
+  TResponse,
+  TSchema extends z.ZodType<TResponse, any, any>,
+>(
+  url: string,
+  config: HttpClientConfig,
+  responseSchema: TSchema,
+  retryOptions?: RetryOptions,
+): Promise<TResponse> {
+  const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await makeValidatedRequest(url, config, responseSchema);
+    } catch (error) {
+      if (error instanceof ResourceUnavailableError && attempt < retries) {
+        await sleep(delayMs);
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw new InternalError(
+    `Failed to fetch resource after ${retries + 1} attempts`,
+  );
+}
 
 /**
  * Makes an HTTP request with timeout and response size limits, and validates the response with Zod.
@@ -29,10 +72,13 @@ export type HttpClientConfig = {
  * @throws {ParseError} If the response cannot be parsed as JSON.
  * @throws {ResourceUnavailableError} If the response structure is invalid according to the schema.
  */
-export async function makeValidatedRequest<TResponse>(
+async function makeValidatedRequest<
+  TResponse,
+  TSchema extends z.ZodType<TResponse, any, any>,
+>(
   url: string,
   config: HttpClientConfig,
-  responseSchema: z.ZodSchema<TResponse>,
+  responseSchema: TSchema,
 ): Promise<TResponse> {
   const { timeoutMs, maxResponseSizeBytes, fetch = globalThis.fetch } = config;
 
@@ -44,6 +90,7 @@ export async function makeValidatedRequest<TResponse>(
     response = await fetch(url, {
       signal: controller.signal,
       headers: {
+        ...config.headers,
         Accept: 'application/json',
         'User-Agent': 'MetaMask-Snap/1.0',
       },
@@ -74,7 +121,7 @@ export async function makeValidatedRequest<TResponse>(
   }
 
   // Check response size before processing
-  const contentLength = response.headers.get('content-length');
+  const contentLength = response.headers?.get('content-length');
   if (contentLength && parseInt(contentLength, 10) > maxResponseSizeBytes) {
     throw new LimitExceededError(
       `Response too large: ${contentLength} bytes exceeds limit of ${maxResponseSizeBytes} bytes`,
@@ -104,4 +151,13 @@ export async function makeValidatedRequest<TResponse>(
  */
 export function isResourceUnavailableStatus(statusCode: number): boolean {
   return statusCode >= 500 || statusCode === 429 || statusCode === 408;
+}
+
+/**
+ * Utility method to sleep for a specified number of milliseconds.
+ * @param ms - The number of milliseconds to sleep.
+ * @returns A promise that resolves after the specified delay.
+ */
+export async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
