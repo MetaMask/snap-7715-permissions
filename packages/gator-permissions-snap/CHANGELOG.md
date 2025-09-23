@@ -101,6 +101,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move allSupportedChains itno BaseAccountController as private static member
 - Improve profile sync dev experience ([#86](https://github.com/MetaMask/snap-7715-permissions/pull/86))
 
+### Removed
+
+- Remove endowment lifecycle hooks ([#164](https://github.com/MetaMask/snap-7715-permissions/pull/164))
+- Remove development constants from production artifacts ([#148](https://github.com/MetaMask/snap-7715-permissions/pull/148))
+- Remove unused code and images ([#111](https://github.com/MetaMask/snap-7715-permissions/pull/111))
+
 ### Fixed
 
 - Fix Polygon Amoy Testnet incorrectly attributed as Metis Sepolia. Rename BNB to BNB Smart Chain.
@@ -119,12 +125,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - EOAAccountController should serialize delegation salt as bigint when calling eth_signTypedData_v4 ([#116](https://github.com/MetaMask/snap-7715-permissions/pull/116))
 - address potential race condition
 - Fix typos ([#98](https://github.com/MetaMask/snap-7715-permissions/pull/98))
-
-### Removed
-
-- Remove endowment lifecycle hooks ([#164](https://github.com/MetaMask/snap-7715-permissions/pull/164))
-- Remove development constants from production artifacts ([#148](https://github.com/MetaMask/snap-7715-permissions/pull/148))
-- Remove unused code and images ([#111](https://github.com/MetaMask/snap-7715-permissions/pull/111))
 
 ## [0.2.1]
 
