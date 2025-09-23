@@ -331,15 +331,20 @@ const Index = () => {
   );
 
   const connectWallet = async () => {
-    await provider?.request({
-      method: 'wallet_requestPermissions',
-      params: [
-        {
-          eth_accounts: {},
-        },
-      ],
-    });
-    setIsWalletConnected(true);
+    try {
+      await provider?.request({
+        method: 'wallet_requestPermissions',
+        params: [
+          {
+            eth_accounts: {},
+          },
+        ],
+      });
+      setIsWalletConnected(true);
+    } catch (error) {
+      console.error('Failed to connect wallet: ', error);
+      setIsWalletConnected(false);
+    }
   };
 
   return (
@@ -572,7 +577,7 @@ const Index = () => {
         <Card
           content={{
             title: `${isWalletConnected ? 'Reconnect' : 'Connect'}(wallet)`,
-            description: 'Connect to your wallet to the site',
+            description: 'Connect your wallet to the site.',
             button: (
               <ConnectButton
                 onClick={connectWallet}
