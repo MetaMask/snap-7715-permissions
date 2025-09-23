@@ -89,7 +89,7 @@ const metadataByChainId: Record<number, ChainMetadata> = {
   },
   97: {
     contracts: CONTRACTS_1_3_0,
-    name: 'BNB Testnet',
+    name: 'BNB Smart Chain Testnet',
     explorerUrl: 'https://testnet.bscscan.com',
   },
   84532: {
@@ -109,8 +109,8 @@ const metadataByChainId: Record<number, ChainMetadata> = {
   },
   80002: {
     contracts: CONTRACTS_1_3_0,
-    name: 'Metis Sepolia Testnet',
-    explorerUrl: 'https://sepolia.metis.io',
+    name: 'Polygon Amoy Testnet',
+    explorerUrl: 'https://amoy.polygonscan.com/',
   },
 };
 
