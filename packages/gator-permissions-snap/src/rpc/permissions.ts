@@ -9,7 +9,10 @@ const allowedPermissionsByOrigin: { [origin: string]: string[] } = {
       RpcMethod.PermissionProviderGetPermissionOffers,
     ],
   }),
-  metamask: [RpcMethod.PermissionProviderGetGrantedPermissions],
+  metamask: [
+    RpcMethod.PermissionProviderGetGrantedPermissions,
+    RpcMethod.PermissionProviderSubmitRevocation,
+  ],
 };
 
 /**
