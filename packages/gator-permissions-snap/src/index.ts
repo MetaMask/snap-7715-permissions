@@ -137,6 +137,7 @@ const profileSyncManager = createProfileSyncManager({
     },
   ),
   snapsMetricsService,
+  ethereumProvider: ethereum,
 });
 
 const priceApiClient = new PriceApiClient({
@@ -185,6 +186,9 @@ const boundRpcHandlers: {
     rpcHandler.getPermissionOffers.bind(rpcHandler),
   [RpcMethod.PermissionsProviderGetGrantedPermissions]:
     rpcHandler.getGrantedPermissions.bind(rpcHandler),
+  [RpcMethod.PermissionProviderSubmitRevocation]: async (
+    params?: JsonRpcParams,
+  ) => rpcHandler.submitRevocation(params as Json),
 };
 
 /**
