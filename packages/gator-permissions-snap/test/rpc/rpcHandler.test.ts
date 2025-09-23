@@ -100,6 +100,7 @@ describe('RpcHandler', () => {
       storeGrantedPermission: jest.fn(),
       storeGrantedPermissionBatch: jest.fn(),
       getGrantedPermission: jest.fn(),
+      getGrantedPermissionByDelegationHash: jest.fn(),
       getAllGrantedPermissions: jest.fn(),
       getUserProfile: jest.fn(),
       updatePermissionRevocationStatus: jest.fn(),
@@ -696,7 +697,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
       };
 
-      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+      mockProfileSyncManager.getGrantedPermissionByDelegationHash.mockResolvedValueOnce(
         mockPermission,
       );
       mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
@@ -709,9 +710,9 @@ describe('RpcHandler', () => {
       const result = await handler.submitRevocation(validRevocationParams);
 
       expect(result).toStrictEqual({ success: true });
-      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
-        validRevocationParams.delegationHash,
-      );
+      expect(
+        mockProfileSyncManager.getGrantedPermissionByDelegationHash,
+      ).toHaveBeenCalledWith(validRevocationParams.delegationHash);
       expect(
         mockProfileSyncManager.checkDelegationDisabledOnChain,
       ).toHaveBeenCalledWith(
@@ -797,7 +798,7 @@ describe('RpcHandler', () => {
       };
 
       const profileSyncError = new Error('Update failed');
-      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+      mockProfileSyncManager.getGrantedPermissionByDelegationHash.mockResolvedValueOnce(
         mockPermission,
       );
       mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
@@ -845,7 +846,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
       };
 
-      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+      mockProfileSyncManager.getGrantedPermissionByDelegationHash.mockResolvedValueOnce(
         mockPermission,
       );
       mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
@@ -858,9 +859,9 @@ describe('RpcHandler', () => {
       const result = await handler.submitRevocation(upperCaseParams);
 
       expect(result).toStrictEqual({ success: true });
-      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
-        upperCaseParams.delegationHash,
-      );
+      expect(
+        mockProfileSyncManager.getGrantedPermissionByDelegationHash,
+      ).toHaveBeenCalledWith(upperCaseParams.delegationHash);
     });
 
     it('should handle different chain configurations', async () => {
@@ -891,7 +892,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
       };
 
-      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+      mockProfileSyncManager.getGrantedPermissionByDelegationHash.mockResolvedValueOnce(
         mockPermission,
       );
       mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
@@ -904,9 +905,9 @@ describe('RpcHandler', () => {
       const result = await handler.submitRevocation(testParams);
 
       expect(result).toStrictEqual({ success: true });
-      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
-        testParams.delegationHash,
-      );
+      expect(
+        mockProfileSyncManager.getGrantedPermissionByDelegationHash,
+      ).toHaveBeenCalledWith(testParams.delegationHash);
     });
   });
 });
