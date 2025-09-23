@@ -190,7 +190,7 @@ const boundRpcHandlers: {
     rpcHandler.getPermissionOffers.bind(rpcHandler),
   [RpcMethod.PermissionsProviderGetGrantedPermissions]:
     rpcHandler.getGrantedPermissions.bind(rpcHandler),
-  [RpcMethod.PermissionProviderSubmitRevocation]: async (
+  [RpcMethod.PermissionsProviderSubmitRevocation]: async (
     params?: JsonRpcParams,
   ) => rpcHandler.submitRevocation(params as Json),
 };
