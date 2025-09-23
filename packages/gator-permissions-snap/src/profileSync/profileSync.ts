@@ -98,6 +98,9 @@ export type ProfileSyncManager = {
   getGrantedPermission: (
     permissionContext: Hex,
   ) => Promise<StoredGrantedPermission | null>;
+  getGrantedPermissionByDelegationHash: (
+    delegationHash: Hex,
+  ) => Promise<StoredGrantedPermission | null>;
   storeGrantedPermission: (
     storedGrantedPermission: StoredGrantedPermission,
   ) => Promise<void>;
@@ -158,6 +161,12 @@ export function createProfileSyncManager(
       throw new UnsupportedMethodError(
         'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
       );
+    },
+    getGrantedPermissionByDelegationHash: async (_: Hex) => {
+      logger.debug(
+        'unConfiguredProfileSyncManager.getGrantedPermissionByDelegationHash()',
+      );
+      return null;
     },
     storeGrantedPermission: async (_: StoredGrantedPermission) => {
       logger.debug(
@@ -286,6 +295,34 @@ export function createProfileSyncManager(
       return safeDeserializeStoredGrantedPermission(permission);
     } catch (error) {
       logger.error('Error fetching granted permissions');
+      throw error;
+    }
+  }
+
+  /**
+   * Retrieve a granted permission by delegation hash using direct storage lookup.
+   * Since delegation hashes are unique, we can use them directly as storage keys.
+   * @param delegationHash - The delegation hash to search for.
+   * @returns The granted permission or null if not found.
+   */
+  async function getGrantedPermissionByDelegationHash(
+    delegationHash: Hex,
+  ): Promise<StoredGrantedPermission | null> {
+    try {
+      await authenticate();
+
+      // Use the delegation hash directly as the storage key
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${delegationHash}`;
+
+      const permission = await userStorage.getItem(path);
+
+      if (!permission) {
+        return null;
+      }
+
+      return safeDeserializeStoredGrantedPermission(permission);
+    } catch (error) {
+      logger.error('Error fetching permission by delegation hash');
       throw error;
     }
   }
@@ -508,6 +545,7 @@ export function createProfileSyncManager(
     ? {
         getAllGrantedPermissions,
         getGrantedPermission,
+        getGrantedPermissionByDelegationHash,
         storeGrantedPermission,
         storeGrantedPermissionBatch,
         updatePermissionRevocationStatus,
