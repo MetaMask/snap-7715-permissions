@@ -45,29 +45,78 @@ const CONTRACTS_1_3_0: DelegationContracts = {
 };
 
 const metadataByChainId: Record<number, ChainMetadata> = {
-  // mainnet
+  // Mainnets:
   1: {
     contracts: CONTRACTS_1_3_0,
     name: 'Ethereum Mainnet',
-    symbol: 'ETH',
-    decimals: 18,
     explorerUrl: 'https://etherscan.io',
   },
-  // sepolia
+  // Testnets:
+  97: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'BNB Smart Chain Testnet',
+    explorerUrl: 'https://testnet.bscscan.com',
+  },
+  1301: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Unichain Sepolia Testnet',
+    explorerUrl: 'https://sepolia.uniscan.xyz',
+  },
+  5115: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Citrea Testnet',
+    explorerUrl: 'https://explorer.testnet.citrea.xyz',
+  },
+  6342: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'MegaETH Testnet',
+    explorerUrl: 'https://megaexplorer.xyz',
+  },
+  10200: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Gnosis Chiado Testnet',
+    explorerUrl: 'https://gnosis-chiado.blockscout.com',
+  },
+  80002: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Polygon Amoy Testnet',
+    explorerUrl: 'https://amoy.polygonscan.com/',
+  },
+  80069: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Berachain Bepolia Testnet',
+    explorerUrl: 'https://bepolia.beratrail.io',
+  },
+  84532: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Base Sepolia Testnet',
+    explorerUrl: 'https://sepolia.basescan.org',
+  },
+  421614: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Arbitrum Sepolia Testnet',
+    explorerUrl: 'https://sepolia.arbiscan.io',
+  },
+  763373: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'Ink Sepolia Testnet',
+    explorerUrl: 'https://explorer-sepolia.inkonchain.com',
+  },
   11155111: {
     contracts: CONTRACTS_1_3_0,
-    name: 'Sepolia',
-    symbol: 'ETH',
-    decimals: 18,
+    name: 'Sepolia Testnet',
     explorerUrl: 'https://sepolia.etherscan.io',
+  },
+  11155420: {
+    contracts: CONTRACTS_1_3_0,
+    name: 'OP Sepolia Testnet',
+    explorerUrl: 'https://sepolia-optimism.etherscan.io',
   },
 };
 
 export type ChainMetadata = {
   contracts: DelegationContracts;
   name: string;
-  symbol: string;
-  decimals: number;
   explorerUrl: string;
 };
 
