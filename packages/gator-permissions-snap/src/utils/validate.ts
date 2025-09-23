@@ -37,7 +37,10 @@ export const validateStartTimeZod = (value: number): boolean => {
 const zRevocationParams = z.object({
   delegationHash: z
     .string()
-    .regex(/^0x[a-fA-F0-9]{64}$/u, 'Invalid delegation hash'),
+    .regex(
+      /^0x[a-fA-F0-9]{64}$/u,
+      'Invalid delegation hash format - must be a 32-byte hex string',
+    ),
 });
 
 /**

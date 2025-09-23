@@ -145,7 +145,9 @@ export function createRpcHandler(config: {
 
     // First, get the existing permission to validate it exists
     const existingPermission =
-      await profileSyncManager.getGrantedPermission(delegationHash);
+      await profileSyncManager.getGrantedPermissionByDelegationHash(
+        delegationHash,
+      );
 
     if (!existingPermission) {
       throw new InvalidInputError(
