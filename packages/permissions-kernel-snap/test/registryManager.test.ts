@@ -43,7 +43,7 @@ describe('PermissionOfferRegistryManager', () => {
         params: {
           snapId: mockSnapId,
           request: {
-            method: ExternalMethod.PermissionProviderGetPermissionOffers,
+            method: ExternalMethod.PermissionsProviderGetPermissionOffers,
           },
         },
       });
@@ -209,7 +209,7 @@ describe('PermissionOfferRegistryManager', () => {
       expect(result.permissionsToGrant).toStrictEqual([]);
       expect(result.missingPermissions).toStrictEqual(mockPermissionsToGrant);
       expect(result.errorMessage).toBe(
-        'The following permissions can not be granted by the permission provider: native-token-transfer, native-token-stream',
+        'The following permissions can not be granted by the permissions provider: native-token-transfer, native-token-stream',
       );
     });
 

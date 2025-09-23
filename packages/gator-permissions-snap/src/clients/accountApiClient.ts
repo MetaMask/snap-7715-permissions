@@ -5,56 +5,64 @@ import { InvalidInputError, ResourceNotFoundError } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
 import { ZERO_ADDRESS } from '../constants';
-import type { TokenBalanceAndMetadata } from './types';
-import { makeValidatedRequest } from '../utils/httpClient';
+import type { TokenBalanceAndMetadata, RetryOptions } from './types';
+import { makeValidatedRequestWithRetry } from '../utils/httpClient';
+import { parseUnits } from '../utils/value';
 
 /**
- * Zod schema for validating token balance response
+ * Zod schema for validating individual token balance item
  */
-const TokenBalanceResponseSchema = z.object({
-  name: z.string().min(1).max(100),
+const TokenBalanceItemSchema = z.object({
+  object: z.literal('token'),
+  address: zAddress,
   symbol: z
     .string()
     .min(1)
     .max(20)
     .regex(/^[A-Z0-9]+$/iu, 'Symbol must contain only alphanumeric characters'),
   decimals: z.number().int().min(0).max(77), // ERC-20 standard allows up to 77 decimals
-  type: z.string().min(1).max(20).optional(),
-  iconUrl: z.string().url().max(2048).optional(), // Limit URL length and validate format
-  coingeckoId: z.string().min(1).max(100),
-  address: zAddress,
+  name: z.string().min(1).max(100),
+  type: z.string().min(1).max(20).optional(), // Only present for native tokens
   occurrences: z.number().nonnegative(),
-  sources: z.array(z.string().min(1).max(100)).max(50), // Limit number of sources
+  balance: z.string().regex(/^\d+\.?\d*$/u, 'Balance must be a numeric string'),
   chainId: z.number().int().positive(),
-  blockNumber: z
-    .string()
-    .regex(
-      /^(latest|\d+)$/u,
-      'Block number must be "latest" or numeric string',
-    ),
-  updatedAt: z.string().datetime(),
-  value: z.record(z.unknown()),
-  price: z.number().finite().min(0),
-  accounts: z
-    .array(
-      z.object({
-        accountAddress: zAddress,
-        chainId: z.number().int().positive(),
-        rawBalance: z
-          .string()
-          .regex(/^\d+$/u, 'Raw balance must be numeric string'),
-        balance: z.number().finite().min(0),
-      }),
-    )
-    .min(1)
-    .max(1000), // Ensure accounts is an array with reasonable limits
 });
+
+/**
+ * Zod schema for validating token balance response
+ */
+const TokenBalanceResponseSchema = z.object({
+  count: z.number().int().nonnegative(),
+  balances: z.array(TokenBalanceItemSchema),
+  unprocessedNetworks: z.array(z.unknown()),
+});
+
+export type TokenBalanceResponse = z.infer<typeof TokenBalanceResponseSchema>;
+
+/**
+ * Zod schema for validating token metadata response
+ */
+const TokenMetadataResponseSchema = z.object({
+  address: zAddress,
+  chainId: z.number().int().positive(),
+  decimals: z.number().int().min(0).max(77),
+  iconUrl: z.string().url().max(2048).optional(),
+  name: z.string().min(1).max(100),
+  symbol: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^[A-Z0-9]+$/iu, 'Symbol must contain only alphanumeric characters'),
+});
+
+export type TokenMetadataResponse = z.infer<typeof TokenMetadataResponseSchema>;
 
 /**
  * Configuration options for AccountApiClient
  */
 export type AccountApiClientConfig = {
-  baseUrl: string;
+  accountBaseUrl: string;
+  tokensBaseUrl: string;
   fetch?: typeof globalThis.fetch;
   timeoutMs: number;
   maxResponseSizeBytes: number;
@@ -64,129 +72,214 @@ export type AccountApiClientConfig = {
  * Class responsible for fetching account data from the Account API.
  */
 export class AccountApiClient {
-  static readonly #supportedTokenTypes = ['native', 'erc20'];
-
   static readonly #nativeTokenAddress = ZERO_ADDRESS;
 
   readonly #fetch: typeof globalThis.fetch;
 
-  readonly #baseUrl: string;
+  readonly #accountBaseUrl: string;
+
+  readonly #tokensBaseUrl: string;
 
   readonly #timeoutMs: number;
 
   readonly #maxResponseSizeBytes: number;
 
   constructor({
-    baseUrl,
+    accountBaseUrl,
+    tokensBaseUrl,
     fetch = globalThis.fetch,
     timeoutMs,
     maxResponseSizeBytes,
   }: AccountApiClientConfig) {
     this.#fetch = fetch;
-    this.#baseUrl = baseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
+    this.#accountBaseUrl = accountBaseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
+    this.#tokensBaseUrl = tokensBaseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
     this.#timeoutMs = timeoutMs;
     this.#maxResponseSizeBytes = maxResponseSizeBytes;
   }
 
   /**
    * Checks if a chain ID is supported by the account API.
-   * Currently only mainnet (chain ID 1) is supported.
    *
    * @param params - The parameters object.
    * @param params.chainId - The chain ID to check.
    * @returns True if the chain ID is supported, false otherwise.
    */
   public isChainIdSupported({ chainId }: { chainId: number }): boolean {
-    return chainId === 1;
+    return [
+      1, // mainnet
+      10, // OP Mainnet
+      1329, // Sei Network
+      137, // Polygon Mainnet
+      42161, // Arbitrum One
+      534352, // Scroll Mainnet
+      56, // BSC Mainnet
+      59144, // Linea Mainnet
+      8453, // Base Mainnet
+    ].includes(chainId);
   }
 
   /**
-   * Fetch the token balance and metadata for a given account and token.
+   * Fetch the token balance for a given account and token. If the request fails, it will retry
+   * according to the retryOptions configuration.
    *
    * @param params - The parameters for fetching the token balance.
    * @param params.chainId - The chain ID to fetch the balance from.
    * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance.
    * @param params.account - The account address to fetch the balance for.
-   * @returns The token balance and metadata.
+   * @param params.retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
+   * @returns The token balance as BigInt.
    */
-  public async getTokenBalanceAndMetadata({
+  public async getTokenBalance({
     chainId,
     assetAddress,
     account,
+    retryOptions,
   }: {
     chainId: number;
     account: Hex;
     assetAddress?: Hex | undefined;
-  }): Promise<TokenBalanceAndMetadata> {
+    retryOptions?: RetryOptions;
+  }): Promise<bigint> {
     if (!chainId) {
       const message = 'No chainId provided to fetch token balance';
       logger.error(message);
-
       throw new InvalidInputError(message);
     }
 
     if (!account) {
       const message = 'No account address provided to fetch token balance';
       logger.error(message);
-
       throw new InvalidInputError(message);
     }
-
     const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
 
-    const validatedResponse = await makeValidatedRequest(
-      `${this.#baseUrl}/tokens/${tokenAddress}?accountAddresses=${account}&chainId=${chainId}`,
-      {
-        timeoutMs: this.#timeoutMs,
-        maxResponseSizeBytes: this.#maxResponseSizeBytes,
-        fetch: this.#fetch,
-      },
-      TokenBalanceResponseSchema,
+    // Try up to initial attempt + retry attempts
+    const response = await this.#fetchTokenBalance(
+      tokenAddress,
+      account,
+      chainId,
+      retryOptions,
     );
 
-    const { accounts, type, iconUrl, symbol, decimals } = validatedResponse;
+    // Parse and validate the response
+    const { balances, count } = response;
 
-    const accountLowercase = account.toLowerCase();
-    const accountData = accounts.find(
-      (acc) => acc.accountAddress.toLowerCase() === accountLowercase,
+    // If count is 0 or balances array is empty, it means the token has no balance (0 balance)
+    if (count === 0 || balances.length === 0) {
+      logger.info(
+        `No balance found for token ${tokenAddress} on account ${account}`,
+      );
+      return 0n;
+    }
+
+    // Find the token in the balances array
+    const tokenAddressLowerCase = tokenAddress.toLowerCase();
+    const tokenData = balances.find(
+      (token) => token.address.toLowerCase() === tokenAddressLowerCase,
     );
 
-    if (!accountData) {
-      const message = `No balance data found for the account: ${account}`;
-      logger.error(message);
-
-      throw new ResourceNotFoundError(message);
+    if (!tokenData) {
+      logger.error(`Token ${tokenAddress} not found in balance response`);
+      throw new ResourceNotFoundError(
+        `Token ${tokenAddress} not found in balance response`,
+      );
     }
 
-    if (
-      type !== undefined &&
-      !AccountApiClient.#supportedTokenTypes.includes(type)
-    ) {
-      const message = `Unsupported token type: ${type}`;
-      logger.error(message);
+    // Convert balance string to BigInt
+    // The balance comes as a decimal string in human-readable format (e.g., "1.5" for 1.5 ETH)
+    // We need to convert it to the smallest unit by multiplying by 10^decimals
+    const balanceInSmallestUnit = parseUnits({
+      formatted: tokenData.balance,
+      decimals: tokenData.decimals,
+    });
+    return balanceInSmallestUnit;
+  }
 
+  /**
+   * Fetch the token metadata for a given token. If the request fails, it will retry
+   * according to the retryOptions configuration.
+   *
+   * @param params - The parameters for fetching the token metadata.
+   * @param params.chainId - The chain ID to fetch metadata from.
+   * @param params.assetAddress - The token address to fetch metadata for. If not provided, fetches native token metadata.
+   * @param params.retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
+   * @returns The token metadata.
+   */
+  public async getTokenMetadata({
+    chainId,
+    assetAddress,
+    retryOptions,
+  }: {
+    chainId: number;
+    assetAddress?: Hex | undefined;
+    retryOptions?: RetryOptions;
+  }): Promise<{ decimals: number; symbol: string; iconUrl?: string }> {
+    if (!chainId) {
+      const message = 'No chainId provided to fetch token metadata';
+      logger.error(message);
       throw new InvalidInputError(message);
     }
+    const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
 
-    // Additional validation for balance conversion
-    let balance: bigint;
-    try {
-      balance = BigInt(accountData.rawBalance);
-    } catch (error) {
-      const message = `Invalid balance format: ${accountData.rawBalance}`;
-      logger.error(message, error);
-      throw new InvalidInputError(message);
-    }
+    const tokenMetadata = await this.#fetchTokenMetadata(
+      tokenAddress,
+      chainId,
+      retryOptions,
+    );
+
+    return {
+      decimals: tokenMetadata.decimals,
+      symbol: tokenMetadata.symbol,
+      ...(tokenMetadata.iconUrl && { iconUrl: tokenMetadata.iconUrl }),
+    };
+  }
+
+  /**
+   * Fetch the token balance and metadata for a given account and token. If the request fails, it will retry
+   * according to the retryOptions configuration.
+   *
+   * @param params - The parameters for fetching the token balance.
+   * @param params.chainId - The chain ID to fetch the balance from.
+   * @param params.assetAddress - The token address to fetch the balance for. If not provided, fetches native token balance.
+   * @param params.account - The account address to fetch the balance for.
+   * @param params.retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
+   * @returns The token balance and metadata.
+   */
+  public async getTokenBalanceAndMetadata({
+    chainId,
+    assetAddress,
+    account,
+    retryOptions,
+  }: {
+    chainId: number;
+    account: Hex;
+    assetAddress?: Hex | undefined;
+    retryOptions?: RetryOptions;
+  }): Promise<TokenBalanceAndMetadata> {
+    // Fetch balance and metadata in parallel for better performance
+    const balancePromise = retryOptions
+      ? this.getTokenBalance({ chainId, assetAddress, account, retryOptions })
+      : this.getTokenBalance({ chainId, assetAddress, account });
+
+    const metadataPromise = retryOptions
+      ? this.getTokenMetadata({ chainId, assetAddress, retryOptions })
+      : this.getTokenMetadata({ chainId, assetAddress });
+
+    const [balance, metadata] = await Promise.all([
+      balancePromise,
+      metadataPromise,
+    ]);
 
     // Sanitize iconUrl if present
-    const sanitizedIconUrl = iconUrl
-      ? this.#sanitizeIconUrl(iconUrl)
+    const sanitizedIconUrl = metadata.iconUrl
+      ? this.#sanitizeIconUrl(metadata.iconUrl)
       : undefined;
 
     const result: TokenBalanceAndMetadata = {
       balance,
-      decimals,
-      symbol,
+      decimals: metadata.decimals,
+      symbol: metadata.symbol,
     };
 
     if (sanitizedIconUrl) {
@@ -234,5 +327,69 @@ export class AccountApiClient {
       logger.warn(`Invalid icon URL format: ${iconUrl}`, error);
       return undefined;
     }
+  }
+
+  /**
+   * Internal method to fetch token balance and return the raw response.
+   * @param tokenAddress - The token address to fetch the balance for.
+   * @param account - The account address to fetch the balance for.
+   * @param chainId - The chain ID to fetch the balance from.
+   * @param retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
+   * @returns The validated token balance response.
+   */
+  async #fetchTokenBalance(
+    tokenAddress: Hex,
+    account: Hex,
+    chainId: number,
+    retryOptions?: RetryOptions,
+  ): Promise<TokenBalanceResponse> {
+    const url = `${this.#accountBaseUrl}/v2/accounts/${account}/balances?networks=${chainId}&filterSupportedTokens=false&includeTokenAddresses=${tokenAddress}&includeStakedAssets=false`;
+
+    return await makeValidatedRequestWithRetry<
+      TokenBalanceResponse,
+      typeof TokenBalanceResponseSchema
+    >(
+      url,
+      {
+        timeoutMs: this.#timeoutMs,
+        maxResponseSizeBytes: this.#maxResponseSizeBytes,
+        fetch: this.#fetch,
+        headers: {
+          'x-mmcx-internal-application': 'gator-permissions-snap',
+          'x-metamask-clientproduct': 'gator-permissions-snap',
+        },
+      },
+      TokenBalanceResponseSchema,
+      retryOptions,
+    );
+  }
+
+  /**
+   * Internal method to fetch token metadata from the tokens API.
+   * @param tokenAddress - The token address to fetch metadata for.
+   * @param chainId - The chain ID to fetch metadata from.
+   * @param retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
+   * @returns The raw fetch response.
+   */
+  async #fetchTokenMetadata(
+    tokenAddress: Hex,
+    chainId: number,
+    retryOptions?: RetryOptions,
+  ): Promise<TokenMetadataResponse> {
+    const url = `${this.#tokensBaseUrl}/token/${chainId}?address=${tokenAddress}&includeEnrichedData=false&includeCoingeckoId=false&includeAggregators=false&includeOccurrences=false&includeIconUrl=true&includeAssetType=false&includeTokenFees=false&includeHoneypotStatus=false&includeContractVerificationStatus=false&includeStorage=false&includeERC20Permit=false&includeDescription=false`;
+
+    return await makeValidatedRequestWithRetry<
+      TokenMetadataResponse,
+      typeof TokenMetadataResponseSchema
+    >(
+      url,
+      {
+        timeoutMs: this.#timeoutMs,
+        maxResponseSizeBytes: this.#maxResponseSizeBytes,
+        fetch: this.#fetch,
+      },
+      TokenMetadataResponseSchema,
+      retryOptions,
+    );
   }
 }

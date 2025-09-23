@@ -61,11 +61,11 @@ export const createPermissionOfferRegistryManager = (
   }
 
   /**
-   * Discovers and builds the permission provider registry by querying all permission provider snaps
+   * Discovers and builds the permissions provider registry by querying all permissions provider snaps
    * for their permission offers.
    *
    * @param snapId - The snap id to query for permission offers.
-   * @returns The permission provider registry.
+   * @returns The permissions provider registry.
    */
   async function buildPermissionOffersRegistry(
     snapId: string,
@@ -80,7 +80,7 @@ export const createPermissionOfferRegistryManager = (
           params: {
             snapId,
             request: {
-              method: ExternalMethod.PermissionProviderGetPermissionOffers,
+              method: ExternalMethod.PermissionsProviderGetPermissionOffers,
             },
           },
         });
@@ -102,12 +102,12 @@ export const createPermissionOfferRegistryManager = (
           };
 
           logger.debug(
-            `Snap ${snapId} supports ${ExternalMethod.PermissionProviderGetPermissionOffers}, adding to registry...`,
+            `Snap ${snapId} supports ${ExternalMethod.PermissionsProviderGetPermissionOffers}, adding to registry...`,
           );
         }
       } catch (error) {
         logger.error(
-          `Snap ${snapId} does not support ${ExternalMethod.PermissionProviderGetPermissionOffers}, or returned an invalid response, skipping...`,
+          `Snap ${snapId} does not support ${ExternalMethod.PermissionsProviderGetPermissionOffers}, or returned an invalid response, skipping...`,
         );
       }
 
@@ -172,7 +172,7 @@ export const createPermissionOfferRegistryManager = (
       return {
         permissionsToGrant: [],
         missingPermissions,
-        errorMessage: `The following permissions can not be granted by the permission provider: ${missingPermissions.map((permission) => permission.permission.type).join(', ')}`,
+        errorMessage: `The following permissions can not be granted by the permissions provider: ${missingPermissions.map((permission) => permission.permission.type).join(', ')}`,
       };
     }
 

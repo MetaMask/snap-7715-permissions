@@ -44,9 +44,13 @@ const isStorePermissionsFeatureEnabled =
 const snapEnv = process.env.SNAP_ENV;
 
 const accountApiBaseUrl = process.env.ACCOUNT_API_BASE_URL;
-
 if (!accountApiBaseUrl) {
   throw new InternalError('ACCOUNT_API_BASE_URL is not set');
+}
+
+const tokensApiBaseUrl = process.env.TOKENS_API_BASE_URL;
+if (!tokensApiBaseUrl) {
+  throw new InternalError('TOKENS_API_BASE_URL is not set');
 }
 
 const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
@@ -69,9 +73,10 @@ const supportedChains = supportedChainsString.split(',').map(Number);
 // set up dependencies
 
 const accountApiClient = new AccountApiClient({
-  baseUrl: accountApiBaseUrl,
   timeoutMs: 10000, // 10 seconds timeout
   maxResponseSizeBytes: 1024 * 1024, // 1MB max response size
+  accountBaseUrl: accountApiBaseUrl,
+  tokensBaseUrl: tokensApiBaseUrl,
 });
 
 const tokenMetadataClient = new BlockchainTokenMetadataClient({
@@ -173,13 +178,13 @@ const rpcHandler = createRpcHandler({
 const boundRpcHandlers: {
   [RpcMethod: string]: (params?: JsonRpcParams) => Promise<Json>;
 } = {
-  [RpcMethod.PermissionProviderGrantPermissions]:
+  [RpcMethod.PermissionsProviderGrantPermissions]:
     rpcHandler.grantPermission.bind(rpcHandler),
-  [RpcMethod.PermissionProviderGetPermissionOffers]:
+  [RpcMethod.PermissionsProviderGetPermissionOffers]:
     rpcHandler.getPermissionOffers.bind(rpcHandler),
-  [RpcMethod.PermissionProviderGetGrantedPermissions]:
+  [RpcMethod.PermissionsProviderGetGrantedPermissions]:
     rpcHandler.getGrantedPermissions.bind(rpcHandler),
-  [RpcMethod.PermissionProviderSubmitRevocation]: async (
+  [RpcMethod.PermissionsProviderSubmitRevocation]: async (
     params?: JsonRpcParams,
   ) => rpcHandler.submitRevocation(params as Json),
 };

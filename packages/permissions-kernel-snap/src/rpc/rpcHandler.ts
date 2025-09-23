@@ -97,7 +97,7 @@ export function createRpcHandler(config: {
       params: {
         snapId: gatorPermissionsProviderSnapId, // We only want gator-permissions-snap for now but we will use more snaps in the future
         request: {
-          method: ExternalMethod.PermissionProviderGrantPermissions,
+          method: ExternalMethod.PermissionsProviderGrantPermissions,
           params: {
             permissionsRequest: permissionsToGrant,
             siteOrigin: options.siteOrigin,
