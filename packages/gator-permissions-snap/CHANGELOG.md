@@ -7,6 +7,123 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0]
+
+### Added
+
+- Add hideSnapBranding flag to preinstalled snap manifest
+- Add chain metadata for supported testnets
+- feat: add lifecycle hooks permission for local development and refactor onInstall handler
+- feat(manifest): add environment-based manifest management ([#153](https://github.com/MetaMask/snap-7715-permissions/pull/153))
+- Add retry logic to all clients
+- Add priceApi response validation
+- Add account API client validation and fetch timeout
+- feat(ui): add TokenBalanceField component for displaying token balances ([#142](https://github.com/MetaMask/snap-7715-permissions/pull/142))
+- feat(ui): add TokenField component for displaying token info ([#136](https://github.com/MetaMask/snap-7715-permissions/pull/136))
+- Allow user to select EOA from which to grant the permission ([#125](https://github.com/MetaMask/snap-7715-permissions/pull/125))
+- Add the nonce enforcer as a default caveat for all permissions ([#127](https://github.com/MetaMask/snap-7715-permissions/pull/127))
+- Async confirmation ([#114](https://github.com/MetaMask/snap-7715-permissions/pull/114))
+- Add new permissionsProvider_getGrantedPermissions RPC ([#108](https://github.com/MetaMask/snap-7715-permissions/pull/108))
+- Add `erc-20-token-periodic` permission type ([#106](https://github.com/MetaMask/snap-7715-permissions/pull/106))
+- Allow setting SUPPORTED_CHAINS, and GATSBY_SUPPORTED_CHAINS (for site package). ([#105](https://github.com/MetaMask/snap-7715-permissions/pull/105))
+- Add support for token icons ([#104](https://github.com/MetaMask/snap-7715-permissions/pull/104))
+- Add valueLTE caveat to erc20 streaming permission ([#103](https://github.com/MetaMask/snap-7715-permissions/pull/103))
+- Feat/ephemeral permission offer registry ([#101](https://github.com/MetaMask/snap-7715-permissions/pull/101))
+- Add `erc20-token-stream` permission ([#100](https://github.com/MetaMask/snap-7715-permissions/pull/100))
+- Fetch token metadata ([#99](https://github.com/MetaMask/snap-7715-permissions/pull/99))
+- Add `native-token-periodic` permission ([#89](https://github.com/MetaMask/snap-7715-permissions/pull/89))
+- Add iconAltText to rule icon data
+- Add close icon for the input fields
+- Add token logo for the input fields
+- feat: add native token periodic permission type and handler
+- Add tests for ruleModalManager and rules
+- Add rules abstraction, somewhat shoehorned into existing baseOrchestrator
+
+### Changed
+
+- Order numerically testnet metadatas
+- Provide metadata when signing delegation ([#169](https://github.com/MetaMask/snap-7715-permissions/pull/169))
+- Rename RCP Urls To Be Consistent ([#168](https://github.com/MetaMask/snap-7715-permissions/pull/168))
+- Refactor getTokenBalance to return bigint zero using 0n and optimize address comparison
+- When signing the delegation with eth_signTypedData, provide origin and justification in metadata property on EIP-712 payload
+- chore: changed to plural refereces of permissionProvider
+- chore: rename rpc urls to be consistent
+- feat: remove local development hooks and add InstallButton component
+- Disable logging in production ([#161](https://github.com/MetaMask/snap-7715-permissions/pull/161))
+- update headers setup for account API and balance formating
+- Better makeValidatedRequestWithRetry typings
+- clear timeout move to finally block
+- account api v2
+- refactor retry http logic into helper function
+- Schema address validation updates, naming updates and creating httpClient utils to merge duplicating code
+- Process permission requests sequentially ([#150](https://github.com/MetaMask/snap-7715-permissions/pull/150))
+- try caipAssetType normal and case insesitive lookup as fallback
+- chore: remove 'viem' dependency from package.json and related files ([#154](https://github.com/MetaMask/snap-7715-permissions/pull/154))
+- Use null where appropriate ([#143](https://github.com/MetaMask/snap-7715-permissions/pull/143))
+- refactor(core): validate chain support early in permission request ([#145](https://github.com/MetaMask/snap-7715-permissions/pull/145))
+- Change generic errors with snap errors ([#135](https://github.com/MetaMask/snap-7715-permissions/pull/135))
+- switch expiry and startTime types to number since we are expecting a timestamp ([#139](https://github.com/MetaMask/snap-7715-permissions/pull/139))
+- Update shasum, in preparation for merge to main ([#137](https://github.com/MetaMask/snap-7715-permissions/pull/137))
+- Chore/integrate new permission types ([#134](https://github.com/MetaMask/snap-7715-permissions/pull/134))
+- Update architecture doc to reflect updated architecture ([#133](https://github.com/MetaMask/snap-7715-permissions/pull/133))
+- Update homepage to remove reference to Smart Contract Account. ([#131](https://github.com/MetaMask/snap-7715-permissions/pull/131))
+- Return unbind handler when calling `UserEventDispatcher.on()` ([#132](https://github.com/MetaMask/snap-7715-permissions/pull/132))
+- Update input validation ([#110](https://github.com/MetaMask/snap-7715-permissions/pull/110))
+- Refactor: extract common field components into reusable Field component ([#122](https://github.com/MetaMask/snap-7715-permissions/pull/122))
+- Better handle date time ([#115](https://github.com/MetaMask/snap-7715-permissions/pull/115))
+- Remove add more rules modal, and replace it with a simple toggle ([#120](https://github.com/MetaMask/snap-7715-permissions/pull/120))
+- style: update component class definition to include text color
+- style: fix indentation in package.json files and docs
+- build: downgrade @types/react from 18.3.23 to 18.2.4
+- execute handlers sequentially and function rename
+- Make sure events are processes sequentially and that all events are proccessed before granting permission
+- make justification optional and show default message in this case
+- Update linter rule for empty line is js docs and update comments to have an empty line
+- Update message-signing-snap dependency to 1.1.3
+- Reduce usage of @metamask/delegation-toolkit and viem ([#107](https://github.com/MetaMask/snap-7715-permissions/pull/107))
+- Update snapshots due to layout changes
+- Bump the npm_and_yarn group across 1 directory with 3 updates ([#78](https://github.com/MetaMask/snap-7715-permissions/pull/78))
+- refactor: reduce boilerplate in permission definitions
+- Improve asynchronicity when resolving context for period permissions. Fix various linting issues.
+- Use dropdown + explicit seconds for selecting the period duration
+- Update packages/gator-permissions-snap/src/permissions/nativeTokenPeriodic/caveats.ts
+- Move confirmation wrapper into shared permissionHandlerContent.tsx - title - add more rules button
+- Move ruleManager, permissionHandler, ruleModalManager to core
+- Remove defunct handlers from confirmation
+- Implement handler pattern: - decouple handler out of orchestrator - update naming throughout handlers and orchestrators to be more consistent
+- Remove shared rules, move expiry rule back into native token stream
+- refactor: extract shared expiry rule, remove defunct permissions/types.ts
+- Update tests to match implementation
+- Standardise some naming
+- Enable linting of tsx files in gator-permissions. Auto fix linting problems.
+- Move allSupportedChains itno BaseAccountController as private static member
+- Improve profile sync dev experience ([#86](https://github.com/MetaMask/snap-7715-permissions/pull/86))
+
+### Removed
+
+- Remove endowment lifecycle hooks ([#164](https://github.com/MetaMask/snap-7715-permissions/pull/164))
+- Remove development constants from production artifacts ([#148](https://github.com/MetaMask/snap-7715-permissions/pull/148))
+- Remove unused code and images ([#111](https://github.com/MetaMask/snap-7715-permissions/pull/111))
+
+### Fixed
+
+- Fix Polygon Amoy Testnet incorrectly attributed as Metis Sepolia. Rename BNB to BNB Smart Chain.
+- fix: remove conditional iconUrl assignment in getTokenMetadata response
+- fix: sanitize icon URL in token metadata response
+- Missing runtime verification for api responses ([#158](https://github.com/MetaMask/snap-7715-permissions/pull/158))
+- fix mock interfearance in tests
+- fix: TokenIcon runtime type enforcement ([#155](https://github.com/MetaMask/snap-7715-permissions/pull/155))
+- Missing runtime schema verification for profile sync store/retrieve ([#157](https://github.com/MetaMask/snap-7715-permissions/pull/157))
+- Fix misleading debug message ([#156](https://github.com/MetaMask/snap-7715-permissions/pull/156))
+- feat: Incorrect token currency shown ([#152](https://github.com/MetaMask/snap-7715-permissions/pull/152))
+- Handle Price API errors ([#146](https://github.com/MetaMask/snap-7715-permissions/pull/146))
+- fix(gator-permissions-snap): fix return type for account addresses ([#141](https://github.com/MetaMask/snap-7715-permissions/pull/141))
+- Validation errors disables grant button ([#126](https://github.com/MetaMask/snap-7715-permissions/pull/126))
+- Improve ERC20 token parsing error and fix fetching bug ([#124](https://github.com/MetaMask/snap-7715-permissions/pull/124))
+- EOAAccountController should serialize delegation salt as bigint when calling eth_signTypedData_v4 ([#116](https://github.com/MetaMask/snap-7715-permissions/pull/116))
+- address potential race condition
+- Fix typos ([#98](https://github.com/MetaMask/snap-7715-permissions/pull/98))
+
 ## [0.2.1]
 
 ### Fixed
@@ -57,7 +174,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.2.1...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.3.0...HEAD
+[0.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.2.1...@metamask/gator-permissions-snap@0.3.0
 [0.2.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.2.0...@metamask/gator-permissions-snap@0.2.1
 [0.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.1.0...@metamask/gator-permissions-snap@0.2.0
 [0.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.0.1...@metamask/gator-permissions-snap@0.1.0
