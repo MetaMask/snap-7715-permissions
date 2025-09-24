@@ -4,8 +4,14 @@ import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
-import type { ProfileSyncManager } from '../profileSync';
-import { validatePermissionRequestParam } from '../utils/validate';
+import type {
+  ProfileSyncManager,
+  StoredGrantedPermission,
+} from '../profileSync/profileSync';
+import {
+  validatePermissionRequestParam,
+  validateRevocationParams,
+} from '../utils/validate';
 
 /**
  * Type for the RPC handler methods.
@@ -32,6 +38,14 @@ export type RpcHandler = {
    * @returns The granted permissions.
    */
   getGrantedPermissions(): Promise<Json>;
+
+  /**
+   * Handles submit revocation requests.
+   *
+   * @param params - The parameters for the revocation.
+   * @returns Success confirmation.
+   */
+  submitRevocation(params: Json): Promise<Json>;
 };
 
 /**
@@ -75,15 +89,19 @@ export function createRpcHandler(config: {
         throw new InvalidInputError(permissionResponse.reason);
       }
 
-      permissionsToStore.push({
+      const storedPermission: StoredGrantedPermission = {
         permissionResponse: permissionResponse.response,
         siteOrigin,
-      });
+        isRevoked: false,
+      };
+      permissionsToStore.push(storedPermission);
     }
 
     // Only after all permissions have been successfully processed, store them all in batch
     if (permissionsToStore.length > 0) {
-      await profileSyncManager.storeGrantedPermissionBatch(permissionsToStore);
+      await profileSyncManager.storeGrantedPermissionBatch(
+        permissionsToStore as StoredGrantedPermission[],
+      );
     }
 
     // Return the permission responses
@@ -114,9 +132,76 @@ export function createRpcHandler(config: {
     return grantedPermission as Json[];
   };
 
+  /**
+   * Handles submit revocation requests.
+   *
+   * @param params - The parameters for the revocation.
+   * @returns Success confirmation.
+   */
+  const submitRevocation = async (params: Json): Promise<Json> => {
+    logger.debug('submitRevocation()', params);
+
+    const { delegationHash } = validateRevocationParams(params);
+
+    // First, get the existing permission to validate it exists
+    const existingPermission =
+      await profileSyncManager.getGrantedPermissionByDelegationHash(
+        delegationHash,
+      );
+
+    if (!existingPermission) {
+      throw new InvalidInputError(
+        `Permission not found for delegation hash: ${delegationHash}`,
+      );
+    }
+
+    // Extract delegationManager and chainId from the permission response for logging
+    const { chainId: permissionChainId, signerMeta } =
+      existingPermission.permissionResponse;
+    const { delegationManager } = signerMeta;
+
+    logger.debug(
+      `Found permission - chainId: ${permissionChainId}, delegationManager: ${delegationManager ?? 'undefined'}`,
+    );
+
+    // Check if the delegation is actually disabled on-chain
+    if (!delegationManager) {
+      throw new InvalidInputError(
+        `No delegation manager found for delegation hash: ${delegationHash}`,
+      );
+    }
+
+    const isDelegationDisabled =
+      await profileSyncManager.checkDelegationDisabledOnChain(
+        delegationHash,
+        permissionChainId,
+        delegationManager,
+      );
+
+    if (!isDelegationDisabled) {
+      throw new InvalidInputError(
+        `Delegation ${delegationHash} is not disabled on-chain. Cannot process revocation.`,
+      );
+    }
+
+    logger.debug(
+      `Processing revocation for delegation ${delegationHash} - validated on-chain`,
+    );
+
+    // Update the permission's revocation status using the optimized method
+    // This avoids re-fetching the permission we already have
+    await profileSyncManager.updatePermissionRevocationStatusWithPermission(
+      existingPermission,
+      true,
+    );
+
+    return { success: true };
+  };
+
   return {
     grantPermission,
     getPermissionOffers,
     getGrantedPermissions,
+    submitRevocation,
   };
 }

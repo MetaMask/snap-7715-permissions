@@ -16,4 +16,9 @@ export enum RpcMethod {
    * This method is used by Metamask clients to retrieve granted permissions for all sites.
    */
   PermissionsProviderGetGrantedPermissions = 'permissionsProvider_getGrantedPermissions',
+
+  /**
+   * This method is used by MetaMask origin to submit a revocation and update the isRevoked flag.
+   */
+  PermissionsProviderSubmitRevocation = 'permissionsProvider_submitRevocation',
 }

@@ -21,6 +21,7 @@ import {
   LimitExceededError,
   ParseError,
   UnsupportedMethodError,
+  type SnapsEthereumProvider,
 } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
@@ -31,6 +32,7 @@ const MAX_STORAGE_SIZE_BYTES = 400 * 1024; // 400kb limit as documented
 const zStoredGrantedPermission = z.object({
   permissionResponse: zPermissionResponse,
   siteOrigin: z.string().min(1, 'Site origin cannot be empty'),
+  isRevoked: z.boolean().default(false),
 });
 
 /**
@@ -94,23 +96,41 @@ export type ProfileSyncManager = {
   getGrantedPermission: (
     permissionContext: Hex,
   ) => Promise<StoredGrantedPermission | null>;
+  getGrantedPermissionByDelegationHash: (
+    delegationHash: Hex,
+  ) => Promise<StoredGrantedPermission | null>;
   storeGrantedPermission: (
     storedGrantedPermission: StoredGrantedPermission,
   ) => Promise<void>;
   storeGrantedPermissionBatch: (
     storedGrantedPermission: StoredGrantedPermission[],
   ) => Promise<void>;
+  updatePermissionRevocationStatus: (
+    permissionContext: Hex,
+    isRevoked: boolean,
+  ) => Promise<void>;
+  updatePermissionRevocationStatusWithPermission: (
+    existingPermission: StoredGrantedPermission,
+    isRevoked: boolean,
+  ) => Promise<void>;
+  checkDelegationDisabledOnChain: (
+    delegationHash: Hex,
+    chainId: Hex,
+    delegationManagerAddress: Hex,
+  ) => Promise<boolean>;
 };
 
 export type StoredGrantedPermission = {
   permissionResponse: PermissionResponse;
   siteOrigin: string;
+  isRevoked: boolean;
 };
 
 export type ProfileSyncManagerConfig = {
   auth: JwtBearerAuth;
   userStorage: UserStorage;
   isFeatureEnabled: boolean;
+  ethereumProvider: SnapsEthereumProvider;
 };
 
 /**
@@ -122,7 +142,7 @@ export function createProfileSyncManager(
   config: ProfileSyncManagerConfig,
 ): ProfileSyncManager {
   const FEATURE = 'gator_7715_permissions';
-  const { auth, userStorage, isFeatureEnabled } = config;
+  const { auth, userStorage, isFeatureEnabled, ethereumProvider } = config;
   const unConfiguredProfileSyncManager = {
     getAllGrantedPermissions: async () => {
       logger.debug('unConfiguredProfileSyncManager.getAllGrantedPermissions()');
@@ -133,6 +153,12 @@ export function createProfileSyncManager(
         'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
       );
     },
+    getGrantedPermissionByDelegationHash: async (_: Hex) => {
+      logger.debug(
+        'unConfiguredProfileSyncManager.getGrantedPermissionByDelegationHash()',
+      );
+      return null;
+    },
     storeGrantedPermission: async (_: StoredGrantedPermission) => {
       logger.debug(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
@@ -142,6 +168,25 @@ export function createProfileSyncManager(
       logger.debug(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
       );
+    },
+    updatePermissionRevocationStatus: async (_: Hex, __: boolean) => {
+      logger.debug(
+        'unConfiguredProfileSyncManager.updatePermissionRevocationStatus()',
+      );
+    },
+    updatePermissionRevocationStatusWithPermission: async (
+      _: StoredGrantedPermission,
+      __: boolean,
+    ) => {
+      logger.debug(
+        'unConfiguredProfileSyncManager.updatePermissionRevocationStatusWithPermission()',
+      );
+    },
+    checkDelegationDisabledOnChain: async (_: Hex, __: Hex, ___: Hex) => {
+      logger.debug(
+        'unConfiguredProfileSyncManager.checkDelegationDisabledOnChain()',
+      );
+      return false; // Default to not disabled when feature is disabled
     },
   };
 
@@ -233,6 +278,34 @@ export function createProfileSyncManager(
   }
 
   /**
+   * Retrieve a granted permission by delegation hash using direct storage lookup.
+   * Since delegation hashes are unique, we can use them directly as storage keys.
+   * @param delegationHash - The delegation hash to search for.
+   * @returns The granted permission or null if not found.
+   */
+  async function getGrantedPermissionByDelegationHash(
+    delegationHash: Hex,
+  ): Promise<StoredGrantedPermission | null> {
+    try {
+      await authenticate();
+
+      // Use the delegation hash directly as the storage key
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${delegationHash}`;
+
+      const permission = await userStorage.getItem(path);
+
+      if (!permission) {
+        return null;
+      }
+
+      return safeDeserializeStoredGrantedPermission(permission);
+    } catch (error) {
+      logger.error('Error fetching permission by delegation hash');
+      throw error;
+    }
+  }
+
+  /**
    * Store the granted permission in profile sync.
    *
    * Persisting "<permissionContext>" key under "gator_7715_permissions" feature
@@ -307,14 +380,135 @@ export function createProfileSyncManager(
   }
 
   /**
+   * Updates the revocation status of a granted permission in profile sync.
+   *
+   * @param permissionContext - The context of the granted permission to update.
+   * @param isRevoked - The new revocation status.
+   * @throws InvalidInputError if the permission is not found.
+   */
+  async function updatePermissionRevocationStatus(
+    permissionContext: Hex,
+    isRevoked: boolean,
+  ): Promise<void> {
+    try {
+      await authenticate();
+
+      // First, get the existing permission
+      const existingPermission = await getGrantedPermission(permissionContext);
+      if (!existingPermission) {
+        throw new InvalidInputError(
+          `Permission not found for delegation hash: ${permissionContext}`,
+        );
+      }
+
+      // Use the optimized version that accepts the existing permission
+      await updatePermissionRevocationStatusWithPermission(
+        existingPermission,
+        isRevoked,
+      );
+    } catch (error) {
+      logger.error('Error updating permission revocation status');
+      throw error;
+    }
+  }
+
+  /**
+   * Updates the revocation status of a granted permission when you already have the permission object.
+   * This is an optimized version that avoids re-fetching the permission.
+   *
+   * @param existingPermission - The existing permission object.
+   * @param isRevoked - The new revocation status.
+   */
+  async function updatePermissionRevocationStatusWithPermission(
+    existingPermission: StoredGrantedPermission,
+    isRevoked: boolean,
+  ): Promise<void> {
+    try {
+      await authenticate();
+
+      // Update the isRevoked flag
+      const updatedPermission: StoredGrantedPermission = {
+        ...existingPermission,
+        isRevoked,
+      };
+
+      // Store the updated permission
+      await storeGrantedPermission(updatedPermission);
+    } catch (error) {
+      logger.error(
+        'Error updating permission revocation status with existing permission',
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Checks if a delegation is disabled on-chain by calling the DelegationManager contract.
+   * @param delegationHash - The hash of the delegation to check.
+   * @param chainId - The chain ID in hex format.
+   * @param delegationManagerAddress - The address of the DelegationManager contract.
+   * @returns True if the delegation is disabled, false otherwise.
+   */
+  async function checkDelegationDisabledOnChain(
+    delegationHash: Hex,
+    chainId: Hex,
+    delegationManagerAddress: Hex,
+  ): Promise<boolean> {
+    try {
+      logger.debug('Checking delegation disabled status on-chain', {
+        delegationHash,
+        chainId,
+        delegationManagerAddress,
+      });
+
+      // Encode the function call data for disabledDelegations(bytes32)
+      const functionSelector = '0x2d40d052'; // keccak256("disabledDelegations(bytes32)").slice(0, 10)
+      const encodedParams = delegationHash.slice(2).padStart(64, '0'); // Remove 0x and pad to 32 bytes
+      const callData = `${functionSelector}${encodedParams}`;
+
+      const result = await ethereumProvider.request<Hex>({
+        method: 'eth_call',
+        params: [
+          {
+            to: delegationManagerAddress,
+            data: callData,
+          },
+          'latest',
+        ],
+      });
+
+      if (!result) {
+        logger.warn('No result from contract call');
+        return false;
+      }
+
+      // Parse the boolean result (32 bytes, last byte is the boolean value)
+      const isDisabled =
+        result !==
+        '0x0000000000000000000000000000000000000000000000000000000000000000';
+
+      logger.debug('Delegation disabled status result', { isDisabled });
+      return isDisabled;
+    } catch (error) {
+      logger.error('Error checking delegation disabled status on-chain', error);
+      // In case of error, assume not disabled to avoid blocking legitimate operations
+      return false;
+    }
+  }
+
+  /**
    * Feature flag to disable profile sync feature until message-signing-snap v1.1.2 released in MM 12.18: https://github.com/MetaMask/metamask-extension/pull/32521.
    */
   return isFeatureEnabled
     ? {
         getAllGrantedPermissions,
         getGrantedPermission,
+        getGrantedPermissionByDelegationHash,
         storeGrantedPermission,
         storeGrantedPermissionBatch,
+        updatePermissionRevocationStatus,
+        updatePermissionRevocationStatusWithPermission,
+        checkDelegationDisabledOnChain,
       }
     : unConfiguredProfileSyncManager;
 }
