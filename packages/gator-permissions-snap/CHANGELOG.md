@@ -80,8 +80,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - make justification optional and show default message in this case
 - Update linter rule for empty line is js docs and update comments to have an empty line
 - Update message-signing-snap dependency to 1.1.3
-- bump major version on dependencies
-- update node version, bump dependencies
 - Reduce usage of @metamask/delegation-toolkit and viem ([#107](https://github.com/MetaMask/snap-7715-permissions/pull/107))
 - Update snapshots due to layout changes
 - Bump the npm_and_yarn group across 1 directory with 3 updates ([#78](https://github.com/MetaMask/snap-7715-permissions/pull/78))
