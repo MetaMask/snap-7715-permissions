@@ -146,6 +146,7 @@ const Index = () => {
   const [value, setValue] = useState<bigint>(0n);
   const [receipt, setReceipt] = useState<UserOperationReceipt | null>(null);
   const [pendingPermissionRequests, setPendingPermissionRequests] = useState<Set<string>>(new Set());
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
 
   const handleChainChange = ({
     target: { value: inputValue },
@@ -328,6 +329,23 @@ const Index = () => {
     },
     [],
   );
+
+  const connectWallet = async () => {
+    try {
+      await provider?.request({
+        method: 'wallet_requestPermissions',
+        params: [
+          {
+            eth_accounts: {},
+          },
+        ],
+      });
+      setIsWalletConnected(true);
+    } catch (error) {
+      console.error('Failed to connect wallet: ', error);
+      setIsWalletConnected(false);
+    }
+  };
 
   return (
     <Container>
@@ -550,6 +568,21 @@ const Index = () => {
                 onClick={requestPermissionSnap}
                 disabled={!isMetaMaskReady}
                 $isReconnect={isGatorSnapReady}
+              />
+            ),
+          }}
+          disabled={!isMetaMaskReady}
+        />
+
+        <Card
+          content={{
+            title: `${isWalletConnected ? 'Reconnect' : 'Connect'}(wallet)`,
+            description: 'Connect your wallet to the site.',
+            button: (
+              <ConnectButton
+                onClick={connectWallet}
+                disabled={!isMetaMaskReady}
+                $isReconnect={isWalletConnected}
               />
             ),
           }}
