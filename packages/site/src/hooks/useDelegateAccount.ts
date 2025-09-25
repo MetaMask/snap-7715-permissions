@@ -24,7 +24,7 @@ export const useDelegateAccount = ({ chain }: { chain: Chain }) => {
     const initializeDelegateAccount = async () => {
       if (!delegateAccount) {
         const pk = generatePrivateKey();
-        const account = privateKeyToAccount(pk) as any;
+        const account = privateKeyToAccount(pk);
 
         const publicClient = createPublicClient({
           chain,
@@ -33,7 +33,7 @@ export const useDelegateAccount = ({ chain }: { chain: Chain }) => {
 
         const smartAccount = await toMetaMaskSmartAccount({
           implementation: Implementation.MultiSig,
-          signatory: [{ account }],
+          signer: [{ account }],
           deployParams: [[account.address], 1n],
           deploySalt: '0x',
           client: publicClient,
