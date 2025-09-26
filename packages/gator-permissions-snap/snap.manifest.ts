@@ -4,7 +4,8 @@
 import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 
 const kernelSnapId = process.env.KERNEL_SNAP_ID;
-
+const messageSnapId = process.env.MESSAGE_SIGNING_SNAP_ID;
+const snapEnv = process.env.SNAP_ENV;
 const manifest: SnapManifest = {
   version: '0.2.1',
   description: 'Grants 7715 permissions from a DeleGator smart account',
@@ -41,8 +42,14 @@ const manifest: SnapManifest = {
 
 if (kernelSnapId) {
   manifest.initialConnections = {
-    [kernelSnapId]: {},
+    ...(kernelSnapId ? { [kernelSnapId]: {} } : {}),
+    ...(messageSnapId ? { [messageSnapId]: {} } : {}),
   };
+}
+
+if (snapEnv === 'local') {
+  // Grant lifecycle hooks permission in local development environment
+  manifest.initialPermissions['endowment:lifecycle-hooks'] = {};
 }
 
 export default manifest;

@@ -14,7 +14,6 @@ import * as chains from 'viem/chains';
 
 import {
   ConnectButton,
-  InstallButton,
   InstallFlaskButton,
   CustomMessageButton,
   Card,
@@ -33,11 +32,7 @@ import type {
   NativeTokenPeriodicPermissionRequest,
   ERC20TokenPeriodicPermissionRequest,
 } from '../components/permissions/types';
-import {
-  kernelSnapOrigin,
-  gatorSnapOrigin,
-  messageSigningSnapOrigin,
-} from '../config';
+import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import {
   useMetaMask,
   useMetaMaskContext,
@@ -98,7 +93,6 @@ const Index = () => {
   const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
-  const requestMessageSigningSnap = useRequestSnap(messageSigningSnapOrigin);
 
   const { delegateAccount } = useDelegateAccount({ chain: selectedChain });
   const { bundlerClient, getFeePerGas } = useBundlerClient({
@@ -122,9 +116,6 @@ const Index = () => {
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
-  const isMessageSigningSnapReady = Boolean(
-    installedSnaps[messageSigningSnapOrigin],
-  );
 
   const chainId = selectedChain.id;
   const [permissionType, setPermissionType] = useState('native-token-stream');
@@ -495,23 +486,6 @@ const Index = () => {
             fullWidth
           />
         )}
-
-        <Card
-          content={{
-            title: 'Message Signing Snap',
-            description:
-              'Set up by installing and authorizing the message signing snap.',
-            button: (
-              <InstallButton
-                onClick={requestMessageSigningSnap}
-                disabled={!isMetaMaskReady || isMessageSigningSnapReady}
-                $isInstalled={isMessageSigningSnapReady}
-              />
-            ),
-          }}
-          fullWidth
-          disabled={!isMetaMaskReady}
-        />
 
         <Card
           content={{

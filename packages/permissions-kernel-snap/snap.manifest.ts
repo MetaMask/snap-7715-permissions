@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-restricted-globals */
 import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
+
+const gatorSnapId = process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
 
 const manifest: SnapManifest = {
   version: '0.2.0',
@@ -29,5 +32,11 @@ const manifest: SnapManifest = {
   platformVersion: '8.1.0',
   manifestVersion: '0.1',
 };
+
+if (gatorSnapId) {
+  manifest.initialConnections = {
+    [gatorSnapId]: {},
+  };
+}
 
 export default manifest;
