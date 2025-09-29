@@ -5,7 +5,7 @@ import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 const gatorSnapId = process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
 
 const manifest: SnapManifest = {
-  version: '0.2.0',
+  version: '0.3.0',
   description: 'Manage onchain 7715 permissions',
   proposedName: 'MetaMask Permissions Kernel',
   repository: {

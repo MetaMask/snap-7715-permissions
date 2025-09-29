@@ -7,7 +7,7 @@ const kernelSnapId = process.env.KERNEL_SNAP_ID;
 const messageSnapId = process.env.MESSAGE_SIGNING_SNAP_ID;
 const snapEnv = process.env.SNAP_ENV;
 const manifest: SnapManifest = {
-  version: '0.2.1',
+  version: '0.3.0',
   description: 'Grants 7715 permissions from a DeleGator smart account',
   proposedName: 'Gator Permissions',
   repository: {
