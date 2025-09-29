@@ -1,4 +1,5 @@
 /* eslint-disable no-restricted-globals */
+import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
   AuthType,
@@ -7,14 +8,16 @@ import {
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 import {
-  type Json,
-  type JsonRpcParams,
-  type OnRpcRequestHandler,
-  type OnUserInputHandler,
   MethodNotFoundError,
   InvalidRequestError,
   InternalError,
+} from '@metamask/snaps-sdk';
+import type {
   OnInstallHandler,
+  Json,
+  JsonRpcParams,
+  OnRpcRequestHandler,
+  OnUserInputHandler,
 } from '@metamask/snaps-sdk';
 
 import { AccountApiClient } from './clients/accountApiClient';
@@ -38,7 +41,6 @@ import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
-import { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
 
 const isStorePermissionsFeatureEnabled =
   process.env.STORE_PERMISSIONS_ENABLED === 'true';
@@ -240,6 +242,7 @@ export const onInstall: OnInstallHandler = async () => {
    *
    * Since the message signing snap is preinstalled in production, and has
    * initialConnections configured to automatically connect to the gator snap, this is not needed in production.
+   * The following code will be tree-shaken out in production builds.
    */
   // eslint-disable-next-line no-restricted-globals
   if (snapEnv === 'local' && isStorePermissionsFeatureEnabled) {
