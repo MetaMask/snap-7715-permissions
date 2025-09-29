@@ -321,7 +321,10 @@ const Index = () => {
 
   const connectWallet = async () => {
     try {
-      await provider?.request({
+      if (!provider) {
+        throw new Error('Provider not found');
+      }
+      await provider.request({
         method: 'wallet_requestPermissions',
         params: [
           {
