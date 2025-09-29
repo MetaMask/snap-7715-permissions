@@ -63,7 +63,7 @@ export class AccountController {
   ): Promise<Delegation> {
     logger.debug('AccountController:signDelegation()');
 
-    const { chainId, delegation, address } = options;
+    const { chainId, delegation, address, origin, justification } = options;
 
     const selectedChain = await this.#ethereumProvider.request<Hex>({
       method: 'eth_chainId',
@@ -96,6 +96,8 @@ export class AccountController {
       chainId,
       delegationManager,
       delegation,
+      origin,
+      justification,
     });
 
     const signature = await this.#ethereumProvider.request<Hex>({
@@ -117,10 +119,14 @@ export class AccountController {
     chainId,
     delegationManager,
     delegation,
+    origin,
+    justification,
   }: {
     chainId: number;
     delegationManager: Hex;
     delegation: Omit<Delegation, 'signature'>;
+    origin: string;
+    justification: string;
   }) {
     logger.debug('AccountController:#getSignDelegationArgs()');
 
@@ -151,10 +157,15 @@ export class AccountController {
       ],
     };
 
+    const metadata = {
+      origin,
+      justification,
+    };
+
     const primaryType = 'Delegation';
 
     const message = { ...delegation, salt: bigIntToHex(delegation.salt) };
 
-    return { domain, types, primaryType, message };
+    return { domain, types, primaryType, message, metadata };
   }
 }

@@ -1,18 +1,14 @@
-import {
-  erc7715ProviderActions,
-  RequestExecutionPermissionsParameters,
-} from '@metamask/delegation-toolkit/experimental';
+import type { RequestExecutionPermissionsParameters } from '@metamask/delegation-toolkit/experimental';
+import { erc7715ProviderActions } from '@metamask/delegation-toolkit/experimental';
 import { useCallback, useMemo, useState } from 'react';
 import {
-  type Hex,
   createClient,
   http,
   custom,
   createPublicClient,
   extractChain,
-  Chain,
-  toHex,
 } from 'viem';
+import { type Chain, type Hex } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
 import * as chains from 'viem/chains';
 
@@ -30,11 +26,25 @@ import {
   NativeTokenPeriodicForm,
   ERC20TokenPeriodicForm,
 } from '../components/permissions';
+import type {
+  PermissionRequest,
+  NativeTokenStreamPermissionRequest,
+  ERC20TokenStreamPermissionRequest,
+  NativeTokenPeriodicPermissionRequest,
+  ERC20TokenPeriodicPermissionRequest,
+} from '../components/permissions/types';
 import {
   kernelSnapOrigin,
   gatorSnapOrigin,
   messageSigningSnapOrigin,
 } from '../config';
+import {
+  useMetaMask,
+  useMetaMaskContext,
+  useRequestSnap,
+  useDelegateAccount,
+  useBundlerClient,
+} from '../hooks';
 import {
   Container,
   Heading,
@@ -47,21 +57,7 @@ import {
   ResponseContainer,
   CopyButton,
 } from '../styles';
-import {
-  useMetaMask,
-  useMetaMaskContext,
-  useRequestSnap,
-  useDelegateAccount,
-  useBundlerClient,
-} from '../hooks';
 import { isLocalSnap } from '../utils';
-import type {
-  PermissionRequest,
-  NativeTokenStreamPermissionRequest,
-  ERC20TokenStreamPermissionRequest,
-  NativeTokenPeriodicPermissionRequest,
-  ERC20TokenPeriodicPermissionRequest,
-} from '../components/permissions/types';
 
 /* eslint-disable no-restricted-globals */
 const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
@@ -121,12 +117,7 @@ const Index = () => {
 
     return createClient({
       transport: custom(provider),
-    }).extend(
-      erc7715ProviderActions({
-        kernelSnapId: kernelSnapOrigin,
-        providerSnapId: gatorSnapOrigin,
-      }),
-    );
+    }).extend(erc7715ProviderActions());
   }, [provider, kernelSnapOrigin, gatorSnapOrigin, isMetaMaskReady]);
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
@@ -145,14 +136,16 @@ const Index = () => {
   const [data, setData] = useState<Hex>('0x');
   const [value, setValue] = useState<bigint>(0n);
   const [receipt, setReceipt] = useState<UserOperationReceipt | null>(null);
-  const [pendingPermissionRequests, setPendingPermissionRequests] = useState<Set<string>>(new Set());
+  const [pendingPermissionRequests, setPendingPermissionRequests] = useState<
+    Set<string>
+  >(new Set());
   const [isWalletConnected, setIsWalletConnected] = useState(false);
 
   const handleChainChange = ({
     target: { value: inputValue },
   }: React.ChangeEvent<HTMLSelectElement>) => {
     const chainId = parseInt(inputValue);
-    const chain = supportedChains.find((c) => c.id === chainId);
+    const chain = supportedChains.find((ch) => ch.id === chainId);
     if (chain) {
       setSelectedChain(chain);
     }
@@ -191,7 +184,7 @@ const Index = () => {
     const requestId = `redeem-${Date.now()}-${Math.random()}`;
 
     // Add this request to pending requests
-    setPendingPermissionRequests(prev => new Set(prev).add(requestId));
+    setPendingPermissionRequests((prev) => new Set(prev).add(requestId));
 
     setReceipt(null);
     setPermissionResponseError(null);
@@ -233,7 +226,7 @@ const Index = () => {
       setPermissionResponseError(error as Error);
     } finally {
       // Remove this request from pending requests
-      setPendingPermissionRequests(prev => {
+      setPendingPermissionRequests((prev) => {
         const newSet = new Set(prev);
         newSet.delete(requestId);
         return newSet;
@@ -250,12 +243,8 @@ const Index = () => {
       throw new Error('No permission request data');
     }
 
-    const {
-      type,
-      expiry,
-      isAdjustmentAllowed,
-      ...permissionData
-    } = permissionRequest;
+    const { type, expiry, isAdjustmentAllowed, ...permissionData } =
+      permissionRequest;
 
     const permissionsRequests: RequestExecutionPermissionsParameters = [
       {
@@ -280,7 +269,7 @@ const Index = () => {
     const requestId = `${type}-${Date.now()}-${Math.random()}`;
 
     // Add this request to pending requests
-    setPendingPermissionRequests(prev => new Set(prev).add(requestId));
+    setPendingPermissionRequests((prev) => new Set(prev).add(requestId));
 
     setPermissionResponse(null);
     setReceipt(null);
@@ -295,7 +284,7 @@ const Index = () => {
       setPermissionResponseError(error as Error);
     } finally {
       // Remove this request from pending requests
-      setPendingPermissionRequests(prev => {
+      setPendingPermissionRequests((prev) => {
         const newSet = new Set(prev);
         newSet.delete(requestId);
         return newSet;
