@@ -94,17 +94,6 @@ export const ConnectButton = (
   );
 };
 
-export const InstallButton = (
-  props: ComponentProps<typeof Button> & { $isInstalled?: boolean },
-) => {
-  return (
-    <Button {...props}>
-      <FlaskFox />
-      <ButtonText>{props.$isInstalled ? 'Installed' : 'Install'}</ButtonText>
-    </Button>
-  );
-};
-
 export const CustomMessageButton = (
   props: ComponentProps<typeof Button> & { $text?: string },
 ) => {
