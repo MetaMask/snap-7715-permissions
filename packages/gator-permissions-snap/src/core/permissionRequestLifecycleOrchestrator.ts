@@ -17,6 +17,7 @@ import {
   bytesToHex,
   hexToNumber,
   numberToHex,
+  parseCaipAccountId,
 } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
@@ -245,6 +246,23 @@ export class PermissionRequestLifecycleOrchestrator {
         // This prevents race conditions where the permission is granted before
         // all user input has been processed
         await this.#userEventDispatcher.waitForPendingHandlers();
+
+        // Check if account needs to be upgraded before processing the permission
+        // We check again because the account could have been upgraded in the time since permission request was created 
+        // especially if we consider a scenario where we have a permission batch with the same account.
+        const { address } = parseCaipAccountId(context.accountAddressCaip10);
+        const upgradeStatus = await this.#accountController.getAccountUpgradeStatus({
+          account: address,
+          chainId,
+        });
+
+        if (!upgradeStatus.isUpgraded) {
+          // Trigger account upgrade
+          await this.#accountController.upgradeAccount({
+            account: address,
+            chainId,
+          });
+        }
 
         const response = await this.#resolveResponse({
           originalRequest: validatedPermissionRequest,

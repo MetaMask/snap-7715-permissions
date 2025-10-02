@@ -211,7 +211,15 @@ export class PermissionHandler<
       const {
         justification,
         tokenMetadata: { symbol: tokenSymbol },
+        accountAddressCaip10,
       } = context;
+
+      // Check account upgrade status
+      const { address } = parseCaipAccountId(accountAddressCaip10);
+      const accountUpgradeStatus = await this.#accountController.getAccountUpgradeStatus({
+        account: address,
+        chainId,
+      });
 
       return PermissionHandlerContent({
         origin,
@@ -227,6 +235,7 @@ export class PermissionHandler<
         tokenBalanceFiat: this.#tokenBalanceFiat,
         chainId,
         explorerUrl,
+        isAccountUpgraded: accountUpgradeStatus.isUpgraded,
       });
     };
 
