@@ -17,6 +17,15 @@ export const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
         allowance: '0x1DCD6500',
       },
     },
+    rules: [
+      {
+        type: 'expiry',
+        isAdjustmentAllowed: true,
+        data: {
+          timestamp: 123456,
+        },
+      },
+    ],
   },
 ];
 
@@ -37,6 +46,15 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
         allowance: '0x1DCD6500',
       },
     },
+    rules: [
+      {
+        type: 'expiry',
+        isAdjustmentAllowed: true,
+        data: {
+          timestamp: 123456,
+        },
+      },
+    ],
   },
   {
     chainId: '0x1',
@@ -55,6 +73,15 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
         allowance: '0x1DCD6500',
       },
     },
+    rules: [
+      {
+        type: 'expiry',
+        isAdjustmentAllowed: true,
+        data: {
+          timestamp: 123456,
+        },
+      },
+    ],
   },
 ];
 
@@ -75,5 +102,14 @@ export const MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED: PermissionsRequest = [
         allowance: '0x1DCD6500',
       },
     },
+    rules: [
+      {
+        type: 'expiry',
+        isAdjustmentAllowed: true,
+        data: {
+          timestamp: 123456,
+        },
+      },
+    ],
   },
 ];
