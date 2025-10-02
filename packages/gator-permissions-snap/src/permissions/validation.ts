@@ -1,4 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
@@ -52,7 +53,9 @@ export function validateStartTime(
   startTime: number | undefined | null,
   rules: PermissionRequest['rules'],
 ) {
-  const expiryRule = rules?.find((rule) => rule.type === 'expiry');
+  const expiryRule = rules?.find(
+    (rule) => extractDescriptorName(rule.type) === 'expiry',
+  );
   // expiry rule is validated by the zod schema, but we need the expiry in order
   // to validate the startTime
   if (!expiryRule) {

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { zPermission, zRule } from './7715-permissions-types';
 import { zAddress, zHexStr } from './common';
+import { extractDescriptorName } from '../utils';
 
 export const zAccountSigner = z.object({
   type: z.literal('account'),
@@ -54,7 +55,9 @@ export const zPermissionRequest = z.object({
    */
   rules: z.array(zRule).refine(
     (rules) => {
-      const hasExpiryRule = rules.some((rule) => rule.type === 'expiry');
+      const hasExpiryRule = rules.some(
+        (rule) => extractDescriptorName(rule.type) === 'expiry',
+      );
 
       if (!hasExpiryRule) {
         return false;

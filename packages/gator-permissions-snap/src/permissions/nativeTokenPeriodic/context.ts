@@ -1,3 +1,4 @@
+import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
@@ -56,7 +57,7 @@ export async function applyContext({
 
   const rules: NativeTokenPeriodicPermissionRequest['rules'] =
     originalRequest.rules?.map((rule) => {
-      if (rule.type === 'expiry') {
+      if (extractDescriptorName(rule.type) === 'expiry') {
         isExpiryRuleFound = true;
         return {
           ...rule,

@@ -114,6 +114,29 @@ describe('validatePermissionRequestParam', () => {
         expect(result).toStrictEqual(erc20PermissionParam);
       }).not.toThrow();
     });
+
+    it('should validate with expiry rule where the type descriptor is an object', () => {
+      const expiryRuleParam = {
+        ...validRequestParam,
+        permissionsRequest: [
+          {
+            ...validPermissionRequest,
+            rules: [
+              {
+                type: { name: 'expiry' },
+                isAdjustmentAllowed: true,
+                data: { timestamp: Math.floor(Date.now() / 1000) + 86400 },
+              },
+            ],
+          },
+        ],
+      };
+
+      expect(() => {
+        const result = validatePermissionRequestParam(expiryRuleParam);
+        expect(result).toStrictEqual(expiryRuleParam);
+      }).not.toThrow();
+    });
   });
 
   describe('invalid cases', () => {

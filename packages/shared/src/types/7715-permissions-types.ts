@@ -1,6 +1,7 @@
 import { any, z } from 'zod';
 
 import { zTimestamp } from './7715-permissions-request';
+import { extractDescriptorName } from '../utils';
 
 // Rather than only define permissions by name,
 // Requestors can optionally make this an object and leave room for forward-extensibility.
@@ -8,7 +9,7 @@ export const zTypeDescriptor = z.union([
   z.string(),
   z.object({
     name: z.string(),
-    description: z.string(),
+    description: z.string().optional(),
   }),
 ]);
 export type TypeDescriptor = z.infer<typeof zTypeDescriptor>;
@@ -43,7 +44,7 @@ export const zRule = z
   })
   .refine((rule) => {
     // Rules are generally free-form, but expiry is a special case.
-    if (rule.type === 'expiry') {
+    if (extractDescriptorName(rule.type) === 'expiry') {
       return zTimestamp.safeParse(rule.data.timestamp).success;
     }
 
