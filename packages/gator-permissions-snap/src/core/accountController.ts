@@ -10,6 +10,9 @@ import {
 } from '@metamask/snaps-sdk';
 import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
+import { getChainMetadata } from './chainMetadata';
+import type { SignDelegationOptions } from './types';
+
 export type AccountUpgradeStatus = {
   isUpgraded: boolean;
 };
@@ -22,9 +25,6 @@ export type AccountUpgradeParams = {
   account: string;
   chainId: number;
 };
-
-import { getChainMetadata } from './chainMetadata';
-import type { SignDelegationOptions } from './types';
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
@@ -188,7 +188,9 @@ export class AccountController {
    * @param params - The account and chain ID to check.
    * @returns Promise resolving to the upgrade status.
    */
-  public async getAccountUpgradeStatus(params: AccountUpgradeParams): Promise<AccountUpgradeStatus> {
+  public async getAccountUpgradeStatus(
+    params: AccountUpgradeParams,
+  ): Promise<AccountUpgradeStatus> {
     logger.debug('AccountController:getAccountUpgradeStatus()', params);
 
     try {
@@ -213,7 +215,9 @@ export class AccountController {
    * @param params - The account and chain ID to upgrade.
    * @returns Promise resolving to the upgrade result with transaction hash.
    */
-  public async upgradeAccount(params: AccountUpgradeParams): Promise<AccountUpgradeResult> {
+  public async upgradeAccount(
+    params: AccountUpgradeParams,
+  ): Promise<AccountUpgradeResult> {
     logger.debug('AccountController:upgradeAccount()', params);
 
     try {
@@ -225,9 +229,14 @@ export class AccountController {
       logger.debug('Account upgrade result', result);
 
       // The result should contain a transaction hash
-      if (typeof result === 'object' && result !== null && 'transactionHash' in result) {
+      if (
+        typeof result === 'object' &&
+        result !== null &&
+        'transactionHash' in result
+      ) {
         return {
-          transactionHash: (result as { transactionHash: string }).transactionHash,
+          transactionHash: (result as { transactionHash: string })
+            .transactionHash,
         };
       }
 

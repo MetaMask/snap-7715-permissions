@@ -216,10 +216,11 @@ export class PermissionHandler<
 
       // Check account upgrade status
       const { address } = parseCaipAccountId(accountAddressCaip10);
-      const accountUpgradeStatus = await this.#accountController.getAccountUpgradeStatus({
-        account: address,
-        chainId,
-      });
+      const accountUpgradeStatus =
+        await this.#accountController.getAccountUpgradeStatus({
+          account: address,
+          chainId,
+        });
 
       return PermissionHandlerContent({
         origin,

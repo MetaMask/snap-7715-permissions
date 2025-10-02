@@ -248,13 +248,14 @@ export class PermissionRequestLifecycleOrchestrator {
         await this.#userEventDispatcher.waitForPendingHandlers();
 
         // Check if account needs to be upgraded before processing the permission
-        // We check again because the account could have been upgraded in the time since permission request was created 
+        // We check again because the account could have been upgraded in the time since permission request was created
         // especially if we consider a scenario where we have a permission batch with the same account.
         const { address } = parseCaipAccountId(context.accountAddressCaip10);
-        const upgradeStatus = await this.#accountController.getAccountUpgradeStatus({
-          account: address,
-          chainId,
-        });
+        const upgradeStatus =
+          await this.#accountController.getAccountUpgradeStatus({
+            account: address,
+            chainId,
+          });
 
         if (!upgradeStatus.isUpgraded) {
           // Trigger account upgrade
