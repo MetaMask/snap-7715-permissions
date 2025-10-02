@@ -176,7 +176,7 @@ export async function buildContext({
     : null;
 
   const expiryRule = permissionRequest.rules?.find(
-    (rule) => rule.type === 'expiry',
+    (rule) => extractDescriptorName(rule.type) === 'expiry',
   );
 
   if (!expiryRule) {

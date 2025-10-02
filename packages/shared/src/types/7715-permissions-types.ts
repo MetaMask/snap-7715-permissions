@@ -1,6 +1,5 @@
 import { any, z } from 'zod';
 
-import { zTimestamp } from './7715-permissions-request';
 import { extractDescriptorName } from '../utils';
 
 // Rather than only define permissions by name,
@@ -27,6 +26,11 @@ export const zPermission = z.object({
    */
   data: z.record(any()),
 });
+
+/**
+ * A timestamp in seconds.
+ */
+export const zTimestamp = z.number().int().positive();
 
 export const zRule = z
   .object({

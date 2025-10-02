@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { zPermission, zRule } from './7715-permissions-types';
+import { zPermission, zRule, zTimestamp } from './7715-permissions-types';
 import { zAddress, zHexStr } from './common';
 import { extractDescriptorName } from '../utils';
 
@@ -63,7 +63,7 @@ export const zPermissionRequest = z.object({
         return false;
       }
 
-      const ruleTypes = rules.map((rule) => rule.type);
+      const ruleTypes = rules.map((rule) => extractDescriptorName(rule.type));
 
       const uniqueRuleTypes = new Set(ruleTypes);
       if (uniqueRuleTypes.size !== ruleTypes.length) {
@@ -94,11 +94,6 @@ export const zRequestExecutionPermissionsParam = z.object({
 export type RequestExecutionPermissionsParam = z.infer<
   typeof zRequestExecutionPermissionsParam
 >;
-
-/**
- * A timestamp in seconds.
- */
-export const zTimestamp = z.number().int().positive();
 
 /**
  * Zod validation for startTime to ensure it's today or later.
