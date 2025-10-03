@@ -2,7 +2,10 @@ import {
   type RequestExecutionPermissionsParam,
   zRequestExecutionPermissionsParam,
 } from '@metamask/7715-permissions-shared/types';
-import { extractZodError } from '@metamask/7715-permissions-shared/utils';
+import {
+  extractZodError,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 import { z } from 'zod';
@@ -53,15 +56,24 @@ export function validateRevocationParams(params: Json): {
   delegationHash: Hex;
 } {
   try {
+    console.log('================================================3');
+    logger.debug('🔍 Validating revocation params:', params);
+    logger.debug('Params type:', typeof params);
+
     if (!params || typeof params !== 'object') {
+      logger.debug('❌ Invalid params: not an object');
       throw new InvalidInputError('Parameters are required');
     }
 
+    logger.debug('✅ Params is valid object, parsing with Zod...');
     const validated = zRevocationParams.parse(params);
+    logger.debug('✅ Zod validation successful:', validated);
+
     return {
       delegationHash: validated.delegationHash as Hex,
     };
   } catch (error) {
+    logger.debug('❌ Validation failed:', error);
     if (error instanceof z.ZodError) {
       throw new InvalidInputError(extractZodError(error.errors));
     }

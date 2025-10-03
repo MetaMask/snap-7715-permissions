@@ -160,37 +160,65 @@ export function createRpcHandler({
    * @returns Success confirmation.
    */
   const submitRevocation = async (params: Json): Promise<Json> => {
-    logger.debug('submitRevocation()', params);
+    console.log('================================================2');
+    logger.debug('=== SUBMIT REVOCATION RPC CALLED ===');
+    logger.debug('submitRevocation() called with params:', params);
+    logger.debug('Params type:', typeof params);
+    logger.debug('Params stringified:', JSON.stringify(params, null, 2));
 
     const { delegationHash } = validateRevocationParams(params);
+    logger.debug('Validated delegationHash:', delegationHash);
 
     // First, get the existing permission to validate it exists
+    logger.debug(
+      'Looking up existing permission for delegationHash:',
+      delegationHash,
+    );
     const existingPermission =
       await profileSyncManager.getGrantedPermissionByDelegationHash(
         delegationHash,
       );
 
     if (!existingPermission) {
+      logger.debug(
+        '❌ Permission not found for delegationHash:',
+        delegationHash,
+      );
       throw new InvalidInputError(
         `Permission not found for delegation hash: ${delegationHash}`,
       );
     }
+
+    logger.debug('✅ Found existing permission:', {
+      delegationHash,
+      isRevoked: existingPermission.isRevoked,
+      siteOrigin: existingPermission.siteOrigin,
+    });
 
     // Extract delegationManager and chainId from the permission response for logging
     const { chainId: permissionChainId, signerMeta } =
       existingPermission.permissionResponse;
     const { delegationManager } = signerMeta;
 
-    logger.debug(
-      `Found permission - chainId: ${permissionChainId}, delegationManager: ${delegationManager ?? 'undefined'}`,
-    );
+    logger.debug('Permission details extracted:', {
+      chainId: permissionChainId,
+      delegationManager: delegationManager ?? 'undefined',
+      signerMeta: signerMeta,
+    });
 
     // Check if the delegation is actually disabled on-chain
     if (!delegationManager) {
+      logger.debug('❌ No delegation manager found');
       throw new InvalidInputError(
         `No delegation manager found for delegation hash: ${delegationHash}`,
       );
     }
+
+    logger.debug('Checking if delegation is disabled on-chain...', {
+      delegationHash,
+      chainId: permissionChainId,
+      delegationManager,
+    });
 
     const isDelegationDisabled =
       await profileSyncManager.checkDelegationDisabledOnChain(
@@ -199,23 +227,29 @@ export function createRpcHandler({
         delegationManager,
       );
 
+    logger.debug('On-chain check result:', { isDelegationDisabled });
+
     if (!isDelegationDisabled) {
+      logger.debug('❌ Delegation is not disabled on-chain');
       throw new InvalidInputError(
         `Delegation ${delegationHash} is not disabled on-chain. Cannot process revocation.`,
       );
     }
 
     logger.debug(
-      `Processing revocation for delegation ${delegationHash} - validated on-chain`,
+      '✅ Delegation is disabled on-chain, proceeding with revocation',
     );
 
     // Update the permission's revocation status using the optimized method
     // This avoids re-fetching the permission we already have
+    logger.debug('Updating permission revocation status to true...');
     await profileSyncManager.updatePermissionRevocationStatusWithPermission(
       existingPermission,
       true,
     );
 
+    logger.debug('✅ Revocation completed successfully');
+    logger.debug('=== SUBMIT REVOCATION RPC COMPLETED ===');
     return { success: true };
   };
 
