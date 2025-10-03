@@ -30,61 +30,66 @@ const contracts: DelegationContracts = {
   nonceEnforcer: '0xDE4f2FAC4B3D87A1d9953Ca5FC09FCa7F366254f',
 };
 
-const nameAndExplorerUrlByChainId: Record<
+// derived from https://chainid.network/chains.json
+export const nameAndExplorerUrlByChainId: Record<
   number,
   Pick<ChainMetadata, 'name' | 'explorerUrl'>
 > = {
-  // Mainnets:
-  1: {
-    name: 'Ethereum Mainnet',
-    explorerUrl: 'https://etherscan.io',
+  // mainnets
+  0x1: { name: 'Ethereum Mainnet', explorerUrl: 'https://etherscan.io' },
+  0xa: { name: 'OP Mainnet', explorerUrl: 'https://optimistic.etherscan.io' },
+  0x38: { name: 'BNB Smart Chain Mainnet', explorerUrl: 'https://bscscan.com' },
+  0x64: { name: 'Gnosis', explorerUrl: 'https://gnosisscan.io' },
+  0x82: { name: 'Unichain', explorerUrl: 'https://uniscan.xyz' },
+  0x89: { name: 'Polygon Mainnet', explorerUrl: 'https://polygonscan.com' },
+  0x2105: { name: 'Base', explorerUrl: 'https://basescan.org' },
+  0xa4b1: { name: 'Arbitrum One', explorerUrl: 'https://arbiscan.io' },
+  0xa4ba: {
+    name: 'Arbitrum Nova',
+    explorerUrl: 'https://nova-explorer.arbitrum.io',
   },
-  // Testnets:
-  97: {
+  0xe708: {
+    name: 'Linea Mainnet',
+    explorerUrl: 'https://linea.blockscout.com',
+  },
+  0x13882: { name: 'Amoy', explorerUrl: 'https://amoy.polygonscan.com' },
+  0x138de: { name: 'Berachain', explorerUrl: 'https://berascan.com' },
+
+  // testnets
+  0x61: {
     name: 'BNB Smart Chain Testnet',
     explorerUrl: 'https://testnet.bscscan.com',
   },
-  1301: {
+  0x515: {
     name: 'Unichain Sepolia Testnet',
-    explorerUrl: 'https://sepolia.uniscan.xyz',
+    explorerUrl: 'https://unichain-sepolia.blockscout.com',
   },
-  5115: {
-    name: 'Citrea Testnet',
-    explorerUrl: 'https://explorer.testnet.citrea.xyz',
-  },
-  6342: {
-    name: 'MegaETH Testnet',
-    explorerUrl: 'https://megaexplorer.xyz',
-  },
-  10200: {
+  0x18c6: { name: 'MegaETH Testnet', explorerUrl: undefined },
+  0x27d8: {
     name: 'Gnosis Chiado Testnet',
-    explorerUrl: 'https://gnosis-chiado.blockscout.com',
+    explorerUrl: 'https://blockscout.chiadochain.net',
   },
-  80002: {
-    name: 'Polygon Amoy Testnet',
-    explorerUrl: 'https://amoy.polygonscan.com/',
+  0xe705: {
+    name: 'Linea Sepolia Testnet',
+    explorerUrl: 'https://sepolia.lineascan.build',
   },
-  80069: {
+  0x138c5: {
     name: 'Berachain Bepolia Testnet',
     explorerUrl: 'https://bepolia.beratrail.io',
   },
-  84532: {
+  0x14a34: {
     name: 'Base Sepolia Testnet',
     explorerUrl: 'https://sepolia.basescan.org',
   },
-  421614: {
+  0x66eee: {
     name: 'Arbitrum Sepolia Testnet',
     explorerUrl: 'https://sepolia.arbiscan.io',
   },
-  763373: {
-    name: 'Ink Sepolia Testnet',
-    explorerUrl: 'https://explorer-sepolia.inkonchain.com',
-  },
-  11155111: {
-    name: 'Sepolia Testnet',
+  0xaa36a7: {
+    name: 'Ethereum Sepolia Testnet',
     explorerUrl: 'https://sepolia.etherscan.io',
   },
-  11155420: {
+  0xaa37dc: {
     name: 'OP Sepolia Testnet',
     explorerUrl: 'https://sepolia-optimism.etherscan.io',
   },

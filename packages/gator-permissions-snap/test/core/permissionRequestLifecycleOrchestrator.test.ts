@@ -5,7 +5,6 @@ import {
   createTimestampTerms,
   createNonceTerms,
 } from '@metamask/delegation-core';
-import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
@@ -420,13 +419,13 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           chainId: '0x9999999' as Hex, // non-existent chain
         };
 
-        await expect(
-          permissionRequestLifecycleOrchestrator.orchestrate(
-            'test-origin',
-            chainRequestWithUnknownChain,
-            lifecycleHandlerMocks,
-          ),
-        ).resolves.not.toThrow();
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          chainRequestWithUnknownChain,
+          lifecycleHandlerMocks,
+        );
+
+        expect(result).toBeDefined();
       });
 
       it('throws an error when expiry rule is not present', async () => {
