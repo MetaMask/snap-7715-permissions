@@ -91,6 +91,40 @@ describe('AccountController', () => {
     });
   });
 
+  describe('getAccountUpgradeStatus()', () => {
+    it('should return upgrade status', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        isUpgraded: true,
+      });
+
+      const result = await accountController.getAccountUpgradeStatus({
+        account: mockAddress,
+        chainId: sepolia,
+      });
+
+      expect(result).toStrictEqual({ isUpgraded: true });
+    });
+  });
+
+  describe('upgradeAccount()', () => {
+    it('should upgrade account and return transaction hash', async () => {
+      const mockTransactionHash =
+        '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        transactionHash: mockTransactionHash,
+      });
+
+      const result = await accountController.upgradeAccount({
+        account: mockAddress,
+        chainId: sepolia,
+      });
+
+      expect(result).toStrictEqual({
+        transactionHash: mockTransactionHash,
+      });
+    });
+  });
+
   describe('signDelegation()', () => {
     const unsignedDelegation: Omit<Delegation, 'signature'> = {
       delegate: '0x1234567890abcdef1234567890abcdef12345678',
