@@ -4,8 +4,14 @@ import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
-import type { ProfileSyncManager } from '../profileSync';
-import { validatePermissionRequestParam } from '../utils/validate';
+import type {
+  ProfileSyncManager,
+  StoredGrantedPermission,
+} from '../profileSync/profileSync';
+import {
+  validatePermissionRequestParam,
+  validateRevocationParams,
+} from '../utils/validate';
 
 /**
  * Type for the RPC handler methods.
@@ -32,6 +38,14 @@ export type RpcHandler = {
    * @returns The granted permissions.
    */
   getGrantedPermissions(): Promise<Json>;
+
+  /**
+   * Handles submit revocation requests.
+   *
+   * @param params - The parameters for the revocation.
+   * @returns Success confirmation.
+   */
+  submitRevocation(params: Json): Promise<Json>;
 };
 
 /**
@@ -75,15 +89,19 @@ export function createRpcHandler(config: {
         throw new InvalidInputError(permissionResponse.reason);
       }
 
-      permissionsToStore.push({
+      const storedPermission: StoredGrantedPermission = {
         permissionResponse: permissionResponse.response,
         siteOrigin,
-      });
+        isRevoked: false,
+      };
+      permissionsToStore.push(storedPermission);
     }
 
     // Only after all permissions have been successfully processed, store them all in batch
     if (permissionsToStore.length > 0) {
-      await profileSyncManager.storeGrantedPermissionBatch(permissionsToStore);
+      await profileSyncManager.storeGrantedPermissionBatch(
+        permissionsToStore as StoredGrantedPermission[],
+      );
     }
 
     // Return the permission responses
@@ -114,9 +132,110 @@ export function createRpcHandler(config: {
     return grantedPermission as Json[];
   };
 
+  /**
+   * Handles submit revocation requests.
+   *
+   * @param params - The parameters for the revocation.
+   * @returns Success confirmation.
+   */
+  const submitRevocation = async (params: Json): Promise<Json> => {
+    console.log('================================================2');
+    logger.debug('=== SUBMIT REVOCATION RPC CALLED ===');
+    logger.debug('submitRevocation() called with params:', params);
+    logger.debug('Params type:', typeof params);
+    logger.debug('Params stringified:', JSON.stringify(params, null, 2));
+
+    const { delegationHash } = validateRevocationParams(params);
+    logger.debug('Validated delegationHash:', delegationHash);
+
+    // First, get the existing permission to validate it exists
+    logger.debug(
+      'Looking up existing permission for delegationHash:',
+      delegationHash,
+    );
+    const existingPermission =
+      await profileSyncManager.getGrantedPermissionByDelegationHash(
+        delegationHash,
+      );
+
+    if (!existingPermission) {
+      logger.debug(
+        '❌ Permission not found for delegationHash:',
+        delegationHash,
+      );
+      throw new InvalidInputError(
+        `Permission not found for delegation hash: ${delegationHash}`,
+      );
+    }
+
+    logger.debug('✅ Found existing permission:', {
+      delegationHash,
+      isRevoked: existingPermission.isRevoked,
+      siteOrigin: existingPermission.siteOrigin,
+    });
+
+    // Extract delegationManager and chainId from the permission response for logging
+    const { chainId: permissionChainId, signerMeta } =
+      existingPermission.permissionResponse;
+    const { delegationManager } = signerMeta;
+
+    logger.debug('Permission details extracted:', {
+      chainId: permissionChainId,
+      delegationManager: delegationManager ?? 'undefined',
+      signerMeta: signerMeta,
+    });
+
+    // Check if the delegation is actually disabled on-chain
+    if (!delegationManager) {
+      logger.debug('❌ No delegation manager found');
+      throw new InvalidInputError(
+        `No delegation manager found for delegation hash: ${delegationHash}`,
+      );
+    }
+
+    logger.debug('Checking if delegation is disabled on-chain...', {
+      delegationHash,
+      chainId: permissionChainId,
+      delegationManager,
+    });
+
+    const isDelegationDisabled =
+      await profileSyncManager.checkDelegationDisabledOnChain(
+        delegationHash,
+        permissionChainId,
+        delegationManager,
+      );
+
+    logger.debug('On-chain check result:', { isDelegationDisabled });
+
+    if (!isDelegationDisabled) {
+      logger.debug('❌ Delegation is not disabled on-chain');
+      throw new InvalidInputError(
+        `Delegation ${delegationHash} is not disabled on-chain. Cannot process revocation.`,
+      );
+    }
+
+    logger.debug(
+      '✅ Delegation is disabled on-chain, proceeding with revocation',
+    );
+
+    // Update the permission's revocation status using the optimized method
+    // This avoids re-fetching the permission we already have
+    logger.debug('Updating permission revocation status to true...');
+    await profileSyncManager.updatePermissionRevocationStatusWithPermission(
+      existingPermission,
+      true,
+    );
+
+    logger.debug('✅ Revocation completed successfully');
+    logger.debug('=== SUBMIT REVOCATION RPC COMPLETED ===');
+    return { success: true };
+  };
+
   return {
     grantPermission,
     getPermissionOffers,
     getGrantedPermissions,
+    submitRevocation,
   };
 }

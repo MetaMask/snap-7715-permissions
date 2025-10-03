@@ -139,6 +139,7 @@ const profileSyncManager = createProfileSyncManager({
       storage: profileSyncOptions.keyStorageOptions,
     },
   ),
+  ethereumProvider: ethereum,
 });
 
 const userEventDispatcher = new UserEventDispatcher();
@@ -187,6 +188,9 @@ const boundRpcHandlers: {
     rpcHandler.getPermissionOffers.bind(rpcHandler),
   [RpcMethod.PermissionsProviderGetGrantedPermissions]:
     rpcHandler.getGrantedPermissions.bind(rpcHandler),
+  [RpcMethod.PermissionsProviderSubmitRevocation]: async (
+    params?: JsonRpcParams,
+  ) => rpcHandler.submitRevocation(params as Json),
 };
 
 /**
@@ -204,8 +208,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }) => {
   logger.debug(`RPC request (origin="${origin}"): method="${request.method}"`);
+  console.log('SNAP================================================1');
+  logger.debug('🔍 Detailed origin info:', {
+    origin,
+    originType: typeof origin,
+    originLength: origin?.length,
+    method: request.method,
+  });
+  console.log('SNAP================================================2');
+  // Special logging for revocation requests
+  if (request.method === 'permissionsProvider_submitRevocation') {
+    logger.debug('🚨 REVOCATION RPC REQUEST DETECTED 🚨');
+    logger.debug('Origin:', origin);
+    logger.debug('Origin type:', typeof origin);
+    logger.debug('Method:', request.method);
+    logger.debug('Params:', request.params);
+  }
 
   if (!isMethodAllowedForOrigin(origin, request.method)) {
+    logger.debug('❌ Permission denied:', {
+      origin,
+      method: request.method,
+    });
     throw new InvalidRequestError(
       `Origin '${origin}' is not allowed to call '${request.method}'`,
     );
