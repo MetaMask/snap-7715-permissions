@@ -3,7 +3,7 @@ import { Skeleton, Text, Tooltip } from '@metamask/snaps-sdk/jsx';
 import { truncateDecimalPlaces } from '../../utils/string';
 
 type TokenBalanceFieldProps = {
-  tokenBalance: string | undefined;
+  tokenBalance: string | null;
 };
 
 /**

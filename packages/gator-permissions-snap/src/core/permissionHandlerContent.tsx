@@ -46,7 +46,7 @@ export type PermissionHandlerContentProps = {
   tokenBalance: string | null;
   tokenBalanceFiat: string | null;
   chainId: number;
-  explorerUrl: string;
+  explorerUrl: string | undefined;
 };
 
 /**
@@ -95,7 +95,10 @@ export const PermissionHandlerContent = ({
     context.tokenAddressCaip19,
   );
   if (assetNamespace === 'erc20') {
-    tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
+    if (explorerUrl) {
+      tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
+    }
+
     tokenAddress = assetReference;
   }
 

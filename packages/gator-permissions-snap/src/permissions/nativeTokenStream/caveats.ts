@@ -25,7 +25,7 @@ export async function createPermissionCaveats({
     permission.data;
 
   const nativeTokenStreamingCaveat: Caveat = {
-    enforcer: contracts.enforcers.NativeTokenStreamingEnforcer,
+    enforcer: contracts.nativeTokenStreamingEnforcer,
     terms: createNativeTokenStreamingTerms({
       initialAmount: BigInt(initialAmount),
       maxAmount: BigInt(maxAmount),
@@ -36,7 +36,7 @@ export async function createPermissionCaveats({
   };
 
   const exactCalldataCaveat: Caveat = {
-    enforcer: contracts.enforcers.ExactCalldataEnforcer,
+    enforcer: contracts.exactCalldataEnforcer,
     terms: createExactCalldataTerms({
       calldata: '0x',
     }),

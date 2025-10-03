@@ -62,17 +62,10 @@ if (!priceApiBaseUrl) {
   throw new InternalError('PRICE_API_BASE_URL is not set');
 }
 
-const supportedChainsString = process.env.SUPPORTED_CHAINS;
-if (!supportedChainsString) {
-  throw new InternalError('SUPPORTED_CHAINS is not set');
-}
-
 const messageSigningSnapId = process.env.MESSAGE_SIGNING_SNAP_ID;
 if (!messageSigningSnapId) {
   throw new InternalError('MESSAGE_SIGNING_SNAP_ID is not set');
 }
-
-const supportedChains = supportedChainsString.split(',').map(Number);
 
 // set up dependencies
 
@@ -161,7 +154,6 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   confirmationDialogFactory,
   userEventDispatcher,
   nonceCaveatService,
-  supportedChains,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({

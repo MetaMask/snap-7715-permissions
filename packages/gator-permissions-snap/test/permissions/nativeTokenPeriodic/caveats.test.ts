@@ -13,12 +13,10 @@ import { parseUnits } from '../../../src/utils/value';
 
 // Define the contracts with enforcers
 const contracts = {
-  enforcers: {
-    NativeTokenPeriodicTransferEnforcer:
-      '0x726B9Dc7515524819365AC0Cf6464C683Ae61765',
-    ExactCalldataEnforcer: '0x9Ec1216e9E98311bF49f7b644cEE7865672fF4B9',
-  },
-} as any as DelegationContracts;
+  nativeTokenPeriodTransferEnforcer:
+    '0x726B9Dc7515524819365AC0Cf6464C683Ae61765',
+  exactCalldataEnforcer: '0x9Ec1216e9E98311bF49f7b644cEE7865672fF4B9',
+} as unknown as DelegationContracts;
 
 // Helper function to create expected terms
 const createExpectedTerms = (
@@ -48,7 +46,7 @@ describe('nativeTokenPeriodic:caveats', () => {
           startTime: convertReadableDateToTimestamp('10/26/1985'),
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const caveats = await createPermissionCaveats({ permission, contracts });
@@ -57,12 +55,12 @@ describe('nativeTokenPeriodic:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.NativeTokenPeriodicTransferEnforcer,
+          enforcer: contracts.nativeTokenPeriodTransferEnforcer,
           terms: nativeTokenPeriodicExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ExactCalldataEnforcer,
+          enforcer: contracts.exactCalldataEnforcer,
           terms: '0x',
           args: '0x',
         },
@@ -81,7 +79,7 @@ describe('nativeTokenPeriodic:caveats', () => {
           startTime: convertReadableDateToTimestamp('10/26/1985'),
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const caveats = await createPermissionCaveats({ permission, contracts });
@@ -90,12 +88,12 @@ describe('nativeTokenPeriodic:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.NativeTokenPeriodicTransferEnforcer,
+          enforcer: contracts.nativeTokenPeriodTransferEnforcer,
           terms: nativeTokenPeriodicExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ExactCalldataEnforcer,
+          enforcer: contracts.exactCalldataEnforcer,
           terms: '0x',
           args: '0x',
         },
@@ -113,7 +111,7 @@ describe('nativeTokenPeriodic:caveats', () => {
           startTime: convertReadableDateToTimestamp('10/26/1985'),
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const caveats = await createPermissionCaveats({ permission, contracts });
@@ -122,12 +120,12 @@ describe('nativeTokenPeriodic:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.NativeTokenPeriodicTransferEnforcer,
+          enforcer: contracts.nativeTokenPeriodTransferEnforcer,
           terms: nativeTokenPeriodicExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ExactCalldataEnforcer,
+          enforcer: contracts.exactCalldataEnforcer,
           terms: '0x',
           args: '0x',
         },

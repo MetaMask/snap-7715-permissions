@@ -24,7 +24,7 @@ export async function createPermissionCaveats({
   const { periodAmount, periodDuration, startTime } = permission.data;
 
   const nativeTokenPeriodTransferCaveat: Caveat = {
-    enforcer: contracts.enforcers.NativeTokenPeriodicTransferEnforcer,
+    enforcer: contracts.nativeTokenPeriodTransferEnforcer,
     terms: createNativeTokenPeriodTransferTerms({
       periodAmount: BigInt(periodAmount),
       periodDuration,
@@ -34,7 +34,7 @@ export async function createPermissionCaveats({
   };
 
   const exactCalldataCaveat: Caveat = {
-    enforcer: contracts.enforcers.ExactCalldataEnforcer,
+    enforcer: contracts.exactCalldataEnforcer,
     terms: createExactCalldataTerms({
       calldata: '0x',
     }),

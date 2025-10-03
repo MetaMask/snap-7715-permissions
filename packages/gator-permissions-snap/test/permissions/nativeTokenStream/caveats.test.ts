@@ -9,12 +9,10 @@ import { parseUnits } from '../../../src/utils/value';
 describe('nativeTokenStream:caveats', () => {
   describe('createPermissionCaveats()', () => {
     const contracts = {
-      enforcers: {
-        NativeTokenStreamingEnforcer:
-          '0x19B32b6E6e4a8eD49805cC8Fe929a4Fd90287Df9',
-        ExactCalldataEnforcer: '0xB1cd88EF93BF9e34c0fE5bF0D20B9c5499049d80',
-      },
-    } as any as DelegationContracts;
+      nativeTokenStreamingEnforcer:
+        '0x19B32b6E6e4a8eD49805cC8Fe929a4Fd90287Df9',
+      exactCalldataEnforcer: '0xB1cd88EF93BF9e34c0fE5bF0D20B9c5499049d80',
+    } as unknown as DelegationContracts;
 
     const initialAmount = bigIntToHex(
       parseUnits({ formatted: '1', decimals: 18 }),
@@ -36,7 +34,7 @@ describe('nativeTokenStream:caveats', () => {
         startTime,
         justification: 'test',
       },
-      rules: {},
+      isAdjustmentAllowed: true,
     };
 
     it('should create nativeTokenStreaming and exactCalldata caveats', async () => {
@@ -54,12 +52,12 @@ describe('nativeTokenStream:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.NativeTokenStreamingEnforcer,
+          enforcer: contracts.nativeTokenStreamingEnforcer,
           terms: nativeTokenStreamExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ExactCalldataEnforcer,
+          enforcer: contracts.exactCalldataEnforcer,
           terms: '0x',
           args: '0x',
         },
