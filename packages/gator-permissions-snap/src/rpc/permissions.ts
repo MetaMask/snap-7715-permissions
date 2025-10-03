@@ -1,3 +1,5 @@
+import { logger } from '@metamask/7715-permissions-shared/utils';
+
 import { RpcMethod } from './rpcMethod';
 
 const allowedPermissionsByOrigin: { [origin: string]: string[] } = {
@@ -25,5 +27,24 @@ export const isMethodAllowedForOrigin = (
   origin: string,
   method: string,
 ): boolean => {
-  return allowedPermissionsByOrigin[origin]?.includes(method) ?? false;
+  logger.debug('🔍 Checking origin permissions:', {
+    origin,
+    method,
+    originCharCodes: origin.split('').map((c) => c.charCodeAt(0)),
+    allowedOrigins: Object.keys(allowedPermissionsByOrigin),
+    allowedMethodsForOrigin: allowedPermissionsByOrigin[origin],
+    exactMatch: allowedPermissionsByOrigin[origin],
+    includesCheck: allowedPermissionsByOrigin[origin]?.includes(method),
+  });
+
+  const isAllowed =
+    allowedPermissionsByOrigin[origin]?.includes(method) ?? false;
+
+  logger.debug('🔍 Permission check result:', {
+    origin,
+    method,
+    isAllowed,
+  });
+
+  return isAllowed;
 };
