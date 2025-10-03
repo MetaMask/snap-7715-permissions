@@ -1,5 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { extractPermissionName } from '@metamask/7715-permissions-shared/utils';
+import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { AccountController } from './accountController';
@@ -63,7 +63,7 @@ export class PermissionHandlerFactory {
   createPermissionHandler(
     permissionRequest: PermissionRequest,
   ): PermissionHandlerType {
-    const type = extractPermissionName(permissionRequest.permission.type);
+    const type = extractDescriptorName(permissionRequest.permission.type);
 
     const createPermissionHandler = <
       TRequest extends PermissionRequest,

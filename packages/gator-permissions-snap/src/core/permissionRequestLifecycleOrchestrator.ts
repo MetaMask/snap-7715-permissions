@@ -3,7 +3,10 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  extractDescriptorName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
 import type { Delegation } from '@metamask/delegation-core';
 import {
   createNonceTerms,
@@ -355,7 +358,7 @@ export class PermissionRequestLifecycleOrchestrator {
     });
 
     const expiryRule = resolvedRequest.rules?.find(
-      (rule) => rule.type === 'expiry',
+      (rule) => extractDescriptorName(rule.type) === 'expiry',
     );
 
     if (expiryRule) {
