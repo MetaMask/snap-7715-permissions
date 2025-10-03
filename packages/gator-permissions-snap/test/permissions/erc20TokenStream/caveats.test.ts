@@ -23,11 +23,9 @@ describe('erc20TokenStream:caveats', () => {
     const tokenAddress = '0x1234567890123456789012345678901234567890';
 
     const contracts = {
-      enforcers: {
-        ERC20StreamingEnforcer: '0x7356Ed4321Ff9e7DAE246461829cDC170ff660Ab',
-        ValueLteEnforcer: '0x5e12Ca712176E7557e4fAa1c8cc27382B60B5e39',
-      },
-    } as any as DelegationContracts;
+      erc20StreamingEnforcer: '0x7356Ed4321Ff9e7DAE246461829cDC170ff660Ab',
+      valueLteEnforcer: '0x5e12Ca712176E7557e4fAa1c8cc27382B60B5e39',
+    } as unknown as DelegationContracts;
 
     const mockPermission: PopulatedErc20TokenStreamPermission = {
       type: 'erc20-token-stream',
@@ -39,7 +37,7 @@ describe('erc20TokenStream:caveats', () => {
         tokenAddress,
         justification: 'test',
       },
-      rules: {},
+      isAdjustmentAllowed: true,
     };
 
     it('should create erc20Streaming and valueLte caveats', async () => {
@@ -55,12 +53,12 @@ describe('erc20TokenStream:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.ERC20StreamingEnforcer,
+          enforcer: contracts.erc20StreamingEnforcer,
           terms: erc20StreamingExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ValueLteEnforcer,
+          enforcer: contracts.valueLteEnforcer,
           terms:
             '0x0000000000000000000000000000000000000000000000000000000000000000',
           args: '0x',

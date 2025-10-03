@@ -98,7 +98,7 @@ export class NonceCaveatClient {
           method: 'eth_call',
           params: [
             {
-              to: contracts.enforcers.NonceEnforcer,
+              to: contracts.nonceEnforcer,
               data:
                 NonceCaveatClient.#currentNonceCalldata +
                 contracts.delegationManager.slice(2).padStart(64, '0') +

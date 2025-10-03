@@ -26,7 +26,7 @@ export async function createPermissionCaveats({
     permission.data;
 
   const erc20StreamingCaveat: Caveat = {
-    enforcer: contracts.enforcers.ERC20StreamingEnforcer,
+    enforcer: contracts.erc20StreamingEnforcer,
     terms: createERC20StreamingTerms({
       tokenAddress: permission.data.tokenAddress,
       initialAmount: BigInt(initialAmount),
@@ -38,7 +38,7 @@ export async function createPermissionCaveats({
   };
 
   const valueLteCaveat: Caveat = {
-    enforcer: contracts.enforcers.ValueLteEnforcer,
+    enforcer: contracts.valueLteEnforcer,
     terms: createValueLteTerms({
       maxValue: 0n,
     }),
