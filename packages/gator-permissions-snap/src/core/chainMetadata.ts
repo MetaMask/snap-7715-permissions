@@ -46,11 +46,11 @@ export const nameAndExplorerUrlByChainId: Record<
   0xa4b1: { name: 'Arbitrum One', explorerUrl: 'https://arbiscan.io' },
   0xa4ba: {
     name: 'Arbitrum Nova',
-    explorerUrl: 'https://nova-explorer.arbitrum.io',
+    explorerUrl: 'https://nova.arbiscan.io',
   },
   0xe708: {
     name: 'Linea Mainnet',
-    explorerUrl: 'https://linea.blockscout.com',
+    explorerUrl: 'https://lineascan.build',
   },
   0x13882: { name: 'Amoy', explorerUrl: 'https://amoy.polygonscan.com' },
   0x138de: { name: 'Berachain', explorerUrl: 'https://berascan.com' },
@@ -67,7 +67,7 @@ export const nameAndExplorerUrlByChainId: Record<
   0x18c6: { name: 'MegaETH Testnet', explorerUrl: undefined },
   0x27d8: {
     name: 'Gnosis Chiado Testnet',
-    explorerUrl: 'https://blockscout.chiadochain.net',
+    explorerUrl: 'https://gnosis-chiado.blockscout.com',
   },
   0xe705: {
     name: 'Linea Sepolia Testnet',
