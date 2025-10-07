@@ -95,6 +95,7 @@ describe('AccountController', () => {
     it('should return upgrade status', async () => {
       mockEthereumProvider.request.mockResolvedValueOnce({
         isUpgraded: true,
+        upgradedAddress: '0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B', // eip7702StatelessDeleGatorImpl address
       });
 
       const result = await accountController.getAccountUpgradeStatus({

@@ -194,15 +194,23 @@ export class AccountController {
     logger.debug('AccountController:getAccountUpgradeStatus()', params);
 
     try {
-      const result = await this.#ethereumProvider.request({
+      const result = (await this.#ethereumProvider.request({
         method: 'wallet_getAccountUpgradeStatus',
         params: [params],
-      });
+      })) as { isUpgraded: boolean; upgradedAddress: Hex | null };
 
       logger.debug('Account upgrade status result', result);
 
+      const {
+        contracts: { eip7702StatelessDeleGatorImpl },
+      } = getChainMetadata({ chainId: params.chainId });
+
       return {
-        isUpgraded: (result as { isUpgraded?: boolean })?.isUpgraded ?? false,
+        isUpgraded:
+          (result.isUpgraded &&
+            result.upgradedAddress?.toLowerCase() ===
+              eip7702StatelessDeleGatorImpl.toLowerCase()) ??
+          false,
       };
     } catch (error) {
       logger.error('Failed to check account upgrade status', error);
