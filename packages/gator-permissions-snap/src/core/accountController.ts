@@ -207,10 +207,9 @@ export class AccountController {
 
       return {
         isUpgraded:
-          (result.isUpgraded &&
-            result.upgradedAddress?.toLowerCase() ===
-              eip7702StatelessDeleGatorImpl.toLowerCase()) ??
-          false,
+          result.isUpgraded &&
+          result.upgradedAddress?.toLowerCase() ===
+            eip7702StatelessDeleGatorImpl.toLowerCase(),
       };
     } catch (error) {
       logger.error('Failed to check account upgrade status', error);
