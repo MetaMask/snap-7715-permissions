@@ -71,6 +71,10 @@ const supportedChains: Chain[] = supportedChainsString
         id: chainId as any,
       });
 
+      if (!chain) {
+        throw new Error(`Chain ${chainId} not found`);
+      }
+
       return chain;
     })
   : DEFAULT_CHAINS;

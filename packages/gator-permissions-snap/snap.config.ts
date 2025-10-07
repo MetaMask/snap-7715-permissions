@@ -12,7 +12,6 @@ const {
   STORE_PERMISSIONS_ENABLED,
   ACCOUNT_API_BASE_URL,
   TOKENS_API_BASE_URL,
-  SUPPORTED_CHAINS,
   KERNEL_SNAP_ID,
   MESSAGE_SIGNING_SNAP_ID,
 } = process.env;
@@ -66,12 +65,6 @@ if (!TOKENS_API_BASE_URL) {
   );
 }
 
-if (!SUPPORTED_CHAINS) {
-  throw new InternalError(
-    'SUPPORTED_CHAINS must be set as an environment variable.',
-  );
-}
-
 const config: SnapConfig = {
   input: resolve(__dirname, 'src/index.ts'),
   server: {
@@ -87,7 +80,6 @@ const config: SnapConfig = {
     STORE_PERMISSIONS_ENABLED,
     ACCOUNT_API_BASE_URL,
     TOKENS_API_BASE_URL,
-    SUPPORTED_CHAINS,
     KERNEL_SNAP_ID,
     MESSAGE_SIGNING_SNAP_ID,
   },
