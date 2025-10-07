@@ -18,4 +18,5 @@ export const zHexStr = z
     return value as Hex;
   });
 
+export const zHexStrNullableOptional = zHexStr.optional().nullable();
 export const zBigInt = z.bigint();

@@ -2,7 +2,7 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
-import { validateHexInteger } from '../validation';
+import { validateHexInteger, validateStartTime } from '../validation';
 import type {
   NativeTokenStreamPermission,
   NativeTokenStreamPermissionRequest,
@@ -50,16 +50,7 @@ function validatePermissionData(
     );
   }
 
-  const expiryRule = rules?.find((rule) => rule.type === 'expiry');
-  if (!expiryRule) {
-    throw new InvalidInputError('Expiry rule is required');
-  }
-  const expiry = Number(expiryRule.data.timestamp);
-
-  // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
-  if (startTime && startTime >= expiry) {
-    throw new InvalidInputError('Invalid startTime: must be before expiry');
-  }
+  validateStartTime(startTime, rules);
 
   return true;
 }

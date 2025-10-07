@@ -74,6 +74,15 @@ describe('validate utils', () => {
               allowed: true,
             },
           },
+          rules: [
+            {
+              type: 'expiry',
+              isAdjustmentAllowed: true,
+              data: {
+                timestamp: 123456,
+              },
+            },
+          ],
           context: '0x1234',
           dependencyInfo: [
             {
@@ -97,6 +106,15 @@ describe('validate utils', () => {
           {
             chainId: '0x1',
             // Missing permission object
+            rules: [
+              {
+                type: 'expiry',
+                isAdjustmentAllowed: true,
+                data: {
+                  timestamp: 123456,
+                },
+              },
+            ],
           },
         ]),
       ).toThrow(

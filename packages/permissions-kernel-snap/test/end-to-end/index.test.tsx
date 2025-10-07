@@ -33,8 +33,14 @@ describe('Kernel Snap', () => {
 
       it('prevents prototype pollution attacks by rejecting prototype method names', async () => {
         // Test various prototype method names that could be used for prototype pollution
-        const prototypeMethods = ['toString', 'valueOf', 'constructor', 'hasOwnProperty', '__proto__'];
-        
+        const prototypeMethods = [
+          'toString',
+          'valueOf',
+          'constructor',
+          'hasOwnProperty',
+          '__proto__',
+        ];
+
         for (const method of prototypeMethods) {
           const response = await snapRequest({
             method,
@@ -82,7 +88,9 @@ describe('Kernel Snap', () => {
               }),
             ]),
           }),
-          message: expect.stringContaining('Invalid parameters for method "snapRpc": At path: 3.jsonrpc -- Expected the literal `"2.0"`, but received: "1.0"'),
+          message: expect.stringContaining(
+            'Invalid parameters for method "snapRpc": At path: 3.jsonrpc -- Expected the literal `"2.0"`, but received: "1.0"',
+          ),
           stack: expect.any(String),
         });
       });
@@ -105,7 +113,7 @@ describe('Kernel Snap', () => {
           jsonrpc: '2.0',
           method: 'wallet_requestExecutionPermissions',
           params: {
-            '__proto__': 'malicious',
+            __proto__: 'malicious',
             normalKey: 'value',
           },
         } as any);
@@ -123,7 +131,7 @@ describe('Kernel Snap', () => {
           method: 'wallet_requestExecutionPermissions',
           params: {
             normalKey: {
-              '__proto__': 'malicious',
+              __proto__: 'malicious',
             },
           },
         } as any);
@@ -186,6 +194,13 @@ describe('Kernel Snap', () => {
                   allowance: '0x1000',
                 },
               },
+              rules: [
+                {
+                  type: 'expiry',
+                  isAdjustmentAllowed: true,
+                  data: { timestamp: 123456 },
+                },
+              ],
             },
           ],
         };

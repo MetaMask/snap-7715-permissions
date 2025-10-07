@@ -50,6 +50,14 @@ describe('profileSync', () => {
     signature: '0x2',
   };
 
+  const expiryRule = {
+    type: 'expiry',
+    isAdjustmentAllowed: false,
+    data: {
+      timestamp: 1234,
+    },
+  };
+
   const mockDelegationHash = hashDelegation(mockDelegation);
   const mockDelegationHashTwo = hashDelegation(mockDelegationTwo);
 
@@ -84,6 +92,7 @@ describe('profileSync', () => {
       signerMeta: {
         delegationManager: '0x1234567890123456789012345678901234567890',
       },
+      rules: [expiryRule],
     },
     siteOrigin: 'https://example.com',
   };
@@ -299,6 +308,7 @@ describe('profileSync', () => {
               signerMeta: {
                 delegationManager: '0x1234567890123456789012345678901234567890',
               },
+              rules: [expiryRule],
             },
             siteOrigin: 'https://example.com',
           },

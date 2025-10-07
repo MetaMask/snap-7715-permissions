@@ -45,6 +45,15 @@ describe('RpcHandler', () => {
             allowance: '0x1000',
           },
         },
+        rules: [
+          {
+            type: 'expiry',
+            isAdjustmentAllowed: true,
+            data: {
+              timestamp: 123456,
+            },
+          },
+        ],
       },
     ];
 
@@ -66,6 +75,15 @@ describe('RpcHandler', () => {
               allowance: '0x1000',
             },
           },
+          rules: [
+            {
+              type: 'expiry',
+              isAdjustmentAllowed: true,
+              data: {
+                timestamp: 123456,
+              },
+            },
+          ],
         },
       ];
 
@@ -119,6 +137,15 @@ describe('RpcHandler', () => {
               allowance: '0x1000',
             },
           },
+          rules: [
+            {
+              type: 'expiry',
+              isAdjustmentAllowed: true,
+              data: {
+                timestamp: 123456,
+              },
+            },
+          ],
           address: '0x1234567890123456789012345678901234567890',
           context: '0x1',
           dependencyInfo: [

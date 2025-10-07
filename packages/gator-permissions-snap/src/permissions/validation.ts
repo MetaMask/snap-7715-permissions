@@ -1,3 +1,5 @@
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
@@ -17,7 +19,7 @@ export function validateHexInteger({
   required,
 }: {
   name: string;
-  value: Hex | undefined;
+  value: Hex | undefined | null;
   allowZero: boolean;
   required: boolean;
 }) {
@@ -38,5 +40,31 @@ export function validateHexInteger({
 
   if (parsedValue === 0n && !allowZero) {
     throw new InvalidInputError(`Invalid ${name}: must be greater than 0`);
+  }
+}
+
+/**
+ * Validates a start time to ensure it's before expiry.
+ * @param startTime - The start time number to validate.
+ * @param rules - The rules of the permission request.
+ * @throws {Error} If the start time fails validation
+ */
+export function validateStartTime(
+  startTime: number | undefined | null,
+  rules: PermissionRequest['rules'],
+) {
+  const expiryRule = rules?.find(
+    (rule) => extractDescriptorName(rule.type) === 'expiry',
+  );
+  // expiry rule is validated by the zod schema, but we need the expiry in order
+  // to validate the startTime
+  if (!expiryRule) {
+    throw new InvalidInputError('Expiry rule is required');
+  }
+  const expiry = expiryRule.data.timestamp as number;
+
+  // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
+  if (startTime && startTime >= expiry) {
+    throw new InvalidInputError('Invalid startTime: must be before expiry');
   }
 }

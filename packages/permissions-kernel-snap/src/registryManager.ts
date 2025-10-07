@@ -8,7 +8,7 @@ import {
   type PermissionOfferRegistry,
 } from '@metamask/7715-permissions-shared/types';
 import {
-  extractPermissionName,
+  extractDescriptorName,
   extractZodError,
   logger,
 } from '@metamask/7715-permissions-shared/utils';
@@ -162,8 +162,8 @@ export const createPermissionOfferRegistryManager = (
       (permission) =>
         !allRegisteredOffers.some(
           (offer) =>
-            extractPermissionName(permission.permission.type) ===
-            extractPermissionName(offer.type),
+            extractDescriptorName(permission.permission.type) ===
+            extractDescriptorName(offer.type),
         ),
     );
 

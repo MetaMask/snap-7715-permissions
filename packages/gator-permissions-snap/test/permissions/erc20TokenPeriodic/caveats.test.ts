@@ -15,11 +15,9 @@ const tokenDecimals = 6;
 
 // Define the contracts with enforcers
 const contracts = {
-  enforcers: {
-    ERC20PeriodicTransferEnforcer: '0x1234567890123456789012345678901234567890',
-    ValueLteEnforcer: '0x1234567890123456789012345678901234567891',
-  },
-} as any as DelegationContracts;
+  erc20PeriodTransferEnforcer: '0x1234567890123456789012345678901234567890',
+  valueLteEnforcer: '0x1234567890123456789012345678901234567891',
+} as unknown as DelegationContracts;
 
 // Helper function to create expected terms
 const createExpectedTerms = (
@@ -51,7 +49,7 @@ describe('erc20TokenPeriodic:caveats', () => {
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const caveats = await createPermissionCaveats({ permission, contracts });
@@ -60,12 +58,12 @@ describe('erc20TokenPeriodic:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+          enforcer: contracts.erc20PeriodTransferEnforcer,
           terms: erc20TokenPeriodicExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ValueLteEnforcer,
+          enforcer: contracts.valueLteEnforcer,
           terms:
             '0x0000000000000000000000000000000000000000000000000000000000000000',
           args: '0x',
@@ -86,7 +84,7 @@ describe('erc20TokenPeriodic:caveats', () => {
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const caveats = await createPermissionCaveats({ permission, contracts });
@@ -95,12 +93,12 @@ describe('erc20TokenPeriodic:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+          enforcer: contracts.erc20PeriodTransferEnforcer,
           terms: erc20TokenPeriodicExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ValueLteEnforcer,
+          enforcer: contracts.valueLteEnforcer,
           terms:
             '0x0000000000000000000000000000000000000000000000000000000000000000',
           args: '0x',
@@ -120,7 +118,7 @@ describe('erc20TokenPeriodic:caveats', () => {
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const caveats = await createPermissionCaveats({ permission, contracts });
@@ -129,12 +127,12 @@ describe('erc20TokenPeriodic:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+          enforcer: contracts.erc20PeriodTransferEnforcer,
           terms: erc20TokenPeriodicExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ValueLteEnforcer,
+          enforcer: contracts.valueLteEnforcer,
           terms:
             '0x0000000000000000000000000000000000000000000000000000000000000000',
           args: '0x',
@@ -154,7 +152,7 @@ describe('erc20TokenPeriodic:caveats', () => {
           tokenAddress: '0x1234567890123456789012345678901234567890', // Different token
           justification: 'Permission to do something important',
         },
-        rules: {},
+        isAdjustmentAllowed: true,
       };
 
       const caveats = await createPermissionCaveats({ permission, contracts });
@@ -163,12 +161,12 @@ describe('erc20TokenPeriodic:caveats', () => {
 
       expect(caveats).toStrictEqual([
         {
-          enforcer: contracts.enforcers.ERC20PeriodicTransferEnforcer,
+          enforcer: contracts.erc20PeriodTransferEnforcer,
           terms: erc20TokenPeriodicExpectedTerms,
           args: '0x',
         },
         {
-          enforcer: contracts.enforcers.ValueLteEnforcer,
+          enforcer: contracts.valueLteEnforcer,
           terms:
             '0x0000000000000000000000000000000000000000000000000000000000000000',
           args: '0x',

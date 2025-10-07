@@ -3250,21 +3250,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/auto-changelog@npm:^3.4.4":
-  version: 3.4.4
-  resolution: "@metamask/auto-changelog@npm:3.4.4"
-  dependencies:
-    diff: ^5.0.0
-    execa: ^5.1.1
-    prettier: ^2.8.8
-    semver: ^7.3.5
-    yargs: ^17.0.1
-  bin:
-    auto-changelog: dist/cli.js
-  checksum: 4876ab3ec98f6d0c00a0679f9e44e1ee79d335ae97e18336a638ac19484cac30d2f3750e6875121ee07b0da128f8609490bed0e195c8153c2b74866f34e405ed
-  languageName: node
-  linkType: hard
-
 "@metamask/auto-changelog@npm:^4.0.0":
   version: 4.1.0
   resolution: "@metamask/auto-changelog@npm:4.1.0"
@@ -3344,27 +3329,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-abis@npm:^0.9.0":
-  version: 0.9.0
-  resolution: "@metamask/delegation-abis@npm:0.9.0"
-  dependencies:
-    "@metamask/auto-changelog": ^3.4.4
-  checksum: c9e7481499f8497d6b5c15d286e9992b52c0db5ddbb7933ec918a24e758da447ec4537d383d74826dc440eae836b3f26496a89a79b207203fb0f0c7a7e72f66e
-  languageName: node
-  linkType: hard
-
-"@metamask/delegation-core@npm:0.2.0-rc.1":
-  version: 0.2.0-rc.1
-  resolution: "@metamask/delegation-core@npm:0.2.0-rc.1"
-  dependencies:
-    "@metamask/abi-utils": ^3.0.0
-    "@metamask/utils": ^11.4.0
-    "@noble/hashes": ^1.8.0
-  checksum: d14829231644235391e9769d66bc1181391b026500db13700543b4d73cca20d672f719d0e64cd887db3ba0ad19a4e54dba2cc0fd7f3554398dfe089f6d991947
-  languageName: node
-  linkType: hard
-
-"@metamask/delegation-core@npm:^0.2.0":
+"@metamask/delegation-core@npm:0.2.0, @metamask/delegation-core@npm:^0.2.0":
   version: 0.2.0
   resolution: "@metamask/delegation-core@npm:0.2.0"
   dependencies:
@@ -3382,27 +3347,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-deployments@npm:^0.9.0":
-  version: 0.9.0
-  resolution: "@metamask/delegation-deployments@npm:0.9.0"
-  dependencies:
-    "@metamask/auto-changelog": ^3.4.4
-  checksum: 72736561870d860744bb77f699c2a05d22ae48ba8f1ec5735d5625eecd76638bcb277aedd8bef9f8e3b643c50a8591cb8ec0faa5fd4e9fe3bc2b1748880745c4
-  languageName: node
-  linkType: hard
-
-"@metamask/delegation-toolkit@npm:0.10.2":
-  version: 0.10.2
-  resolution: "@metamask/delegation-toolkit@npm:0.10.2"
-  dependencies:
-    "@metamask/delegation-utils": ^0.10.0
-    webauthn-p256: ^0.0.5
-  peerDependencies:
-    viem: ">=2.18.2 <3.0.0"
-  checksum: 08e80512faf6f26f6a2142d6f25f9850cb79690e7fd583e9d06902d4e22b3b65d27fc552a5bf5ead5de5ba8b39cd397841d3f11e151332aa0592c2dfe77fdce4
-  languageName: node
-  linkType: hard
-
 "@metamask/delegation-toolkit@npm:0.13.0":
   version: 0.13.0
   resolution: "@metamask/delegation-toolkit@npm:0.13.0"
@@ -3416,19 +3360,6 @@ __metadata:
   peerDependencies:
     viem: ^2.31.4
   checksum: 62244f88cf806eb54229390c13a3dddce05769ff1b52594cab7b3f4a3cc86fab785853aece165e73adf657b7064319488902765f9846a46c8c511e6d3f4ec245
-  languageName: node
-  linkType: hard
-
-"@metamask/delegation-utils@npm:^0.10.0":
-  version: 0.10.0
-  resolution: "@metamask/delegation-utils@npm:0.10.0"
-  dependencies:
-    "@metamask/delegation-abis": ^0.9.0
-    "@metamask/delegation-deployments": ^0.9.0
-    buffer: ^6.0.3
-  peerDependencies:
-    viem: ">=2.18.2 <3.0.0"
-  checksum: a7386bb23c3145d7f887afecac659ef0ee3377ddc9bff999ed278e0970b9ae3eb50e1e46e21cdc6cac58047ac3129b7b4099dc39e04975746d59e0f2f5102f35
   languageName: node
   linkType: hard
 
@@ -3583,8 +3514,7 @@ __metadata:
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/abi-utils": 3.0.0
     "@metamask/auto-changelog": 5.0.2
-    "@metamask/delegation-core": 0.2.0-rc.1
-    "@metamask/delegation-toolkit": 0.10.2
+    "@metamask/delegation-core": 0.2.0
     "@metamask/eslint-config": 12.2.0
     "@metamask/eslint-config-jest": 12.1.0
     "@metamask/eslint-config-nodejs": 12.1.0
@@ -17173,15 +17103,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.8.8":
-  version: 2.8.8
-  resolution: "prettier@npm:2.8.8"
-  bin:
-    prettier: bin-prettier.js
-  checksum: b49e409431bf129dd89238d64299ba80717b57ff5a6d1c1a8b1a28b590d998a34e083fa13573bc732bb8d2305becb4c9a4407f8486c81fa7d55100eb08263cf8
-  languageName: node
-  linkType: hard
-
 "pretty-error@npm:^2.1.2":
   version: 2.1.2
   resolution: "pretty-error@npm:2.1.2"
@@ -20560,16 +20481,6 @@ __metadata:
     "@noble/curves": ^1.4.0
     "@noble/hashes": ^1.4.0
   checksum: 0648a3d78451bfa7105b5151a34bd685ee60e193be9be1981fe73819ed5a92f410973bdeb72427ef03c8c2a848619f818cf3e66b94012d5127b462cb10c24f5d
-  languageName: node
-  linkType: hard
-
-"webauthn-p256@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "webauthn-p256@npm:0.0.5"
-  dependencies:
-    "@noble/curves": ^1.4.0
-    "@noble/hashes": ^1.4.0
-  checksum: 2837188d1e6d947c87c5728374fb6aec96387cb766f78e7a04d5903774264feb278d68a639748f09997f591e5278796c662bb5c4e8b8286b0f22254694023584
   languageName: node
   linkType: hard
 

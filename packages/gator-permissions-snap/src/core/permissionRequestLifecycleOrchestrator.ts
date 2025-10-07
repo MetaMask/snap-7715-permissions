@@ -3,7 +3,10 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  extractDescriptorName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
 import type { Delegation } from '@metamask/delegation-core';
 import {
   createNonceTerms,
@@ -46,53 +49,21 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #nonceCaveatService: NonceCaveatService;
 
-  protected supportedChains: readonly number[];
-
   constructor({
     accountController,
     confirmationDialogFactory,
     userEventDispatcher,
     nonceCaveatService,
-    supportedChains,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
-    supportedChains: readonly number[];
   }) {
-    this.#validateSupportedChains(supportedChains);
-
-    this.supportedChains = supportedChains;
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
-  }
-
-  /**
-   * Validates that the specified chains are supported.
-   * @param supportedChains - The chains to validate.
-   * @throws If no chains are specified or if any chain is not supported.
-   */
-  #validateSupportedChains(supportedChains: readonly number[]) {
-    if (supportedChains.length === 0) {
-      logger.error('No supported chains specified');
-      throw new InvalidParamsError('No supported chains specified');
-    }
-
-    // ensure that there is chain metadata for all specified chains
-    try {
-      supportedChains.map((chainId) => getChainMetadata({ chainId }));
-    } catch (error) {
-      logger.error('Unsupported chains specified', {
-        supportedChains,
-        error,
-      });
-      throw new InvalidParamsError(
-        `Unsupported chains specified: ${supportedChains.join(', ')}`,
-      );
-    }
   }
 
   /**
@@ -101,11 +72,14 @@ export class PermissionRequestLifecycleOrchestrator {
    * @throws If the chain ID is not supported.
    */
   #assertIsSupportedChainId(chainId: number) {
-    if (!this.supportedChains.includes(chainId)) {
+    try {
+      getChainMetadata({ chainId });
+    } catch (error) {
       logger.error(
         'PermissionRequestLifecycleOrchestrator:assertIsSupportedChainId() - unsupported chainId',
         {
           chainId,
+          error,
         },
       );
       throw new InvalidParamsError(`Unsupported ChainId: ${chainId}`);
@@ -363,10 +337,6 @@ export class PermissionRequestLifecycleOrchestrator {
     }
 
     const { contracts } = getChainMetadata({ chainId });
-    const {
-      enforcers: { TimestampEnforcer },
-      delegationManager,
-    } = contracts;
 
     const caveats = await lifecycleHandlers.createPermissionCaveats({
       permission: populatedPermission,
@@ -374,7 +344,7 @@ export class PermissionRequestLifecycleOrchestrator {
     });
 
     const expiryRule = resolvedRequest.rules?.find(
-      (rule) => rule.type === 'expiry',
+      (rule) => extractDescriptorName(rule.type) === 'expiry',
     );
 
     if (expiryRule) {
@@ -382,7 +352,7 @@ export class PermissionRequestLifecycleOrchestrator {
       const timestampBeforeThreshold = expiryRule.data.timestamp;
 
       caveats.push({
-        enforcer: TimestampEnforcer,
+        enforcer: contracts.timestampEnforcer,
         terms: createTimestampTerms({
           timestampAfterThreshold,
           timestampBeforeThreshold,
@@ -401,7 +371,7 @@ export class PermissionRequestLifecycleOrchestrator {
     });
 
     caveats.push({
-      enforcer: contracts.enforcers.NonceEnforcer,
+      enforcer: contracts.nonceEnforcer,
       terms: createNonceTerms({
         nonce: bigIntToHex(nonce),
       }),
@@ -443,7 +413,7 @@ export class PermissionRequestLifecycleOrchestrator {
       dependencyInfo,
       context,
       signerMeta: {
-        delegationManager,
+        delegationManager: contracts.delegationManager,
       },
     };
     return response;
