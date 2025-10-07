@@ -71,13 +71,11 @@ const supportedChains: Chain[] = supportedChainsString
         id: chainId as any,
       });
 
-      return (
-        chain ?? {
-          id: chainId,
-          name: `Unknown chain ${chainId}`,
-          explorerUrl: undefined,
-        }
-      );
+      if (!chain) {
+        throw new Error(`Chain ${chainId} not found`);
+      }
+
+      return chain;
     })
   : DEFAULT_CHAINS;
 
