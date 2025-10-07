@@ -595,6 +595,27 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result.approved).toBe(true);
       });
 
+      it('does not trigger upgrade when account is already upgraded', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: true,
+        });
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(
+          mockAccountController.getAccountUpgradeStatus,
+        ).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: 1,
+        });
+        expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
+        expect(result.approved).toBe(true);
+      });
+
       it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
         const initialContext = {
           foo: 'original',
