@@ -29,7 +29,7 @@ export type Erc20TokenPeriodicMetadata = BaseMetadata & {
 export type Erc20TokenPeriodicContext = BaseContext & {
   permissionDetails: {
     periodAmount: string;
-    periodType: TimePeriod | 'Other';
+    periodType: TimePeriod;
     periodDuration: string;
     startTime: number;
   };
