@@ -253,9 +253,44 @@ export const getStartOfNextDayUTC = (): number => {
  * A mapping of time periods to their equivalent seconds.
  */
 export const TIME_PERIOD_TO_SECONDS: Record<TimePeriod, bigint> = {
+  [TimePeriod.HOURLY]: 60n * 60n, // 3,600(seconds)
   [TimePeriod.DAILY]: 60n * 60n * 24n, // 86,400(seconds)
   [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800(seconds)
-  // Monthly is difficult because months are not consistent in length.
-  // We approximate by calculating the number of seconds in 1/12th of a year.
-  [TimePeriod.MONTHLY]: (60n * 60n * 24n * 365n) / 12n, // 2,629,760(seconds)
+  [TimePeriod.BIWEEKLY]: 60n * 60n * 24n * 14n, // 1,209,600(seconds)
+  [TimePeriod.MONTHLY]: 60n * 60n * 24n * 30n, // 2,592,000(seconds)
+  [TimePeriod.YEARLY]: 60n * 60n * 24n * 365n, // 31,536,000(seconds)
+};
+
+/**
+ * Finds the closest TimePeriod enum value for a given duration in seconds.
+ *
+ * @param seconds - The duration in seconds to match.
+ * @returns The TimePeriod that most closely matches the given duration.
+ * @throws InvalidInputError if no time periods are available.
+ */
+export const getClosestTimePeriod = (seconds: bigint): TimePeriod => {
+  const timePeriodEntries = Object.entries(TIME_PERIOD_TO_SECONDS) as [
+    TimePeriod,
+    bigint,
+  ][];
+
+  const firstEntry = timePeriodEntries[0];
+  if (!firstEntry) {
+    throw new InvalidInputError('No time periods available');
+  }
+
+  let closestPeriod = firstEntry[0];
+  let minDifference =
+    seconds > firstEntry[1] ? seconds - firstEntry[1] : firstEntry[1] - seconds;
+
+  for (const [period, periodValue] of timePeriodEntries.slice(1)) {
+    const difference =
+      seconds > periodValue ? seconds - periodValue : periodValue - seconds;
+    if (difference < minDifference) {
+      minDifference = difference;
+      closestPeriod = period;
+    }
+  }
+
+  return closestPeriod;
 };

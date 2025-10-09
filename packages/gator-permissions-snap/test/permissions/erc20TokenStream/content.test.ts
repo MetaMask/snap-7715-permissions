@@ -215,6 +215,14 @@ describe('erc20TokenStream:content', () => {
                           "props": {
                             "children": [
                               {
+                                "key": "Hourly",
+                                "props": {
+                                  "children": "Hourly",
+                                  "value": "Hourly",
+                                },
+                                "type": "Option",
+                              },
+                              {
                                 "key": "Daily",
                                 "props": {
                                   "children": "Daily",
@@ -231,10 +239,26 @@ describe('erc20TokenStream:content', () => {
                                 "type": "Option",
                               },
                               {
+                                "key": "Biweekly",
+                                "props": {
+                                  "children": "Biweekly",
+                                  "value": "Biweekly",
+                                },
+                                "type": "Option",
+                              },
+                              {
                                 "key": "Monthly",
                                 "props": {
                                   "children": "Monthly",
                                   "value": "Monthly",
+                                },
+                                "type": "Option",
+                              },
+                              {
+                                "key": "Yearly",
+                                "props": {
+                                  "children": "Yearly",
+                                  "value": "Yearly",
                                 },
                                 "type": "Option",
                               },
@@ -1070,6 +1094,14 @@ describe('erc20TokenStream:content', () => {
                           "props": {
                             "children": [
                               {
+                                "key": "Hourly",
+                                "props": {
+                                  "children": "Hourly",
+                                  "value": "Hourly",
+                                },
+                                "type": "Option",
+                              },
+                              {
                                 "key": "Daily",
                                 "props": {
                                   "children": "Daily",
@@ -1086,10 +1118,26 @@ describe('erc20TokenStream:content', () => {
                                 "type": "Option",
                               },
                               {
+                                "key": "Biweekly",
+                                "props": {
+                                  "children": "Biweekly",
+                                  "value": "Biweekly",
+                                },
+                                "type": "Option",
+                              },
+                              {
                                 "key": "Monthly",
                                 "props": {
                                   "children": "Monthly",
                                   "value": "Monthly",
+                                },
+                                "type": "Option",
+                              },
+                              {
+                                "key": "Yearly",
+                                "props": {
+                                  "children": "Yearly",
+                                  "value": "Yearly",
                                 },
                                 "type": "Option",
                               },

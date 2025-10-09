@@ -42,22 +42,28 @@ export const periodTypeRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: PERIOD_TYPE_ELEMENT,
-  label: 'Period duration',
+  label: 'Transfer Window',
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     value: context.permissionDetails.periodType,
     isVisible: true,
     tooltip: 'The duration of the period',
-    options: [TimePeriod.DAILY, TimePeriod.WEEKLY, 'Other'],
+    options: [
+      TimePeriod.HOURLY,
+      TimePeriod.DAILY,
+      TimePeriod.WEEKLY,
+      TimePeriod.BIWEEKLY,
+      TimePeriod.MONTHLY,
+      TimePeriod.YEARLY,
+    ],
     error: metadata.validationErrors.periodTypeError,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => {
-    const periodType = value as TimePeriod | 'Other';
-    const periodDuration =
-      periodType === 'Other'
-        ? context.permissionDetails.periodDuration
-        : Number(TIME_PERIOD_TO_SECONDS[periodType]).toString();
+    const periodType = value as TimePeriod;
+    const periodDuration = Number(
+      TIME_PERIOD_TO_SECONDS[periodType],
+    ).toString();
 
     return {
       ...context,
@@ -68,29 +74,6 @@ export const periodTypeRule: RuleDefinition<
       },
     };
   },
-};
-
-export const periodDurationRule: RuleDefinition<
-  Erc20TokenPeriodicContext,
-  Erc20TokenPeriodicMetadata
-> = {
-  name: PERIOD_DURATION_ELEMENT,
-  label: 'Duration (seconds)',
-  type: 'number',
-  getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.periodDuration,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
-    isVisible: context.permissionDetails.periodType === 'Other',
-    tooltip: 'The length of each period in seconds',
-    error: metadata.validationErrors.periodDurationError,
-  }),
-  updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({
-    ...context,
-    permissionDetails: {
-      ...context.permissionDetails,
-      periodDuration: value,
-    },
-  }),
 };
 
 export const startTimeRule: RuleDefinition<
@@ -162,7 +145,6 @@ export const expiryRule: RuleDefinition<
 export const allRules = [
   periodAmountRule,
   periodTypeRule,
-  periodDurationRule,
   startTimeRule,
   expiryRule,
 ];

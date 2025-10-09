@@ -4,7 +4,6 @@ import { Box, Section } from '@metamask/snaps-sdk/jsx';
 import {
   periodAmountRule,
   periodTypeRule,
-  periodDurationRule,
   startTimeRule,
   expiryRule,
 } from './rules';
@@ -32,12 +31,7 @@ export async function createConfirmationContent({
     <Box>
       <Section>
         {renderRules({
-          rules: [
-            startTimeRule,
-            periodAmountRule,
-            periodTypeRule,
-            periodDurationRule,
-          ],
+          rules: [startTimeRule, periodAmountRule, periodTypeRule],
           context,
           metadata,
         })}

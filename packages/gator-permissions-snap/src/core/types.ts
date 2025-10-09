@@ -91,9 +91,12 @@ export type DeepRequired<TParent> = TParent extends (infer U)[]
  * An enum representing the time periods for which the stream rate can be calculated.
  */
 export enum TimePeriod {
+  HOURLY = 'Hourly',
   DAILY = 'Daily',
   WEEKLY = 'Weekly',
+  BIWEEKLY = 'Biweekly',
   MONTHLY = 'Monthly',
+  YEARLY = 'Yearly',
 }
 
 /**
