@@ -294,7 +294,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Period duration",
+                                  "children": "Transfer Window",
                                 },
                                 "type": "Text",
                               },
@@ -339,6 +339,14 @@ describe('nativeTokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
+                              "key": "Hourly",
+                              "props": {
+                                "children": "Hourly",
+                                "value": "Hourly",
+                              },
+                              "type": "Option",
+                            },
+                            {
                               "key": "Daily",
                               "props": {
                                 "children": "Daily",
@@ -355,10 +363,26 @@ describe('nativeTokenPeriodic:content', () => {
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "Biweekly",
                               "props": {
-                                "children": "Other",
-                                "value": "Other",
+                                "children": "Biweekly",
+                                "value": "Biweekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Monthly",
+                              "props": {
+                                "children": "Monthly",
+                                "value": "Monthly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Yearly",
+                              "props": {
+                                "children": "Yearly",
+                                "value": "Yearly",
                               },
                               "type": "Option",
                             },
@@ -376,7 +400,6 @@ describe('nativeTokenPeriodic:content', () => {
               },
               "type": "Box",
             },
-            null,
           ],
         },
         "type": "Section",
@@ -797,7 +820,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Period duration",
+                                  "children": "Transfer Window",
                                 },
                                 "type": "Text",
                               },
@@ -842,6 +865,14 @@ describe('nativeTokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
+                              "key": "Hourly",
+                              "props": {
+                                "children": "Hourly",
+                                "value": "Hourly",
+                              },
+                              "type": "Option",
+                            },
+                            {
                               "key": "Daily",
                               "props": {
                                 "children": "Daily",
@@ -858,10 +889,26 @@ describe('nativeTokenPeriodic:content', () => {
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "Biweekly",
                               "props": {
-                                "children": "Other",
-                                "value": "Other",
+                                "children": "Biweekly",
+                                "value": "Biweekly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Monthly",
+                              "props": {
+                                "children": "Monthly",
+                                "value": "Monthly",
+                              },
+                              "type": "Option",
+                            },
+                            {
+                              "key": "Yearly",
+                              "props": {
+                                "children": "Yearly",
+                                "value": "Yearly",
                               },
                               "type": "Option",
                             },
@@ -871,95 +918,6 @@ describe('nativeTokenPeriodic:content', () => {
                         },
                         "type": "Dropdown",
                       },
-                    },
-                    "type": "Field",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Duration (seconds)",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The length of each period in seconds",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        null,
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "native-token-periodic-period-duration",
-                            "type": "number",
-                            "value": "86400",
-                          },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                      ],
                     },
                     "type": "Field",
                   },
