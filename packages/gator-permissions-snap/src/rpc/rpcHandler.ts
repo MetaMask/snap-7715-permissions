@@ -1,6 +1,6 @@
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
+import { UserRejectedRequestError, type Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
@@ -72,7 +72,7 @@ export function createRpcHandler(config: {
         await handler.handlePermissionRequest(siteOrigin);
 
       if (!permissionResponse.approved) {
-        throw new InvalidInputError(permissionResponse.reason);
+        throw new UserRejectedRequestError(permissionResponse.reason);
       }
 
       permissionsToStore.push({
@@ -99,7 +99,7 @@ export function createRpcHandler(config: {
    */
   const getPermissionOffers = async (): Promise<Json> => {
     logger.debug('getPermissionOffers()');
-    return DEFAULT_GATOR_PERMISSION_TO_OFFER;
+    return DEFAULT_GATOR_PERMISSION_TO_OFFER as Json[];
   };
 
   /**
