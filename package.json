@@ -59,6 +59,7 @@
     }
   },
   "resolutions": {
-    "gatsby/path-to-regexp": "0.1.12"
+    "gatsby/path-to-regexp": "0.1.12",
+    "@parcel/reporter-dev-server": "2.16.0"
   }
 }
