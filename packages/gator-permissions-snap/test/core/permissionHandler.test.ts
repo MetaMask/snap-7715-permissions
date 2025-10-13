@@ -42,7 +42,6 @@ type TestLifecycleHandlersType = LifecycleOrchestrationHandlers<
 
 const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
-  expiry: 1234567890,
   signer: {
     type: 'account',
     data: {
@@ -69,7 +68,10 @@ const mockContext: TestContextType = {
   },
   accountAddressCaip10: `eip155:1:${mockAddress}`,
   tokenAddressCaip19: `eip155:1/erc20:${mockAssetAddress}`,
-  expiry: '1234567890',
+  expiry: {
+    timestamp: 1234567890,
+    isAdjustmentAllowed: false,
+  },
   isAdjustmentAllowed: false,
 };
 
@@ -135,7 +137,13 @@ const setupTest = () => {
   const accountController = {
     signDelegation: jest.fn(),
     getAccountAddresses: jest.fn(),
+    getAccountUpgradeStatus: jest.fn(),
+    upgradeAccount: jest.fn(),
   } as unknown as jest.Mocked<AccountController>;
+
+  accountController.getAccountUpgradeStatus.mockResolvedValue({
+    isUpgraded: false,
+  });
 
   userEventDispatcher = {
     on: jest.fn(bindEvent),
@@ -1034,6 +1042,15 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
+                    },
+                    {
+                      "key": null,
+                      "props": {
                         "alignment": "end",
                         "children": [
                           {
@@ -1538,6 +1555,15 @@ describe('PermissionHandler', () => {
                         "value": "eip155:1:0x1234567890123456789012345678901234567890",
                       },
                       "type": "AccountSelector",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
                     },
                     {
                       "key": null,
@@ -2088,6 +2114,15 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
+                    },
+                    {
+                      "key": null,
+                      "props": {
                         "alignment": "end",
                         "children": [
                           {
@@ -2558,6 +2593,15 @@ describe('PermissionHandler', () => {
                         "value": "eip155:1:0x1234567890123456789012345678901234567890",
                       },
                       "type": "AccountSelector",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
                     },
                     {
                       "key": null,
@@ -3037,6 +3081,15 @@ describe('PermissionHandler', () => {
                         "value": "eip155:1:0x1234567890123456789012345678901234567890",
                       },
                       "type": "AccountSelector",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
                     },
                     {
                       "key": null,
