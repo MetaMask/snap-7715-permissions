@@ -605,11 +605,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         );
 
         // Verify that updateContext can be called without throwing (restriction is now in handlers)
-        await expect(
-          onConfirmationCreatedArgs.updateContext({
-            updatedContext: { ...initialContext, foo: 'updated' },
-          }),
-        ).resolves.not.toThrow();
+        const updateContextPromise = onConfirmationCreatedArgs.updateContext({
+          updatedContext: { ...initialContext, foo: 'updated' },
+        });
+        expect(await updateContextPromise).toBeUndefined();
 
         // this is called once when the context is first resolved, and once when we call updateContext
         expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(2);
