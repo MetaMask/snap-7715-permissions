@@ -157,6 +157,7 @@ export type LifecycleOrchestrationHandlers<
     updateContext: (updateContextArgs: {
       updatedContext: TContext;
     }) => Promise<void>;
+    isAdjustmentAllowed: boolean;
   }) => void;
 
   /**
