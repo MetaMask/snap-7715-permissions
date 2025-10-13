@@ -1,6 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
-  InvalidInputError,
   InvalidRequestError,
   ResourceNotFoundError,
   UserInputEventType,
@@ -322,10 +321,6 @@ export class PermissionHandler<
         eventType: UserInputEventType.InputChangeEvent,
         interfaceId,
         handler: async ({ event: { value } }) => {
-          if (!isAdjustmentAllowed) {
-            throw new InvalidInputError('Adjustment is not allowed');
-          }
-
           const {
             addresses: [address],
           } = value as unknown as {
@@ -346,7 +341,7 @@ export class PermissionHandler<
             logger.error(`Fetching account balance failed: ${message}`);
           });
 
-          await updateContext({ updatedContext: currentContext });
+          await rerender();
         },
       });
 

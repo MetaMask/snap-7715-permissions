@@ -3215,7 +3215,7 @@ describe('PermissionHandler', () => {
         expect(showMoreButtonUnboundEvent).toBeDefined();
       });
 
-      it('does not bind rule handlers when isAdjustmentAllowed is false', async () => {
+      it('does not bind rule handlers when isAdjustmentAllowed is false but allows account selection', async () => {
         const {
           permissionHandler,
           getLifecycleHandlers,
@@ -3241,8 +3241,17 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
         });
 
-        // The handler should not be bound when adjustment is not allowed
+        // The rule handler should not be bound when adjustment is not allowed
         expect(ruleInputHandler).toBeUndefined();
+
+        // But account selector should still be bound (it's allowed even when adjustment is not allowed)
+        const accountSelectorHandler = getBoundEvent({
+          elementName: 'account-selector',
+          eventType: 'InputChangeEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        expect(accountSelectorHandler).toBeDefined();
       });
     });
   });
