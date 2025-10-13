@@ -8,7 +8,7 @@ export const zAddress = z
   .string()
   .regex(/^0x[a-fA-F0-9]{40}$/u, 'Invalid Ethereum address')
   .transform((value) => {
-    return getChecksumAddress(value as Hex);
+    return getChecksumAddress(value as Hex) as Hex;
   });
 
 export const zHexStr = z
