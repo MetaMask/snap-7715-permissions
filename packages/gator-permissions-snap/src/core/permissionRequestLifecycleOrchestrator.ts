@@ -228,14 +228,14 @@ export class PermissionRequestLifecycleOrchestrator {
         const upgradeStatus =
           await this.#accountController.getAccountUpgradeStatus({
             account: address,
-            chainId,
+            chainId: numberToHex(chainId),
           });
 
         if (!upgradeStatus.isUpgraded) {
           // Trigger account upgrade
           await this.#accountController.upgradeAccount({
             account: address,
-            chainId,
+            chainId: numberToHex(chainId),
           });
         }
 

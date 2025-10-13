@@ -23,7 +23,7 @@ export type AccountUpgradeResult = {
 
 export type AccountUpgradeParams = {
   account: string;
-  chainId: number;
+  chainId: Hex;
 };
 
 /**
@@ -203,7 +203,7 @@ export class AccountController {
 
       const {
         contracts: { eip7702StatelessDeleGatorImpl },
-      } = getChainMetadata({ chainId: params.chainId });
+      } = getChainMetadata({ chainId: hexToNumber(params.chainId) });
 
       return {
         isUpgraded:

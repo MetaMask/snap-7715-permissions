@@ -8,6 +8,7 @@ import type { Hex } from '@metamask/utils';
 import {
   bigIntToHex,
   isStrictHexString,
+  numberToHex,
   parseCaipAccountId,
   parseCaipAssetType,
 } from '@metamask/utils';
@@ -219,7 +220,7 @@ export class PermissionHandler<
       const accountUpgradeStatus =
         await this.#accountController.getAccountUpgradeStatus({
           account: address,
-          chainId,
+          chainId: numberToHex(chainId),
         });
 
       return PermissionHandlerContent({
