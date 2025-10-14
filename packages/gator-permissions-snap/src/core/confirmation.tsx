@@ -70,7 +70,7 @@ export class ConfirmationDialog {
     const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
       // cleanup can't be defined before the click handlers, so cannot be const
       // eslint-disable-next-line prefer-const
-      let cleanup: () => Promise<void>;
+      let cleanup: (resolveInterface?: boolean) => Promise<void>;
 
       const { unbind: unbindGrantButtonClick } = this.#userEventDispatcher.on({
         elementName: ConfirmationDialog.#grantButton,
@@ -94,32 +94,40 @@ export class ConfirmationDialog {
         },
       });
 
-      cleanup = async () => {
-        unbindGrantButtonClick();
-        unbindCancelButtonClick();
-
-        // clear our stored unbind handler reference
-        this.#unbindHandlers = undefined;
-
-        try {
-          await this.#snaps.request({
-            method: 'snap_resolveInterface',
-            params: {
-              id: interfaceId,
-              value: {},
-            },
-          });
-        } catch (error) {
-          const reason = error as Error;
-          reject(reason);
-        }
-      };
-
       // store hooks so we can close/reject programmatically on error
       this.#unbindHandlers = () => {
         unbindGrantButtonClick();
         unbindCancelButtonClick();
       };
+
+      cleanup = async (resolveInterface = true) => {
+        if (this.#unbindHandlers) {
+          try {
+            this.#unbindHandlers();
+          } catch {
+            // ignore
+          } finally {
+            // clear our stored unbind handler reference
+            this.#unbindHandlers = undefined;
+          }
+        }
+
+        if (resolveInterface) {
+          try {
+            await this.#snaps.request({
+              method: 'snap_resolveInterface',
+              params: {
+                id: interfaceId,
+                value: {},
+              },
+            });
+          } catch (error) {
+            const reason = error as Error;
+            reject(reason);
+          }
+        }
+      };
+
       this.#decisionReject = reject;
 
       // we don't await this, because we only want to present the dialog, and
@@ -134,11 +142,7 @@ export class ConfirmationDialog {
         .then(async (result) => {
           // Should resolve with false when dialog is closed.
           if (result === null) {
-            unbindGrantButtonClick();
-            unbindCancelButtonClick();
-
-            // clear our stored unbind handler reference
-            this.#unbindHandlers = undefined;
+            await cleanup(false);
 
             resolve(false);
           }
