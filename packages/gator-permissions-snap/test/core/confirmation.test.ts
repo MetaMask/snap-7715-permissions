@@ -140,6 +140,25 @@ describe('ConfirmationDialog', () => {
       expect(result).toStrictEqual({ isConfirmationGranted: false });
     });
 
+    it('should resolve with false when dialog is closed', async () => {
+      // Simulate dialog closure
+      mockSnaps.request.mockResolvedValueOnce(null);
+
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(2);
+      expect(mockUnbindFunctions).toHaveLength(2);
+
+      const result = await awaitingUserDecision;
+
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
+      expect(result).toStrictEqual({ isConfirmationGranted: false });
+    });
+
     it('should clean up event listeners after decision', async () => {
       const awaitingUserDecision =
         confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
