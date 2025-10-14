@@ -177,12 +177,8 @@ export async function buildContext({
     decimals,
   });
 
-  console.log('zzzz', data);
-
   const periodType = getClosestTimePeriod(BigInt(data.periodDuration));
   const periodDuration = TIME_PERIOD_TO_SECONDS[periodType].toString();
-
-  console.log('yyyyy', { periodType, periodDuration });
 
   const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
 

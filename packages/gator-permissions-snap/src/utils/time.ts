@@ -255,10 +255,10 @@ export const getStartOfNextDayUTC = (): number => {
 export const TIME_PERIOD_TO_SECONDS: Record<TimePeriod, bigint> = {
   [TimePeriod.HOURLY]: 60n * 60n, // 3,600(seconds)
   [TimePeriod.DAILY]: 60n * 60n * 24n, // 86,400(seconds)
-  [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800(seconds)
-  [TimePeriod.BIWEEKLY]: 60n * 60n * 24n * 14n, // 1,209,600(seconds)
-  [TimePeriod.MONTHLY]: 60n * 60n * 24n * 30n, // 2,592,000(seconds)
-  [TimePeriod.YEARLY]: 60n * 60n * 24n * 365n, // 31,536,000(seconds)
+  [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800(seconds), 7 days
+  [TimePeriod.BIWEEKLY]: 60n * 60n * 24n * 14n, // 1,209,600(seconds), 14 days
+  [TimePeriod.MONTHLY]: 60n * 60n * 24n * 30n, // 2,592,000(seconds), 30 days
+  [TimePeriod.YEARLY]: 60n * 60n * 24n * 365n, // 31,536,000(seconds), 365 days
 };
 
 /**
