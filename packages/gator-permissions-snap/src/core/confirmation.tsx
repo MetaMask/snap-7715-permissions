@@ -131,6 +131,12 @@ export class ConfirmationDialog {
             id: interfaceId,
           },
         })
+        .then((result) => {
+          // Should resolve with false when dialog is closed.
+          if (result === null) {
+            resolve(false);
+          }
+        })
         .catch((error) => {
           const reason = error as Error;
           reject(reason);
