@@ -147,7 +147,15 @@ describe('ConfirmationDialog', () => {
       const awaitingUserDecision =
         confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(2);
+      expect(mockUnbindFunctions).toHaveLength(2);
+
       const result = await awaitingUserDecision;
+
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
       expect(result).toStrictEqual({ isConfirmationGranted: false });
     });
 

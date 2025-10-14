@@ -131,9 +131,15 @@ export class ConfirmationDialog {
             id: interfaceId,
           },
         })
-        .then((result) => {
+        .then(async (result) => {
           // Should resolve with false when dialog is closed.
           if (result === null) {
+            unbindGrantButtonClick();
+            unbindCancelButtonClick();
+
+            // clear our stored unbind handler reference
+            this.#unbindHandlers = undefined;
+
             resolve(false);
           }
         })
