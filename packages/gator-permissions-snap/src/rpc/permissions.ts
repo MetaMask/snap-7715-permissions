@@ -30,7 +30,7 @@ export const isMethodAllowedForOrigin = (
   logger.debug('🔍 Checking origin permissions:', {
     origin,
     method,
-    originCharCodes: origin.split('').map((c) => c.charCodeAt(0)),
+    originCharCodes: origin.split('').map((char) => char.charCodeAt(0)),
     allowedOrigins: Object.keys(allowedPermissionsByOrigin),
     allowedMethodsForOrigin: allowedPermissionsByOrigin[origin],
     exactMatch: allowedPermissionsByOrigin[origin],

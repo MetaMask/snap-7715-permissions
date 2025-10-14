@@ -5,6 +5,7 @@ import {
 import {
   extractZodError,
   logger,
+  logToFile,
 } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
@@ -38,11 +39,11 @@ export const validateStartTimeZod = (value: number): boolean => {
 
 // Validation schema for revocation parameters
 const zRevocationParams = z.object({
-  delegationHash: z
+  permissionContext: z
     .string()
     .regex(
-      /^0x[a-fA-F0-9]{64}$/u,
-      'Invalid delegation hash format - must be a 32-byte hex string',
+      /^0x[a-fA-F0-9]+$/u,
+      'Invalid permission context format - must be a hex string',
     ),
 });
 
@@ -53,10 +54,10 @@ const zRevocationParams = z.object({
  * @throws InvalidInputError if validation fails.
  */
 export function validateRevocationParams(params: Json): {
-  delegationHash: Hex;
+  permissionContext: Hex;
 } {
   try {
-    console.log('================================================3');
+    logToFile('================================================3');
     logger.debug('🔍 Validating revocation params:', params);
     logger.debug('Params type:', typeof params);
 
@@ -70,7 +71,7 @@ export function validateRevocationParams(params: Json): {
     logger.debug('✅ Zod validation successful:', validated);
 
     return {
-      delegationHash: validated.delegationHash as Hex,
+      permissionContext: validated.permissionContext as Hex,
     };
   } catch (error) {
     logger.debug('❌ Validation failed:', error);
