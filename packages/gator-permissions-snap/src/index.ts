@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import type { GetSnapsResponse } from '@metamask/7715-permissions-shared/types';
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import { logger, logToFile } from '@metamask/7715-permissions-shared/utils';
 import {
   AuthType,
   JwtBearerAuth,
@@ -210,14 +210,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }) => {
   logger.debug(`RPC request (origin="${origin}"): method="${request.method}"`);
-  console.log('SNAP================================================1');
+  logToFile('SNAP================================================1');
   logger.debug('🔍 Detailed origin info:', {
     origin,
     originType: typeof origin,
     originLength: origin?.length,
     method: request.method,
   });
-  console.log('SNAP================================================2');
+  logToFile('SNAP================================================2');
   // Special logging for revocation requests
   if (request.method === 'permissionsProvider_submitRevocation') {
     logger.debug('🚨 REVOCATION RPC REQUEST DETECTED 🚨');

@@ -3011,11 +3011,12 @@ __metadata:
     jest: 29.7.0
     rimraf: 6.0.1
     ts-jest: 29.4.0
+    tsx: 4.20.3
     typescript: 5.8.3
     viem: 2.31.7
     zod: 3.25.76
   bin:
-    generate-snap-manifest: ./src/scripts/generate-manifest.ts
+    generate-snap-manifest: ./bin/generate-snap-manifest
   languageName: unknown
   linkType: soft
 

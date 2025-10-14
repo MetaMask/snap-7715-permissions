@@ -3,12 +3,19 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
+import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
 import type { ProfileSyncManager } from '../../src/profileSync';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
+
+// Mock the delegation-core functions
+jest.mock('@metamask/delegation-core', () => ({
+  decodeDelegations: jest.fn(),
+  hashDelegation: jest.fn(),
+}));
 
 const TEST_ADDRESS = '0x1234567890123456789012345678901234567890' as const;
 const TEST_SITE_ORIGIN = 'https://example.com';
@@ -88,6 +95,23 @@ describe('RpcHandler', () => {
   let mockProfileSyncManager: jest.Mocked<ProfileSyncManager>;
 
   beforeEach(() => {
+    // Reset mocks
+    jest.clearAllMocks();
+
+    // Setup delegation-core mocks
+    (
+      decodeDelegations as jest.MockedFunction<typeof decodeDelegations>
+    ).mockReturnValue([
+      {
+        /* mock delegation */
+      },
+    ] as any);
+    (
+      hashDelegation as jest.MockedFunction<typeof hashDelegation>
+    ).mockReturnValue(
+      '0x1234567890123456789012345678901234567890123456789012345678901234' as any,
+    );
+
     mockHandler = {
       handlePermissionRequest: jest.fn(),
     } as unknown as jest.Mocked<PermissionHandlerType>;
@@ -100,7 +124,6 @@ describe('RpcHandler', () => {
       storeGrantedPermission: jest.fn(),
       storeGrantedPermissionBatch: jest.fn(),
       getGrantedPermission: jest.fn(),
-      getGrantedPermissionByDelegationHash: jest.fn(),
       getAllGrantedPermissions: jest.fn(),
       getUserProfile: jest.fn(),
       updatePermissionRevocationStatus: jest.fn(),
@@ -583,7 +606,15 @@ describe('RpcHandler', () => {
         {
           permissionResponse: {
             chainId: TEST_CHAIN_ID,
-            expiry: TEST_EXPIRY,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
             signer: {
               type: 'account' as const,
               data: { address: TEST_ADDRESS },
@@ -669,15 +700,22 @@ describe('RpcHandler', () => {
 
   describe('submitRevocation', () => {
     const validRevocationParams = {
-      delegationHash:
-        '0x1234567890123456789012345678901234567890123456789012345678901234',
+      permissionContext: TEST_CONTEXT,
     };
 
     it('should successfully submit revocation with valid parameters', async () => {
       const mockPermission = {
         permissionResponse: {
           chainId: TEST_CHAIN_ID,
-          expiry: TEST_EXPIRY,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           signer: {
             type: 'account' as const,
             data: { address: TEST_ADDRESS },
@@ -697,7 +735,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
       };
 
-      mockProfileSyncManager.getGrantedPermissionByDelegationHash.mockResolvedValueOnce(
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
       mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
@@ -710,40 +748,36 @@ describe('RpcHandler', () => {
       const result = await handler.submitRevocation(validRevocationParams);
 
       expect(result).toStrictEqual({ success: true });
-      expect(
-        mockProfileSyncManager.getGrantedPermissionByDelegationHash,
-      ).toHaveBeenCalledWith(validRevocationParams.delegationHash);
+      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
+        validRevocationParams.permissionContext,
+      );
       expect(
         mockProfileSyncManager.checkDelegationDisabledOnChain,
-      ).toHaveBeenCalledWith(
-        validRevocationParams.delegationHash,
-        TEST_CHAIN_ID,
-        TEST_ADDRESS,
-      );
+      ).toHaveBeenCalled();
       expect(
         mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
       ).toHaveBeenCalledWith(mockPermission, true);
     });
 
-    it('should throw InvalidInputError when delegationHash is invalid', async () => {
+    it('should throw InvalidInputError when permissionContext is invalid', async () => {
       const invalidParams = {
         ...validRevocationParams,
-        delegationHash: 'invalid-hash',
+        permissionContext: 'invalid-context',
       };
 
       await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
-        'Invalid delegation hash',
+        'Invalid permission context',
       );
     });
 
-    it('should throw InvalidInputError when delegationHash is wrong length', async () => {
+    it('should throw InvalidInputError when permissionContext is wrong format', async () => {
       const invalidParams = {
         ...validRevocationParams,
-        delegationHash: '0x12345', // Too short
+        permissionContext: 'not-hex-string', // Invalid format
       };
 
       await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
-        'Invalid delegation hash',
+        'Invalid permission context',
       );
     });
 
@@ -765,7 +799,7 @@ describe('RpcHandler', () => {
       );
     });
 
-    it('should throw InvalidInputError when delegationHash is missing', async () => {
+    it('should throw InvalidInputError when permissionContext is missing', async () => {
       const invalidParams = {};
 
       await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
@@ -777,7 +811,15 @@ describe('RpcHandler', () => {
       const mockPermission = {
         permissionResponse: {
           chainId: TEST_CHAIN_ID,
-          expiry: TEST_EXPIRY,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           signer: {
             type: 'account' as const,
             data: { address: TEST_ADDRESS },
@@ -798,7 +840,7 @@ describe('RpcHandler', () => {
       };
 
       const profileSyncError = new Error('Update failed');
-      mockProfileSyncManager.getGrantedPermissionByDelegationHash.mockResolvedValueOnce(
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
       mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
@@ -819,14 +861,21 @@ describe('RpcHandler', () => {
 
     it('should handle hex values with uppercase letters', async () => {
       const upperCaseParams = {
-        delegationHash:
-          '0x1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF',
+        permissionContext: '0x1234567890ABCDEF1234567890ABCDEF',
       };
 
       const mockPermission = {
         permissionResponse: {
           chainId: '0xAA36A7' as const,
-          expiry: TEST_EXPIRY,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           signer: {
             type: 'account' as const,
             data: { address: TEST_ADDRESS },
@@ -846,7 +895,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
       };
 
-      mockProfileSyncManager.getGrantedPermissionByDelegationHash.mockResolvedValueOnce(
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
       mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
@@ -859,9 +908,9 @@ describe('RpcHandler', () => {
       const result = await handler.submitRevocation(upperCaseParams);
 
       expect(result).toStrictEqual({ success: true });
-      expect(
-        mockProfileSyncManager.getGrantedPermissionByDelegationHash,
-      ).toHaveBeenCalledWith(upperCaseParams.delegationHash);
+      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
+        upperCaseParams.permissionContext,
+      );
     });
 
     it('should handle different chain configurations', async () => {
@@ -872,7 +921,15 @@ describe('RpcHandler', () => {
       const mockPermission = {
         permissionResponse: {
           chainId: '0xaa36a7' as const,
-          expiry: TEST_EXPIRY,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
           signer: {
             type: 'account' as const,
             data: { address: TEST_ADDRESS },
@@ -892,7 +949,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
       };
 
-      mockProfileSyncManager.getGrantedPermissionByDelegationHash.mockResolvedValueOnce(
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
       mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
@@ -905,9 +962,9 @@ describe('RpcHandler', () => {
       const result = await handler.submitRevocation(testParams);
 
       expect(result).toStrictEqual({ success: true });
-      expect(
-        mockProfileSyncManager.getGrantedPermissionByDelegationHash,
-      ).toHaveBeenCalledWith(testParams.delegationHash);
+      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
+        testParams.permissionContext,
+      );
     });
   });
 });

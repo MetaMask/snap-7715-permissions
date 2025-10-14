@@ -5,6 +5,7 @@ import { zPermissionResponse } from '@metamask/7715-permissions-shared/types';
 import {
   logger,
   extractZodError,
+  logToFile,
 } from '@metamask/7715-permissions-shared/utils';
 import {
   hashDelegation,
@@ -96,9 +97,6 @@ export type ProfileSyncManager = {
   getGrantedPermission: (
     permissionContext: Hex,
   ) => Promise<StoredGrantedPermission | null>;
-  getGrantedPermissionByDelegationHash: (
-    delegationHash: Hex,
-  ) => Promise<StoredGrantedPermission | null>;
   storeGrantedPermission: (
     storedGrantedPermission: StoredGrantedPermission,
   ) => Promise<void>;
@@ -153,12 +151,6 @@ export function createProfileSyncManager(
         'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
       );
     },
-    getGrantedPermissionByDelegationHash: async (_: Hex) => {
-      logger.debug(
-        'unConfiguredProfileSyncManager.getGrantedPermissionByDelegationHash()',
-      );
-      return null;
-    },
     storeGrantedPermission: async (_: StoredGrantedPermission) => {
       logger.debug(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
@@ -210,9 +202,14 @@ export function createProfileSyncManager(
    */
   async function authenticate(): Promise<void> {
     try {
+      logToFile('🔐 PROFILE SYNC: Starting authentication...');
+      logger.debug('Profile Sync: Attempting to get access token');
       await auth.getAccessToken();
+      logToFile('✅ PROFILE SYNC: Authentication successful');
+      logger.debug('Profile Sync: Access token obtained successfully');
     } catch (error) {
-      logger.error('Error fetching access token');
+      logToFile('❌ PROFILE SYNC: Authentication failed:', error);
+      logger.error('Error fetching access token:', error);
       throw error;
     }
   }
@@ -273,34 +270,6 @@ export function createProfileSyncManager(
       return safeDeserializeStoredGrantedPermission(permission);
     } catch (error) {
       logger.error('Error fetching granted permissions');
-      throw error;
-    }
-  }
-
-  /**
-   * Retrieve a granted permission by delegation hash using direct storage lookup.
-   * Since delegation hashes are unique, we can use them directly as storage keys.
-   * @param delegationHash - The delegation hash to search for.
-   * @returns The granted permission or null if not found.
-   */
-  async function getGrantedPermissionByDelegationHash(
-    delegationHash: Hex,
-  ): Promise<StoredGrantedPermission | null> {
-    try {
-      await authenticate();
-
-      // Use the delegation hash directly as the storage key
-      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${delegationHash}`;
-
-      const permission = await userStorage.getItem(path);
-
-      if (!permission) {
-        return null;
-      }
-
-      return safeDeserializeStoredGrantedPermission(permission);
-    } catch (error) {
-      logger.error('Error fetching permission by delegation hash');
       throw error;
     }
   }
@@ -424,6 +393,16 @@ export function createProfileSyncManager(
     isRevoked: boolean,
   ): Promise<void> {
     try {
+      logToFile('🔄 PROFILE SYNC: Updating permission revocation status:', {
+        delegationHash: existingPermission.permissionResponse.context,
+        currentRevokedStatus: existingPermission.isRevoked,
+        newRevokedStatus: isRevoked,
+      });
+      logger.debug('Profile Sync: Updating permission revocation status:', {
+        existingPermission,
+        isRevoked,
+      });
+
       await authenticate();
 
       // Update the isRevoked flag
@@ -431,12 +410,29 @@ export function createProfileSyncManager(
         ...existingPermission,
         isRevoked,
       };
+      logToFile('📝 PROFILE SYNC: Created updated permission object:', {
+        delegationHash: updatedPermission.permissionResponse.context,
+        isRevoked: updatedPermission.isRevoked,
+        siteOrigin: updatedPermission.siteOrigin,
+      });
+      logger.debug(
+        'Profile Sync: Created updated permission object:',
+        updatedPermission,
+      );
 
       // Store the updated permission
+      logToFile('💾 PROFILE SYNC: Storing updated permission...');
       await storeGrantedPermission(updatedPermission);
+      logToFile('✅ PROFILE SYNC: Successfully stored updated permission');
+      logger.debug('Profile Sync: Successfully stored updated permission');
     } catch (error) {
+      logToFile(
+        '❌ PROFILE SYNC: Error updating permission revocation status:',
+        error,
+      );
       logger.error(
-        'Error updating permission revocation status with existing permission',
+        'Error updating permission revocation status with existing permission:',
+        error,
       );
       throw error;
     }
@@ -503,7 +499,6 @@ export function createProfileSyncManager(
     ? {
         getAllGrantedPermissions,
         getGrantedPermission,
-        getGrantedPermissionByDelegationHash,
         storeGrantedPermission,
         storeGrantedPermissionBatch,
         updatePermissionRevocationStatus,

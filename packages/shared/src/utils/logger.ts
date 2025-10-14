@@ -14,7 +14,7 @@ export enum LogLevel {
 /**
  * Log function signature.
  */
-type LogFunction = (message?: any, ...optionalParams: any[]) => void;
+type LogFunction = (message?: unknown, ...optionalParams: unknown[]) => void;
 
 /**
  * Logger context.
@@ -29,36 +29,24 @@ type LoggerContext = {
  * @returns The default logging level.
  */
 function getDefaultLevel(): LogLevel {
-  if (
-    // eslint-disable-next-line no-restricted-globals
-    process?.env?.NODE_ENV === 'production' &&
-    // eslint-disable-next-line no-restricted-globals
-    process?.env?.ENABLE_LOGGING !== 'true'
-  ) {
-    return LogLevel.DISABLED;
-  }
-  // eslint-disable-next-line no-restricted-globals
-  if (process?.env?.NODE_ENV === 'development') {
-    return LogLevel.DEBUG;
-  }
-  return LogLevel.WARN;
-}
+  // Always enable DEBUG logging for debugging
+  return LogLevel.DEBUG;
 
-/**
- * Logger internal context.
- */
-const DEFAULT_CONTEXT: LoggerContext = {
-  threshold: getDefaultLevel(),
-  handlers: {
-    [LogLevel.DEBUG]: console.debug,
-    [LogLevel.INFO]: console.info,
-    [LogLevel.WARN]: console.warn,
-    [LogLevel.ERROR]: console.error,
-    [LogLevel.DISABLED]: () => {
-      /* intentionally empty - logging disabled */
-    },
-  },
-} as const;
+  // Original logic (commented out):
+  // if (
+  //   // eslint-disable-next-line no-restricted-globals
+  //   process?.env?.NODE_ENV === 'production' &&
+  //   // eslint-disable-next-line no-restricted-globals
+  //   process?.env?.ENABLE_LOGGING !== 'true'
+  // ) {
+  //   return LogLevel.DISABLED;
+  // }
+  // // eslint-disable-next-line no-restricted-globals
+  // if (process?.env?.NODE_ENV === 'development') {
+  //   return LogLevel.DEBUG;
+  // }
+  // return LogLevel.WARN;
+}
 
 /**
  * Stringifies an object, converting BigInts to hex strings.
@@ -66,14 +54,38 @@ const DEFAULT_CONTEXT: LoggerContext = {
  * @param data - The object to stringify.
  * @returns The stringified object.
  */
-export const objStringify = (data: any) => {
-  return JSON.stringify(data, (_: any, value: any) => {
+export const objStringify = (data: unknown): string => {
+  return JSON.stringify(data, (_: unknown, value: unknown) => {
     if (typeof value === 'bigint') {
       return bigIntToHex(value);
     }
     return value;
   });
 };
+
+/**
+ * Logger internal context.
+ */
+const DEFAULT_CONTEXT: LoggerContext = {
+  threshold: getDefaultLevel(),
+  handlers: {
+    [LogLevel.DEBUG]: (message?: unknown, ...optionalParams: unknown[]) => {
+      console.debug(message, ...optionalParams);
+    },
+    [LogLevel.INFO]: (message?: unknown, ...optionalParams: unknown[]) => {
+      console.info(message, ...optionalParams);
+    },
+    [LogLevel.WARN]: (message?: unknown, ...optionalParams: unknown[]) => {
+      console.warn(message, ...optionalParams);
+    },
+    [LogLevel.ERROR]: (message?: unknown, ...optionalParams: unknown[]) => {
+      console.error(message, ...optionalParams);
+    },
+    [LogLevel.DISABLED]: () => {
+      /* intentionally empty - logging disabled */
+    },
+  },
+} as const;
 
 export class Logger {
   #context: LoggerContext;
@@ -109,7 +121,7 @@ export class Logger {
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
-  #log(level: LogLevel, message?: any, ...optionalParams: any[]): void {
+  #log(level: LogLevel, message?: unknown, ...optionalParams: unknown[]): void {
     const { threshold, handlers } = this.#context;
     if (level >= threshold) {
       handlers[level](message, ...optionalParams);
@@ -122,7 +134,7 @@ export class Logger {
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
-  debug(message?: any, ...optionalParams: any[]): void {
+  debug(message?: unknown, ...optionalParams: unknown[]): void {
     this.#log(LogLevel.DEBUG, message, ...optionalParams);
   }
 
@@ -132,7 +144,7 @@ export class Logger {
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
-  info(message?: any, ...optionalParams: any[]): void {
+  info(message?: unknown, ...optionalParams: unknown[]): void {
     this.#log(LogLevel.INFO, message, ...optionalParams);
   }
 
@@ -142,7 +154,7 @@ export class Logger {
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
-  warn(message?: any, ...optionalParams: any[]): void {
+  warn(message?: unknown, ...optionalParams: unknown[]): void {
     this.#log(LogLevel.WARN, message, ...optionalParams);
   }
 
@@ -152,7 +164,7 @@ export class Logger {
    * @param message - Message to log.
    * @param optionalParams - Optional parameters to log.
    */
-  error(message?: any, ...optionalParams: any[]): void {
+  error(message?: unknown, ...optionalParams: unknown[]): void {
     this.#log(LogLevel.ERROR, message, ...optionalParams);
   }
 }
@@ -161,3 +173,10 @@ export class Logger {
  * Exported logger object.
  */
 export const logger = new Logger();
+
+export const logToFile = (
+  message?: unknown,
+  ...optionalParams: unknown[]
+): void => {
+  console.log(message, ...optionalParams);
+};
