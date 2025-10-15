@@ -201,5 +201,30 @@ describe('Time Utility Functions', () => {
       const result = getClosestTimePeriod(halfwayHourlyDaily);
       expect([TimePeriod.HOURLY, TimePeriod.DAILY]).toContain(result);
     });
+
+    it('should throw error for zero duration', () => {
+      expect(() => getClosestTimePeriod(0n)).toThrow(
+        'Period duration must be positive. Received: 0 seconds.',
+      );
+    });
+
+    it('should throw error for negative duration', () => {
+      expect(() => getClosestTimePeriod(-86400n)).toThrow(
+        'Period duration must be positive. Received: -86400 seconds.',
+      );
+    });
+
+    it('should throw error for absurdly large values (> 10 years)', () => {
+      const elevenYears = 60n * 60n * 24n * 365n * 11n;
+      expect(() => getClosestTimePeriod(elevenYears)).toThrow(
+        'is too large. Maximum supported period is 10 years.',
+      );
+    });
+
+    it('should accept values up to 10 years', () => {
+      const tenYears = 60n * 60n * 24n * 365n * 10n;
+      expect(() => getClosestTimePeriod(tenYears)).not.toThrow();
+      expect(getClosestTimePeriod(tenYears)).toBe(TimePeriod.YEARLY);
+    });
   });
 });

@@ -1,3 +1,5 @@
+import { InvalidInputError } from '@metamask/snaps-sdk';
+
 import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../../core/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
@@ -9,7 +11,6 @@ import type {
 
 export const PERIOD_AMOUNT_ELEMENT = 'erc20-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'erc20-token-periodic-period-type';
-export const PERIOD_DURATION_ELEMENT = 'erc20-token-periodic-period-duration';
 export const START_TIME_ELEMENT = 'erc20-token-periodic-start-date';
 export const EXPIRY_ELEMENT = 'erc20-token-periodic-expiry';
 
@@ -60,10 +61,24 @@ export const periodTypeRule: RuleDefinition<
     error: metadata.validationErrors.periodTypeError,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => {
+    // Validate that value is a valid TimePeriod
+    if (!Object.values(TimePeriod).includes(value as TimePeriod)) {
+      throw new InvalidInputError(
+        `Invalid period type: "${value}". Valid options are: ${Object.values(TimePeriod).join(', ')}`,
+      );
+    }
+
     const periodType = value as TimePeriod;
-    const periodDuration = Number(
-      TIME_PERIOD_TO_SECONDS[periodType],
-    ).toString();
+    const periodSeconds = TIME_PERIOD_TO_SECONDS[periodType];
+
+    // This should never happen if the above check passed, but be defensive
+    if (periodSeconds === undefined) {
+      throw new InvalidInputError(
+        `Period type "${periodType}" is not mapped to a duration. This indicates a system error.`,
+      );
+    }
+
+    const periodDuration = Number(periodSeconds).toString();
 
     return {
       ...context,

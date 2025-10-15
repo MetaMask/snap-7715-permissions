@@ -253,22 +253,42 @@ export const getStartOfNextDayUTC = (): number => {
  * A mapping of time periods to their equivalent seconds.
  */
 export const TIME_PERIOD_TO_SECONDS: Record<TimePeriod, bigint> = {
-  [TimePeriod.HOURLY]: 60n * 60n, // 3,600(seconds)
-  [TimePeriod.DAILY]: 60n * 60n * 24n, // 86,400(seconds)
-  [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800(seconds), 7 days
-  [TimePeriod.BIWEEKLY]: 60n * 60n * 24n * 14n, // 1,209,600(seconds), 14 days
-  [TimePeriod.MONTHLY]: 60n * 60n * 24n * 30n, // 2,592,000(seconds), 30 days
-  [TimePeriod.YEARLY]: 60n * 60n * 24n * 365n, // 31,536,000(seconds), 365 days
+  [TimePeriod.HOURLY]: 60n * 60n, // 3,600 seconds (1 hour)
+  [TimePeriod.DAILY]: 60n * 60n * 24n, // 86,400 seconds (1 day)
+  [TimePeriod.WEEKLY]: 60n * 60n * 24n * 7n, // 604,800 seconds (7 days)
+  [TimePeriod.BIWEEKLY]: 60n * 60n * 24n * 14n, // 1,209,600 seconds (14 days)
+  [TimePeriod.MONTHLY]: 60n * 60n * 24n * 30n, // 2,592,000 seconds (approximated as 30 days, real months vary 28-31 days)
+  [TimePeriod.YEARLY]: 60n * 60n * 24n * 365n, // 31,536,000 seconds (365 days, does not account for leap years)
 };
 
 /**
  * Finds the closest TimePeriod enum value for a given duration in seconds.
+ * Uses absolute difference to find the nearest match by comparing against all
+ * predefined time periods (HOURLY, DAILY, WEEKLY, BIWEEKLY, MONTHLY, YEARLY).
  *
- * @param seconds - The duration in seconds to match.
+ * @param seconds - The duration in seconds to match. Must be positive and reasonable.
  * @returns The TimePeriod that most closely matches the given duration.
- * @throws InvalidInputError if no time periods are available.
+ * @throws InvalidInputError if seconds is invalid or no time periods are available.
+ * @example
+ * getClosestTimePeriod(80000n) // Returns TimePeriod.DAILY (~22 hours)
+ * getClosestTimePeriod(1300000n) // Returns TimePeriod.BIWEEKLY (~15 days)
  */
 export const getClosestTimePeriod = (seconds: bigint): TimePeriod => {
+  // Validate input range
+  if (seconds <= 0n) {
+    throw new InvalidInputError(
+      `Period duration must be positive. Received: ${seconds} seconds.`,
+    );
+  }
+
+  // Warn about absurdly large values (more than 10 years)
+  const TEN_YEARS = 60n * 60n * 24n * 365n * 10n;
+  if (seconds > TEN_YEARS) {
+    throw new InvalidInputError(
+      `Period duration ${seconds} seconds (${seconds / (60n * 60n * 24n)} days) is too large. Maximum supported period is 10 years.`,
+    );
+  }
+
   const timePeriodEntries = Object.entries(TIME_PERIOD_TO_SECONDS) as [
     TimePeriod,
     bigint,
@@ -276,7 +296,9 @@ export const getClosestTimePeriod = (seconds: bigint): TimePeriod => {
 
   const firstEntry = timePeriodEntries[0];
   if (!firstEntry) {
-    throw new InvalidInputError('No time periods available');
+    throw new InvalidInputError(
+      `No time periods available. This indicates a system error. Input: ${seconds} seconds, Available periods: ${Object.keys(TIME_PERIOD_TO_SECONDS).length}`,
+    );
   }
 
   let closestPeriod = firstEntry[0];
