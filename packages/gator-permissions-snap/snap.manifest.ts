@@ -12,7 +12,7 @@ const snapEnv = process.env.SNAP_ENV;
 const manifest: SnapManifest = {
   version: packageJson.version,
   description: 'Grants 7715 permissions from a DeleGator smart account',
-  proposedName: 'Gator Permissions',
+  proposedName: 'Permission Request',
   repository: {
     type: 'git',
     url: 'https://github.com/MetaMask/snap-7715-permissions.git',
