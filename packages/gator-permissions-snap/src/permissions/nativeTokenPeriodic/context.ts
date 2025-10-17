@@ -8,9 +8,8 @@ import {
   type Hex,
 } from '@metamask/utils';
 
-import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
+import { getClosestTimePeriod, TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
@@ -178,19 +177,27 @@ export async function buildContext({
     decimals,
   });
 
-  const periodDuration = data.periodDuration.toString();
-
-  // Determine the period type based on the duration
-  let periodType: TimePeriod | 'Other';
-  if (periodDuration === TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY].toString()) {
-    periodType = TimePeriod.DAILY;
-  } else if (
-    periodDuration === TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY].toString()
-  ) {
-    periodType = TimePeriod.WEEKLY;
-  } else {
-    periodType = 'Other';
+  // Safely convert period duration to BigInt with error handling
+  let periodDurationBigInt: bigint;
+  try {
+    periodDurationBigInt = BigInt(data.periodDuration);
+  } catch (error) {
+    throw new InvalidInputError(
+      `Invalid period duration: "${data.periodDuration}". Period duration must be a valid integer representing seconds.`,
+    );
   }
+
+  // Validate that the duration is positive
+  if (periodDurationBigInt <= 0n) {
+    throw new InvalidInputError(
+      `Period duration must be positive. Received: ${periodDurationBigInt} seconds.`,
+    );
+  }
+
+  // Map the requested duration to the closest standard time period.
+  // This normalizes non-standard durations to predefined periods.
+  const periodType = getClosestTimePeriod(periodDurationBigInt);
+  const periodDuration = TIME_PERIOD_TO_SECONDS[periodType].toString();
 
   const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
 
