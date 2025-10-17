@@ -25,7 +25,7 @@ export const erc20TokenPeriodicPermissionDefinition: PermissionDefinition<
   PopulatedErc20TokenPeriodicPermission
 > = {
   rules: allRules,
-  title: 'ERC20 token periodic transfer',
+  title: 'Token Subscription',
   dependencies: {
     parseAndValidatePermission,
     buildContext,
