@@ -3,7 +3,6 @@ import {
   zPermission,
   zMetaMaskPermissionData,
   zAddress,
-  zTimestamp,
   zStartTime,
 } from '@metamask/7715-permissions-shared/types';
 import { z } from 'zod';
@@ -15,6 +14,7 @@ import type {
   TimePeriod,
   BaseMetadata,
 } from '../../core/types';
+import { zPeriodDuration } from '../../utils/time';
 
 export type Erc20TokenPeriodicMetadata = BaseMetadata & {
   validationErrors: {
@@ -41,7 +41,7 @@ export const zErc20TokenPeriodicPermission = zPermission.extend({
     zMetaMaskPermissionData,
     z.object({
       periodAmount: zHexStr,
-      periodDuration: zTimestamp,
+      periodDuration: zPeriodDuration,
       startTime: zStartTime,
       tokenAddress: zAddress,
     }),

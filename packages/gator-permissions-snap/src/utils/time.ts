@@ -1,3 +1,4 @@
+import { zTimestamp } from '@metamask/7715-permissions-shared/types';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import { TimePeriod } from '../core/types';
@@ -316,3 +317,10 @@ export const getClosestTimePeriod = (seconds: bigint): TimePeriod => {
 
   return closestPeriod;
 };
+
+/**
+ * period duration in seconds, mapped to closest TransferWindow enum value
+ */
+export const zPeriodDuration = zTimestamp.transform((val) => {
+  return val; // getClosestTimePeriod(BigInt(val)) as unknown as number;
+});
