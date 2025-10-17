@@ -42,7 +42,6 @@ type TestLifecycleHandlersType = LifecycleOrchestrationHandlers<
 
 const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
-  expiry: 1234567890,
   signer: {
     type: 'account',
     data: {
@@ -58,6 +57,7 @@ const mockPermissionRequest: PermissionRequest = {
     },
     isAdjustmentAllowed: false,
   },
+  rules: [],
 };
 
 const mockContext: TestContextType = {
@@ -69,7 +69,10 @@ const mockContext: TestContextType = {
   },
   accountAddressCaip10: `eip155:1:${mockAddress}`,
   tokenAddressCaip19: `eip155:1/erc20:${mockAssetAddress}`,
-  expiry: '1234567890',
+  expiry: {
+    timestamp: 1234567890,
+    isAdjustmentAllowed: true,
+  },
   isAdjustmentAllowed: false,
 };
 
@@ -447,6 +450,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         const accountSelectorBoundEvent = getBoundEvent({
@@ -481,6 +485,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         expect(
@@ -508,6 +513,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -556,6 +562,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -602,6 +609,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         const confirmationContent =
@@ -1088,6 +1096,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -1626,6 +1635,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -3116,6 +3126,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -3168,6 +3179,7 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
+          isAdjustmentAllowed: true,
         });
 
         const accountSelectorBoundEvent = getBoundEvent({
@@ -3201,6 +3213,45 @@ describe('PermissionHandler', () => {
 
         expect(accountSelectorUnboundEvent).toBeDefined();
         expect(showMoreButtonUnboundEvent).toBeDefined();
+      });
+
+      it('does not bind rule handlers when isAdjustmentAllowed is false but allows account selection', async () => {
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getBoundEvent,
+          updateContext,
+        } = setupTest();
+
+        await permissionHandler.handlePermissionRequest(mockOrigin);
+
+        const lifecycleHandlers = getLifecycleHandlers();
+
+        lifecycleHandlers.onConfirmationCreated?.({
+          interfaceId: mockInterfaceId,
+          initialContext: mockContext,
+          updateContext,
+          isAdjustmentAllowed: false, // Adjustment not allowed
+        });
+
+        // Try to get a rule input handler - it should not exist when adjustment is not allowed
+        const ruleInputHandler = getBoundEvent({
+          elementName: 'amountPerSecond', // Example rule input field
+          eventType: 'InputChangeEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        // The rule handler should not be bound when adjustment is not allowed
+        expect(ruleInputHandler).toBeUndefined();
+
+        // But account selector should still be bound (it's allowed even when adjustment is not allowed)
+        const accountSelectorHandler = getBoundEvent({
+          elementName: 'account-selector',
+          eventType: 'InputChangeEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        expect(accountSelectorHandler).toBeDefined();
       });
     });
   });

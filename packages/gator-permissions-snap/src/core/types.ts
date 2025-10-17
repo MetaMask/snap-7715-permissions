@@ -150,6 +150,10 @@ export type LifecycleOrchestrationHandlers<
   /**
    * Optional callback that is invoked when a confirmation dialog is created.
    * @param confirmationCreatedArgs - Arguments containing the interface ID and a function to update the context
+   * @param confirmationCreatedArgs.interfaceId - The interface ID for the confirmation dialog
+   * @param confirmationCreatedArgs.initialContext - The initial context for the confirmation dialog
+   * @param confirmationCreatedArgs.updateContext - Function to update the context of the confirmation dialog
+   * @param confirmationCreatedArgs.isAdjustmentAllowed - Whether adjustments to the confirmation dialog are allowed
    */
   onConfirmationCreated?: (confirmationCreatedArgs: {
     interfaceId: string;
@@ -157,6 +161,7 @@ export type LifecycleOrchestrationHandlers<
     updateContext: (updateContextArgs: {
       updatedContext: TContext;
     }) => Promise<void>;
+    isAdjustmentAllowed: boolean;
   }) => void;
 
   /**

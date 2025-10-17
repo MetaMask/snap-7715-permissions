@@ -189,10 +189,6 @@ export class PermissionRequestLifecycleOrchestrator {
       }: {
         updatedContext: TContext;
       }) => {
-        if (!isAdjustmentAllowed) {
-          throw new InvalidInputError('Adjustment is not allowed');
-        }
-
         try {
           await updateConfirmation({
             newContext: updatedContext,
@@ -208,6 +204,7 @@ export class PermissionRequestLifecycleOrchestrator {
         interfaceId,
         updateContext,
         initialContext: context,
+        isAdjustmentAllowed,
       });
     }
 
