@@ -16,6 +16,7 @@ import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
+import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 const randomAddress = () => {
@@ -113,6 +114,16 @@ const mockNonceCaveatService = {
   getNonce: jest.fn(),
 } as unknown as jest.Mocked<NonceCaveatService>;
 
+const mockSnapsMetricsService = {
+  trackPermissionRequestStarted: jest.fn().mockResolvedValue(undefined),
+  trackPermissionDialogShown: jest.fn().mockResolvedValue(undefined),
+  trackPermissionRejected: jest.fn().mockResolvedValue(undefined),
+  trackPermissionGranted: jest.fn().mockResolvedValue(undefined),
+  trackSmartAccountUpgraded: jest.fn().mockResolvedValue(undefined),
+  trackDelegationSigning: jest.fn().mockResolvedValue(undefined),
+  trackProfileSync: jest.fn().mockResolvedValue(undefined),
+} as unknown as jest.Mocked<SnapsMetricsService>;
+
 type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
@@ -174,6 +185,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         confirmationDialogFactory: mockConfirmationDialogFactory,
         userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
+        snapsMetricsService: mockSnapsMetricsService,
       });
   });
 
@@ -184,6 +196,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         confirmationDialogFactory: mockConfirmationDialogFactory,
         userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
+        snapsMetricsService: mockSnapsMetricsService,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });

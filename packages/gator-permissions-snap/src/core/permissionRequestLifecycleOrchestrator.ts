@@ -23,6 +23,7 @@ import {
 } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
+import type { SnapsMetricsService } from '../services/snapsMetricsService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
@@ -48,21 +49,26 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #nonceCaveatService: NonceCaveatService;
 
+  readonly #snapsMetricsService: SnapsMetricsService;
+
   constructor({
     accountController,
     confirmationDialogFactory,
     userEventDispatcher,
     nonceCaveatService,
+    snapsMetricsService,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
+    snapsMetricsService: SnapsMetricsService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
+    this.#snapsMetricsService = snapsMetricsService;
   }
 
   /**
@@ -110,8 +116,18 @@ export class PermissionRequestLifecycleOrchestrator {
     >,
   ): Promise<PermissionRequestResult> {
     const chainId = hexToNumber(permissionRequest.chainId);
+    const permissionType = permissionRequest.permission.type as any;
 
     this.#assertIsSupportedChainId(chainId);
+
+    // Track permission request started
+    await this.#snapsMetricsService.trackPermissionRequestStarted(
+      origin,
+      permissionType,
+      {
+        chainId: permissionRequest.chainId,
+      },
+    );
 
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.
@@ -175,6 +191,15 @@ export class PermissionRequestLifecycleOrchestrator {
         newContext: context,
         isGrantDisabled: false,
       });
+
+      // Track dialog shown after successful rendering
+      await this.#snapsMetricsService.trackPermissionDialogShown(
+        origin,
+        permissionType,
+        {
+          chainId: permissionRequest.chainId,
+        },
+      );
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
       throw error;
@@ -231,6 +256,14 @@ export class PermissionRequestLifecycleOrchestrator {
           response,
         };
       }
+
+      await this.#snapsMetricsService.trackPermissionRejected(
+        origin,
+        permissionType,
+        {
+          chainId: permissionRequest.chainId,
+        },
+      );
 
       return {
         approved: false,
@@ -291,6 +324,8 @@ export class PermissionRequestLifecycleOrchestrator {
       TPopulatedPermission
     >;
   }): Promise<PermissionResponse> {
+    const permissionType = originalRequest.permission.type as any;
+
     // apply the changes made to the context to the request
     const resolvedRequest = await lifecycleHandlers.applyContext({
       context: modifiedContext,
@@ -370,14 +405,31 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const { justification } = modifiedContext;
 
-    const signedDelegation: Delegation =
-      await this.#accountController.signDelegation({
+    let signedDelegation: Delegation;
+    try {
+      signedDelegation = await this.#accountController.signDelegation({
         chainId,
         delegation,
         address,
         origin,
         justification,
       });
+
+      await this.#snapsMetricsService.trackDelegationSigning(
+        origin,
+        permissionType,
+        true,
+      );
+    } catch (error) {
+      await this.#snapsMetricsService.trackDelegationSigning(
+        origin,
+        permissionType,
+        false,
+        (error as Error).message,
+      );
+
+      throw error;
+    }
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
@@ -394,6 +446,17 @@ export class PermissionRequestLifecycleOrchestrator {
         delegationManager: contracts.delegationManager,
       },
     };
+
+    // Track successful permission grant
+    await this.#snapsMetricsService.trackPermissionGranted(
+      origin,
+      permissionType,
+      {
+        chainId: numberToHex(chainId),
+      },
+      !isAdjustmentAllowed,
+    );
+
     return response;
   }
 }
