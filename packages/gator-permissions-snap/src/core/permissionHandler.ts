@@ -37,6 +37,7 @@ import type {
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
 import { ZERO_ADDRESS } from '../constants';
+import type { MessageKey } from '../utils/i18n';
 import { formatUnits } from '../utils/value';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
@@ -183,7 +184,7 @@ export class PermissionHandler<
 
     const createSkeletonConfirmationContentHandler = async () => {
       return SkeletonPermissionHandlerContent({
-        permissionTitle: this.#permissionTitle,
+        permissionTitle: this.#permissionTitle as MessageKey,
       });
     };
 

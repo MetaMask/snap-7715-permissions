@@ -3,6 +3,7 @@ import { Dropdown, Option } from '@metamask/snaps-sdk/jsx';
 import type { BaseFieldProps } from './Field';
 import { Field } from './Field';
 import { TextField } from './TextField';
+import { t } from '../../utils/i18n';
 
 export type DropdownFieldParams = BaseFieldProps & {
   name: string;
@@ -20,7 +21,7 @@ export const DropdownField = ({
   errorMessage,
 }: DropdownFieldParams) => {
   if (disabled) {
-    return <TextField label={label} value={value} tooltip={tooltip} />;
+    return <TextField label={label} value={t(value)} tooltip={tooltip} />;
   }
 
   return (
@@ -34,7 +35,7 @@ export const DropdownField = ({
       <Dropdown name={name} value={value}>
         {options.map((option) => (
           <Option key={option} value={option}>
-            {option}
+            {t(option)}
           </Option>
         ))}
       </Dropdown>

@@ -1,0 +1,197 @@
+{
+  "locale": "en",
+  "messages": {
+    "recipientLabel": {
+      "message": "Recipient",
+      "description": "Label for the recipient field"
+    },
+    "recipientTooltip": {
+      "message": "The site requesting the permission",
+      "description": "Tooltip for the recipient field"
+    },
+    "networkLabel": {
+      "message": "Network",
+      "description": "Label for the network field"
+    },
+    "networkTooltip": {
+      "message": "The network on which the permission is being requested",
+      "description": "Tooltip for the network field"
+    },
+    "tokenLabel": {
+      "message": "Token",
+      "description": "Label for the token field"
+    },
+    "tokenTooltip": {
+      "message": "The token being requested",
+      "description": "Tooltip for the token field"
+    },
+    "reasonLabel": {
+      "message": "Reason",
+      "description": "Label for the reason field"
+    },
+    "reasonTooltip": {
+      "message": "Reason given by the recipient for requesting this permission.",
+      "description": "Tooltip for the reason field"
+    },
+    "accountLabel": {
+      "message": "Account",
+      "description": "Label for the account field"
+    },
+    "accountTooltip": {
+      "message": "The account from which the permission is being granted.",
+      "description": "Tooltip for the account field"
+    },
+    "initialAmountLabel": {
+      "message": "Initial Amount",
+      "description": "Label for the initial amount field"
+    },
+    "initialAmountTooltip": {
+      "message": "The initial amount of tokens that can be streamed.",
+      "description": "Tooltip for the initial amount field"
+    },
+    "maxAmountLabel": {
+      "message": "Max Amount",
+      "description": "Label for the max amount field"
+    },
+    "maxAmountTooltip": {
+      "message": "The maximum amount of tokens that can be streamed.",
+      "description": "Tooltip for the max amount field"
+    },
+    "startTimeLabel": {
+      "message": "Start Time",
+      "description": "Label for the start time field"
+    },
+    "startTimeTooltip": {
+      "message": "The time at which the first period begins(mm/dd/yyyy hh:mm:ss).",
+      "description": "Tooltip for the start time field for periodic permissions"
+    },
+    "streamStartTimeTooltip": {
+      "message": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+      "description": "Tooltip for the start time field for stream permissions"
+    },
+    "expiryLabel": {
+      "message": "Expiry",
+      "description": "Label for the expiry field"
+    },
+    "expiryTooltip": {
+      "message": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+      "description": "Tooltip for the expiry field"
+    },
+    "streamAmountLabel": {
+      "message": "Stream Amount",
+      "description": "Label for the stream amount field"
+    },
+    "streamAmountTooltip": {
+      "message": "The amount of tokens that can be streamed per period.",
+      "description": "Tooltip for the stream amount field"
+    },
+    "streamPeriodLabel": {
+      "message": "Stream Period",
+      "description": "Label for the stream period field"
+    },
+    "streamPeriodTooltip": {
+      "message": "The period of the stream.",
+      "description": "Tooltip for the stream period field"
+    },
+    "amountLabel": {
+      "message": "Amount",
+      "description": "Label for the amount field"
+    },
+    "amountTooltip": {
+      "message": "The amount of tokens granted during each period",
+      "description": "Tooltip for the amount field"
+    },
+    "periodDurationLabel": {
+      "message": "Period duration",
+      "description": "Label for the period duration dropdown field"
+    },
+    "periodDurationTooltip": {
+      "message": "The duration of the period",
+      "description": "Tooltip for the period duration dropdown field"
+    },
+    "periodDurationSecondsLabel": {
+      "message": "Duration (seconds)",
+      "description": "Label for the period duration input field in seconds"
+    },
+    "periodDurationSecondsTooltip": {
+      "message": "The length of each period in seconds",
+      "description": "Tooltip for the period duration input field in seconds"
+    },
+    "nativeTokenStreamTitle": {
+      "message": "Native Token Stream Permission",
+      "description": "Title for native token stream permission"
+    },
+    "erc20TokenStreamTitle": {
+      "message": "ERC20 Token Stream Permission",
+      "description": "Title for ERC20 token stream permission"
+    },
+    "nativeTokenPeriodicTitle": {
+      "message": "Native Token Periodic Permission",
+      "description": "Title for native token periodic permission"
+    },
+    "erc20TokenPeriodicTitle": {
+      "message": "ERC20 Token Periodic Permission",
+      "description": "Title for ERC20 token periodic permission"
+    },
+    "showMoreButton": {
+      "message": "Show",
+      "description": "Text for show more button"
+    },
+    "hideButton": {
+      "message": "Hide",
+      "description": "Text for hide button"
+    },
+    "dateTimeFormat": {
+      "message": "mm/dd/yyyy hh:mm:ss",
+      "description": "Date time format display"
+    },
+    "datePlaceholder": {
+      "message": "mm/dd/yyyy",
+      "description": "Placeholder for date input"
+    },
+    "timePlaceholder": {
+      "message": "HH:MM:SS",
+      "description": "Placeholder for time input"
+    },
+    "streamRateLabel": {
+      "message": "Stream rate",
+      "description": "Label for stream rate field"
+    },
+    "streamRateTooltip": {
+      "message": "The amount of tokens to stream per second.",
+      "description": "Tooltip for stream rate field"
+    },
+    "streamRateValue": {
+      "message": "$1 $2/sec",
+      "description": "Stream rate value format with amount and symbol"
+    },
+    "cancelButton": {
+      "message": "Cancel",
+      "description": "Cancel button text"
+    },
+    "grantButton": {
+      "message": "Grant",
+      "description": "Grant button text"
+    },
+    "daily": {
+      "message": "Daily",
+      "description": "Daily time period option"
+    },
+    "weekly": {
+      "message": "Weekly",
+      "description": "Weekly time period option"
+    },
+    "monthly": {
+      "message": "Monthly",
+      "description": "Monthly time period option"
+    },
+    "availableLabel": {
+      "message": "available",
+      "description": "Available label for token balance"
+    },
+    "other": {
+      "message": "Other",
+      "description": "Other time period option"
+    }
+  }
+}

@@ -350,32 +350,32 @@ describe('erc20TokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
-                                "value": "Daily",
+                                "value": "daily",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Weekly",
+                              "key": "weekly",
                               "props": {
                                 "children": "Weekly",
-                                "value": "Weekly",
+                                "value": "weekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "other",
                               "props": {
                                 "children": "Other",
-                                "value": "Other",
+                                "value": "other",
                               },
                               "type": "Option",
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "Daily",
+                          "value": "daily",
                         },
                         "type": "Dropdown",
                       },
@@ -870,32 +870,32 @@ describe('erc20TokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
-                                "value": "Daily",
+                                "value": "daily",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Weekly",
+                              "key": "weekly",
                               "props": {
                                 "children": "Weekly",
-                                "value": "Weekly",
+                                "value": "weekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "other",
                               "props": {
                                 "children": "Other",
-                                "value": "Other",
+                                "value": "other",
                               },
                               "type": "Option",
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "Daily",
+                          "value": "daily",
                         },
                         "type": "Dropdown",
                       },
@@ -1386,32 +1386,32 @@ describe('erc20TokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
-                                "value": "Daily",
+                                "value": "daily",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Weekly",
+                              "key": "weekly",
                               "props": {
                                 "children": "Weekly",
-                                "value": "Weekly",
+                                "value": "weekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "other",
                               "props": {
                                 "children": "Other",
-                                "value": "Other",
+                                "value": "other",
                               },
                               "type": "Option",
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "Weekly",
+                          "value": "weekly",
                         },
                         "type": "Dropdown",
                       },
@@ -1585,7 +1585,7 @@ describe('erc20TokenPeriodic:content', () => {
         ...mockContext,
         permissionDetails: {
           ...mockContext.permissionDetails,
-          periodType: 'Other' as const,
+          periodType: 'other' as const,
           periodDuration: '123456',
         },
       };
@@ -1900,32 +1900,32 @@ describe('erc20TokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
-                                "value": "Daily",
+                                "value": "daily",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Weekly",
+                              "key": "weekly",
                               "props": {
                                 "children": "Weekly",
-                                "value": "Weekly",
+                                "value": "weekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "other",
                               "props": {
                                 "children": "Other",
-                                "value": "Other",
+                                "value": "other",
                               },
                               "type": "Option",
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "Other",
+                          "value": "other",
                         },
                         "type": "Dropdown",
                       },
@@ -2492,32 +2492,32 @@ describe('erc20TokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
-                                "value": "Daily",
+                                "value": "daily",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Weekly",
+                              "key": "weekly",
                               "props": {
                                 "children": "Weekly",
-                                "value": "Weekly",
+                                "value": "weekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "other",
                               "props": {
                                 "children": "Other",
-                                "value": "Other",
+                                "value": "other",
                               },
                               "type": "Option",
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "Daily",
+                          "value": "daily",
                         },
                         "type": "Dropdown",
                       },
@@ -2997,32 +2997,32 @@ describe('erc20TokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
-                                "value": "Daily",
+                                "value": "daily",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Weekly",
+                              "key": "weekly",
                               "props": {
                                 "children": "Weekly",
-                                "value": "Weekly",
+                                "value": "weekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "other",
                               "props": {
                                 "children": "Other",
-                                "value": "Other",
+                                "value": "other",
                               },
                               "type": "Option",
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "Daily",
+                          "value": "daily",
                         },
                         "type": "Dropdown",
                       },
@@ -3520,32 +3520,32 @@ describe('erc20TokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
-                                "value": "Daily",
+                                "value": "daily",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Weekly",
+                              "key": "weekly",
                               "props": {
                                 "children": "Weekly",
-                                "value": "Weekly",
+                                "value": "weekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "other",
                               "props": {
                                 "children": "Other",
-                                "value": "Other",
+                                "value": "other",
                               },
                               "type": "Option",
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "Daily",
+                          "value": "daily",
                         },
                         "type": "Dropdown",
                       },
@@ -4033,32 +4033,32 @@ describe('erc20TokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
-                                "value": "Daily",
+                                "value": "daily",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Weekly",
+                              "key": "weekly",
                               "props": {
                                 "children": "Weekly",
-                                "value": "Weekly",
+                                "value": "weekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Other",
+                              "key": "other",
                               "props": {
                                 "children": "Other",
-                                "value": "Other",
+                                "value": "other",
                               },
                               "type": "Option",
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "Daily",
+                          "value": "daily",
                         },
                         "type": "Dropdown",
                       },

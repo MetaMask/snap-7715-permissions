@@ -215,32 +215,32 @@ describe('erc20TokenStream:content', () => {
                           "props": {
                             "children": [
                               {
-                                "key": "Daily",
+                                "key": "daily",
                                 "props": {
                                   "children": "Daily",
-                                  "value": "Daily",
+                                  "value": "daily",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Weekly",
+                                "key": "weekly",
                                 "props": {
                                   "children": "Weekly",
-                                  "value": "Weekly",
+                                  "value": "weekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Monthly",
+                                "key": "monthly",
                                 "props": {
                                   "children": "Monthly",
-                                  "value": "Monthly",
+                                  "value": "monthly",
                                 },
                                 "type": "Option",
                               },
                             ],
                             "name": "erc20-token-stream-time-period",
-                            "value": "Weekly",
+                            "value": "weekly",
                           },
                           "type": "Dropdown",
                         },
@@ -1070,32 +1070,32 @@ describe('erc20TokenStream:content', () => {
                           "props": {
                             "children": [
                               {
-                                "key": "Daily",
+                                "key": "daily",
                                 "props": {
                                   "children": "Daily",
-                                  "value": "Daily",
+                                  "value": "daily",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Weekly",
+                                "key": "weekly",
                                 "props": {
                                   "children": "Weekly",
-                                  "value": "Weekly",
+                                  "value": "weekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Monthly",
+                                "key": "monthly",
                                 "props": {
                                   "children": "Monthly",
-                                  "value": "Monthly",
+                                  "value": "monthly",
                                 },
                                 "type": "Option",
                               },
                             ],
                             "name": "erc20-token-stream-time-period",
-                            "value": "Weekly",
+                            "value": "weekly",
                           },
                           "type": "Dropdown",
                         },
