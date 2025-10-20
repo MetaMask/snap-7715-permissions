@@ -15,6 +15,7 @@ import type {
 } from './types';
 import { renderRules } from '../../core/rules';
 import { TokenIcon, TooltipIcon } from '../../ui/components';
+import { t } from '../../utils/i18n';
 
 /**
  * Creates the confirmation content for a native token stream permission request.
@@ -44,8 +45,8 @@ export async function createConfirmationContent({
         <Box direction="vertical">
           <Box direction="horizontal" alignment="space-between">
             <Box direction="horizontal">
-              <Text>Stream rate</Text>
-              <TooltipIcon tooltip="The amount of tokens to stream per second." />
+              <Text>{t('streamRateLabel')}</Text>
+              <TooltipIcon tooltip={t('streamRateTooltip')} />
             </Box>
           </Box>
           <Field>
@@ -58,7 +59,7 @@ export async function createConfirmationContent({
             <Input
               name="stream-rate"
               type="text"
-              value={`${amountPerSecond} ETH/sec`}
+              value={t('streamRateValue', [amountPerSecond, 'ETH'])}
               disabled={true}
             />
           </Field>

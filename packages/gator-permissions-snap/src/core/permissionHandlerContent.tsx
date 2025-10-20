@@ -19,23 +19,14 @@ import {
   TokenField,
   TokenBalanceField,
 } from '../ui/components';
+import type { MessageKey } from '../utils/i18n';
+import { t } from '../utils/i18n';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 
-export const RECIPIENT_LABEL = 'Recipient';
-export const RECIPIENT_TOOLTIP = 'The site requesting the permission';
-export const NETWORK_LABEL = 'Network';
-export const NETWORK_TOOLTIP =
-  'The network on which the permission is being requested';
-export const TOKEN_LABEL = 'Token';
-export const TOKEN_TOOLTIP = 'The token being requested';
-export const REASON_LABEL = 'Reason';
-export const REASON_TOOLTIP =
-  'Reason given by the recipient for requesting this permission.';
-
 export type PermissionHandlerContentProps = {
   children: SnapElement;
-  permissionTitle: string;
+  permissionTitle: MessageKey;
   justification: string;
   networkName: string;
   tokenSymbol: string;
@@ -106,31 +97,31 @@ export const PermissionHandlerContent = ({
     <Box>
       <Box direction="vertical">
         <Box center={true}>
-          <Heading size="lg">{permissionTitle}</Heading>
+          <Heading size="lg">{t(permissionTitle)}</Heading>
         </Box>
         <Section>
           <TextField
-            label={RECIPIENT_LABEL}
+            label={t('recipientLabel')}
             value={origin}
-            tooltip={RECIPIENT_TOOLTIP}
+            tooltip={t('recipientTooltip')}
           />
           <TextField
-            label={NETWORK_LABEL}
+            label={t('networkLabel')}
             value={networkName}
-            tooltip={NETWORK_TOOLTIP}
+            tooltip={t('networkTooltip')}
           />
           <TokenField
-            label={TOKEN_LABEL}
+            label={t('tokenLabel')}
             tokenSymbol={tokenSymbol}
             tokenAddress={tokenAddress}
             explorerUrl={tokenExplorerUrl}
-            tooltip={TOKEN_TOOLTIP}
+            tooltip={t('tokenTooltip')}
             iconData={tokenIconData}
           />
           <Box direction="horizontal" alignment="space-between">
             <Box direction="horizontal">
-              <Text>{REASON_LABEL}</Text>
-              <TooltipIcon tooltip={REASON_TOOLTIP} />
+              <Text>{t('reasonLabel')}</Text>
+              <TooltipIcon tooltip={t('reasonTooltip')} />
             </Box>
             <Box direction="horizontal">
               <ShowMoreText
@@ -145,8 +136,8 @@ export const PermissionHandlerContent = ({
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
               <Box direction="horizontal">
-                <Text>Account</Text>
-                <TooltipIcon tooltip="The account from which the permission is being granted." />
+                <Text>{t('accountLabel')}</Text>
+                <TooltipIcon tooltip={t('accountTooltip')} />
               </Box>
             </Box>
             <AccountSelector
@@ -170,19 +161,28 @@ export const PermissionHandlerContent = ({
 export const SkeletonPermissionHandlerContent = ({
   permissionTitle,
 }: {
-  permissionTitle: string;
+  permissionTitle: MessageKey;
 }) => {
   return (
     <Box>
       <Box direction="vertical">
         <Box center={true}>
-          <Heading size="lg">{permissionTitle}</Heading>
+          <Heading size="lg">{t(permissionTitle)}</Heading>
         </Box>
         <Section>
-          <SkeletonField label={RECIPIENT_LABEL} tooltip={RECIPIENT_TOOLTIP} />
-          <SkeletonField label={NETWORK_LABEL} tooltip={NETWORK_TOOLTIP} />
-          <SkeletonField label={TOKEN_LABEL} tooltip={TOKEN_TOOLTIP} />
-          <SkeletonField label={REASON_LABEL} tooltip={REASON_TOOLTIP} />
+          <SkeletonField
+            label={t('recipientLabel')}
+            tooltip={t('recipientTooltip')}
+          />
+          <SkeletonField
+            label={t('networkLabel')}
+            tooltip={t('networkTooltip')}
+          />
+          <SkeletonField label={t('tokenLabel')} tooltip={t('tokenTooltip')} />
+          <SkeletonField
+            label={t('reasonLabel')}
+            tooltip={t('reasonTooltip')}
+          />
         </Section>
         <Section>
           <Skeleton />

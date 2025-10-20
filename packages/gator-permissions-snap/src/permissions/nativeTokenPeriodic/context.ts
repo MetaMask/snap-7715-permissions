@@ -181,7 +181,7 @@ export async function buildContext({
   const periodDuration = data.periodDuration.toString();
 
   // Determine the period type based on the duration
-  let periodType: TimePeriod | 'Other';
+  let periodType: TimePeriod | 'other';
   if (periodDuration === TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY].toString()) {
     periodType = TimePeriod.DAILY;
   } else if (
@@ -189,7 +189,7 @@ export async function buildContext({
   ) {
     periodType = TimePeriod.WEEKLY;
   } else {
-    periodType = 'Other';
+    periodType = 'other';
   }
 
   const startTime = data.startTime ?? Math.floor(Date.now() / 1000);

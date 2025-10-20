@@ -2,14 +2,15 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
 import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
+import type { BaseContext, RuleDefinition } from './types';
+import { DateTimeField } from '../ui/components/DateTimeField';
 import { DropdownField } from '../ui/components/DropdownField';
 import { InputField } from '../ui/components/InputField';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
-import type { BaseContext, RuleDefinition } from './types';
-import { DateTimeField } from '../ui/components/DateTimeField';
+import { t } from '../utils/i18n';
 import {
   combineDateAndTimeToTimestamp,
   convertTimestampToReadableDate,
@@ -78,7 +79,7 @@ export function renderRule<
     case 'text': {
       return (
         <InputField
-          label={label}
+          label={t(label)}
           name={name}
           value={value}
           errorMessage={error}
@@ -102,7 +103,7 @@ export function renderRule<
 
       return (
         <DropdownField
-          label={label}
+          label={t(label)}
           name={name}
           value={value ?? ''}
           errorMessage={error}
@@ -130,7 +131,7 @@ export function renderRule<
 
       return (
         <DateTimeField
-          label={label}
+          label={t(label)}
           name={name}
           value={dateTimeValue ?? ''}
           errorMessage={error}

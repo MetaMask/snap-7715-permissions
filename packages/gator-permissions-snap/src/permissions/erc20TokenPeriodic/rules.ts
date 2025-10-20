@@ -1,11 +1,12 @@
-import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../../core/types';
+import { TimePeriod } from '../../core/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import type {
   Erc20TokenPeriodicContext,
   Erc20TokenPeriodicMetadata,
 } from './types';
+import { t } from '../../utils/i18n';
 
 export const PERIOD_AMOUNT_ELEMENT = 'erc20-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'erc20-token-periodic-period-type';
@@ -18,13 +19,13 @@ export const periodAmountRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: PERIOD_AMOUNT_ELEMENT,
-  label: 'Amount',
+  label: 'amountLabel',
   type: 'number',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.periodAmount,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The amount of tokens granted during each period',
+    tooltip: t('amountTooltip'),
     error: metadata.validationErrors.periodAmountError,
     iconData: getIconData(context),
   }),
@@ -42,20 +43,20 @@ export const periodTypeRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: PERIOD_TYPE_ELEMENT,
-  label: 'Period duration',
+  label: 'periodDurationLabel',
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     value: context.permissionDetails.periodType,
     isVisible: true,
-    tooltip: 'The duration of the period',
-    options: [TimePeriod.DAILY, TimePeriod.WEEKLY, 'Other'],
+    tooltip: t('periodDurationTooltip'),
+    options: [TimePeriod.DAILY, TimePeriod.WEEKLY, 'other'],
     error: metadata.validationErrors.periodTypeError,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => {
-    const periodType = value as TimePeriod | 'Other';
+    const periodType = value as TimePeriod | 'other';
     const periodDuration =
-      periodType === 'Other'
+      periodType === 'other'
         ? context.permissionDetails.periodDuration
         : Number(TIME_PERIOD_TO_SECONDS[periodType]).toString();
 
@@ -75,13 +76,13 @@ export const periodDurationRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: PERIOD_DURATION_ELEMENT,
-  label: 'Duration (seconds)',
+  label: 'periodDurationSecondsLabel',
   type: 'number',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.periodDuration,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
-    isVisible: context.permissionDetails.periodType === 'Other',
-    tooltip: 'The length of each period in seconds',
+    isVisible: context.permissionDetails.periodType === 'other',
+    tooltip: t('periodDurationSecondsTooltip'),
     error: metadata.validationErrors.periodDurationError,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({
@@ -98,13 +99,13 @@ export const startTimeRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: START_TIME_ELEMENT,
-  label: 'Start Time',
+  label: 'startTimeLabel',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.startTime.toString(),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The time at which the first period begins(mm/dd/yyyy hh:mm:ss).',
+    tooltip: t('startTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
     dateTimeParameterNames: {
       timestampName: 'permissionDetails.startTime',
@@ -132,13 +133,13 @@ export const expiryRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: EXPIRY_ELEMENT,
-  label: 'Expiry',
+  label: 'expiryLabel',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: context.expiry.timestamp.toString(),
     isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',
+    tooltip: t('expiryTooltip'),
     error: metadata.validationErrors.expiryError,
     dateTimeParameterNames: {
       timestampName: 'expiry.timestamp',
