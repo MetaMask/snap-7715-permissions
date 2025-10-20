@@ -867,7 +867,7 @@ describe('nativeTokenPeriodic:content', () => {
                             },
                           ],
                           "name": "native-token-periodic-period-type",
-                          "value": "Other",
+                          "value": "other",
                         },
                         "type": "Dropdown",
                       },
@@ -879,7 +879,95 @@ describe('nativeTokenPeriodic:content', () => {
               },
               "type": "Box",
             },
-            null,
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Duration (seconds)",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The length of each period in seconds",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        null,
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "name": "native-token-periodic-period-duration",
+                            "type": "number",
+                            "value": "86400",
+                          },
+                          "type": "Input",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "children": null,
+                          },
+                          "type": "Box",
+                        },
+                      ],
+                    },
+                    "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Section",
