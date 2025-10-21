@@ -305,7 +305,7 @@ describe('erc20TokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Transfer Window",
+                                  "children": "Frequency",
                                 },
                                 "type": "Text",
                               },
@@ -848,7 +848,7 @@ describe('erc20TokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Transfer Window",
+                                  "children": "Frequency",
                                 },
                                 "type": "Text",
                               },
@@ -1387,7 +1387,7 @@ describe('erc20TokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Transfer Window",
+                                  "children": "Frequency",
                                 },
                                 "type": "Text",
                               },
@@ -1914,7 +1914,7 @@ describe('erc20TokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Transfer Window",
+                                  "children": "Frequency",
                                 },
                                 "type": "Text",
                               },
@@ -2442,7 +2442,7 @@ describe('erc20TokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Transfer Window",
+                                  "children": "Frequency",
                                 },
                                 "type": "Text",
                               },
@@ -2988,7 +2988,7 @@ describe('erc20TokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Transfer Window",
+                                  "children": "Frequency",
                                 },
                                 "type": "Text",
                               },
@@ -3524,7 +3524,7 @@ describe('erc20TokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Transfer Window",
+                                  "children": "Frequency",
                                 },
                                 "type": "Text",
                               },

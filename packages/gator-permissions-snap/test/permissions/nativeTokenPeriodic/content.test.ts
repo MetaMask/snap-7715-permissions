@@ -294,7 +294,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Transfer Window",
+                                  "children": "Frequency",
                                 },
                                 "type": "Text",
                               },

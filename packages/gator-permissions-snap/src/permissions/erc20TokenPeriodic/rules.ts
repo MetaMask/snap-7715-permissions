@@ -43,7 +43,7 @@ export const periodTypeRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: PERIOD_TYPE_ELEMENT,
-  label: 'Transfer Window',
+  label: 'Frequency',
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
     isAdjustmentAllowed: context.isAdjustmentAllowed,

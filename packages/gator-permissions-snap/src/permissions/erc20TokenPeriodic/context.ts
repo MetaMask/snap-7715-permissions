@@ -177,26 +177,7 @@ export async function buildContext({
     decimals,
   });
 
-  // Safely convert period duration to BigInt with error handling
-  let periodDurationBigInt: bigint;
-  try {
-    periodDurationBigInt = BigInt(data.periodDuration);
-  } catch (error) {
-    throw new InvalidInputError(
-      `Invalid period duration: "${data.periodDuration}". Period duration must be a valid integer representing seconds.`,
-    );
-  }
-
-  // Validate that the duration is positive
-  if (periodDurationBigInt <= 0n) {
-    throw new InvalidInputError(
-      `Period duration must be positive. Received: ${periodDurationBigInt} seconds.`,
-    );
-  }
-
-  // Map the requested duration to the closest standard time period.
-  // This normalizes non-standard durations to predefined periods.
-  const periodType = getClosestTimePeriod(periodDurationBigInt);
+  const periodType = getClosestTimePeriod(data.periodDuration);
   const periodDuration = TIME_PERIOD_TO_SECONDS[periodType].toString();
 
   const startTime = data.startTime ?? Math.floor(Date.now() / 1000);

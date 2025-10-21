@@ -269,46 +269,22 @@ export const TIME_PERIOD_TO_SECONDS: Record<TimePeriod, bigint> = {
  *
  * @param seconds - The duration in seconds to match. Must be positive and reasonable.
  * @returns The TimePeriod that most closely matches the given duration.
- * @throws InvalidInputError if seconds is invalid or no time periods are available.
  * @example
- * getClosestTimePeriod(80000n) // Returns TimePeriod.DAILY (~22 hours)
- * getClosestTimePeriod(1300000n) // Returns TimePeriod.BIWEEKLY (~15 days)
+ * getClosestTimePeriod(80000) // Returns TimePeriod.DAILY (~22 hours)
+ * getClosestTimePeriod(1300000) // Returns TimePeriod.BIWEEKLY (~15 days)
  */
-export const getClosestTimePeriod = (seconds: bigint): TimePeriod => {
-  // Validate input range
-  if (seconds <= 0n) {
-    throw new InvalidInputError(
-      `Period duration must be positive. Received: ${seconds} seconds.`,
-    );
-  }
-
-  // Warn about absurdly large values (more than 10 years)
-  const TEN_YEARS = 60n * 60n * 24n * 365n * 10n;
-  if (seconds > TEN_YEARS) {
-    throw new InvalidInputError(
-      `Period duration ${seconds} seconds (${seconds / (60n * 60n * 24n)} days) is too large. Maximum supported period is 10 years.`,
-    );
-  }
-
+export const getClosestTimePeriod = (seconds: number): TimePeriod => {
   const timePeriodEntries = Object.entries(TIME_PERIOD_TO_SECONDS) as [
     TimePeriod,
     bigint,
   ][];
 
-  const firstEntry = timePeriodEntries[0];
-  if (!firstEntry) {
-    throw new InvalidInputError(
-      `No time periods available. This indicates a system error. Input: ${seconds} seconds, Available periods: ${Object.keys(TIME_PERIOD_TO_SECONDS).length}`,
-    );
-  }
+  let closestPeriod = TimePeriod.HOURLY;
+  let minDifference = Number.MAX_SAFE_INTEGER;
 
-  let closestPeriod = firstEntry[0];
-  let minDifference =
-    seconds > firstEntry[1] ? seconds - firstEntry[1] : firstEntry[1] - seconds;
+  for (const [period, periodValue] of timePeriodEntries) {
+    const difference = Math.abs(seconds - Number(periodValue));
 
-  for (const [period, periodValue] of timePeriodEntries.slice(1)) {
-    const difference =
-      seconds > periodValue ? seconds - periodValue : periodValue - seconds;
     if (difference < minDifference) {
       minDifference = difference;
       closestPeriod = period;
@@ -318,9 +294,15 @@ export const getClosestTimePeriod = (seconds: bigint): TimePeriod => {
   return closestPeriod;
 };
 
+const TEN_YEARS = 10 * 365 * 24 * 60 * 60; // 10 years in seconds
 /**
  * period duration in seconds, mapped to closest TransferWindow enum value
  */
-export const zPeriodDuration = zTimestamp.transform((val) => {
-  return val; // getClosestTimePeriod(BigInt(val)) as unknown as number;
-});
+export const zPeriodDuration = zTimestamp
+  .max(TEN_YEARS, {
+    message: `Period duration must be less than or equal to ${TEN_YEARS} seconds (10 years).`,
+  })
+  .transform((val) => {
+    const periodType = getClosestTimePeriod(val);
+    return Number(TIME_PERIOD_TO_SECONDS[periodType]);
+  });
