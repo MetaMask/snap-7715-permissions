@@ -618,7 +618,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         });
       });
 
-      it('throws an error when adjustment is not allowed', async () => {
+      it('passes isAdjustmentAllowed flag to onConfirmationCreated when adjustment is not allowed', async () => {
         const initialContext = {
           foo: 'bar',
           expiry: '2024-12-31',
@@ -636,11 +636,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
 
-        let updateContextHandler: any;
+        let onConfirmationCreatedArgs: any;
         expect(lifecycleHandlerMocks.onConfirmationCreated).toBeDefined();
         lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
-          ({ updateContext }) => {
-            updateContextHandler = updateContext;
+          (args) => {
+            onConfirmationCreatedArgs = args;
           },
         );
 
@@ -653,14 +653,22 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         await new Promise((resolve) => setTimeout(resolve, 0));
 
-        await expect(
-          updateContextHandler({
-            updatedContext: { ...initialContext, foo: 'updated' },
-          }),
-        ).rejects.toThrow('Adjustment is not allowed');
+        // Verify that isAdjustmentAllowed is passed correctly
+        expect(onConfirmationCreatedArgs).toBeDefined();
+        expect(onConfirmationCreatedArgs.isAdjustmentAllowed).toBe(false);
+        expect(onConfirmationCreatedArgs.updateContext).toBeDefined();
+        expect(onConfirmationCreatedArgs.initialContext).toStrictEqual(
+          initialContext,
+        );
 
-        // this is called once when the context is first resolved
-        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(1);
+        // Verify that updateContext can be called without throwing (restriction is now in handlers)
+        const updateContextPromise = onConfirmationCreatedArgs.updateContext({
+          updatedContext: { ...initialContext, foo: 'updated' },
+        });
+        expect(await updateContextPromise).toBeUndefined();
+
+        // this is called once when the context is first resolved, and once when we call updateContext
+        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(2);
 
         mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
           {

@@ -245,10 +245,12 @@ export class PermissionHandler<
       interfaceId,
       initialContext,
       updateContext,
+      isAdjustmentAllowed,
     }: {
       interfaceId: string;
       initialContext: TContext;
       updateContext: (args: { updatedContext: TContext }) => Promise<void>;
+      isAdjustmentAllowed: boolean;
     }) => {
       let currentContext = initialContext;
       const rerender = async () => {
@@ -354,17 +356,21 @@ export class PermissionHandler<
         },
       });
 
-      const unbindRuleHandlers = bindRuleHandlers({
-        rules: this.#rules,
-        userEventDispatcher: this.#userEventDispatcher,
-        interfaceId,
-        getContext: () => currentContext,
-        deriveMetadata: this.#dependencies.deriveMetadata,
-        onContextChanged: async ({ context }) => {
-          currentContext = context;
-          await rerender();
-        },
-      });
+      const unbindRuleHandlers = isAdjustmentAllowed
+        ? bindRuleHandlers({
+            rules: this.#rules,
+            userEventDispatcher: this.#userEventDispatcher,
+            interfaceId,
+            getContext: () => currentContext,
+            deriveMetadata: this.#dependencies.deriveMetadata,
+            onContextChanged: async ({ context }) => {
+              currentContext = context;
+              await rerender();
+            },
+          })
+        : () => {
+            // No-op function when adjustment is not allowed
+          };
 
       this.#unbindHandlers = () => {
         unbindRuleHandlers();
