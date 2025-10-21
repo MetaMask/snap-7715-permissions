@@ -74,7 +74,7 @@ export class ConfirmationDialog {
         interfaceId,
         handler: async () => {
           await this.#cleanup();
-
+          this.#interfaceId = undefined;
           resolve(true);
         },
       });
@@ -85,7 +85,7 @@ export class ConfirmationDialog {
         interfaceId,
         handler: async () => {
           await this.#cleanup();
-
+          this.#interfaceId = undefined;
           resolve(false);
         },
       });
@@ -143,18 +143,13 @@ export class ConfirmationDialog {
     }
 
     if (resolveInterface && this.#interfaceId) {
-      try {
-        await this.#snaps.request({
-          method: 'snap_resolveInterface',
-          params: {
-            id: this.#interfaceId,
-            value: {},
-          },
-        });
-      } catch (error) {
-        // If resolving fails during cleanup, we still want to continue
-        // The error will be caught by the caller if needed
-      }
+      await this.#snaps.request({
+        method: 'snap_resolveInterface',
+        params: {
+          id: this.#interfaceId,
+          value: {},
+        },
+      });
     }
   }
 
