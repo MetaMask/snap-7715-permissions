@@ -199,12 +199,6 @@ export class PermissionHandler<
       origin: string;
       chainId: number;
     }) => {
-      const permissionContent =
-        await this.#dependencies.createConfirmationContent({
-          context,
-          metadata,
-        });
-
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
       const tokenIconData = getIconData(context);
@@ -215,13 +209,17 @@ export class PermissionHandler<
         accountAddressCaip10,
       } = context;
 
-      // Check account upgrade status
       const { address } = parseCaipAccountId(accountAddressCaip10);
-      const accountUpgradeStatus =
-        await this.#accountController.getAccountUpgradeStatus({
+      const [permissionContent, accountUpgradeStatus] = await Promise.all([
+        this.#dependencies.createConfirmationContent({
+          context,
+          metadata,
+        }),
+        this.#accountController.getAccountUpgradeStatus({
           account: address,
           chainId: numberToHex(chainId),
-        });
+        }),
+      ]);
 
       return PermissionHandlerContent({
         origin,

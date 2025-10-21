@@ -228,22 +228,19 @@ export class AccountController {
     logger.debug('AccountController:upgradeAccount()', params);
 
     try {
-      const result = await this.#ethereumProvider.request({
-        method: 'wallet_upgradeAccount',
-        params,
-      });
+      const result = await this.#ethereumProvider.request<AccountUpgradeResult>(
+        {
+          method: 'wallet_upgradeAccount',
+          params,
+        },
+      );
 
       logger.debug('Account upgrade result', result);
 
       // The result should contain a transaction hash
-      if (
-        typeof result === 'object' &&
-        result !== null &&
-        'transactionHash' in result
-      ) {
+      if (result?.transactionHash) {
         return {
-          transactionHash: (result as { transactionHash: string })
-            .transactionHash,
+          transactionHash: result.transactionHash,
         };
       }
 
