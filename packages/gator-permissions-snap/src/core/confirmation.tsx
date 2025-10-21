@@ -68,16 +68,12 @@ export class ConfirmationDialog {
     const interfaceId = this.#interfaceId;
 
     const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
-      // cleanup can't be defined before the click handlers, so cannot be const
-      // eslint-disable-next-line prefer-const
-      let cleanup: (resolveInterface?: boolean) => Promise<void>;
-
       const { unbind: unbindGrantButtonClick } = this.#userEventDispatcher.on({
         elementName: ConfirmationDialog.#grantButton,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          await cleanup();
+          await this.#cleanup();
 
           resolve(true);
         },
@@ -88,7 +84,7 @@ export class ConfirmationDialog {
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          await cleanup();
+          await this.#cleanup();
 
           resolve(false);
         },
@@ -98,34 +94,6 @@ export class ConfirmationDialog {
       this.#unbindHandlers = () => {
         unbindGrantButtonClick();
         unbindCancelButtonClick();
-      };
-
-      cleanup = async (resolveInterface = true) => {
-        if (this.#unbindHandlers) {
-          try {
-            this.#unbindHandlers();
-          } catch {
-            // ignore
-          } finally {
-            // clear our stored unbind handler reference
-            this.#unbindHandlers = undefined;
-          }
-        }
-
-        if (resolveInterface) {
-          try {
-            await this.#snaps.request({
-              method: 'snap_resolveInterface',
-              params: {
-                id: interfaceId,
-                value: {},
-              },
-            });
-          } catch (error) {
-            const reason = error as Error;
-            reject(reason);
-          }
-        }
       };
 
       this.#decisionReject = reject;
@@ -142,7 +110,7 @@ export class ConfirmationDialog {
         .then(async (result) => {
           // Should resolve with false when dialog is closed.
           if (result === null) {
-            await cleanup(false);
+            await this.#cleanup(false);
 
             resolve(false);
           }
@@ -156,6 +124,38 @@ export class ConfirmationDialog {
     return {
       isConfirmationGranted: await isConfirmationGranted,
     };
+  }
+
+  /**
+   * Clean up event handlers and optionally resolve the interface.
+   * @param resolveInterface - Whether to resolve the interface. Defaults to true.
+   */
+  async #cleanup(resolveInterface = true): Promise<void> {
+    // Unbind any listeners to avoid leaks
+    if (this.#unbindHandlers) {
+      try {
+        this.#unbindHandlers();
+      } catch {
+        // ignore
+      } finally {
+        this.#unbindHandlers = undefined;
+      }
+    }
+
+    if (resolveInterface && this.#interfaceId) {
+      try {
+        await this.#snaps.request({
+          method: 'snap_resolveInterface',
+          params: {
+            id: this.#interfaceId,
+            value: {},
+          },
+        });
+      } catch (error) {
+        // If resolving fails during cleanup, we still want to continue
+        // The error will be caught by the caller if needed
+      }
+    }
   }
 
   #buildConfirmation(): JSX.Element {
@@ -219,30 +219,11 @@ export class ConfirmationDialog {
       return;
     }
 
-    // Unbind any listeners to avoid leaks
-    if (this.#unbindHandlers) {
-      try {
-        this.#unbindHandlers();
-      } catch {
-        // ignore
-      } finally {
-        this.#unbindHandlers = undefined;
-      }
-    }
+    // Clean up handlers and resolve interface
+    await this.#cleanup(true);
 
-    try {
-      await this.#snaps.request({
-        method: 'snap_resolveInterface',
-        params: {
-          id: this.#interfaceId,
-          value: {},
-        },
-      });
-    } catch (error) {
-      // If closing fails, still reject with the original reason
-    } finally {
-      this.#interfaceId = undefined;
-    }
+    // Clear interface ID after cleanup
+    this.#interfaceId = undefined;
 
     if (this.#decisionReject) {
       this.#decisionReject(reason);
