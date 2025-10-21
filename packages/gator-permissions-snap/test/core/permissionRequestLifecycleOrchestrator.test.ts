@@ -509,11 +509,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           mockAccountController.getAccountUpgradeStatus,
         ).toHaveBeenCalledWith({
           account: grantingAccountAddress,
-          chainId: 1,
+          chainId: '0x1',
         });
         expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
           account: grantingAccountAddress,
-          chainId: 1,
+          chainId: '0x1',
         });
         expect(result.approved).toBe(true);
       });
@@ -533,7 +533,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           mockAccountController.getAccountUpgradeStatus,
         ).toHaveBeenCalledWith({
           account: grantingAccountAddress,
-          chainId: 1,
+          chainId: '0x1',
         });
         expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
         expect(result.approved).toBe(true);
@@ -799,7 +799,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           mockAccountController.getAccountUpgradeStatus,
         ).toHaveBeenCalledWith({
           account: grantingAccountAddress,
-          chainId: 1,
+          chainId: '0x1',
         });
       });
 

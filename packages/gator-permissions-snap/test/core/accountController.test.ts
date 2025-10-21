@@ -40,6 +40,16 @@ describe('AccountController', () => {
           return mockSignature;
         case 'eth_getBalance':
           return expectedBalance;
+        case 'wallet_getAccountUpgradeStatus':
+          return {
+            isUpgraded: false,
+            upgradedAddress: null,
+          };
+        case 'wallet_upgradeAccount':
+          return {
+            transactionHash:
+              '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+          };
         default:
           return null;
       }
@@ -100,7 +110,7 @@ describe('AccountController', () => {
 
       const result = await accountController.getAccountUpgradeStatus({
         account: mockAddress,
-        chainId: sepolia,
+        chainId: mockChainId,
       });
 
       expect(result).toStrictEqual({ isUpgraded: true });
@@ -117,7 +127,7 @@ describe('AccountController', () => {
 
       const result = await accountController.upgradeAccount({
         account: mockAddress,
-        chainId: sepolia,
+        chainId: mockChainId,
       });
 
       expect(result).toStrictEqual({

@@ -196,7 +196,7 @@ export class AccountController {
     try {
       const result = (await this.#ethereumProvider.request({
         method: 'wallet_getAccountUpgradeStatus',
-        params: params,
+        params,
       })) as { isUpgraded: boolean; upgradedAddress: Hex | null };
 
       logger.debug('Account upgrade status result', result);
@@ -230,7 +230,7 @@ export class AccountController {
     try {
       const result = await this.#ethereumProvider.request({
         method: 'wallet_upgradeAccount',
-        params: params,
+        params,
       });
 
       logger.debug('Account upgrade result', result);
