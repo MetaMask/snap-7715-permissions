@@ -15,6 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove unnecessary code within the permission provider and add placeholder confirmation with simple "Confirm" "Reject" options. ([#21](https://github.com/MetaMask/snap-7715-permissions/pull/18))
 
-### Fixed
-
-### Removed
+[Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/
