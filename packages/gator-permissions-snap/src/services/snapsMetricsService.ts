@@ -47,17 +47,24 @@ export class SnapsMetricsService {
     event: string,
     properties: Record<string, Json>,
   ): Promise<void> {
-    logger.debug(`SnapsMetricsService: Tracking event ${event}`, properties);
-
-    await this.#snap.request({
-      method: 'snap_trackEvent',
-      params: {
-        event: {
-          event,
-          properties,
+    try {
+      logger.info(`SnapsMetricsService: Tracking event ${event}`, properties);
+      await this.#snap.request({
+        method: 'snap_trackEvent',
+        params: {
+          event: {
+            event: `${event}`,
+            properties,
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      logger.error(`SnapsMetricsService: Failed to track event ${event}`, {
+        error,
+        event,
+        properties,
+      });
+    }
   }
 
   /**
