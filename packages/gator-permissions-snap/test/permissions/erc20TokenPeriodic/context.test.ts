@@ -89,7 +89,7 @@ const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
   },
   permissionDetails: {
     periodAmount: '100',
-    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
+    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
     startTime: 1729900800,
   },
 } as const;
@@ -306,7 +306,7 @@ describe('erc20TokenPeriodic:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            periodDuration: 'invalid',
+            periodDuration: 'invalid' as unknown as number,
           },
         };
 
@@ -324,7 +324,7 @@ describe('erc20TokenPeriodic:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            periodDuration: '-1',
+            periodDuration: '-1' as unknown as number,
           },
         };
 
@@ -452,7 +452,7 @@ describe('erc20TokenPeriodic:context', () => {
         permissionDetails: {
           ...alreadyPopulatedContext.permissionDetails,
           periodAmount: '200',
-          periodDuration: '604800', // 1 week
+          periodDuration: 604800, // 1 week
           startTime: Math.floor(Date.now() / 1000),
         },
         expiry: {

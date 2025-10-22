@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits, toHex, type Hex } from 'viem';
+
 import type { ERC20TokenPeriodicPermissionRequest } from './types';
 
 type ERC20TokenPeriodicFormProps = {
@@ -15,7 +16,9 @@ export const ERC20TokenPeriodicForm = ({
     BigInt(toHex(parseUnits('1', decimals))),
   );
   const [periodDuration, setPeriodDuration] = useState(2592000); // 30 days in seconds
-  const [startTime, setStartTime] = useState<number | null>(Math.floor(Date.now() / 1000));
+  const [startTime, setStartTime] = useState<number | null>(
+    Math.floor(Date.now() / 1000),
+  );
   const [expiry, setExpiry] = useState(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
   );

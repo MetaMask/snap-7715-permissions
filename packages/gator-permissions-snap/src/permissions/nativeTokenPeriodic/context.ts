@@ -75,7 +75,7 @@ export async function applyContext({
     periodAmount: bigIntToHex(
       parseUnits({ formatted: permissionDetails.periodAmount, decimals }),
     ),
-    periodDuration: parseInt(permissionDetails.periodDuration, 10),
+    periodDuration: permissionDetails.periodDuration,
     startTime: permissionDetails.startTime,
     justification: originalRequest.permission.data.justification,
   };
@@ -176,7 +176,7 @@ export async function buildContext({
     decimals,
   });
 
-  const periodDuration = data.periodDuration.toString();
+  const { periodDuration } = data;
 
   const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
 

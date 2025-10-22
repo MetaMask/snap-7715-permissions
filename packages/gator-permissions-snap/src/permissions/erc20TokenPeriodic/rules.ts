@@ -47,9 +47,7 @@ export const periodDurationRule: RuleDefinition<
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
     isAdjustmentAllowed: context.isAdjustmentAllowed,
-    value: getClosestTimePeriod(
-      parseInt(context.permissionDetails.periodDuration, 10),
-    ),
+    value: getClosestTimePeriod(context.permissionDetails.periodDuration),
     isVisible: true,
     tooltip: 'The duration of the period',
     options: Object.values(TimePeriod),
@@ -73,7 +71,7 @@ export const periodDurationRule: RuleDefinition<
       );
     }
 
-    const periodDuration = Number(periodSeconds).toString();
+    const periodDuration = Number(periodSeconds);
 
     return {
       ...context,

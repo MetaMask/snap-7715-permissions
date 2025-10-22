@@ -26,7 +26,7 @@ export type NativeTokenPeriodicMetadata = BaseMetadata & {
 export type NativeTokenPeriodicContext = BaseContext & {
   permissionDetails: {
     periodAmount: string;
-    periodDuration: string;
+    periodDuration: number;
     startTime: number;
   };
 };
