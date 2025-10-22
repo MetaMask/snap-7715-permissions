@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- Update RpcHandler to restrict supported chainIds ([#200](https://github.com/MetaMask/snap-7715-permissions/pull/200))
+- Add new time periods for ERC20 and native token permissions ([#190](https://github.com/MetaMask/snap-7715-permissions/pull/190))
+- rename header title and subtitle ([#196](https://github.com/MetaMask/snap-7715-permissions/pull/196))
+- fix: is adjusment allowed check ([#193](https://github.com/MetaMask/snap-7715-permissions/pull/193))
+- chore: remove mock price api package and update env configuration ([#194](https://github.com/MetaMask/snap-7715-permissions/pull/194))
+- Replace InvalidInputError with UserRejectedRequestError for permission rejection handling ([#191](https://github.com/MetaMask/snap-7715-permissions/pull/191))
+- Support all chains ([#189](https://github.com/MetaMask/snap-7715-permissions/pull/189))
+- Improve request validation ([#187](https://github.com/MetaMask/snap-7715-permissions/pull/187))
+- Remove @metamask/delegation-toolkit and bump @metamask/delegation-core to 'stable' release 0.2.0
+- Refactor snap manifest to use package version from package.json and enhance local development permissions documentation
+- Bump version to 0.3.0 in snap.manifest.ts for both Gator Permissions and Permissions Kernel
+- Refactor imports and update onInstall handler documentation for clarity
+- Enhance local development setup by adding lifecycle hooks permission and installing message signing snap if not present
+- Add message signing snap ID and update initialConnections logic
+
 ## [0.3.0]
 
 ### Added
