@@ -27,7 +27,6 @@ const mockContext: Erc20TokenPeriodicContext = {
   },
   permissionDetails: {
     periodAmount: '100',
-    periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
     startTime: 499161600, // 10/26/1985
   },
@@ -1115,7 +1114,6 @@ describe('erc20TokenPeriodic:content', () => {
         ...mockContext,
         permissionDetails: {
           ...mockContext.permissionDetails,
-          periodType: TimePeriod.WEEKLY,
           periodDuration: Number(
             TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY],
           ).toString(),
@@ -3086,6 +3084,7 @@ describe('erc20TokenPeriodic:content', () => {
                         },
                         "type": "Dropdown",
                       },
+                      "error": "Invalid period duration",
                     },
                     "type": "Field",
                   },

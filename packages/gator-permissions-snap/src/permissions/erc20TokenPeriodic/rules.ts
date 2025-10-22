@@ -2,7 +2,7 @@ import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../../core/types';
-import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
+import { getClosestTimePeriod, TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import type {
   Erc20TokenPeriodicContext,
@@ -38,7 +38,7 @@ export const periodAmountRule: RuleDefinition<
   }),
 };
 
-export const periodTypeRule: RuleDefinition<
+export const periodDurationRule: RuleDefinition<
   Erc20TokenPeriodicContext,
   Erc20TokenPeriodicMetadata
 > = {
@@ -47,18 +47,13 @@ export const periodTypeRule: RuleDefinition<
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
     isAdjustmentAllowed: context.isAdjustmentAllowed,
-    value: context.permissionDetails.periodType,
+    value: getClosestTimePeriod(
+      parseInt(context.permissionDetails.periodDuration, 10),
+    ),
     isVisible: true,
     tooltip: 'The duration of the period',
-    options: [
-      TimePeriod.HOURLY,
-      TimePeriod.DAILY,
-      TimePeriod.WEEKLY,
-      TimePeriod.BIWEEKLY,
-      TimePeriod.MONTHLY,
-      TimePeriod.YEARLY,
-    ],
-    error: metadata.validationErrors.periodTypeError,
+    options: Object.values(TimePeriod),
+    error: metadata.validationErrors.periodDurationError,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => {
     // Validate that value is a valid TimePeriod
@@ -84,7 +79,6 @@ export const periodTypeRule: RuleDefinition<
       ...context,
       permissionDetails: {
         ...context.permissionDetails,
-        periodType,
         periodDuration,
       },
     };
@@ -159,7 +153,7 @@ export const expiryRule: RuleDefinition<
 
 export const allRules = [
   periodAmountRule,
-  periodTypeRule,
+  periodDurationRule,
   startTimeRule,
   expiryRule,
 ];

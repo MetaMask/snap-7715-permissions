@@ -11,7 +11,6 @@ import type {
   DeepRequired,
   TypedPermissionRequest,
   BaseContext,
-  TimePeriod,
   BaseMetadata,
 } from '../../core/types';
 import { zPeriodDuration } from '../../utils/time';
@@ -20,7 +19,6 @@ export type Erc20TokenPeriodicMetadata = BaseMetadata & {
   validationErrors: {
     periodAmountError?: string;
     periodDurationError?: string;
-    periodTypeError?: string;
     startTimeError?: string;
     expiryError?: string;
   };
@@ -29,7 +27,6 @@ export type Erc20TokenPeriodicMetadata = BaseMetadata & {
 export type Erc20TokenPeriodicContext = BaseContext & {
   permissionDetails: {
     periodAmount: string;
-    periodType: TimePeriod;
     periodDuration: string;
     startTime: number;
   };

@@ -89,7 +89,6 @@ const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
   },
   permissionDetails: {
     periodAmount: '100',
-    periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
     startTime: 1729900800,
   },
@@ -220,7 +219,7 @@ describe('erc20TokenPeriodic:context', () => {
     it('throws an error if the permission request has no rules', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
-        rules: undefined,
+        rules: [],
       };
 
       await expect(

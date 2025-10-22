@@ -25,7 +25,6 @@ const mockContext: NativeTokenPeriodicContext = {
   },
   permissionDetails: {
     periodAmount: '1',
-    periodType: TimePeriod.DAILY,
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
     startTime: 499161600, // 10/26/1985
   },

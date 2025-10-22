@@ -8,9 +8,7 @@ import {
   type Hex,
 } from '@metamask/utils';
 
-import type { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
@@ -178,10 +176,6 @@ export async function buildContext({
     decimals,
   });
 
-  const periodType = (Object.keys(TIME_PERIOD_TO_SECONDS) as TimePeriod[]).find(
-    (key: TimePeriod) =>
-      Number(TIME_PERIOD_TO_SECONDS[key]) === data.periodDuration,
-  );
   const periodDuration = data.periodDuration.toString();
 
   const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
@@ -212,7 +206,6 @@ export async function buildContext({
     },
     permissionDetails: {
       periodAmount,
-      periodType,
       periodDuration,
       startTime,
     },
