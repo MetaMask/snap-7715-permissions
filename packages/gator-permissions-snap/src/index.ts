@@ -67,6 +67,15 @@ if (!messageSigningSnapId) {
   throw new InternalError('MESSAGE_SIGNING_SNAP_ID is not set');
 }
 
+const supportedChainIdsString = process.env.SUPPORTED_CHAIN_IDS;
+if (!supportedChainIdsString) {
+  throw new InternalError('SUPPORTED_CHAIN_IDS is not set');
+}
+
+const supportedChainIds = supportedChainIdsString
+  .split(',')
+  .map((chainIdString) => parseInt(chainIdString, 10));
+
 // set up dependencies
 
 const accountApiClient = new AccountApiClient({
@@ -167,6 +176,7 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
 const rpcHandler = createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
+  supportedChainIds,
 });
 
 // configure RPC methods bindings

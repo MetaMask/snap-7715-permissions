@@ -16,6 +16,10 @@ const TEST_CHAIN_ID = '0x1' as const;
 const TEST_EXPIRY = Math.floor(Date.now() / 1000) + 86400; // 24 hours from now
 const TEST_CONTEXT = '0xabcd' as const;
 
+const TEST_SUPPORTED_CHAIN_IDS = [0x1, 0x10];
+
+const UNSUPPORTED_CHAIN_ID = '0xFA11' as const;
+
 const VALID_PERMISSION_REQUEST: PermissionRequest = {
   chainId: TEST_CHAIN_ID,
   rules: [
@@ -103,6 +107,7 @@ describe('RpcHandler', () => {
     handler = createRpcHandler({
       permissionHandlerFactory: mockHandlerFactory,
       profileSyncManager: mockProfileSyncManager,
+      supportedChainIds: TEST_SUPPORTED_CHAIN_IDS,
     });
   });
 
@@ -128,6 +133,54 @@ describe('RpcHandler', () => {
       );
 
       expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE]);
+    });
+
+    it('should handle a permission request with a different supported chainId successfully', async () => {
+      const differentSupportedChainId = '0x10';
+      const permissionRequestWithDifferentSupportedChainId = {
+        ...VALID_PERMISSION_REQUEST,
+        chainId: differentSupportedChainId,
+      };
+
+      const requestWithDifferentSupportedChainId = {
+        permissionsRequest: [
+          permissionRequestWithDifferentSupportedChainId,
+        ] as unknown as Json[],
+        siteOrigin: TEST_SITE_ORIGIN,
+      };
+
+      const responseWithDifferentSupportedChainId = {
+        approved: true,
+        response: {
+          ...VALID_PERMISSION_RESPONSE,
+          chainId: differentSupportedChainId,
+        },
+      } as const;
+
+      mockHandler.handlePermissionRequest.mockImplementation(
+        async () => responseWithDifferentSupportedChainId,
+      );
+
+      const result = await handler.grantPermission(
+        requestWithDifferentSupportedChainId,
+      );
+
+      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledTimes(
+        1,
+      );
+
+      expect(mockHandlerFactory.createPermissionHandler).toHaveBeenCalledWith(
+        permissionRequestWithDifferentSupportedChainId,
+      );
+
+      expect(mockHandler.handlePermissionRequest).toHaveBeenCalledTimes(1);
+      expect(mockHandler.handlePermissionRequest).toHaveBeenCalledWith(
+        TEST_SITE_ORIGIN,
+      );
+
+      expect(result).toStrictEqual([
+        responseWithDifferentSupportedChainId.response,
+      ]);
     });
 
     it('should throw an error if no parameters are provided', async () => {
@@ -213,12 +266,12 @@ describe('RpcHandler', () => {
     it('should handle multiple permission requests in parallel', async () => {
       const secondPermissionRequest = {
         ...VALID_PERMISSION_REQUEST,
-        chainId: '0x2' as const,
+        chainId: TEST_CHAIN_ID,
       };
 
       const secondResponse = {
         ...VALID_PERMISSION_RESPONSE,
-        chainId: '0x2' as const,
+        chainId: TEST_CHAIN_ID,
       };
 
       const request: Json = {
@@ -259,7 +312,7 @@ describe('RpcHandler', () => {
     it('should handle mixed success/failure responses for multiple requests', async () => {
       const secondPermissionRequest = {
         ...VALID_PERMISSION_REQUEST,
-        chainId: '0x2' as const,
+        chainId: TEST_CHAIN_ID,
       };
 
       const request: Json = {
@@ -290,12 +343,12 @@ describe('RpcHandler', () => {
     it('should process multiple permission requests sequentially (no concurrency)', async () => {
       const secondPermissionRequest = {
         ...VALID_PERMISSION_REQUEST,
-        chainId: '0x2' as const,
+        chainId: TEST_CHAIN_ID,
       };
 
       const secondResponse = {
         ...VALID_PERMISSION_RESPONSE,
-        chainId: '0x2' as const,
+        chainId: TEST_CHAIN_ID,
       };
 
       const request: Json = {
@@ -448,12 +501,12 @@ describe('RpcHandler', () => {
     it('should maintain response order matching request order', async () => {
       const secondPermissionRequest = {
         ...VALID_PERMISSION_REQUEST,
-        chainId: '0x2' as const,
+        chainId: TEST_CHAIN_ID,
       };
 
       const secondResponse = {
         ...VALID_PERMISSION_RESPONSE,
-        chainId: '0x2' as const,
+        chainId: TEST_CHAIN_ID,
       };
 
       const request: Json = {
@@ -479,6 +532,20 @@ describe('RpcHandler', () => {
 
       const result = await handler.grantPermission(request);
       expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
+    });
+
+    it('throws an error if the chain ID is not supported', async () => {
+      const request: Json = {
+        permissionsRequest: [
+          VALID_PERMISSION_REQUEST,
+          { ...VALID_PERMISSION_REQUEST, chainId: UNSUPPORTED_CHAIN_ID },
+        ],
+        siteOrigin: TEST_SITE_ORIGIN,
+      } as unknown as Json;
+
+      await expect(handler.grantPermission(request)).rejects.toThrow(
+        `Unsupported chain IDs: ${UNSUPPORTED_CHAIN_ID}`,
+      );
     });
   });
 
@@ -532,7 +599,7 @@ describe('RpcHandler', () => {
         },
         {
           permissionResponse: {
-            chainId: '0x2' as const,
+            chainId: TEST_CHAIN_ID,
             expiry: TEST_EXPIRY + 1000,
             signer: {
               type: 'account' as const,
