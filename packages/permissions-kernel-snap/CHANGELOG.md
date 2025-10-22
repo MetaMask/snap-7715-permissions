@@ -9,13 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.0]
 
-### Uncategorized
+### Changed
 
-- Update RpcHandler to restrict supported chainIds ([#200](https://github.com/MetaMask/snap-7715-permissions/pull/200))
-- Improve request validation ([#187](https://github.com/MetaMask/snap-7715-permissions/pull/187))
-- Refactor snap manifest to use package version from package.json and enhance local development permissions documentation
-- Bump version to 0.3.0 in snap.manifest.ts for both Gator Permissions and Permissions Kernel
-- Add message signing snap ID and update initialConnections logic
+- `snap.manifest.ts` version bumped to 3.0.0
 
 ## [0.3.0]
 
