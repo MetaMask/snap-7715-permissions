@@ -1,6 +1,6 @@
 {
   "name": "@metamask/snap-7715-permissions-monorepo",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "private": true,
   "description": "Monorepo for 7715 permissions snaps.",
   "repository": {
