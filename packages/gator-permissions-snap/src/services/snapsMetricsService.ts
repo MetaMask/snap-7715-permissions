@@ -48,7 +48,7 @@ export class SnapsMetricsService {
     properties: Record<string, Json>,
   ): Promise<void> {
     try {
-      logger.info(`SnapsMetricsService: Tracking event ${event}`, properties);
+      logger.debug(`SnapsMetricsService: Tracking event ${event}`, properties);
       await this.#snap.request({
         method: 'snap_trackEvent',
         params: {
