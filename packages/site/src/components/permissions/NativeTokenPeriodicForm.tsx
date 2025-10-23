@@ -1,7 +1,8 @@
+import { bigIntToHex } from '@metamask/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
+
 import type { NativeTokenPeriodicPermissionRequest } from './types';
-import { bigIntToHex } from '@metamask/utils';
 
 type NativeTokenPeriodicFormProps = {
   onChange: (request: NativeTokenPeriodicPermissionRequest) => void;
@@ -14,7 +15,9 @@ export const NativeTokenPeriodicForm = ({
     BigInt(bigIntToHex(parseUnits('1', 18))),
   );
   const [periodDuration, setPeriodDuration] = useState(2592000); // 30 days in seconds
-  const [startTime, setStartTime] = useState<number | null>(Math.floor(Date.now() / 1000));
+  const [startTime, setStartTime] = useState<number | null>(
+    Math.floor(Date.now() / 1000),
+  );
   const [expiry, setExpiry] = useState(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
   );
