@@ -25,7 +25,7 @@ export const nativeTokenPeriodicPermissionDefinition: PermissionDefinition<
   PopulatedNativeTokenPeriodicPermission
 > = {
   rules: allRules,
-  title: 'Token Subscription',
+  title: 'Permission request',
   dependencies: {
     parseAndValidatePermission,
     buildContext,

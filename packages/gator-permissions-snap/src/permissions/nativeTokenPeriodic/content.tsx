@@ -1,5 +1,5 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { Box, Section } from '@metamask/snaps-sdk/jsx';
+import { Box, Divider, Section } from '@metamask/snaps-sdk/jsx';
 
 import {
   periodAmountRule,
@@ -31,15 +31,13 @@ export async function createConfirmationContent({
     <Box>
       <Section>
         {renderRules({
-          rules: [startTimeRule, periodAmountRule, periodDurationRule],
+          rules: [periodAmountRule, periodDurationRule],
           context,
           metadata,
         })}
-      </Section>
-
-      <Section>
+        <Divider />
         {renderRules({
-          rules: [expiryRule],
+          rules: [startTimeRule, expiryRule],
           context,
           metadata,
         })}

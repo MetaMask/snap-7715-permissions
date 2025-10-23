@@ -631,348 +631,25 @@ describe('PermissionHandler', () => {
             "key": null,
             "props": {
               "center": true,
-              "children": {
-                "key": null,
-                "props": {
-                  "children": "Test permission",
-                  "size": "lg",
-                },
-                "type": "Heading",
-              },
-            },
-            "type": "Box",
-          },
-          {
-            "key": null,
-            "props": {
               "children": [
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Recipient",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
-                                      },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The site requesting the permission",
-                                        },
-                                        "type": "Text",
-                                      },
-                                    },
-                                    "type": "Tooltip",
-                                  },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
-                            },
-                            null,
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            null,
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "https://example.com",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
+                    "children": "Test permission",
+                    "size": "lg",
                   },
-                  "type": "Box",
+                  "type": "Heading",
                 },
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Network",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
-                                      },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The network on which the permission is being requested",
-                                        },
-                                        "type": "Text",
-                                      },
-                                    },
-                                    "type": "Tooltip",
-                                  },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
-                            },
-                            null,
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            null,
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Ethereum Mainnet",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
+                    "children": "This site wants permissions to spend your tokens.",
                   },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Token",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
-                                      },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The token being requested",
-                                        },
-                                        "type": "Text",
-                                      },
-                                    },
-                                    "type": "Tooltip",
-                                  },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
-                            },
-                            null,
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            null,
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "ETH",
-                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
-                                  },
-                                  "type": "Link",
-                                },
-                                "content": "0x38c4A...611F3",
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Reason",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Reason given by the recipient for requesting this permission.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Test justification",
-                                    "color": "muted",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
-                              ],
-                              "direction": "horizontal",
-                            },
-                            "type": "Box",
-                          },
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
+                  "type": "Text",
                 },
               ],
             },
-            "type": "Section",
+            "type": "Box",
           },
           {
             "key": null,
@@ -1067,89 +744,99 @@ describe('PermissionHandler', () => {
             },
             "type": "Section",
           },
-          undefined,
-        ],
-        "direction": "vertical",
-      },
-      "type": "Box",
-    },
-  },
-  "type": "Box",
-}
-`);
-      });
-
-      it('updates the balance in the confirmation content when the account is changed', async () => {
-        const {
-          permissionHandler,
-          getLifecycleHandlers,
-          getBoundEvent,
-          tokenPricesService,
-          updateContext,
-        } = setupTest();
-
-        await permissionHandler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlers();
-
-        lifecycleHandlers.onConfirmationCreated?.({
-          interfaceId: mockInterfaceId,
-          initialContext: mockContext,
-          updateContext,
-          isAdjustmentAllowed: true,
-        });
-
-        const accountSelectorChangeHandler = getBoundEvent({
-          elementName: 'account-selector',
-          eventType: 'InputChangeEvent',
-          interfaceId: mockInterfaceId,
-        });
-
-        expect(accountSelectorChangeHandler).toBeDefined();
-
-        const mockAddress2Caip10 = `eip155:1:${mockAddress2}`;
-
-        tokenPricesService.getCryptoToFiatConversion.mockResolvedValue('$2000');
-
-        await accountSelectorChangeHandler?.({
-          event: {
-            value: { addresses: [mockAddress2Caip10] } as any,
-            name: 'account-selector',
-            type: UserInputEventType.InputChangeEvent,
-          },
-          interfaceId: mockInterfaceId,
-        });
-
-        const confirmationContent =
-          await lifecycleHandlers.createConfirmationContent({
-            context: mockContext,
-            metadata: mockMetadata,
-            origin: mockOrigin,
-            chainId: 1,
-          });
-
-        expect(confirmationContent).toMatchInlineSnapshot(`
-{
-  "key": null,
-  "props": {
-    "children": {
-      "key": null,
-      "props": {
-        "children": [
           {
             "key": null,
             "props": {
-              "center": true,
               "children": {
                 "key": null,
                 "props": {
-                  "children": "Test permission",
-                  "size": "lg",
+                  "alignment": "space-between",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Reason",
+                            },
+                            "type": "Text",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "color": "muted",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "Reason given by the recipient for requesting this permission.",
+                                },
+                                "type": "Text",
+                              },
+                            },
+                            "type": "Tooltip",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Test justification",
+                                  "color": "muted",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "end",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Show",
+                                      "name": "show-more-justification",
+                                    },
+                                    "type": "Button",
+                                  },
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "horizontal",
                 },
-                "type": "Heading",
+                "type": "Box",
               },
             },
-            "type": "Box",
+            "type": "Section",
           },
           {
             "key": null,
@@ -1391,97 +1078,102 @@ describe('PermissionHandler', () => {
                   },
                   "type": "Box",
                 },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Reason",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Reason given by the recipient for requesting this permission.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Test justification",
-                                    "color": "muted",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
-                              ],
-                              "direction": "horizontal",
-                            },
-                            "type": "Box",
-                          },
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
               ],
             },
             "type": "Section",
+          },
+          undefined,
+        ],
+        "direction": "vertical",
+      },
+      "type": "Box",
+    },
+  },
+  "type": "Box",
+}
+`);
+      });
+
+      it('updates the balance in the confirmation content when the account is changed', async () => {
+        const {
+          permissionHandler,
+          getLifecycleHandlers,
+          getBoundEvent,
+          tokenPricesService,
+          updateContext,
+        } = setupTest();
+
+        await permissionHandler.handlePermissionRequest(mockOrigin);
+
+        const lifecycleHandlers = getLifecycleHandlers();
+
+        lifecycleHandlers.onConfirmationCreated?.({
+          interfaceId: mockInterfaceId,
+          initialContext: mockContext,
+          updateContext,
+          isAdjustmentAllowed: true,
+        });
+
+        const accountSelectorChangeHandler = getBoundEvent({
+          elementName: 'account-selector',
+          eventType: 'InputChangeEvent',
+          interfaceId: mockInterfaceId,
+        });
+
+        expect(accountSelectorChangeHandler).toBeDefined();
+
+        const mockAddress2Caip10 = `eip155:1:${mockAddress2}`;
+
+        tokenPricesService.getCryptoToFiatConversion.mockResolvedValue('$2000');
+
+        await accountSelectorChangeHandler?.({
+          event: {
+            value: { addresses: [mockAddress2Caip10] } as any,
+            name: 'account-selector',
+            type: UserInputEventType.InputChangeEvent,
+          },
+          interfaceId: mockInterfaceId,
+        });
+
+        const confirmationContent =
+          await lifecycleHandlers.createConfirmationContent({
+            context: mockContext,
+            metadata: mockMetadata,
+            origin: mockOrigin,
+            chainId: 1,
+          });
+
+        expect(confirmationContent).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": {
+      "key": null,
+      "props": {
+        "children": [
+          {
+            "key": null,
+            "props": {
+              "center": true,
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "children": "Test permission",
+                    "size": "lg",
+                  },
+                  "type": "Heading",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "children": "This site wants permissions to spend your tokens.",
+                  },
+                  "type": "Text",
+                },
+              ],
+            },
+            "type": "Box",
           },
           {
             "key": null,
@@ -1578,6 +1270,344 @@ describe('PermissionHandler', () => {
                 },
                 "type": "Box",
               },
+            },
+            "type": "Section",
+          },
+          {
+            "key": null,
+            "props": {
+              "children": {
+                "key": null,
+                "props": {
+                  "alignment": "space-between",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Reason",
+                            },
+                            "type": "Text",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "color": "muted",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "Reason given by the recipient for requesting this permission.",
+                                },
+                                "type": "Text",
+                              },
+                            },
+                            "type": "Tooltip",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Test justification",
+                                  "color": "muted",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "end",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Show",
+                                      "name": "show-more-justification",
+                                    },
+                                    "type": "Button",
+                                  },
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "horizontal",
+                },
+                "type": "Box",
+              },
+            },
+            "type": "Section",
+          },
+          {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "https://example.com",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Network",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The network on which the permission is being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Ethereum Mainnet",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Token",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The token being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "ETH",
+                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
+                                  },
+                                  "type": "Link",
+                                },
+                                "content": "0x38c4A...611F3",
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
             },
             "type": "Section",
           },
@@ -1687,348 +1717,25 @@ describe('PermissionHandler', () => {
             "key": null,
             "props": {
               "center": true,
-              "children": {
-                "key": null,
-                "props": {
-                  "children": "Test permission",
-                  "size": "lg",
-                },
-                "type": "Heading",
-              },
-            },
-            "type": "Box",
-          },
-          {
-            "key": null,
-            "props": {
               "children": [
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Recipient",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
-                                      },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The site requesting the permission",
-                                        },
-                                        "type": "Text",
-                                      },
-                                    },
-                                    "type": "Tooltip",
-                                  },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
-                            },
-                            null,
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            null,
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "https://example.com",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
+                    "children": "Test permission",
+                    "size": "lg",
                   },
-                  "type": "Box",
+                  "type": "Heading",
                 },
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Network",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
-                                      },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The network on which the permission is being requested",
-                                        },
-                                        "type": "Text",
-                                      },
-                                    },
-                                    "type": "Tooltip",
-                                  },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
-                            },
-                            null,
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            null,
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Ethereum Mainnet",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
+                    "children": "This site wants permissions to spend your tokens.",
                   },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "alignment": "space-between",
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": [
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Token",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  {
-                                    "key": null,
-                                    "props": {
-                                      "children": {
-                                        "key": null,
-                                        "props": {
-                                          "color": "muted",
-                                          "name": "question",
-                                          "size": "inherit",
-                                        },
-                                        "type": "Icon",
-                                      },
-                                      "content": {
-                                        "key": null,
-                                        "props": {
-                                          "children": "The token being requested",
-                                        },
-                                        "type": "Text",
-                                      },
-                                    },
-                                    "type": "Tooltip",
-                                  },
-                                ],
-                                "direction": "horizontal",
-                              },
-                              "type": "Box",
-                            },
-                            null,
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            null,
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "ETH",
-                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
-                                  },
-                                  "type": "Link",
-                                },
-                                "content": "0x38c4A...611F3",
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Reason",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Reason given by the recipient for requesting this permission.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Test justification",
-                                    "color": "muted",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
-                              ],
-                              "direction": "horizontal",
-                            },
-                            "type": "Box",
-                          },
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
+                  "type": "Text",
                 },
               ],
             },
-            "type": "Section",
+            "type": "Box",
           },
           {
             "key": null,
@@ -2123,54 +1830,99 @@ describe('PermissionHandler', () => {
             },
             "type": "Section",
           },
-          undefined,
-        ],
-        "direction": "vertical",
-      },
-      "type": "Box",
-    },
-  },
-  "type": "Box",
-}
-`);
-
-        // resolve the token balance, which triggers a re-render
-        resolveTokenBalancePromise();
-
-        // allow the event loop to run the re-render
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        const confirmationContentWithBalance =
-          await lifecycleHandlers.createConfirmationContent({
-            context: mockContext,
-            metadata: mockMetadata,
-            origin: mockOrigin,
-            chainId: 1,
-          });
-
-        // concrete token balance, skeleton for fiat balance
-        expect(confirmationContentWithBalance).toMatchInlineSnapshot(`
-{
-  "key": null,
-  "props": {
-    "children": {
-      "key": null,
-      "props": {
-        "children": [
           {
             "key": null,
             "props": {
-              "center": true,
               "children": {
                 "key": null,
                 "props": {
-                  "children": "Test permission",
-                  "size": "lg",
+                  "alignment": "space-between",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Reason",
+                            },
+                            "type": "Text",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "color": "muted",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "Reason given by the recipient for requesting this permission.",
+                                },
+                                "type": "Text",
+                              },
+                            },
+                            "type": "Tooltip",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Test justification",
+                                  "color": "muted",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "end",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Show",
+                                      "name": "show-more-justification",
+                                    },
+                                    "type": "Button",
+                                  },
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "horizontal",
                 },
-                "type": "Heading",
+                "type": "Box",
               },
             },
-            "type": "Box",
+            "type": "Section",
           },
           {
             "key": null,
@@ -2412,97 +2164,67 @@ describe('PermissionHandler', () => {
                   },
                   "type": "Box",
                 },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Reason",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Reason given by the recipient for requesting this permission.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Test justification",
-                                    "color": "muted",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
-                              ],
-                              "direction": "horizontal",
-                            },
-                            "type": "Box",
-                          },
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
               ],
             },
             "type": "Section",
+          },
+          undefined,
+        ],
+        "direction": "vertical",
+      },
+      "type": "Box",
+    },
+  },
+  "type": "Box",
+}
+`);
+
+        // resolve the token balance, which triggers a re-render
+        resolveTokenBalancePromise();
+
+        // allow the event loop to run the re-render
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        const confirmationContentWithBalance =
+          await lifecycleHandlers.createConfirmationContent({
+            context: mockContext,
+            metadata: mockMetadata,
+            origin: mockOrigin,
+            chainId: 1,
+          });
+
+        // concrete token balance, skeleton for fiat balance
+        expect(confirmationContentWithBalance).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": {
+      "key": null,
+      "props": {
+        "children": [
+          {
+            "key": null,
+            "props": {
+              "center": true,
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "children": "Test permission",
+                    "size": "lg",
+                  },
+                  "type": "Heading",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "children": "This site wants permissions to spend your tokens.",
+                  },
+                  "type": "Text",
+                },
+              ],
+            },
+            "type": "Box",
           },
           {
             "key": null,
@@ -2602,54 +2324,99 @@ describe('PermissionHandler', () => {
             },
             "type": "Section",
           },
-          undefined,
-        ],
-        "direction": "vertical",
-      },
-      "type": "Box",
-    },
-  },
-  "type": "Box",
-}
-`);
-
-        // resolve the fiat balance, which triggers a re-render
-        resolveFiatBalancePromise();
-
-        // allow the event loop to run the re-render
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        const confirmationContentWithFiatBalance =
-          await lifecycleHandlers.createConfirmationContent({
-            context: mockContext,
-            metadata: mockMetadata,
-            origin: mockOrigin,
-            chainId: 1,
-          });
-
-        // concrete token balance, concrete fiat balance
-        expect(confirmationContentWithFiatBalance).toMatchInlineSnapshot(`
-{
-  "key": null,
-  "props": {
-    "children": {
-      "key": null,
-      "props": {
-        "children": [
           {
             "key": null,
             "props": {
-              "center": true,
               "children": {
                 "key": null,
                 "props": {
-                  "children": "Test permission",
-                  "size": "lg",
+                  "alignment": "space-between",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Reason",
+                            },
+                            "type": "Text",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "color": "muted",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "Reason given by the recipient for requesting this permission.",
+                                },
+                                "type": "Text",
+                              },
+                            },
+                            "type": "Tooltip",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Test justification",
+                                  "color": "muted",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "end",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Show",
+                                      "name": "show-more-justification",
+                                    },
+                                    "type": "Button",
+                                  },
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "horizontal",
                 },
-                "type": "Heading",
+                "type": "Box",
               },
             },
-            "type": "Box",
+            "type": "Section",
           },
           {
             "key": null,
@@ -2891,97 +2658,67 @@ describe('PermissionHandler', () => {
                   },
                   "type": "Box",
                 },
-                {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Reason",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Reason given by the recipient for requesting this permission.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Test justification",
-                                    "color": "muted",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
-                              ],
-                              "direction": "horizontal",
-                            },
-                            "type": "Box",
-                          },
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
               ],
             },
             "type": "Section",
+          },
+          undefined,
+        ],
+        "direction": "vertical",
+      },
+      "type": "Box",
+    },
+  },
+  "type": "Box",
+}
+`);
+
+        // resolve the fiat balance, which triggers a re-render
+        resolveFiatBalancePromise();
+
+        // allow the event loop to run the re-render
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        const confirmationContentWithFiatBalance =
+          await lifecycleHandlers.createConfirmationContent({
+            context: mockContext,
+            metadata: mockMetadata,
+            origin: mockOrigin,
+            chainId: 1,
+          });
+
+        // concrete token balance, concrete fiat balance
+        expect(confirmationContentWithFiatBalance).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": {
+      "key": null,
+      "props": {
+        "children": [
+          {
+            "key": null,
+            "props": {
+              "center": true,
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "children": "Test permission",
+                    "size": "lg",
+                  },
+                  "type": "Heading",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "children": "This site wants permissions to spend your tokens.",
+                  },
+                  "type": "Text",
+                },
+              ],
+            },
+            "type": "Box",
           },
           {
             "key": null,
@@ -3080,6 +2817,344 @@ describe('PermissionHandler', () => {
                 },
                 "type": "Box",
               },
+            },
+            "type": "Section",
+          },
+          {
+            "key": null,
+            "props": {
+              "children": {
+                "key": null,
+                "props": {
+                  "alignment": "space-between",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Reason",
+                            },
+                            "type": "Text",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "color": "muted",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "Reason given by the recipient for requesting this permission.",
+                                },
+                                "type": "Text",
+                              },
+                            },
+                            "type": "Tooltip",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Test justification",
+                                  "color": "muted",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "end",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Show",
+                                      "name": "show-more-justification",
+                                    },
+                                    "type": "Button",
+                                  },
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "horizontal",
+                },
+                "type": "Box",
+              },
+            },
+            "type": "Section",
+          },
+          {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "https://example.com",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Network",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The network on which the permission is being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Ethereum Mainnet",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Token",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The token being requested",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "ETH",
+                                    "href": "https://etherscan.io/address/0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3",
+                                  },
+                                  "type": "Link",
+                                },
+                                "content": "0x38c4A...611F3",
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+              ],
             },
             "type": "Section",
           },

@@ -16,8 +16,8 @@ import {
   SkeletonField,
   TextField,
   TooltipIcon,
-  TokenField,
   TokenBalanceField,
+  TokenField,
 } from '../ui/components';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
@@ -107,40 +107,8 @@ export const PermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{permissionTitle}</Heading>
+          <Text>This site wants permissions to spend your tokens.</Text>
         </Box>
-        <Section>
-          <TextField
-            label={RECIPIENT_LABEL}
-            value={origin}
-            tooltip={RECIPIENT_TOOLTIP}
-          />
-          <TextField
-            label={NETWORK_LABEL}
-            value={networkName}
-            tooltip={NETWORK_TOOLTIP}
-          />
-          <TokenField
-            label={TOKEN_LABEL}
-            tokenSymbol={tokenSymbol}
-            tokenAddress={tokenAddress}
-            explorerUrl={tokenExplorerUrl}
-            tooltip={TOKEN_TOOLTIP}
-            iconData={tokenIconData}
-          />
-          <Box direction="horizontal" alignment="space-between">
-            <Box direction="horizontal">
-              <Text>{REASON_LABEL}</Text>
-              <TooltipIcon tooltip={REASON_TOOLTIP} />
-            </Box>
-            <Box direction="horizontal">
-              <ShowMoreText
-                text={justification}
-                buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
-                isCollapsed={isJustificationCollapsed}
-              />
-            </Box>
-          </Box>
-        </Section>
         <Section>
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
@@ -160,6 +128,41 @@ export const PermissionHandlerContent = ({
               {tokenBalanceComponent}
             </Box>
           </Box>
+        </Section>
+        <Section>
+          <Box direction="horizontal" alignment="space-between">
+            <Box direction="horizontal">
+              <Text>{REASON_LABEL}</Text>
+              <TooltipIcon tooltip={REASON_TOOLTIP} />
+            </Box>
+            <Box direction="horizontal">
+              <ShowMoreText
+                text={justification}
+                buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
+                isCollapsed={isJustificationCollapsed}
+              />
+            </Box>
+          </Box>
+        </Section>
+        <Section>
+          <TextField
+            label={RECIPIENT_LABEL}
+            value={origin}
+            tooltip={RECIPIENT_TOOLTIP}
+          />
+          <TextField
+            label={NETWORK_LABEL}
+            value={networkName}
+            tooltip={NETWORK_TOOLTIP}
+          />
+          <TokenField
+            label={TOKEN_LABEL}
+            tokenSymbol={tokenSymbol}
+            tokenAddress={tokenAddress}
+            explorerUrl={tokenExplorerUrl}
+            tooltip={TOKEN_TOOLTIP}
+            iconData={tokenIconData}
+          />
         </Section>
         {children}
       </Box>

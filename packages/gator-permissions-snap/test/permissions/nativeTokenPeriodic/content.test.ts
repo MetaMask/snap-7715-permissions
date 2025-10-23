@@ -46,148 +46,11 @@ describe('nativeTokenPeriodic:content', () => {
 {
   "key": null,
   "props": {
-    "children": [
-      {
-        "key": null,
-        "props": {
-          "children": [
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Start Time",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The time at which the first period begins(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-periodic-start-date_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "10/26/1985",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-periodic-start-date_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "08:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
+    "children": {
+      "key": null,
+      "props": {
+        "children": [
+          [
             {
               "key": null,
               "props": {
@@ -400,13 +263,149 @@ describe('nativeTokenPeriodic:content', () => {
               "type": "Box",
             },
           ],
-        },
-        "type": "Section",
-      },
-      {
-        "key": null,
-        "props": {
-          "children": [
+          {
+            "key": null,
+            "props": {},
+            "type": "Divider",
+          },
+          [
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins(mm/dd/yyyy hh:mm:ss).",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        {
+                          "key": null,
+                          "props": {
+                            "alignment": "end",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": "mm/dd/yyyy hh:mm:ss",
+                                "color": "muted",
+                                "size": "sm",
+                              },
+                              "type": "Text",
+                            },
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                      ],
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-start-date_date",
+                                "placeholder": "mm/dd/yyyy",
+                                "type": "text",
+                                "value": "10/26/1985",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "name": "native-token-periodic-start-date_time",
+                                "placeholder": "HH:MM:SS",
+                                "type": "text",
+                                "value": "08:00:00",
+                              },
+                              "type": "Input",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "alignment": "center",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alignment": "center",
+                                    "children": "UTC",
+                                  },
+                                  "type": "Text",
+                                },
+                                "direction": "vertical",
+                              },
+                              "type": "Box",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": [
+                        null,
+                        null,
+                      ],
+                    },
+                    "type": "Box",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
             {
               "key": null,
               "props": {
@@ -545,10 +544,10 @@ describe('nativeTokenPeriodic:content', () => {
               "type": "Box",
             },
           ],
-        },
-        "type": "Section",
+        ],
       },
-    ],
+      "type": "Section",
+    },
   },
   "type": "Box",
 }
