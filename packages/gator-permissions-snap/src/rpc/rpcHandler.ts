@@ -41,9 +41,10 @@ export type RpcHandler = {
   /**
    * Handles get granted permissions requests.
    *
-   * @returns The granted permissions.
+   * @param params - Optional parameters for filtering permissions.
+   * @returns The granted permissions, optionally filtered.
    */
-  getGrantedPermissions(): Promise<Json>;
+  getGrantedPermissions(params?: Json): Promise<Json>;
 
   /**
    * Handles submit revocation requests.
@@ -145,13 +146,58 @@ export function createRpcHandler({
   /**
    * Handles get granted permissions requests.
    *
-   * @returns The granted permissions.
+   * @param params - Optional parameters for filtering permissions.
+   * @returns The granted permissions, optionally filtered.
    */
-  const getGrantedPermissions = async (): Promise<Json> => {
-    logger.debug('getGrantedPermissions()');
-    const grantedPermission =
-      await profileSyncManager.getAllGrantedPermissions();
-    return grantedPermission as Json[];
+  const getGrantedPermissions = async (params?: Json): Promise<Json> => {
+    logger.debug('getGrantedPermissions()', params);
+
+    // Get all permissions
+    const allPermissions = await profileSyncManager.getAllGrantedPermissions();
+
+    // If no params provided, return all permissions (backward compatibility)
+    if (!params || typeof params !== 'object') {
+      return allPermissions as Json[];
+    }
+
+    // Parse filtering options
+    const { isRevoked, siteOrigin, chainId, delegationManager } = params as {
+      isRevoked?: boolean;
+      siteOrigin?: string;
+      chainId?: string;
+      delegationManager?: string;
+    };
+
+    // Apply filters
+    let filteredPermissions = allPermissions;
+
+    if (typeof isRevoked === 'boolean') {
+      filteredPermissions = filteredPermissions.filter(
+        (permission) => permission.isRevoked === isRevoked,
+      );
+    }
+
+    if (typeof siteOrigin === 'string') {
+      filteredPermissions = filteredPermissions.filter(
+        (permission) => permission.siteOrigin === siteOrigin,
+      );
+    }
+
+    if (typeof chainId === 'string') {
+      filteredPermissions = filteredPermissions.filter(
+        (permission) => permission.permissionResponse.chainId === chainId,
+      );
+    }
+
+    if (typeof delegationManager === 'string') {
+      filteredPermissions = filteredPermissions.filter(
+        (permission) =>
+          permission.permissionResponse.signerMeta.delegationManager ===
+          delegationManager,
+      );
+    }
+
+    return filteredPermissions as Json[];
   };
 
   /**
@@ -161,15 +207,9 @@ export function createRpcHandler({
    * @returns Success confirmation.
    */
   const submitRevocation = async (params: Json): Promise<Json> => {
-    logToFile('================================================2');
-    logger.debug('=== SUBMIT REVOCATION RPC CALLED ===');
     logger.debug('submitRevocation() called with params:', params);
-    logger.debug('Params type:', typeof params);
-    logger.debug('Params stringified:', JSON.stringify(params, null, 2));
 
     const { permissionContext } = validateRevocationParams(params);
-
-    logger.debug('Validated permissionContext:', permissionContext);
 
     // First, get the existing permission to validate it exists
     logger.debug(
@@ -178,23 +218,12 @@ export function createRpcHandler({
     );
     const existingPermission =
       await profileSyncManager.getGrantedPermission(permissionContext);
-    console.log('existingPermissionBefore:', existingPermission);
 
     if (!existingPermission) {
-      logger.debug(
-        '❌ Permission not found for permissionContext:',
-        permissionContext,
-      );
       throw new InvalidInputError(
         `Permission not found for permission context: ${permissionContext}`,
       );
     }
-
-    logger.debug('✅ Found existing permission:', {
-      permissionContext,
-      isRevoked: existingPermission.isRevoked,
-      siteOrigin: existingPermission.siteOrigin,
-    });
 
     // Extract delegationManager and chainId from the permission response for logging
     const { chainId: permissionChainId, signerMeta } =
@@ -209,7 +238,6 @@ export function createRpcHandler({
 
     // Check if the delegation is actually disabled on-chain
     if (!delegationManager) {
-      logger.debug('❌ No delegation manager found');
       throw new InvalidInputError(
         `No delegation manager found for permission context: ${permissionContext}`,
       );
@@ -218,7 +246,6 @@ export function createRpcHandler({
     // For on-chain validation, we need to check each delegation in the context
     try {
       const delegations = decodeDelegations(permissionContext);
-      logger.debug('Decoded delegations from context:', delegations.length);
 
       // Check if any delegation is disabled on-chain
       // For now, we'll check the first delegation. This might need adjustment based on business logic
@@ -230,12 +257,6 @@ export function createRpcHandler({
       }
 
       const delegationHash = hashDelegation(firstDelegation);
-      logger.debug('Checking if delegation is disabled on-chain...', {
-        delegationHash,
-        chainId: permissionChainId,
-        delegationManager,
-      });
-
       const isDelegationDisabled =
         await profileSyncManager.checkDelegationDisabledOnChain(
           delegationHash,
@@ -243,14 +264,9 @@ export function createRpcHandler({
           delegationManager,
         );
 
-      console.log(
-        '++++++++++++++++++++isDelegationDisabled:',
-        isDelegationDisabled,
-      );
       logger.debug('On-chain check result:', { isDelegationDisabled });
 
       if (!isDelegationDisabled) {
-        logger.debug('❌ Delegation is not disabled on-chain');
         throw new InvalidInputError(
           `Delegation ${delegationHash} is not disabled on-chain. Cannot process revocation.`,
         );
@@ -266,22 +282,12 @@ export function createRpcHandler({
       );
     }
 
-    // Update the permission's revocation status using the optimized method
-    // This avoids re-fetching the permission we already have
     logger.debug('Updating permission revocation status to true...');
     await profileSyncManager.updatePermissionRevocationStatusWithPermission(
       existingPermission,
       true,
     );
 
-    const existingPermissionAfter =
-      await profileSyncManager.getGrantedPermission(permissionContext);
-
-    console.log('existingPermissionAfter:', existingPermissionAfter);
-    logToFile('existingPermissionAfter:', existingPermissionAfter);
-
-    logger.debug('✅ Revocation completed successfully');
-    logger.debug('=== SUBMIT REVOCATION RPC COMPLETED ===');
     return { success: true };
   };
 

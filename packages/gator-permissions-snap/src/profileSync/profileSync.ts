@@ -5,7 +5,6 @@ import { zPermissionResponse } from '@metamask/7715-permissions-shared/types';
 import {
   logger,
   extractZodError,
-  logToFile,
 } from '@metamask/7715-permissions-shared/utils';
 import {
   hashDelegation,
@@ -211,13 +210,10 @@ export function createProfileSyncManager(
    */
   async function authenticate(): Promise<void> {
     try {
-      logToFile('🔐 PROFILE SYNC: Starting authentication...');
       logger.debug('Profile Sync: Attempting to get access token');
       await auth.getAccessToken();
-      logToFile('✅ PROFILE SYNC: Authentication successful');
       logger.debug('Profile Sync: Access token obtained successfully');
     } catch (error) {
-      logToFile('❌ PROFILE SYNC: Authentication failed:', error);
       logger.error('Error fetching access token:', error);
       throw error;
     }
@@ -435,11 +431,6 @@ export function createProfileSyncManager(
     isRevoked: boolean,
   ): Promise<void> {
     try {
-      logToFile('🔄 PROFILE SYNC: Updating permission revocation status:', {
-        delegationHash: existingPermission.permissionResponse.context,
-        currentRevokedStatus: existingPermission.isRevoked,
-        newRevokedStatus: isRevoked,
-      });
       logger.debug('Profile Sync: Updating permission revocation status:', {
         existingPermission,
         isRevoked,
@@ -452,26 +443,16 @@ export function createProfileSyncManager(
         ...existingPermission,
         isRevoked,
       };
-      logToFile('📝 PROFILE SYNC: Created updated permission object:', {
-        delegationHash: updatedPermission.permissionResponse.context,
-        isRevoked: updatedPermission.isRevoked,
-        siteOrigin: updatedPermission.siteOrigin,
-      });
+
       logger.debug(
         'Profile Sync: Created updated permission object:',
         updatedPermission,
       );
 
       // Store the updated permission
-      logToFile('💾 PROFILE SYNC: Storing updated permission...');
       await storeGrantedPermission(updatedPermission);
-      logToFile('✅ PROFILE SYNC: Successfully stored updated permission');
       logger.debug('Profile Sync: Successfully stored updated permission');
     } catch (error) {
-      logToFile(
-        '❌ PROFILE SYNC: Error updating permission revocation status:',
-        error,
-      );
       logger.error(
         'Error updating permission revocation status with existing permission:',
         error,
