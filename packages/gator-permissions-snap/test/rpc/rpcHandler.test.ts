@@ -696,6 +696,253 @@ describe('RpcHandler', () => {
         mockProfileSyncManager.getAllGrantedPermissions,
       ).toHaveBeenCalledTimes(1);
     });
+
+    describe('filtering options', () => {
+      const mockGrantedPermissions = [
+        {
+          permissionResponse: {
+            chainId: TEST_CHAIN_ID,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
+            signer: {
+              type: 'account' as const,
+              data: { address: TEST_ADDRESS },
+            },
+            permission: {
+              type: 'test-permission',
+              data: { justification: 'Testing permission request' },
+              isAdjustmentAllowed: true,
+            },
+            context: TEST_CONTEXT,
+            dependencyInfo: [],
+            signerMeta: {
+              delegationManager: TEST_ADDRESS,
+            },
+          },
+          siteOrigin: TEST_SITE_ORIGIN,
+          isRevoked: false,
+        },
+        {
+          permissionResponse: {
+            chainId: '0x2' as const,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY + 1000,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
+            signer: {
+              type: 'account' as const,
+              data: {
+                address: '0x0987654321098765432109876543210987654321' as const,
+              },
+            },
+            permission: {
+              type: 'different-permission',
+              data: { justification: 'Another permission' },
+              isAdjustmentAllowed: true,
+            },
+            context: '0xefgh' as const,
+            dependencyInfo: [],
+            signerMeta: {
+              delegationManager:
+                '0x0987654321098765432109876543210987654321' as const,
+            },
+          },
+          siteOrigin: 'https://another-example.com',
+          isRevoked: true,
+        },
+        {
+          permissionResponse: {
+            chainId: TEST_CHAIN_ID,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
+            signer: {
+              type: 'account' as const,
+              data: { address: TEST_ADDRESS },
+            },
+            permission: {
+              type: 'third-permission',
+              data: { justification: 'Third permission' },
+              isAdjustmentAllowed: true,
+            },
+            context: '0xijkl' as const,
+            dependencyInfo: [],
+            signerMeta: {
+              delegationManager:
+                '0x1111111111111111111111111111111111111111' as const,
+            },
+          },
+          siteOrigin: TEST_SITE_ORIGIN,
+          isRevoked: false,
+        },
+      ];
+
+      beforeEach(() => {
+        mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue(
+          mockGrantedPermissions,
+        );
+      });
+
+      it('should filter by isRevoked=true', async () => {
+        const result = await handler.getGrantedPermissions({ isRevoked: true });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(1);
+        expect((result as any[])[0].isRevoked).toBe(true);
+      });
+
+      it('should filter by isRevoked=false', async () => {
+        const result = await handler.getGrantedPermissions({
+          isRevoked: false,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(2);
+        expect((result as any[]).every((p) => p.isRevoked === false)).toBe(
+          true,
+        );
+      });
+
+      it('should filter by siteOrigin', async () => {
+        const result = await handler.getGrantedPermissions({
+          siteOrigin: TEST_SITE_ORIGIN,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(2);
+        expect(
+          (result as any[]).every((p) => p.siteOrigin === TEST_SITE_ORIGIN),
+        ).toBe(true);
+      });
+
+      it('should filter by chainId', async () => {
+        const result = await handler.getGrantedPermissions({
+          chainId: TEST_CHAIN_ID,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(2);
+        expect(
+          (result as any[]).every(
+            (p) => p.permissionResponse.chainId === TEST_CHAIN_ID,
+          ),
+        ).toBe(true);
+      });
+
+      it('should filter by delegationManager', async () => {
+        const result = await handler.getGrantedPermissions({
+          delegationManager: TEST_ADDRESS,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(1);
+        expect(
+          (result as any[])[0].permissionResponse.signerMeta.delegationManager,
+        ).toBe(TEST_ADDRESS);
+      });
+
+      it('should combine multiple filters', async () => {
+        const result = await handler.getGrantedPermissions({
+          isRevoked: false,
+          siteOrigin: TEST_SITE_ORIGIN,
+          chainId: TEST_CHAIN_ID,
+          delegationManager: TEST_ADDRESS,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(1);
+        const permission = (result as any[])[0];
+        expect(permission.isRevoked).toBe(false);
+        expect(permission.siteOrigin).toBe(TEST_SITE_ORIGIN);
+        expect(permission.permissionResponse.chainId).toBe(TEST_CHAIN_ID);
+        expect(permission.permissionResponse.signerMeta.delegationManager).toBe(
+          TEST_ADDRESS,
+        );
+      });
+
+      it('should return empty array when no permissions match filters', async () => {
+        const result = await handler.getGrantedPermissions({
+          isRevoked: true,
+          siteOrigin: 'https://nonexistent.com',
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(0);
+      });
+
+      it('should ignore invalid filter values', async () => {
+        const result = await handler.getGrantedPermissions({
+          isRevoked: 'invalid' as any,
+          siteOrigin: 123 as any,
+          chainId: null as any,
+          delegationManager: undefined as any,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(3); // All permissions returned since filters are ignored
+      });
+
+      it('should handle empty params object', async () => {
+        const result = await handler.getGrantedPermissions({});
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(3); // All permissions returned
+      });
+
+      it('should handle null params', async () => {
+        const result = await handler.getGrantedPermissions(null as any);
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(3); // All permissions returned
+      });
+
+      it('should handle undefined params', async () => {
+        const result = await handler.getGrantedPermissions(undefined as any);
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(3); // All permissions returned
+      });
+    });
   });
 
   describe('submitRevocation', () => {
