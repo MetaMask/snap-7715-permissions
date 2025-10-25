@@ -7,8 +7,6 @@ import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
-import { getStartOfTodayLocal } from './time';
-
 export const validatePermissionRequestParam = (
   params: unknown,
 ): RequestExecutionPermissionsParam => {
@@ -21,16 +19,6 @@ export const validatePermissionRequestParam = (
   }
 
   return validateGrantAttenuatedPermissionsParams.data;
-};
-
-/**
- * Zod validation for startTime to ensure it's today or later.
- * @param value - Unix timestamp in seconds.
- * @returns True if the start time is today or later, false otherwise.
- */
-export const validateStartTimeZod = (value: number): boolean => {
-  const startOfToday = getStartOfTodayLocal();
-  return value >= startOfToday;
 };
 
 // Validation schema for revocation parameters

@@ -1,6 +1,5 @@
 import {
   encodeDelegations,
-  decodeDelegations,
   hashDelegation,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
@@ -12,6 +11,7 @@ import type {
 
 import {
   createProfileSyncManager,
+  generateObjectKey,
   type ProfileSyncManager,
   type StoredGrantedPermission,
 } from '../../src/profileSync';
@@ -32,6 +32,9 @@ describe('profileSync', () => {
     setItem: jest.fn(),
     batchSetItems: jest.fn(),
   } as unknown as jest.Mocked<UserStorage>;
+  const ethereumProviderMock = {
+    request: jest.fn(),
+  } as unknown as jest.Mocked<any>;
 
   const mockDelegation: Delegation = {
     delegate: sessionAccount,
@@ -61,19 +64,6 @@ describe('profileSync', () => {
 
   const mockDelegationHash = hashDelegation(mockDelegation);
   const mockDelegationHashTwo = hashDelegation(mockDelegationTwo);
-
-  /**
-   * Helper function to generate object key (same logic as in profileSync.ts).
-   * @param permissionContext - The permission context to generate key for.
-   * @returns The generated object key.
-   */
-  function generateObjectKey(permissionContext: Hex): Hex {
-    const delegations = decodeDelegations(permissionContext);
-    const hashes = delegations.map((delegation) =>
-      hashDelegation(delegation).slice(2),
-    );
-    return `0x${hashes.join('')}`;
-  }
 
   const mockStoredGrantedPermission: StoredGrantedPermission = {
     permissionResponse: {
@@ -131,6 +121,7 @@ describe('profileSync', () => {
         isFeatureEnabled: true,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
+        ethereumProvider: ethereumProviderMock,
       });
     });
 
@@ -389,6 +380,7 @@ describe('profileSync', () => {
         isFeatureEnabled: true,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
+        ethereumProvider: ethereumProviderMock,
       });
     });
 
@@ -611,6 +603,7 @@ describe('profileSync', () => {
         isFeatureEnabled: false,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
+        ethereumProvider: ethereumProviderMock,
       });
     });
 
