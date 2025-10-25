@@ -125,6 +125,20 @@ export type StoredGrantedPermission = {
   isRevoked: boolean;
 };
 
+/**
+ * Generates an object key for the permission response stored in profile sync.
+ * @param permissionContext - The encoded delegation(ie. permissions context).
+ * @returns The object key by concatenating the delegation hashes.
+ */
+export function generateObjectKey(permissionContext: Hex): Hex {
+  const delegations = decodeDelegations(permissionContext);
+  const hashes = delegations.map((delegation) =>
+    hashDelegation(delegation).slice(2),
+  );
+
+  return `0x${hashes.join('')}`;
+}
+
 export type ProfileSyncManagerConfig = {
   auth: JwtBearerAuth;
   userStorage: UserStorage;
@@ -191,28 +205,12 @@ export function createProfileSyncManager(
   };
 
   /**
-   * Generates an object key for the permission response stored in profile sync.
-   * @param permissionContext - The encoded delegation(ie. permissions context).
-   * @returns The object key by concatenating the delegation hashes.
-   */
-  function generateObjectKey(permissionContext: Hex): Hex {
-    const delegations = decodeDelegations(permissionContext);
-    const hashes = delegations.map((delegation) =>
-      hashDelegation(delegation).slice(2),
-    );
-
-    return `0x${hashes.join('')}`;
-  }
-
-  /**
    * Authenticates the user with profile sync.
    *
    */
   async function authenticate(): Promise<void> {
     try {
-      logger.debug('Profile Sync: Attempting to get access token');
       await auth.getAccessToken();
-      logger.debug('Profile Sync: Access token obtained successfully');
     } catch (error) {
       logger.error('Error fetching access token:', error);
       throw error;
@@ -400,7 +398,6 @@ export function createProfileSyncManager(
     try {
       await authenticate();
 
-      // First, get the existing permission
       const existingPermission = await getGrantedPermission(permissionContext);
       if (!existingPermission) {
         throw new InvalidInputError(
@@ -408,7 +405,6 @@ export function createProfileSyncManager(
         );
       }
 
-      // Use the optimized version that accepts the existing permission
       await updatePermissionRevocationStatusWithPermission(
         existingPermission,
         isRevoked,
@@ -438,7 +434,6 @@ export function createProfileSyncManager(
 
       await authenticate();
 
-      // Update the isRevoked flag
       const updatedPermission: StoredGrantedPermission = {
         ...existingPermission,
         isRevoked,
@@ -449,7 +444,6 @@ export function createProfileSyncManager(
         updatedPermission,
       );
 
-      // Store the updated permission
       await storeGrantedPermission(updatedPermission);
       logger.debug('Profile Sync: Successfully stored updated permission');
     } catch (error) {
