@@ -570,7 +570,7 @@ describe('profileSync', () => {
             true,
           ),
         ).rejects.toThrow(
-          `Permission not found for delegation hash: ${nonExistentDelegationHash}`,
+          `Permission not found for permission context: ${nonExistentDelegationHash}`,
         );
 
         const expectedObjectKey = generateObjectKey(nonExistentDelegationHash);
