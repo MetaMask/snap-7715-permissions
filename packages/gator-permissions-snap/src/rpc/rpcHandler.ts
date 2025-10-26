@@ -1,4 +1,3 @@
-import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
 import {
@@ -96,10 +95,7 @@ export function createRpcHandler({
       );
     }
 
-    const permissionsToStore: {
-      permissionResponse: PermissionResponse;
-      siteOrigin: string;
-    }[] = [];
+    const permissionsToStore: StoredGrantedPermission[] = [];
 
     // First, process all permissions to collect responses and validate all are approved
     for (const request of permissionsRequest) {
@@ -122,9 +118,7 @@ export function createRpcHandler({
 
     // Only after all permissions have been successfully processed, store them all in batch
     if (permissionsToStore.length > 0) {
-      await profileSyncManager.storeGrantedPermissionBatch(
-        permissionsToStore as StoredGrantedPermission[],
-      );
+      await profileSyncManager.storeGrantedPermissionBatch(permissionsToStore);
     }
 
     // Return the permission responses
