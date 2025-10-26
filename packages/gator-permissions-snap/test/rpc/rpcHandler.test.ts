@@ -820,9 +820,11 @@ describe('RpcHandler', () => {
           mockProfileSyncManager.getAllGrantedPermissions,
         ).toHaveBeenCalledTimes(1);
         expect(result).toHaveLength(2);
-        expect((result as any[]).every((p) => p.isRevoked === false)).toBe(
-          true,
-        );
+        expect(
+          (result as any[]).every(
+            (permission) => permission.isRevoked === false,
+          ),
+        ).toBe(true);
       });
 
       it('should filter by siteOrigin', async () => {
@@ -835,7 +837,9 @@ describe('RpcHandler', () => {
         ).toHaveBeenCalledTimes(1);
         expect(result).toHaveLength(2);
         expect(
-          (result as any[]).every((p) => p.siteOrigin === TEST_SITE_ORIGIN),
+          (result as any[]).every(
+            (permission) => permission.siteOrigin === TEST_SITE_ORIGIN,
+          ),
         ).toBe(true);
       });
 
@@ -850,7 +854,8 @@ describe('RpcHandler', () => {
         expect(result).toHaveLength(2);
         expect(
           (result as any[]).every(
-            (p) => p.permissionResponse.chainId === TEST_CHAIN_ID,
+            (permission) =>
+              permission.permissionResponse.chainId === TEST_CHAIN_ID,
           ),
         ).toBe(true);
       });
