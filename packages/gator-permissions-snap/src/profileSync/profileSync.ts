@@ -359,7 +359,7 @@ export function createProfileSyncManager(
       const existingPermission = await getGrantedPermission(permissionContext);
       if (!existingPermission) {
         throw new InvalidInputError(
-          `Permission not found for delegation hash: ${permissionContext}`,
+          `Permission not found for permission context: ${permissionContext}`,
         );
       }
 
