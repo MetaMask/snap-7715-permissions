@@ -487,6 +487,7 @@ export function createProfileSyncManager(
             data: callData,
           },
           'latest',
+          chainId,
         ],
       });
 
