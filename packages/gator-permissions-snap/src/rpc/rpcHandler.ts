@@ -244,43 +244,36 @@ export function createRpcHandler({
     }
 
     // For on-chain validation, we need to check each delegation in the context
-    try {
-      const delegations = decodeDelegations(permissionContext);
+    const delegations = decodeDelegations(permissionContext);
 
-      // Check if any delegation is disabled on-chain
-      // For now, we'll check the first delegation. This might need adjustment based on business logic
-      const firstDelegation = delegations[0];
-      if (!firstDelegation) {
-        throw new InvalidInputError(
-          `No delegations found in permission context: ${permissionContext}`,
-        );
-      }
-
-      const delegationHash = hashDelegation(firstDelegation);
-      const isDelegationDisabled =
-        await profileSyncManager.checkDelegationDisabledOnChain(
-          delegationHash,
-          permissionChainId,
-          delegationManager,
-        );
-
-      logger.debug('On-chain check result:', { isDelegationDisabled });
-
-      if (!isDelegationDisabled) {
-        throw new InvalidInputError(
-          `Delegation ${delegationHash} is not disabled on-chain. Cannot process revocation.`,
-        );
-      }
-
-      logger.debug(
-        '✅ Delegation is disabled on-chain, proceeding with revocation',
-      );
-    } catch (error) {
-      logger.error('Error processing delegation context:', error);
+    // Check if any delegation is disabled on-chain
+    // For now, we'll check the first delegation. This might need adjustment based on business logic
+    const firstDelegation = delegations[0];
+    if (!firstDelegation) {
       throw new InvalidInputError(
-        `Invalid permission context format: ${permissionContext}`,
+        `No delegations found in permission context: ${permissionContext}`,
       );
     }
+
+    const delegationHash = hashDelegation(firstDelegation);
+    const isDelegationDisabled =
+      await profileSyncManager.checkDelegationDisabledOnChain(
+        delegationHash,
+        permissionChainId,
+        delegationManager,
+      );
+
+    logger.debug('On-chain check result:', { isDelegationDisabled });
+
+    if (!isDelegationDisabled) {
+      throw new InvalidInputError(
+        `Delegation ${delegationHash} is not disabled on-chain. Cannot process revocation.`,
+      );
+    }
+
+    logger.debug(
+      '✅ Delegation is disabled on-chain, proceeding with revocation',
+    );
 
     logger.debug('Updating permission revocation status to true...');
     await profileSyncManager.updatePermissionRevocationStatusWithPermission(
