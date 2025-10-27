@@ -239,7 +239,7 @@ export const onInstall: OnInstallHandler = async () => {
    * Local Development Only
    *
    * The gator permissions snap must have permission to communicate with the
-   * message signing snap, or the profile sync configuration will lnot work.
+   * message signing snap, or the profile sync authentication will not work.
    *
    * Since the message signing snap has initialConnections configured to
    * automatically accept connections from the gator snap, this is not needed in
