@@ -30,7 +30,6 @@
   "dependencies": {
     "@metamask/utils": "11.4.2",
     "dotenv": "17.2.0",
-    "viem": "2.31.7",
     "zod": "3.25.76"
   },
   "devDependencies": {
