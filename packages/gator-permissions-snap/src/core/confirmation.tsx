@@ -29,6 +29,9 @@ export class ConfirmationDialog {
 
   #decisionReject: ((reason: Error) => void) | undefined;
 
+  // Optional validation callback that runs before grant is confirmed
+  #onBeforeGrant: (() => Promise<boolean>) | undefined;
+
   constructor({
     ui,
     isGrantDisabled,
@@ -73,6 +76,14 @@ export class ConfirmationDialog {
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
+          if (this.#onBeforeGrant) {
+            const isValid = await this.#onBeforeGrant();
+            // If validation fails, don't resolve - keep dialog open with errors shown
+            if (!isValid) {
+              return;
+            }
+          }
+
           await this.#cleanup();
           this.#interfaceId = undefined;
           resolve(true);
@@ -197,6 +208,27 @@ export class ConfirmationDialog {
         ui: this.#buildConfirmation(),
       },
     });
+  }
+
+  /**
+   * Set a validation callback that will be called before the grant button resolves.
+   *
+   * This provides a final validation check after any pending debounced events have been
+   * processed but before the permission is actually granted. Useful for preventing
+   * race conditions where the button is clicked before debounced validation completes.
+   *
+   * @param callback - The validation callback that returns a promise resolving to a boolean.
+   * Return true to proceed with grant, false to keep dialog open.
+   *
+   * @example
+   * // Validate before granting
+   * dialog.setBeforeGrantCallback(async () => {
+   *   const errors = await checkValidation();
+   *   return errors.length === 0; // false keeps dialog open
+   * });
+   */
+  setBeforeGrantCallback(callback: () => Promise<boolean>): void {
+    this.#onBeforeGrant = callback;
   }
 
   /**

@@ -128,9 +128,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    const decisionPromise =
-      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
-
     let context: TContext;
     try {
       context = await lifecycleHandlers.buildContext(
@@ -140,6 +137,12 @@ export class PermissionRequestLifecycleOrchestrator {
       await confirmationDialog.closeWithError(error as Error);
       throw error;
     }
+
+    const hasValidationErrors = (metadata: TMetadata): boolean => {
+      return Object.values(metadata?.validationErrors ?? {}).some(
+        (message) => typeof message === 'string',
+      );
+    };
 
     const updateConfirmation = async ({
       newContext,
@@ -152,10 +155,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
-      const hasValidationErrors = Object.values(
-        metadata?.validationErrors ?? {},
-      ).some((message) => typeof message === 'string');
-
       const ui = await lifecycleHandlers.createConfirmationContent({
         context,
         metadata,
@@ -165,9 +164,25 @@ export class PermissionRequestLifecycleOrchestrator {
 
       await confirmationDialog.updateContent({
         ui,
-        isGrantDisabled: isGrantDisabled || hasValidationErrors,
+        isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
       });
     };
+
+    // Set up validation callback that runs when grant button is clicked.
+    // Race condition scenario this prevents:
+    //   1. User types invalid input → validation debounced (500ms delay)
+    //   2. User clicks Grant before 500ms elapses (button still enabled)
+    //   3. Button click event flushes all pending debounced events
+    //   4. Validation runs → updates UI with errors & disables button
+    //   5. Button handler already invoked (button was enabled at click time)
+    //   6. This callback catches it → returns false → dialog stays open
+    confirmationDialog.setBeforeGrantCallback(async () => {
+      const metadata = await lifecycleHandlers.deriveMetadata({ context });
+      return !hasValidationErrors(metadata);
+    });
+
+    const decisionPromise =
+      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
     // replace the skeleton content with the actual content rendered with the resolved context
     try {
@@ -212,11 +227,6 @@ export class PermissionRequestLifecycleOrchestrator {
       const { isConfirmationGranted } = await decisionPromise;
 
       if (isConfirmationGranted) {
-        // Wait for any pending context updates to complete before granting permission
-        // This prevents race conditions where the permission is granted before
-        // all user input has been processed
-        await this.#userEventDispatcher.waitForPendingHandlers();
-
         const response = await this.#resolveResponse({
           originalRequest: validatedPermissionRequest,
           modifiedContext: context,
