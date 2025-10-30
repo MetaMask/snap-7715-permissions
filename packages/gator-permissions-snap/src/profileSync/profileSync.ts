@@ -106,15 +106,6 @@ export type ProfileSyncManager = {
     permissionContext: Hex,
     isRevoked: boolean,
   ) => Promise<void>;
-  updatePermissionRevocationStatusWithPermission: (
-    existingPermission: StoredGrantedPermission,
-    isRevoked: boolean,
-  ) => Promise<void>;
-  checkDelegationDisabledOnChain: (
-    delegationHash: Hex,
-    chainId: Hex,
-    delegationManagerAddress: Hex,
-  ) => Promise<boolean>;
 };
 
 export type StoredGrantedPermission = {
@@ -178,20 +169,6 @@ export function createProfileSyncManager(
       logger.debug(
         'unConfiguredProfileSyncManager.updatePermissionRevocationStatus()',
       );
-    },
-    updatePermissionRevocationStatusWithPermission: async (
-      _: StoredGrantedPermission,
-      __: boolean,
-    ) => {
-      logger.debug(
-        'unConfiguredProfileSyncManager.updatePermissionRevocationStatusWithPermission()',
-      );
-    },
-    checkDelegationDisabledOnChain: async (_: Hex, __: Hex, ___: Hex) => {
-      logger.debug(
-        'unConfiguredProfileSyncManager.checkDelegationDisabledOnChain()',
-      );
-      return false; // Default to not disabled when feature is disabled
     },
   };
 
@@ -343,77 +320,6 @@ export function createProfileSyncManager(
   }
 
   /**
-   * Updates the revocation status of a granted permission in profile sync.
-   *
-   * @param permissionContext - The context of the granted permission to update.
-   * @param isRevoked - The new revocation status.
-   * @throws InvalidInputError if the permission is not found.
-   */
-  async function updatePermissionRevocationStatus(
-    permissionContext: Hex,
-    isRevoked: boolean,
-  ): Promise<void> {
-    try {
-      await authenticate();
-
-      const existingPermission = await getGrantedPermission(permissionContext);
-      if (!existingPermission) {
-        throw new InvalidInputError(
-          `Permission not found for permission context: ${permissionContext}`,
-        );
-      }
-
-      await updatePermissionRevocationStatusWithPermission(
-        existingPermission,
-        isRevoked,
-      );
-    } catch (error) {
-      logger.error('Error updating permission revocation status');
-      throw error;
-    }
-  }
-
-  /**
-   * Updates the revocation status of a granted permission when you already have the permission object.
-   * This is an optimized version that avoids re-fetching the permission.
-   *
-   * @param existingPermission - The existing permission object.
-   * @param isRevoked - The new revocation status.
-   */
-  async function updatePermissionRevocationStatusWithPermission(
-    existingPermission: StoredGrantedPermission,
-    isRevoked: boolean,
-  ): Promise<void> {
-    try {
-      logger.debug('Profile Sync: Updating permission revocation status:', {
-        existingPermission,
-        isRevoked,
-      });
-
-      await authenticate();
-
-      const updatedPermission: StoredGrantedPermission = {
-        ...existingPermission,
-        isRevoked,
-      };
-
-      logger.debug(
-        'Profile Sync: Created updated permission object:',
-        updatedPermission,
-      );
-
-      await storeGrantedPermission(updatedPermission);
-      logger.debug('Profile Sync: Successfully stored updated permission');
-    } catch (error) {
-      logger.error(
-        'Error updating permission revocation status with existing permission:',
-        error,
-      );
-      throw error;
-    }
-  }
-
-  /**
    * Checks if a delegation is disabled on-chain by calling the DelegationManager contract.
    * @param delegationHash - The hash of the delegation to check.
    * @param chainId - The chain ID in hex format.
@@ -468,6 +374,69 @@ export function createProfileSyncManager(
   }
 
   /**
+   * Updates the revocation status of a granted permission in profile sync.
+   *
+   * @param permissionContext - The context of the granted permission to update.
+   * @param isRevoked - The new revocation status.
+   * @throws InvalidInputError if the permission is not found.
+   */
+  async function updatePermissionRevocationStatus(
+    permissionContext: Hex,
+    isRevoked: boolean,
+  ): Promise<void> {
+    try {
+      await authenticate();
+
+      const existingPermission = await getGrantedPermission(permissionContext);
+      if (!existingPermission) {
+        throw new InvalidInputError(
+          `Permission not found for permission context: ${permissionContext}`,
+        );
+      }
+
+      const { delegationManager } =
+        existingPermission.permissionResponse.signerMeta;
+      if (!delegationManager) {
+        throw new InvalidInputError(
+          `No delegation manager found for permission context: ${permissionContext}`,
+        );
+      }
+
+      // Check if any delegation is disabled on-chain
+      // For now, we'll check the first delegation. This might need adjustment based on business logic
+      const { chainId } = existingPermission.permissionResponse;
+      const delegations = decodeDelegations(permissionContext);
+      const firstDelegation = delegations[0];
+      if (!firstDelegation) {
+        throw new InvalidInputError(
+          `No delegations found in permission context: ${permissionContext}`,
+        );
+      }
+
+      const delegationHash = hashDelegation(firstDelegation);
+      const isDelegationDisabled = await checkDelegationDisabledOnChain(
+        delegationHash,
+        chainId,
+        delegationManager,
+      );
+
+      if (!isDelegationDisabled) {
+        throw new InvalidInputError(
+          `Delegation ${delegationHash} is not disabled on-chain. Unable to update permission revocation status.`,
+        );
+      }
+
+      await storeGrantedPermission({
+        ...existingPermission,
+        isRevoked,
+      });
+    } catch (error) {
+      logger.error('Error updating permission revocation status');
+      throw error;
+    }
+  }
+
+  /**
    * Feature flag to disable profile sync feature until message-signing-snap v1.1.2 released in MM 12.18: https://github.com/MetaMask/metamask-extension/pull/32521.
    */
   return isFeatureEnabled
@@ -477,8 +446,6 @@ export function createProfileSyncManager(
         storeGrantedPermission,
         storeGrantedPermissionBatch,
         updatePermissionRevocationStatus,
-        updatePermissionRevocationStatusWithPermission,
-        checkDelegationDisabledOnChain,
       }
     : unConfiguredProfileSyncManager;
 }
