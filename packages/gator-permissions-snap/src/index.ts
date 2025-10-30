@@ -241,7 +241,7 @@ export const onInstall: OnInstallHandler = async () => {
     await snap.request({
       method: 'wallet_requestSnaps',
       params: {
-        ['npm:@metamask/message-signing-snap']: {},
+        'npm:@metamask/message-signing-snap': {},
       },
     });
   }
