@@ -61,11 +61,6 @@ if (!priceApiBaseUrl) {
   throw new InternalError('PRICE_API_BASE_URL is not set');
 }
 
-const messageSigningSnapId = process.env.MESSAGE_SIGNING_SNAP_ID;
-if (!messageSigningSnapId) {
-  throw new InternalError('MESSAGE_SIGNING_SNAP_ID is not set');
-}
-
 const supportedChainIdsString = process.env.SUPPORTED_CHAIN_IDS;
 if (!supportedChainIdsString) {
   throw new InternalError('SUPPORTED_CHAIN_IDS is not set');
@@ -108,11 +103,7 @@ const accountController = new AccountController({
 
 const stateManager = createStateManager(snap);
 
-const profileSyncOptions = createProfileSyncOptions(
-  stateManager,
-  snap,
-  messageSigningSnapId,
-);
+const profileSyncOptions = createProfileSyncOptions(stateManager, snap);
 
 const profileSyncSdkEnv = getProfileSyncSdkEnv(snapEnv);
 
@@ -247,10 +238,10 @@ export const onInstall: OnInstallHandler = async () => {
    * builds.
    */
   if (snapEnv === 'local' && isStorePermissionsFeatureEnabled) {
-    await ethereum.request({
+    await snap.request({
       method: 'wallet_requestSnaps',
       params: {
-        [messageSigningSnapId]: {},
+        ['npm:@metamask/message-signing-snap']: {},
       },
     });
   }
