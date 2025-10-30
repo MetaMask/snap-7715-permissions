@@ -9,7 +9,10 @@ const allowedPermissionsByOrigin: { [origin: string]: string[] } = {
       RpcMethod.PermissionsProviderGetPermissionOffers,
     ],
   }),
-  metamask: [RpcMethod.PermissionsProviderGetGrantedPermissions],
+  metamask: [
+    RpcMethod.PermissionsProviderGetGrantedPermissions,
+    RpcMethod.PermissionsProviderSubmitRevocation,
+  ],
 };
 
 /**
@@ -22,5 +25,8 @@ export const isMethodAllowedForOrigin = (
   origin: string,
   method: string,
 ): boolean => {
-  return allowedPermissionsByOrigin[origin]?.includes(method) ?? false;
+  const isAllowed =
+    allowedPermissionsByOrigin[origin]?.includes(method) ?? false;
+
+  return isAllowed;
 };
