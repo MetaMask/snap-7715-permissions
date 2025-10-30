@@ -21,12 +21,3 @@ export const kernelSnapOrigin =
 export const gatorSnapOrigin =
   // eslint-disable-next-line no-restricted-globals
   process.env.GATSBY_GATOR_SNAP_ORIGIN ?? `local:http://localhost:8082`;
-
-/**
- * The message signing snap origin to use.
- * Will default to the local hosted snap if no value is provided in environment.
- */
-export const messageSigningSnapOrigin =
-  // eslint-disable-next-line no-restricted-globals
-  process.env.GATSBY_MESSAGE_SIGNING_SNAP_ORIGIN ??
-  `npm:@metamask/message-signing-snap`;

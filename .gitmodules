@@ -1,3 +1,0 @@
-[submodule "external/message-signing-snap"]
-	path = external/message-signing-snap
-	url = https://github.com/MetaMask/message-signing-snap.git

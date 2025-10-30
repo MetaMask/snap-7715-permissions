@@ -81,16 +81,12 @@ The development site will start up on `http://localhost:8000/`
 # Install dependencies and sets up submodule
 yarn prepare:snap
 
-# Starts local @metamask/message-signing-snap
-yarn start:message-signing-snap
-
 # In new terminal window, start local @metamask/permissions-kernel-snap and @metamask/gator-permissions-snap
 yarn start
 ```
 
 The development site will start up on `http://localhost:8000/`
 
-- `@metamask/message-signing-snap` is served from `local:http://localhost:8080`
 - `@metamask/permissions-kernel-snap`is served from `local:http://localhost:8081`
 - `@metamask/gator-permissions-snap` is served from `local:http://localhost:8082`
 

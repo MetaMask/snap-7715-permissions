@@ -22,7 +22,6 @@
     "lint:fix": "yarn workspaces foreach --parallel run lint:fix",
     "lint:misc": "yarn workspaces foreach --parallel run lint:misc",
     "start": "yarn workspaces foreach --parallel --interlaced --verbose run start",
-    "start:message-signing-snap": "cd external/message-signing-snap && yarn start",
     "test": "yarn workspaces foreach --parallel --interlaced --verbose run test"
   },
   "devDependencies": {
