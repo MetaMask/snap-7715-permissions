@@ -12,6 +12,7 @@ import {
   parsePermissionsResponseParam,
 } from '../utils';
 import { ExternalMethod } from './rpcMethod';
+import { deserializeSnapError } from '../utils/error';
 
 /**
  * Type for the RPC handler methods.
@@ -92,21 +93,33 @@ export function createRpcHandler(config: {
       throw new InvalidInputError(errorMessage);
     }
 
-    const grantedPermissions = await snapsProvider.request({
-      method: 'wallet_invokeSnap',
-      params: {
-        snapId: gatorPermissionsProviderSnapId, // We only want gator-permissions-snap for now but we will use more snaps in the future
-        request: {
-          method: ExternalMethod.PermissionsProviderGrantPermissions,
-          params: {
-            permissionsRequest: permissionsToGrant,
-            siteOrigin: options.siteOrigin,
-          } as Json,
+    try {
+      const grantedPermissions = await snapsProvider.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: gatorPermissionsProviderSnapId, // We only want gator-permissions-snap for now but we will use more snaps in the future
+          request: {
+            method: ExternalMethod.PermissionsProviderGrantPermissions,
+            params: {
+              permissionsRequest: permissionsToGrant,
+              siteOrigin: options.siteOrigin,
+            } as Json,
+          },
         },
-      },
-    });
+      });
 
-    return parsePermissionsResponseParam(grantedPermissions) as Json;
+      return parsePermissionsResponseParam(grantedPermissions) as Json;
+    } catch (error) {
+      // When errors cross snap boundaries via wallet_invokeSnap, they get serialized
+      // and lose their type information. Try to deserialize them back to proper Snap errors.
+      const deserializedError = deserializeSnapError(error);
+      if (deserializedError) {
+        throw deserializedError;
+      }
+
+      // Re-throw other errors as-is
+      throw error;
+    }
   };
 
   return {
