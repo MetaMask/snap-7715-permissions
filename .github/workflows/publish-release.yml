@@ -7,6 +7,15 @@ on:
         required: true
       SLACK_WEBHOOK_URL:
         required: true
+env:
+  SNAP_ENV: ${{ vars.SNAP_ENV }}
+  PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
+  STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
+  ACCOUNT_API_BASE_URL: ${{ vars.ACCOUNT_API_BASE_URL }}
+  TOKENS_API_BASE_URL: ${{ vars.TOKENS_API_BASE_URL }}
+  GATOR_PERMISSIONS_PROVIDER_SNAP_ID: ${{ vars.GATOR_PERMISSIONS_PROVIDER_SNAP_ID }}
+  KERNEL_SNAP_ID: ${{ vars.KERNEL_SNAP_ID }}
+  SUPPORTED_CHAIN_IDS: ${{ vars.SUPPORTED_CHAIN_IDS }}
 
 jobs:
   publish-release:
@@ -14,15 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      SNAP_ENV: ${{ vars.SNAP_ENV }}
-      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
-      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
-      GATOR_PERMISSIONS_PROVIDER_SNAP_ID: ${{ vars.GATOR_PERMISSIONS_PROVIDER_SNAP_ID }}
-      MESSAGE_SIGNING_SNAP_ID: ${{ vars.MESSAGE_SIGNING_SNAP_ID }}
-      KERNEL_SNAP_ID: ${{ vars.KERNEL_SNAP_ID }}
-      ACCOUNT_API_BASE_URL: ${{ vars.ACCOUNT_API_BASE_URL }}
-      TOKENS_API_BASE_URL: ${{ vars.TOKENS_API_BASE_URL }}
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1
@@ -47,10 +47,6 @@ jobs:
     name: Dry run publish to NPM
     runs-on: ubuntu-latest
     needs: publish-release
-    env:
-      SNAP_ENV: ${{ vars.SNAP_ENV }}
-      PRICE_API_BASE_URL: ${{ vars.PRICE_API_BASE_URL }}
-      STORE_PERMISSIONS_ENABLED: ${{ vars.STORE_PERMISSIONS_ENABLED }}
     steps:
       - name: Checkout and setup environment
         uses: MetaMask/action-checkout-and-setup@v1

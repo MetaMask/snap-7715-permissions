@@ -2,7 +2,6 @@ import {
   zHexStr,
   zPermission,
   zMetaMaskPermissionData,
-  zTimestamp,
   zStartTime,
 } from '@metamask/7715-permissions-shared/types';
 import { z } from 'zod';
@@ -11,15 +10,14 @@ import type {
   DeepRequired,
   TypedPermissionRequest,
   BaseContext,
-  TimePeriod,
   BaseMetadata,
 } from '../../core/types';
+import { zPeriodDuration } from '../../utils/time';
 
 export type NativeTokenPeriodicMetadata = BaseMetadata & {
   validationErrors: {
     periodAmountError?: string;
     periodDurationError?: string;
-    periodTypeError?: string;
     startTimeError?: string;
     expiryError?: string;
   };
@@ -28,8 +26,7 @@ export type NativeTokenPeriodicMetadata = BaseMetadata & {
 export type NativeTokenPeriodicContext = BaseContext & {
   permissionDetails: {
     periodAmount: string;
-    periodType: TimePeriod | 'Other';
-    periodDuration: string;
+    periodDuration: number;
     startTime: number;
   };
 };
@@ -40,7 +37,7 @@ export const zNativeTokenPeriodicPermission = zPermission.extend({
     zMetaMaskPermissionData,
     z.object({
       periodAmount: zHexStr,
-      periodDuration: zTimestamp,
+      periodDuration: zPeriodDuration,
       startTime: zStartTime,
     }),
   ),

@@ -3012,7 +3012,6 @@ __metadata:
     rimraf: "npm:6.0.1"
     ts-jest: "npm:29.4.0"
     typescript: "npm:5.8.3"
-    viem: "npm:2.31.7"
     zod: "npm:3.25.76"
   bin:
     generate-snap-manifest: ./src/scripts/generate-manifest.ts
