@@ -7,6 +7,7 @@ export type ShowMoreTextProps = {
 };
 
 const MAX_TEXT_LENGTH = 20;
+const MIN_TEXT_LENGTH = 10;
 const ELLIPSIS_TEXT_LENGTH = MAX_TEXT_LENGTH - 3; // 3 is the length of the ellipsis
 
 export const ShowMoreText = ({
@@ -19,12 +20,16 @@ export const ShowMoreText = ({
       ? `${text.slice(0, ELLIPSIS_TEXT_LENGTH)}...`
       : text;
   const buttonText = isCollapsed ? 'Show' : 'Hide';
+  const showMoreButtonContent =
+    text.length <= MIN_TEXT_LENGTH ? null : (
+      <Button name={buttonName}>{buttonText}</Button>
+    );
 
   return (
     <Box direction={isCollapsed ? 'horizontal' : 'vertical'}>
       <Text color="muted">{displayText}</Text>
       <Box direction="horizontal" alignment="end">
-        <Button name={buttonName}>{buttonText}</Button>
+        {showMoreButtonContent}
       </Box>
     </Box>
   );
