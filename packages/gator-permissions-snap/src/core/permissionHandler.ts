@@ -8,6 +8,7 @@ import type { Hex } from '@metamask/utils';
 import {
   bigIntToHex,
   isStrictHexString,
+  numberToHex,
   parseCaipAccountId,
   parseCaipAssetType,
 } from '@metamask/utils';
@@ -198,12 +199,6 @@ export class PermissionHandler<
       origin: string;
       chainId: number;
     }) => {
-      const permissionContent =
-        await this.#dependencies.createConfirmationContent({
-          context,
-          metadata,
-        });
-
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
       const tokenIconData = getIconData(context);
@@ -211,7 +206,20 @@ export class PermissionHandler<
       const {
         justification,
         tokenMetadata: { symbol: tokenSymbol },
+        accountAddressCaip10,
       } = context;
+
+      const { address } = parseCaipAccountId(accountAddressCaip10);
+      const [permissionContent, accountUpgradeStatus] = await Promise.all([
+        this.#dependencies.createConfirmationContent({
+          context,
+          metadata,
+        }),
+        this.#accountController.getAccountUpgradeStatus({
+          account: address,
+          chainId: numberToHex(chainId),
+        }),
+      ]);
 
       return PermissionHandlerContent({
         origin,
@@ -227,6 +235,7 @@ export class PermissionHandler<
         tokenBalanceFiat: this.#tokenBalanceFiat,
         chainId,
         explorerUrl,
+        isAccountUpgraded: accountUpgradeStatus.isUpgraded,
       });
     };
 
