@@ -47,9 +47,7 @@ export async function createConfirmationContent({
           context,
           metadata,
         })}
-        <Box>
-          <Divider />
-        </Box>
+        <Divider />
         {renderRules({
           rules: [startTimeRule, expiryRule],
           context,

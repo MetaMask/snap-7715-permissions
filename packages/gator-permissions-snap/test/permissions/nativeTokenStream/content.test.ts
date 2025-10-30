@@ -288,14 +288,8 @@ describe('nativeTokenStream:content', () => {
             ],
             {
               "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {},
-                  "type": "Divider",
-                },
-              },
-              "type": "Box",
+              "props": {},
+              "type": "Divider",
             },
             [
               {
@@ -1149,14 +1143,8 @@ describe('nativeTokenStream:content', () => {
             ],
             {
               "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {},
-                  "type": "Divider",
-                },
-              },
-              "type": "Box",
+              "props": {},
+              "type": "Divider",
             },
             [
               {
@@ -1927,14 +1915,8 @@ describe('nativeTokenStream:content', () => {
             ],
             {
               "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {},
-                  "type": "Divider",
-                },
-              },
-              "type": "Box",
+              "props": {},
+              "type": "Divider",
             },
             [
               {
@@ -2602,14 +2584,8 @@ describe('nativeTokenStream:content', () => {
             ],
             {
               "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {},
-                  "type": "Divider",
-                },
-              },
-              "type": "Box",
+              "props": {},
+              "type": "Divider",
             },
             [
               {
@@ -3462,14 +3438,8 @@ describe('nativeTokenStream:content', () => {
             ],
             {
               "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {},
-                  "type": "Divider",
-                },
-              },
-              "type": "Box",
+              "props": {},
+              "type": "Divider",
             },
             [
               {
