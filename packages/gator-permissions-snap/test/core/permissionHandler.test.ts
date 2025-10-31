@@ -53,7 +53,7 @@ const mockPermissionRequest: PermissionRequest = {
     data: {
       amountPerSecond: '0x1',
       startTime: 1234567890,
-      justification: 'test',
+      justification: 'test a very long justification that should be truncated',
     },
     isAdjustmentAllowed: false,
   },
@@ -940,22 +940,7 @@ describe('PermissionHandler', () => {
                                   },
                                   "type": "Text",
                                 },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
+                                null,
                               ],
                               "direction": "horizontal",
                             },
@@ -1449,22 +1434,7 @@ describe('PermissionHandler', () => {
                                   },
                                   "type": "Text",
                                 },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
+                                null,
                               ],
                               "direction": "horizontal",
                             },
@@ -1996,22 +1966,7 @@ describe('PermissionHandler', () => {
                                   },
                                   "type": "Text",
                                 },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
+                                null,
                               ],
                               "direction": "horizontal",
                             },
@@ -2470,22 +2425,7 @@ describe('PermissionHandler', () => {
                                   },
                                   "type": "Text",
                                 },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
+                                null,
                               ],
                               "direction": "horizontal",
                             },
@@ -2949,22 +2889,7 @@ describe('PermissionHandler', () => {
                                   },
                                   "type": "Text",
                                 },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "end",
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "Show",
-                                        "name": "show-more-justification",
-                                      },
-                                      "type": "Button",
-                                    },
-                                    "direction": "horizontal",
-                                  },
-                                  "type": "Box",
-                                },
+                                null,
                               ],
                               "direction": "horizontal",
                             },
