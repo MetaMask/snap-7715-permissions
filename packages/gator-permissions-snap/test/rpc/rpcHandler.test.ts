@@ -3,12 +3,19 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
+import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
 import type { ProfileSyncManager } from '../../src/profileSync';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
+
+// Mock the delegation-core functions
+jest.mock('@metamask/delegation-core', () => ({
+  decodeDelegations: jest.fn(),
+  hashDelegation: jest.fn(),
+}));
 
 const TEST_ADDRESS = '0x1234567890123456789012345678901234567890' as const;
 const TEST_SITE_ORIGIN = 'https://example.com';
@@ -88,6 +95,23 @@ describe('RpcHandler', () => {
   let mockProfileSyncManager: jest.Mocked<ProfileSyncManager>;
 
   beforeEach(() => {
+    // Reset mocks
+    jest.clearAllMocks();
+
+    // Setup delegation-core mocks
+    (
+      decodeDelegations as jest.MockedFunction<typeof decodeDelegations>
+    ).mockReturnValue([
+      {
+        /* mock delegation */
+      },
+    ] as any);
+    (
+      hashDelegation as jest.MockedFunction<typeof hashDelegation>
+    ).mockReturnValue(
+      '0x1234567890123456789012345678901234567890123456789012345678901234' as any,
+    );
+
     mockHandler = {
       handlePermissionRequest: jest.fn(),
     } as unknown as jest.Mocked<PermissionHandlerType>;
@@ -102,6 +126,9 @@ describe('RpcHandler', () => {
       getGrantedPermission: jest.fn(),
       getAllGrantedPermissions: jest.fn(),
       getUserProfile: jest.fn(),
+      updatePermissionRevocationStatus: jest.fn(),
+      checkDelegationDisabledOnChain: jest.fn(),
+      updatePermissionRevocationStatusWithPermission: jest.fn(),
     } as unknown as jest.Mocked<ProfileSyncManager>;
 
     handler = createRpcHandler({
@@ -579,7 +606,15 @@ describe('RpcHandler', () => {
         {
           permissionResponse: {
             chainId: TEST_CHAIN_ID,
-            expiry: TEST_EXPIRY,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
             signer: {
               type: 'account' as const,
               data: { address: TEST_ADDRESS },
@@ -596,6 +631,7 @@ describe('RpcHandler', () => {
             },
           },
           siteOrigin: TEST_SITE_ORIGIN,
+          isRevoked: false,
         },
         {
           permissionResponse: {
@@ -620,6 +656,7 @@ describe('RpcHandler', () => {
             },
           },
           siteOrigin: 'https://another-example.com',
+          isRevoked: false,
         },
       ];
 
@@ -658,6 +695,528 @@ describe('RpcHandler', () => {
       expect(
         mockProfileSyncManager.getAllGrantedPermissions,
       ).toHaveBeenCalledTimes(1);
+    });
+
+    describe('filtering options', () => {
+      const mockGrantedPermissions = [
+        {
+          permissionResponse: {
+            chainId: TEST_CHAIN_ID,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
+            signer: {
+              type: 'account' as const,
+              data: { address: TEST_ADDRESS },
+            },
+            permission: {
+              type: 'test-permission',
+              data: { justification: 'Testing permission request' },
+              isAdjustmentAllowed: true,
+            },
+            context: TEST_CONTEXT,
+            dependencyInfo: [],
+            signerMeta: {
+              delegationManager: TEST_ADDRESS,
+            },
+          },
+          siteOrigin: TEST_SITE_ORIGIN,
+          isRevoked: false,
+        },
+        {
+          permissionResponse: {
+            chainId: '0x2' as const,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY + 1000,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
+            signer: {
+              type: 'account' as const,
+              data: {
+                address: '0x0987654321098765432109876543210987654321' as const,
+              },
+            },
+            permission: {
+              type: 'different-permission',
+              data: { justification: 'Another permission' },
+              isAdjustmentAllowed: true,
+            },
+            context: '0xefgh' as const,
+            dependencyInfo: [],
+            signerMeta: {
+              delegationManager:
+                '0x0987654321098765432109876543210987654321' as const,
+            },
+          },
+          siteOrigin: 'https://another-example.com',
+          isRevoked: true,
+        },
+        {
+          permissionResponse: {
+            chainId: TEST_CHAIN_ID,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
+            signer: {
+              type: 'account' as const,
+              data: { address: TEST_ADDRESS },
+            },
+            permission: {
+              type: 'third-permission',
+              data: { justification: 'Third permission' },
+              isAdjustmentAllowed: true,
+            },
+            context: '0xijkl' as const,
+            dependencyInfo: [],
+            signerMeta: {
+              delegationManager:
+                '0x1111111111111111111111111111111111111111' as const,
+            },
+          },
+          siteOrigin: TEST_SITE_ORIGIN,
+          isRevoked: false,
+        },
+      ];
+
+      beforeEach(() => {
+        mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue(
+          mockGrantedPermissions,
+        );
+      });
+
+      it('should filter by isRevoked=true', async () => {
+        const result = await handler.getGrantedPermissions({ isRevoked: true });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(1);
+        expect((result as any[])[0].isRevoked).toBe(true);
+      });
+
+      it('should filter by isRevoked=false', async () => {
+        const result = await handler.getGrantedPermissions({
+          isRevoked: false,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(2);
+        expect(
+          (result as any[]).every(
+            (permission) => permission.isRevoked === false,
+          ),
+        ).toBe(true);
+      });
+
+      it('should filter by siteOrigin', async () => {
+        const result = await handler.getGrantedPermissions({
+          siteOrigin: TEST_SITE_ORIGIN,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(2);
+        expect(
+          (result as any[]).every(
+            (permission) => permission.siteOrigin === TEST_SITE_ORIGIN,
+          ),
+        ).toBe(true);
+      });
+
+      it('should filter by chainId', async () => {
+        const result = await handler.getGrantedPermissions({
+          chainId: TEST_CHAIN_ID,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(2);
+        expect(
+          (result as any[]).every(
+            (permission) =>
+              permission.permissionResponse.chainId === TEST_CHAIN_ID,
+          ),
+        ).toBe(true);
+      });
+
+      it('should filter by delegationManager', async () => {
+        const result = await handler.getGrantedPermissions({
+          delegationManager: TEST_ADDRESS,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(1);
+        expect(
+          (result as any[])[0].permissionResponse.signerMeta.delegationManager,
+        ).toBe(TEST_ADDRESS);
+      });
+
+      it('should combine multiple filters', async () => {
+        const result = await handler.getGrantedPermissions({
+          isRevoked: false,
+          siteOrigin: TEST_SITE_ORIGIN,
+          chainId: TEST_CHAIN_ID,
+          delegationManager: TEST_ADDRESS,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(1);
+        const permission = (result as any[])[0];
+        expect(permission.isRevoked).toBe(false);
+        expect(permission.siteOrigin).toBe(TEST_SITE_ORIGIN);
+        expect(permission.permissionResponse.chainId).toBe(TEST_CHAIN_ID);
+        expect(permission.permissionResponse.signerMeta.delegationManager).toBe(
+          TEST_ADDRESS,
+        );
+      });
+
+      it('should return empty array when no permissions match filters', async () => {
+        const result = await handler.getGrantedPermissions({
+          isRevoked: true,
+          siteOrigin: 'https://nonexistent.com',
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(0);
+      });
+
+      it('should ignore invalid filter values', async () => {
+        const result = await handler.getGrantedPermissions({
+          isRevoked: 'invalid' as any,
+          siteOrigin: 123 as any,
+          chainId: null as any,
+          delegationManager: undefined as any,
+        });
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(3); // All permissions returned since filters are ignored
+      });
+
+      it('should handle empty params object', async () => {
+        const result = await handler.getGrantedPermissions({});
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(3); // All permissions returned
+      });
+
+      it('should handle null params', async () => {
+        const result = await handler.getGrantedPermissions(null as any);
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(3); // All permissions returned
+      });
+
+      it('should handle undefined params', async () => {
+        const result = await handler.getGrantedPermissions(undefined as any);
+
+        expect(
+          mockProfileSyncManager.getAllGrantedPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(result).toHaveLength(3); // All permissions returned
+      });
+    });
+  });
+
+  describe('submitRevocation', () => {
+    const validRevocationParams = {
+      permissionContext: TEST_CONTEXT,
+    };
+
+    it('should successfully submit revocation with valid parameters', async () => {
+      const mockPermission = {
+        permissionResponse: {
+          chainId: TEST_CHAIN_ID,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          signer: {
+            type: 'account' as const,
+            data: { address: TEST_ADDRESS },
+          },
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencyInfo: [],
+          signerMeta: {
+            delegationManager: TEST_ADDRESS,
+          },
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+        isRevoked: false,
+      };
+
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+        true,
+      );
+      mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(
+        undefined,
+      );
+
+      const result = await handler.submitRevocation(validRevocationParams);
+
+      expect(result).toStrictEqual({ success: true });
+      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
+        validRevocationParams.permissionContext,
+      );
+      expect(
+        mockProfileSyncManager.checkDelegationDisabledOnChain,
+      ).toHaveBeenCalled();
+      expect(
+        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+      ).toHaveBeenCalledWith(mockPermission, true);
+    });
+
+    it('should throw InvalidInputError when permissionContext is invalid', async () => {
+      const invalidParams = {
+        ...validRevocationParams,
+        permissionContext: 'invalid-context',
+      };
+
+      await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
+        'Invalid permission context',
+      );
+    });
+
+    it('should throw InvalidInputError when permissionContext is wrong format', async () => {
+      const invalidParams = {
+        ...validRevocationParams,
+        permissionContext: 'not-hex-string', // Invalid format
+      };
+
+      await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
+        'Invalid permission context',
+      );
+    });
+
+    it('should throw InvalidInputError when params is null', async () => {
+      await expect(handler.submitRevocation(null)).rejects.toThrow(
+        'Parameters are required',
+      );
+    });
+
+    it('should throw InvalidInputError when params is undefined', async () => {
+      await expect(handler.submitRevocation(undefined as any)).rejects.toThrow(
+        'Parameters are required',
+      );
+    });
+
+    it('should throw InvalidInputError when params is not an object', async () => {
+      await expect(handler.submitRevocation('invalid')).rejects.toThrow(
+        'Parameters are required',
+      );
+    });
+
+    it('should throw InvalidInputError when permissionContext is missing', async () => {
+      const invalidParams = {};
+
+      await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
+        'Required',
+      );
+    });
+
+    it('should propagate errors from updatePermissionRevocationStatusWithPermission', async () => {
+      const mockPermission = {
+        permissionResponse: {
+          chainId: TEST_CHAIN_ID,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          signer: {
+            type: 'account' as const,
+            data: { address: TEST_ADDRESS },
+          },
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencyInfo: [],
+          signerMeta: {
+            delegationManager: TEST_ADDRESS,
+          },
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+        isRevoked: false,
+      };
+
+      const profileSyncError = new Error('Update failed');
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+        true,
+      );
+      mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockRejectedValueOnce(
+        profileSyncError,
+      );
+
+      await expect(
+        handler.submitRevocation(validRevocationParams),
+      ).rejects.toThrow('Update failed');
+
+      expect(
+        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+      ).toHaveBeenCalledWith(mockPermission, true);
+    });
+
+    it('should handle hex values with uppercase letters', async () => {
+      const upperCaseParams = {
+        permissionContext: '0x1234567890ABCDEF1234567890ABCDEF',
+      };
+
+      const mockPermission = {
+        permissionResponse: {
+          chainId: '0xAA36A7' as const,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          signer: {
+            type: 'account' as const,
+            data: { address: TEST_ADDRESS },
+          },
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencyInfo: [],
+          signerMeta: {
+            delegationManager: TEST_ADDRESS,
+          },
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+        isRevoked: false,
+      };
+
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+        true,
+      );
+      mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(
+        undefined,
+      );
+
+      const result = await handler.submitRevocation(upperCaseParams);
+
+      expect(result).toStrictEqual({ success: true });
+      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
+        upperCaseParams.permissionContext,
+      );
+    });
+
+    it('should handle different chain configurations', async () => {
+      const testParams = {
+        ...validRevocationParams,
+      };
+
+      const mockPermission = {
+        permissionResponse: {
+          chainId: '0xaa36a7' as const,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          signer: {
+            type: 'account' as const,
+            data: { address: TEST_ADDRESS },
+          },
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencyInfo: [],
+          signerMeta: {
+            delegationManager: TEST_ADDRESS,
+          },
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+        isRevoked: false,
+      };
+
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+        true,
+      );
+      mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(
+        undefined,
+      );
+
+      const result = await handler.submitRevocation(testParams);
+
+      expect(result).toStrictEqual({ success: true });
+      expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
+        testParams.permissionContext,
+      );
     });
   });
 });

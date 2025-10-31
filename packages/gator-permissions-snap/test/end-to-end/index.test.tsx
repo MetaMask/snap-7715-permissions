@@ -43,5 +43,29 @@ describe('Kernel Snap', () => {
         });
       });
     });
+
+    describe('success', () => {
+      it('should return empty array when no permissions are granted', async () => {
+        const response = await snapRequest({
+          method: 'permissionsProvider_getGrantedPermissions',
+          origin: 'metamask',
+        });
+
+        expect(response).toRespondWith([]);
+      });
+
+      it('should accept filtering parameters', async () => {
+        const response = await snapRequest({
+          method: 'permissionsProvider_getGrantedPermissions',
+          origin: 'metamask',
+          params: {
+            isRevoked: false,
+            siteOrigin: 'https://example.com',
+          },
+        });
+
+        expect(response).toRespondWith([]);
+      });
+    });
   });
 });

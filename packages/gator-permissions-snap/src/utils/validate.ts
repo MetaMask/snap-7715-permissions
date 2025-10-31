@@ -3,7 +3,9 @@ import {
   zRequestExecutionPermissionsParam,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
-import { InvalidInputError } from '@metamask/snaps-sdk';
+import type { Hex } from '@metamask/delegation-core';
+import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
+import { z } from 'zod';
 
 export const validatePermissionRequestParam = (
   params: unknown,
@@ -18,3 +20,40 @@ export const validatePermissionRequestParam = (
 
   return validateGrantAttenuatedPermissionsParams.data;
 };
+
+// Validation schema for revocation parameters
+const zRevocationParams = z.object({
+  permissionContext: z
+    .string()
+    .regex(
+      /^0x[a-fA-F0-9]+$/u,
+      'Invalid permission context format - must be a hex string',
+    ),
+});
+
+/**
+ * Validates the revocation parameters.
+ * @param params - The parameters to validate.
+ * @returns The validated parameters.
+ * @throws InvalidInputError if validation fails.
+ */
+export function validateRevocationParams(params: Json): {
+  permissionContext: Hex;
+} {
+  try {
+    if (!params || typeof params !== 'object') {
+      throw new InvalidInputError('Parameters are required');
+    }
+
+    const validated = zRevocationParams.parse(params);
+
+    return {
+      permissionContext: validated.permissionContext as Hex,
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw new InvalidInputError(extractZodError(error.errors));
+    }
+    throw error;
+  }
+}
