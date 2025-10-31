@@ -96,6 +96,7 @@ const mockConfirmationDialog = {
   displayConfirmationDialogAndAwaitUserDecision: jest.fn(),
   updateContent: jest.fn(),
   closeWithError: jest.fn(),
+  setBeforeGrantCallback: jest.fn(),
 } as unknown as jest.Mocked<ConfirmationDialog>;
 
 const mockConfirmationDialogFactory = {
@@ -618,6 +619,60 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
             isConfirmationGranted: true,
           },
         );
+
+        await orchestrationPromise;
+      });
+
+      it('prevents race condition when grant is clicked before debounced validation completes', async () => {
+        // This test simulates the race condition scenario:
+        // 1. User types invalid input → validation debounced (500ms delay)
+        // 2. User clicks Grant before debounce completes (button still enabled)
+        // 3. beforeGrantCallback validates fresh state → detects errors → prevents grant
+
+        let validationErrorsState = {};
+
+        // Mock deriveMetadata to return our controlled validation state
+        lifecycleHandlerMocks.deriveMetadata.mockImplementation(async () => ({
+          test: 'metadata',
+          validationErrors: validationErrorsState,
+        }));
+
+        // Start orchestration
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequest,
+            lifecycleHandlerMocks,
+          );
+
+        // Wait for initial setup
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        // Extract the beforeGrantCallback that was registered
+        expect(
+          mockConfirmationDialog.setBeforeGrantCallback,
+        ).toHaveBeenCalledTimes(1);
+        const beforeGrantCallback =
+          mockConfirmationDialog.setBeforeGrantCallback.mock.calls[0]?.[0];
+
+        if (!beforeGrantCallback) {
+          throw new Error('Expected beforeGrantCallback to be defined');
+        }
+
+        // Valid state: grant should be allowed
+        validationErrorsState = {};
+        let result = await beforeGrantCallback();
+        expect(result).toBe(true);
+
+        // Invalid state (simulating user typed invalid input before debounce completed)
+        validationErrorsState = { amount: 'Amount must be positive' };
+        result = await beforeGrantCallback();
+        expect(result).toBe(false); // Should prevent grant
+
+        // Back to valid state
+        validationErrorsState = {};
+        result = await beforeGrantCallback();
+        expect(result).toBe(true); // Should allow grant
 
         await orchestrationPromise;
       });
