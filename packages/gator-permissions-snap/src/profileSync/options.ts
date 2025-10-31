@@ -15,17 +15,17 @@ export type ProfileSyncOptions = {
   authSigningOptions: AuthSigningOptions;
 };
 
+const MESSAGE_SIGNING_SNAP_ID = 'npm:@metamask/message-signing-snap';
+
 /**
  * Creates the profile sync options.
  * @param stateManager - The state manager.
  * @param snapsProvider - The snaps provider.
- * @param messageSigningSnapId - The message signing snap id.
  * @returns The profile sync options.
  */
 export const createProfileSyncOptions = (
   stateManager: StateManager,
   snapsProvider: SnapsProvider,
-  messageSigningSnapId: string,
 ): ProfileSyncOptions => {
   /**
    * Auth storage for profile sync authentication session.
@@ -73,7 +73,7 @@ export const createProfileSyncOptions = (
         const signature = (await snapsProvider.request({
           method: 'wallet_invokeSnap',
           params: {
-            snapId: messageSigningSnapId,
+            snapId: MESSAGE_SIGNING_SNAP_ID,
             request: {
               method: 'signMessage',
               params: {
@@ -93,7 +93,7 @@ export const createProfileSyncOptions = (
         const publicKey: string = (await snapsProvider.request({
           method: 'wallet_invokeSnap',
           params: {
-            snapId: messageSigningSnapId,
+            snapId: MESSAGE_SIGNING_SNAP_ID,
             request: {
               method: 'getPublicKey',
               params: {},
