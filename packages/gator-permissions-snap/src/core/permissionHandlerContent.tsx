@@ -16,11 +16,14 @@ import {
   SkeletonField,
   TextField,
   TooltipIcon,
-  TokenField,
   TokenBalanceField,
+  TokenField,
 } from '../ui/components';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
+export const ACCOUNT_LABEL = 'Account';
+export const ACCOUNT_TOOLTIP =
+  'The account from which the permission is being granted.';
 
 export const RECIPIENT_LABEL = 'Recipient';
 export const RECIPIENT_TOOLTIP = 'The site requesting the permission';
@@ -107,7 +110,43 @@ export const PermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{permissionTitle}</Heading>
+          <Text>This site wants permissions to spend your tokens.</Text>
         </Box>
+        <Section>
+          <Box direction="vertical">
+            <Box direction="horizontal" alignment="space-between">
+              <Box direction="horizontal">
+                <Text>{ACCOUNT_LABEL}</Text>
+                <TooltipIcon tooltip={ACCOUNT_TOOLTIP} />
+              </Box>
+            </Box>
+            <AccountSelector
+              name={ACCOUNT_SELECTOR_NAME}
+              chainIds={[`eip155:${chainId}`]}
+              switchGlobalAccount={false}
+              value={context.accountAddressCaip10}
+            />
+            <Box direction="horizontal" alignment="end">
+              {fiatBalanceComponent}
+              {tokenBalanceComponent}
+            </Box>
+          </Box>
+        </Section>
+        <Section>
+          <Box direction="horizontal" alignment="space-between">
+            <Box direction="horizontal">
+              <Text>{REASON_LABEL}</Text>
+              <TooltipIcon tooltip={REASON_TOOLTIP} />
+            </Box>
+            <Box direction="horizontal">
+              <ShowMoreText
+                text={justification}
+                buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
+                isCollapsed={isJustificationCollapsed}
+              />
+            </Box>
+          </Box>
+        </Section>
         <Section>
           <TextField
             label={RECIPIENT_LABEL}
@@ -127,39 +166,6 @@ export const PermissionHandlerContent = ({
             tooltip={TOKEN_TOOLTIP}
             iconData={tokenIconData}
           />
-          <Box direction="horizontal" alignment="space-between">
-            <Box direction="horizontal">
-              <Text>{REASON_LABEL}</Text>
-              <TooltipIcon tooltip={REASON_TOOLTIP} />
-            </Box>
-            <Box direction="horizontal">
-              <ShowMoreText
-                text={justification}
-                buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
-                isCollapsed={isJustificationCollapsed}
-              />
-            </Box>
-          </Box>
-        </Section>
-        <Section>
-          <Box direction="vertical">
-            <Box direction="horizontal" alignment="space-between">
-              <Box direction="horizontal">
-                <Text>Account</Text>
-                <TooltipIcon tooltip="The account from which the permission is being granted." />
-              </Box>
-            </Box>
-            <AccountSelector
-              name={ACCOUNT_SELECTOR_NAME}
-              chainIds={[`eip155:${chainId}`]}
-              switchGlobalAccount={false}
-              value={context.accountAddressCaip10}
-            />
-            <Box direction="horizontal" alignment="end">
-              {fiatBalanceComponent}
-              {tokenBalanceComponent}
-            </Box>
-          </Box>
         </Section>
         {children}
       </Box>
@@ -177,12 +183,26 @@ export const SkeletonPermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{permissionTitle}</Heading>
+          <Text>This site wants permissions to spend your tokens.</Text>
         </Box>
+        <Section>
+          <Box direction="vertical">
+            <Box direction="horizontal" alignment="space-between">
+              <Box direction="horizontal">
+                <Text>{ACCOUNT_LABEL}</Text>
+                <TooltipIcon tooltip={ACCOUNT_TOOLTIP} />
+              </Box>
+            </Box>
+            <Skeleton />
+          </Box>
+        </Section>
+        <Section>
+          <SkeletonField label={REASON_LABEL} tooltip={REASON_TOOLTIP} />
+        </Section>
         <Section>
           <SkeletonField label={RECIPIENT_LABEL} tooltip={RECIPIENT_TOOLTIP} />
           <SkeletonField label={NETWORK_LABEL} tooltip={NETWORK_TOOLTIP} />
           <SkeletonField label={TOKEN_LABEL} tooltip={TOKEN_TOOLTIP} />
-          <SkeletonField label={REASON_LABEL} tooltip={REASON_TOOLTIP} />
         </Section>
         <Section>
           <Skeleton />

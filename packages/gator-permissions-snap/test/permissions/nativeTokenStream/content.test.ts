@@ -69,6 +69,529 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
+                                    "children": "Initial Amount",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The initial amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alt": "Remove Initial Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                    },
+                                    "type": "Image",
+                                  },
+                                  "name": "native-token-stream-initial-amount_removeFieldButton",
+                                },
+                                "type": "Button",
+                              },
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "name": "native-token-stream-initial-amount",
+                              "type": "number",
+                              "value": "1",
+                            },
+                            "type": "Input",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                      },
+                      "type": "Field",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Max Amount",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The maximum amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alt": "Remove Max Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                    },
+                                    "type": "Image",
+                                  },
+                                  "name": "native-token-stream-max-amount_removeFieldButton",
+                                },
+                                "type": "Button",
+                              },
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "name": "native-token-stream-max-amount",
+                              "type": "number",
+                              "value": "10",
+                            },
+                            "type": "Input",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                      },
+                      "type": "Field",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
+            {
+              "key": null,
+              "props": {},
+              "type": "Divider",
+            },
+            [
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Start Time",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-start-time_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "10/26/1985",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-start-time_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "08:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Expiry",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "05/01/2024",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "00:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
+          ],
+        },
+        "type": "Section",
+      },
+      {
+        "key": null,
+        "props": {
+          "children": [
+            [
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
                                     "children": "Stream Amount",
                                   },
                                   "type": "Text",
@@ -355,520 +878,6 @@ describe('nativeTokenStream:content', () => {
         },
         "type": "Section",
       },
-      {
-        "key": null,
-        "props": {
-          "children": [
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Initial Amount",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The initial amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Initial Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "native-token-stream-initial-amount_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "native-token-stream-initial-amount",
-                            "type": "number",
-                            "value": "1",
-                          },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                    },
-                    "type": "Field",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Max Amount",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The maximum amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Max Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "native-token-stream-max-amount_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "native-token-stream-max-amount",
-                            "type": "number",
-                            "value": "10",
-                          },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                    },
-                    "type": "Field",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Start Time",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-start-time_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "10/26/1985",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-start-time_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "08:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Expiry",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "05/01/2024",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-          ],
-        },
-        "type": "Section",
-      },
     ],
   },
   "type": "Box",
@@ -893,6 +902,530 @@ describe('nativeTokenStream:content', () => {
   "key": null,
   "props": {
     "children": [
+      {
+        "key": null,
+        "props": {
+          "children": [
+            [
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Initial Amount",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The initial amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alt": "Remove Initial Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                    },
+                                    "type": "Image",
+                                  },
+                                  "name": "native-token-stream-initial-amount_removeFieldButton",
+                                },
+                                "type": "Button",
+                              },
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "name": "native-token-stream-initial-amount",
+                              "type": "number",
+                              "value": "1",
+                            },
+                            "type": "Input",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "error": "Invalid initial amount",
+                      },
+                      "type": "Field",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Max Amount",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The maximum amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alt": "Remove Max Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                    },
+                                    "type": "Image",
+                                  },
+                                  "name": "native-token-stream-max-amount_removeFieldButton",
+                                },
+                                "type": "Button",
+                              },
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "name": "native-token-stream-max-amount",
+                              "type": "number",
+                              "value": "10",
+                            },
+                            "type": "Input",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                      },
+                      "type": "Field",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
+            {
+              "key": null,
+              "props": {},
+              "type": "Divider",
+            },
+            [
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Start Time",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-start-time_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "10/26/1985",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-start-time_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "08:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Expiry",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "05/01/2024",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "00:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
+          ],
+        },
+        "type": "Section",
+      },
       {
         "key": null,
         "props": {
@@ -1201,521 +1734,6 @@ describe('nativeTokenStream:content', () => {
         },
         "type": "Section",
       },
-      {
-        "key": null,
-        "props": {
-          "children": [
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Initial Amount",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The initial amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Initial Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "native-token-stream-initial-amount_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "native-token-stream-initial-amount",
-                            "type": "number",
-                            "value": "1",
-                          },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "error": "Invalid initial amount",
-                    },
-                    "type": "Field",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Max Amount",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The maximum amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Max Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "native-token-stream-max-amount_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "native-token-stream-max-amount",
-                            "type": "number",
-                            "value": "10",
-                          },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                    },
-                    "type": "Field",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Start Time",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-start-time_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "10/26/1985",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-start-time_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "08:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Expiry",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "05/01/2024",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-          ],
-        },
-        "type": "Section",
-      },
     ],
   },
   "type": "Box",
@@ -1737,6 +1755,388 @@ describe('nativeTokenStream:content', () => {
   "key": null,
   "props": {
     "children": [
+      {
+        "key": null,
+        "props": {
+          "children": [
+            [
+              {
+                "key": null,
+                "props": {
+                  "alignment": "space-between",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Initial Amount",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The initial amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          null,
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "1",
+                            },
+                            "type": "Text",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "horizontal",
+                },
+                "type": "Box",
+              },
+              {
+                "key": null,
+                "props": {
+                  "alignment": "space-between",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Max Amount",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The maximum amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          null,
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "10",
+                            },
+                            "type": "Text",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "horizontal",
+                },
+                "type": "Box",
+              },
+            ],
+            {
+              "key": null,
+              "props": {},
+              "type": "Divider",
+            },
+            [
+              {
+                "key": null,
+                "props": {
+                  "alignment": "space-between",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Start Time",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          null,
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "10/26/1985 08:00:00 UTC",
+                            },
+                            "type": "Text",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "horizontal",
+                },
+                "type": "Box",
+              },
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Expiry",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "05/01/2024",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "00:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
+          ],
+        },
+        "type": "Section",
+      },
       {
         "key": null,
         "props": {
@@ -1985,16 +2385,40 @@ describe('nativeTokenStream:content', () => {
         },
         "type": "Section",
       },
+    ],
+  },
+  "type": "Box",
+}
+`);
+    });
+
+    it('should handle missing optional fields', async () => {
+      const contentWithMissingFields = await createConfirmationContent({
+        context: {
+          ...mockContext,
+          permissionDetails: {
+            ...mockContext.permissionDetails,
+            initialAmount: undefined,
+            maxAmount: undefined,
+          },
+        },
+        metadata: mockMetadata,
+      });
+
+      expect(contentWithMissingFields).toMatchInlineSnapshot(`
+{
+  "key": null,
+  "props": {
+    "children": [
       {
         "key": null,
         "props": {
           "children": [
-            {
-              "key": null,
-              "props": {
-                "alignment": "space-between",
-                "children": [
-                  {
+            [
+              {
+                "key": null,
+                "props": {
+                  "children": {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
@@ -2037,40 +2461,47 @@ describe('nativeTokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
                         {
                           "key": null,
                           "props": {
-                            "children": "1",
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alt": "Add Initial Amount",
+                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
+
+  <!-- Toggle circle (on left) -->
+  <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                  },
+                                  "type": "Image",
+                                },
+                                "name": "native-token-stream-initial-amount_addFieldButton",
+                              },
+                              "type": "Button",
+                            },
                           },
-                          "type": "Text",
+                          "type": "Box",
                         },
                       ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
                   },
-                ],
-                "direction": "horizontal",
+                  "direction": "vertical",
+                },
+                "type": "Box",
               },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "alignment": "space-between",
-                "children": [
-                  {
+              {
+                "key": null,
+                "props": {
+                  "children": {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
@@ -2113,171 +2544,31 @@ describe('nativeTokenStream:content', () => {
                           },
                           "type": "Box",
                         },
-                        null,
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
                         {
                           "key": null,
                           "props": {
-                            "children": "10",
-                          },
-                          "type": "Text",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "horizontal",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "alignment": "space-between",
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Start Time",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        null,
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        {
-                          "key": null,
-                          "props": {
-                            "children": "10/26/1985 08:00:00 UTC",
-                          },
-                          "type": "Text",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "horizontal",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Expiry",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
                             "children": {
                               "key": null,
                               "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alt": "Add Max Amount",
+                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
+
+  <!-- Toggle circle (on left) -->
+  <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                  },
+                                  "type": "Image",
+                                },
+                                "name": "native-token-stream-max-amount_addFieldButton",
                               },
-                              "type": "Text",
+                              "type": "Button",
                             },
-                            "direction": "horizontal",
                           },
                           "type": "Box",
                         },
@@ -2286,103 +2577,296 @@ describe('nativeTokenStream:content', () => {
                     },
                     "type": "Box",
                   },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "05/01/2024",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
+            {
+              "key": null,
+              "props": {},
+              "type": "Divider",
+            },
+            [
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
                                   "key": null,
                                   "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
+                                    "children": "Start Time",
                                   },
                                   "type": "Text",
                                 },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
                             },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
                       },
-                      "direction": "horizontal",
+                      "type": "Box",
                     },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-start-time_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "10/26/1985",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-start-time_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "08:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
                     },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
               },
-              "type": "Box",
-            },
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Expiry",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "05/01/2024",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "00:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
           ],
         },
         "type": "Section",
       },
-    ],
-  },
-  "type": "Box",
-}
-`);
-    });
-
-    it('should handle missing optional fields', async () => {
-      const contentWithMissingFields = await createConfirmationContent({
-        context: {
-          ...mockContext,
-          permissionDetails: {
-            ...mockContext.permissionDetails,
-            initialAmount: undefined,
-            maxAmount: undefined,
-          },
-        },
-        metadata: mockMetadata,
-      });
-
-      expect(contentWithMissingFields).toMatchInlineSnapshot(`
-{
-  "key": null,
-  "props": {
-    "children": [
       {
         "key": null,
         "props": {
@@ -2690,454 +3174,6 @@ describe('nativeTokenStream:content', () => {
         },
         "type": "Section",
       },
-      {
-        "key": null,
-        "props": {
-          "children": [
-            {
-              "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Initial Amount",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The initial amount of tokens that can be streamed.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "alt": "Add Initial Amount",
-                                  "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
-
-  <!-- Toggle circle (on left) -->
-  <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                },
-                                "type": "Image",
-                              },
-                              "name": "native-token-stream-initial-amount_addFieldButton",
-                            },
-                            "type": "Button",
-                          },
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": {
-                  "key": null,
-                  "props": {
-                    "alignment": "space-between",
-                    "children": [
-                      {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Max Amount",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
-                                },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The maximum amount of tokens that can be streamed.",
-                                  },
-                                  "type": "Text",
-                                },
-                              },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      {
-                        "key": null,
-                        "props": {
-                          "children": {
-                            "key": null,
-                            "props": {
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "alt": "Add Max Amount",
-                                  "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
-
-  <!-- Toggle circle (on left) -->
-  <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                },
-                                "type": "Image",
-                              },
-                              "name": "native-token-stream-max-amount_addFieldButton",
-                            },
-                            "type": "Button",
-                          },
-                        },
-                        "type": "Box",
-                      },
-                    ],
-                    "direction": "horizontal",
-                  },
-                  "type": "Box",
-                },
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Start Time",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-start-time_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "10/26/1985",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-start-time_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "08:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Expiry",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "05/01/2024",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-          ],
-        },
-        "type": "Section",
-      },
     ],
   },
   "type": "Box",
@@ -3162,6 +3198,529 @@ describe('nativeTokenStream:content', () => {
   "key": null,
   "props": {
     "children": [
+      {
+        "key": null,
+        "props": {
+          "children": [
+            [
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Initial Amount",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The initial amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alt": "Remove Initial Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                    },
+                                    "type": "Image",
+                                  },
+                                  "name": "native-token-stream-initial-amount_removeFieldButton",
+                                },
+                                "type": "Button",
+                              },
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "name": "native-token-stream-initial-amount",
+                              "type": "number",
+                              "value": "1",
+                            },
+                            "type": "Input",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                      },
+                      "type": "Field",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Max Amount",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The maximum amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alt": "Remove Max Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                    },
+                                    "type": "Image",
+                                  },
+                                  "name": "native-token-stream-max-amount_removeFieldButton",
+                                },
+                                "type": "Button",
+                              },
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "name": "native-token-stream-max-amount",
+                              "type": "number",
+                              "value": "10",
+                            },
+                            "type": "Input",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": null,
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                      },
+                      "type": "Field",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
+            {
+              "key": null,
+              "props": {},
+              "type": "Divider",
+            },
+            [
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Start Time",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-start-time_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "10/26/1985",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-start-time_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "08:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+              {
+                "key": null,
+                "props": {
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Expiry",
+                                  },
+                                  "type": "Text",
+                                },
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "alignment": "end",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": "mm/dd/yyyy hh:mm:ss",
+                                  "color": "muted",
+                                  "size": "sm",
+                                },
+                                "type": "Text",
+                              },
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_date",
+                                  "placeholder": "mm/dd/yyyy",
+                                  "type": "text",
+                                  "value": "05/01/2024",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "name": "native-token-stream-expiry_time",
+                                  "placeholder": "HH:MM:SS",
+                                  "type": "text",
+                                  "value": "00:00:00",
+                                },
+                                "type": "Input",
+                              },
+                              {
+                                "key": null,
+                                "props": {
+                                  "alignment": "center",
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alignment": "center",
+                                      "children": "UTC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  "direction": "vertical",
+                                },
+                                "type": "Box",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
+                        },
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": [
+                          null,
+                          null,
+                        ],
+                      },
+                      "type": "Box",
+                    },
+                  ],
+                  "direction": "vertical",
+                },
+                "type": "Box",
+              },
+            ],
+          ],
+        },
+        "type": "Section",
+      },
       {
         "key": null,
         "props": {
@@ -3459,520 +4018,6 @@ describe('nativeTokenStream:content', () => {
                       ],
                     },
                     "type": "Field",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-          ],
-        },
-        "type": "Section",
-      },
-      {
-        "key": null,
-        "props": {
-          "children": [
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Initial Amount",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The initial amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Initial Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "native-token-stream-initial-amount_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "native-token-stream-initial-amount",
-                            "type": "number",
-                            "value": "1",
-                          },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                    },
-                    "type": "Field",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Max Amount",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The maximum amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Max Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "native-token-stream-max-amount_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "native-token-stream-max-amount",
-                            "type": "number",
-                            "value": "10",
-                          },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                    },
-                    "type": "Field",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Start Time",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-start-time_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "10/26/1985",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-start-time_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "08:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
-                  },
-                ],
-                "direction": "vertical",
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Expiry",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "alignment": "end",
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": "mm/dd/yyyy hh:mm:ss",
-                                "color": "muted",
-                                "size": "sm",
-                              },
-                              "type": "Text",
-                            },
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_date",
-                                "placeholder": "mm/dd/yyyy",
-                                "type": "text",
-                                "value": "05/01/2024",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "name": "native-token-stream-expiry_time",
-                                "placeholder": "HH:MM:SS",
-                                "type": "text",
-                                "value": "00:00:00",
-                              },
-                              "type": "Input",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "alignment": "center",
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alignment": "center",
-                                    "children": "UTC",
-                                  },
-                                  "type": "Text",
-                                },
-                                "direction": "vertical",
-                              },
-                              "type": "Box",
-                            },
-                          ],
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
-                      "direction": "horizontal",
-                    },
-                    "type": "Box",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": [
-                        null,
-                        null,
-                      ],
-                    },
-                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
