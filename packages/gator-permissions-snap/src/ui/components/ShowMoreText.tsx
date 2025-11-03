@@ -19,13 +19,17 @@ export const ShowMoreText = ({
       ? `${text.slice(0, ELLIPSIS_TEXT_LENGTH)}...`
       : text;
   const buttonText = isCollapsed ? 'Show' : 'Hide';
+  const showMoreButtonContent =
+    text.length > MAX_TEXT_LENGTH ? (
+      <Box direction="horizontal" alignment="end">
+        <Button name={buttonName}>{buttonText}</Button>
+      </Box>
+    ) : null;
 
   return (
     <Box direction={isCollapsed ? 'horizontal' : 'vertical'}>
       <Text>{displayText}</Text>
-      <Box direction="horizontal" alignment="end">
-        <Button name={buttonName}>{buttonText}</Button>
-      </Box>
+      {showMoreButtonContent}
     </Box>
   );
 };
