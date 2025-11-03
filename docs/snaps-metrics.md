@@ -79,34 +79,6 @@ All events include:
 - `origin`: The dapp origin requesting the permission
 - Additional event-specific properties
 
-## Usage Example
-
-```typescript
-// Track permission request started
-await snapsMetricsService.trackPermissionRequestStarted(
-  'https://example.com',
-  'erc20-token-periodic',
-  {
-    chainId: '0x1',
-    period: 86400, // 1 day in seconds
-    amount: '1000000000000000000', // 1 token
-    token: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI
-  }
-);
-
-// Track permission granted
-await snapsMetricsService.trackPermissionGranted(
-  'https://example.com',
-  'erc20-token-periodic',
-  {
-    chainId: '0x1',
-    period: 86400,
-    amount: '1000000000000000000',
-    token: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-  },
-  false // isAdjustmentAllowed
-);
-```
 
 ## Data Flow
 

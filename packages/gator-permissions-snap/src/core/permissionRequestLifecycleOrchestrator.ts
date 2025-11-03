@@ -454,7 +454,7 @@ export class PermissionRequestLifecycleOrchestrator {
       {
         chainId: numberToHex(chainId),
       },
-      !isAdjustmentAllowed,
+      isAdjustmentAllowed,
     );
 
     return response;
