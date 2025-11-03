@@ -29,7 +29,6 @@ export class ConfirmationDialog {
 
   #decisionReject: ((reason: Error) => void) | undefined;
 
-  // Validation callback that runs before grant is confirmed
   readonly #onBeforeGrant: () => Promise<boolean>;
 
   constructor({
