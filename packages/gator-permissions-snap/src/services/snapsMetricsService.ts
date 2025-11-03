@@ -3,15 +3,6 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 
 /**
- * Permission type identifiers for analytics tracking.
- */
-export type PermissionType =
-  | 'native-token-stream'
-  | 'native-token-periodic'
-  | 'erc20-token-stream'
-  | 'erc20-token-periodic';
-
-/**
  * Permission value details for analytics.
  */
 export type PermissionValue = {
@@ -75,7 +66,7 @@ export class SnapsMetricsService {
    */
   async trackPermissionRequestStarted(
     origin: string,
-    permissionType: PermissionType,
+    permissionType: string,
     permissionValue?: PermissionValue,
   ): Promise<void> {
     await this.#trackEvent('Permission Request Started', {
@@ -94,7 +85,7 @@ export class SnapsMetricsService {
    */
   async trackPermissionDialogShown(
     origin: string,
-    permissionType: PermissionType,
+    permissionType: string,
     permissionValue?: PermissionValue,
   ): Promise<void> {
     await this.#trackEvent('Permission Dialog Shown', {
@@ -113,7 +104,7 @@ export class SnapsMetricsService {
    */
   async trackPermissionRejected(
     origin: string,
-    permissionType: PermissionType,
+    permissionType: string,
     permissionValue?: PermissionValue,
   ): Promise<void> {
     await this.#trackEvent('Permission Rejected', {
@@ -133,7 +124,7 @@ export class SnapsMetricsService {
    */
   async trackPermissionGranted(
     origin: string,
-    permissionType: PermissionType,
+    permissionType: string,
     permissionValue: PermissionValue,
     isAdjustmentAllowed: boolean,
   ): Promise<void> {
@@ -179,7 +170,7 @@ export class SnapsMetricsService {
    */
   async trackDelegationSigning(
     origin: string,
-    permissionType: PermissionType,
+    permissionType: string,
     success: boolean,
     errorMessage?: string,
   ): Promise<void> {

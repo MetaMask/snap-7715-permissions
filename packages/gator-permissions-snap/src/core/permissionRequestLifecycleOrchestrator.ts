@@ -116,7 +116,9 @@ export class PermissionRequestLifecycleOrchestrator {
     >,
   ): Promise<PermissionRequestResult> {
     const chainId = hexToNumber(permissionRequest.chainId);
-    const permissionType = permissionRequest.permission.type as any;
+    const permissionType = extractDescriptorName(
+      permissionRequest.permission.type,
+    );
 
     this.#assertIsSupportedChainId(chainId);
 
@@ -324,7 +326,9 @@ export class PermissionRequestLifecycleOrchestrator {
       TPopulatedPermission
     >;
   }): Promise<PermissionResponse> {
-    const permissionType = originalRequest.permission.type as any;
+    const permissionType = extractDescriptorName(
+      originalRequest.permission.type,
+    );
 
     // apply the changes made to the context to the request
     const resolvedRequest = await lifecycleHandlers.applyContext({
