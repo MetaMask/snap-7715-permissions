@@ -801,7 +801,6 @@ describe('PermissionHandler', () => {
                                 "key": null,
                                 "props": {
                                   "children": "Test justification",
-                                  "color": "muted",
                                 },
                                 "type": "Text",
                               },
@@ -1330,7 +1329,6 @@ describe('PermissionHandler', () => {
                                 "key": null,
                                 "props": {
                                   "children": "Test justification",
-                                  "color": "muted",
                                 },
                                 "type": "Text",
                               },
@@ -1887,7 +1885,6 @@ describe('PermissionHandler', () => {
                                 "key": null,
                                 "props": {
                                   "children": "Test justification",
-                                  "color": "muted",
                                 },
                                 "type": "Text",
                               },
@@ -2381,7 +2378,6 @@ describe('PermissionHandler', () => {
                                 "key": null,
                                 "props": {
                                   "children": "Test justification",
-                                  "color": "muted",
                                 },
                                 "type": "Text",
                               },
@@ -2877,7 +2873,6 @@ describe('PermissionHandler', () => {
                                 "key": null,
                                 "props": {
                                   "children": "Test justification",
-                                  "color": "muted",
                                 },
                                 "type": "Text",
                               },

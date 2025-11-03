@@ -22,7 +22,7 @@ export const ShowMoreText = ({
 
   return (
     <Box direction={isCollapsed ? 'horizontal' : 'vertical'}>
-      <Text color="muted">{displayText}</Text>
+      <Text>{displayText}</Text>
       <Box direction="horizontal" alignment="end">
         <Button name={buttonName}>{buttonText}</Button>
       </Box>
