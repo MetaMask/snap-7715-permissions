@@ -120,15 +120,36 @@ export class PermissionRequestLifecycleOrchestrator {
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);
 
+    let context: TContext;
+
+    const hasValidationErrors = (metadata: TMetadata): boolean => {
+      return Object.values(metadata?.validationErrors ?? {}).some(
+        (message) => typeof message === 'string',
+      );
+    };
+
+    // Validation callback that runs when grant button is clicked.
+    // Race condition scenario this prevents:
+    //   1. User types invalid input → validation debounced (500ms delay)
+    //   2. User clicks Grant before 500ms elapses (button still enabled)
+    //   3. Button click event flushes all pending debounced events
+    //   4. Validation runs → updates UI with errors & disables button
+    //   5. Button handler already invoked (button was enabled at click time)
+    //   6. This callback catches it → returns false → dialog stays open
+    const onBeforeGrant = async (): Promise<boolean> => {
+      const metadata = await lifecycleHandlers.deriveMetadata({ context });
+      return !hasValidationErrors(metadata);
+    };
+
     const confirmationDialog =
       this.#confirmationDialogFactory.createConfirmation({
         ui: await lifecycleHandlers.createSkeletonConfirmationContent(),
         isGrantDisabled: true,
+        onBeforeGrant,
       });
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    let context: TContext;
     try {
       context = await lifecycleHandlers.buildContext(
         validatedPermissionRequest,
@@ -137,12 +158,6 @@ export class PermissionRequestLifecycleOrchestrator {
       await confirmationDialog.closeWithError(error as Error);
       throw error;
     }
-
-    const hasValidationErrors = (metadata: TMetadata): boolean => {
-      return Object.values(metadata?.validationErrors ?? {}).some(
-        (message) => typeof message === 'string',
-      );
-    };
 
     const updateConfirmation = async ({
       newContext,
@@ -167,19 +182,6 @@ export class PermissionRequestLifecycleOrchestrator {
         isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
       });
     };
-
-    // Set up validation callback that runs when grant button is clicked.
-    // Race condition scenario this prevents:
-    //   1. User types invalid input → validation debounced (500ms delay)
-    //   2. User clicks Grant before 500ms elapses (button still enabled)
-    //   3. Button click event flushes all pending debounced events
-    //   4. Validation runs → updates UI with errors & disables button
-    //   5. Button handler already invoked (button was enabled at click time)
-    //   6. This callback catches it → returns false → dialog stays open
-    confirmationDialog.setBeforeGrantCallback(async () => {
-      const metadata = await lifecycleHandlers.deriveMetadata({ context });
-      return !hasValidationErrors(metadata);
-    });
 
     const decisionPromise =
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();

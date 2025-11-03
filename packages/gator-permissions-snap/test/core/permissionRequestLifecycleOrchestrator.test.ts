@@ -96,7 +96,6 @@ const mockConfirmationDialog = {
   displayConfirmationDialogAndAwaitUserDecision: jest.fn(),
   updateContent: jest.fn(),
   closeWithError: jest.fn(),
-  setBeforeGrantCallback: jest.fn(),
 } as unknown as jest.Mocked<ConfirmationDialog>;
 
 const mockConfirmationDialogFactory = {
@@ -277,6 +276,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           ui: mockSkeletonUiContent,
           isGrantDisabled: true,
+          onBeforeGrant: expect.any(Function),
         });
       });
 
@@ -648,16 +648,18 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         // Wait for initial setup
         await new Promise((resolve) => setTimeout(resolve, 0));
 
-        // Extract the beforeGrantCallback that was registered
+        // Extract the onBeforeGrant callback that was passed to createConfirmation
         expect(
-          mockConfirmationDialog.setBeforeGrantCallback,
+          mockConfirmationDialogFactory.createConfirmation,
         ).toHaveBeenCalledTimes(1);
-        const beforeGrantCallback =
-          mockConfirmationDialog.setBeforeGrantCallback.mock.calls[0]?.[0];
+        const createConfirmationCall =
+          mockConfirmationDialogFactory.createConfirmation.mock.calls[0]?.[0];
 
-        if (!beforeGrantCallback) {
-          throw new Error('Expected beforeGrantCallback to be defined');
+        if (!createConfirmationCall?.onBeforeGrant) {
+          throw new Error('Expected onBeforeGrant to be defined');
         }
+
+        const beforeGrantCallback = createConfirmationCall.onBeforeGrant;
 
         // Valid state: grant should be allowed
         validationErrorsState = {};
@@ -721,6 +723,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           ui: mockSkeletonUiContent,
           isGrantDisabled: true,
+          onBeforeGrant: expect.any(Function),
         });
 
         expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();
