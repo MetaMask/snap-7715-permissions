@@ -29,16 +29,20 @@ export class ConfirmationDialog {
 
   #decisionReject: ((reason: Error) => void) | undefined;
 
+  readonly #onBeforeGrant: () => Promise<boolean>;
+
   constructor({
     ui,
     isGrantDisabled,
     snaps,
     userEventDispatcher,
+    onBeforeGrant,
   }: ConfirmationProps) {
     this.#ui = ui;
     this.#isGrantDisabled = isGrantDisabled;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#onBeforeGrant = onBeforeGrant;
   }
 
   async createInterface(): Promise<string> {
@@ -73,6 +77,19 @@ export class ConfirmationDialog {
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
+          /**
+           * Button click events are non-debounced and trigger immediately. However, when a non-debounced event
+           * fires, all pending debounced events (like input changes) are processed first. This ensures that
+           * if a user modifies a field and immediately clicks grant, the input change handler completes before
+           * this click handler executes, keeping state up-to-date. But the button is already triggered so
+           * onBeforeGrant is here to prevent button click execution if validation fails.
+           */
+          const isValid = await this.#onBeforeGrant();
+          // If validation fails, don't resolve - keep dialog open with errors shown
+          if (!isValid) {
+            return;
+          }
+
           await this.#cleanup();
           this.#interfaceId = undefined;
           resolve(true);
