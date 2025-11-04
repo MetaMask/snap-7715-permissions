@@ -221,19 +221,24 @@ export class PermissionRequestLifecycleOrchestrator {
         // Check if account needs to be upgraded before processing the permission
         // We check again because the account could have been upgraded in the time since permission request was created
         // especially if we consider a scenario where we have a permission batch with the same account.
-        const { address } = parseCaipAccountId(context.accountAddressCaip10);
-        const upgradeStatus =
-          await this.#accountController.getAccountUpgradeStatus({
-            account: address,
-            chainId: numberToHex(chainId),
-          });
+        try {
+          const { address } = parseCaipAccountId(context.accountAddressCaip10);
+          const upgradeStatus =
+            await this.#accountController.getAccountUpgradeStatus({
+              account: address,
+              chainId: numberToHex(chainId),
+            });
 
-        if (!upgradeStatus.isUpgraded) {
-          // Trigger account upgrade
-          await this.#accountController.upgradeAccount({
-            account: address,
-            chainId: numberToHex(chainId),
-          });
+          if (!upgradeStatus.isUpgraded) {
+            // Trigger account upgrade
+            await this.#accountController.upgradeAccount({
+              account: address,
+              chainId: numberToHex(chainId),
+            });
+          }
+        } catch (error) {
+          // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
+          // TODO: When we know extension has support for account upgrade, we can show an error to the user
         }
 
         const response = await this.#resolveResponse({

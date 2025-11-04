@@ -17,7 +17,10 @@ import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
-import type { AccountController } from './accountController';
+import type {
+  AccountController,
+  AccountUpgradeStatus,
+} from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import {
   ACCOUNT_SELECTOR_NAME,
@@ -210,16 +213,36 @@ export class PermissionHandler<
       } = context;
 
       const { address } = parseCaipAccountId(accountAddressCaip10);
-      const [permissionContent, accountUpgradeStatus] = await Promise.all([
-        this.#dependencies.createConfirmationContent({
+      // TODO: Uncomment this when we know extension has support for account upgrade
+      // const [permissionContent, accountUpgradeStatus] = await Promise.all([
+      //   this.#dependencies.createConfirmationContent({
+      //     context,
+      //     metadata,
+      //   }),
+      //   this.#accountController.getAccountUpgradeStatus({
+      //     account: address,
+      //     chainId: numberToHex(chainId),
+      //   }),
+      // ]);
+
+      let accountUpgradeStatus: AccountUpgradeStatus = { isUpgraded: true };
+
+      try {
+        accountUpgradeStatus =
+          await this.#accountController.getAccountUpgradeStatus({
+            account: address,
+            chainId: numberToHex(chainId),
+          });
+      } catch (error) {
+        // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
+        // TODO: When we know extension has support for account upgrade, we can show an error to the user
+      }
+
+      const permissionContent =
+        await this.#dependencies.createConfirmationContent({
           context,
           metadata,
-        }),
-        this.#accountController.getAccountUpgradeStatus({
-          account: address,
-          chainId: numberToHex(chainId),
-        }),
-      ]);
+        });
 
       return PermissionHandlerContent({
         origin,
