@@ -3,6 +3,7 @@ import { numberToHex } from '@metamask/utils';
 
 export type DelegationContracts = {
   delegationManager: Hex;
+  eip7702StatelessDeleGatorImpl: Hex;
 
   // Enforcers:
   limitedCallsEnforcer: Hex;
@@ -18,6 +19,7 @@ export type DelegationContracts = {
 
 const contracts: DelegationContracts = {
   delegationManager: '0xdb9B1e94B5b69Df7e401DDbedE43491141047dB3',
+  eip7702StatelessDeleGatorImpl: '0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B',
   limitedCallsEnforcer: '0x04658B29F6b82ed55274221a06Fc97D318E25416',
   erc20StreamingEnforcer: '0x56c97aE02f233B29fa03502Ecc0457266d9be00e',
   erc20PeriodTransferEnforcer: '0x474e3Ae7E169e940607cC624Da8A15Eb120139aB',

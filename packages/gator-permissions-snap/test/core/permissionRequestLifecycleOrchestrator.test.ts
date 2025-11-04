@@ -21,18 +21,23 @@ import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 const randomAddress = () => {
   /* eslint-disable no-restricted-globals */
-  const randomBytes = crypto.getRandomValues(new Uint8Array(20));
+  const randomBytes = new Uint8Array(20);
+  for (let i = 0; i < 20; i++) {
+    randomBytes[i] = Math.floor(Math.random() * 256);
+  }
   return bytesToHex(randomBytes);
 };
 
 const mockSignature = '0x1234';
 const mockInterfaceId = 'test-interface-id';
 const grantingAccountAddress = randomAddress();
+const fixedCaip10Address = `eip155:1:${grantingAccountAddress}`;
 
 const mockContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
   address: grantingAccountAddress,
+  accountAddressCaip10: fixedCaip10Address,
 };
 
 const mockMetadata = {
@@ -90,6 +95,8 @@ const mockPopulatedPermission = {
 const mockAccountController = {
   signDelegation: jest.fn(),
   getAccountAddresses: jest.fn(),
+  getAccountUpgradeStatus: jest.fn(async () => ({ isUpgraded: false })),
+  upgradeAccount: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<AccountController>;
 
 const mockConfirmationDialog = {
@@ -164,6 +171,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ...delegation,
         signature: mockSignature,
       }),
+    );
+
+    mockAccountController.getAccountUpgradeStatus.mockImplementation(
+      async () => ({ isUpgraded: false }),
     );
 
     mockConfirmationDialogFactory.createConfirmation.mockReturnValue(
@@ -497,12 +508,57 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           'Expiry rule not found. An expiry is required on all permissions.',
         );
       });
+      it('checks account upgrade status and triggers upgrade when needed', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: false,
+        });
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(
+          mockAccountController.getAccountUpgradeStatus,
+        ).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(result.approved).toBe(true);
+      });
+
+      it('does not trigger upgrade when account is already upgraded', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: true,
+        });
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(
+          mockAccountController.getAccountUpgradeStatus,
+        ).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
+        expect(result.approved).toBe(true);
+      });
+
       it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
         const initialContext = {
           foo: 'original',
           expiry: '2024-12-31',
           isAdjustmentAllowed: true,
-          accountAddressCaip10: grantingAccountAddress,
+          accountAddressCaip10: fixedCaip10Address,
           tokenAddressCaip19: 'eip155:1:0x1234',
           tokenMetadata: {
             decimals: 18,
@@ -514,7 +570,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           foo: 'updated',
           expiry: '2025-01-01',
           isAdjustmentAllowed: true,
-          accountAddressCaip10: grantingAccountAddress,
+          accountAddressCaip10: fixedCaip10Address,
           tokenAddressCaip19: 'eip155:1:0x1234',
           tokenMetadata: {
             decimals: 18,
@@ -581,6 +637,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           foo: 'bar',
           expiry: '2024-12-31',
           isAdjustmentAllowed: false, // Adjustment not allowed
+          accountAddressCaip10: fixedCaip10Address,
         };
 
         const mockPermissionRequestWithAdjustmentNotAllowed = {
@@ -703,7 +760,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
        * 4. Applies context to resolve the permission request.
        * 5. Populates the permission with required values.
        * 6. Appends caveats to the permission.
-       * 7. Signs the delegation for the permission.
+       * 7. Checks and upgrades account if necessary.
+       * 8. Signs the delegation for the permission.
        */
 
       beforeEach(async () => {
@@ -805,7 +863,19 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 7. Signs the delegation for the permission.
+       * 7. Checks and upgrades account if necessary.
+       */
+      it('checks account upgrade status before processing permission', async () => {
+        expect(
+          mockAccountController.getAccountUpgradeStatus,
+        ).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+      });
+
+      /*
+       * 8. Signs the delegation for the permission.
        */
       it('signs the delegation for the permission', async () => {
         expect(mockAccountController.signDelegation).toHaveBeenCalledWith(

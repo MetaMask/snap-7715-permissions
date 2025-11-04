@@ -2,6 +2,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
 import {
   ChainDisconnectedError,
+  InternalError,
   ResourceNotFoundError,
   ResourceUnavailableError,
   type SnapsEthereumProvider,
@@ -11,6 +12,19 @@ import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
 
 import { getChainMetadata } from './chainMetadata';
 import type { SignDelegationOptions } from './types';
+
+export type AccountUpgradeStatus = {
+  isUpgraded: boolean;
+};
+
+export type AccountUpgradeResult = {
+  transactionHash: string;
+};
+
+export type AccountUpgradeParams = {
+  account: string;
+  chainId: Hex;
+};
 
 /**
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
@@ -167,5 +181,73 @@ export class AccountController {
     const message = { ...delegation, salt: bigIntToHex(delegation.salt) };
 
     return { domain, types, primaryType, message, metadata };
+  }
+
+  /**
+   * Checks if the account is already upgraded to a smart account.
+   * @param params - The account and chain ID to check.
+   * @returns Promise resolving to the upgrade status.
+   */
+  public async getAccountUpgradeStatus(
+    params: AccountUpgradeParams,
+  ): Promise<AccountUpgradeStatus> {
+    logger.debug('AccountController:getAccountUpgradeStatus()', params);
+
+    try {
+      const result = (await this.#ethereumProvider.request({
+        method: 'wallet_getAccountUpgradeStatus',
+        params,
+      })) as { isUpgraded: boolean; upgradedAddress: Hex | null };
+
+      logger.debug('Account upgrade status result', result);
+
+      const {
+        contracts: { eip7702StatelessDeleGatorImpl },
+      } = getChainMetadata({ chainId: hexToNumber(params.chainId) });
+
+      return {
+        isUpgraded:
+          result.isUpgraded &&
+          result.upgradedAddress?.toLowerCase() ===
+            eip7702StatelessDeleGatorImpl.toLowerCase(),
+      };
+    } catch (error) {
+      logger.error('Failed to check account upgrade status', error);
+      throw new InternalError('Failed to check account upgrade status');
+    }
+  }
+
+  /**
+   * Upgrades the account to a smart account.
+   * @param params - The account and chain ID to upgrade.
+   * @returns Promise resolving to the upgrade result with transaction hash.
+   */
+  public async upgradeAccount(
+    params: AccountUpgradeParams,
+  ): Promise<AccountUpgradeResult> {
+    logger.debug('AccountController:upgradeAccount()', params);
+
+    try {
+      const result = await this.#ethereumProvider.request<AccountUpgradeResult>(
+        {
+          method: 'wallet_upgradeAccount',
+          params,
+        },
+      );
+
+      logger.debug('Account upgrade result', result);
+
+      // The result should contain a transaction hash
+      if (result?.transactionHash) {
+        return {
+          transactionHash: result.transactionHash,
+        };
+      }
+
+      throw new Error('Invalid upgrade result: missing transaction hash');
+    } catch (error) {
+      logger.error('Failed to upgrade account', error);
+      throw new InternalError('Failed to upgrade account');
+    }
   }
 }
