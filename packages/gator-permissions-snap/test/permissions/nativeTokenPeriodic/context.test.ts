@@ -84,8 +84,7 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
   },
   permissionDetails: {
     periodAmount: '1',
-    periodType: TimePeriod.DAILY,
-    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
+    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
     startTime: 1729900800,
   },
 } as const;
@@ -210,7 +209,7 @@ describe('nativeTokenPeriodic:context', () => {
     it('throws an error if the permission request has no rules', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
-        rules: undefined,
+        rules: [],
       };
 
       await expect(
@@ -297,7 +296,7 @@ describe('nativeTokenPeriodic:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            periodDuration: 'invalid',
+            periodDuration: 'invalid' as unknown as number,
           },
         };
 
@@ -315,7 +314,7 @@ describe('nativeTokenPeriodic:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            periodDuration: '-1',
+            periodDuration: '-1' as unknown as number,
           },
         };
 
