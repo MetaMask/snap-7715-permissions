@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
+import type { Hex } from '@metamask/utils';
 
 /**
  * Permission value details for analytics.
@@ -11,11 +12,92 @@ export type PermissionValue = {
   /** The amount in the token's base unit */
   amount?: string;
   /** The token address (0x0 for native tokens) */
-  token?: string;
+  token?: Hex;
   /** The chain ID */
-  chainId?: string;
+  chainId?: Hex;
   /** Duration/expiry in seconds */
   duration?: number;
+};
+
+/**
+ * Base parameters shared by all permission tracking methods.
+ */
+export type BasePermissionTrackingParams = {
+  /** The origin of the request */
+  origin: string;
+  /** The type of permission */
+  permissionType: string;
+};
+
+/**
+ * Parameters for tracking permission request started.
+ */
+export type TrackPermissionRequestStartedParams =
+  BasePermissionTrackingParams & {
+    /** Optional permission value details */
+    permissionValue?: PermissionValue;
+  };
+
+/**
+ * Parameters for tracking permission dialog shown.
+ */
+export type TrackPermissionDialogShownParams = BasePermissionTrackingParams & {
+  /** Optional permission value details */
+  permissionValue?: PermissionValue;
+};
+
+/**
+ * Parameters for tracking permission rejected.
+ */
+export type TrackPermissionRejectedParams = BasePermissionTrackingParams & {
+  /** Optional permission value details */
+  permissionValue?: PermissionValue;
+};
+
+/**
+ * Parameters for tracking permission granted.
+ */
+export type TrackPermissionGrantedParams = BasePermissionTrackingParams & {
+  /** Permission value details */
+  permissionValue: PermissionValue;
+  /** Whether the permission adjustment was allowed */
+  isAdjustmentAllowed: boolean;
+};
+
+/**
+ * Parameters for tracking smart account upgrade.
+ */
+export type TrackSmartAccountUpgradedParams = {
+  /** The origin of the request */
+  origin: string;
+  /** The account address that was upgraded */
+  accountAddress: string;
+  /** The chain ID where the upgrade occurred */
+  chainId: string;
+  /** Whether the upgrade was successful */
+  success: boolean;
+};
+
+/**
+ * Parameters for tracking delegation signing.
+ */
+export type TrackDelegationSigningParams = BasePermissionTrackingParams & {
+  /** Whether the signing was successful */
+  success: boolean;
+  /** Optional error message if signing failed */
+  errorMessage?: string;
+};
+
+/**
+ * Parameters for tracking profile sync operations.
+ */
+export type TrackProfileSyncParams = {
+  /** The type of operation (store, retrieve, etc.) */
+  operation: 'store' | 'retrieve' | 'batch_store';
+  /** Whether the operation was successful */
+  success: boolean;
+  /** Optional error message if operation failed */
+  errorMessage?: string;
 };
 
 /**
@@ -60,149 +142,113 @@ export class SnapsMetricsService {
 
   /**
    * Track when a permission request is initiated.
-   * @param origin - The origin of the request.
-   * @param permissionType - The type of permission being requested.
-   * @param permissionValue - The permission value details.
+   * @param params - The tracking parameters.
    */
   async trackPermissionRequestStarted(
-    origin: string,
-    permissionType: string,
-    permissionValue?: PermissionValue,
+    params: TrackPermissionRequestStartedParams,
   ): Promise<void> {
     await this.#trackEvent('Permission Request Started', {
       message: 'User initiated permission request',
-      origin,
-      permission_type: permissionType,
-      ...this.#formatPermissionValue(permissionValue),
+      origin: params.origin,
+      permission_type: params.permissionType,
+      ...this.#formatPermissionValue(params.permissionValue),
     });
   }
 
   /**
    * Track when a permission dialog is displayed to the user.
-   * @param origin - The origin of the request.
-   * @param permissionType - The type of permission being requested.
-   * @param permissionValue - The permission value details.
+   * @param params - The tracking parameters.
    */
   async trackPermissionDialogShown(
-    origin: string,
-    permissionType: string,
-    permissionValue?: PermissionValue,
+    params: TrackPermissionDialogShownParams,
   ): Promise<void> {
     await this.#trackEvent('Permission Dialog Shown', {
       message: 'Permission confirmation dialog displayed',
-      origin,
-      permission_type: permissionType,
-      ...this.#formatPermissionValue(permissionValue),
+      origin: params.origin,
+      permission_type: params.permissionType,
+      ...this.#formatPermissionValue(params.permissionValue),
     });
   }
 
   /**
    * Track when a user rejects a permission request.
-   * @param origin - The origin of the request.
-   * @param permissionType - The type of permission being requested.
-   * @param permissionValue - The permission value details.
+   * @param params - The tracking parameters.
    */
   async trackPermissionRejected(
-    origin: string,
-    permissionType: string,
-    permissionValue?: PermissionValue,
+    params: TrackPermissionRejectedParams,
   ): Promise<void> {
     await this.#trackEvent('Permission Rejected', {
       message: 'User rejected permission request',
-      origin,
-      permission_type: permissionType,
-      ...this.#formatPermissionValue(permissionValue),
+      origin: params.origin,
+      permission_type: params.permissionType,
+      ...this.#formatPermissionValue(params.permissionValue),
     });
   }
 
   /**
    * Track when a permission is successfully granted.
-   * @param origin - The origin of the request.
-   * @param permissionType - The type of permission being requested.
-   * @param permissionValue - The permission value details.
-   * @param isAdjustmentAllowed - Whether the permission adjustment was allowed.
+   * @param params - The tracking parameters.
    */
   async trackPermissionGranted(
-    origin: string,
-    permissionType: string,
-    permissionValue: PermissionValue,
-    isAdjustmentAllowed: boolean,
+    params: TrackPermissionGrantedParams,
   ): Promise<void> {
     await this.#trackEvent('Permission Granted', {
       message: 'Permission successfully granted',
-      origin,
-      permission_type: permissionType,
-      is_adjustment_allowed: isAdjustmentAllowed,
-      ...this.#formatPermissionValue(permissionValue),
+      origin: params.origin,
+      permission_type: params.permissionType,
+      is_adjustment_allowed: params.isAdjustmentAllowed,
+      ...this.#formatPermissionValue(params.permissionValue),
     });
   }
 
   /**
    * Track when a smart account is upgraded (7702 account).
-   * @param origin - The origin of the request.
-   * @param accountAddress - The account address that was upgraded.
-   * @param chainId - The chain ID where the upgrade occurred.
-   * @param success - Whether the upgrade was successful.
+   * @param params - The tracking parameters.
    */
   async trackSmartAccountUpgraded(
-    origin: string,
-    accountAddress: string,
-    chainId: string,
-    success: boolean,
+    params: TrackSmartAccountUpgradedParams,
   ): Promise<void> {
     await this.#trackEvent('Smart Account Upgraded', {
-      message: success
+      message: params.success
         ? 'Smart account successfully upgraded'
         : 'Smart account upgrade failed',
-      origin,
-      account_address: accountAddress,
-      chain_id: chainId,
-      success,
+      origin: params.origin,
+      account_address: params.accountAddress,
+      chain_id: params.chainId,
+      success: params.success,
     });
   }
 
   /**
    * Track delegation signing events.
-   * @param origin - The origin of the request.
-   * @param permissionType - The type of permission.
-   * @param success - Whether the signing was successful.
-   * @param errorMessage - Optional error message if signing failed.
+   * @param params - The tracking parameters.
    */
   async trackDelegationSigning(
-    origin: string,
-    permissionType: string,
-    success: boolean,
-    errorMessage?: string,
+    params: TrackDelegationSigningParams,
   ): Promise<void> {
     await this.#trackEvent('Delegation Signing', {
-      message: success
+      message: params.success
         ? 'Delegation signed successfully'
         : 'Delegation signing failed',
-      origin,
-      permission_type: permissionType,
-      success,
-      ...(errorMessage ? { error_message: errorMessage } : {}),
+      origin: params.origin,
+      permission_type: params.permissionType,
+      success: params.success,
+      ...(params.errorMessage ? { error_message: params.errorMessage } : {}),
     });
   }
 
   /**
    * Track profile sync operations.
-   * @param operation - The type of operation (store, retrieve, etc.).
-   * @param success - Whether the operation was successful.
-   * @param errorMessage - Optional error message if operation failed.
+   * @param params - The tracking parameters.
    */
-  async trackProfileSync(
-    operation: 'store' | 'retrieve' | 'batch_store',
-    success: boolean,
-    errorMessage?: string,
-  ): Promise<void> {
+  async trackProfileSync(params: TrackProfileSyncParams): Promise<void> {
     await this.#trackEvent('Profile Sync', {
-      message: success
-        ? `Profile sync ${operation} successful`
-        : `Profile sync ${operation} failed`,
-      operation,
-      success,
-      ...(errorMessage ? { error_message: errorMessage } : {}),
+      message: params.success
+        ? `Profile sync ${params.operation} successful`
+        : `Profile sync ${params.operation} failed`,
+      operation: params.operation,
+      success: params.success,
+      ...(params.errorMessage ? { error_message: params.errorMessage } : {}),
     });
   }
 

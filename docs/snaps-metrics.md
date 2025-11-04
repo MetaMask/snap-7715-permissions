@@ -42,7 +42,7 @@ The `SnapsMetricsService` class provides methods to track various events using M
 - `period_seconds`: The time period for periodic permissions
 - `amount`: The token amount
 - `token`: The token address (0x0 for native tokens)
-- `duration_seconds`: Permission duration/expiry
+- `duration_seconds`: Permission duration
 - `is_adjustment_allowed`: Boolean indicating if permission adjustment was allowed
 
 ### 2. Smart Account Upgrades

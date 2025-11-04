@@ -188,7 +188,10 @@ export function createProfileSyncManager(
 
       const items = await userStorage.getAllFeatureItems(FEATURE);
       if (!items) {
-        await snapsMetricsService?.trackProfileSync('retrieve', true);
+        await snapsMetricsService?.trackProfileSync({
+          operation: 'retrieve',
+          success: true,
+        });
         return [];
       }
 
@@ -203,15 +206,18 @@ export function createProfileSyncManager(
         }
       }
 
-      await snapsMetricsService?.trackProfileSync('retrieve', true);
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'retrieve',
+        success: true,
+      });
       return validPermissions;
     } catch (error) {
       logger.error('Error fetching all granted permissions');
-      await snapsMetricsService?.trackProfileSync(
-        'retrieve',
-        false,
-        (error as Error).message,
-      );
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'retrieve',
+        success: false,
+        errorMessage: (error as Error).message,
+      });
       throw error;
     }
   }
@@ -266,14 +272,17 @@ export function createProfileSyncManager(
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(storedGrantedPermission.permissionResponse.context)}`;
       await userStorage.setItem(path, serializedPermission);
 
-      await snapsMetricsService?.trackProfileSync('store', true);
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'store',
+        success: true,
+      });
     } catch (error) {
       logger.error('Error storing granted permission');
-      await snapsMetricsService?.trackProfileSync(
-        'store',
-        false,
-        (error as Error).message,
-      );
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'store',
+        success: false,
+        errorMessage: (error as Error).message,
+      });
       throw error;
     }
   }
@@ -318,14 +327,17 @@ export function createProfileSyncManager(
 
       await userStorage.batchSetItems(FEATURE, validatedItems);
 
-      await snapsMetricsService?.trackProfileSync('batch_store', true);
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'batch_store',
+        success: true,
+      });
     } catch (error) {
       logger.error('Error storing granted permission batch');
-      await snapsMetricsService?.trackProfileSync(
-        'batch_store',
-        false,
-        (error as Error).message,
-      );
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'batch_store',
+        success: false,
+        errorMessage: (error as Error).message,
+      });
       throw error;
     }
   }

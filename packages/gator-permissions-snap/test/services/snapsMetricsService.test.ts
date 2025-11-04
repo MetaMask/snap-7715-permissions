@@ -25,13 +25,13 @@ describe('SnapsMetricsService', () => {
     it('should track permission request started event with basic properties', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackPermissionRequestStarted(
-        'https://example.com',
-        'native-token-stream',
-        {
+      await snapsMetricsService.trackPermissionRequestStarted({
+        origin: 'https://example.com',
+        permissionType: 'native-token-stream',
+        permissionValue: {
           chainId: '0x1',
         },
-      );
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -52,17 +52,17 @@ describe('SnapsMetricsService', () => {
     it('should track permission request with full permission value details', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackPermissionRequestStarted(
-        'https://dapp.example',
-        'erc20-token-periodic',
-        {
+      await snapsMetricsService.trackPermissionRequestStarted({
+        origin: 'https://dapp.example',
+        permissionType: 'erc20-token-periodic',
+        permissionValue: {
           chainId: '0x1',
           period: 86400,
           amount: '1000000000000000000',
           token: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
           duration: 604800,
         },
-      );
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -87,13 +87,13 @@ describe('SnapsMetricsService', () => {
     it('should track permission request with native token', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackPermissionRequestStarted(
-        'https://example.com',
-        'native-token-periodic',
-        {
+      await snapsMetricsService.trackPermissionRequestStarted({
+        origin: 'https://example.com',
+        permissionType: 'native-token-periodic',
+        permissionValue: {
           token: '0x0',
         },
-      );
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -116,13 +116,13 @@ describe('SnapsMetricsService', () => {
     it('should track permission dialog shown event', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackPermissionDialogShown(
-        'https://example.com',
-        'erc20-token-stream',
-        {
+      await snapsMetricsService.trackPermissionDialogShown({
+        origin: 'https://example.com',
+        permissionType: 'erc20-token-stream',
+        permissionValue: {
           chainId: '0x89',
         },
-      );
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -145,13 +145,13 @@ describe('SnapsMetricsService', () => {
     it('should track permission rejected event', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackPermissionRejected(
-        'https://example.com',
-        'native-token-stream',
-        {
+      await snapsMetricsService.trackPermissionRejected({
+        origin: 'https://example.com',
+        permissionType: 'native-token-stream',
+        permissionValue: {
           chainId: '0x1',
         },
-      );
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -174,16 +174,16 @@ describe('SnapsMetricsService', () => {
     it('should track permission granted event', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackPermissionGranted(
-        'https://example.com',
-        'erc20-token-stream',
-        {
+      await snapsMetricsService.trackPermissionGranted({
+        origin: 'https://example.com',
+        permissionType: 'erc20-token-stream',
+        permissionValue: {
           chainId: '0x1',
           token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
           amount: '1000000',
         },
-        false,
-      );
+        isAdjustmentAllowed: false,
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -209,12 +209,12 @@ describe('SnapsMetricsService', () => {
     it('should track successful smart account upgrade', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackSmartAccountUpgraded(
-        'https://example.com',
-        '0x1234567890123456789012345678901234567890',
-        '0x1',
-        true,
-      );
+      await snapsMetricsService.trackSmartAccountUpgraded({
+        origin: 'https://example.com',
+        accountAddress: '0x1234567890123456789012345678901234567890',
+        chainId: '0x1',
+        success: true,
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -236,12 +236,12 @@ describe('SnapsMetricsService', () => {
     it('should track failed smart account upgrade', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackSmartAccountUpgraded(
-        'https://example.com',
-        '0x1234567890123456789012345678901234567890',
-        '0x89',
-        false,
-      );
+      await snapsMetricsService.trackSmartAccountUpgraded({
+        origin: 'https://example.com',
+        accountAddress: '0x1234567890123456789012345678901234567890',
+        chainId: '0x89',
+        success: false,
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -265,11 +265,11 @@ describe('SnapsMetricsService', () => {
     it('should track successful delegation signing', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackDelegationSigning(
-        'https://example.com',
-        'native-token-periodic',
-        true,
-      );
+      await snapsMetricsService.trackDelegationSigning({
+        origin: 'https://example.com',
+        permissionType: 'native-token-periodic',
+        success: true,
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -290,12 +290,12 @@ describe('SnapsMetricsService', () => {
     it('should track failed delegation signing with error message', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackDelegationSigning(
-        'https://example.com',
-        'erc20-token-stream',
-        false,
-        'User denied transaction signature',
-      );
+      await snapsMetricsService.trackDelegationSigning({
+        origin: 'https://example.com',
+        permissionType: 'erc20-token-stream',
+        success: false,
+        errorMessage: 'User denied transaction signature',
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -319,7 +319,10 @@ describe('SnapsMetricsService', () => {
     it('should track successful store operation', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackProfileSync('store', true);
+      await snapsMetricsService.trackProfileSync({
+        operation: 'store',
+        success: true,
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -339,7 +342,10 @@ describe('SnapsMetricsService', () => {
     it('should track successful retrieve operation', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackProfileSync('retrieve', true);
+      await snapsMetricsService.trackProfileSync({
+        operation: 'retrieve',
+        success: true,
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -359,7 +365,10 @@ describe('SnapsMetricsService', () => {
     it('should track successful batch_store operation', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackProfileSync('batch_store', true);
+      await snapsMetricsService.trackProfileSync({
+        operation: 'batch_store',
+        success: true,
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -379,11 +388,11 @@ describe('SnapsMetricsService', () => {
     it('should track failed profile sync with error message', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackProfileSync(
-        'store',
-        false,
-        'Network timeout',
-      );
+      await snapsMetricsService.trackProfileSync({
+        operation: 'store',
+        success: false,
+        errorMessage: 'Network timeout',
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -407,20 +416,20 @@ describe('SnapsMetricsService', () => {
       mockSnap.request.mockResolvedValue(null);
 
       await Promise.all([
-        snapsMetricsService.trackPermissionRequestStarted(
-          'https://example1.com',
-          'native-token-stream',
-        ),
-        snapsMetricsService.trackPermissionDialogShown(
-          'https://example2.com',
-          'erc20-token-periodic',
-        ),
-        snapsMetricsService.trackPermissionGranted(
-          'https://example3.com',
-          'native-token-periodic',
-          { chainId: '0x1' },
-          false,
-        ),
+        snapsMetricsService.trackPermissionRequestStarted({
+          origin: 'https://example1.com',
+          permissionType: 'native-token-stream',
+        }),
+        snapsMetricsService.trackPermissionDialogShown({
+          origin: 'https://example2.com',
+          permissionType: 'erc20-token-periodic',
+        }),
+        snapsMetricsService.trackPermissionGranted({
+          origin: 'https://example3.com',
+          permissionType: 'native-token-periodic',
+          permissionValue: { chainId: '0x1' },
+          isAdjustmentAllowed: false,
+        }),
       ]);
 
       expect(mockSnap.request).toHaveBeenCalledTimes(3);
@@ -431,11 +440,11 @@ describe('SnapsMetricsService', () => {
     it('should format empty permission value', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackPermissionRequestStarted(
-        'https://example.com',
-        'native-token-stream',
-        undefined,
-      );
+      await snapsMetricsService.trackPermissionRequestStarted({
+        origin: 'https://example.com',
+        permissionType: 'native-token-stream',
+        permissionValue: undefined,
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',
@@ -455,14 +464,14 @@ describe('SnapsMetricsService', () => {
     it('should only include provided permission value fields', async () => {
       mockSnap.request.mockResolvedValueOnce(null);
 
-      await snapsMetricsService.trackPermissionRequestStarted(
-        'https://example.com',
-        'erc20-token-periodic',
-        {
+      await snapsMetricsService.trackPermissionRequestStarted({
+        origin: 'https://example.com',
+        permissionType: 'erc20-token-periodic',
+        permissionValue: {
           period: 3600,
           amount: '100',
         },
-      );
+      });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
         method: 'snap_trackEvent',

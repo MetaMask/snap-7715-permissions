@@ -123,13 +123,13 @@ export class PermissionRequestLifecycleOrchestrator {
     this.#assertIsSupportedChainId(chainId);
 
     // Track permission request started
-    await this.#snapsMetricsService.trackPermissionRequestStarted(
+    await this.#snapsMetricsService.trackPermissionRequestStarted({
       origin,
       permissionType,
-      {
+      permissionValue: {
         chainId: permissionRequest.chainId,
       },
-    );
+    });
 
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.
@@ -195,13 +195,13 @@ export class PermissionRequestLifecycleOrchestrator {
       });
 
       // Track dialog shown after successful rendering
-      await this.#snapsMetricsService.trackPermissionDialogShown(
+      await this.#snapsMetricsService.trackPermissionDialogShown({
         origin,
         permissionType,
-        {
+        permissionValue: {
           chainId: permissionRequest.chainId,
         },
-      );
+      });
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
       throw error;
@@ -259,13 +259,13 @@ export class PermissionRequestLifecycleOrchestrator {
         };
       }
 
-      await this.#snapsMetricsService.trackPermissionRejected(
+      await this.#snapsMetricsService.trackPermissionRejected({
         origin,
         permissionType,
-        {
+        permissionValue: {
           chainId: permissionRequest.chainId,
         },
-      );
+      });
 
       return {
         approved: false,
@@ -419,18 +419,18 @@ export class PermissionRequestLifecycleOrchestrator {
         justification,
       });
 
-      await this.#snapsMetricsService.trackDelegationSigning(
+      await this.#snapsMetricsService.trackDelegationSigning({
         origin,
         permissionType,
-        true,
-      );
+        success: true,
+      });
     } catch (error) {
-      await this.#snapsMetricsService.trackDelegationSigning(
+      await this.#snapsMetricsService.trackDelegationSigning({
         origin,
         permissionType,
-        false,
-        (error as Error).message,
-      );
+        success: false,
+        errorMessage: (error as Error).message,
+      });
 
       throw error;
     }
@@ -452,14 +452,14 @@ export class PermissionRequestLifecycleOrchestrator {
     };
 
     // Track successful permission grant
-    await this.#snapsMetricsService.trackPermissionGranted(
+    await this.#snapsMetricsService.trackPermissionGranted({
       origin,
       permissionType,
-      {
+      permissionValue: {
         chainId: numberToHex(chainId),
       },
       isAdjustmentAllowed,
-    );
+    });
 
     return response;
   }
