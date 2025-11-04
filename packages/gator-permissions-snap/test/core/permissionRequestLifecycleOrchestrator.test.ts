@@ -289,6 +289,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           ui: mockSkeletonUiContent,
           isGrantDisabled: true,
+          onBeforeGrant: expect.any(Function),
         });
       });
 
@@ -634,6 +635,62 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         await orchestrationPromise;
       });
+
+      it('prevents race condition when grant is clicked before debounced validation completes', async () => {
+        // This test simulates the race condition scenario:
+        // 1. User types invalid input → validation debounced (500ms delay)
+        // 2. User clicks Grant before debounce completes (button still enabled)
+        // 3. beforeGrantCallback validates fresh state → detects errors → prevents grant
+
+        let validationErrorsState = {};
+
+        // Mock deriveMetadata to return our controlled validation state
+        lifecycleHandlerMocks.deriveMetadata.mockImplementation(async () => ({
+          test: 'metadata',
+          validationErrors: validationErrorsState,
+        }));
+
+        // Start orchestration
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequest,
+            lifecycleHandlerMocks,
+          );
+
+        // Wait for initial setup
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        // Extract the onBeforeGrant callback that was passed to createConfirmation
+        expect(
+          mockConfirmationDialogFactory.createConfirmation,
+        ).toHaveBeenCalledTimes(1);
+        const createConfirmationCall =
+          mockConfirmationDialogFactory.createConfirmation.mock.calls[0]?.[0];
+
+        if (!createConfirmationCall?.onBeforeGrant) {
+          throw new Error('Expected onBeforeGrant to be defined');
+        }
+
+        const beforeGrantCallback = createConfirmationCall.onBeforeGrant;
+
+        // Valid state: grant should be allowed
+        validationErrorsState = {};
+        let result = await beforeGrantCallback();
+        expect(result).toBe(true);
+
+        // Invalid state (simulating user typed invalid input before debounce completed)
+        validationErrorsState = { amount: 'Amount must be positive' };
+        result = await beforeGrantCallback();
+        expect(result).toBe(false); // Should prevent grant
+
+        // Back to valid state
+        validationErrorsState = {};
+        result = await beforeGrantCallback();
+        expect(result).toBe(true); // Should allow grant
+
+        await orchestrationPromise;
+      });
     });
 
     describe('nominal path', () => {
@@ -679,6 +736,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           ui: mockSkeletonUiContent,
           isGrantDisabled: true,
+          onBeforeGrant: expect.any(Function),
         });
 
         expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();

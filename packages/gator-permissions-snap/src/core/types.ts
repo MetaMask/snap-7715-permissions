@@ -105,12 +105,14 @@ export enum TimePeriod {
  * @property isGrantDisabled - Whether the user can grant the permission
  * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
+ * @property onBeforeGrant - Validation callback that runs before grant is confirmed
  */
 export type ConfirmationProps = {
   ui: SnapElement;
   isGrantDisabled: boolean;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
+  onBeforeGrant: () => Promise<boolean>;
 };
 
 /**

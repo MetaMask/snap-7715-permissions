@@ -17,8 +17,11 @@ describe('ConfirmationDialog', () => {
     children: 'Test Title',
   }) as unknown as SnapElement;
 
+  const mockOnBeforeGrant = jest.fn<() => Promise<boolean>>();
+
   const defaultProps = {
     ui: mockUi,
+    onBeforeGrant: mockOnBeforeGrant,
   };
 
   beforeEach(() => {
@@ -38,6 +41,10 @@ describe('ConfirmationDialog', () => {
       }),
       off: jest.fn(),
     } as unknown as jest.Mocked<UserEventDispatcher>;
+
+    // Reset and configure mock to return true by default (validation passes)
+    mockOnBeforeGrant.mockClear();
+    mockOnBeforeGrant.mockResolvedValue(true);
 
     confirmationDialog = new ConfirmationDialog({
       ...defaultProps,

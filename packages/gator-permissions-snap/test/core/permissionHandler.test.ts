@@ -61,7 +61,8 @@ const mockPermissionRequest: PermissionRequest = {
 };
 
 const mockContext: TestContextType = {
-  justification: 'Test justification',
+  justification:
+    'Test justification text that is longer than twenty characters',
   tokenMetadata: {
     symbol: 'ETH',
     decimals: 18,
@@ -800,8 +801,7 @@ describe('PermissionHandler', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Test justification",
-                                  "color": "muted",
+                                  "children": "Test justificatio...",
                                 },
                                 "type": "Text",
                               },
@@ -1329,8 +1329,7 @@ describe('PermissionHandler', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Test justification",
-                                  "color": "muted",
+                                  "children": "Test justificatio...",
                                 },
                                 "type": "Text",
                               },
@@ -1886,8 +1885,7 @@ describe('PermissionHandler', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Test justification",
-                                  "color": "muted",
+                                  "children": "Test justificatio...",
                                 },
                                 "type": "Text",
                               },
@@ -2380,8 +2378,7 @@ describe('PermissionHandler', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Test justification",
-                                  "color": "muted",
+                                  "children": "Test justificatio...",
                                 },
                                 "type": "Text",
                               },
@@ -2876,8 +2873,7 @@ describe('PermissionHandler', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Test justification",
-                                  "color": "muted",
+                                  "children": "Test justificatio...",
                                 },
                                 "type": "Text",
                               },

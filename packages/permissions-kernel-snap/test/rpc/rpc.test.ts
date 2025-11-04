@@ -57,6 +57,27 @@ describe('RpcHandler', () => {
       },
     ];
 
+    /**
+     * Helper function to set up successful permission flow mocks.
+     * This reduces test duplication by centralizing common mock setup.
+     */
+    const setupSuccessfulPermissionFlow = () => {
+      mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
+        {
+          'test-provider': [],
+        },
+      );
+      mockPermissionOfferRegistryManager.getRegisteredPermissionOffers.mockReturnValue(
+        [],
+      );
+      mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
+        {
+          permissionsToGrant: mockPermissions,
+          missingPermissions: [],
+        },
+      );
+    };
+
     it('should throw error when permissions provider does not support all requested permissions', async () => {
       const mockPartialPermissions: PermissionsRequest = [
         {
@@ -159,20 +180,7 @@ describe('RpcHandler', () => {
           },
         },
       ];
-      mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
-        {
-          'test-provider': [],
-        },
-      );
-      mockPermissionOfferRegistryManager.getRegisteredPermissionOffers.mockReturnValue(
-        [],
-      );
-      mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
-        {
-          permissionsToGrant: mockPermissions,
-          missingPermissions: [],
-        },
-      );
+      setupSuccessfulPermissionFlow();
       mockSnapsProvider.request.mockResolvedValueOnce(
         mockGrantedPermissions as unknown as Json,
       );
@@ -200,20 +208,7 @@ describe('RpcHandler', () => {
     });
 
     it('should handle errors thrown during call to permissions provider when granting permissions', async () => {
-      mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
-        {
-          'test-provider': [],
-        },
-      );
-      mockPermissionOfferRegistryManager.getRegisteredPermissionOffers.mockReturnValue(
-        [],
-      );
-      mockPermissionOfferRegistryManager.findRelevantPermissionsToGrant.mockReturnValue(
-        {
-          permissionsToGrant: mockPermissions,
-          missingPermissions: [],
-        },
-      );
+      setupSuccessfulPermissionFlow();
       mockSnapsProvider.request.mockRejectedValueOnce(new Error('Test error'));
 
       await expect(
@@ -222,6 +217,22 @@ describe('RpcHandler', () => {
           params: mockPermissions as unknown as Json,
         }),
       ).rejects.toThrow('Test error');
+    });
+
+    it('should handle user rejection with error code 4001', async () => {
+      setupSuccessfulPermissionFlow();
+      const userRejectionError = {
+        code: 4001,
+        message: 'Permission request denied',
+      };
+      mockSnapsProvider.request.mockRejectedValueOnce(userRejectionError);
+
+      await expect(
+        handler.requestExecutionPermissions({
+          siteOrigin,
+          params: mockPermissions as unknown as Json,
+        }),
+      ).rejects.toThrow('Permission request denied');
     });
   });
 });
