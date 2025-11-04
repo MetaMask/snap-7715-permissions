@@ -36,6 +36,7 @@ import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
 import { NonceCaveatService } from './services/nonceCaveatService';
+import { SnapsMetricsService } from './services/snapsMetricsService';
 import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
@@ -119,6 +120,10 @@ const auth = new JwtBearerAuth(
   },
 );
 
+const userEventDispatcher = new UserEventDispatcher();
+
+const snapsMetricsService = new SnapsMetricsService(snap);
+
 const profileSyncManager = createProfileSyncManager({
   isFeatureEnabled: isStorePermissionsFeatureEnabled,
   auth,
@@ -131,9 +136,8 @@ const profileSyncManager = createProfileSyncManager({
       storage: profileSyncOptions.keyStorageOptions,
     },
   ),
+  snapsMetricsService,
 });
-
-const userEventDispatcher = new UserEventDispatcher();
 
 const priceApiClient = new PriceApiClient({
   baseUrl: priceApiBaseUrl,
@@ -153,6 +157,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   confirmationDialogFactory,
   userEventDispatcher,
   nonceCaveatService,
+  snapsMetricsService,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
@@ -161,6 +166,7 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
   tokenMetadataService,
   userEventDispatcher,
   orchestrator,
+  snapsMetricsService,
 });
 
 const rpcHandler = createRpcHandler({

@@ -24,6 +24,7 @@ import {
 } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
+import type { SnapsMetricsService } from '../services/snapsMetricsService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
@@ -49,21 +50,26 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #nonceCaveatService: NonceCaveatService;
 
+  readonly #snapsMetricsService: SnapsMetricsService;
+
   constructor({
     accountController,
     confirmationDialogFactory,
     userEventDispatcher,
     nonceCaveatService,
+    snapsMetricsService,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
+    snapsMetricsService: SnapsMetricsService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
+    this.#snapsMetricsService = snapsMetricsService;
   }
 
   /**
@@ -111,8 +117,20 @@ export class PermissionRequestLifecycleOrchestrator {
     >,
   ): Promise<PermissionRequestResult> {
     const chainId = hexToNumber(permissionRequest.chainId);
+    const permissionType = extractDescriptorName(
+      permissionRequest.permission.type,
+    );
 
     this.#assertIsSupportedChainId(chainId);
+
+    // Track permission request started
+    await this.#snapsMetricsService.trackPermissionRequestStarted({
+      origin,
+      permissionType,
+      permissionValue: {
+        chainId: permissionRequest.chainId,
+      },
+    });
 
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.
@@ -121,18 +139,36 @@ export class PermissionRequestLifecycleOrchestrator {
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);
 
+    let context: TContext;
+
+    const hasValidationErrors = (metadata: TMetadata): boolean => {
+      return Object.values(metadata?.validationErrors ?? {}).some(
+        (message) => typeof message === 'string',
+      );
+    };
+
+    // Validation callback that runs when grant button is clicked.
+    // Race condition scenario this prevents:
+    //   1. User types invalid input → validation debounced (500ms delay)
+    //   2. User clicks Grant before 500ms elapses (button still enabled)
+    //   3. Button click event flushes all pending debounced events
+    //   4. Validation runs → updates UI with errors & disables button
+    //   5. Button handler already invoked (button was enabled at click time)
+    //   6. This callback catches it → returns false → dialog stays open
+    const onBeforeGrant = async (): Promise<boolean> => {
+      const metadata = await lifecycleHandlers.deriveMetadata({ context });
+      return !hasValidationErrors(metadata);
+    };
+
     const confirmationDialog =
       this.#confirmationDialogFactory.createConfirmation({
         ui: await lifecycleHandlers.createSkeletonConfirmationContent(),
         isGrantDisabled: true,
+        onBeforeGrant,
       });
 
     const interfaceId = await confirmationDialog.createInterface();
 
-    const decisionPromise =
-      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
-
-    let context: TContext;
     try {
       context = await lifecycleHandlers.buildContext(
         validatedPermissionRequest,
@@ -153,10 +189,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
-      const hasValidationErrors = Object.values(
-        metadata?.validationErrors ?? {},
-      ).some((message) => typeof message === 'string');
-
       const ui = await lifecycleHandlers.createConfirmationContent({
         context,
         metadata,
@@ -166,15 +198,27 @@ export class PermissionRequestLifecycleOrchestrator {
 
       await confirmationDialog.updateContent({
         ui,
-        isGrantDisabled: isGrantDisabled || hasValidationErrors,
+        isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
       });
     };
+
+    const decisionPromise =
+      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
     // replace the skeleton content with the actual content rendered with the resolved context
     try {
       await updateConfirmation({
         newContext: context,
         isGrantDisabled: false,
+      });
+
+      // Track dialog shown after successful rendering
+      await this.#snapsMetricsService.trackPermissionDialogShown({
+        origin,
+        permissionType,
+        permissionValue: {
+          chainId: permissionRequest.chainId,
+        },
       });
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
@@ -213,11 +257,6 @@ export class PermissionRequestLifecycleOrchestrator {
       const { isConfirmationGranted } = await decisionPromise;
 
       if (isConfirmationGranted) {
-        // Wait for any pending context updates to complete before granting permission
-        // This prevents race conditions where the permission is granted before
-        // all user input has been processed
-        await this.#userEventDispatcher.waitForPendingHandlers();
-
         // Check if account needs to be upgraded before processing the permission
         // We check again because the account could have been upgraded in the time since permission request was created
         // especially if we consider a scenario where we have a permission batch with the same account.
@@ -255,6 +294,14 @@ export class PermissionRequestLifecycleOrchestrator {
           response,
         };
       }
+
+      await this.#snapsMetricsService.trackPermissionRejected({
+        origin,
+        permissionType,
+        permissionValue: {
+          chainId: permissionRequest.chainId,
+        },
+      });
 
       return {
         approved: false,
@@ -315,6 +362,10 @@ export class PermissionRequestLifecycleOrchestrator {
       TPopulatedPermission
     >;
   }): Promise<PermissionResponse> {
+    const permissionType = extractDescriptorName(
+      originalRequest.permission.type,
+    );
+
     // apply the changes made to the context to the request
     const resolvedRequest = await lifecycleHandlers.applyContext({
       context: modifiedContext,
@@ -394,14 +445,31 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const { justification } = modifiedContext;
 
-    const signedDelegation: Delegation =
-      await this.#accountController.signDelegation({
+    let signedDelegation: Delegation;
+    try {
+      signedDelegation = await this.#accountController.signDelegation({
         chainId,
         delegation,
         address,
         origin,
         justification,
       });
+
+      await this.#snapsMetricsService.trackDelegationSigning({
+        origin,
+        permissionType,
+        success: true,
+      });
+    } catch (error) {
+      await this.#snapsMetricsService.trackDelegationSigning({
+        origin,
+        permissionType,
+        success: false,
+        errorMessage: (error as Error).message,
+      });
+
+      throw error;
+    }
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
@@ -418,6 +486,17 @@ export class PermissionRequestLifecycleOrchestrator {
         delegationManager: contracts.delegationManager,
       },
     };
+
+    // Track successful permission grant
+    await this.#snapsMetricsService.trackPermissionGranted({
+      origin,
+      permissionType,
+      permissionValue: {
+        chainId: numberToHex(chainId),
+      },
+      isAdjustmentAllowed,
+    });
+
     return response;
   }
 }

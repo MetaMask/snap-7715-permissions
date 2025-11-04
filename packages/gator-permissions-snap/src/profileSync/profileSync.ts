@@ -24,6 +24,8 @@ import {
 } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
+import type { SnapsMetricsService } from '../services/snapsMetricsService';
+
 // Constants for validation
 const MAX_STORAGE_SIZE_BYTES = 400 * 1024; // 400kb limit as documented
 
@@ -111,6 +113,7 @@ export type ProfileSyncManagerConfig = {
   auth: JwtBearerAuth;
   userStorage: UserStorage;
   isFeatureEnabled: boolean;
+  snapsMetricsService?: SnapsMetricsService;
 };
 
 /**
@@ -122,7 +125,7 @@ export function createProfileSyncManager(
   config: ProfileSyncManagerConfig,
 ): ProfileSyncManager {
   const FEATURE = 'gator_7715_permissions';
-  const { auth, userStorage, isFeatureEnabled } = config;
+  const { auth, userStorage, isFeatureEnabled, snapsMetricsService } = config;
   const unConfiguredProfileSyncManager = {
     getAllGrantedPermissions: async () => {
       logger.debug('unConfiguredProfileSyncManager.getAllGrantedPermissions()');
@@ -185,6 +188,10 @@ export function createProfileSyncManager(
 
       const items = await userStorage.getAllFeatureItems(FEATURE);
       if (!items) {
+        await snapsMetricsService?.trackProfileSync({
+          operation: 'retrieve',
+          success: true,
+        });
         return [];
       }
 
@@ -199,9 +206,18 @@ export function createProfileSyncManager(
         }
       }
 
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'retrieve',
+        success: true,
+      });
       return validPermissions;
     } catch (error) {
       logger.error('Error fetching all granted permissions');
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'retrieve',
+        success: false,
+        errorMessage: (error as Error).message,
+      });
       throw error;
     }
   }
@@ -255,8 +271,18 @@ export function createProfileSyncManager(
 
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(storedGrantedPermission.permissionResponse.context)}`;
       await userStorage.setItem(path, serializedPermission);
+
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'store',
+        success: true,
+      });
     } catch (error) {
       logger.error('Error storing granted permission');
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'store',
+        success: false,
+        errorMessage: (error as Error).message,
+      });
       throw error;
     }
   }
@@ -300,8 +326,18 @@ export function createProfileSyncManager(
       }
 
       await userStorage.batchSetItems(FEATURE, validatedItems);
+
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'batch_store',
+        success: true,
+      });
     } catch (error) {
       logger.error('Error storing granted permission batch');
+      await snapsMetricsService?.trackProfileSync({
+        operation: 'batch_store',
+        success: false,
+        errorMessage: (error as Error).message,
+      });
       throw error;
     }
   }
