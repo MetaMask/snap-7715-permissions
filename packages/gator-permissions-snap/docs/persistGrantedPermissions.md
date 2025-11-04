@@ -12,7 +12,7 @@ In the meantime(i.e., while `@metamask/gator-permissions-snap` is still a manual
 
 **Useful links:**
 
-- [@metamask/message-signing-snap](https://github.com/MetaMask/message-signing-snap) (its preinstalled in mobile and extension)
+- [@metamask/message-signing-snap](https://github.com/MetaMask/message-signing-snap) (preinstalled in mobile and extension)
 - [Profile sync SDK(i.e ProfileSyncController)](https://www.npmjs.com/package/@metamask/profile-sync-controller)
 
 ## Profile Sync SDK: OAuth 2.0 Authentication flow

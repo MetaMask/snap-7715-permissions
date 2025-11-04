@@ -1,6 +1,11 @@
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { UserRejectedRequestError, type Json } from '@metamask/snaps-sdk';
+import {
+  InvalidInputError,
+  UserRejectedRequestError,
+  type Json,
+} from '@metamask/snaps-sdk';
+import { hexToNumber } from '@metamask/utils';
 
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
@@ -40,14 +45,18 @@ export type RpcHandler = {
  * @param config - The parameters for creating the RPC handler.
  * @param config.permissionHandlerFactory - The factory for creating permission handlers.
  * @param config.profileSyncManager - The profile sync manager.
+ * @param config.supportedChainIds - The supported chain IDs.
  * @returns An object with RPC handler methods.
  */
-export function createRpcHandler(config: {
+export function createRpcHandler({
+  permissionHandlerFactory,
+  profileSyncManager,
+  supportedChainIds,
+}: {
   permissionHandlerFactory: PermissionHandlerFactory;
   profileSyncManager: ProfileSyncManager;
+  supportedChainIds: number[];
 }): RpcHandler {
-  const { permissionHandlerFactory, profileSyncManager } = config;
-
   /**
    * Handles grant permission requests.
    *
@@ -58,6 +67,18 @@ export function createRpcHandler(config: {
     logger.debug('grantPermissions()', params);
     const { permissionsRequest, siteOrigin } =
       validatePermissionRequestParam(params);
+
+    const unsupportedChainIds = permissionsRequest
+      .filter(
+        (request) => !supportedChainIds.includes(hexToNumber(request.chainId)),
+      )
+      .map((request) => request.chainId);
+
+    if (unsupportedChainIds.length > 0) {
+      throw new InvalidInputError(
+        `Unsupported chain IDs: ${unsupportedChainIds.join(', ')}`,
+      );
+    }
 
     const permissionsToStore: {
       permissionResponse: PermissionResponse;
