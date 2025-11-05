@@ -270,10 +270,22 @@ export class PermissionRequestLifecycleOrchestrator {
 
           if (!upgradeStatus.isUpgraded) {
             // Trigger account upgrade
-            await this.#accountController.upgradeAccount({
-              account: address,
-              chainId: numberToHex(chainId),
-            });
+            let upgradeSuccess = false;
+            try {
+              await this.#accountController.upgradeAccount({
+                account: address,
+                chainId: numberToHex(chainId),
+              });
+              upgradeSuccess = true;
+            } finally {
+              // Track account upgrade result
+              await this.#snapsMetricsService.trackSmartAccountUpgraded({
+                origin,
+                accountAddress: address,
+                chainId: numberToHex(chainId),
+                success: upgradeSuccess,
+              });
+            }
           }
         } catch (error) {
           // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
@@ -446,6 +458,8 @@ export class PermissionRequestLifecycleOrchestrator {
     const { justification } = modifiedContext;
 
     let signedDelegation: Delegation;
+    let signingSuccess = false;
+    let signingError: Error | undefined;
     try {
       signedDelegation = await this.#accountController.signDelegation({
         chainId,
@@ -454,21 +468,18 @@ export class PermissionRequestLifecycleOrchestrator {
         origin,
         justification,
       });
-
-      await this.#snapsMetricsService.trackDelegationSigning({
-        origin,
-        permissionType,
-        success: true,
-      });
+      signingSuccess = true;
     } catch (error) {
+      signingError = error as Error;
+      throw error;
+    } finally {
+      // Track delegation signing result
       await this.#snapsMetricsService.trackDelegationSigning({
         origin,
         permissionType,
-        success: false,
-        errorMessage: (error as Error).message,
+        success: signingSuccess,
+        ...(signingError && { errorMessage: signingError.message }),
       });
-
-      throw error;
     }
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
