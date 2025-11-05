@@ -7,16 +7,24 @@ import type { Hex } from '@metamask/utils';
  * Permission value details for analytics.
  */
 export type PermissionValue = {
-  /** The period in seconds (for periodic permissions) */
-  period?: number;
-  /** The amount in the token's base unit */
-  amount?: string;
-  /** The token address (0x0 for native tokens) */
-  token?: Hex;
   /** The chain ID */
   chainId?: Hex;
-  /** Duration/expiry in seconds */
-  duration?: number;
+  /** The period amount in hex (for periodic permissions) */
+  periodAmount?: string;
+  /** The period duration in seconds (for periodic permissions) */
+  periodDuration?: number;
+  /** The start time timestamp in seconds */
+  startTime?: number;
+  /** The justification text provided by the user */
+  justification?: string;
+  /** The token address (for ERC20 tokens) */
+  tokenAddress?: string;
+  /** The amount per second in hex (for streaming permissions) */
+  amountPerSecond?: string;
+  /** The initial amount in hex (for streaming permissions) */
+  initialAmount?: string;
+  /** The maximum amount in hex (for streaming permissions) */
+  maxAmount?: string;
 };
 
 /**
@@ -34,34 +42,48 @@ export type BasePermissionTrackingParams = {
  */
 export type TrackPermissionRequestStartedParams =
   BasePermissionTrackingParams & {
-    /** Optional permission value details */
-    permissionValue?: PermissionValue;
+    /** Chain ID */
+    chainId: Hex;
+    /** Permission data */
+    permissionData: Record<string, unknown>;
   };
 
 /**
  * Parameters for tracking permission dialog shown.
  */
 export type TrackPermissionDialogShownParams = BasePermissionTrackingParams & {
-  /** Optional permission value details */
-  permissionValue?: PermissionValue;
+  /** Chain ID */
+  chainId: Hex;
+  /** Permission data */
+  permissionData: Record<string, unknown>;
+  /** Optional justification text */
+  justification?: string;
 };
 
 /**
  * Parameters for tracking permission rejected.
  */
 export type TrackPermissionRejectedParams = BasePermissionTrackingParams & {
-  /** Optional permission value details */
-  permissionValue?: PermissionValue;
+  /** Chain ID */
+  chainId: Hex;
+  /** Permission data */
+  permissionData: Record<string, unknown>;
+  /** Optional justification text */
+  justification?: string;
 };
 
 /**
  * Parameters for tracking permission granted.
  */
 export type TrackPermissionGrantedParams = BasePermissionTrackingParams & {
-  /** Permission value details */
-  permissionValue: PermissionValue;
   /** Whether the permission adjustment was allowed */
   isAdjustmentAllowed: boolean;
+  /** Chain ID */
+  chainId: string;
+  /** Permission data */
+  permissionData: Record<string, unknown>;
+  /** Optional justification text */
+  justification?: string;
 };
 
 /**
@@ -151,7 +173,10 @@ export class SnapsMetricsService {
       message: 'User initiated permission request',
       origin: params.origin,
       permission_type: params.permissionType,
-      ...this.#formatPermissionValue(params.permissionValue),
+      ...this.#formatPermissionData({
+        chainId: params.chainId,
+        permissionData: params.permissionData,
+      }),
     });
   }
 
@@ -166,7 +191,11 @@ export class SnapsMetricsService {
       message: 'Permission confirmation dialog displayed',
       origin: params.origin,
       permission_type: params.permissionType,
-      ...this.#formatPermissionValue(params.permissionValue),
+      ...this.#formatPermissionData({
+        chainId: params.chainId,
+        permissionData: params.permissionData,
+        ...(params.justification && { justification: params.justification }),
+      }),
     });
   }
 
@@ -181,7 +210,11 @@ export class SnapsMetricsService {
       message: 'User rejected permission request',
       origin: params.origin,
       permission_type: params.permissionType,
-      ...this.#formatPermissionValue(params.permissionValue),
+      ...this.#formatPermissionData({
+        chainId: params.chainId,
+        permissionData: params.permissionData,
+        ...(params.justification && { justification: params.justification }),
+      }),
     });
   }
 
@@ -197,7 +230,11 @@ export class SnapsMetricsService {
       origin: params.origin,
       permission_type: params.permissionType,
       is_adjustment_allowed: params.isAdjustmentAllowed,
-      ...this.#formatPermissionValue(params.permissionValue),
+      ...this.#formatPermissionData({
+        chainId: params.chainId,
+        permissionData: params.permissionData,
+        ...(params.justification && { justification: params.justification }),
+      }),
     });
   }
 
@@ -253,37 +290,49 @@ export class SnapsMetricsService {
   }
 
   /**
-   * Format permission value for analytics.
-   * @param permissionValue - The permission value to format.
+   * Formats permission data for analytics.
+   * @param params - The formatting parameters.
+   * @param params.chainId - The chain ID for the permission.
+   * @param params.permissionData - The permission data to format.
+   * @param params.justification - Optional justification text provided by the user.
    * @returns Formatted properties for tracking.
    */
-  #formatPermissionValue(
-    permissionValue?: PermissionValue,
-  ): Record<string, Json> {
-    if (!permissionValue) {
-      return {};
+  #formatPermissionData(params: {
+    chainId: string;
+    permissionData: Record<string, unknown>;
+    justification?: string;
+  }): Record<string, Json> {
+    const formatted: Record<string, Json> = {
+      chain_id: params.chainId,
+    };
+
+    const { permissionData } = params;
+
+    if (permissionData.periodAmount !== undefined) {
+      formatted.period_amount = permissionData.periodAmount as string;
+    }
+    if (permissionData.periodDuration !== undefined) {
+      formatted.period_duration = permissionData.periodDuration as number;
+    }
+    if (permissionData.startTime !== undefined) {
+      formatted.start_time = permissionData.startTime as number;
+    }
+    if (permissionData.tokenAddress !== undefined) {
+      formatted.token_address = permissionData.tokenAddress as string;
+    }
+    if (permissionData.amountPerSecond !== undefined) {
+      formatted.amount_per_second = permissionData.amountPerSecond as string;
+    }
+    if (permissionData.initialAmount !== undefined) {
+      formatted.initial_amount = permissionData.initialAmount as string;
+    }
+    if (permissionData.maxAmount !== undefined) {
+      formatted.max_amount = permissionData.maxAmount as string;
     }
 
-    const formatted: Record<string, Json> = {};
-
-    if (permissionValue.period !== undefined) {
-      formatted.period_seconds = permissionValue.period;
-    }
-
-    if (permissionValue.amount !== undefined) {
-      formatted.amount = permissionValue.amount;
-    }
-
-    if (permissionValue.token !== undefined) {
-      formatted.token = permissionValue.token;
-    }
-
-    if (permissionValue.chainId !== undefined) {
-      formatted.chain_id = permissionValue.chainId;
-    }
-
-    if (permissionValue.duration !== undefined) {
-      formatted.duration_seconds = permissionValue.duration;
+    // Add justification if provided
+    if (params.justification) {
+      formatted.justification = params.justification;
     }
 
     return formatted;
