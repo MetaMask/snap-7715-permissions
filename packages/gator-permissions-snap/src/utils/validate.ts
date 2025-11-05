@@ -3,6 +3,7 @@ import {
   type GetGrantedPermissionsParam,
   zRequestExecutionPermissionsParam,
   zGetGrantedPermissionsParam,
+  zHexStr,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
@@ -38,12 +39,7 @@ export const validatePermissionRequestParam = (
 
 // Validation schema for revocation parameters
 const zRevocationParams = z.object({
-  permissionContext: z
-    .string()
-    .regex(
-      /^0x[a-fA-F0-9]+$/u,
-      'Invalid permission context format - must be a hex string',
-    ),
+  permissionContext: zHexStr,
 });
 
 /**
@@ -63,7 +59,7 @@ export function validateRevocationParams(params: Json): {
     const validated = zRevocationParams.parse(params);
 
     return {
-      permissionContext: validated.permissionContext as Hex,
+      permissionContext: validated.permissionContext,
     };
   } catch (error) {
     if (error instanceof z.ZodError) {
