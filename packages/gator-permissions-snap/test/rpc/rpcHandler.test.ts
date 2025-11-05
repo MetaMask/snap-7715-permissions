@@ -4,7 +4,12 @@ import type {
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
-import type { Json } from '@metamask/snaps-sdk';
+import {
+  ChainDisconnectedError,
+  InvalidInputError,
+  ResourceUnavailableError,
+  type Json,
+} from '@metamask/snaps-sdk';
 
 import type { BlockchainTokenMetadataClient } from '../../src/clients/blockchainMetadataClient';
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
@@ -1224,6 +1229,222 @@ describe('RpcHandler', () => {
       expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
         testParams.permissionContext,
       );
+    });
+
+    it('should throw InvalidInputError when delegation is not disabled on-chain', async () => {
+      const mockPermission = {
+        permissionResponse: {
+          chainId: TEST_CHAIN_ID,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          signer: {
+            type: 'account' as const,
+            data: { address: TEST_ADDRESS },
+          },
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencyInfo: [],
+          signerMeta: {
+            delegationManager: TEST_ADDRESS,
+          },
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+        isRevoked: false,
+      };
+
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+        false,
+      );
+
+      await expect(
+        handler.submitRevocation(validRevocationParams),
+      ).rejects.toThrow('is not disabled on-chain');
+
+      expect(
+        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+      ).toHaveBeenCalled();
+      expect(
+        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should propagate ResourceUnavailableError when on-chain check fails', async () => {
+      const mockPermission = {
+        permissionResponse: {
+          chainId: TEST_CHAIN_ID,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          signer: {
+            type: 'account' as const,
+            data: { address: TEST_ADDRESS },
+          },
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencyInfo: [],
+          signerMeta: {
+            delegationManager: TEST_ADDRESS,
+          },
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+        isRevoked: false,
+      };
+
+      const resourceUnavailableError = new ResourceUnavailableError(
+        'Unable to determine delegation disabled status',
+      );
+
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
+        resourceUnavailableError,
+      );
+
+      await expect(
+        handler.submitRevocation(validRevocationParams),
+      ).rejects.toThrow('Unable to determine delegation disabled status');
+
+      expect(
+        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+      ).toHaveBeenCalled();
+      expect(
+        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should propagate ChainDisconnectedError when on-chain check fails due to wrong chain', async () => {
+      const mockPermission = {
+        permissionResponse: {
+          chainId: TEST_CHAIN_ID,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          signer: {
+            type: 'account' as const,
+            data: { address: TEST_ADDRESS },
+          },
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencyInfo: [],
+          signerMeta: {
+            delegationManager: TEST_ADDRESS,
+          },
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+        isRevoked: false,
+      };
+
+      const chainDisconnectedError = new ChainDisconnectedError(
+        'Selected chain does not match the requested chain',
+      );
+
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
+        chainDisconnectedError,
+      );
+
+      await expect(
+        handler.submitRevocation(validRevocationParams),
+      ).rejects.toThrow('Selected chain does not match the requested chain');
+
+      expect(
+        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+      ).toHaveBeenCalled();
+      expect(
+        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should propagate InvalidInputError from on-chain check', async () => {
+      const mockPermission = {
+        permissionResponse: {
+          chainId: TEST_CHAIN_ID,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+              isAdjustmentAllowed: true,
+            },
+          ],
+          signer: {
+            type: 'account' as const,
+            data: { address: TEST_ADDRESS },
+          },
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencyInfo: [],
+          signerMeta: {
+            delegationManager: TEST_ADDRESS,
+          },
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+        isRevoked: false,
+      };
+
+      const invalidInputError = new InvalidInputError(
+        'No delegation hash provided',
+      );
+
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
+        invalidInputError,
+      );
+
+      await expect(
+        handler.submitRevocation(validRevocationParams),
+      ).rejects.toThrow('No delegation hash provided');
+
+      expect(
+        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+      ).toHaveBeenCalled();
+      expect(
+        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+      ).not.toHaveBeenCalled();
     });
   });
 });

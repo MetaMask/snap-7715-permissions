@@ -6,6 +6,7 @@ import {
   InvalidInputError,
   InternalError,
   ResourceNotFoundError,
+  ResourceUnavailableError,
   type SnapsEthereumProvider,
 } from '@metamask/snaps-sdk';
 
@@ -236,7 +237,10 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
    * @param args.chainId - The chain ID in hex format.
    * @param args.delegationManagerAddress - The address of the DelegationManager contract.
    * @param args.retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
-   * @returns True if the delegation is disabled, false otherwise.
+   * @returns True if the delegation is disabled, false if it is confirmed to be enabled.
+   * @throws InvalidInputError if input parameters are invalid.
+   * @throws ChainDisconnectedError if the provider is on the wrong chain.
+   * @throws ResourceUnavailableError if the on-chain check fails and we cannot determine the status.
    */
   public async checkDelegationDisabledOnChain({
     delegationHash,
@@ -276,15 +280,16 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       throw new InvalidInputError(message);
     }
 
+    // Ensure we're on the correct chain
+    // This can throw ChainDisconnectedError - we want it to propagate
+    await ensureChain(this.#ethereumProvider, chainId);
+
+    // Encode the function call data for disabledDelegations(bytes32)
+    const encodedParams = delegationHash.slice(2).padStart(64, '0'); // Remove 0x and pad to 32 bytes
+    const callData =
+      `${BlockchainTokenMetadataClient.#disabledDelegationsCalldata}${encodedParams}` as Hex;
+
     try {
-      // Ensure we're on the correct chain
-      await ensureChain(this.#ethereumProvider, chainId);
-
-      // Encode the function call data for disabledDelegations(bytes32)
-      const encodedParams = delegationHash.slice(2).padStart(64, '0'); // Remove 0x and pad to 32 bytes
-      const callData =
-        `${BlockchainTokenMetadataClient.#disabledDelegationsCalldata}${encodedParams}` as Hex;
-
       const result = await callContract({
         ethereumProvider: this.#ethereumProvider,
         contractAddress: delegationManagerAddress,
@@ -307,11 +312,19 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         `Failed to check delegation disabled status: ${errorMessage}`,
       );
 
-      // In case of error, assume not disabled to avoid blocking legitimate operations
-      logger.warn(
-        'Failed to check delegation disabled status, assuming not disabled',
+      // Re-throw critical errors - they should propagate
+      if (
+        error instanceof InvalidInputError ||
+        error instanceof ChainDisconnectedError
+      ) {
+        throw error;
+      }
+
+      // For other errors (network issues, contract call failures, etc.),
+      // we cannot determine the status, so throw an error instead of returning false
+      throw new ResourceUnavailableError(
+        `Unable to determine delegation disabled status: ${errorMessage}`,
       );
-      return false;
     }
   }
 }
