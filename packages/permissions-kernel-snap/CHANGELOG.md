@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- rethrow snap errors in kernel snap ([#211](https://github.com/MetaMask/snap-7715-permissions/pull/211))
+
 ## [0.4.0]
 
 ### Changed

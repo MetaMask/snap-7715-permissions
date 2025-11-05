@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- Added New RPC for Marking Delegation as Revoked ([#171](https://github.com/MetaMask/snap-7715-permissions/pull/171))
+- feat: add tracking for smart account upgrade success and failure ([#216](https://github.com/MetaMask/snap-7715-permissions/pull/216))
+- Remove chainId restriction so that gator permissions supports all chains ([#215](https://github.com/MetaMask/snap-7715-permissions/pull/215))
+- feat: upgrade account to smart account ([#188](https://github.com/MetaMask/snap-7715-permissions/pull/188))
+- Feat: implement Snaps metrics tracking service ([#198](https://github.com/MetaMask/snap-7715-permissions/pull/198))
+- Fix: race condition on debounce events ([#210](https://github.com/MetaMask/snap-7715-permissions/pull/210))
+- fix: Hide show more button for short text ([#213](https://github.com/MetaMask/snap-7715-permissions/pull/213))
+- change justification text color ([#212](https://github.com/MetaMask/snap-7715-permissions/pull/212))
+- Improve permission picker layout ([#202](https://github.com/MetaMask/snap-7715-permissions/pull/202))
+- Remove local message signing snap, use preinstall only ([#208](https://github.com/MetaMask/snap-7715-permissions/pull/208))
+- Fixed: handle dialog closure case in confirmation flow ([#195](https://github.com/MetaMask/snap-7715-permissions/pull/195))
+
 ## [0.4.1]
 
 ### Changed
