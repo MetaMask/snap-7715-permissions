@@ -1007,7 +1007,7 @@ describe('RpcHandler', () => {
       };
 
       await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
-        'Invalid permission context',
+        'Failed type validation: permissionContext: Invalid hex value',
       );
     });
 
@@ -1018,7 +1018,7 @@ describe('RpcHandler', () => {
       };
 
       await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
-        'Invalid permission context',
+        'Failed type validation: permissionContext: Invalid hex value',
       );
     });
 
