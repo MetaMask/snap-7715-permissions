@@ -62,15 +62,6 @@ if (!priceApiBaseUrl) {
   throw new InternalError('PRICE_API_BASE_URL is not set');
 }
 
-const supportedChainIdsString = process.env.SUPPORTED_CHAIN_IDS;
-if (!supportedChainIdsString) {
-  throw new InternalError('SUPPORTED_CHAIN_IDS is not set');
-}
-
-const supportedChainIds = supportedChainIdsString
-  .split(',')
-  .map((chainIdString) => parseInt(chainIdString, 10));
-
 // set up dependencies
 
 const accountApiClient = new AccountApiClient({
@@ -172,7 +163,6 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
 const rpcHandler = createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
-  supportedChainIds,
   blockchainMetadataClient: tokenMetadataClient,
 });
 

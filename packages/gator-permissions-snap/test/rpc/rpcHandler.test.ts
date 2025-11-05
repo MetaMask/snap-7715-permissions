@@ -29,10 +29,6 @@ const TEST_CHAIN_ID = '0x1' as const;
 const TEST_EXPIRY = Math.floor(Date.now() / 1000) + 86400; // 24 hours from now
 const TEST_CONTEXT = '0xabcd' as const;
 
-const TEST_SUPPORTED_CHAIN_IDS = [0x1, 0x10];
-
-const UNSUPPORTED_CHAIN_ID = '0xFA11' as const;
-
 const VALID_PERMISSION_REQUEST: PermissionRequest = {
   chainId: TEST_CHAIN_ID,
   rules: [
@@ -144,7 +140,6 @@ describe('RpcHandler', () => {
     handler = createRpcHandler({
       permissionHandlerFactory: mockHandlerFactory,
       profileSyncManager: mockProfileSyncManager,
-      supportedChainIds: TEST_SUPPORTED_CHAIN_IDS,
       blockchainMetadataClient: mockBlockchainMetadataClient,
     });
   });
@@ -570,20 +565,6 @@ describe('RpcHandler', () => {
 
       const result = await handler.grantPermission(request);
       expect(result).toStrictEqual([VALID_PERMISSION_RESPONSE, secondResponse]);
-    });
-
-    it('throws an error if the chain ID is not supported', async () => {
-      const request: Json = {
-        permissionsRequest: [
-          VALID_PERMISSION_REQUEST,
-          { ...VALID_PERMISSION_REQUEST, chainId: UNSUPPORTED_CHAIN_ID },
-        ],
-        siteOrigin: TEST_SITE_ORIGIN,
-      } as unknown as Json;
-
-      await expect(handler.grantPermission(request)).rejects.toThrow(
-        `Unsupported chain IDs: ${UNSUPPORTED_CHAIN_ID}`,
-      );
     });
   });
 

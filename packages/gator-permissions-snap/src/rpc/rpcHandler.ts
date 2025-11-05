@@ -3,9 +3,8 @@ import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
 import {
   InvalidInputError,
   UserRejectedRequestError,
-  type Json,
 } from '@metamask/snaps-sdk';
-import { hexToNumber } from '@metamask/utils';
+import type { Json } from '@metamask/snaps-sdk';
 
 import type { BlockchainTokenMetadataClient } from '../clients/blockchainMetadataClient';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
@@ -62,19 +61,16 @@ export type RpcHandler = {
  * @param config - The parameters for creating the RPC handler.
  * @param config.permissionHandlerFactory - The factory for creating permission handlers.
  * @param config.profileSyncManager - The profile sync manager.
- * @param config.supportedChainIds - The supported chain IDs.
  * @param config.blockchainMetadataClient - The blockchain metadata client for on-chain checks.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
-  supportedChainIds,
   blockchainMetadataClient,
 }: {
   permissionHandlerFactory: PermissionHandlerFactory;
   profileSyncManager: ProfileSyncManager;
-  supportedChainIds: number[];
   blockchainMetadataClient: BlockchainTokenMetadataClient;
 }): RpcHandler {
   /**
@@ -87,18 +83,6 @@ export function createRpcHandler({
     logger.debug('grantPermissions()', params);
     const { permissionsRequest, siteOrigin } =
       validatePermissionRequestParam(params);
-
-    const unsupportedChainIds = permissionsRequest
-      .filter(
-        (request) => !supportedChainIds.includes(hexToNumber(request.chainId)),
-      )
-      .map((request) => request.chainId);
-
-    if (unsupportedChainIds.length > 0) {
-      throw new InvalidInputError(
-        `Unsupported chain IDs: ${unsupportedChainIds.join(', ')}`,
-      );
-    }
 
     const permissionsToStore: StoredGrantedPermission[] = [];
 
