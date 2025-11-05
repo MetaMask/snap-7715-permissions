@@ -7,6 +7,7 @@ import {
 } from '@metamask/snaps-sdk';
 import { hexToNumber } from '@metamask/utils';
 
+import type { BlockchainTokenMetadataClient } from '../clients/blockchainMetadataClient';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
@@ -61,16 +62,19 @@ export type RpcHandler = {
  * @param config.permissionHandlerFactory - The factory for creating permission handlers.
  * @param config.profileSyncManager - The profile sync manager.
  * @param config.supportedChainIds - The supported chain IDs.
+ * @param config.blockchainMetadataClient - The blockchain metadata client for on-chain checks.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
   supportedChainIds,
+  blockchainMetadataClient,
 }: {
   permissionHandlerFactory: PermissionHandlerFactory;
   profileSyncManager: ProfileSyncManager;
   supportedChainIds: number[];
+  blockchainMetadataClient: BlockchainTokenMetadataClient;
 }): RpcHandler {
   /**
    * Handles grant permission requests.
@@ -230,7 +234,6 @@ export function createRpcHandler({
       signerMeta,
     });
 
-    // Check if the delegation is actually disabled on-chain
     if (!delegationManager) {
       throw new InvalidInputError(
         `No delegation manager found for permission context: ${permissionContext}`,
@@ -241,7 +244,7 @@ export function createRpcHandler({
     const delegations = decodeDelegations(permissionContext);
 
     // Check if any delegation is disabled on-chain
-    // For now, we'll check the first delegation. This might need adjustment based on business logic
+    // Only one delegation is allowed per permission context, taking the first one
     const firstDelegation = delegations[0];
     if (!firstDelegation) {
       throw new InvalidInputError(
@@ -251,13 +254,11 @@ export function createRpcHandler({
 
     const delegationHash = hashDelegation(firstDelegation);
     const isDelegationDisabled =
-      await profileSyncManager.checkDelegationDisabledOnChain(
+      await blockchainMetadataClient.checkDelegationDisabledOnChain({
         delegationHash,
-        permissionChainId,
-        delegationManager,
-      );
-
-    logger.debug('On-chain check result:', { isDelegationDisabled });
+        chainId: permissionChainId,
+        delegationManagerAddress: delegationManager,
+      });
 
     if (!isDelegationDisabled) {
       throw new InvalidInputError(
@@ -265,11 +266,6 @@ export function createRpcHandler({
       );
     }
 
-    logger.debug(
-      '✅ Delegation is disabled on-chain, proceeding with revocation',
-    );
-
-    logger.debug('Updating permission revocation status to true...');
     await profileSyncManager.updatePermissionRevocationStatusWithPermission(
       existingPermission,
       true,

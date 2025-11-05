@@ -21,7 +21,6 @@ import {
   LimitExceededError,
   ParseError,
   UnsupportedMethodError,
-  type SnapsEthereumProvider,
 } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
@@ -112,11 +111,6 @@ export type ProfileSyncManager = {
     existingPermission: StoredGrantedPermission,
     isRevoked: boolean,
   ) => Promise<void>;
-  checkDelegationDisabledOnChain: (
-    delegationHash: Hex,
-    chainId: Hex,
-    delegationManagerAddress: Hex,
-  ) => Promise<boolean>;
 };
 
 export type StoredGrantedPermission = {
@@ -144,7 +138,6 @@ export type ProfileSyncManagerConfig = {
   userStorage: UserStorage;
   isFeatureEnabled: boolean;
   snapsMetricsService?: SnapsMetricsService;
-  ethereumProvider: SnapsEthereumProvider;
 };
 
 /**
@@ -156,13 +149,7 @@ export function createProfileSyncManager(
   config: ProfileSyncManagerConfig,
 ): ProfileSyncManager {
   const FEATURE = 'gator_7715_permissions';
-  const {
-    auth,
-    userStorage,
-    isFeatureEnabled,
-    snapsMetricsService,
-    ethereumProvider,
-  } = config;
+  const { auth, userStorage, isFeatureEnabled, snapsMetricsService } = config;
   const unConfiguredProfileSyncManager = {
     getAllGrantedPermissions: async () => {
       logger.debug('unConfiguredProfileSyncManager.getAllGrantedPermissions()');
@@ -195,12 +182,6 @@ export function createProfileSyncManager(
       logger.debug(
         'unConfiguredProfileSyncManager.updatePermissionRevocationStatusWithPermission()',
       );
-    },
-    checkDelegationDisabledOnChain: async (_: Hex, __: Hex, ___: Hex) => {
-      logger.debug(
-        'unConfiguredProfileSyncManager.checkDelegationDisabledOnChain()',
-      );
-      return false; // Default to not disabled when feature is disabled
     },
   };
 
@@ -439,11 +420,6 @@ export function createProfileSyncManager(
         isRevoked,
       };
 
-      logger.debug(
-        'Profile Sync: Created updated permission object:',
-        updatedPermission,
-      );
-
       await storeGrantedPermission(updatedPermission);
       logger.debug('Profile Sync: Successfully stored updated permission');
     } catch (error) {
@@ -452,60 +428,6 @@ export function createProfileSyncManager(
         error,
       );
       throw error;
-    }
-  }
-
-  /**
-   * Checks if a delegation is disabled on-chain by calling the DelegationManager contract.
-   * @param delegationHash - The hash of the delegation to check.
-   * @param chainId - The chain ID in hex format.
-   * @param delegationManagerAddress - The address of the DelegationManager contract.
-   * @returns True if the delegation is disabled, false otherwise.
-   */
-  async function checkDelegationDisabledOnChain(
-    delegationHash: Hex,
-    chainId: Hex,
-    delegationManagerAddress: Hex,
-  ): Promise<boolean> {
-    try {
-      logger.debug('Checking delegation disabled status on-chain', {
-        delegationHash,
-        chainId,
-        delegationManagerAddress,
-      });
-
-      // Encode the function call data for disabledDelegations(bytes32)
-      const functionSelector = '0x2d40d052'; // keccak256("disabledDelegations(bytes32)").slice(0, 10)
-      const encodedParams = delegationHash.slice(2).padStart(64, '0'); // Remove 0x and pad to 32 bytes
-      const callData = `${functionSelector}${encodedParams}`;
-
-      const result = await ethereumProvider.request<Hex>({
-        method: 'eth_call',
-        params: [
-          {
-            to: delegationManagerAddress,
-            data: callData,
-          },
-          'latest',
-        ],
-      });
-
-      if (!result) {
-        logger.warn('No result from contract call');
-        return false;
-      }
-
-      // Parse the boolean result (32 bytes, last byte is the boolean value)
-      const isDisabled =
-        result !==
-        '0x0000000000000000000000000000000000000000000000000000000000000000';
-
-      logger.debug('Delegation disabled status result', { isDisabled });
-      return isDisabled;
-    } catch (error) {
-      logger.error('Error checking delegation disabled status on-chain', error);
-      // In case of error, assume not disabled to avoid blocking legitimate operations
-      return false;
     }
   }
 
@@ -520,7 +442,6 @@ export function createProfileSyncManager(
         storeGrantedPermissionBatch,
         updatePermissionRevocationStatus,
         updatePermissionRevocationStatusWithPermission,
-        checkDelegationDisabledOnChain,
       }
     : unConfiguredProfileSyncManager;
 }

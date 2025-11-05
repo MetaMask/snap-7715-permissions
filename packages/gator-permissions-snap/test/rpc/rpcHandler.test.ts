@@ -6,6 +6,7 @@ import type {
 import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
 import type { Json } from '@metamask/snaps-sdk';
 
+import type { BlockchainTokenMetadataClient } from '../../src/clients/blockchainMetadataClient';
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
 import type { ProfileSyncManager } from '../../src/profileSync';
@@ -93,6 +94,7 @@ describe('RpcHandler', () => {
   let mockHandler: jest.Mocked<PermissionHandlerType>;
   let mockHandlerFactory: jest.Mocked<PermissionHandlerFactory>;
   let mockProfileSyncManager: jest.Mocked<ProfileSyncManager>;
+  let mockBlockchainMetadataClient: jest.Mocked<BlockchainTokenMetadataClient>;
 
   beforeEach(() => {
     // Reset mocks
@@ -127,14 +129,19 @@ describe('RpcHandler', () => {
       getAllGrantedPermissions: jest.fn(),
       getUserProfile: jest.fn(),
       updatePermissionRevocationStatus: jest.fn(),
-      checkDelegationDisabledOnChain: jest.fn(),
       updatePermissionRevocationStatusWithPermission: jest.fn(),
     } as unknown as jest.Mocked<ProfileSyncManager>;
+
+    mockBlockchainMetadataClient = {
+      checkDelegationDisabledOnChain: jest.fn(),
+      getTokenBalanceAndMetadata: jest.fn(),
+    } as unknown as jest.Mocked<BlockchainTokenMetadataClient>;
 
     handler = createRpcHandler({
       permissionHandlerFactory: mockHandlerFactory,
       profileSyncManager: mockProfileSyncManager,
       supportedChainIds: TEST_SUPPORTED_CHAIN_IDS,
+      blockchainMetadataClient: mockBlockchainMetadataClient,
     });
   });
 
@@ -990,7 +997,7 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
       mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(
@@ -1004,7 +1011,7 @@ describe('RpcHandler', () => {
         validRevocationParams.permissionContext,
       );
       expect(
-        mockProfileSyncManager.checkDelegationDisabledOnChain,
+        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
         mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
@@ -1095,7 +1102,7 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
       mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockRejectedValueOnce(
@@ -1150,7 +1157,7 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
       mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(
@@ -1204,7 +1211,7 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockProfileSyncManager.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
       mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(

@@ -137,7 +137,6 @@ const profileSyncManager = createProfileSyncManager({
     },
   ),
   snapsMetricsService,
-  ethereumProvider: ethereum,
 });
 
 const priceApiClient = new PriceApiClient({
@@ -174,6 +173,7 @@ const rpcHandler = createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
   supportedChainIds,
+  blockchainMetadataClient: tokenMetadataClient,
 });
 
 // configure RPC methods bindings
