@@ -32,9 +32,6 @@ describe('profileSync', () => {
     setItem: jest.fn(),
     batchSetItems: jest.fn(),
   } as unknown as jest.Mocked<UserStorage>;
-  const ethereumProviderMock = {
-    request: jest.fn(),
-  } as unknown as jest.Mocked<any>;
 
   const mockDelegation: Delegation = {
     delegate: sessionAccount,
@@ -121,7 +118,6 @@ describe('profileSync', () => {
         isFeatureEnabled: true,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
-        ethereumProvider: ethereumProviderMock,
       });
     });
 
@@ -380,7 +376,6 @@ describe('profileSync', () => {
         isFeatureEnabled: true,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
-        ethereumProvider: ethereumProviderMock,
       });
     });
 
@@ -603,7 +598,6 @@ describe('profileSync', () => {
         isFeatureEnabled: false,
         auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
-        ethereumProvider: ethereumProviderMock,
       });
     });
 
