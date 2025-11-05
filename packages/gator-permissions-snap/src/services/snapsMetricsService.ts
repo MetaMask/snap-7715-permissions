@@ -4,30 +4,6 @@ import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 
 /**
- * Permission value details for analytics.
- */
-export type PermissionValue = {
-  /** The chain ID */
-  chainId?: Hex;
-  /** The period amount in hex (for periodic permissions) */
-  periodAmount?: string;
-  /** The period duration in seconds (for periodic permissions) */
-  periodDuration?: number;
-  /** The start time timestamp in seconds */
-  startTime?: number;
-  /** The justification text provided by the user */
-  justification?: string;
-  /** The token address (for ERC20 tokens) */
-  tokenAddress?: string;
-  /** The amount per second in hex (for streaming permissions) */
-  amountPerSecond?: string;
-  /** The initial amount in hex (for streaming permissions) */
-  initialAmount?: string;
-  /** The maximum amount in hex (for streaming permissions) */
-  maxAmount?: string;
-};
-
-/**
  * Base parameters shared by all permission tracking methods.
  */
 export type BasePermissionTrackingParams = {
