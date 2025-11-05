@@ -1,17 +1,17 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex, type Delegation } from '@metamask/delegation-core';
 import {
-  ChainDisconnectedError,
   InternalError,
   ResourceNotFoundError,
   ResourceUnavailableError,
   type SnapsEthereumProvider,
   type SnapsProvider,
 } from '@metamask/snaps-sdk';
-import { bigIntToHex, hexToNumber, numberToHex } from '@metamask/utils';
+import { bigIntToHex, hexToNumber } from '@metamask/utils';
 
 import { getChainMetadata } from './chainMetadata';
 import type { SignDelegationOptions } from './types';
+import { ensureChain } from '../utils/blockchain';
 
 export type AccountUpgradeStatus = {
   isUpgraded: boolean;
@@ -79,28 +79,8 @@ export class AccountController {
 
     const { chainId, delegation, address, origin, justification } = options;
 
-    const selectedChain = await this.#ethereumProvider.request<Hex>({
-      method: 'eth_chainId',
-      params: [],
-    });
-
-    if (selectedChain && hexToNumber(selectedChain) !== chainId) {
-      await this.#ethereumProvider.request<Hex>({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: numberToHex(chainId) }],
-      });
-
-      const updatedChain = await this.#ethereumProvider.request<Hex>({
-        method: 'eth_chainId',
-        params: [],
-      });
-
-      if (updatedChain && hexToNumber(updatedChain) !== chainId) {
-        throw new ChainDisconnectedError(
-          'Selected chain does not match the requested chain',
-        );
-      }
-    }
+    // Ensure we're on the correct chain
+    await ensureChain(this.#ethereumProvider, chainId);
 
     const {
       contracts: { delegationManager },

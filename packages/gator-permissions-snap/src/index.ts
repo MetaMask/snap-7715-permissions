@@ -163,6 +163,7 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
 const rpcHandler = createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
+  blockchainMetadataClient: tokenMetadataClient,
 });
 
 // configure RPC methods bindings
@@ -175,6 +176,9 @@ const boundRpcHandlers: {
     rpcHandler.getPermissionOffers.bind(rpcHandler),
   [RpcMethod.PermissionsProviderGetGrantedPermissions]:
     rpcHandler.getGrantedPermissions.bind(rpcHandler),
+  [RpcMethod.PermissionsProviderSubmitRevocation]: async (
+    params?: JsonRpcParams,
+  ) => rpcHandler.submitRevocation(params as Json),
 };
 
 /**

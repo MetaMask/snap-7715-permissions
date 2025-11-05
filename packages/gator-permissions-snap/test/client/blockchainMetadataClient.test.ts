@@ -1,4 +1,8 @@
-import { ChainDisconnectedError, InvalidInputError } from '@metamask/snaps-sdk';
+import {
+  ChainDisconnectedError,
+  InvalidInputError,
+  ResourceUnavailableError,
+} from '@metamask/snaps-sdk';
 import { numberToHex } from '@metamask/utils';
 
 import { BlockchainTokenMetadataClient } from '../../src/clients/blockchainMetadataClient';
@@ -13,6 +17,10 @@ describe('BlockchainTokenMetadataClient', () => {
 
   beforeEach(() => {
     mockEthereumProvider.request.mockClear();
+    mockEthereumProvider.request.mockReset();
+    mockEthereumProvider.request.mockImplementation(() => {
+      throw new Error('Unexpected mock call');
+    });
     client = new BlockchainTokenMetadataClient({
       ethereumProvider: mockEthereumProvider,
     });
@@ -235,25 +243,23 @@ describe('BlockchainTokenMetadataClient', () => {
       });
 
       it('retries once on RPC error and succeeds for ERC20 token', async () => {
-        // First call fails with RPC error
+        // ensureChain is called first (eth_chainId)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')) // balanceOf
-          .mockRejectedValueOnce(new Error('RPC error')) // decimals
-          .mockRejectedValueOnce(new Error('RPC error')); // symbol
-
-        // Second call succeeds
-        mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
+          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId from ensureChain
+          // First attempt: all calls fail with RPC error, then retry internally
+          .mockRejectedValueOnce(new Error('RPC error')) // balanceOf (attempt 1)
+          .mockRejectedValueOnce(new Error('RPC error')) // decimals (attempt 1)
+          .mockRejectedValueOnce(new Error('RPC error')) // symbol (attempt 1)
+          // Internal retries (callContract retries once by default)
           .mockResolvedValueOnce(
             '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
-          ) // balanceOf
+          ) // balanceOf (retry)
           .mockResolvedValueOnce(
             '0x0000000000000000000000000000000000000000000000000000000000000012',
-          ) // decimals
+          ) // decimals (retry)
           .mockResolvedValueOnce(
             '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000034441490000000000000000000000000000000000000000000000000000000000',
-          ); // symbol
+          ); // symbol (retry)
 
         const result = await client.getTokenBalanceAndMetadata({
           chainId: mockChainId,
@@ -267,7 +273,8 @@ describe('BlockchainTokenMetadataClient', () => {
           symbol: 'DAI',
         });
 
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(8);
+        // 1 eth_chainId + 3 failed calls + 3 retry calls = 7 calls
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(7);
       });
 
       it('retries with custom retry options', async () => {
@@ -437,29 +444,21 @@ describe('BlockchainTokenMetadataClient', () => {
       });
 
       it('retries on null response for ERC20 token', async () => {
-        // First call returns null for balance
+        // ensureChain is called first (eth_chainId)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockResolvedValueOnce(null) // balanceOf
+          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId from ensureChain
+          // First attempt: balanceOf returns null (throws ResourceNotFoundError), decimals and symbol succeed
+          .mockResolvedValueOnce(null) // balanceOf (attempt 1 - null throws ResourceNotFoundError)
           .mockResolvedValueOnce(
             '0x0000000000000000000000000000000000000000000000000000000000000012',
-          ) // decimals
+          ) // decimals (attempt 1 - succeeds)
           .mockResolvedValueOnce(
             '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000034441490000000000000000000000000000000000000000000000000000000000',
-          ); // symbol
-
-        // Second call succeeds
-        mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
+          ) // symbol (attempt 1 - succeeds)
+          // Internal retry for balanceOf (callContract retries once by default)
           .mockResolvedValueOnce(
             '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
-          ) // balanceOf
-          .mockResolvedValueOnce(
-            '0x0000000000000000000000000000000000000000000000000000000000000012',
-          ) // decimals
-          .mockResolvedValueOnce(
-            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000034441490000000000000000000000000000000000000000000000000000000000',
-          ); // symbol
+          ); // balanceOf (retry - succeeds)
 
         const result = await client.getTokenBalanceAndMetadata({
           chainId: mockChainId,
@@ -473,8 +472,204 @@ describe('BlockchainTokenMetadataClient', () => {
           symbol: 'DAI',
         });
 
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(8);
+        // 1 eth_chainId + 3 first attempt calls + 1 retry call = 5 calls
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(5);
       });
+    });
+  });
+
+  describe('checkDelegationDisabledOnChain', () => {
+    const mockDelegationHash =
+      '0x1234567890123456789012345678901234567890123456789012345678901234' as const;
+    const mockChainId = '0xaa36a7' as const;
+    const mockDelegationManagerAddress =
+      '0x1234567890123456789012345678901234567890';
+
+    beforeEach(() => {
+      mockEthereumProvider.request.mockClear();
+    });
+
+    it('should return true when delegation is disabled on-chain', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      // Result: 0x0000000000000000000000000000000000000000000000000000000000000001 (true)
+      mockEthereumProvider.request.mockResolvedValueOnce(
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ); // disabledDelegations call
+
+      const result = await client.checkDelegationDisabledOnChain({
+        delegationHash: mockDelegationHash,
+        chainId: mockChainId,
+        delegationManagerAddress: mockDelegationManagerAddress,
+      });
+
+      expect(result).toBe(true);
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
+    });
+
+    it('should return false when delegation is not disabled on-chain', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      // Result: 0x0000000000000000000000000000000000000000000000000000000000000000 (false)
+      mockEthereumProvider.request.mockResolvedValueOnce(
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ); // disabledDelegations call
+
+      const result = await client.checkDelegationDisabledOnChain({
+        delegationHash: mockDelegationHash,
+        chainId: mockChainId,
+        delegationManagerAddress: mockDelegationManagerAddress,
+      });
+
+      expect(result).toBe(false);
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
+    });
+
+    it('should throw InvalidInputError when delegationHash is missing', async () => {
+      await expect(
+        client.checkDelegationDisabledOnChain({
+          delegationHash: '' as any,
+          chainId: mockChainId,
+          delegationManagerAddress: mockDelegationManagerAddress,
+        }),
+      ).rejects.toThrow('No delegation hash provided');
+
+      expect(mockEthereumProvider.request).not.toHaveBeenCalled();
+    });
+
+    it('should throw InvalidInputError when chainId is missing', async () => {
+      await expect(
+        client.checkDelegationDisabledOnChain({
+          delegationHash: mockDelegationHash,
+          chainId: '' as any,
+          delegationManagerAddress: mockDelegationManagerAddress,
+        }),
+      ).rejects.toThrow('No chain ID provided');
+
+      expect(mockEthereumProvider.request).not.toHaveBeenCalled();
+    });
+
+    it('should throw InvalidInputError when delegationManagerAddress is missing', async () => {
+      await expect(
+        client.checkDelegationDisabledOnChain({
+          delegationHash: mockDelegationHash,
+          chainId: mockChainId,
+          delegationManagerAddress: '' as any,
+        }),
+      ).rejects.toThrow('No delegation manager address provided');
+
+      expect(mockEthereumProvider.request).not.toHaveBeenCalled();
+    });
+
+    it('should propagate ChainDisconnectedError from ensureChain', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce('0x1'); // Wrong chain
+      mockEthereumProvider.request.mockResolvedValueOnce('OK'); // switch chain
+      mockEthereumProvider.request.mockResolvedValueOnce('0x1'); // Still wrong chain
+
+      await expect(
+        client.checkDelegationDisabledOnChain({
+          delegationHash: mockDelegationHash,
+          chainId: mockChainId,
+          delegationManagerAddress: mockDelegationManagerAddress,
+        }),
+      ).rejects.toThrow('Selected chain does not match the requested chain');
+    });
+
+    it('should throw ResourceUnavailableError when contract call fails after retries', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      // First attempt fails
+      mockEthereumProvider.request.mockRejectedValueOnce(
+        new Error('RPC error'),
+      ); // eth_call (attempt 1)
+      // Retry also fails
+      mockEthereumProvider.request.mockRejectedValueOnce(
+        new Error('RPC error'),
+      ); // eth_call (retry)
+
+      await expect(
+        client.checkDelegationDisabledOnChain({
+          delegationHash: mockDelegationHash,
+          chainId: mockChainId,
+          delegationManagerAddress: mockDelegationManagerAddress,
+        }),
+      ).rejects.toThrow(ResourceUnavailableError);
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
+    });
+
+    it('should throw ResourceUnavailableError when contract call returns null', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      // First attempt returns null
+      mockEthereumProvider.request.mockResolvedValueOnce(null); // eth_call (attempt 1)
+      // Retry also returns null
+      mockEthereumProvider.request.mockResolvedValueOnce(null); // eth_call (retry)
+
+      await expect(
+        client.checkDelegationDisabledOnChain({
+          delegationHash: mockDelegationHash,
+          chainId: mockChainId,
+          delegationManagerAddress: mockDelegationManagerAddress,
+        }),
+      ).rejects.toThrow(ResourceUnavailableError);
+    });
+
+    it('should use custom retry options', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      // First attempt fails
+      mockEthereumProvider.request.mockRejectedValueOnce(
+        new Error('RPC error'),
+      ); // eth_call (attempt 1)
+      // Retry succeeds
+      mockEthereumProvider.request.mockResolvedValueOnce(
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ); // eth_call (retry)
+
+      const result = await client.checkDelegationDisabledOnChain({
+        delegationHash: mockDelegationHash,
+        chainId: mockChainId,
+        delegationManagerAddress: mockDelegationManagerAddress,
+        retryOptions: {
+          retries: 2,
+          delayMs: 500,
+        },
+      });
+
+      expect(result).toBe(true);
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
+    });
+
+    it('should not retry on InvalidInputError from callContract', async () => {
+      const invalidInputError = new InvalidInputError('Invalid input');
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      mockEthereumProvider.request.mockRejectedValueOnce(invalidInputError); // eth_call
+
+      await expect(
+        client.checkDelegationDisabledOnChain({
+          delegationHash: mockDelegationHash,
+          chainId: mockChainId,
+          delegationManagerAddress: mockDelegationManagerAddress,
+        }),
+      ).rejects.toThrow('Invalid input');
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not retry on ChainDisconnectedError from callContract', async () => {
+      const chainDisconnectedError = new ChainDisconnectedError(
+        'Chain disconnected',
+      );
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      mockEthereumProvider.request.mockRejectedValueOnce(
+        chainDisconnectedError,
+      ); // eth_call
+
+      await expect(
+        client.checkDelegationDisabledOnChain({
+          delegationHash: mockDelegationHash,
+          chainId: mockChainId,
+          delegationManagerAddress: mockDelegationManagerAddress,
+        }),
+      ).rejects.toThrow('Chain disconnected');
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
     });
   });
 });

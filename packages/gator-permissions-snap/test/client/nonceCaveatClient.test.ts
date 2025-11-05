@@ -157,15 +157,13 @@ describe('NonceCaveatClient', () => {
         const mockNonceEncoded =
           '0x0000000000000000000000000000000000000000000000000000000000000005';
 
-        // First call fails with RPC error
-        mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')); // eth_call
+        // ensureChain is called first (eth_chainId)
+        mockEthereumProvider.request.mockResolvedValueOnce(mockChainIdHex); // eth_chainId from ensureChain
 
-        // Second call succeeds
+        // First eth_call fails, second succeeds (retry handled by callContract)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockResolvedValueOnce(mockNonceEncoded); // eth_call
+          .mockRejectedValueOnce(new Error('RPC error')) // eth_call (first attempt)
+          .mockResolvedValueOnce(mockNonceEncoded); // eth_call (retry)
 
         const result = await client.getNonce({
           chainId: mockChainId,
@@ -173,22 +171,20 @@ describe('NonceCaveatClient', () => {
         });
 
         expect(result).toBe(5n);
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(4);
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
       });
 
       it('retries with custom retry options', async () => {
         const mockNonceEncoded =
           '0x0000000000000000000000000000000000000000000000000000000000000005';
 
-        // First call fails with RPC error
-        mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')); // eth_call
+        // ensureChain is called first (eth_chainId)
+        mockEthereumProvider.request.mockResolvedValueOnce(mockChainIdHex); // eth_chainId from ensureChain
 
-        // Second call succeeds
+        // First eth_call fails, second succeeds (retry handled by callContract)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockResolvedValueOnce(mockNonceEncoded); // eth_call
+          .mockRejectedValueOnce(new Error('RPC error')) // eth_call (first attempt)
+          .mockResolvedValueOnce(mockNonceEncoded); // eth_call (retry)
 
         const result = await client.getNonce({
           chainId: mockChainId,
@@ -200,7 +196,7 @@ describe('NonceCaveatClient', () => {
         });
 
         expect(result).toBe(5n);
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(4);
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
       });
 
       it('does not retry on ChainDisconnectedError', async () => {
@@ -209,8 +205,9 @@ describe('NonceCaveatClient', () => {
           'Chain disconnected',
         );
 
+        // ensureChain is called first (eth_chainId)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
+          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId from ensureChain
           .mockRejectedValueOnce(chainDisconnectedError); // eth_call
 
         await expect(
@@ -224,16 +221,15 @@ describe('NonceCaveatClient', () => {
       });
 
       it('retries up to the specified number of attempts', async () => {
-        // All calls fail with RPC error
+        // ensureChain is called first (eth_chainId)
+        mockEthereumProvider.request.mockResolvedValueOnce(mockChainIdHex); // eth_chainId from ensureChain
+
+        // All eth_call attempts fail (retries handled by callContract)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')) // eth_call
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')) // eth_call
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')) // eth_call
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')); // eth_call
+          .mockRejectedValueOnce(new Error('RPC error')) // eth_call (attempt 1)
+          .mockRejectedValueOnce(new Error('RPC error')) // eth_call (attempt 2)
+          .mockRejectedValueOnce(new Error('RPC error')) // eth_call (attempt 3)
+          .mockRejectedValueOnce(new Error('RPC error')); // eth_call (attempt 4)
 
         await expect(
           client.getNonce({
@@ -246,22 +242,20 @@ describe('NonceCaveatClient', () => {
           }),
         ).rejects.toThrow('Failed to fetch nonce');
 
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(8); // 4 attempts * 2 calls each
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(5); // 1 eth_chainId + 4 eth_call attempts
       });
 
       it('uses default retry options when none provided', async () => {
         const mockNonceEncoded =
           '0x0000000000000000000000000000000000000000000000000000000000000005';
 
-        // First call fails with RPC error
-        mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')); // eth_call
+        // ensureChain is called first (eth_chainId)
+        mockEthereumProvider.request.mockResolvedValueOnce(mockChainIdHex); // eth_chainId from ensureChain
 
-        // Second call succeeds
+        // First eth_call fails, second succeeds (retry handled by callContract)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockResolvedValueOnce(mockNonceEncoded); // eth_call
+          .mockRejectedValueOnce(new Error('RPC error')) // eth_call (first attempt)
+          .mockResolvedValueOnce(mockNonceEncoded); // eth_call (retry)
 
         const result = await client.getNonce({
           chainId: mockChainId,
@@ -269,15 +263,16 @@ describe('NonceCaveatClient', () => {
         });
 
         expect(result).toBe(5n);
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(4);
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
       });
 
       it('succeeds on first attempt when no retry is needed', async () => {
         const mockNonceEncoded =
           '0x0000000000000000000000000000000000000000000000000000000000000005';
 
+        // ensureChain is called first (eth_chainId)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
+          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId from ensureChain
           .mockResolvedValueOnce(mockNonceEncoded); // eth_call
 
         const result = await client.getNonce({
@@ -297,15 +292,13 @@ describe('NonceCaveatClient', () => {
         const mockNonceEncoded =
           '0x0000000000000000000000000000000000000000000000000000000000000005';
 
-        // First call returns null
-        mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockResolvedValueOnce(null); // eth_call
+        // ensureChain is called first (eth_chainId)
+        mockEthereumProvider.request.mockResolvedValueOnce(mockChainIdHex); // eth_chainId from ensureChain
 
-        // Second call succeeds
+        // First eth_call returns null (throws ResourceNotFoundError), second succeeds (retry handled by callContract)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockResolvedValueOnce(mockNonceEncoded); // eth_call
+          .mockResolvedValueOnce(null) // eth_call (first attempt - null throws ResourceNotFoundError)
+          .mockResolvedValueOnce(mockNonceEncoded); // eth_call (retry)
 
         const result = await client.getNonce({
           chainId: mockChainId,
@@ -313,7 +306,7 @@ describe('NonceCaveatClient', () => {
         });
 
         expect(result).toBe(5n);
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(4);
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
       });
     });
   });
