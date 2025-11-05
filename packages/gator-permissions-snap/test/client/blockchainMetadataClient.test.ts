@@ -13,6 +13,10 @@ describe('BlockchainTokenMetadataClient', () => {
 
   beforeEach(() => {
     mockEthereumProvider.request.mockClear();
+    mockEthereumProvider.request.mockReset();
+    mockEthereumProvider.request.mockImplementation(() => {
+      throw new Error('Unexpected mock call');
+    });
     client = new BlockchainTokenMetadataClient({
       ethereumProvider: mockEthereumProvider,
     });
@@ -235,25 +239,23 @@ describe('BlockchainTokenMetadataClient', () => {
       });
 
       it('retries once on RPC error and succeeds for ERC20 token', async () => {
-        // First call fails with RPC error
+        // ensureChain is called first (eth_chainId)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockRejectedValueOnce(new Error('RPC error')) // balanceOf
-          .mockRejectedValueOnce(new Error('RPC error')) // decimals
-          .mockRejectedValueOnce(new Error('RPC error')); // symbol
-
-        // Second call succeeds
-        mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
+          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId from ensureChain
+          // First attempt: all calls fail with RPC error, then retry internally
+          .mockRejectedValueOnce(new Error('RPC error')) // balanceOf (attempt 1)
+          .mockRejectedValueOnce(new Error('RPC error')) // decimals (attempt 1)
+          .mockRejectedValueOnce(new Error('RPC error')) // symbol (attempt 1)
+          // Internal retries (callContract retries once by default)
           .mockResolvedValueOnce(
             '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
-          ) // balanceOf
+          ) // balanceOf (retry)
           .mockResolvedValueOnce(
             '0x0000000000000000000000000000000000000000000000000000000000000012',
-          ) // decimals
+          ) // decimals (retry)
           .mockResolvedValueOnce(
             '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000034441490000000000000000000000000000000000000000000000000000000000',
-          ); // symbol
+          ); // symbol (retry)
 
         const result = await client.getTokenBalanceAndMetadata({
           chainId: mockChainId,
@@ -267,7 +269,8 @@ describe('BlockchainTokenMetadataClient', () => {
           symbol: 'DAI',
         });
 
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(8);
+        // 1 eth_chainId + 3 failed calls + 3 retry calls = 7 calls
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(7);
       });
 
       it('retries with custom retry options', async () => {
@@ -437,29 +440,21 @@ describe('BlockchainTokenMetadataClient', () => {
       });
 
       it('retries on null response for ERC20 token', async () => {
-        // First call returns null for balance
+        // ensureChain is called first (eth_chainId)
         mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
-          .mockResolvedValueOnce(null) // balanceOf
+          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId from ensureChain
+          // First attempt: balanceOf returns null (throws ResourceNotFoundError), decimals and symbol succeed
+          .mockResolvedValueOnce(null) // balanceOf (attempt 1 - null throws ResourceNotFoundError)
           .mockResolvedValueOnce(
             '0x0000000000000000000000000000000000000000000000000000000000000012',
-          ) // decimals
+          ) // decimals (attempt 1 - succeeds)
           .mockResolvedValueOnce(
             '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000034441490000000000000000000000000000000000000000000000000000000000',
-          ); // symbol
-
-        // Second call succeeds
-        mockEthereumProvider.request
-          .mockResolvedValueOnce(mockChainIdHex) // eth_chainId
+          ) // symbol (attempt 1 - succeeds)
+          // Internal retry for balanceOf (callContract retries once by default)
           .mockResolvedValueOnce(
             '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
-          ) // balanceOf
-          .mockResolvedValueOnce(
-            '0x0000000000000000000000000000000000000000000000000000000000000012',
-          ) // decimals
-          .mockResolvedValueOnce(
-            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000034441490000000000000000000000000000000000000000000000000000000000',
-          ); // symbol
+          ); // balanceOf (retry - succeeds)
 
         const result = await client.getTokenBalanceAndMetadata({
           chainId: mockChainId,
@@ -473,7 +468,8 @@ describe('BlockchainTokenMetadataClient', () => {
           symbol: 'DAI',
         });
 
-        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(8);
+        // 1 eth_chainId + 3 first attempt calls + 1 retry call = 5 calls
+        expect(mockEthereumProvider.request).toHaveBeenCalledTimes(5);
       });
     });
   });

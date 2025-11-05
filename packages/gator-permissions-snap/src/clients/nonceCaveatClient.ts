@@ -66,10 +66,9 @@ export class NonceCaveatClient {
     // Ensure we're on the correct chain
     await ensureChain(this.#ethereumProvider, chainId);
 
-    const callData =
-      (NonceCaveatClient.#currentNonceCalldata +
-        contracts.delegationManager.slice(2).padStart(64, '0') +
-        account.slice(2).padStart(64, '0')) as Hex;
+    const callData = (NonceCaveatClient.#currentNonceCalldata +
+      contracts.delegationManager.slice(2).padStart(64, '0') +
+      account.slice(2).padStart(64, '0')) as Hex;
 
     try {
       const nonceEncoded = await callContract({
@@ -83,6 +82,11 @@ export class NonceCaveatClient {
       const nonce = decodeSingle('uint256', nonceEncoded);
       return nonce;
     } catch (error) {
+      // Re-throw ChainDisconnectedError without wrapping
+      if (error instanceof ChainDisconnectedError) {
+        throw error;
+      }
+
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       logger.error(`Failed to fetch nonce: ${errorMessage}`);
