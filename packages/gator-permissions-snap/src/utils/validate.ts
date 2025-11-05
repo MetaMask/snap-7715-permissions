@@ -1,11 +1,26 @@
 import {
   type RequestExecutionPermissionsParam,
+  type GetGrantedPermissionsParam,
   zRequestExecutionPermissionsParam,
+  zGetGrantedPermissionsParam,
 } from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 import { z } from 'zod';
+
+export const validateGetGrantedPermissionsParams = (
+  params: unknown,
+): GetGrantedPermissionsParam => {
+  const result = zGetGrantedPermissionsParam.safeParse(params);
+
+  // Support undefined/null and invalid params (treat as no filters)
+  if (!result.success || params === undefined || params === null) {
+    return {};
+  }
+
+  return result.data;
+};
 
 export const validatePermissionRequestParam = (
   params: unknown,

@@ -134,7 +134,6 @@ describe('RpcHandler', () => {
       getAllGrantedPermissions: jest.fn(),
       getUserProfile: jest.fn(),
       updatePermissionRevocationStatus: jest.fn(),
-      updatePermissionRevocationStatusWithPermission: jest.fn(),
     } as unknown as jest.Mocked<ProfileSyncManager>;
 
     mockBlockchainMetadataClient = {
@@ -1005,9 +1004,6 @@ describe('RpcHandler', () => {
       mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
-      mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(
-        undefined,
-      );
 
       const result = await handler.submitRevocation(validRevocationParams);
 
@@ -1019,8 +1015,8 @@ describe('RpcHandler', () => {
         mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
-      ).toHaveBeenCalledWith(mockPermission, true);
+        mockProfileSyncManager.updatePermissionRevocationStatus,
+      ).toHaveBeenCalledWith(TEST_CONTEXT, true);
     });
 
     it('should throw InvalidInputError when permissionContext is invalid', async () => {
@@ -1071,7 +1067,7 @@ describe('RpcHandler', () => {
       );
     });
 
-    it('should propagate errors from updatePermissionRevocationStatusWithPermission', async () => {
+    it('should propagate errors from updatePermissionRevocationStatus', async () => {
       const mockPermission = {
         permissionResponse: {
           chainId: TEST_CHAIN_ID,
@@ -1110,7 +1106,7 @@ describe('RpcHandler', () => {
       mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
-      mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockRejectedValueOnce(
+      mockProfileSyncManager.updatePermissionRevocationStatus.mockRejectedValueOnce(
         profileSyncError,
       );
 
@@ -1119,8 +1115,8 @@ describe('RpcHandler', () => {
       ).rejects.toThrow('Update failed');
 
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
-      ).toHaveBeenCalledWith(mockPermission, true);
+        mockProfileSyncManager.updatePermissionRevocationStatus,
+      ).toHaveBeenCalledWith(TEST_CONTEXT, true);
     });
 
     it('should handle hex values with uppercase letters', async () => {
@@ -1165,7 +1161,7 @@ describe('RpcHandler', () => {
       mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
-      mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(
+      mockProfileSyncManager.updatePermissionRevocationStatus.mockResolvedValueOnce(
         undefined,
       );
 
@@ -1219,7 +1215,7 @@ describe('RpcHandler', () => {
       mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
-      mockProfileSyncManager.updatePermissionRevocationStatusWithPermission.mockResolvedValueOnce(
+      mockProfileSyncManager.updatePermissionRevocationStatus.mockResolvedValueOnce(
         undefined,
       );
 
@@ -1278,7 +1274,7 @@ describe('RpcHandler', () => {
         mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+        mockProfileSyncManager.updatePermissionRevocationStatus,
       ).not.toHaveBeenCalled();
     });
 
@@ -1333,7 +1329,7 @@ describe('RpcHandler', () => {
         mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+        mockProfileSyncManager.updatePermissionRevocationStatus,
       ).not.toHaveBeenCalled();
     });
 
@@ -1388,7 +1384,7 @@ describe('RpcHandler', () => {
         mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+        mockProfileSyncManager.updatePermissionRevocationStatus,
       ).not.toHaveBeenCalled();
     });
 
@@ -1443,7 +1439,7 @@ describe('RpcHandler', () => {
         mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatusWithPermission,
+        mockProfileSyncManager.updatePermissionRevocationStatus,
       ).not.toHaveBeenCalled();
     });
   });

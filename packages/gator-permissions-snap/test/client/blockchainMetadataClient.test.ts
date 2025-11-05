@@ -633,7 +633,7 @@ describe('BlockchainTokenMetadataClient', () => {
       });
 
       expect(result).toBe(true);
-      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
     });
 
     it('should not retry on InvalidInputError from callContract', async () => {

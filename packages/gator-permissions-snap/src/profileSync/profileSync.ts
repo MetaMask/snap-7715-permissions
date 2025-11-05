@@ -107,10 +107,6 @@ export type ProfileSyncManager = {
     permissionContext: Hex,
     isRevoked: boolean,
   ) => Promise<void>;
-  updatePermissionRevocationStatusWithPermission: (
-    existingPermission: StoredGrantedPermission,
-    isRevoked: boolean,
-  ) => Promise<void>;
 };
 
 export type StoredGrantedPermission = {
@@ -173,14 +169,6 @@ export function createProfileSyncManager(
     updatePermissionRevocationStatus: async (_: Hex, __: boolean) => {
       logger.debug(
         'unConfiguredProfileSyncManager.updatePermissionRevocationStatus()',
-      );
-    },
-    updatePermissionRevocationStatusWithPermission: async (
-      _: StoredGrantedPermission,
-      __: boolean,
-    ) => {
-      logger.debug(
-        'unConfiguredProfileSyncManager.updatePermissionRevocationStatusWithPermission()',
       );
     },
   };
@@ -366,48 +354,25 @@ export function createProfileSyncManager(
   }
 
   /**
-   * Updates the revocation status of a granted permission in profile sync.
+   * Updates the revocation status of a granted permission when you already have the permission object.
+   * This is an optimized version that avoids re-fetching the permission.
    *
    * @param permissionContext - The context of the granted permission to update.
    * @param isRevoked - The new revocation status.
-   * @throws InvalidInputError if the permission is not found.
    */
   async function updatePermissionRevocationStatus(
     permissionContext: Hex,
     isRevoked: boolean,
   ): Promise<void> {
     try {
-      await authenticate();
-
       const existingPermission = await getGrantedPermission(permissionContext);
+
       if (!existingPermission) {
         throw new InvalidInputError(
           `Permission not found for permission context: ${permissionContext}`,
         );
       }
 
-      await updatePermissionRevocationStatusWithPermission(
-        existingPermission,
-        isRevoked,
-      );
-    } catch (error) {
-      logger.error('Error updating permission revocation status');
-      throw error;
-    }
-  }
-
-  /**
-   * Updates the revocation status of a granted permission when you already have the permission object.
-   * This is an optimized version that avoids re-fetching the permission.
-   *
-   * @param existingPermission - The existing permission object.
-   * @param isRevoked - The new revocation status.
-   */
-  async function updatePermissionRevocationStatusWithPermission(
-    existingPermission: StoredGrantedPermission,
-    isRevoked: boolean,
-  ): Promise<void> {
-    try {
       logger.debug('Profile Sync: Updating permission revocation status:', {
         existingPermission,
         isRevoked,
@@ -441,7 +406,6 @@ export function createProfileSyncManager(
         storeGrantedPermission,
         storeGrantedPermissionBatch,
         updatePermissionRevocationStatus,
-        updatePermissionRevocationStatusWithPermission,
       }
     : unConfiguredProfileSyncManager;
 }

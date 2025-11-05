@@ -15,6 +15,7 @@ import type {
   StoredGrantedPermission,
 } from '../profileSync/profileSync';
 import {
+  validateGetGrantedPermissionsParams,
   validatePermissionRequestParam,
   validateRevocationParams,
 } from '../utils/validate';
@@ -150,21 +151,20 @@ export function createRpcHandler({
   const getGrantedPermissions = async (params?: Json): Promise<Json> => {
     logger.debug('getGrantedPermissions()', params);
 
+    // If no params provided, return all permissions for backward compatibility.
+    if (!params || typeof params !== 'object') {
+      // we duplicate the call to getAllGrantedPermissions here, to avoid having
+      // to branch the validation logic when params is specified.
+      return (await profileSyncManager.getAllGrantedPermissions()) as Json[];
+    }
+
+    const { isRevoked, siteOrigin, chainId, delegationManager } =
+      validateGetGrantedPermissionsParams(params);
+
     // Get all permissions
     const allPermissions = await profileSyncManager.getAllGrantedPermissions();
 
-    // If no params provided, return all permissions (backward compatibility)
-    if (!params || typeof params !== 'object') {
-      return allPermissions as Json[];
-    }
-
-    // Parse filtering options
-    const { isRevoked, siteOrigin, chainId, delegationManager } = params as {
-      isRevoked?: boolean;
-      siteOrigin?: string;
-      chainId?: string;
-      delegationManager?: string;
-    };
+    // Use validated filtering options
 
     // Apply filters
     let filteredPermissions = allPermissions;
@@ -243,14 +243,19 @@ export function createRpcHandler({
     // For on-chain validation, we need to check each delegation in the context
     const delegations = decodeDelegations(permissionContext);
 
-    // Check if any delegation is disabled on-chain
     // Only one delegation is allowed per permission context, taking the first one
+    if (delegations.length > 1) {
+      throw new InvalidInputError(
+        `Multiple delegations found in permission context: ${permissionContext}`,
+      );
+    }
     const firstDelegation = delegations[0];
     if (!firstDelegation) {
       throw new InvalidInputError(
         `No delegations found in permission context: ${permissionContext}`,
       );
     }
+    // Check if any delegation is disabled on-chain
 
     const delegationHash = hashDelegation(firstDelegation);
     const isDelegationDisabled =
@@ -266,8 +271,8 @@ export function createRpcHandler({
       );
     }
 
-    await profileSyncManager.updatePermissionRevocationStatusWithPermission(
-      existingPermission,
+    await profileSyncManager.updatePermissionRevocationStatus(
+      permissionContext,
       true,
     );
 
