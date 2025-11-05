@@ -13,7 +13,6 @@ const {
   ACCOUNT_API_BASE_URL,
   TOKENS_API_BASE_URL,
   KERNEL_SNAP_ID,
-  SUPPORTED_CHAIN_IDS,
 } = process.env;
 
 if (!SNAP_ENV) {
@@ -59,12 +58,6 @@ if (!TOKENS_API_BASE_URL) {
   );
 }
 
-if (!SUPPORTED_CHAIN_IDS) {
-  throw new InternalError(
-    'SUPPORTED_CHAIN_IDS must be set as an environment variable.',
-  );
-}
-
 const config: SnapConfig = {
   input: resolve(__dirname, 'src/index.ts'),
   server: {
@@ -81,7 +74,6 @@ const config: SnapConfig = {
     ACCOUNT_API_BASE_URL,
     TOKENS_API_BASE_URL,
     KERNEL_SNAP_ID,
-    SUPPORTED_CHAIN_IDS,
   },
 };
 
