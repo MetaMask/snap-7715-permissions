@@ -50,6 +50,7 @@ export type PermissionHandlerContentProps = {
   tokenBalanceFiat: string | null;
   chainId: number;
   explorerUrl: string | undefined;
+  isAccountUpgraded: boolean;
 };
 
 /**
@@ -68,6 +69,7 @@ export type PermissionHandlerContentProps = {
  * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
+ * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -84,8 +86,11 @@ export const PermissionHandlerContent = ({
   tokenBalanceFiat,
   chainId,
   explorerUrl,
+  isAccountUpgraded,
 }: PermissionHandlerContentProps): SnapElement => {
-  const tokenBalanceComponent = TokenBalanceField({ tokenBalance });
+  const tokenBalanceComponent = TokenBalanceField({
+    tokenBalance,
+  });
 
   const fiatBalanceComponent = tokenBalanceFiat ? (
     <Text>{tokenBalanceFiat}</Text>
@@ -126,6 +131,12 @@ export const PermissionHandlerContent = ({
               switchGlobalAccount={false}
               value={context.accountAddressCaip10}
             />
+            {!isAccountUpgraded && (
+              <Text size="sm" color="warning">
+                This account will be upgraded to a smart account to complete
+                this permission.
+              </Text>
+            )}
             <Box direction="horizontal" alignment="end">
               {fiatBalanceComponent}
               {tokenBalanceComponent}

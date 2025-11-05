@@ -139,7 +139,13 @@ const setupTest = () => {
   const accountController = {
     signDelegation: jest.fn(),
     getAccountAddresses: jest.fn(),
+    getAccountUpgradeStatus: jest.fn(),
+    upgradeAccount: jest.fn(),
   } as unknown as jest.Mocked<AccountController>;
+
+  accountController.getAccountUpgradeStatus.mockResolvedValue({
+    isUpgraded: false,
+  });
 
   userEventDispatcher = {
     on: jest.fn(bindEvent),
@@ -720,6 +726,15 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
+                    },
+                    {
+                      "key": null,
+                      "props": {
                         "alignment": "end",
                         "children": [
                           {
@@ -1239,6 +1254,15 @@ describe('PermissionHandler', () => {
                         "value": "eip155:1:0x1234567890123456789012345678901234567890",
                       },
                       "type": "AccountSelector",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
                     },
                     {
                       "key": null,
@@ -1804,6 +1828,15 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
+                    },
+                    {
+                      "key": null,
+                      "props": {
                         "alignment": "end",
                         "children": [
                           {
@@ -2288,6 +2321,15 @@ describe('PermissionHandler', () => {
                         "value": "eip155:1:0x1234567890123456789012345678901234567890",
                       },
                       "type": "AccountSelector",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
                     },
                     {
                       "key": null,
@@ -2781,6 +2823,15 @@ describe('PermissionHandler', () => {
                         "value": "eip155:1:0x1234567890123456789012345678901234567890",
                       },
                       "type": "AccountSelector",
+                    },
+                    {
+                      "key": null,
+                      "props": {
+                        "children": "This account will be upgraded to a smart account to complete this permission.",
+                        "color": "warning",
+                        "size": "sm",
+                      },
+                      "type": "Text",
                     },
                     {
                       "key": null,

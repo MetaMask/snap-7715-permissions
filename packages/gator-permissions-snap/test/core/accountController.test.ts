@@ -40,6 +40,16 @@ describe('AccountController', () => {
           return mockSignature;
         case 'eth_getBalance':
           return expectedBalance;
+        case 'wallet_getAccountUpgradeStatus':
+          return {
+            isUpgraded: false,
+            upgradedAddress: null,
+          };
+        case 'wallet_upgradeAccount':
+          return {
+            transactionHash:
+              '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+          };
         default:
           return null;
       }
@@ -87,6 +97,41 @@ describe('AccountController', () => {
 
       expect(mockEthereumProvider.request).toHaveBeenCalledWith({
         method: 'eth_requestAccounts',
+      });
+    });
+  });
+
+  describe('getAccountUpgradeStatus()', () => {
+    it('should return upgrade status', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        isUpgraded: true,
+        upgradedAddress: '0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B', // eip7702StatelessDeleGatorImpl address
+      });
+
+      const result = await accountController.getAccountUpgradeStatus({
+        account: mockAddress,
+        chainId: mockChainId,
+      });
+
+      expect(result).toStrictEqual({ isUpgraded: true });
+    });
+  });
+
+  describe('upgradeAccount()', () => {
+    it('should upgrade account and return transaction hash', async () => {
+      const mockTransactionHash =
+        '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        transactionHash: mockTransactionHash,
+      });
+
+      const result = await accountController.upgradeAccount({
+        account: mockAddress,
+        chainId: mockChainId,
+      });
+
+      expect(result).toStrictEqual({
+        transactionHash: mockTransactionHash,
       });
     });
   });
