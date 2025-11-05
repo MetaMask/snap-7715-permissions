@@ -553,6 +553,82 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result.approved).toBe(true);
       });
 
+      it('tracks smart account upgrade success when upgrade is successful', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: false,
+        });
+        mockAccountController.upgradeAccount.mockResolvedValueOnce({
+          transactionHash: '0xabc123',
+        });
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(
+          mockSnapsMetricsService.trackSmartAccountUpgraded,
+        ).toHaveBeenCalledWith({
+          origin: 'test-origin',
+          accountAddress: grantingAccountAddress,
+          chainId: '0x1',
+          success: true,
+        });
+        expect(result.approved).toBe(true);
+      });
+
+      it('tracks smart account upgrade failure when upgrade fails', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: false,
+        });
+        mockAccountController.upgradeAccount.mockRejectedValueOnce(
+          new Error('Upgrade failed'),
+        );
+
+        // The permission request should still succeed despite upgrade failure
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(
+          mockSnapsMetricsService.trackSmartAccountUpgraded,
+        ).toHaveBeenCalledWith({
+          origin: 'test-origin',
+          accountAddress: grantingAccountAddress,
+          chainId: '0x1',
+          success: false,
+        });
+        expect(result.approved).toBe(true);
+      });
+
+      it('does not track smart account upgrade when account is already upgraded', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: true,
+        });
+
+        await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
+        expect(
+          mockSnapsMetricsService.trackSmartAccountUpgraded,
+        ).not.toHaveBeenCalled();
+      });
+
       it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
         const initialContext = {
           foo: 'original',

@@ -270,10 +270,29 @@ export class PermissionRequestLifecycleOrchestrator {
 
           if (!upgradeStatus.isUpgraded) {
             // Trigger account upgrade
-            await this.#accountController.upgradeAccount({
-              account: address,
-              chainId: numberToHex(chainId),
-            });
+            try {
+              await this.#accountController.upgradeAccount({
+                account: address,
+                chainId: numberToHex(chainId),
+              });
+
+              // Track successful account upgrade
+              await this.#snapsMetricsService.trackSmartAccountUpgraded({
+                origin,
+                accountAddress: address,
+                chainId: numberToHex(chainId),
+                success: true,
+              });
+            } catch (upgradeError) {
+              // Track failed account upgrade
+              await this.#snapsMetricsService.trackSmartAccountUpgraded({
+                origin,
+                accountAddress: address,
+                chainId: numberToHex(chainId),
+                success: false,
+              });
+              throw upgradeError;
+            }
           }
         } catch (error) {
           // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
