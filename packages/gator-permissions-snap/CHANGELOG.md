@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0]
+
 ### Uncategorized
 
 - Added New RPC for Marking Delegation as Revoked ([#171](https://github.com/MetaMask/snap-7715-permissions/pull/171))
@@ -211,7 +213,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.4.1...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.5.0...HEAD
+[0.5.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.4.1...@metamask/gator-permissions-snap@0.5.0
 [0.4.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.4.0...@metamask/gator-permissions-snap@0.4.1
 [0.4.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.3.0...@metamask/gator-permissions-snap@0.4.0
 [0.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.2.1...@metamask/gator-permissions-snap@0.3.0
