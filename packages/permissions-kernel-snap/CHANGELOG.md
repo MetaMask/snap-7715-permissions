@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0]
 
-### Uncategorized
+### Fixed
 
-- rethrow snap errors in kernel snap ([#211](https://github.com/MetaMask/snap-7715-permissions/pull/211))
+- Throw appropriate `SnapError` when an error is thrown by the target of an RPC ([#211](https://github.com/MetaMask/snap-7715-permissions/pull/211))
 
 ## [0.4.0]
 
