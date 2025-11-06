@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- feat: enhance Snaps metrics tracking ([#218](https://github.com/MetaMask/snap-7715-permissions/pull/218))
+
 ## [0.5.0]
 
 ### Added
