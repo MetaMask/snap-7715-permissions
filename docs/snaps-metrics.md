@@ -36,14 +36,26 @@ The `SnapsMetricsService` class provides methods to track various events using M
 - `Permission Rejected`: When the user rejects a permission
 - `Permission Granted`: When a permission is successfully granted
 
-**Tracked Data:**
+**Common Tracked Data:**
 - `permission_type`: One of `native-token-stream`, `native-token-periodic`, `erc20-token-stream`, `erc20-token-periodic`
-- `chain_id`: The blockchain network ID
-- `period_seconds`: The time period for periodic permissions
-- `amount`: The token amount
-- `token`: The token address (0x0 for native tokens)
-- `duration_seconds`: Permission duration
-- `is_adjustment_allowed`: Boolean indicating if permission adjustment was allowed
+- `chain_id`: The blockchain network ID (hex string)
+- `justification`: Optional user-provided justification text
+- `is_adjustment_allowed`: Boolean indicating if permission adjustment was allowed (only for `Permission Granted`)
+
+**Permission-Specific Data:**
+
+For **Periodic Permissions** (`native-token-periodic`, `erc20-token-periodic`):
+- `period_amount`: The token amount per period (hex string)
+- `period_duration`: The time period duration in seconds (number)
+- `start_time`: Permission start timestamp in seconds (number)
+- `token_address`: Token contract address (hex string, only for ERC20)
+
+For **Streaming Permissions** (`native-token-stream`, `erc20-token-stream`):
+- `amount_per_second`: Token amount streamed per second (hex string)
+- `initial_amount`: Initial upfront amount (hex string, optional)
+- `max_amount`: Maximum total amount (hex string, optional)
+- `start_time`: Permission start timestamp in seconds (number)
+- `token_address`: Token contract address (hex string, only for ERC20)
 
 ### 2. Smart Account Upgrades
 
@@ -79,7 +91,6 @@ All events include:
 - `origin`: The dapp origin requesting the permission
 - Additional event-specific properties
 
-
 ## Data Flow
 
 1. User initiates permission request → `trackPermissionRequestStarted`
@@ -89,4 +100,3 @@ All events include:
 5. Delegation signing → `trackDelegationSigning`
 6. Permission granted → `trackPermissionGranted`
 7. Profile sync (if enabled) → `trackProfileSync`
-

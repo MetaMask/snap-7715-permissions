@@ -127,9 +127,8 @@ export class PermissionRequestLifecycleOrchestrator {
     await this.#snapsMetricsService.trackPermissionRequestStarted({
       origin,
       permissionType,
-      permissionValue: {
-        chainId: permissionRequest.chainId,
-      },
+      chainId: permissionRequest.chainId,
+      permissionData: permissionRequest.permission.data,
     });
 
     // only necessary when not pre-installed, to ensure that the account
@@ -216,9 +215,9 @@ export class PermissionRequestLifecycleOrchestrator {
       await this.#snapsMetricsService.trackPermissionDialogShown({
         origin,
         permissionType,
-        permissionValue: {
-          chainId: permissionRequest.chainId,
-        },
+        chainId: permissionRequest.chainId,
+        permissionData: permissionRequest.permission.data,
+        justification: context.justification,
       });
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
@@ -310,9 +309,9 @@ export class PermissionRequestLifecycleOrchestrator {
       await this.#snapsMetricsService.trackPermissionRejected({
         origin,
         permissionType,
-        permissionValue: {
-          chainId: permissionRequest.chainId,
-        },
+        chainId: permissionRequest.chainId,
+        permissionData: permissionRequest.permission.data,
+        justification: context.justification,
       });
 
       return {
@@ -502,9 +501,9 @@ export class PermissionRequestLifecycleOrchestrator {
     await this.#snapsMetricsService.trackPermissionGranted({
       origin,
       permissionType,
-      permissionValue: {
-        chainId: numberToHex(chainId),
-      },
+      chainId: numberToHex(chainId),
+      permissionData: populatedPermission.data,
+      justification: modifiedContext.justification,
       isAdjustmentAllowed,
     });
 

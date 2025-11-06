@@ -28,9 +28,8 @@ describe('SnapsMetricsService', () => {
       await snapsMetricsService.trackPermissionRequestStarted({
         origin: 'https://example.com',
         permissionType: 'native-token-stream',
-        permissionValue: {
-          chainId: '0x1',
-        },
+        chainId: '0x1',
+        permissionData: {},
       });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
@@ -55,12 +54,12 @@ describe('SnapsMetricsService', () => {
       await snapsMetricsService.trackPermissionRequestStarted({
         origin: 'https://dapp.example',
         permissionType: 'erc20-token-periodic',
-        permissionValue: {
-          chainId: '0x1',
-          period: 86400,
-          amount: '1000000000000000000',
-          token: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-          duration: 604800,
+        chainId: '0x1',
+        permissionData: {
+          periodAmount: '0xde0b6b3a7640000',
+          periodDuration: 2592000,
+          startTime: 1762379896,
+          tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
         },
       });
 
@@ -74,10 +73,10 @@ describe('SnapsMetricsService', () => {
               origin: 'https://dapp.example',
               permission_type: 'erc20-token-periodic',
               chain_id: '0x1',
-              period_seconds: 86400,
-              amount: '1000000000000000000',
-              token: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-              duration_seconds: 604800,
+              period_amount: '0xde0b6b3a7640000',
+              period_duration: 2592000,
+              start_time: 1762379896,
+              token_address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
             },
           },
         },
@@ -90,8 +89,11 @@ describe('SnapsMetricsService', () => {
       await snapsMetricsService.trackPermissionRequestStarted({
         origin: 'https://example.com',
         permissionType: 'native-token-periodic',
-        permissionValue: {
-          token: '0x0',
+        chainId: '0x1',
+        permissionData: {
+          periodAmount: '0xde0b6b3a7640000',
+          periodDuration: 2592000,
+          startTime: 1762379518,
         },
       });
 
@@ -104,7 +106,10 @@ describe('SnapsMetricsService', () => {
               message: 'User initiated permission request',
               origin: 'https://example.com',
               permission_type: 'native-token-periodic',
-              token: '0x0',
+              chain_id: '0x1',
+              period_amount: '0xde0b6b3a7640000',
+              period_duration: 2592000,
+              start_time: 1762379518,
             },
           },
         },
@@ -119,9 +124,8 @@ describe('SnapsMetricsService', () => {
       await snapsMetricsService.trackPermissionDialogShown({
         origin: 'https://example.com',
         permissionType: 'erc20-token-stream',
-        permissionValue: {
-          chainId: '0x89',
-        },
+        chainId: '0x89',
+        permissionData: {},
       });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
@@ -148,9 +152,8 @@ describe('SnapsMetricsService', () => {
       await snapsMetricsService.trackPermissionRejected({
         origin: 'https://example.com',
         permissionType: 'native-token-stream',
-        permissionValue: {
-          chainId: '0x1',
-        },
+        chainId: '0x1',
+        permissionData: {},
       });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
@@ -177,10 +180,13 @@ describe('SnapsMetricsService', () => {
       await snapsMetricsService.trackPermissionGranted({
         origin: 'https://example.com',
         permissionType: 'erc20-token-stream',
-        permissionValue: {
-          chainId: '0x1',
-          token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-          amount: '1000000',
+        chainId: '0x1',
+        permissionData: {
+          tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          amountPerSecond: '0x7a120',
+          initialAmount: '0x7a120',
+          maxAmount: '0x2625a0',
+          startTime: 1762379839,
         },
         isAdjustmentAllowed: false,
       });
@@ -196,8 +202,11 @@ describe('SnapsMetricsService', () => {
               permission_type: 'erc20-token-stream',
               is_adjustment_allowed: false,
               chain_id: '0x1',
-              token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-              amount: '1000000',
+              token_address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+              amount_per_second: '0x7a120',
+              initial_amount: '0x7a120',
+              max_amount: '0x2625a0',
+              start_time: 1762379839,
             },
           },
         },
@@ -419,15 +428,20 @@ describe('SnapsMetricsService', () => {
         snapsMetricsService.trackPermissionRequestStarted({
           origin: 'https://example1.com',
           permissionType: 'native-token-stream',
+          chainId: '0x1',
+          permissionData: {},
         }),
         snapsMetricsService.trackPermissionDialogShown({
           origin: 'https://example2.com',
           permissionType: 'erc20-token-periodic',
+          chainId: '0x1',
+          permissionData: {},
         }),
         snapsMetricsService.trackPermissionGranted({
           origin: 'https://example3.com',
           permissionType: 'native-token-periodic',
-          permissionValue: { chainId: '0x1' },
+          chainId: '0x1',
+          permissionData: {},
           isAdjustmentAllowed: false,
         }),
       ]);
@@ -443,7 +457,8 @@ describe('SnapsMetricsService', () => {
       await snapsMetricsService.trackPermissionRequestStarted({
         origin: 'https://example.com',
         permissionType: 'native-token-stream',
-        permissionValue: undefined,
+        chainId: '0x1',
+        permissionData: {},
       });
 
       expect(mockSnap.request).toHaveBeenCalledWith({
@@ -455,6 +470,7 @@ describe('SnapsMetricsService', () => {
               message: 'User initiated permission request',
               origin: 'https://example.com',
               permission_type: 'native-token-stream',
+              chain_id: '0x1',
             },
           },
         },
@@ -467,9 +483,10 @@ describe('SnapsMetricsService', () => {
       await snapsMetricsService.trackPermissionRequestStarted({
         origin: 'https://example.com',
         permissionType: 'erc20-token-periodic',
-        permissionValue: {
-          period: 3600,
-          amount: '100',
+        chainId: '0x1',
+        permissionData: {
+          periodDuration: 3600,
+          periodAmount: '0xf4240',
         },
       });
 
@@ -482,8 +499,9 @@ describe('SnapsMetricsService', () => {
               message: 'User initiated permission request',
               origin: 'https://example.com',
               permission_type: 'erc20-token-periodic',
-              period_seconds: 3600,
-              amount: '100',
+              chain_id: '0x1',
+              period_duration: 3600,
+              period_amount: '0xf4240',
             },
           },
         },
