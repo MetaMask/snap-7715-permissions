@@ -26,61 +26,64 @@ const FALLBACK_LOCALE: SupportedLocale = 'en';
 let currentLocaleCode: SupportedLocale = FALLBACK_LOCALE;
 let currentMessages: LocaleMessages | undefined;
 const fallbackMessages: LocaleMessages | undefined = locales[FALLBACK_LOCALE];
-let isInitializing = false;
+let initializationPromise: Promise<void> | null = null;
 
 /**
  * Initialize i18n system by detecting user's locale and loading appropriate messages.
  * Must be called during snap lifecycle. Can be called multiple times safely.
+ * Concurrent calls will wait for the same initialization to complete.
  *
+ * @returns A promise that resolves when initialization is complete.
  */
 export async function setupI18n(): Promise<void> {
-  // Check if already initializing and return early
-  if (isInitializing) {
-    return;
+  if (initializationPromise) {
+    return initializationPromise;
   }
 
-  // Mark that we're initializing
-  isInitializing = true;
+  initializationPromise = (async () => {
+    try {
+      // Get user's locale preference
+      const preferences = await snap.request({
+        method: 'snap_getPreferences',
+      });
 
-  try {
-    // Get user's locale preference
-    const preferences = await snap.request({
-      method: 'snap_getPreferences',
-    });
+      const userLocale = (preferences.locale || FALLBACK_LOCALE).toLowerCase();
 
-    const userLocale = (preferences.locale || FALLBACK_LOCALE).toLowerCase();
+      // If already initialized with the requested locale, skip re-initialization
+      if (currentMessages && currentLocaleCode === userLocale) {
+        return;
+      }
 
-    // If already initialized with the requested locale, skip re-initialization
-    if (currentMessages && currentLocaleCode === userLocale) {
-      return;
-    }
-
-    // Check if we support this locale
-    if (userLocale in locales) {
-      currentLocaleCode = userLocale as SupportedLocale;
-      currentMessages = locales[currentLocaleCode];
-    } else {
-      // Try just the language code (e.g., 'en' from 'en-US')
-      const languageCode = userLocale.split('-')[0];
-      if (languageCode && languageCode in locales) {
-        currentLocaleCode = languageCode as SupportedLocale;
+      // Check if we support this locale
+      if (userLocale in locales) {
+        currentLocaleCode = userLocale as SupportedLocale;
         currentMessages = locales[currentLocaleCode];
       } else {
-        // Fallback to English
+        // Try just the language code (e.g., 'en' from 'en-US')
+        const languageCode = userLocale.split('-')[0];
+        if (languageCode && languageCode in locales) {
+          currentLocaleCode = languageCode as SupportedLocale;
+          currentMessages = locales[currentLocaleCode];
+        } else {
+          // Fallback to English
+          currentLocaleCode = FALLBACK_LOCALE;
+          currentMessages = locales[FALLBACK_LOCALE];
+        }
+      }
+    } catch (error) {
+      // If we fail to fetch messages set them to English fallback.
+      if (!currentMessages) {
         currentLocaleCode = FALLBACK_LOCALE;
         currentMessages = locales[FALLBACK_LOCALE];
       }
+      logger.error('Failed to fetch user preferences for i18n', error);
+    } finally {
+      // eslint-disable-next-line require-atomic-updates
+      initializationPromise = null;
     }
-  } catch (error) {
-    // If we fail to fetch messages set them to English fallback.
-    if (!currentMessages) {
-      currentLocaleCode = FALLBACK_LOCALE;
-      currentMessages = locales[FALLBACK_LOCALE];
-    }
-  } finally {
-    // eslint-disable-next-line require-atomic-updates
-    isInitializing = false;
-  }
+  })();
+
+  return initializationPromise;
 }
 
 /**
