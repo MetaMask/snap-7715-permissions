@@ -25,7 +25,7 @@ export const nativeTokenStreamPermissionDefinition: PermissionDefinition<
   PopulatedNativeTokenStreamPermission
 > = {
   rules: allRules,
-  title: 'nativeTokenStreamTitle',
+  title: 'permissionRequestTitle',
   dependencies: {
     parseAndValidatePermission,
     buildContext,

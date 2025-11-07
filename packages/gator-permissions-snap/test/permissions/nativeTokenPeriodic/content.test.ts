@@ -25,7 +25,7 @@ const mockContext: NativeTokenPeriodicContext = {
   },
   permissionDetails: {
     periodAmount: '1',
-    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]).toString(),
+    periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
     startTime: 499161600, // 10/26/1985
   },
 };
@@ -201,15 +201,15 @@ describe('nativeTokenPeriodic:content', () => {
                         "props": {
                           "children": [
                             {
-                              "key": "Hourly",
+                              "key": "hourly",
                               "props": {
                                 "children": "Hourly",
-                                "value": "Hourly",
+                                "value": "hourly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Daily",
+                              "key": "daily",
                               "props": {
                                 "children": "Daily",
                                 "value": "daily",
@@ -225,26 +225,26 @@ describe('nativeTokenPeriodic:content', () => {
                               "type": "Option",
                             },
                             {
-                              "key": "Biweekly",
+                              "key": "biweekly",
                               "props": {
                                 "children": "Biweekly",
-                                "value": "Biweekly",
+                                "value": "biweekly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Monthly",
+                              "key": "monthly",
                               "props": {
                                 "children": "Monthly",
-                                "value": "Monthly",
+                                "value": "monthly",
                               },
                               "type": "Option",
                             },
                             {
-                              "key": "Yearly",
+                              "key": "yearly",
                               "props": {
                                 "children": "Yearly",
-                                "value": "Yearly",
+                                "value": "yearly",
                               },
                               "type": "Option",
                             },

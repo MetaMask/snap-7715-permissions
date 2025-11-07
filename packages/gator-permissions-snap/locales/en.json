@@ -117,21 +117,9 @@
       "message": "The length of each period in seconds",
       "description": "Tooltip for the period duration input field in seconds"
     },
-    "nativeTokenStreamTitle": {
+    "permissionRequestTitle": {
       "message": "Permission request",
-      "description": "Title for native token stream permission"
-    },
-    "erc20TokenStreamTitle": {
-      "message": "Permission request",
-      "description": "Title for ERC20 token stream permission"
-    },
-    "nativeTokenPeriodicTitle": {
-      "message": "Permission request",
-      "description": "Title for native token periodic permission"
-    },
-    "erc20TokenPeriodicTitle": {
-      "message": "Permission request",
-      "description": "Title for ERC20 token periodic permission"
+      "description": "Title for permission request dialogs"
     },
     "showMoreButton": {
       "message": "Show",
@@ -173,6 +161,10 @@
       "message": "Grant",
       "description": "Grant button text"
     },
+    "hourly": {
+      "message": "Hourly",
+      "description": "Hourly time period option"
+    },
     "daily": {
       "message": "Daily",
       "description": "Daily time period option"
@@ -181,17 +173,29 @@
       "message": "Weekly",
       "description": "Weekly time period option"
     },
+    "biweekly": {
+      "message": "Biweekly",
+      "description": "Biweekly time period option"
+    },
     "monthly": {
       "message": "Monthly",
       "description": "Monthly time period option"
+    },
+    "yearly": {
+      "message": "Yearly",
+      "description": "Yearly time period option"
     },
     "availableLabel": {
       "message": "available",
       "description": "Available label for token balance"
     },
-    "other": {
-      "message": "Other",
-      "description": "Other time period option"
+    "permissionRequestSubtitle": {
+      "message": "This site wants permissions to spend your tokens.",
+      "description": "Subtitle for permission request"
+    },
+    "accountUpgradeWarning": {
+      "message": "This account will be upgraded to a smart account to complete this permission.",
+      "description": "Warning message when account needs to be upgraded"
     }
   }
 }

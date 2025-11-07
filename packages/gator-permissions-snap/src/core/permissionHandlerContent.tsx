@@ -23,9 +23,6 @@ import type { MessageKey } from '../utils/i18n';
 import { t } from '../utils/i18n';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
-export const ACCOUNT_LABEL = 'Account';
-export const ACCOUNT_TOOLTIP =
-  'The account from which the permission is being granted.';
 
 export type PermissionHandlerContentProps = {
   children: SnapElement;
@@ -106,14 +103,14 @@ export const PermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{t(permissionTitle)}</Heading>
-          <Text>This site wants permissions to spend your tokens.</Text>
+          <Text>{t('permissionRequestSubtitle')}</Text>
         </Box>
         <Section>
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
               <Box direction="horizontal">
-                <Text>{ACCOUNT_LABEL}</Text>
-                <TooltipIcon tooltip={ACCOUNT_TOOLTIP} />
+                <Text>{t('accountLabel')}</Text>
+                <TooltipIcon tooltip={t('accountTooltip')} />
               </Box>
             </Box>
             <AccountSelector
@@ -124,8 +121,7 @@ export const PermissionHandlerContent = ({
             />
             {!isAccountUpgraded && (
               <Text size="sm" color="warning">
-                This account will be upgraded to a smart account to complete
-                this permission.
+                {t('accountUpgradeWarning')}
               </Text>
             )}
             <Box direction="horizontal" alignment="end">
@@ -185,7 +181,7 @@ export const SkeletonPermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{t(permissionTitle)}</Heading>
-          <Text>This site wants permissions to spend your tokens.</Text>
+          <Text>{t('permissionRequestSubtitle')}</Text>
         </Box>
         <Section>
           <SkeletonField

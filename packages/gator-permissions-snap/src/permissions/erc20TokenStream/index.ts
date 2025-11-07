@@ -25,7 +25,7 @@ export const erc20TokenStreamPermissionDefinition: PermissionDefinition<
   PopulatedErc20TokenStreamPermission
 > = {
   rules: allRules,
-  title: 'erc20TokenStreamTitle',
+  title: 'permissionRequestTitle',
   dependencies: {
     parseAndValidatePermission,
     buildContext,
