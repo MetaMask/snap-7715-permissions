@@ -8,8 +8,16 @@ import {
   type Hex,
 } from '@metamask/utils';
 
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamPermissionRequest,
+  NativeTokenStreamMetadata,
+  PopulatedNativeTokenStreamPermission,
+  NativeTokenStreamPermission,
+} from './types';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import { t } from '../../utils/i18n';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
@@ -20,13 +28,6 @@ import {
   calculateAmountPerSecond,
   validateStartTimeVsExpiry,
 } from '../contextValidation';
-import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamPermissionRequest,
-  NativeTokenStreamMetadata,
-  PopulatedNativeTokenStreamPermission,
-  NativeTokenStreamPermission,
-} from './types';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -293,7 +294,7 @@ export async function deriveMetadata({
     decimals,
     'amount per period',
   );
-  let amountPerSecond = 'Unknown';
+  let amountPerSecond = t('unknownStreamRate');
   if (amountPerPeriodResult.error) {
     validationErrors.amountPerPeriodError = amountPerPeriodResult.error;
   } else if (amountPerPeriodResult.amount) {
