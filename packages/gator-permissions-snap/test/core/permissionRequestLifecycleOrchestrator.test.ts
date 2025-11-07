@@ -16,22 +16,28 @@ import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
+import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 const randomAddress = () => {
   /* eslint-disable no-restricted-globals */
-  const randomBytes = crypto.getRandomValues(new Uint8Array(20));
+  const randomBytes = new Uint8Array(20);
+  for (let i = 0; i < 20; i++) {
+    randomBytes[i] = Math.floor(Math.random() * 256);
+  }
   return bytesToHex(randomBytes);
 };
 
 const mockSignature = '0x1234';
 const mockInterfaceId = 'test-interface-id';
 const grantingAccountAddress = randomAddress();
+const fixedCaip10Address = `eip155:1:${grantingAccountAddress}`;
 
 const mockContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
   address: grantingAccountAddress,
+  accountAddressCaip10: fixedCaip10Address,
 };
 
 const mockMetadata = {
@@ -89,6 +95,8 @@ const mockPopulatedPermission = {
 const mockAccountController = {
   signDelegation: jest.fn(),
   getAccountAddresses: jest.fn(),
+  getAccountUpgradeStatus: jest.fn(async () => ({ isUpgraded: false })),
+  upgradeAccount: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<AccountController>;
 
 const mockConfirmationDialog = {
@@ -112,6 +120,16 @@ const mockUserEventDispatcher = {
 const mockNonceCaveatService = {
   getNonce: jest.fn(),
 } as unknown as jest.Mocked<NonceCaveatService>;
+
+const mockSnapsMetricsService = {
+  trackPermissionRequestStarted: jest.fn().mockResolvedValue(undefined),
+  trackPermissionDialogShown: jest.fn().mockResolvedValue(undefined),
+  trackPermissionRejected: jest.fn().mockResolvedValue(undefined),
+  trackPermissionGranted: jest.fn().mockResolvedValue(undefined),
+  trackSmartAccountUpgraded: jest.fn().mockResolvedValue(undefined),
+  trackDelegationSigning: jest.fn().mockResolvedValue(undefined),
+  trackProfileSync: jest.fn().mockResolvedValue(undefined),
+} as unknown as jest.Mocked<SnapsMetricsService>;
 
 type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
@@ -155,6 +173,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       }),
     );
 
+    mockAccountController.getAccountUpgradeStatus.mockImplementation(
+      async () => ({ isUpgraded: false }),
+    );
+
     mockConfirmationDialogFactory.createConfirmation.mockReturnValue(
       mockConfirmationDialog,
     );
@@ -174,6 +196,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         confirmationDialogFactory: mockConfirmationDialogFactory,
         userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
+        snapsMetricsService: mockSnapsMetricsService,
       });
   });
 
@@ -184,6 +207,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         confirmationDialogFactory: mockConfirmationDialogFactory,
         userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
+        snapsMetricsService: mockSnapsMetricsService,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });
@@ -276,6 +300,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           ui: mockSkeletonUiContent,
           isGrantDisabled: true,
+          onBeforeGrant: expect.any(Function),
         });
       });
 
@@ -483,12 +508,133 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           'Expiry rule not found. An expiry is required on all permissions.',
         );
       });
+      it('checks account upgrade status and triggers upgrade when needed', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: false,
+        });
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(
+          mockAccountController.getAccountUpgradeStatus,
+        ).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(result.approved).toBe(true);
+      });
+
+      it('does not trigger upgrade when account is already upgraded', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: true,
+        });
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(
+          mockAccountController.getAccountUpgradeStatus,
+        ).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
+        expect(result.approved).toBe(true);
+      });
+
+      it('tracks smart account upgrade success when upgrade is successful', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: false,
+        });
+        mockAccountController.upgradeAccount.mockResolvedValueOnce({
+          transactionHash: '0xabc123',
+        });
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(
+          mockSnapsMetricsService.trackSmartAccountUpgraded,
+        ).toHaveBeenCalledWith({
+          origin: 'test-origin',
+          accountAddress: grantingAccountAddress,
+          chainId: '0x1',
+          success: true,
+        });
+        expect(result.approved).toBe(true);
+      });
+
+      it('tracks smart account upgrade failure when upgrade fails', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: false,
+        });
+        mockAccountController.upgradeAccount.mockRejectedValueOnce(
+          new Error('Upgrade failed'),
+        );
+
+        // The permission request should still succeed despite upgrade failure
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+        expect(
+          mockSnapsMetricsService.trackSmartAccountUpgraded,
+        ).toHaveBeenCalledWith({
+          origin: 'test-origin',
+          accountAddress: grantingAccountAddress,
+          chainId: '0x1',
+          success: false,
+        });
+        expect(result.approved).toBe(true);
+      });
+
+      it('does not track smart account upgrade when account is already upgraded', async () => {
+        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+          isUpgraded: true,
+        });
+
+        await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
+        expect(
+          mockSnapsMetricsService.trackSmartAccountUpgraded,
+        ).not.toHaveBeenCalled();
+      });
+
       it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
         const initialContext = {
           foo: 'original',
           expiry: '2024-12-31',
           isAdjustmentAllowed: true,
-          accountAddressCaip10: grantingAccountAddress,
+          accountAddressCaip10: fixedCaip10Address,
           tokenAddressCaip19: 'eip155:1:0x1234',
           tokenMetadata: {
             decimals: 18,
@@ -500,7 +646,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           foo: 'updated',
           expiry: '2025-01-01',
           isAdjustmentAllowed: true,
-          accountAddressCaip10: grantingAccountAddress,
+          accountAddressCaip10: fixedCaip10Address,
           tokenAddressCaip19: 'eip155:1:0x1234',
           tokenMetadata: {
             decimals: 18,
@@ -562,11 +708,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         });
       });
 
-      it('throws an error when adjustment is not allowed', async () => {
+      it('passes isAdjustmentAllowed flag to onConfirmationCreated when adjustment is not allowed', async () => {
         const initialContext = {
           foo: 'bar',
           expiry: '2024-12-31',
           isAdjustmentAllowed: false, // Adjustment not allowed
+          accountAddressCaip10: fixedCaip10Address,
         };
 
         const mockPermissionRequestWithAdjustmentNotAllowed = {
@@ -579,11 +726,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
 
-        let updateContextHandler: any;
+        let onConfirmationCreatedArgs: any;
         expect(lifecycleHandlerMocks.onConfirmationCreated).toBeDefined();
         lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
-          ({ updateContext }) => {
-            updateContextHandler = updateContext;
+          (args) => {
+            onConfirmationCreatedArgs = args;
           },
         );
 
@@ -596,20 +743,84 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         await new Promise((resolve) => setTimeout(resolve, 0));
 
-        await expect(
-          updateContextHandler({
-            updatedContext: { ...initialContext, foo: 'updated' },
-          }),
-        ).rejects.toThrow('Adjustment is not allowed');
+        // Verify that isAdjustmentAllowed is passed correctly
+        expect(onConfirmationCreatedArgs).toBeDefined();
+        expect(onConfirmationCreatedArgs.isAdjustmentAllowed).toBe(false);
+        expect(onConfirmationCreatedArgs.updateContext).toBeDefined();
+        expect(onConfirmationCreatedArgs.initialContext).toStrictEqual(
+          initialContext,
+        );
 
-        // this is called once when the context is first resolved
-        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(1);
+        // Verify that updateContext can be called without throwing (restriction is now in handlers)
+        const updateContextPromise = onConfirmationCreatedArgs.updateContext({
+          updatedContext: { ...initialContext, foo: 'updated' },
+        });
+        expect(await updateContextPromise).toBeUndefined();
+
+        // this is called once when the context is first resolved, and once when we call updateContext
+        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(2);
 
         mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
           {
             isConfirmationGranted: true,
           },
         );
+
+        await orchestrationPromise;
+      });
+
+      it('prevents race condition when grant is clicked before debounced validation completes', async () => {
+        // This test simulates the race condition scenario:
+        // 1. User types invalid input → validation debounced (500ms delay)
+        // 2. User clicks Grant before debounce completes (button still enabled)
+        // 3. beforeGrantCallback validates fresh state → detects errors → prevents grant
+
+        let validationErrorsState = {};
+
+        // Mock deriveMetadata to return our controlled validation state
+        lifecycleHandlerMocks.deriveMetadata.mockImplementation(async () => ({
+          test: 'metadata',
+          validationErrors: validationErrorsState,
+        }));
+
+        // Start orchestration
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequest,
+            lifecycleHandlerMocks,
+          );
+
+        // Wait for initial setup
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        // Extract the onBeforeGrant callback that was passed to createConfirmation
+        expect(
+          mockConfirmationDialogFactory.createConfirmation,
+        ).toHaveBeenCalledTimes(1);
+        const createConfirmationCall =
+          mockConfirmationDialogFactory.createConfirmation.mock.calls[0]?.[0];
+
+        if (!createConfirmationCall?.onBeforeGrant) {
+          throw new Error('Expected onBeforeGrant to be defined');
+        }
+
+        const beforeGrantCallback = createConfirmationCall.onBeforeGrant;
+
+        // Valid state: grant should be allowed
+        validationErrorsState = {};
+        let result = await beforeGrantCallback();
+        expect(result).toBe(true);
+
+        // Invalid state (simulating user typed invalid input before debounce completed)
+        validationErrorsState = { amount: 'Amount must be positive' };
+        result = await beforeGrantCallback();
+        expect(result).toBe(false); // Should prevent grant
+
+        // Back to valid state
+        validationErrorsState = {};
+        result = await beforeGrantCallback();
+        expect(result).toBe(true); // Should allow grant
 
         await orchestrationPromise;
       });
@@ -625,7 +836,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
        * 4. Applies context to resolve the permission request.
        * 5. Populates the permission with required values.
        * 6. Appends caveats to the permission.
-       * 7. Signs the delegation for the permission.
+       * 7. Checks and upgrades account if necessary.
+       * 8. Signs the delegation for the permission.
        */
 
       beforeEach(async () => {
@@ -658,6 +870,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           ui: mockSkeletonUiContent,
           isGrantDisabled: true,
+          onBeforeGrant: expect.any(Function),
         });
 
         expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();
@@ -726,7 +939,19 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 7. Signs the delegation for the permission.
+       * 7. Checks and upgrades account if necessary.
+       */
+      it('checks account upgrade status before processing permission', async () => {
+        expect(
+          mockAccountController.getAccountUpgradeStatus,
+        ).toHaveBeenCalledWith({
+          account: grantingAccountAddress,
+          chainId: '0x1',
+        });
+      });
+
+      /*
+       * 8. Signs the delegation for the permission.
        */
       it('signs the delegation for the permission', async () => {
         expect(mockAccountController.signDelegation).toHaveBeenCalledWith(

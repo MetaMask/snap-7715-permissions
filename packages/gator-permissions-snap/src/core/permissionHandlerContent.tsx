@@ -16,13 +16,16 @@ import {
   SkeletonField,
   TextField,
   TooltipIcon,
-  TokenField,
   TokenBalanceField,
+  TokenField,
 } from '../ui/components';
 import type { MessageKey } from '../utils/i18n';
 import { t } from '../utils/i18n';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
+export const ACCOUNT_LABEL = 'Account';
+export const ACCOUNT_TOOLTIP =
+  'The account from which the permission is being granted.';
 
 export type PermissionHandlerContentProps = {
   children: SnapElement;
@@ -38,6 +41,7 @@ export type PermissionHandlerContentProps = {
   tokenBalanceFiat: string | null;
   chainId: number;
   explorerUrl: string | undefined;
+  isAccountUpgraded: boolean;
 };
 
 /**
@@ -56,6 +60,7 @@ export type PermissionHandlerContentProps = {
  * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
+ * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -72,8 +77,11 @@ export const PermissionHandlerContent = ({
   tokenBalanceFiat,
   chainId,
   explorerUrl,
+  isAccountUpgraded,
 }: PermissionHandlerContentProps): SnapElement => {
-  const tokenBalanceComponent = TokenBalanceField({ tokenBalance });
+  const tokenBalanceComponent = TokenBalanceField({
+    tokenBalance,
+  });
 
   const fiatBalanceComponent = tokenBalanceFiat ? (
     <Text>{tokenBalanceFiat}</Text>
@@ -98,7 +106,49 @@ export const PermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{t(permissionTitle)}</Heading>
+          <Text>This site wants permissions to spend your tokens.</Text>
         </Box>
+        <Section>
+          <Box direction="vertical">
+            <Box direction="horizontal" alignment="space-between">
+              <Box direction="horizontal">
+                <Text>{ACCOUNT_LABEL}</Text>
+                <TooltipIcon tooltip={ACCOUNT_TOOLTIP} />
+              </Box>
+            </Box>
+            <AccountSelector
+              name={ACCOUNT_SELECTOR_NAME}
+              chainIds={[`eip155:${chainId}`]}
+              switchGlobalAccount={false}
+              value={context.accountAddressCaip10}
+            />
+            {!isAccountUpgraded && (
+              <Text size="sm" color="warning">
+                This account will be upgraded to a smart account to complete
+                this permission.
+              </Text>
+            )}
+            <Box direction="horizontal" alignment="end">
+              {fiatBalanceComponent}
+              {tokenBalanceComponent}
+            </Box>
+          </Box>
+        </Section>
+        <Section>
+          <Box direction="horizontal" alignment="space-between">
+            <Box direction="horizontal">
+              <Text>{t('reasonLabel')}</Text>
+              <TooltipIcon tooltip={t('reasonTooltip')} />
+            </Box>
+            <Box direction="horizontal">
+              <ShowMoreText
+                text={justification}
+                buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
+                isCollapsed={isJustificationCollapsed}
+              />
+            </Box>
+          </Box>
+        </Section>
         <Section>
           <TextField
             label={t('recipientLabel')}
@@ -118,39 +168,6 @@ export const PermissionHandlerContent = ({
             tooltip={t('tokenTooltip')}
             iconData={tokenIconData}
           />
-          <Box direction="horizontal" alignment="space-between">
-            <Box direction="horizontal">
-              <Text>{t('reasonLabel')}</Text>
-              <TooltipIcon tooltip={t('reasonTooltip')} />
-            </Box>
-            <Box direction="horizontal">
-              <ShowMoreText
-                text={justification}
-                buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
-                isCollapsed={isJustificationCollapsed}
-              />
-            </Box>
-          </Box>
-        </Section>
-        <Section>
-          <Box direction="vertical">
-            <Box direction="horizontal" alignment="space-between">
-              <Box direction="horizontal">
-                <Text>{t('accountLabel')}</Text>
-                <TooltipIcon tooltip={t('accountTooltip')} />
-              </Box>
-            </Box>
-            <AccountSelector
-              name={ACCOUNT_SELECTOR_NAME}
-              chainIds={[`eip155:${chainId}`]}
-              switchGlobalAccount={false}
-              value={context.accountAddressCaip10}
-            />
-            <Box direction="horizontal" alignment="end">
-              {fiatBalanceComponent}
-              {tokenBalanceComponent}
-            </Box>
-          </Box>
         </Section>
         {children}
       </Box>
@@ -168,6 +185,7 @@ export const SkeletonPermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{t(permissionTitle)}</Heading>
+          <Text>This site wants permissions to spend your tokens.</Text>
         </Box>
         <Section>
           <SkeletonField
@@ -183,10 +201,6 @@ export const SkeletonPermissionHandlerContent = ({
             label={t('reasonLabel')}
             tooltip={t('reasonTooltip')}
           />
-        </Section>
-        <Section>
-          <Skeleton />
-          <Skeleton />
         </Section>
       </Box>
     </Box>

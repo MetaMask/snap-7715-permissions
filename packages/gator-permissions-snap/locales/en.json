@@ -102,7 +102,7 @@
       "description": "Tooltip for the amount field"
     },
     "periodDurationLabel": {
-      "message": "Period duration",
+      "message": "Frequency",
       "description": "Label for the period duration dropdown field"
     },
     "periodDurationTooltip": {
@@ -118,19 +118,19 @@
       "description": "Tooltip for the period duration input field in seconds"
     },
     "nativeTokenStreamTitle": {
-      "message": "Native Token Stream Permission",
+      "message": "Permission request",
       "description": "Title for native token stream permission"
     },
     "erc20TokenStreamTitle": {
-      "message": "ERC20 Token Stream Permission",
+      "message": "Permission request",
       "description": "Title for ERC20 token stream permission"
     },
     "nativeTokenPeriodicTitle": {
-      "message": "Native Token Periodic Permission",
+      "message": "Permission request",
       "description": "Title for native token periodic permission"
     },
     "erc20TokenPeriodicTitle": {
-      "message": "ERC20 Token Periodic Permission",
+      "message": "Permission request",
       "description": "Title for ERC20 token periodic permission"
     },
     "showMoreButton": {

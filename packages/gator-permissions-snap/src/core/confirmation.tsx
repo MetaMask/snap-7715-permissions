@@ -30,16 +30,20 @@ export class ConfirmationDialog {
 
   #decisionReject: ((reason: Error) => void) | undefined;
 
+  readonly #onBeforeGrant: () => Promise<boolean>;
+
   constructor({
     ui,
     isGrantDisabled,
     snaps,
     userEventDispatcher,
+    onBeforeGrant,
   }: ConfirmationProps) {
     this.#ui = ui;
     this.#isGrantDisabled = isGrantDisabled;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#onBeforeGrant = onBeforeGrant;
   }
 
   async createInterface(): Promise<string> {
@@ -69,17 +73,26 @@ export class ConfirmationDialog {
     const interfaceId = this.#interfaceId;
 
     const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
-      // cleanup can't be defined before the click handlers, so cannot be const
-      // eslint-disable-next-line prefer-const
-      let cleanup: () => Promise<void>;
-
       const { unbind: unbindGrantButtonClick } = this.#userEventDispatcher.on({
         elementName: ConfirmationDialog.#grantButton,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          await cleanup();
+          /**
+           * Button click events are non-debounced and trigger immediately. However, when a non-debounced event
+           * fires, all pending debounced events (like input changes) are processed first. This ensures that
+           * if a user modifies a field and immediately clicks grant, the input change handler completes before
+           * this click handler executes, keeping state up-to-date. But the button is already triggered so
+           * onBeforeGrant is here to prevent button click execution if validation fails.
+           */
+          const isValid = await this.#onBeforeGrant();
+          // If validation fails, don't resolve - keep dialog open with errors shown
+          if (!isValid) {
+            return;
+          }
 
+          await this.#cleanup();
+          this.#interfaceId = undefined;
           resolve(true);
         },
       });
@@ -89,38 +102,18 @@ export class ConfirmationDialog {
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          await cleanup();
-
+          await this.#cleanup();
+          this.#interfaceId = undefined;
           resolve(false);
         },
       });
-
-      cleanup = async () => {
-        unbindGrantButtonClick();
-        unbindCancelButtonClick();
-
-        // clear our stored unbind handler reference
-        this.#unbindHandlers = undefined;
-
-        try {
-          await this.#snaps.request({
-            method: 'snap_resolveInterface',
-            params: {
-              id: interfaceId,
-              value: {},
-            },
-          });
-        } catch (error) {
-          const reason = error as Error;
-          reject(reason);
-        }
-      };
 
       // store hooks so we can close/reject programmatically on error
       this.#unbindHandlers = () => {
         unbindGrantButtonClick();
         unbindCancelButtonClick();
       };
+
       this.#decisionReject = reject;
 
       // we don't await this, because we only want to present the dialog, and
@@ -132,6 +125,14 @@ export class ConfirmationDialog {
             id: interfaceId,
           },
         })
+        .then(async (result) => {
+          // Should resolve with false when dialog is closed.
+          if (result === null) {
+            await this.#cleanup(false);
+
+            resolve(false);
+          }
+        })
         .catch((error) => {
           const reason = error as Error;
           reject(reason);
@@ -141,6 +142,33 @@ export class ConfirmationDialog {
     return {
       isConfirmationGranted: await isConfirmationGranted,
     };
+  }
+
+  /**
+   * Clean up event handlers and optionally resolve the interface.
+   * @param resolveInterface - Whether to resolve the interface. Defaults to true.
+   */
+  async #cleanup(resolveInterface = true): Promise<void> {
+    // Unbind any listeners to avoid leaks
+    if (this.#unbindHandlers) {
+      try {
+        this.#unbindHandlers();
+      } catch {
+        // ignore
+      } finally {
+        this.#unbindHandlers = undefined;
+      }
+    }
+
+    if (resolveInterface && this.#interfaceId) {
+      await this.#snaps.request({
+        method: 'snap_resolveInterface',
+        params: {
+          id: this.#interfaceId,
+          value: {},
+        },
+      });
+    }
   }
 
   #buildConfirmation(): JSX.Element {
@@ -204,30 +232,11 @@ export class ConfirmationDialog {
       return;
     }
 
-    // Unbind any listeners to avoid leaks
-    if (this.#unbindHandlers) {
-      try {
-        this.#unbindHandlers();
-      } catch {
-        // ignore
-      } finally {
-        this.#unbindHandlers = undefined;
-      }
-    }
+    // Clean up handlers and resolve interface
+    await this.#cleanup(true);
 
-    try {
-      await this.#snaps.request({
-        method: 'snap_resolveInterface',
-        params: {
-          id: this.#interfaceId,
-          value: {},
-        },
-      });
-    } catch (error) {
-      // If closing fails, still reject with the original reason
-    } finally {
-      this.#interfaceId = undefined;
-    }
+    // Clear interface ID after cleanup
+    this.#interfaceId = undefined;
 
     if (this.#decisionReject) {
       this.#decisionReject(reason);

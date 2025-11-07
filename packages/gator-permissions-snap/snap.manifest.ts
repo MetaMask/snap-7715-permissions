@@ -7,7 +7,6 @@ import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 import packageJson from './package.json' with { type: 'json' };
 
 const kernelSnapId = process.env.KERNEL_SNAP_ID;
-const messageSnapId = process.env.MESSAGE_SIGNING_SNAP_ID;
 const snapEnv = process.env.SNAP_ENV;
 const manifest: SnapManifest = {
   version: packageJson.version,
@@ -46,7 +45,6 @@ const manifest: SnapManifest = {
 if (kernelSnapId) {
   manifest.initialConnections = {
     ...(kernelSnapId ? { [kernelSnapId]: {} } : {}),
-    ...(messageSnapId ? { [messageSnapId]: {} } : {}),
   };
 }
 

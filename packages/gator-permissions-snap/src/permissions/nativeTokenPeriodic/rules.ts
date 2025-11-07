@@ -1,6 +1,8 @@
+import { InvalidInputError } from '@metamask/snaps-sdk';
+
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
-import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
+import { getClosestTimePeriod, TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import type {
   NativeTokenPeriodicContext,
@@ -10,7 +12,6 @@ import { t } from '../../utils/i18n';
 
 export const PERIOD_AMOUNT_ELEMENT = 'native-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'native-token-periodic-period-type';
-export const PERIOD_DURATION_ELEMENT = 'native-token-periodic-period-duration';
 export const START_TIME_ELEMENT = 'native-token-periodic-start-date';
 export const EXPIRY_ELEMENT = 'native-token-periodic-expiry';
 
@@ -38,7 +39,7 @@ export const periodAmountRule: RuleDefinition<
   }),
 };
 
-export const periodTypeRule: RuleDefinition<
+export const periodDurationRule: RuleDefinition<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
 > = {
@@ -47,51 +48,40 @@ export const periodTypeRule: RuleDefinition<
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
     isAdjustmentAllowed: context.isAdjustmentAllowed,
-    value: context.permissionDetails.periodType,
+    value: getClosestTimePeriod(context.permissionDetails.periodDuration),
     isVisible: true,
     tooltip: t('periodDurationTooltip'),
-    options: [TimePeriod.DAILY, TimePeriod.WEEKLY, 'other'],
-    error: metadata.validationErrors.periodTypeError,
+    options: Object.values(TimePeriod),
+    error: metadata.validationErrors.periodDurationError,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => {
-    const periodType = value as TimePeriod | 'other';
-    const periodDuration =
-      periodType === 'other'
-        ? context.permissionDetails.periodDuration
-        : Number(TIME_PERIOD_TO_SECONDS[periodType]).toString();
+    // Validate that value is a valid TimePeriod
+    if (!Object.values(TimePeriod).includes(value as TimePeriod)) {
+      throw new InvalidInputError(
+        `Invalid period type: "${value}". Valid options are: ${Object.values(TimePeriod).join(', ')}`,
+      );
+    }
+
+    const periodType = value as TimePeriod;
+    const periodSeconds = TIME_PERIOD_TO_SECONDS[periodType];
+
+    // This should never happen if the above check passed, but be defensive
+    if (periodSeconds === undefined) {
+      throw new InvalidInputError(
+        `Period type "${periodType}" is not mapped to a duration. This indicates a system error.`,
+      );
+    }
+
+    const periodDuration = Number(periodSeconds);
 
     return {
       ...context,
       permissionDetails: {
         ...context.permissionDetails,
-        periodType,
         periodDuration,
       },
     };
   },
-};
-
-export const periodDurationRule: RuleDefinition<
-  NativeTokenPeriodicContext,
-  NativeTokenPeriodicMetadata
-> = {
-  name: PERIOD_DURATION_ELEMENT,
-  label: 'periodDurationSecondsLabel',
-  type: 'number',
-  getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.periodDuration,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
-    isVisible: context.permissionDetails.periodType === 'other',
-    tooltip: t('periodDurationSecondsTooltip'),
-    error: metadata.validationErrors.periodDurationError,
-  }),
-  updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
-    ...context,
-    permissionDetails: {
-      ...context.permissionDetails,
-      periodDuration: value,
-    },
-  }),
 };
 
 export const startTimeRule: RuleDefinition<
@@ -162,7 +152,6 @@ export const expiryRule: RuleDefinition<
 
 export const allRules = [
   periodAmountRule,
-  periodTypeRule,
   periodDurationRule,
   startTimeRule,
   expiryRule,

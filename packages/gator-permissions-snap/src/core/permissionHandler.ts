@@ -8,6 +8,7 @@ import type { Hex } from '@metamask/utils';
 import {
   bigIntToHex,
   isStrictHexString,
+  numberToHex,
   parseCaipAccountId,
   parseCaipAssetType,
 } from '@metamask/utils';
@@ -16,7 +17,10 @@ import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
-import type { AccountController } from './accountController';
+import type {
+  AccountController,
+  AccountUpgradeStatus,
+} from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import {
   ACCOUNT_SELECTOR_NAME,
@@ -199,12 +203,6 @@ export class PermissionHandler<
       origin: string;
       chainId: number;
     }) => {
-      const permissionContent =
-        await this.#dependencies.createConfirmationContent({
-          context,
-          metadata,
-        });
-
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
       const tokenIconData = getIconData(context);
@@ -212,7 +210,40 @@ export class PermissionHandler<
       const {
         justification,
         tokenMetadata: { symbol: tokenSymbol },
+        accountAddressCaip10,
       } = context;
+
+      const { address } = parseCaipAccountId(accountAddressCaip10);
+      // TODO: Uncomment this when we know extension has support for account upgrade
+      // const [permissionContent, accountUpgradeStatus] = await Promise.all([
+      //   this.#dependencies.createConfirmationContent({
+      //     context,
+      //     metadata,
+      //   }),
+      //   this.#accountController.getAccountUpgradeStatus({
+      //     account: address,
+      //     chainId: numberToHex(chainId),
+      //   }),
+      // ]);
+
+      let accountUpgradeStatus: AccountUpgradeStatus = { isUpgraded: true };
+
+      try {
+        accountUpgradeStatus =
+          await this.#accountController.getAccountUpgradeStatus({
+            account: address,
+            chainId: numberToHex(chainId),
+          });
+      } catch (error) {
+        // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
+        // TODO: When we know extension has support for account upgrade, we can show an error to the user
+      }
+
+      const permissionContent =
+        await this.#dependencies.createConfirmationContent({
+          context,
+          metadata,
+        });
 
       return PermissionHandlerContent({
         origin,
@@ -228,6 +259,7 @@ export class PermissionHandler<
         tokenBalanceFiat: this.#tokenBalanceFiat,
         chainId,
         explorerUrl,
+        isAccountUpgraded: accountUpgradeStatus.isUpgraded,
       });
     };
 
@@ -235,10 +267,12 @@ export class PermissionHandler<
       interfaceId,
       initialContext,
       updateContext,
+      isAdjustmentAllowed,
     }: {
       interfaceId: string;
       initialContext: TContext;
       updateContext: (args: { updatedContext: TContext }) => Promise<void>;
+      isAdjustmentAllowed: boolean;
     }) => {
       let currentContext = initialContext;
       const rerender = async () => {
@@ -344,17 +378,21 @@ export class PermissionHandler<
         },
       });
 
-      const unbindRuleHandlers = bindRuleHandlers({
-        rules: this.#rules,
-        userEventDispatcher: this.#userEventDispatcher,
-        interfaceId,
-        getContext: () => currentContext,
-        deriveMetadata: this.#dependencies.deriveMetadata,
-        onContextChanged: async ({ context }) => {
-          currentContext = context;
-          await rerender();
-        },
-      });
+      const unbindRuleHandlers = isAdjustmentAllowed
+        ? bindRuleHandlers({
+            rules: this.#rules,
+            userEventDispatcher: this.#userEventDispatcher,
+            interfaceId,
+            getContext: () => currentContext,
+            deriveMetadata: this.#dependencies.deriveMetadata,
+            onContextChanged: async ({ context }) => {
+              currentContext = context;
+              await rerender();
+            },
+          })
+        : () => {
+            // No-op function when adjustment is not allowed
+          };
 
       this.#unbindHandlers = () => {
         unbindRuleHandlers();

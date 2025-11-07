@@ -22,6 +22,7 @@ describe('chainMetadata', () => {
     const metadataSchema = {
       contracts: {
         delegationManager: expect.any(String),
+        eip7702StatelessDeleGatorImpl: expect.any(String),
         limitedCallsEnforcer: expect.any(String),
         erc20StreamingEnforcer: expect.any(String),
         erc20PeriodTransferEnforcer: expect.any(String),

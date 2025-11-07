@@ -13,7 +13,6 @@ const {
   ACCOUNT_API_BASE_URL,
   TOKENS_API_BASE_URL,
   KERNEL_SNAP_ID,
-  MESSAGE_SIGNING_SNAP_ID,
 } = process.env;
 
 if (!SNAP_ENV) {
@@ -23,12 +22,6 @@ if (!SNAP_ENV) {
 if (!KERNEL_SNAP_ID) {
   throw new InternalError(
     'KERNEL_SNAP_ID must be set as an environment variable.',
-  );
-}
-
-if (!MESSAGE_SIGNING_SNAP_ID) {
-  throw new InternalError(
-    'MESSAGE_SIGNING_SNAP_ID must be set as an environment variable.',
   );
 }
 
@@ -81,7 +74,6 @@ const config: SnapConfig = {
     ACCOUNT_API_BASE_URL,
     TOKENS_API_BASE_URL,
     KERNEL_SNAP_ID,
-    MESSAGE_SIGNING_SNAP_ID,
   },
 };
 

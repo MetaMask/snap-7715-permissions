@@ -157,12 +157,12 @@ export function calculateAmountPerSecond(
  * @param periodDuration - The period duration string to validate.
  * @returns Object containing parsed duration and any validation error.
  */
-export function validatePeriodDuration(periodDuration: string): {
+export function validatePeriodDuration(periodDuration: number): {
   duration: number | undefined;
   error: string | undefined;
 } {
   try {
-    const duration = parseInt(periodDuration, 10);
+    const duration = periodDuration;
     if (isNaN(duration) || duration <= 0) {
       return {
         duration: undefined,

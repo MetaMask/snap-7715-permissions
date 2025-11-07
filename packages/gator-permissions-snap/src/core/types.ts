@@ -92,9 +92,12 @@ export type DeepRequired<TParent> = TParent extends (infer U)[]
  * An enum representing the time periods for which the stream rate can be calculated.
  */
 export enum TimePeriod {
+  HOURLY = 'hourly',
   DAILY = 'daily',
   WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
   MONTHLY = 'monthly',
+  YEARLY = 'yearly',
 }
 
 /**
@@ -103,12 +106,14 @@ export enum TimePeriod {
  * @property isGrantDisabled - Whether the user can grant the permission
  * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
+ * @property onBeforeGrant - Validation callback that runs before grant is confirmed
  */
 export type ConfirmationProps = {
   ui: SnapElement;
   isGrantDisabled: boolean;
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
+  onBeforeGrant: () => Promise<boolean>;
 };
 
 /**
@@ -151,6 +156,10 @@ export type LifecycleOrchestrationHandlers<
   /**
    * Optional callback that is invoked when a confirmation dialog is created.
    * @param confirmationCreatedArgs - Arguments containing the interface ID and a function to update the context
+   * @param confirmationCreatedArgs.interfaceId - The interface ID for the confirmation dialog
+   * @param confirmationCreatedArgs.initialContext - The initial context for the confirmation dialog
+   * @param confirmationCreatedArgs.updateContext - Function to update the context of the confirmation dialog
+   * @param confirmationCreatedArgs.isAdjustmentAllowed - Whether adjustments to the confirmation dialog are allowed
    */
   onConfirmationCreated?: (confirmationCreatedArgs: {
     interfaceId: string;
@@ -158,6 +167,7 @@ export type LifecycleOrchestrationHandlers<
     updateContext: (updateContextArgs: {
       updatedContext: TContext;
     }) => Promise<void>;
+    isAdjustmentAllowed: boolean;
   }) => void;
 
   /**

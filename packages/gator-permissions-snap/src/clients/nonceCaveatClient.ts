@@ -4,15 +4,13 @@ import type { Hex } from '@metamask/delegation-core';
 import {
   ChainDisconnectedError,
   InvalidInputError,
-  InternalError,
   ResourceUnavailableError,
   type SnapsEthereumProvider,
 } from '@metamask/snaps-sdk';
-import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import type { RetryOptions } from './types';
 import { getChainMetadata } from '../core/chainMetadata';
-import { sleep } from '../utils/httpClient';
+import { callContract, ensureChain } from '../utils/blockchain';
 
 /**
  * Client that fetches nonce from nonce caveat enforcer.
@@ -65,84 +63,35 @@ export class NonceCaveatClient {
       throw new InvalidInputError(message);
     }
 
-    const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
+    // Ensure we're on the correct chain
+    await ensureChain(this.#ethereumProvider, chainId);
 
-    // Try up to initial attempt + retry attempts
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        // Check if we're on the correct chain and switch if not
-        const selectedChain = await this.#ethereumProvider.request<Hex>({
-          method: 'eth_chainId',
-          params: [],
-        });
+    const callData = (NonceCaveatClient.#currentNonceCalldata +
+      contracts.delegationManager.slice(2).padStart(64, '0') +
+      account.slice(2).padStart(64, '0')) as Hex;
 
-        if (selectedChain && hexToNumber(selectedChain) !== chainId) {
-          await this.#ethereumProvider.request<Hex>({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: numberToHex(chainId) }],
-          });
+    try {
+      const nonceEncoded = await callContract({
+        ethereumProvider: this.#ethereumProvider,
+        contractAddress: contracts.nonceEnforcer,
+        callData,
+        retryOptions,
+        isRetryableError: (error) => this.#isRetryableError(error),
+      });
 
-          const updatedChain = await this.#ethereumProvider.request<Hex>({
-            method: 'eth_chainId',
-            params: [],
-          });
-
-          if (updatedChain && hexToNumber(updatedChain) !== chainId) {
-            throw new ChainDisconnectedError(
-              'Selected chain does not match the requested chain',
-            );
-          }
-        }
-
-        const nonceEncoded = await this.#ethereumProvider.request<Hex>({
-          method: 'eth_call',
-          params: [
-            {
-              to: contracts.nonceEnforcer,
-              data:
-                NonceCaveatClient.#currentNonceCalldata +
-                contracts.delegationManager.slice(2).padStart(64, '0') +
-                account.slice(2).padStart(64, '0'),
-            },
-            'latest',
-          ],
-        });
-
-        if (!nonceEncoded) {
-          logger.error('Failed to fetch nonce');
-          if (attempt < retries) {
-            await sleep(delayMs);
-            continue;
-          }
-          throw new ResourceUnavailableError('Failed to fetch nonce');
-        }
-
-        const nonce = decodeSingle('uint256', nonceEncoded);
-        return nonce;
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        logger.error(
-          `Failed to fetch nonce (attempt ${attempt + 1}): ${errorMessage}`,
-        );
-
-        // Check if this is a retryable error
-        if (this.#isRetryableError(error)) {
-          if (attempt < retries) {
-            await sleep(delayMs);
-            continue;
-          }
-          throw new ResourceUnavailableError('Failed to fetch nonce');
-        } else {
-          // Re-throw non-retryable errors immediately
-          throw error;
-        }
+      const nonce = decodeSingle('uint256', nonceEncoded);
+      return nonce;
+    } catch (error) {
+      // Re-throw ChainDisconnectedError without wrapping
+      if (error instanceof ChainDisconnectedError) {
+        throw error;
       }
-    }
 
-    throw new InternalError(
-      `Failed to fetch nonce after ${retries + 1} attempts`,
-    );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error(`Failed to fetch nonce: ${errorMessage}`);
+      throw new ResourceUnavailableError('Failed to fetch nonce');
+    }
   }
 
   /**

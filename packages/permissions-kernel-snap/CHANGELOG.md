@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0]
+
+### Fixed
+
+- Throw appropriate `SnapError` when an error is thrown by the target of an RPC ([#211](https://github.com/MetaMask/snap-7715-permissions/pull/211))
+
+## [0.4.0]
+
+### Changed
+
+- `snap.manifest.ts` version bumped to 3.0.0
+
 ## [0.3.0]
 
 ### Added
@@ -84,7 +96,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add validate logic for native token stream permission data ([#33](https://github.com/MetaMask/snap-7715-permissions/pull/33))
 - Update 7715 types to match mm proposed types ([#30](https://github.com/MetaMask/snap-7715-permissions/pull/30))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.3.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.5.0...HEAD
+[0.5.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.4.0...@metamask/permissions-kernel-snap@0.5.0
+[0.4.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.3.0...@metamask/permissions-kernel-snap@0.4.0
 [0.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.2.0...@metamask/permissions-kernel-snap@0.3.0
 [0.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.1.0...@metamask/permissions-kernel-snap@0.2.0
 [0.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.0.1...@metamask/permissions-kernel-snap@0.1.0

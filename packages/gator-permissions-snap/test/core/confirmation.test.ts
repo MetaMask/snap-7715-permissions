@@ -17,8 +17,11 @@ describe('ConfirmationDialog', () => {
     children: 'Test Title',
   }) as unknown as SnapElement;
 
+  const mockOnBeforeGrant = jest.fn<() => Promise<boolean>>();
+
   const defaultProps = {
     ui: mockUi,
+    onBeforeGrant: mockOnBeforeGrant,
   };
 
   beforeEach(() => {
@@ -38,6 +41,10 @@ describe('ConfirmationDialog', () => {
       }),
       off: jest.fn(),
     } as unknown as jest.Mocked<UserEventDispatcher>;
+
+    // Reset and configure mock to return true by default (validation passes)
+    mockOnBeforeGrant.mockClear();
+    mockOnBeforeGrant.mockResolvedValue(true);
 
     confirmationDialog = new ConfirmationDialog({
       ...defaultProps,
@@ -137,6 +144,25 @@ describe('ConfirmationDialog', () => {
       });
 
       const result = await awaitingUserDecision;
+      expect(result).toStrictEqual({ isConfirmationGranted: false });
+    });
+
+    it('should resolve with false when dialog is closed', async () => {
+      // Simulate dialog closure
+      mockSnaps.request.mockResolvedValueOnce(null);
+
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(2);
+      expect(mockUnbindFunctions).toHaveLength(2);
+
+      const result = await awaitingUserDecision;
+
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
       expect(result).toStrictEqual({ isConfirmationGranted: false });
     });
 

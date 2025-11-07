@@ -1,6 +1,6 @@
 {
   "name": "@metamask/snap-7715-permissions-monorepo",
-  "version": "5.0.0",
+  "version": "9.0.0",
   "private": true,
   "description": "Monorepo for 7715 permissions snaps.",
   "repository": {
@@ -13,17 +13,16 @@
   ],
   "scripts": {
     "prepare:snap": "./scripts/prepare-snap.sh",
-    "build": "yarn workspaces foreach --parallel --topological --verbose run build",
-    "build:pack": "yarn workspaces foreach --parallel --interlaced --verbose run build:pack",
-    "changelog:update": "yarn workspaces foreach --all --no-private --parallel --interlaced --verbose run changelog:update",
-    "changelog:validate": "yarn workspaces foreach --all --no-private --parallel --interlaced --verbose run changelog:validate",
-    "lint": "yarn workspaces foreach --parallel run lint",
-    "lint:eslint": "yarn workspaces foreach --parallel run lint:eslint",
-    "lint:fix": "yarn workspaces foreach --parallel run lint:fix",
-    "lint:misc": "yarn workspaces foreach --parallel run lint:misc",
-    "start": "yarn workspaces foreach --parallel --interlaced --verbose run start",
-    "start:message-signing-snap": "cd external/message-signing-snap && yarn start",
-    "test": "yarn workspaces foreach --parallel --interlaced --verbose run test"
+    "build": "yarn workspaces foreach --worktree --parallel --topological --verbose run build",
+    "build:pack": "yarn workspaces foreach --worktree --parallel --interlaced --verbose run build:pack",
+    "changelog:update": "yarn workspaces foreach --worktree --no-private --parallel --interlaced --verbose run changelog:update",
+    "changelog:validate": "yarn workspaces foreach --worktree --no-private --parallel --interlaced --verbose run changelog:validate",
+    "lint": "yarn workspaces foreach --worktree --parallel run lint",
+    "lint:eslint": "yarn workspaces foreach --worktree --parallel run lint:eslint",
+    "lint:fix": "yarn workspaces foreach --worktree --parallel run lint:fix",
+    "lint:misc": "yarn workspaces foreach --worktree --parallel run lint:misc",
+    "start": "yarn workspaces foreach --worktree --parallel --interlaced --verbose run start",
+    "test": "yarn workspaces foreach --worktree --parallel --interlaced --verbose run test"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "3.3.4",
@@ -48,7 +47,7 @@
     "sharp": "0.32.6",
     "typescript": "5.8.3"
   },
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@4.10.1",
   "engines": {
     "node": "^20 || >=22"
   },

@@ -1,5 +1,12 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { Box, Field, Input, Section, Text } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Divider,
+  Field,
+  Input,
+  Section,
+  Text,
+} from '@metamask/snaps-sdk/jsx';
 
 import {
   initialAmountRule,
@@ -37,6 +44,20 @@ export async function createConfirmationContent({
     <Box>
       <Section>
         {renderRules({
+          rules: [initialAmountRule, maxAmountRule],
+          context,
+          metadata,
+        })}
+        <Divider />
+        {renderRules({
+          rules: [startTimeRule, expiryRule],
+          context,
+          metadata,
+        })}
+      </Section>
+
+      <Section>
+        {renderRules({
           rules: [streamAmountPerPeriodRule, streamPeriodRule],
           context,
           metadata,
@@ -64,14 +85,6 @@ export async function createConfirmationContent({
             />
           </Field>
         </Box>
-      </Section>
-
-      <Section>
-        {renderRules({
-          rules: [initialAmountRule, maxAmountRule, startTimeRule, expiryRule],
-          context,
-          metadata,
-        })}
       </Section>
     </Box>
   );
