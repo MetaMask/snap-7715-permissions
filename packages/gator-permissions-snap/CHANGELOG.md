@@ -9,10 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.1]
 
-### Uncategorized
+### Fixed
 
-- Correct yarn upgrade ([#222](https://github.com/MetaMask/snap-7715-permissions/pull/222))
-- Revert "Release/10.0.0" ([#221](https://github.com/MetaMask/snap-7715-permissions/pull/221))
+- Corrects Accounts API URL, which caused permission requests on Mainnet to fail
 
 ## [0.6.0]
 
