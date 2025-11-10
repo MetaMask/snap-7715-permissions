@@ -81,7 +81,7 @@
     "ts-jest": "29.4.0",
     "typescript": "5.8.3"
   },
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@4.10.1",
   "engines": {
     "node": "^20 || >=22"
   },
