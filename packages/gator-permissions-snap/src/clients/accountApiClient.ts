@@ -222,11 +222,21 @@ export class AccountApiClient {
     }
     const tokenAddress = assetAddress ?? AccountApiClient.#nativeTokenAddress;
 
-    const tokenMetadata = await this.#fetchTokenMetadata(
-      tokenAddress,
-      chainId,
-      retryOptions,
-    );
+    let tokenMetadata: TokenMetadataResponse;
+    try {
+      tokenMetadata = await this.#fetchTokenMetadata(
+        tokenAddress,
+        chainId,
+        retryOptions,
+      );
+    } catch (error) {
+      if (error instanceof InvalidInputError) {
+        throw new InvalidInputError(
+          'Failed to fetch token balance and metadata: Token address is invalid',
+        );
+      }
+      throw error;
+    }
 
     return {
       decimals: tokenMetadata.decimals,
