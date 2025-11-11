@@ -1,10 +1,12 @@
-import { zAddress } from '@metamask/7715-permissions-shared/types';
+import {
+  zAddress,
+  ZERO_ADDRESS,
+} from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
 import { InvalidInputError, ResourceNotFoundError } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
-import { ZERO_ADDRESS } from '../constants';
 import type { TokenBalanceAndMetadata, RetryOptions } from './types';
 import { makeValidatedRequestWithRetry } from '../utils/httpClient';
 import { parseUnits } from '../utils/value';
