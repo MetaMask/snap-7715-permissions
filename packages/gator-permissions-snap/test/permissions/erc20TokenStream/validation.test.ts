@@ -427,6 +427,24 @@ describe('erc20TokenStream:validation', () => {
         );
       });
 
+      it('should throw for zero address tokenAddress', () => {
+        const zeroAddressRequest = {
+          ...validPermissionRequest,
+          permission: {
+            ...validPermissionRequest.permission,
+            data: {
+              ...validPermissionRequest.permission.data,
+              tokenAddress:
+                '0x0000000000000000000000000000000000000000' as `0x${string}`,
+            },
+          },
+        };
+
+        expect(() => parseAndValidatePermission(zeroAddressRequest)).toThrow(
+          'Failed type validation: data.tokenAddress: Address cannot be the zero address',
+        );
+      });
+
       it('should throw for missing token address', () => {
         const missingTokenAddressRequest = {
           ...validPermissionRequest,

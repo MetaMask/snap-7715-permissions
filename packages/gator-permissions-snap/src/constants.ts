@@ -1,6 +1,3 @@
-export const ZERO_ADDRESS =
-  '0x0000000000000000000000000000000000000000' as const;
-
 // The character limit on ENS names, nicknames and addresses before we truncate
 export const TRUNCATED_NAME_CHAR_LIMIT = 11;
 

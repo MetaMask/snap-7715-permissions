@@ -2,9 +2,9 @@ import {
   zHexStr,
   zPermission,
   zMetaMaskPermissionData,
-  zAddress,
   zStartTime,
   zHexStrNullableOptional,
+  zAddressNotZeroAddress,
 } from '@metamask/7715-permissions-shared/types';
 import { z } from 'zod';
 
@@ -46,7 +46,7 @@ export const zErc20TokenStreamPermission = zPermission.extend({
       maxAmount: zHexStrNullableOptional,
       amountPerSecond: zHexStr,
       startTime: zStartTime,
-      tokenAddress: zAddress,
+      tokenAddress: zAddressNotZeroAddress,
     }),
   ),
 });
