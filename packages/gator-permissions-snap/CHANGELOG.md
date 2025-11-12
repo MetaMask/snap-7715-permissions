@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.0]
 
-### Uncategorized
+### Fixed
 
 - Add zero address validation ([#226](https://github.com/MetaMask/snap-7715-permissions/pull/226))
 - Fix: throw proper errors ([#225](https://github.com/MetaMask/snap-7715-permissions/pull/225))
