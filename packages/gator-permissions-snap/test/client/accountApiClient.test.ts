@@ -129,10 +129,10 @@ describe('AccountApiClient', () => {
     });
 
     it('retries on 5xx status and succeeds', async () => {
-      // First call fails with 500 status
+      // First call fails with 503 status
       mockFetch.mockResolvedValueOnce({
         ok: false,
-        status: 500,
+        status: 503,
       });
 
       // Second call succeeds
@@ -569,24 +569,24 @@ describe('AccountApiClient', () => {
 
     describe('retry logic', () => {
       it('retries once on ResourceUnavailableError (5xx status) and succeeds', async () => {
-        // First balance call fails with 500 status (ResourceUnavailableError)
+        // First balance call fails with 503 status (ResourceUnavailableError)
         mockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
-          // No json method - this will cause the httpClient to throw the 500 error before trying to parse JSON
+          // No json method - this will cause the httpClient to throw the 503 error before trying to parse JSON
         });
 
-        // First metadata call fails with 500 status (ResourceUnavailableError)
+        // First metadata call fails with 503 status (ResourceUnavailableError)
         mockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
-          // No json method - this will cause the httpClient to throw the 500 error before trying to parse JSON
+          // No json method - this will cause the httpClient to throw the 503 error before trying to parse JSON
         });
 
         // Second balance call succeeds
@@ -648,24 +648,24 @@ describe('AccountApiClient', () => {
       });
 
       it('retries with custom retry options', async () => {
-        // Mock balance API - first call fails with 500 status
+        // Mock balance API - first call fails with 503 status
         mockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
-          // No json method - this will cause the httpClient to throw the 500 error before trying to parse JSON
+          // No json method - this will cause the httpClient to throw the 503 error before trying to parse JSON
         });
 
-        // Mock metadata API - first call fails with 500 status
+        // Mock metadata API - first call fails with 503 status
         mockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
-          // No json method - this will cause the httpClient to throw the 500 error before trying to parse JSON
+          // No json method - this will cause the httpClient to throw the 503 error before trying to parse JSON
         });
 
         // Mock balance API - second call succeeds
@@ -769,15 +769,15 @@ describe('AccountApiClient', () => {
       });
 
       it('retries up to the specified number of attempts', async () => {
-        // All calls fail with 500 status - provide 7 mock responses (4 for balance API + 3 for metadata API)
+        // All calls fail with 503 status - provide 7 mock responses (4 for balance API + 3 for metadata API)
         for (let i = 0; i < 7; i++) {
           mockFetch.mockResolvedValueOnce({
             ok: false,
-            status: 500,
+            status: 503,
             headers: {
               get: jest.fn().mockReturnValue('1024'),
             },
-            // No json method - this will cause the httpClient to throw the 500 error before trying to parse JSON
+            // No json method - this will cause the httpClient to throw the 503 error before trying to parse JSON
           });
         }
 
@@ -790,7 +790,7 @@ describe('AccountApiClient', () => {
               delayMs: 100,
             },
           }),
-        ).rejects.toThrow('Server error: 500');
+        ).rejects.toThrow('Server error: 503');
 
         expect(mockFetch).toHaveBeenCalledTimes(7); // 4 balance calls + 3 metadata calls (one API fails before making all retries)
       });
@@ -808,27 +808,27 @@ describe('AccountApiClient', () => {
           maxResponseSizeBytes: 1024 * 1024, // 1MB
         });
 
-        // Mock balance API - first call fails with 500 status
+        // Mock balance API - first call fails with 503 status
         freshMockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
           json: async () => {
-            throw new Error('Server error: 500');
+            throw new Error('Server error: 503');
           },
         });
 
-        // Mock metadata API - first call fails with 500 status
+        // Mock metadata API - first call fails with 503 status
         freshMockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
           json: async () => {
-            throw new Error('Server error: 500');
+            throw new Error('Server error: 503');
           },
         });
 

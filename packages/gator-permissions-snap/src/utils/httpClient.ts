@@ -150,7 +150,7 @@ async function makeValidatedRequest<
  * @returns True if the status code indicates a resource unavailable error.
  */
 export function isResourceUnavailableStatus(statusCode: number): boolean {
-  return statusCode >= 500 || statusCode === 429 || statusCode === 408;
+  return statusCode > 501 || statusCode === 429 || statusCode === 408;
 }
 
 /**
