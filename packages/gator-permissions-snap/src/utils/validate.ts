@@ -40,6 +40,7 @@ export const validatePermissionRequestParam = (
 // Validation schema for revocation parameters
 const zRevocationParams = z.object({
   permissionContext: zHexStr,
+  txHash: zHexStr,
 });
 
 /**
@@ -50,6 +51,7 @@ const zRevocationParams = z.object({
  */
 export function validateRevocationParams(params: Json): {
   permissionContext: Hex;
+  txHash: Hex;
 } {
   try {
     if (!params || typeof params !== 'object') {
@@ -60,6 +62,7 @@ export function validateRevocationParams(params: Json): {
 
     return {
       permissionContext: validated.permissionContext,
+      txHash: validated.txHash,
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

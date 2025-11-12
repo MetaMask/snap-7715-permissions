@@ -97,6 +97,9 @@ describe('profileSync', () => {
     },
     siteOrigin: 'https://example.com',
     isRevoked: false,
+    metadata: {
+      txHash: '0x' as Hex,
+    },
   };
   const mockPassAuth = () => {
     jwtBearerAuthMock.getAccessToken.mockResolvedValueOnce('aaa.bbb.ccc');
@@ -216,7 +219,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
           ),
         );
         // Verify the stored data can be parsed and contains expected fields
@@ -247,7 +250,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo.slice(2)}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
           ),
         );
         // Verify the stored data can be parsed and contains expected fields
@@ -327,13 +330,13 @@ describe('profileSync', () => {
             [
               mockDelegationHash,
               expect.stringMatching(
-                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false\}$/u,
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
               ),
             ],
             [
               mockDelegationHashTwo,
               expect.stringMatching(
-                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false\}$/u,
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
               ),
             ],
           ],
@@ -461,7 +464,7 @@ describe('profileSync', () => {
           [
             mockDelegationHash,
             expect.stringMatching(
-              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false\}$/u,
+              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
             ),
           ],
         ],
@@ -489,6 +492,7 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           true,
+          '0xMocked-tx-hash',
         );
 
         // Should first get the existing permission
@@ -500,7 +504,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":true\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":true,"metadata":\{"txHash":"0xMocked-tx-hash"\}\}$/u,
           ),
         );
 
@@ -512,7 +516,7 @@ describe('profileSync', () => {
         expect(parsed.siteOrigin).toBe('https://example.com');
       });
 
-      it('should set permission revocation status to false', async () => {
+      it('should set permission revocation status to false and store the transaction hash', async () => {
         // Create a mock permission that's already revoked
         const revokedPermission = {
           ...mockStoredGrantedPermission,
@@ -528,13 +532,14 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           false,
+          '0xMocked-tx-hash',
         );
 
         // Should store the updated permission with isRevoked=false
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0xMocked-tx-hash"\}\}$/u,
           ),
         );
 
@@ -543,6 +548,7 @@ describe('profileSync', () => {
         expect(storedData).toBeDefined();
         const parsed = JSON.parse(storedData as string);
         expect(parsed.isRevoked).toBe(false);
+        expect(parsed.metadata.txHash).toBe('0xMocked-tx-hash');
       });
 
       it('should throw error when permission not found', async () => {
@@ -563,6 +569,7 @@ describe('profileSync', () => {
           profileSyncManager.updatePermissionRevocationStatus(
             nonExistentDelegationHash,
             true,
+            '0xMocked-tx-hash',
           ),
         ).rejects.toThrow(
           `Permission not found for permission context: ${nonExistentDelegationHash}`,
@@ -586,6 +593,7 @@ describe('profileSync', () => {
           profileSyncManager.updatePermissionRevocationStatus(
             mockStoredGrantedPermission.permissionResponse.context,
             true,
+            '0xMocked-tx-hash',
           ),
         ).rejects.toThrow('Auth failed');
       });
@@ -643,6 +651,7 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           true,
+          '0xMocked-tx-hash',
         );
         expect(userStorageMock.getItem).not.toHaveBeenCalled();
         expect(userStorageMock.setItem).not.toHaveBeenCalled();

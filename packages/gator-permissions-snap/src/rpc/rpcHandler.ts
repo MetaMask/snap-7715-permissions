@@ -191,7 +191,7 @@ export function createRpcHandler({
   const submitRevocation = async (params: Json): Promise<Json> => {
     logger.debug('submitRevocation() called with params:', params);
 
-    const { permissionContext } = validateRevocationParams(params);
+    const { permissionContext, txHash } = validateRevocationParams(params);
 
     // First, get the existing permission to validate it exists
     logger.debug(
@@ -255,9 +255,12 @@ export function createRpcHandler({
       );
     }
 
+    // TODO:Check that that provided transaction hash is valid using the blockchain metadata client
+
     await profileSyncManager.updatePermissionRevocationStatus(
       permissionContext,
       true,
+      txHash,
     );
 
     return { success: true };
