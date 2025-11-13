@@ -62,11 +62,11 @@
       "description": "Label for the start time field"
     },
     "startTimeTooltip": {
-      "message": "The time at which the first period begins(mm/dd/yyyy hh:mm:ss).",
+      "message": "The time at which the first period begins (mm/dd/yyyy hh:mm:ss).",
       "description": "Tooltip for the start time field for periodic permissions"
     },
     "streamStartTimeTooltip": {
-      "message": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+      "message": "The start time of the stream (mm/dd/yyyy hh:mm:ss).",
       "description": "Tooltip for the start time field for stream permissions"
     },
     "expiryLabel": {
@@ -74,7 +74,7 @@
       "description": "Label for the expiry field"
     },
     "expiryTooltip": {
-      "message": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+      "message": "The expiry date of the permission (mm/dd/yyyy hh:mm:ss).",
       "description": "Tooltip for the expiry field"
     },
     "streamAmountLabel": {
