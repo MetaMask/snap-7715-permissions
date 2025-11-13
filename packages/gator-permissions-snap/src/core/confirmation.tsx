@@ -161,13 +161,17 @@ export class ConfirmationDialog {
     }
 
     if (resolveInterface && this.#interfaceId) {
-      await this.#snaps.request({
-        method: 'snap_resolveInterface',
-        params: {
-          id: this.#interfaceId,
-          value: {},
-        },
-      });
+      try {
+        await this.#snaps.request({
+          method: 'snap_resolveInterface',
+          params: {
+            id: this.#interfaceId,
+            value: {},
+          },
+        });
+      } catch (error) {
+        // silently ignore since dialog is already closed (probably from an internal error)
+      }
     }
   }
 

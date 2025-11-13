@@ -1,4 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import { ZERO_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import {
   InvalidRequestError,
   ResourceNotFoundError,
@@ -40,7 +41,6 @@ import type {
   PermissionHandlerParams,
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
-import { ZERO_ADDRESS } from '../constants';
 import type { MessageKey } from '../utils/i18n';
 import { formatUnits } from '../utils/value';
 
@@ -253,7 +253,7 @@ export class PermissionHandler<
         tokenIconData,
         isJustificationCollapsed: this.#isJustificationCollapsed,
         children: permissionContent,
-        permissionTitle: this.#permissionTitle,
+        permissionTitle: this.#permissionTitle as MessageKey,
         context,
         tokenBalance: this.#tokenBalance,
         tokenBalanceFiat: this.#tokenBalanceFiat,

@@ -1,6 +1,6 @@
 {
   "name": "@metamask/gator-permissions-snap",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Grants 7715 permissions from a DeleGator smart account",
   "homepage": "https://github.com/MetaMask/snap-7715-permissions/tree/main/packages/permissions-kernel-snap#readme",
   "bugs": {
@@ -81,7 +81,7 @@
     "ts-jest": "29.4.0",
     "typescript": "5.8.3"
   },
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@4.10.1",
   "engines": {
     "node": "^20 || >=22"
   },

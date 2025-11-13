@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import {
-  gatorSnapOrigin,
-  kernelSnapOrigin,
-  messageSigningSnapOrigin,
-} from '../config';
+import { gatorSnapOrigin, kernelSnapOrigin } from '../config';
 import type { GetSnapsResponse } from '../types';
 import { useMetaMaskContext } from './MetamaskContext';
 import { useRequest } from './useRequest';
@@ -50,10 +46,6 @@ export const useMetaMask = () => {
     const gatorSnap = snaps[gatorSnapOrigin];
     if (gatorSnap) {
       handleSetInstalledSnap(gatorSnap);
-    }
-    const messageSigningSnap = snaps[messageSigningSnapOrigin];
-    if (messageSigningSnap) {
-      handleSetInstalledSnap(messageSigningSnap);
     }
   };
 

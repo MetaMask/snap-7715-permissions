@@ -138,10 +138,10 @@ describe('PriceApiClient', () => {
 
     describe('retry logic', () => {
       it('retries once on ResourceUnavailableError (5xx status) and succeeds', async () => {
-        // First call fails with 500 status (ResourceUnavailableError)
+        // First call fails with 503 status (ResourceUnavailableError)
         mockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
@@ -189,10 +189,10 @@ describe('PriceApiClient', () => {
       });
 
       it('retries with custom retry options', async () => {
-        // First call fails with 500 status
+        // First call fails with 503 status
         mockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
@@ -253,10 +253,10 @@ describe('PriceApiClient', () => {
       });
 
       it('retries up to the specified number of attempts', async () => {
-        // All calls fail with 500 status
+        // All calls fail with 503 status
         mockFetch.mockResolvedValue({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },
@@ -267,16 +267,16 @@ describe('PriceApiClient', () => {
             retries: 3,
             delayMs: 100,
           }),
-        ).rejects.toThrow('Server error: 500');
+        ).rejects.toThrow('Server error: 503');
 
         expect(mockFetch).toHaveBeenCalledTimes(4); // Initial + 3 retries
       });
 
       it('uses default retry options when none provided', async () => {
-        // First call fails with 500 status
+        // First call fails with 503 status
         mockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 500,
+          status: 503,
           headers: {
             get: jest.fn().mockReturnValue('1024'),
           },

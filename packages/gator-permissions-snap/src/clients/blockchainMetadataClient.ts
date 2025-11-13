@@ -1,3 +1,4 @@
+import { ZERO_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { decodeSingle } from '@metamask/abi-utils';
 import type { Hex } from '@metamask/delegation-core';
@@ -10,7 +11,6 @@ import {
   type SnapsEthereumProvider,
 } from '@metamask/snaps-sdk';
 
-import { ZERO_ADDRESS } from '../constants';
 import type {
   RetryOptions,
   TokenBalanceAndMetadata,
