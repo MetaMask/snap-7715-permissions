@@ -34,7 +34,7 @@ function validatePermissionData(
     name: 'initialAmount',
     value: initialAmount,
     required: false,
-    allowZero: false,
+    allowZero: true,
   });
 
   validateHexInteger({
