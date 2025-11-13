@@ -260,7 +260,7 @@ export type PermissionDefinition<
     DeepRequired<TPermission> = DeepRequired<TPermission>,
 > = {
   rules: RuleDefinition<TContext, TMetadata>[];
-  title: string;
+  title: MessageKey;
   dependencies: PermissionHandlerDependencies<
     TRequest,
     TContext,
