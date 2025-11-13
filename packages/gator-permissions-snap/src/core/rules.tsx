@@ -10,6 +10,7 @@ import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
+import type { MessageKey } from '../utils/i18n';
 import { t } from '../utils/i18n';
 import {
   combineDateAndTimeToTimestamp,
@@ -105,11 +106,11 @@ export function renderRule<
         <DropdownField
           label={t(label)}
           name={name}
-          value={value ?? ''}
+          value={value as MessageKey}
           errorMessage={error}
           disabled={isDisabled}
           tooltip={tooltip}
-          options={options}
+          options={options as MessageKey[]}
         />
       );
     }

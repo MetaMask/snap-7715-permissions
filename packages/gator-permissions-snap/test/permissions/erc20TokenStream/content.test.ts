@@ -348,7 +348,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+                                        "children": "The start time of the stream (mm/dd/yyyy hh:mm:ss).",
                                       },
                                       "type": "Text",
                                     },
@@ -485,7 +485,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+                                        "children": "The expiry date of the permission (mm/dd/yyyy hh:mm:ss).",
                                       },
                                       "type": "Text",
                                     },
@@ -1237,7 +1237,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
+                                        "children": "The start time of the stream (mm/dd/yyyy hh:mm:ss).",
                                       },
                                       "type": "Text",
                                     },
@@ -1382,7 +1382,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+                                        "children": "The expiry date of the permission (mm/dd/yyyy hh:mm:ss).",
                                       },
                                       "type": "Text",
                                     },

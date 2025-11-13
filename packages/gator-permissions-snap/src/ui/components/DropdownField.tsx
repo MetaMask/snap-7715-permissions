@@ -3,12 +3,13 @@ import { Dropdown, Option } from '@metamask/snaps-sdk/jsx';
 import type { BaseFieldProps } from './Field';
 import { Field } from './Field';
 import { TextField } from './TextField';
+import type { MessageKey } from '../../utils/i18n';
 import { t } from '../../utils/i18n';
 
 export type DropdownFieldParams = BaseFieldProps & {
   name: string;
-  value: string;
-  options: string[];
+  value: MessageKey;
+  options: MessageKey[];
 };
 
 export const DropdownField = ({
