@@ -154,7 +154,7 @@ describe('nativeTokenStream:validation', () => {
     });
 
     describe('initialAmount validation', () => {
-      it('should throw for zero initialAmount', () => {
+      it('should allow zero initialAmount', () => {
         const zeroInitialAmountRequest = {
           ...validPermissionRequest,
           permission: {
@@ -168,7 +168,7 @@ describe('nativeTokenStream:validation', () => {
 
         expect(() =>
           parseAndValidatePermission(zeroInitialAmountRequest),
-        ).toThrow('Invalid initialAmount: must be greater than 0');
+        ).not.toThrow();
       });
 
       it('should allow missing initialAmount', () => {
