@@ -1,6 +1,7 @@
 import { logger } from '../../../shared/src/utils/logger';
 import enLocale from '../../locales/en.json';
-
+import zhCNLocale from '../../locales/zh_CN.json';
+import zhTWLocale from '../../locales/zh_TW.json';
 // Type definitions
 export type LocaleMessage = {
   message: string;
@@ -12,11 +13,15 @@ export type LocaleMessages = {
 };
 
 export type MessageKey = keyof typeof enLocale.messages;
-export type SupportedLocale = 'en';
+export type SupportedLocale = 'en' | 'zh_CN' | 'zh_TW';
 
 // All available locales
 const locales: Record<SupportedLocale, LocaleMessages> = {
   en: enLocale.messages,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  zh_CN: zhCNLocale.messages,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  zh_TW: zhTWLocale.messages,
 };
 
 // Fallback locale
@@ -47,8 +52,7 @@ export async function setupI18n(): Promise<void> {
         method: 'snap_getPreferences',
       });
 
-      const userLocale = (preferences.locale || FALLBACK_LOCALE).toLowerCase();
-
+      const userLocale = preferences.locale || FALLBACK_LOCALE;
       // If already initialized with the requested locale, skip re-initialization
       if (currentMessages && currentLocaleCode === userLocale) {
         return;
