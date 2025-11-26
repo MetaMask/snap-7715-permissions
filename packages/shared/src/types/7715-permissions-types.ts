@@ -46,14 +46,19 @@ export const zRule = z
      */
     data: z.record(z.string(), z.any()),
   })
-  .refine((rule) => {
-    // Rules are generally free-form, but expiry is a special case.
-    if (extractDescriptorName(rule.type) === 'expiry') {
-      return zTimestamp.safeParse(rule.data.timestamp).success;
-    }
+  .refine(
+    (rule) => {
+      // Rules are generally free-form, but expiry is a special case.
+      if (extractDescriptorName(rule.type) === 'expiry') {
+        return zTimestamp.safeParse(rule.data.timestamp).success;
+      }
 
-    return true;
-  });
+      return true;
+    },
+    {
+      message: 'Expiry timestamp must be a valid positive integer',
+    },
+  );
 
 /**
  * Default message for when no justification is provided
