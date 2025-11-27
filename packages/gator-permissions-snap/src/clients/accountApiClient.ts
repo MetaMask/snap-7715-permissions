@@ -123,7 +123,6 @@ export class AccountApiClient {
       56, // BSC Mainnet
       59144, // Linea Mainnet
       8453, // Base Mainnet
-      11155111, // Sepolia
     ].includes(chainId);
   }
 
