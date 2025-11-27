@@ -1,6 +1,5 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import type { Hex } from '@metamask/delegation-core';
-import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { AccountApiClient } from '../../src/clients/accountApiClient';
 import type { TokenMetadataClient } from '../../src/clients/types';
@@ -164,23 +163,7 @@ describe('TokenMetadataService', () => {
         mockAccountApiClient.isChainIdSupported.mockReturnValue(true);
       });
 
-      it('should propagate InvalidInputError from AccountApiClient without fallback', async () => {
-        const error = new InvalidInputError('Invalid token address');
-        mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
-          error,
-        );
-
-        await expect(
-          tokenMetadataService.getTokenBalanceAndMetadata(baseOptions),
-        ).rejects.toThrow('Invalid token address');
-
-        // Verify no fallback occurred
-        expect(
-          mockTokenMetadataClient.getTokenBalanceAndMetadata,
-        ).not.toHaveBeenCalled();
-      });
-
-      it('should fallback to blockchain client when AccountApiClient fails with non-InvalidInputError', async () => {
+      it('should fallback to blockchain client when AccountApiClient fails', async () => {
         const networkError = new Error('Network timeout');
         mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
           networkError,
@@ -210,7 +193,7 @@ describe('TokenMetadataService', () => {
         expect(result).toStrictEqual(mockTokenBalanceAndMetadata);
       });
 
-      it('should propagate errors from TokenMetadataClient', async () => {
+      it('should propagate errors from TokenMetadataClient when no fallback available', async () => {
         mockAccountApiClient.isChainIdSupported.mockReturnValue(false);
         const error = new Error('TokenMetadata error');
         mockTokenMetadataClient.getTokenBalanceAndMetadata.mockRejectedValue(
@@ -222,7 +205,7 @@ describe('TokenMetadataService', () => {
         ).rejects.toThrow('TokenMetadata error');
       });
 
-      it('should throw the last error when both AccountApiClient and TokenMetadataClient fail', async () => {
+      it('should throw the last error when both clients fail', async () => {
         const accountApiError = new Error('Account API network error');
         const tokenMetadataError = new Error('TokenMetadata network error');
 

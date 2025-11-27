@@ -1,6 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
-import { InternalError, InvalidInputError } from '@metamask/snaps-sdk';
+import { InternalError } from '@metamask/snaps-sdk';
 
 import type { AccountApiClient } from '../clients/accountApiClient';
 import type {
@@ -70,8 +70,8 @@ export class TokenMetadataService {
 
   /**
    * Retrieves the token balance and metadata for the specified account.
-   * Tries multiple clients in order of preference. If a client fails (except for
-   * InvalidInputError), automatically falls back to the next available client.
+   * Tries multiple clients in order of preference. If a client fails,
+   * automatically falls back to the next available client.
    * @param options - The options for fetching the token balance and metadata.
    * @returns A promise resolving to the token balance and metadata.
    */
@@ -99,11 +99,6 @@ export class TokenMetadataService {
 
         return balanceAndMetadata;
       } catch (error) {
-        // If the error is InvalidInputError, re-throw immediately without trying other clients
-        if (error instanceof InvalidInputError) {
-          throw error;
-        }
-
         lastError = error;
         logger.info(
           `TokenMetadataService:getTokenBalanceAndMetadata() - client failed for chain ${chainId}`,
