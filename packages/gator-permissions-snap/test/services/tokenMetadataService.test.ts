@@ -1,5 +1,6 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import type { Hex } from '@metamask/delegation-core';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { AccountApiClient } from '../../src/clients/accountApiClient';
 import type { TokenMetadataClient } from '../../src/clients/types';
@@ -163,15 +164,50 @@ describe('TokenMetadataService', () => {
         mockAccountApiClient.isChainIdSupported.mockReturnValue(true);
       });
 
-      it('should propagate errors from AccountApiClient', async () => {
-        const error = new Error('AccountAPI error');
+      it('should propagate InvalidInputError from AccountApiClient without fallback', async () => {
+        const error = new InvalidInputError('Invalid token address');
         mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
           error,
         );
 
         await expect(
           tokenMetadataService.getTokenBalanceAndMetadata(baseOptions),
-        ).rejects.toThrow('AccountAPI error');
+        ).rejects.toThrow('Invalid token address');
+
+        // Verify no fallback occurred
+        expect(
+          mockTokenMetadataClient.getTokenBalanceAndMetadata,
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should fallback to blockchain client when AccountApiClient fails with non-InvalidInputError', async () => {
+        const networkError = new Error('Network timeout');
+        mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
+          networkError,
+        );
+        mockTokenMetadataClient.getTokenBalanceAndMetadata.mockResolvedValue(
+          mockTokenBalanceAndMetadata,
+        );
+
+        const result =
+          await tokenMetadataService.getTokenBalanceAndMetadata(baseOptions);
+
+        // Verify fallback occurred
+        expect(
+          mockAccountApiClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledWith({
+          chainId: 1,
+          account: mockAddress,
+          assetAddress: undefined,
+        });
+        expect(
+          mockTokenMetadataClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledWith({
+          chainId: 1,
+          account: mockAddress,
+          assetAddress: undefined,
+        });
+        expect(result).toStrictEqual(mockTokenBalanceAndMetadata);
       });
 
       it('should propagate errors from TokenMetadataClient', async () => {
@@ -184,6 +220,38 @@ describe('TokenMetadataService', () => {
         await expect(
           tokenMetadataService.getTokenBalanceAndMetadata(baseOptions),
         ).rejects.toThrow('TokenMetadata error');
+      });
+
+      it('should throw the last error when both AccountApiClient and TokenMetadataClient fail', async () => {
+        const accountApiError = new Error('Account API network error');
+        const tokenMetadataError = new Error('TokenMetadata network error');
+
+        mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
+          accountApiError,
+        );
+        mockTokenMetadataClient.getTokenBalanceAndMetadata.mockRejectedValue(
+          tokenMetadataError,
+        );
+
+        await expect(
+          tokenMetadataService.getTokenBalanceAndMetadata(baseOptions),
+        ).rejects.toThrow('TokenMetadata network error');
+
+        // Verify both clients were tried
+        expect(
+          mockAccountApiClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledWith({
+          chainId: 1,
+          account: mockAddress,
+          assetAddress: undefined,
+        });
+        expect(
+          mockTokenMetadataClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledWith({
+          chainId: 1,
+          account: mockAddress,
+          assetAddress: undefined,
+        });
       });
     });
 
