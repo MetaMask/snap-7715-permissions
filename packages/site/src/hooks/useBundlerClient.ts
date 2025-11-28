@@ -1,4 +1,4 @@
-import { erc7710BundlerActions } from '@metamask/delegation-toolkit/experimental';
+import { erc7710BundlerActions } from '@metamask/smart-accounts-kit/actions';
 import { useMemo } from 'react';
 import { createClient, http } from 'viem';
 import type { Chain } from 'viem';

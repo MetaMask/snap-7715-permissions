@@ -26,6 +26,7 @@ export const nativeTokenStreamPermissionDefinition: PermissionDefinition<
 > = {
   rules: allRules,
   title: 'Permission request',
+  subtitle: 'This site wants permissions to spend your tokens.',
   dependencies: {
     parseAndValidatePermission,
     buildContext,

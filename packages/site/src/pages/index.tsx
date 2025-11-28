@@ -1,5 +1,7 @@
-import type { RequestExecutionPermissionsParameters } from '@metamask/delegation-toolkit/experimental';
-import { erc7715ProviderActions } from '@metamask/delegation-toolkit/experimental';
+import {
+  erc7715ProviderActions,
+  type RequestExecutionPermissionsParameters,
+} from '@metamask/smart-accounts-kit/actions';
 import { useCallback, useMemo, useState } from 'react';
 import {
   createClient,
@@ -24,6 +26,7 @@ import {
   ERC20TokenStreamForm,
   NativeTokenPeriodicForm,
   ERC20TokenPeriodicForm,
+  ERC20TokenRevocationForm,
 } from '../components/permissions';
 import type {
   PermissionRequest,
@@ -453,6 +456,9 @@ const Index = () => {
                   <option value="erc20-token-periodic">
                     ERC20 Token Periodic
                   </option>
+                  <option value="erc20-token-revocation">
+                    ERC20 Token Revocation
+                  </option>
                 </select>
               </div>
 
@@ -470,6 +476,10 @@ const Index = () => {
 
               {permissionType === 'erc20-token-periodic' && (
                 <ERC20TokenPeriodicForm onChange={onFormChange} />
+              )}
+
+              {permissionType === 'erc20-token-revocation' && (
+                <ERC20TokenRevocationForm onChange={onFormChange} />
               )}
             </StyledForm>
             <CustomMessageButton

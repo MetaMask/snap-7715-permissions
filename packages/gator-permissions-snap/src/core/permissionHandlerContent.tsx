@@ -8,6 +8,7 @@ import {
   AccountSelector,
 } from '@metamask/snaps-sdk/jsx';
 import { parseCaipAssetType } from '@metamask/utils';
+import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
@@ -39,6 +40,7 @@ export const REASON_TOOLTIP =
 export type PermissionHandlerContentProps = {
   children: SnapElement;
   permissionTitle: string;
+  permissionSubtitle: string;
   justification: string;
   networkName: string;
   tokenSymbol: string;
@@ -58,6 +60,7 @@ export type PermissionHandlerContentProps = {
  * @param options - The params for the content.
  * @param options.children - The children of the content.
  * @param options.permissionTitle - The title of the permission.
+ * @param options.permissionSubtitle - The subtitle of the permission.
  * @param options.origin - The origin of the permission request.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
@@ -75,6 +78,7 @@ export type PermissionHandlerContentProps = {
 export const PermissionHandlerContent = ({
   children,
   permissionTitle,
+  permissionSubtitle,
   origin,
   justification,
   networkName,
@@ -98,16 +102,20 @@ export const PermissionHandlerContent = ({
     <Skeleton />
   );
 
-  let tokenExplorerUrl, tokenAddress;
-  const { assetReference, assetNamespace } = parseCaipAssetType(
-    context.tokenAddressCaip19,
-  );
-  if (assetNamespace === 'erc20') {
-    if (explorerUrl) {
-      tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
-    }
+  const hasAsset = context.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
 
-    tokenAddress = assetReference;
+  let tokenExplorerUrl, tokenAddress;
+  if (hasAsset) {
+    const { assetReference, assetNamespace } = parseCaipAssetType(
+      context.tokenAddressCaip19,
+    );
+    if (assetNamespace === 'erc20') {
+      if (explorerUrl) {
+        tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
+      }
+
+      tokenAddress = assetReference;
+    }
   }
 
   return (
@@ -115,7 +123,7 @@ export const PermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{permissionTitle}</Heading>
-          <Text>This site wants permissions to spend your tokens.</Text>
+          <Text>{permissionSubtitle}</Text>
         </Box>
         <Section>
           <Box direction="vertical">
@@ -137,10 +145,12 @@ export const PermissionHandlerContent = ({
                 this permission.
               </Text>
             )}
-            <Box direction="horizontal" alignment="end">
-              {fiatBalanceComponent}
-              {tokenBalanceComponent}
-            </Box>
+            {hasAsset && (
+              <Box direction="horizontal" alignment="end">
+                {fiatBalanceComponent}
+                {tokenBalanceComponent}
+              </Box>
+            )}
           </Box>
         </Section>
         <Section>
@@ -169,14 +179,16 @@ export const PermissionHandlerContent = ({
             value={networkName}
             tooltip={NETWORK_TOOLTIP}
           />
-          <TokenField
-            label={TOKEN_LABEL}
-            tokenSymbol={tokenSymbol}
-            tokenAddress={tokenAddress}
-            explorerUrl={tokenExplorerUrl}
-            tooltip={TOKEN_TOOLTIP}
-            iconData={tokenIconData}
-          />
+          {hasAsset && (
+            <TokenField
+              label={TOKEN_LABEL}
+              tokenSymbol={tokenSymbol}
+              tokenAddress={tokenAddress}
+              explorerUrl={tokenExplorerUrl}
+              tooltip={TOKEN_TOOLTIP}
+              iconData={tokenIconData}
+            />
+          )}
         </Section>
         {children}
       </Box>
@@ -186,15 +198,17 @@ export const PermissionHandlerContent = ({
 
 export const SkeletonPermissionHandlerContent = ({
   permissionTitle,
+  permissionSubtitle,
 }: {
   permissionTitle: string;
+  permissionSubtitle: string;
 }) => {
   return (
     <Box>
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{permissionTitle}</Heading>
-          <Text>This site wants permissions to spend your tokens.</Text>
+          <Text>{permissionSubtitle}</Text>
         </Box>
         <Section>
           <Box direction="vertical">
