@@ -1,5 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
+import { InternalError } from '@metamask/snaps-sdk';
 
 import type { AccountApiClient } from '../clients/accountApiClient';
 import type {
@@ -45,24 +46,32 @@ export class TokenMetadataService {
   }
 
   /**
-   * Gets the appropriate token metadata client for the given chain ID.
-   * Uses the account API client for mainnet (chain ID 1) and the blockchain client for other chains.
+   * Gets the ordered list of token metadata clients to try for the given chain ID.
+   * Returns an array with preferred client(s) first, followed by fallback client(s).
+   * For supported chains, tries Account API first, then blockchain client.
+   * For unsupported chains, only uses blockchain client.
    * @param config - The configuration object.
-   * @param config.chainId - The chain ID to get the client for.
-   * @returns The appropriate token metadata client.
+   * @param config.chainId - The chain ID to get the clients for.
+   * @returns Array of token metadata clients to try in order.
    */
   #getTokenMetadataClientForChainId(config: {
     chainId: number;
-  }): TokenMetadataClient {
+  }): TokenMetadataClient[] {
+    const clients: TokenMetadataClient[] = [];
+
     if (this.#accountApiClient.isChainIdSupported(config)) {
-      return this.#accountApiClient;
+      clients.push(this.#accountApiClient);
     }
 
-    return this.#tokenMetadataClient;
+    clients.push(this.#tokenMetadataClient);
+
+    return clients;
   }
 
   /**
    * Retrieves the token balance and metadata for the specified account.
+   * Tries multiple clients in order of preference. If a client fails,
+   * automatically falls back to the next available client.
    * @param options - The options for fetching the token balance and metadata.
    * @returns A promise resolving to the token balance and metadata.
    */
@@ -73,19 +82,31 @@ export class TokenMetadataService {
 
     const { chainId, account, assetAddress } = options;
 
-    const client = this.#getTokenMetadataClientForChainId({ chainId });
+    const clients = this.#getTokenMetadataClientForChainId({ chainId });
+    let lastError: unknown = new InternalError('No client found');
 
-    const balanceAndMetadata = await client.getTokenBalanceAndMetadata({
-      chainId,
-      account,
-      assetAddress,
-    });
+    for (const client of clients) {
+      try {
+        const balanceAndMetadata = await client.getTokenBalanceAndMetadata({
+          chainId,
+          account,
+          assetAddress,
+        });
 
-    logger.debug(
-      'TokenMetadataService:getTokenBalanceAndMetadata() - balance and metadata resolved',
-    );
+        logger.debug(
+          'TokenMetadataService:getTokenBalanceAndMetadata() - balance and metadata resolved',
+        );
 
-    return balanceAndMetadata;
+        return balanceAndMetadata;
+      } catch (error) {
+        lastError = error;
+        logger.info(
+          `TokenMetadataService:getTokenBalanceAndMetadata() - client failed for chain ${chainId}`,
+        );
+      }
+    }
+
+    throw lastError;
   }
 
   /**
