@@ -2,6 +2,7 @@ import { Box, Text, Input, Button, Icon } from '@metamask/snaps-sdk/jsx';
 
 import { TextField } from './TextField';
 import { TooltipIcon } from './TooltipIcon';
+import { t } from '../../utils/i18n';
 import {
   convertTimestampToReadableDate,
   convertTimestampToReadableTime,
@@ -94,7 +95,7 @@ export const DateTimeField = ({
         </Box>
         <Box direction="horizontal" alignment="end">
           <Text color="muted" size="sm">
-            mm/dd/yyyy hh:mm:ss
+            {t('dateTimeFormat')}
           </Text>
         </Box>
       </Box>
@@ -104,13 +105,13 @@ export const DateTimeField = ({
             name={`${name}_date`}
             type="text"
             value={value.date}
-            placeholder="mm/dd/yyyy"
+            placeholder={t('datePlaceholder')}
           />
           <Input
             name={`${name}_time`}
             type="text"
             value={value.time}
-            placeholder="HH:MM:SS"
+            placeholder={t('timePlaceholder')}
           />
           <Box direction="vertical" alignment="center">
             <Text alignment="center">{shortTimeZoneName}</Text>

@@ -19,26 +19,14 @@ import {
   TokenBalanceField,
   TokenField,
 } from '../ui/components';
+import type { MessageKey } from '../utils/i18n';
+import { t } from '../utils/i18n';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
-export const ACCOUNT_LABEL = 'Account';
-export const ACCOUNT_TOOLTIP =
-  'The account from which the permission is being granted.';
-
-export const RECIPIENT_LABEL = 'Recipient';
-export const RECIPIENT_TOOLTIP = 'The site requesting the permission';
-export const NETWORK_LABEL = 'Network';
-export const NETWORK_TOOLTIP =
-  'The network on which the permission is being requested';
-export const TOKEN_LABEL = 'Token';
-export const TOKEN_TOOLTIP = 'The token being requested';
-export const REASON_LABEL = 'Reason';
-export const REASON_TOOLTIP =
-  'Reason given by the recipient for requesting this permission.';
 
 export type PermissionHandlerContentProps = {
   children: SnapElement;
-  permissionTitle: string;
+  permissionTitle: MessageKey;
   justification: string;
   networkName: string;
   tokenSymbol: string;
@@ -114,15 +102,15 @@ export const PermissionHandlerContent = ({
     <Box>
       <Box direction="vertical">
         <Box center={true}>
-          <Heading size="lg">{permissionTitle}</Heading>
-          <Text>This site wants permissions to spend your tokens.</Text>
+          <Heading size="lg">{t(permissionTitle)}</Heading>
+          <Text>{t('permissionRequestSubtitle')}</Text>
         </Box>
         <Section>
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
               <Box direction="horizontal">
-                <Text>{ACCOUNT_LABEL}</Text>
-                <TooltipIcon tooltip={ACCOUNT_TOOLTIP} />
+                <Text>{t('accountLabel')}</Text>
+                <TooltipIcon tooltip={t('accountTooltip')} />
               </Box>
             </Box>
             <AccountSelector
@@ -133,8 +121,7 @@ export const PermissionHandlerContent = ({
             />
             {!isAccountUpgraded && (
               <Text size="sm" color="warning">
-                This account will be upgraded to a smart account to complete
-                this permission.
+                {t('accountUpgradeWarning')}
               </Text>
             )}
             <Box direction="horizontal" alignment="end">
@@ -146,8 +133,8 @@ export const PermissionHandlerContent = ({
         <Section>
           <Box direction="horizontal" alignment="space-between">
             <Box direction="horizontal">
-              <Text>{REASON_LABEL}</Text>
-              <TooltipIcon tooltip={REASON_TOOLTIP} />
+              <Text>{t('reasonLabel')}</Text>
+              <TooltipIcon tooltip={t('reasonTooltip')} />
             </Box>
             <Box direction="horizontal">
               <ShowMoreText
@@ -160,21 +147,21 @@ export const PermissionHandlerContent = ({
         </Section>
         <Section>
           <TextField
-            label={RECIPIENT_LABEL}
+            label={t('recipientLabel')}
             value={origin}
-            tooltip={RECIPIENT_TOOLTIP}
+            tooltip={t('recipientTooltip')}
           />
           <TextField
-            label={NETWORK_LABEL}
+            label={t('networkLabel')}
             value={networkName}
-            tooltip={NETWORK_TOOLTIP}
+            tooltip={t('networkTooltip')}
           />
           <TokenField
-            label={TOKEN_LABEL}
+            label={t('tokenLabel')}
             tokenSymbol={tokenSymbol}
             tokenAddress={tokenAddress}
             explorerUrl={tokenExplorerUrl}
-            tooltip={TOKEN_TOOLTIP}
+            tooltip={t('tokenTooltip')}
             iconData={tokenIconData}
           />
         </Section>
@@ -187,37 +174,29 @@ export const PermissionHandlerContent = ({
 export const SkeletonPermissionHandlerContent = ({
   permissionTitle,
 }: {
-  permissionTitle: string;
+  permissionTitle: MessageKey;
 }) => {
   return (
     <Box>
       <Box direction="vertical">
         <Box center={true}>
-          <Heading size="lg">{permissionTitle}</Heading>
-          <Text>This site wants permissions to spend your tokens.</Text>
+          <Heading size="lg">{t(permissionTitle)}</Heading>
+          <Text>{t('permissionRequestSubtitle')}</Text>
         </Box>
         <Section>
-          <Box direction="vertical">
-            <Box direction="horizontal" alignment="space-between">
-              <Box direction="horizontal">
-                <Text>{ACCOUNT_LABEL}</Text>
-                <TooltipIcon tooltip={ACCOUNT_TOOLTIP} />
-              </Box>
-            </Box>
-            <Skeleton />
-          </Box>
-        </Section>
-        <Section>
-          <SkeletonField label={REASON_LABEL} tooltip={REASON_TOOLTIP} />
-        </Section>
-        <Section>
-          <SkeletonField label={RECIPIENT_LABEL} tooltip={RECIPIENT_TOOLTIP} />
-          <SkeletonField label={NETWORK_LABEL} tooltip={NETWORK_TOOLTIP} />
-          <SkeletonField label={TOKEN_LABEL} tooltip={TOKEN_TOOLTIP} />
-        </Section>
-        <Section>
-          <Skeleton />
-          <Skeleton />
+          <SkeletonField
+            label={t('recipientLabel')}
+            tooltip={t('recipientTooltip')}
+          />
+          <SkeletonField
+            label={t('networkLabel')}
+            tooltip={t('networkTooltip')}
+          />
+          <SkeletonField label={t('tokenLabel')} tooltip={t('tokenTooltip')} />
+          <SkeletonField
+            label={t('reasonLabel')}
+            tooltip={t('reasonTooltip')}
+          />
         </Section>
       </Box>
     </Box>

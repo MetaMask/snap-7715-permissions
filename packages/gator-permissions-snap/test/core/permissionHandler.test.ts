@@ -1279,7 +1279,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
@@ -2346,7 +2347,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
@@ -2850,7 +2852,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
