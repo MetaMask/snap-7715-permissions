@@ -26,9 +26,9 @@
     ]
   },
   "dependencies": {
-    "@metamask/7715-permission-types": "0.2.0",
+    "@metamask/7715-permission-types": "0.4.0",
     "@metamask/providers": "22.1.0",
-    "@metamask/smart-accounts-kit": "0.1.0",
+    "@metamask/smart-accounts-kit": "0.2.0",
     "babel-plugin-styled-components": "2.1.4",
     "dotenv": "17.2.0",
     "react": "18.3.1",
