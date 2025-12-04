@@ -9,6 +9,10 @@ import type { DelegationContracts } from '../../core/chainMetadata';
 
 /**
  * Appends permission-specific caveats for ERC20 approval revocation.
+ * @param args - The options object containing the permission and caveat builder.
+ * @param args.permission - The complete ERC20 token revocation permission containing revocation parameters.
+ * @param args.contracts - The contracts to use for the caveats.
+ * @returns The modified caveat builder with appended ERC20 token revocation caveats.
  */
 export async function createPermissionCaveats({
   contracts,

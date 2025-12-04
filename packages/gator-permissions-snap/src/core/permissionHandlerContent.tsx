@@ -1,3 +1,4 @@
+import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
@@ -8,7 +9,6 @@ import {
   AccountSelector,
 } from '@metamask/snaps-sdk/jsx';
 import { parseCaipAssetType } from '@metamask/utils';
-import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';

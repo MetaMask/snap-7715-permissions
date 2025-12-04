@@ -1,8 +1,8 @@
-import type { RuleDefinition } from '../../core/types';
 import type {
   Erc20TokenRevocationContext,
   Erc20TokenRevocationMetadata,
 } from './types';
+import type { RuleDefinition } from '../../core/types';
 
 export const EXPIRY_ELEMENT = 'erc20-token-revocation-expiry';
 
@@ -41,5 +41,3 @@ export const expiryRule: Erc20TokenRevocationRuleDefinition = {
 };
 
 export const allRules = [expiryRule];
-
-

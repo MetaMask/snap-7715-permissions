@@ -11,6 +11,10 @@ import { renderRules } from '../../core/rules';
 /**
  * Creates UI content for an ERC20 token approval revocation permission.
  * Only expiry is configurable by the user; account selection is provided by the wrapper.
+ * @param args - The options object containing the context and metadata.
+ * @param args.context - The context containing the permission details.
+ * @param args.metadata - The metadata containing the validation errors.
+ * @returns A Promise that resolves to the UI element for the confirmation dialog.
  */
 export async function createConfirmationContent({
   context,
@@ -31,5 +35,3 @@ export async function createConfirmationContent({
     </Box>
   );
 }
-
-

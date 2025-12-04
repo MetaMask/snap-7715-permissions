@@ -26,6 +26,13 @@ const EXTRANEOUS_CONTEXT_DATA = {
   },
 } as const;
 
+/**
+ * Applies the context to the original request.
+ * @param args - The options object containing the context and original request.
+ * @param args.context - The context containing the permission details.
+ * @param args.originalRequest - The original request containing the permission details.
+ * @returns The modified request with the context applied.
+ */
 export async function applyContext({
   context,
   originalRequest,
@@ -74,6 +81,12 @@ export async function applyContext({
   };
 }
 
+/**
+ * Populates the permission with the necessary data.
+ * @param args - The options object containing the permission.
+ * @param args.permission - The permission to populate.
+ * @returns The populated permission.
+ */
 export async function populatePermission({
   permission,
 }: {
@@ -84,6 +97,14 @@ export async function populatePermission({
   };
 }
 
+/**
+ * Converts a permission request into a context object that can be used to render the UI
+ * and manage the permission state.
+ * @param args - The options object containing the request and required services.
+ * @param args.permissionRequest - The Erc20 token revocation permission request to convert.
+ * @param args.tokenMetadataService - Service for fetching token metadata.
+ * @returns A context object containing the formatted permission details and account information.
+ */
 export async function buildContext({
   permissionRequest,
 }: {
@@ -134,6 +155,12 @@ export async function buildContext({
   };
 }
 
+/**
+ * Derives the metadata for the permission.
+ * @param args - The options object containing the context.
+ * @param args.context - The context containing the permission details.
+ * @returns The metadata for the permission.
+ */
 export async function deriveMetadata({
   context,
 }: {
