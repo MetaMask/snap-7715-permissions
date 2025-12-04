@@ -20,7 +20,7 @@ export async function createPermissionCaveats({
   permission: PopulatedErc20TokenRevocationPermission;
   contracts: DelegationContracts;
 }): Promise<Caveat[]> {
-  // keccak("approve(address,uint256)"")
+  // keccak("approve(address,uint256)")
   const approveFunctionSelector = '0x095ea7b3';
   const zeroAsUInt256 =
     '0x0000000000000000000000000000000000000000000000000000000000000000';
