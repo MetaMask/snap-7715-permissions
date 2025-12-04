@@ -34,6 +34,7 @@ import type {
   ERC20TokenStreamPermissionRequest,
   NativeTokenPeriodicPermissionRequest,
   ERC20TokenPeriodicPermissionRequest,
+  ERC20TokenRevocationPermissionRequest,
 } from '../components/permissions/types';
 import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import {
@@ -309,7 +310,8 @@ const Index = () => {
         | ERC20TokenPeriodicPermissionRequest
         | ERC20TokenStreamPermissionRequest
         | NativeTokenPeriodicPermissionRequest
-        | NativeTokenStreamPermissionRequest,
+        | NativeTokenStreamPermissionRequest
+        | ERC20TokenRevocationPermissionRequest,
     ) => {
       setPermissionRequest(request);
     },
