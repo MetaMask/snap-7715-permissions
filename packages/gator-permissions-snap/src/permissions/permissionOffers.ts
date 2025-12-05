@@ -20,4 +20,8 @@ export const DEFAULT_GATOR_PERMISSION_TO_OFFER: PermissionOffer[] = [
     type: 'erc20-token-periodic',
     proposedName: 'ERC20 Token Periodic Transfer',
   },
+  {
+    type: 'erc20-token-revocation',
+    proposedName: 'ERC20 Token Revocation',
+  },
 ];

@@ -1,5 +1,8 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { ZERO_ADDRESS } from '@metamask/7715-permissions-shared/types';
+import {
+  NO_ASSET_ADDRESS,
+  ZERO_ADDRESS,
+} from '@metamask/7715-permissions-shared/types';
 import {
   InvalidRequestError,
   ResourceNotFoundError,
@@ -81,6 +84,8 @@ export class PermissionHandler<
 
   readonly #permissionTitle: string;
 
+  readonly #permissionSubtitle: string;
+
   #isJustificationCollapsed = true;
 
   #unbindHandlers: (() => void) | null = null;
@@ -101,6 +106,7 @@ export class PermissionHandler<
     tokenMetadataService,
     rules,
     title,
+    subtitle,
   }: PermissionHandlerParams<
     TRequest,
     TContext,
@@ -117,6 +123,7 @@ export class PermissionHandler<
     this.#tokenMetadataService = tokenMetadataService;
     this.#rules = rules;
     this.#permissionTitle = title;
+    this.#permissionSubtitle = subtitle;
   }
 
   /**
@@ -188,6 +195,7 @@ export class PermissionHandler<
     const createSkeletonConfirmationContentHandler = async () => {
       return SkeletonPermissionHandlerContent({
         permissionTitle: this.#permissionTitle,
+        permissionSubtitle: this.#permissionSubtitle,
       });
     };
 
@@ -253,6 +261,7 @@ export class PermissionHandler<
         isJustificationCollapsed: this.#isJustificationCollapsed,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,
+        permissionSubtitle: this.#permissionSubtitle,
         context,
         tokenBalance: this.#tokenBalance,
         tokenBalanceFiat: this.#tokenBalanceFiat,
@@ -281,54 +290,63 @@ export class PermissionHandler<
       // fetchAccountBalanceCallCounter is used to cancel any previously executed instances of this function.
       let fetchAccountBalanceCallCounter = 0;
       const fetchAccountBalance = async (context: TContext) => {
-        fetchAccountBalanceCallCounter += 1;
-        const currentCallCounter = fetchAccountBalanceCallCounter;
+        const hasAsset = context.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
 
-        const { address } = parseCaipAccountId(context.accountAddressCaip10);
+        // todo: presently the permissionHandler has a presumption that the
+        // permission is related to a token from which a balance can be derived.
+        // this is not necessarily true, and this presumption must be removed. as
+        // a workaround, we check whether there's a token address associated with
+        // the context.
+        if (hasAsset) {
+          fetchAccountBalanceCallCounter += 1;
+          const currentCallCounter = fetchAccountBalanceCallCounter;
 
-        const {
-          assetReference,
-          chain: { reference: chainId },
-        } = parseCaipAssetType(context.tokenAddressCaip19);
+          const { address } = parseCaipAccountId(context.accountAddressCaip10);
 
-        const assetAddress = isStrictHexString(assetReference)
-          ? assetReference
-          : ZERO_ADDRESS;
+          const {
+            assetReference,
+            chain: { reference: chainId },
+          } = parseCaipAssetType(context.tokenAddressCaip19);
 
-        const { balance, decimals } =
-          await this.#tokenMetadataService.getTokenBalanceAndMetadata({
-            chainId: parseInt(chainId, 10),
-            account: address as Hex,
-            assetAddress,
-          });
+          const assetAddress = isStrictHexString(assetReference)
+            ? assetReference
+            : ZERO_ADDRESS;
 
-        if (currentCallCounter !== fetchAccountBalanceCallCounter) {
-          // the function was called again, abandon the current call.
-          return;
+          const { balance, decimals } =
+            await this.#tokenMetadataService.getTokenBalanceAndMetadata({
+              chainId: parseInt(chainId, 10),
+              account: address as Hex,
+              assetAddress,
+            });
+
+          if (currentCallCounter !== fetchAccountBalanceCallCounter) {
+            // the function was called again, abandon the current call.
+            return;
+          }
+
+          this.#tokenBalance = formatUnits({ value: balance, decimals });
+
+          // send the request to fetch the fiat balance, then re-render the UI while we wait for the response
+          const fiatBalanceRequest =
+            this.#tokenPricesService.getCryptoToFiatConversion(
+              context.tokenAddressCaip19,
+              bigIntToHex(balance),
+              context.tokenMetadata.decimals,
+            );
+
+          await rerender();
+
+          const fiatBalance = await fiatBalanceRequest;
+
+          if (currentCallCounter !== fetchAccountBalanceCallCounter) {
+            // the function was called again, abandon the current call.
+            return;
+          }
+
+          this.#tokenBalanceFiat = fiatBalance;
+
+          await rerender();
         }
-
-        this.#tokenBalance = formatUnits({ value: balance, decimals });
-
-        // send the request to fetch the fiat balance, then re-render the UI while we wait for the response
-        const fiatBalanceRequest =
-          this.#tokenPricesService.getCryptoToFiatConversion(
-            context.tokenAddressCaip19,
-            bigIntToHex(balance),
-            context.tokenMetadata.decimals,
-          );
-
-        await rerender();
-
-        const fiatBalance = await fiatBalanceRequest;
-
-        if (currentCallCounter !== fetchAccountBalanceCallCounter) {
-          // the function was called again, abandon the current call.
-          return;
-        }
-
-        this.#tokenBalanceFiat = fiatBalance;
-
-        await rerender();
       };
 
       // we explicitly don't await this as it's a background process that will re-render the UI (twice) once it is complete
