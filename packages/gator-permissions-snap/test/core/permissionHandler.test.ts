@@ -86,6 +86,7 @@ const mockMetadata: TestMetadataType = {};
 
 const setupTest = () => {
   const title = 'Test permission';
+  const subtitle = 'This site wants a test permission.';
 
   const boundEvents = new Map<string, UserEventHandler<UserInputEventType>>();
   const unboundEvents = new Map<string, UserEventHandler<UserInputEventType>>();
@@ -189,6 +190,7 @@ const setupTest = () => {
 
   const permissionHandlerDependencies = {
     title,
+    subtitle,
     accountController,
     userEventDispatcher,
     orchestrator,
@@ -650,7 +652,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants permissions to spend your tokens.",
+                    "children": "This site wants a test permission.",
                   },
                   "type": "Text",
                 },
@@ -1182,7 +1184,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants permissions to spend your tokens.",
+                    "children": "This site wants a test permission.",
                   },
                   "type": "Text",
                 },
@@ -1752,7 +1754,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants permissions to spend your tokens.",
+                    "children": "This site wants a test permission.",
                   },
                   "type": "Text",
                 },
@@ -2249,7 +2251,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants permissions to spend your tokens.",
+                    "children": "This site wants a test permission.",
                   },
                   "type": "Text",
                 },
@@ -2751,7 +2753,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants permissions to spend your tokens.",
+                    "children": "This site wants a test permission.",
                   },
                   "type": "Text",
                 },

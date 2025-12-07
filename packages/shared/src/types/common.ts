@@ -7,6 +7,11 @@ export type { ZodIssue } from 'zod';
 export const ZERO_ADDRESS =
   '0x0000000000000000000000000000000000000000' as const;
 
+/**
+ * A placeholder value for when no asset address is available.
+ */
+export const NO_ASSET_ADDRESS = ':/:' as const;
+
 export const zAddress = z
   .string()
   .regex(/^0x[a-fA-F0-9]{40}$/u, 'Invalid Ethereum address')
