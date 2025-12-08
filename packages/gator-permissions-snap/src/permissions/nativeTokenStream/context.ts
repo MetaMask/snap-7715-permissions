@@ -193,7 +193,7 @@ export async function buildContext({
     decimals,
   });
 
-  const timePeriod = TimePeriod.WEEKLY;
+  const timePeriod = TimePeriod.MONTHLY;
 
   const maxAmount = formatUnitsFromHex({
     value: data.maxAmount,

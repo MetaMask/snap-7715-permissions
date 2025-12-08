@@ -51,7 +51,7 @@ describe('validate utils', () => {
 
     it('throw error if params is invalid type', async () => {
       expect(() => parsePermissionRequestParam('invalid')).toThrow(
-        'Failed type validation: : Expected array, received string',
+        'Failed type validation: Expected array, received string',
       );
     });
   });
@@ -130,7 +130,7 @@ describe('validate utils', () => {
 
     it('throw error if params is invalid type', async () => {
       expect(() => parsePermissionsResponseParam('invalid')).toThrow(
-        'Failed type validation: : Expected array, received string',
+        'Failed type validation: Expected array, received string',
       );
     });
   });

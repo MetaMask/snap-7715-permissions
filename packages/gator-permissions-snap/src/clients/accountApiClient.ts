@@ -13,21 +13,26 @@ import { parseUnits } from '../utils/value';
 
 /**
  * Zod schema for validating individual token balance item
+ * Only requires fields that are actually used in the code (address, balance, decimals, symbol, name)
  */
 const TokenBalanceItemSchema = z.object({
-  object: z.literal('token'),
+  // Required fields - actually used in the code
   address: zAddress,
+  balance: z.string().regex(/^\d+\.?\d*$/u, 'Balance must be a numeric string'),
+  decimals: z.number().int().min(0).max(77), // ERC-20 standard allows up to 77 decimals
   symbol: z
     .string()
     .min(1)
     .max(20)
     .regex(/^[A-Z0-9]+$/iu, 'Symbol must contain only alphanumeric characters'),
-  decimals: z.number().int().min(0).max(77), // ERC-20 standard allows up to 77 decimals
   name: z.string().min(1).max(100),
+
+  // Optional fields - present in API response but not required for functionality
+  object: z.literal('token').optional(),
   type: z.string().min(1).max(20).optional(), // Only present for native tokens
-  occurrences: z.number().nonnegative(),
-  balance: z.string().regex(/^\d+\.?\d*$/u, 'Balance must be a numeric string'),
-  chainId: z.number().int().positive(),
+  occurrences: z.number().nonnegative().optional(), // Sometimes present in API responses
+  chainId: z.number().int().positive().optional(),
+  timestamp: z.string().optional(), // Sometimes present in API responses
 });
 
 /**
