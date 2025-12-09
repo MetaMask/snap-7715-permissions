@@ -300,7 +300,7 @@ export class PermissionHandler<
 
             return { balance, decimals, ctx };
           },
-          async ({ balance, decimals, ctx }) => {
+          async ({ balance, decimals, ctx }, isCancelled) => {
             this.#tokenBalance = formatUnits({ value: balance, decimals });
             await rerender();
 
@@ -311,6 +311,11 @@ export class PermissionHandler<
                 bigIntToHex(balance),
                 ctx.tokenMetadata.decimals,
               );
+
+            // Check if this operation was cancelled during the fiat balance fetch
+            if (isCancelled()) {
+              return;
+            }
 
             this.#tokenBalanceFiat = fiatBalance;
             await rerender();
@@ -332,7 +337,7 @@ export class PermissionHandler<
               chainId: numberToHex(parseInt(chainId, 10)),
             });
           },
-          async (status) => {
+          async (status, _isCancelled) => {
             this.#accountUpgradeStatus = status;
             await rerender();
           },

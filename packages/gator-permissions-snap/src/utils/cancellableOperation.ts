@@ -15,12 +15,14 @@ export function createCancellableOperation<TArg>() {
    * @param arg - The argument to pass to the operation.
    * @param operation - The async operation to execute.
    * @param onSuccess - Callback invoked with the result if not cancelled.
+   * Receives an `isCancelled` function to check cancellation status during
+   * async operations within the callback.
    * @returns A promise that resolves when the operation completes (whether cancelled or not).
    */
   async function execute<TResult>(
     arg: TArg,
     operation: (arg: TArg) => Promise<TResult>,
-    onSuccess: (result: TResult) => Promise<void>,
+    onSuccess: (result: TResult, isCancelled: () => boolean) => Promise<void>,
   ): Promise<void> {
     callCounter += 1;
     const currentCall = callCounter;
@@ -32,7 +34,8 @@ export function createCancellableOperation<TArg>() {
       return;
     }
 
-    await onSuccess(result);
+    const isCancelled = () => currentCall !== callCounter;
+    await onSuccess(result, isCancelled);
   }
 
   return { execute };
