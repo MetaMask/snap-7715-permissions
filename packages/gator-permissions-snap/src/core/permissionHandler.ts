@@ -327,10 +327,10 @@ export class PermissionHandler<
         await upgradeStatusOperation.execute(
           context,
           async (ctx) => {
-            const { address } = parseCaipAccountId(ctx.accountAddressCaip10);
             const {
+              address,
               chain: { reference: chainId },
-            } = parseCaipAssetType(ctx.tokenAddressCaip19);
+            } = parseCaipAccountId(ctx.accountAddressCaip10);
 
             return this.#accountController.getAccountUpgradeStatus({
               account: address as Hex,
