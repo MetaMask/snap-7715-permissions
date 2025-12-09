@@ -85,9 +85,9 @@ const alreadyPopulatedContext: NativeTokenStreamContext = {
   permissionDetails: {
     initialAmount: '1',
     maxAmount: '10',
-    timePeriod: TimePeriod.WEEKLY,
+    timePeriod: TimePeriod.MONTHLY,
     startTime: 1729900800,
-    amountPerPeriod: '302400',
+    amountPerPeriod: '1296000',
   },
 } as const;
 

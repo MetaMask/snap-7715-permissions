@@ -17,6 +17,7 @@ export type DelegationContracts = {
   timestampEnforcer: Hex;
   exactCalldataEnforcer: Hex;
   nonceEnforcer: Hex;
+  allowedCalldataEnforcer: Hex;
 };
 
 const contracts: DelegationContracts = {
@@ -32,6 +33,7 @@ const contracts: DelegationContracts = {
   timestampEnforcer: '0x1046bb45C8d673d4ea75321280DB34899413c069',
   exactCalldataEnforcer: '0x99F2e9bF15ce5eC84685604836F71aB835DBBdED',
   nonceEnforcer: '0xDE4f2FAC4B3D87A1d9953Ca5FC09FCa7F366254f',
+  allowedCalldataEnforcer: '0xc2b0d624c1c4319760C96503BA27C347F3260f55',
 };
 
 // derived from https://chainid.network/chains.json

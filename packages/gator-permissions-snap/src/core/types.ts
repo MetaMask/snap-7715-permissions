@@ -261,6 +261,7 @@ export type PermissionDefinition<
 > = {
   rules: RuleDefinition<TContext, TMetadata>[];
   title: MessageKey;
+  subtitle: string;
   dependencies: PermissionHandlerDependencies<
     TRequest,
     TContext,
@@ -300,6 +301,7 @@ export type PermissionHandlerParams<
   tokenMetadataService: TokenMetadataService;
   rules: RuleDefinition<TContext, TMetadata>[];
   title: string;
+  subtitle: string;
 };
 
 /**

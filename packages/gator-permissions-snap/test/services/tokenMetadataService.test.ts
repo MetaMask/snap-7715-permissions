@@ -163,18 +163,37 @@ describe('TokenMetadataService', () => {
         mockAccountApiClient.isChainIdSupported.mockReturnValue(true);
       });
 
-      it('should propagate errors from AccountApiClient', async () => {
-        const error = new Error('AccountAPI error');
+      it('should fallback to blockchain client when AccountApiClient fails', async () => {
+        const networkError = new Error('Network timeout');
         mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
-          error,
+          networkError,
+        );
+        mockTokenMetadataClient.getTokenBalanceAndMetadata.mockResolvedValue(
+          mockTokenBalanceAndMetadata,
         );
 
-        await expect(
-          tokenMetadataService.getTokenBalanceAndMetadata(baseOptions),
-        ).rejects.toThrow('AccountAPI error');
+        const result =
+          await tokenMetadataService.getTokenBalanceAndMetadata(baseOptions);
+
+        // Verify fallback occurred
+        expect(
+          mockAccountApiClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledWith({
+          chainId: 1,
+          account: mockAddress,
+          assetAddress: undefined,
+        });
+        expect(
+          mockTokenMetadataClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledWith({
+          chainId: 1,
+          account: mockAddress,
+          assetAddress: undefined,
+        });
+        expect(result).toStrictEqual(mockTokenBalanceAndMetadata);
       });
 
-      it('should propagate errors from TokenMetadataClient', async () => {
+      it('should propagate errors from TokenMetadataClient when no fallback available', async () => {
         mockAccountApiClient.isChainIdSupported.mockReturnValue(false);
         const error = new Error('TokenMetadata error');
         mockTokenMetadataClient.getTokenBalanceAndMetadata.mockRejectedValue(
@@ -184,6 +203,38 @@ describe('TokenMetadataService', () => {
         await expect(
           tokenMetadataService.getTokenBalanceAndMetadata(baseOptions),
         ).rejects.toThrow('TokenMetadata error');
+      });
+
+      it('should throw the last error when both clients fail', async () => {
+        const accountApiError = new Error('Account API network error');
+        const tokenMetadataError = new Error('TokenMetadata network error');
+
+        mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
+          accountApiError,
+        );
+        mockTokenMetadataClient.getTokenBalanceAndMetadata.mockRejectedValue(
+          tokenMetadataError,
+        );
+
+        await expect(
+          tokenMetadataService.getTokenBalanceAndMetadata(baseOptions),
+        ).rejects.toThrow('TokenMetadata network error');
+
+        // Verify both clients were tried
+        expect(
+          mockAccountApiClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledWith({
+          chainId: 1,
+          account: mockAddress,
+          assetAddress: undefined,
+        });
+        expect(
+          mockTokenMetadataClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledWith({
+          chainId: 1,
+          account: mockAddress,
+          assetAddress: undefined,
+        });
       });
     });
 

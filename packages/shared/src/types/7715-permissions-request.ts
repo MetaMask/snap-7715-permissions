@@ -53,29 +53,30 @@ export const zPermissionRequest = z.object({
   /**
    * Defines the allowed behavior the signer can do on behalf of the account.
    */
-  rules: z.array(zRule).refine(
-    (rules) => {
-      const hasExpiryRule = rules.some(
-        (rule) => extractDescriptorName(rule.type) === 'expiry',
-      );
+  rules: z.array(zRule).superRefine((rules, ctx) => {
+    // Check for expiry rule
+    const hasExpiryRule = rules.some(
+      (rule) => extractDescriptorName(rule.type) === 'expiry',
+    );
 
-      if (!hasExpiryRule) {
-        return false;
-      }
+    if (!hasExpiryRule) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Expiry rule is required',
+      });
+    }
 
-      const ruleTypes = rules.map((rule) => extractDescriptorName(rule.type));
+    // Check for duplicate rule types
+    const ruleTypes = rules.map((rule) => extractDescriptorName(rule.type));
+    const uniqueRuleTypes = new Set(ruleTypes);
 
-      const uniqueRuleTypes = new Set(ruleTypes);
-      if (uniqueRuleTypes.size !== ruleTypes.length) {
-        return false;
-      }
-
-      return true;
-    },
-    {
-      message: 'Failed rule validation: Expiry rule is missing or invalid',
-    },
-  ),
+    if (uniqueRuleTypes.size !== ruleTypes.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Duplicate rule types are not allowed',
+      });
+    }
+  }),
 });
 export const zPermissionsRequest = z.array(zPermissionRequest);
 

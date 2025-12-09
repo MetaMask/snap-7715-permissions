@@ -8,25 +8,26 @@ import {
 } from './context';
 import { allRules } from './rules';
 import type {
-  Erc20TokenPeriodicContext,
-  Erc20TokenPeriodicMetadata,
-  Erc20TokenPeriodicPermission,
-  Erc20TokenPeriodicPermissionRequest,
-  PopulatedErc20TokenPeriodicPermission,
+  Erc20TokenRevocationContext,
+  Erc20TokenRevocationMetadata,
+  Erc20TokenRevocationPermission,
+  Erc20TokenRevocationPermissionRequest,
+  PopulatedErc20TokenRevocationPermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
 import type { PermissionDefinition } from '../../core/types';
 
-export const erc20TokenPeriodicPermissionDefinition: PermissionDefinition<
-  Erc20TokenPeriodicPermissionRequest,
-  Erc20TokenPeriodicContext,
-  Erc20TokenPeriodicMetadata,
-  Erc20TokenPeriodicPermission,
-  PopulatedErc20TokenPeriodicPermission
+export const erc20TokenRevocationPermissionDefinition: PermissionDefinition<
+  Erc20TokenRevocationPermissionRequest,
+  Erc20TokenRevocationContext,
+  Erc20TokenRevocationMetadata,
+  Erc20TokenRevocationPermission,
+  PopulatedErc20TokenRevocationPermission
 > = {
   rules: allRules,
-  title: 'permissionRequestTitle',
-  subtitle: 'This site wants permissions to spend your tokens.',
+  title: 'Permission request',
+  subtitle:
+    'This site wants permissions to revoke your ERC-20 token approvals.',
   dependencies: {
     parseAndValidatePermission,
     buildContext,

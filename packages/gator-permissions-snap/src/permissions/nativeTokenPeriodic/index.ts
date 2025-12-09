@@ -26,6 +26,7 @@ export const nativeTokenPeriodicPermissionDefinition: PermissionDefinition<
 > = {
   rules: allRules,
   title: 'permissionRequestTitle',
+  subtitle: 'This site wants permissions to spend your tokens.',
   dependencies: {
     parseAndValidatePermission,
     buildContext,

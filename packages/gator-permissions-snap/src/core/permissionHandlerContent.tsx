@@ -1,3 +1,4 @@
+import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
@@ -27,6 +28,7 @@ export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 export type PermissionHandlerContentProps = {
   children: SnapElement;
   permissionTitle: MessageKey;
+  permissionSubtitle: string;
   justification: string;
   networkName: string;
   tokenSymbol: string;
@@ -46,6 +48,7 @@ export type PermissionHandlerContentProps = {
  * @param options - The params for the content.
  * @param options.children - The children of the content.
  * @param options.permissionTitle - The title of the permission.
+ * @param options.permissionSubtitle - The subtitle of the permission.
  * @param options.origin - The origin of the permission request.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
@@ -63,6 +66,7 @@ export type PermissionHandlerContentProps = {
 export const PermissionHandlerContent = ({
   children,
   permissionTitle,
+  permissionSubtitle,
   origin,
   justification,
   networkName,
@@ -86,16 +90,20 @@ export const PermissionHandlerContent = ({
     <Skeleton />
   );
 
-  let tokenExplorerUrl, tokenAddress;
-  const { assetReference, assetNamespace } = parseCaipAssetType(
-    context.tokenAddressCaip19,
-  );
-  if (assetNamespace === 'erc20') {
-    if (explorerUrl) {
-      tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
-    }
+  const hasAsset = context.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
 
-    tokenAddress = assetReference;
+  let tokenExplorerUrl, tokenAddress;
+  if (hasAsset) {
+    const { assetReference, assetNamespace } = parseCaipAssetType(
+      context.tokenAddressCaip19,
+    );
+    if (assetNamespace === 'erc20') {
+      if (explorerUrl) {
+        tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
+      }
+
+      tokenAddress = assetReference;
+    }
   }
 
   return (
@@ -103,7 +111,7 @@ export const PermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{t(permissionTitle)}</Heading>
-          <Text>{t('permissionRequestSubtitle')}</Text>
+          <Text>{permissionSubtitle}</Text>
         </Box>
         <Section>
           <Box direction="vertical">
@@ -124,10 +132,12 @@ export const PermissionHandlerContent = ({
                 {t('accountUpgradeWarning')}
               </Text>
             )}
-            <Box direction="horizontal" alignment="end">
-              {fiatBalanceComponent}
-              {tokenBalanceComponent}
-            </Box>
+            {hasAsset && (
+              <Box direction="horizontal" alignment="end">
+                {fiatBalanceComponent}
+                {tokenBalanceComponent}
+              </Box>
+            )}
           </Box>
         </Section>
         <Section>
@@ -156,14 +166,16 @@ export const PermissionHandlerContent = ({
             value={networkName}
             tooltip={t('networkTooltip')}
           />
-          <TokenField
-            label={t('tokenLabel')}
-            tokenSymbol={tokenSymbol}
-            tokenAddress={tokenAddress}
-            explorerUrl={tokenExplorerUrl}
-            tooltip={t('tokenTooltip')}
-            iconData={tokenIconData}
-          />
+           {hasAsset && (
+            <TokenField
+              label={t('tokenLabel')}
+              tokenSymbol={tokenSymbol}
+              tokenAddress={tokenAddress}
+              explorerUrl={tokenExplorerUrl}
+              tooltip={t('tokenTooltip')}
+              iconData={tokenIconData}
+            />
+          )}
         </Section>
         {children}
       </Box>
@@ -173,15 +185,17 @@ export const PermissionHandlerContent = ({
 
 export const SkeletonPermissionHandlerContent = ({
   permissionTitle,
+  permissionSubtitle,
 }: {
   permissionTitle: MessageKey;
+  permissionSubtitle: string;
 }) => {
   return (
     <Box>
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{t(permissionTitle)}</Heading>
-          <Text>{t('permissionRequestSubtitle')}</Text>
+          <Text>{permissionSubtitle}</Text>
         </Box>
         <Section>
           <SkeletonField

@@ -218,7 +218,7 @@ describe('RpcHandler', () => {
 
     it('should throw an error if no parameters are provided', async () => {
       await expect(handler.grantPermission()).rejects.toThrow(
-        'Failed type validation: : Required',
+        'Failed type validation: Required',
       );
     });
 
@@ -587,6 +587,10 @@ describe('RpcHandler', () => {
         {
           proposedName: 'ERC20 Token Periodic Transfer',
           type: 'erc20-token-periodic',
+        },
+        {
+          proposedName: 'ERC20 Token Revocation',
+          type: 'erc20-token-revocation',
         },
       ]);
     });
