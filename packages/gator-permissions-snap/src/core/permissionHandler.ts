@@ -1,5 +1,8 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import { ZERO_ADDRESS } from '@metamask/7715-permissions-shared/types';
+import {
+  NO_ASSET_ADDRESS,
+  ZERO_ADDRESS,
+} from '@metamask/7715-permissions-shared/types';
 import {
   InvalidRequestError,
   ResourceNotFoundError,
@@ -82,6 +85,8 @@ export class PermissionHandler<
 
   readonly #permissionTitle: string;
 
+  readonly #permissionSubtitle: string;
+
   #isJustificationCollapsed = true;
 
   #unbindHandlers: (() => void) | null = null;
@@ -104,6 +109,7 @@ export class PermissionHandler<
     tokenMetadataService,
     rules,
     title,
+    subtitle,
   }: PermissionHandlerParams<
     TRequest,
     TContext,
@@ -120,6 +126,7 @@ export class PermissionHandler<
     this.#tokenMetadataService = tokenMetadataService;
     this.#rules = rules;
     this.#permissionTitle = title;
+    this.#permissionSubtitle = subtitle;
   }
 
   /**
@@ -191,6 +198,7 @@ export class PermissionHandler<
     const createSkeletonConfirmationContentHandler = async () => {
       return SkeletonPermissionHandlerContent({
         permissionTitle: this.#permissionTitle,
+        permissionSubtitle: this.#permissionSubtitle,
       });
     };
 
@@ -229,6 +237,7 @@ export class PermissionHandler<
         isJustificationCollapsed: this.#isJustificationCollapsed,
         children: permissionContent,
         permissionTitle: this.#permissionTitle,
+        permissionSubtitle: this.#permissionSubtitle,
         context,
         tokenBalance: this.#tokenBalance,
         tokenBalanceFiat: this.#tokenBalanceFiat,
@@ -258,6 +267,17 @@ export class PermissionHandler<
       const upgradeStatusOperation = createCancellableOperation<TContext>();
 
       const fetchAccountBalance = async (context: TContext) => {
+        const hasAsset = context.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
+
+        // todo: presently the permissionHandler has a presumption that the
+        // permission is related to a token from which a balance can be derived.
+        // this is not necessarily true, and this presumption must be removed. as
+        // a workaround, we check whether there's a token address associated with
+        // the context.
+        if (!hasAsset) {
+          return;
+        }
+        
         await balanceOperation.execute(
           context,
           async (ctx) => {

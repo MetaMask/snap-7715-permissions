@@ -4,6 +4,7 @@ import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { AccountController } from './accountController';
 import { erc20TokenPeriodicPermissionDefinition } from '../permissions/erc20TokenPeriodic';
+import { erc20TokenRevocationPermissionDefinition } from '../permissions/erc20TokenRevocation';
 import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
 import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
 import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
@@ -103,13 +104,18 @@ export class PermissionHandlerFactory {
           nativeTokenPeriodicPermissionDefinition,
         );
         break;
-      case 'erc20-token-stream':
-        handler = createPermissionHandler(erc20TokenStreamPermissionDefinition);
-        break;
       case 'erc20-token-periodic':
         handler = createPermissionHandler(
           erc20TokenPeriodicPermissionDefinition,
         );
+        break;
+      case 'erc20-token-revocation':
+        handler = createPermissionHandler(
+          erc20TokenRevocationPermissionDefinition,
+        );
+        break;
+      case 'erc20-token-stream':
+        handler = createPermissionHandler(erc20TokenStreamPermissionDefinition);
         break;
       default:
         throw new InvalidInputError(`Unsupported permission type: ${type}`);
