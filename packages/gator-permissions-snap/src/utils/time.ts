@@ -306,3 +306,37 @@ export const zPeriodDuration = zTimestamp
     const periodType = getClosestTimePeriod(val);
     return Number(TIME_PERIOD_TO_SECONDS[periodType]);
   });
+
+/**
+ * Converts a Unix timestamp (in seconds) to an ISO 8601 date string with timezone.
+ * This format is required by the snaps-sdk DateTimePicker component.
+ *
+ * @param timestamp - The Unix timestamp in seconds.
+ * @returns An ISO 8601 formatted date string (e.g., "2024-01-15T10:30:00.000Z").
+ */
+export const timestampToISO8601 = (timestamp: number): string => {
+  const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
+
+  if (isNaN(date.getTime())) {
+    throw new InvalidInputError('timestampToISO8601: Invalid timestamp');
+  }
+
+  return date.toISOString();
+};
+
+/**
+ * Converts an ISO 8601 date string to a Unix timestamp (in seconds).
+ * This is used to convert DateTimePicker values back to timestamps.
+ *
+ * @param iso - The ISO 8601 formatted date string.
+ * @returns The Unix timestamp in seconds.
+ */
+export const iso8601ToTimestamp = (iso: string): number => {
+  const date = new Date(iso);
+
+  if (isNaN(date.getTime())) {
+    throw new InvalidInputError('iso8601ToTimestamp: Invalid ISO 8601 string');
+  }
+
+  return Math.floor(date.getTime() / 1000);
+};

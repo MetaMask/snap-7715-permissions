@@ -299,62 +299,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Start Time",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Start Time",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The start time of the stream.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -364,65 +337,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-start-time_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "10/26/1985",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-start-time_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "08:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-start-time",
+                            "type": "datetime",
+                            "value": "1985-10-26T08:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
@@ -436,62 +363,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Expiry",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Expiry",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The expiry date of the permission.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -501,65 +401,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "05/01/2024",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "00:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-expiry",
+                            "type": "datetime",
+                            "value": "2024-05-01T00:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
@@ -1154,62 +1008,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Start Time",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Start Time",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The start time of the stream.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -1219,65 +1046,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-start-time_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "10/26/1985",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-start-time_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "08:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-start-time",
+                            "type": "datetime",
+                            "value": "1985-10-26T08:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
@@ -1291,62 +1072,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Expiry",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Expiry",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The expiry date of the permission.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -1356,65 +1110,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "05/01/2024",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "00:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-expiry",
+                            "type": "datetime",
+                            "value": "2024-05-01T00:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
@@ -1922,52 +1630,40 @@ describe('nativeTokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
                   "children": [
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Start Time",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Start Time",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
-                          null,
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "color": "muted",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The start time of the stream.",
+                                },
+                                "type": "Text",
+                              },
+                            },
+                            "type": "Tooltip",
+                          },
                         ],
                         "direction": "horizontal",
                       },
@@ -1976,22 +1672,22 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "children": [
-                          null,
-                          {
-                            "key": null,
-                            "props": {
-                              "children": "10/26/1985 08:00:00 UTC",
-                            },
-                            "type": "Text",
+                        "children": {
+                          "key": null,
+                          "props": {
+                            "disablePast": true,
+                            "disabled": true,
+                            "name": "native-token-stream-start-time",
+                            "type": "datetime",
+                            "value": "1985-10-26T08:00:00.000Z",
                           },
-                        ],
-                        "direction": "horizontal",
+                          "type": "DateTimePicker",
+                        },
                       },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -2002,62 +1698,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Expiry",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Expiry",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The expiry date of the permission.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -2067,65 +1736,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "05/01/2024",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "00:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-expiry",
+                            "type": "datetime",
+                            "value": "2024-05-01T00:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
@@ -2595,62 +2218,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Start Time",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Start Time",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The start time of the stream.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -2660,65 +2256,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-start-time_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "10/26/1985",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-start-time_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "08:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-start-time",
+                            "type": "datetime",
+                            "value": "1985-10-26T08:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
@@ -2732,62 +2282,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Expiry",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Expiry",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The expiry date of the permission.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -2797,65 +2320,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "05/01/2024",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "00:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-expiry",
+                            "type": "datetime",
+                            "value": "2024-05-01T00:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
@@ -3449,62 +2926,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Start Time",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The start time of the stream(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Start Time",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The start time of the stream.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -3514,65 +2964,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-start-time_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "10/26/1985",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-start-time_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "08:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-start-time",
+                            "type": "datetime",
+                            "value": "1985-10-26T08:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
@@ -3586,62 +2990,35 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": [
                           {
                             "key": null,
                             "props": {
-                              "children": [
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": "Expiry",
-                                  },
-                                  "type": "Text",
-                                },
-                                {
-                                  "key": null,
-                                  "props": {
-                                    "children": {
-                                      "key": null,
-                                      "props": {
-                                        "color": "muted",
-                                        "name": "question",
-                                        "size": "inherit",
-                                      },
-                                      "type": "Icon",
-                                    },
-                                    "content": {
-                                      "key": null,
-                                      "props": {
-                                        "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
-                                      },
-                                      "type": "Text",
-                                    },
-                                  },
-                                  "type": "Tooltip",
-                                },
-                              ],
-                              "direction": "horizontal",
+                              "children": "Expiry",
                             },
-                            "type": "Box",
+                            "type": "Text",
                           },
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "children": "mm/dd/yyyy hh:mm:ss",
                                   "color": "muted",
-                                  "size": "sm",
+                                  "name": "question",
+                                  "size": "inherit",
+                                },
+                                "type": "Icon",
+                              },
+                              "content": {
+                                "key": null,
+                                "props": {
+                                  "children": "The expiry date of the permission.",
                                 },
                                 "type": "Text",
                               },
-                              "direction": "horizontal",
                             },
-                            "type": "Box",
+                            "type": "Tooltip",
                           },
                         ],
                         "direction": "horizontal",
@@ -3651,65 +3028,19 @@ describe('nativeTokenStream:content', () => {
                     {
                       "key": null,
                       "props": {
-                        "alignment": "space-between",
                         "children": {
                           "key": null,
                           "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_date",
-                                  "placeholder": "mm/dd/yyyy",
-                                  "type": "text",
-                                  "value": "05/01/2024",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "name": "native-token-stream-expiry_time",
-                                  "placeholder": "HH:MM:SS",
-                                  "type": "text",
-                                  "value": "00:00:00",
-                                },
-                                "type": "Input",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "alignment": "center",
-                                      "children": "UTC",
-                                    },
-                                    "type": "Text",
-                                  },
-                                  "direction": "vertical",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                            "disablePast": true,
+                            "disabled": false,
+                            "name": "native-token-stream-expiry",
+                            "type": "datetime",
+                            "value": "2024-05-01T00:00:00.000Z",
                           },
-                          "type": "Box",
+                          "type": "DateTimePicker",
                         },
-                        "direction": "horizontal",
                       },
-                      "type": "Box",
-                    },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": [
-                          null,
-                          null,
-                        ],
-                      },
-                      "type": "Box",
+                      "type": "Field",
                     },
                   ],
                   "direction": "vertical",
