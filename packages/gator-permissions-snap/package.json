@@ -50,7 +50,7 @@
     "@metamask/abi-utils": "3.0.0",
     "@metamask/delegation-core": "0.2.0",
     "@metamask/profile-sync-controller": "21.0.0",
-    "@metamask/snaps-sdk": "8.1.0",
+    "@metamask/snaps-sdk": "10.2.0",
     "@metamask/utils": "11.4.2",
     "zod": "3.25.76"
   },
