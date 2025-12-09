@@ -26,7 +26,7 @@ export const erc20TokenStreamPermissionDefinition: PermissionDefinition<
 > = {
   rules: allRules,
   title: 'permissionRequestTitle',
-  subtitle: 'This site wants permissions to spend your tokens.',
+  subtitle: 'permissionRequestSubtitle',
   dependencies: {
     parseAndValidatePermission,
     buildContext,

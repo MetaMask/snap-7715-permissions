@@ -28,7 +28,7 @@ export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 export type PermissionHandlerContentProps = {
   children: SnapElement;
   permissionTitle: MessageKey;
-  permissionSubtitle: string;
+  permissionSubtitle: MessageKey;
   justification: string;
   networkName: string;
   tokenSymbol: string;
@@ -111,7 +111,7 @@ export const PermissionHandlerContent = ({
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{t(permissionTitle)}</Heading>
-          <Text>{permissionSubtitle}</Text>
+          <Text>{t(permissionSubtitle)}</Text>
         </Box>
         <Section>
           <Box direction="vertical">
@@ -188,14 +188,14 @@ export const SkeletonPermissionHandlerContent = ({
   permissionSubtitle,
 }: {
   permissionTitle: MessageKey;
-  permissionSubtitle: string;
+  permissionSubtitle: MessageKey;
 }) => {
   return (
     <Box>
       <Box direction="vertical">
         <Box center={true}>
           <Heading size="lg">{t(permissionTitle)}</Heading>
-          <Text>{permissionSubtitle}</Text>
+          <Text>{t(permissionSubtitle)}</Text>
         </Box>
         <Section>
           <SkeletonField

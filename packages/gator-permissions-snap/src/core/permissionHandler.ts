@@ -83,9 +83,9 @@ export class PermissionHandler<
 
   readonly #rules: RuleDefinition<TContext, TMetadata>[];
 
-  readonly #permissionTitle: string;
+  readonly #permissionTitle: MessageKey;
 
-  readonly #permissionSubtitle: string;
+  readonly #permissionSubtitle: MessageKey;
 
   #isJustificationCollapsed = true;
 
@@ -195,7 +195,7 @@ export class PermissionHandler<
 
     const createSkeletonConfirmationContentHandler = async () => {
       return SkeletonPermissionHandlerContent({
-        permissionTitle: this.#permissionTitle as MessageKey,
+        permissionTitle: this.#permissionTitle,
         permissionSubtitle: this.#permissionSubtitle,
       });
     };
@@ -261,7 +261,7 @@ export class PermissionHandler<
         tokenIconData,
         isJustificationCollapsed: this.#isJustificationCollapsed,
         children: permissionContent,
-        permissionTitle: this.#permissionTitle as MessageKey,
+        permissionTitle: this.#permissionTitle,
         permissionSubtitle: this.#permissionSubtitle,
         context,
         tokenBalance: this.#tokenBalance,

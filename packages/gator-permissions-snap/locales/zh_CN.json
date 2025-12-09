@@ -256,6 +256,10 @@
     "unknownChain": {
       "message": "未知链 $1",
       "description": "Fallback text when chain name is not available"
+    },
+    "permissionRequestSubtitleRevocation": {
+      "message": "此网站请求撤销您的 ERC-20 代币授权。",
+      "description": "Subtitle for ERC-20 token revocation permission request"
     }
   }
 }
