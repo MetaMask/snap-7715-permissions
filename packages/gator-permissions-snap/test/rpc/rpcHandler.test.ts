@@ -3,7 +3,11 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
+import {
+  decodeDelegations,
+  hashDelegation,
+  type Hex,
+} from '@metamask/delegation-core';
 import {
   ChainDisconnectedError,
   InvalidInputError,
@@ -14,7 +18,10 @@ import {
 import type { BlockchainTokenMetadataClient } from '../../src/clients/blockchainMetadataClient';
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
-import type { ProfileSyncManager } from '../../src/profileSync';
+import type {
+  ProfileSyncManager,
+  StoredGrantedPermission,
+} from '../../src/profileSync';
 import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
 
 // Mock the delegation-core functions
@@ -28,6 +35,9 @@ const TEST_SITE_ORIGIN = 'https://example.com';
 const TEST_CHAIN_ID = '0x1' as const;
 const TEST_EXPIRY = Math.floor(Date.now() / 1000) + 86400; // 24 hours from now
 const TEST_CONTEXT = '0xabcd' as const;
+const TEST_VALID_TX_HASH =
+  '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' as Hex;
+const TEST_EMPTY_TX_HASH = '0x' as Hex;
 
 const VALID_PERMISSION_REQUEST: PermissionRequest = {
   chainId: TEST_CHAIN_ID,
@@ -135,6 +145,7 @@ describe('RpcHandler', () => {
     mockBlockchainMetadataClient = {
       checkDelegationDisabledOnChain: jest.fn(),
       getTokenBalanceAndMetadata: jest.fn(),
+      checkTransactionReceipt: jest.fn(),
     } as unknown as jest.Mocked<BlockchainTokenMetadataClient>;
 
     handler = createRpcHandler({
@@ -598,7 +609,7 @@ describe('RpcHandler', () => {
 
   describe('getGrantedPermissions', () => {
     it('should return all granted permissions successfully', async () => {
-      const mockGrantedPermissions = [
+      const mockGrantedPermissions: StoredGrantedPermission[] = [
         {
           permissionResponse: {
             chainId: TEST_CHAIN_ID,
@@ -628,11 +639,22 @@ describe('RpcHandler', () => {
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
+          metadata: {
+            txHash: TEST_EMPTY_TX_HASH,
+          },
         },
         {
           permissionResponse: {
             chainId: TEST_CHAIN_ID,
-            expiry: TEST_EXPIRY + 1000,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY + 1000,
+                },
+                isAdjustmentAllowed: true,
+              },
+            ],
             signer: {
               type: 'account' as const,
               data: {
@@ -653,6 +675,9 @@ describe('RpcHandler', () => {
           },
           siteOrigin: 'https://another-example.com',
           isRevoked: false,
+          metadata: {
+            txHash: TEST_EMPTY_TX_HASH,
+          },
         },
       ];
 
@@ -757,6 +782,9 @@ describe('RpcHandler', () => {
           },
           siteOrigin: 'https://another-example.com',
           isRevoked: true,
+          metadata: {
+            txHash: TEST_VALID_TX_HASH,
+          },
         },
         {
           permissionResponse: {
@@ -788,6 +816,9 @@ describe('RpcHandler', () => {
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
+          metadata: {
+            txHash: TEST_EMPTY_TX_HASH,
+          },
         },
       ];
 
@@ -949,6 +980,7 @@ describe('RpcHandler', () => {
   describe('submitRevocation', () => {
     const validRevocationParams = {
       permissionContext: TEST_CONTEXT,
+      txHash: TEST_VALID_TX_HASH,
     };
 
     it('should successfully submit revocation with valid parameters', async () => {
@@ -981,12 +1013,18 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
+        metadata: {
+          txHash: TEST_EMPTY_TX_HASH,
+        },
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
       mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+        true,
+      );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
         true,
       );
 
@@ -1001,7 +1039,7 @@ describe('RpcHandler', () => {
       ).toHaveBeenCalled();
       expect(
         mockProfileSyncManager.updatePermissionRevocationStatus,
-      ).toHaveBeenCalledWith(TEST_CONTEXT, true);
+      ).toHaveBeenCalledWith(TEST_CONTEXT, true, TEST_VALID_TX_HASH);
     });
 
     it('should throw InvalidInputError when permissionContext is invalid', async () => {
@@ -1082,6 +1120,9 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
+        metadata: {
+          txHash: TEST_EMPTY_TX_HASH,
+        },
       };
 
       const profileSyncError = new Error('Update failed');
@@ -1094,6 +1135,9 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.updatePermissionRevocationStatus.mockRejectedValueOnce(
         profileSyncError,
       );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
+      );
 
       await expect(
         handler.submitRevocation(validRevocationParams),
@@ -1101,12 +1145,13 @@ describe('RpcHandler', () => {
 
       expect(
         mockProfileSyncManager.updatePermissionRevocationStatus,
-      ).toHaveBeenCalledWith(TEST_CONTEXT, true);
+      ).toHaveBeenCalledWith(TEST_CONTEXT, true, TEST_VALID_TX_HASH);
     });
 
     it('should handle hex values with uppercase letters', async () => {
       const upperCaseParams = {
         permissionContext: '0x1234567890ABCDEF1234567890ABCDEF',
+        txHash: TEST_VALID_TX_HASH,
       };
 
       const mockPermission = {
@@ -1138,6 +1183,9 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
+        metadata: {
+          txHash: TEST_EMPTY_TX_HASH,
+        },
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
@@ -1148,6 +1196,9 @@ describe('RpcHandler', () => {
       );
       mockProfileSyncManager.updatePermissionRevocationStatus.mockResolvedValueOnce(
         undefined,
+      );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
       );
 
       const result = await handler.submitRevocation(upperCaseParams);
@@ -1192,6 +1243,9 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
+        metadata: {
+          txHash: TEST_EMPTY_TX_HASH,
+        },
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
@@ -1202,6 +1256,9 @@ describe('RpcHandler', () => {
       );
       mockProfileSyncManager.updatePermissionRevocationStatus.mockResolvedValueOnce(
         undefined,
+      );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
       );
 
       const result = await handler.submitRevocation(testParams);
@@ -1242,6 +1299,9 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
+        metadata: {
+          txHash: TEST_EMPTY_TX_HASH,
+        },
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
@@ -1249,6 +1309,9 @@ describe('RpcHandler', () => {
       );
       mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         false,
+      );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
       );
 
       await expect(
@@ -1293,6 +1356,9 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
+        metadata: {
+          txHash: TEST_EMPTY_TX_HASH,
+        },
       };
 
       const resourceUnavailableError = new ResourceUnavailableError(
@@ -1348,6 +1414,9 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
+        metadata: {
+          txHash: TEST_EMPTY_TX_HASH,
+        },
       };
 
       const chainDisconnectedError = new ChainDisconnectedError(
@@ -1403,6 +1472,9 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
+        metadata: {
+          txHash: TEST_EMPTY_TX_HASH,
+        },
       };
 
       const invalidInputError = new InvalidInputError(

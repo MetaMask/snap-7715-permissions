@@ -191,7 +191,7 @@ export function createRpcHandler({
   const submitRevocation = async (params: Json): Promise<Json> => {
     logger.debug('submitRevocation() called with params:', params);
 
-    const { permissionContext } = validateRevocationParams(params);
+    const { permissionContext, txHash } = validateRevocationParams(params);
 
     // First, get the existing permission to validate it exists
     logger.debug(
@@ -255,9 +255,22 @@ export function createRpcHandler({
       );
     }
 
+    const isTransactionValid =
+      await blockchainMetadataClient.checkTransactionReceipt({
+        txHash,
+        chainId: permissionChainId,
+      });
+
+    if (!isTransactionValid) {
+      throw new InvalidInputError(
+        `Transaction ${txHash} is not valid. Cannot process revocation.`,
+      );
+    }
+
     await profileSyncManager.updatePermissionRevocationStatus(
       permissionContext,
       true,
+      txHash,
     );
 
     return { success: true };

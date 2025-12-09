@@ -672,4 +672,6 @@ describe('BlockchainTokenMetadataClient', () => {
       expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
     });
   });
+
+  // TODO: Add test cases for checkTransactionReceipt
 });
