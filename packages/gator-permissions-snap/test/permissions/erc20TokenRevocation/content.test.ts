@@ -78,7 +78,7 @@ describe('erc20TokenRevocation:content', () => {
                                 "content": {
                                   "key": null,
                                   "props": {
-                                    "children": "The expiry date of the permission(mm/dd/yyyy hh:mm:ss).",
+                                    "children": "The expiry date of the permission.",
                                   },
                                   "type": "Text",
                                 },
@@ -90,23 +90,7 @@ describe('erc20TokenRevocation:content', () => {
                         },
                         "type": "Box",
                       },
-                      {
-                        "key": null,
-                        "props": {
-                          "alignment": "end",
-                          "children": {
-                            "key": null,
-                            "props": {
-                              "children": "mm/dd/yyyy hh:mm:ss",
-                              "color": "muted",
-                              "size": "sm",
-                            },
-                            "type": "Text",
-                          },
-                          "direction": "horizontal",
-                        },
-                        "type": "Box",
-                      },
+                      null,
                     ],
                     "direction": "horizontal",
                   },
@@ -115,65 +99,18 @@ describe('erc20TokenRevocation:content', () => {
                 {
                   "key": null,
                   "props": {
-                    "alignment": "space-between",
                     "children": {
                       "key": null,
                       "props": {
-                        "children": [
-                          {
-                            "key": null,
-                            "props": {
-                              "name": "erc20-token-revocation-expiry_date",
-                              "placeholder": "mm/dd/yyyy",
-                              "type": "text",
-                              "value": "05/01/2024",
-                            },
-                            "type": "Input",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "name": "erc20-token-revocation-expiry_time",
-                              "placeholder": "HH:MM:SS",
-                              "type": "text",
-                              "value": "00:00:00",
-                            },
-                            "type": "Input",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "alignment": "center",
-                              "children": {
-                                "key": null,
-                                "props": {
-                                  "alignment": "center",
-                                  "children": "UTC",
-                                },
-                                "type": "Text",
-                              },
-                              "direction": "vertical",
-                            },
-                            "type": "Box",
-                          },
-                        ],
-                        "direction": "horizontal",
+                        "disablePast": true,
+                        "name": "erc20-token-revocation-expiry",
+                        "type": "datetime",
+                        "value": "2024-05-01T00:00:00.000Z",
                       },
-                      "type": "Box",
+                      "type": "DateTimePicker",
                     },
-                    "direction": "horizontal",
                   },
-                  "type": "Box",
-                },
-                {
-                  "key": null,
-                  "props": {
-                    "children": [
-                      null,
-                      null,
-                    ],
-                  },
-                  "type": "Box",
+                  "type": "Field",
                 },
               ],
               "direction": "vertical",

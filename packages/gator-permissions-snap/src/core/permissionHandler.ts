@@ -277,7 +277,7 @@ export class PermissionHandler<
         if (!hasAsset) {
           return;
         }
-        
+
         await balanceOperation.execute(
           context,
           async (ctx) => {

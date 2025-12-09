@@ -3,6 +3,7 @@ import type {
   Erc20TokenRevocationMetadata,
 } from './types';
 import type { RuleDefinition } from '../../core/types';
+import { iso8601ToTimestamp, timestampToISO8601 } from '../../utils/time';
 
 export const EXPIRY_ELEMENT = 'erc20-token-revocation-expiry';
 
@@ -16,26 +17,18 @@ export const expiryRule: Erc20TokenRevocationRuleDefinition = {
   label: 'Expiry',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.expiry.timestamp.toString(),
+    value: timestampToISO8601(context.expiry.timestamp),
     isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',
+    tooltip: 'The expiry date of the permission.',
     error: metadata.validationErrors.expiryError,
-    dateTimeParameterNames: {
-      timestampName: 'expiry.timestamp',
-      dateName: 'expiryDate.date',
-      timeName: 'expiryDate.time',
-    },
+    disablePast: true,
   }),
   updateContext: (context: Erc20TokenRevocationContext, value: any) => ({
     ...context,
     expiry: {
       ...context.expiry,
-      timestamp: value.timestamp,
-    },
-    expiryDate: {
-      date: value.date,
-      time: value.time,
+      timestamp: iso8601ToTimestamp(value),
     },
   }),
 };
