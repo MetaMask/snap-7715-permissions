@@ -1,86 +1,90 @@
 import { TimePeriod } from '../../src/core/types';
 import {
-  convertTimestampToReadableDate,
-  convertReadableDateToTimestamp,
   getStartOfTodayUTC,
   getStartOfNextDayUTC,
   getClosestTimePeriod,
   TIME_PERIOD_TO_SECONDS,
+  timestampToISO8601,
+  iso8601ToTimestamp,
 } from '../../src/utils/time';
 
 describe('Time Utility Functions', () => {
-  describe('convertTimestampToReadableDate', () => {
-    it('should convert a Unix timestamp to mm/dd/yyyy format', () => {
-      const timestamp = 1744588800; // April 14, 2025
-      const result = convertTimestampToReadableDate(timestamp);
-      expect(result).toBe('04/14/2025');
+  describe('timestampToISO8601', () => {
+    it('should convert a Unix timestamp to ISO 8601 format', () => {
+      const timestamp = 1704067200; // 2024-01-01T00:00:00.000Z
+      const result = timestampToISO8601(timestamp);
+      expect(result).toBe('2024-01-01T00:00:00.000Z');
     });
 
-    it('should handle different dates correctly', () => {
-      const timestamp = 1747180800; // May 14, 2025
-      const result = convertTimestampToReadableDate(timestamp);
-      expect(result).toBe('05/14/2025');
+    it('should handle timestamps with time components', () => {
+      const timestamp = 1704106230; // 2024-01-01T10:50:30.000Z
+      const result = timestampToISO8601(timestamp);
+      expect(result).toBe('2024-01-01T10:50:30.000Z');
     });
 
-    it('should throw an error for invalid date format', () => {
-      const timestamp = NaN;
-      expect(() => convertTimestampToReadableDate(timestamp)).toThrow(
-        'Invalid date format',
+    it('should throw an error for invalid timestamps', () => {
+      expect(() => timestampToISO8601(NaN)).toThrow(
+        'timestampToISO8601: Invalid timestamp',
+      );
+    });
+
+    it('should handle zero timestamp (Unix epoch)', () => {
+      const result = timestampToISO8601(0);
+      expect(result).toBe('1970-01-01T00:00:00.000Z');
+    });
+  });
+
+  describe('iso8601ToTimestamp', () => {
+    it('should convert an ISO 8601 string to Unix timestamp', () => {
+      const iso = '2024-01-01T00:00:00.000Z';
+      const result = iso8601ToTimestamp(iso);
+      expect(result).toBe(1704067200);
+    });
+
+    it('should handle ISO strings with time components', () => {
+      const iso = '2024-01-01T10:50:30.000Z';
+      const result = iso8601ToTimestamp(iso);
+      expect(result).toBe(1704106230);
+    });
+
+    it('should handle ISO strings with timezone offset', () => {
+      // +02:00 offset means 2 hours behind UTC
+      const iso = '2024-01-01T02:00:00.000+02:00';
+      const result = iso8601ToTimestamp(iso);
+      expect(result).toBe(1704067200); // Same as 2024-01-01T00:00:00.000Z
+    });
+
+    it('should throw an error for invalid ISO strings', () => {
+      expect(() => iso8601ToTimestamp('invalid-date')).toThrow(
+        'iso8601ToTimestamp: Invalid ISO 8601 string',
+      );
+      expect(() => iso8601ToTimestamp('')).toThrow(
+        'iso8601ToTimestamp: Invalid ISO 8601 string',
       );
     });
   });
 
-  describe('convertReadableDateToTimestamp', () => {
-    it('should convert mm/dd/yyyy format to Unix timestamp (backward compatibility)', () => {
-      const date = '04/11/2025';
-      // Calculate expected timestamp based on local timezone
-      const localDate = new Date('2025-04-11T00:00:00');
-      const expectedTimestamp = Math.floor(localDate.getTime() / 1000);
-      expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
+  describe('timestampToISO8601 and iso8601ToTimestamp round-trip', () => {
+    it('should round-trip correctly', () => {
+      const originalTimestamp = 1704106230;
+      const iso = timestampToISO8601(originalTimestamp);
+      const result = iso8601ToTimestamp(iso);
+      expect(result).toBe(originalTimestamp);
     });
 
-    it('should handle different dates correctly', () => {
-      const date = '04/12/2025';
-      // Calculate expected timestamp based on local timezone
-      const localDate = new Date('2025-04-12T00:00:00');
-      const expectedTimestamp = Math.floor(localDate.getTime() / 1000);
-      expect(convertReadableDateToTimestamp(date)).toBe(expectedTimestamp);
-    });
+    it('should round-trip correctly for various timestamps', () => {
+      const testTimestamps = [
+        0, // Unix epoch
+        1704067200, // 2024-01-01
+        1735689600, // 2025-01-01
+        1893456000, // 2030-01-01
+      ];
 
-    it('should reject non-mm/dd/yyyy formats', () => {
-      // Test that it rejects various non-mm/dd/yyyy formats
-      const date1 = '2025-04-11'; // ISO format
-      const date2 = '04-11-2025'; // MM-DD-YYYY format with dashes
-
-      // Both should throw errors
-      expect(() => convertReadableDateToTimestamp(date1)).toThrow(
-        'Invalid date format. Expected format: mm/dd/yyyy',
-      );
-      expect(() => convertReadableDateToTimestamp(date2)).toThrow(
-        'Invalid date format. Expected format: mm/dd/yyyy',
-      );
-    });
-
-    it('should throw an error for invalid date format', () => {
-      const date = 'invalid-date';
-      expect(() => convertReadableDateToTimestamp(date)).toThrow(
-        'Invalid date format',
-      );
-    });
-
-    it('should handle inputs that are already timestamps', () => {
-      const timestamp = '1744329600'; // April 11, 2025 timestamp
-      expect(convertReadableDateToTimestamp(timestamp)).toBe(1744329600);
-
-      const anotherTimestamp = '1640995200'; // January 1, 2022 timestamp
-      expect(convertReadableDateToTimestamp(anotherTimestamp)).toBe(1640995200);
-    });
-
-    it('should reject non-integer numeric strings', () => {
-      const decimalString = '1744329600.5';
-      expect(() => convertReadableDateToTimestamp(decimalString)).toThrow(
-        'Invalid date format',
-      );
+      for (const timestamp of testTimestamps) {
+        const iso = timestampToISO8601(timestamp);
+        const result = iso8601ToTimestamp(iso);
+        expect(result).toBe(timestamp);
+      }
     });
   });
 

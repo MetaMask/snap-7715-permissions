@@ -5,10 +5,7 @@ import type { DelegationContracts } from '../../../src/core/chainMetadata';
 import { TimePeriod } from '../../../src/core/types';
 import { createPermissionCaveats } from '../../../src/permissions/erc20TokenPeriodic/caveats';
 import type { PopulatedErc20TokenPeriodicPermission } from '../../../src/permissions/erc20TokenPeriodic/types';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../../src/utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 6;
@@ -45,7 +42,7 @@ describe('erc20TokenPeriodic:caveats', () => {
             parseUnits({ formatted: '100', decimals: tokenDecimals }),
           ), // 100 USDC per period
           periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
+          startTime: 499132800, // 10/26/1985 00:00:00 UTC
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
           justification: 'Permission to do something important',
         },
@@ -80,7 +77,7 @@ describe('erc20TokenPeriodic:caveats', () => {
             parseUnits({ formatted: '200', decimals: tokenDecimals }),
           ), // 200 USDC per period
           periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY]), // 1 week in seconds
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
+          startTime: 499132800, // 10/26/1985 00:00:00 UTC
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
           justification: 'Permission to do something important',
         },
@@ -114,7 +111,7 @@ describe('erc20TokenPeriodic:caveats', () => {
             parseUnits({ formatted: '75', decimals: tokenDecimals }),
           ), // 75 USDC per period
           periodDuration: 123456, // Custom duration in seconds
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
+          startTime: 499132800, // 10/26/1985 00:00:00 UTC
           tokenAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
           justification: 'Permission to do something important',
         },
@@ -148,7 +145,7 @@ describe('erc20TokenPeriodic:caveats', () => {
             parseUnits({ formatted: '1000', decimals: 18 }),
           ), // 1000 tokens with 18 decimals
           periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
+          startTime: 499132800, // 10/26/1985 00:00:00 UTC
           tokenAddress: '0x1234567890123456789012345678901234567890', // Different token
           justification: 'Permission to do something important',
         },

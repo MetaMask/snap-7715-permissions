@@ -723,15 +723,7 @@ describe('PermissionHandler', () => {
                       },
                       "type": "AccountSelector",
                     },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": "This account will be upgraded to a smart account to complete this permission.",
-                        "color": "warning",
-                        "size": "sm",
-                      },
-                      "type": "Text",
-                    },
+                    false,
                     {
                       "key": null,
                       "props": {

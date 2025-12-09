@@ -14,14 +14,13 @@ import type {
   NativeTokenStreamPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const permissionWithoutOptionals: NativeTokenStreamPermission = {
   type: 'native-token-stream',
   data: {
     amountPerSecond: bigIntToHex(parseUnits({ formatted: '.5', decimals: 18 })), // 0.5 eth per second
-    startTime: convertReadableDateToTimestamp('10/26/2024'),
+    startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     justification: 'Permission to do something important',
   },
   isAdjustmentAllowed: true,
@@ -48,7 +47,7 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
     {
       type: 'expiry',
       data: {
-        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+        timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
       },
       isAdjustmentAllowed: true,
     },
@@ -63,7 +62,7 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
     ...alreadyPopulatedPermission,
     data: {
       ...alreadyPopulatedPermission.data,
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     },
   },
 };
@@ -399,7 +398,7 @@ describe('nativeTokenStream:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            startTime: 499161600, // 10/26/1985
+            startTime: 499161600, // 10/26/1985 00:00:00 UTC
           },
         };
 
@@ -457,7 +456,7 @@ describe('nativeTokenStream:context', () => {
         const contextWithExpiryInThePast = {
           ...context,
           expiry: {
-            timestamp: 499161600, // 10/26/1985
+            timestamp: 499161600, // 10/26/1985 00:00:00 UTC
             isAdjustmentAllowed: true,
           },
           permissionDetails: {

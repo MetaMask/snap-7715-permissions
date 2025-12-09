@@ -1,15 +1,9 @@
 import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
-import {
-  type SnapElement,
-  Field,
-  DateTimePicker,
-  Text,
-  Box,
-} from '@metamask/snaps-sdk/jsx';
+import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
+import { DateTimePickerField } from '../ui/components/DateTimePickerField';
 import { DropdownField } from '../ui/components/DropdownField';
 import { InputField } from '../ui/components/InputField';
-import { TooltipIcon } from '../ui/components/TooltipIcon';
 import type {
   UserEventDispatcher,
   UserEventHandler,
@@ -99,24 +93,16 @@ export function renderRule<
       );
     }
     case 'datetime': {
-      const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
-
       return (
-        <Box direction="vertical">
-          <Box direction="horizontal">
-            <Text>{label}</Text>
-            {tooltipElement}
-          </Box>
-          <Field error={error}>
-            <DateTimePicker
-              name={name}
-              value={value}
-              type="datetime"
-              disabled={isDisabled}
-              disablePast={disablePast}
-            />
-          </Field>
-        </Box>
+        <DateTimePickerField
+          label={label}
+          name={name}
+          value={value}
+          errorMessage={error}
+          disabled={isDisabled}
+          tooltip={tooltip}
+          disablePast={disablePast}
+        />
       );
     }
     default: {

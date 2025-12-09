@@ -287,36 +287,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Start Time",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The time at which the first period begins.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -329,7 +340,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-start-date",
                           "type": "datetime",
                           "value": "1985-10-26T08:00:00.000Z",
@@ -351,36 +361,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Expiry",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The expiry date of the permission.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -393,7 +414,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-expiry",
                           "type": "datetime",
                           "value": "2024-05-01T00:00:00.000Z",
@@ -683,36 +703,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Start Time",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The time at which the first period begins.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -725,7 +756,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-start-date",
                           "type": "datetime",
                           "value": "1985-10-26T08:00:00.000Z",
@@ -747,36 +777,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Expiry",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The expiry date of the permission.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -789,7 +830,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-expiry",
                           "type": "datetime",
                           "value": "2024-05-01T00:00:00.000Z",
@@ -1074,36 +1114,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Start Time",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The time at which the first period begins.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -1116,7 +1167,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-start-date",
                           "type": "datetime",
                           "value": "1985-10-26T08:00:00.000Z",
@@ -1138,36 +1188,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Expiry",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The expiry date of the permission.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -1180,7 +1241,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-expiry",
                           "type": "datetime",
                           "value": "2024-05-01T00:00:00.000Z",
@@ -1454,36 +1514,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Start Time",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The time at which the first period begins.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -1496,7 +1567,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-start-date",
                           "type": "datetime",
                           "value": "1985-10-26T08:00:00.000Z",
@@ -1518,36 +1588,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Expiry",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The expiry date of the permission.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -1560,7 +1641,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-expiry",
                           "type": "datetime",
                           "value": "2024-05-01T00:00:00.000Z",
@@ -1835,36 +1915,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Start Time",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The time at which the first period begins.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -1877,7 +1968,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-start-date",
                           "type": "datetime",
                           "value": "1985-10-26T08:00:00.000Z",
@@ -1899,36 +1989,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Expiry",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The expiry date of the permission.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -1941,7 +2042,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-expiry",
                           "type": "datetime",
                           "value": "2024-05-01T00:00:00.000Z",
@@ -2227,36 +2327,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Start Time",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The time at which the first period begins.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -2269,7 +2380,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-start-date",
                           "type": "datetime",
                           "value": "1985-10-26T08:00:00.000Z",
@@ -2292,36 +2402,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Expiry",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The expiry date of the permission.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -2334,7 +2455,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-expiry",
                           "type": "datetime",
                           "value": "2024-05-01T00:00:00.000Z",
@@ -2610,36 +2730,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Start Time",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Start Time",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The time at which the first period begins.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The time at which the first period begins.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -2652,7 +2783,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-start-date",
                           "type": "datetime",
                           "value": "1985-10-26T08:00:00.000Z",
@@ -2674,36 +2804,47 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
+                      "alignment": "space-between",
                       "children": [
                         {
                           "key": null,
                           "props": {
-                            "children": "Expiry",
-                          },
-                          "type": "Text",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "color": "muted",
-                                "name": "question",
-                                "size": "inherit",
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Expiry",
+                                },
+                                "type": "Text",
                               },
-                              "type": "Icon",
-                            },
-                            "content": {
-                              "key": null,
-                              "props": {
-                                "children": "The expiry date of the permission.",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The expiry date of the permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
                               },
-                              "type": "Text",
-                            },
+                            ],
+                            "direction": "horizontal",
                           },
-                          "type": "Tooltip",
+                          "type": "Box",
                         },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -2716,7 +2857,6 @@ describe('erc20TokenPeriodic:content', () => {
                         "key": null,
                         "props": {
                           "disablePast": true,
-                          "disabled": false,
                           "name": "erc20-token-periodic-expiry",
                           "type": "datetime",
                           "value": "2024-05-01T00:00:00.000Z",
