@@ -145,6 +145,7 @@ describe('RpcHandler', () => {
     mockBlockchainMetadataClient = {
       checkDelegationDisabledOnChain: jest.fn(),
       getTokenBalanceAndMetadata: jest.fn(),
+      checkTransactionReceipt: jest.fn(),
     } as unknown as jest.Mocked<BlockchainTokenMetadataClient>;
 
     handler = createRpcHandler({
@@ -1023,6 +1024,9 @@ describe('RpcHandler', () => {
       mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
+      );
 
       const result = await handler.submitRevocation(validRevocationParams);
 
@@ -1131,6 +1135,9 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.updatePermissionRevocationStatus.mockRejectedValueOnce(
         profileSyncError,
       );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
+      );
 
       await expect(
         handler.submitRevocation(validRevocationParams),
@@ -1190,6 +1197,9 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.updatePermissionRevocationStatus.mockResolvedValueOnce(
         undefined,
       );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
+      );
 
       const result = await handler.submitRevocation(upperCaseParams);
 
@@ -1247,6 +1257,9 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.updatePermissionRevocationStatus.mockResolvedValueOnce(
         undefined,
       );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
+      );
 
       const result = await handler.submitRevocation(testParams);
 
@@ -1296,6 +1309,9 @@ describe('RpcHandler', () => {
       );
       mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         false,
+      );
+      mockBlockchainMetadataClient.checkTransactionReceipt.mockResolvedValueOnce(
+        true,
       );
 
       await expect(

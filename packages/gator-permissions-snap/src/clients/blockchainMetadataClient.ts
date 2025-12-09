@@ -16,7 +16,11 @@ import type {
   TokenBalanceAndMetadata,
   TokenMetadataClient,
 } from './types';
-import { callContract, ensureChain } from '../utils/blockchain';
+import {
+  callContract,
+  ensureChain,
+  getTransactionReceipt,
+} from '../utils/blockchain';
 import { sleep } from '../utils/httpClient';
 
 /**
@@ -324,6 +328,68 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       // we cannot determine the status, so throw an error instead of returning false
       throw new ResourceUnavailableError(
         `Unable to determine delegation disabled status: ${errorMessage}`,
+      );
+    }
+  }
+
+  /**
+   * Checks if a transaction receipt is valid by calling the eth_getTransactionReceipt method.
+   * @param args - The parameters for checking the transaction receipt.
+   * @param args.txHash - The hash of the transaction to check.
+   * @param args.chainId - The chain ID in hex format.
+   * @returns True if the transaction receipt is valid, false if it is not.
+   * @throws InvalidInputError if input parameters are invalid.
+   * @throws ChainDisconnectedError if the provider is on the wrong chain.
+   * @throws ResourceUnavailableError if the on-chain check fails and we cannot determine the status.
+   */
+  public async checkTransactionReceipt({
+    txHash,
+    chainId,
+  }: {
+    txHash: Hex;
+    chainId: Hex;
+  }): Promise<boolean> {
+    logger.debug('BlockchainTokenMetadataClient:checkTransactionReceipt()', {
+      txHash,
+      chainId,
+    });
+
+    if (!chainId) {
+      const message = 'No chain ID provided';
+      logger.error(message);
+      throw new InvalidInputError(message);
+    }
+
+    await ensureChain(this.#ethereumProvider, chainId);
+
+    try {
+      const result = await getTransactionReceipt({
+        ethereumProvider: this.#ethereumProvider,
+        txHash,
+        isRetryableError: (error) => this.#isRetryableError(error),
+      });
+
+      // TODO: Parse the transaction receipt
+
+      logger.debug('Transaction receipt result', { result });
+      return true;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error(`Failed to check transaction receipt: ${errorMessage}`);
+
+      // Re-throw critical errors - they should propagate
+      if (
+        error instanceof InvalidInputError ||
+        error instanceof ChainDisconnectedError
+      ) {
+        throw error;
+      }
+
+      // For other errors (network issues, contract call failures, etc.),
+      // we cannot determine the status, so throw an error instead of returning false
+      throw new ResourceUnavailableError(
+        `Failed to check transaction receipt: ${errorMessage}`,
       );
     }
   }

@@ -97,6 +97,37 @@ export type TokenBalanceAndMetadata = {
 };
 
 /**
+ * Represents a transaction receipt from the blockchain.
+ * As defined in the Ethereum JSON-RPC API(https://docs.metamask.io/services/reference/zksync/json-rpc-methods/eth_gettransactionreceipt/)
+ */
+export type TransactionReceipt = {
+  blockHash: Hex;
+  blockNumber: Hex;
+  contractAddress: Hex | null;
+  cumulativeGasUsed: Hex;
+  effectiveGasPrice: Hex;
+  from: Hex;
+  gasUsed: Hex;
+  logs: {
+    address: Hex;
+    blockHash: Hex;
+    blockNumber: Hex;
+    data: Hex;
+    logIndex: Hex;
+    removed: boolean;
+    topics: Hex[];
+    transactionHash: Hex;
+    transactionIndex: Hex;
+  }[];
+  logsBloom: Hex;
+  status: Hex;
+  to: Hex;
+  transactionHash: Hex;
+  transactionIndex: Hex;
+  type: Hex;
+};
+
+/**
  * Interface for token metadata clients that can fetch token balance and metadata
  */
 export type TokenMetadataClient = {

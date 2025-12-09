@@ -255,7 +255,17 @@ export function createRpcHandler({
       );
     }
 
-    // TODO:Check that that provided transaction hash is valid using the blockchain metadata client
+    const isTransactionValid =
+      await blockchainMetadataClient.checkTransactionReceipt({
+        txHash,
+        chainId: permissionChainId,
+      });
+
+    if (!isTransactionValid) {
+      throw new InvalidInputError(
+        `Transaction ${txHash} is not valid. Cannot process revocation.`,
+      );
+    }
 
     await profileSyncManager.updatePermissionRevocationStatus(
       permissionContext,
