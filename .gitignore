@@ -1,4 +1,5 @@
 .DS_Store
+.cursorrules
 dist/
 build/
 coverage/
