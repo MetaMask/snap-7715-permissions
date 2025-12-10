@@ -1,5 +1,18 @@
 import { logger } from '../../../shared/src/utils/logger';
+import deLocale from '../../locales/de.json';
+import elLocale from '../../locales/el.json';
 import enLocale from '../../locales/en.json';
+import es419Locale from '../../locales/es_419.json';
+import frLocale from '../../locales/fr.json';
+import hiLocale from '../../locales/hi.json';
+import idLocale from '../../locales/id.json';
+import jaLocale from '../../locales/ja.json';
+import koLocale from '../../locales/ko.json';
+import ptBRLocale from '../../locales/pt_BR.json';
+import ruLocale from '../../locales/ru.json';
+import tlLocale from '../../locales/tl.json';
+import trLocale from '../../locales/tr.json';
+import viLocale from '../../locales/vi.json';
 import zhCNLocale from '../../locales/zh_CN.json';
 // Type definitions
 export type LocaleMessage = {
@@ -12,13 +25,43 @@ export type LocaleMessages = {
 };
 
 export type MessageKey = keyof typeof enLocale.messages;
-export type SupportedLocale = 'en' | 'zh_CN'
+export type SupportedLocale =
+  | 'en'
+  | 'zh_CN'
+  | 'fr'
+  | 'de'
+  | 'el'
+  | 'hi'
+  | 'id'
+  | 'ja'
+  | 'ko'
+  | 'pt_BR'
+  | 'ru'
+  | 'es_419'
+  | 'tl'
+  | 'tr'
+  | 'vi';
 
 // All available locales
 const locales: Record<SupportedLocale, LocaleMessages> = {
   en: enLocale.messages,
   // eslint-disable-next-line @typescript-eslint/naming-convention
   zh_CN: zhCNLocale.messages,
+  fr: frLocale.messages,
+  de: deLocale.messages,
+  el: elLocale.messages,
+  hi: hiLocale.messages,
+  id: idLocale.messages,
+  ja: jaLocale.messages,
+  ko: koLocale.messages,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  pt_BR: ptBRLocale.messages,
+  ru: ruLocale.messages,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  es_419: es419Locale.messages,
+  tl: tlLocale.messages,
+  tr: trLocale.messages,
+  vi: viLocale.messages,
 };
 
 // Fallback locale
@@ -131,15 +174,15 @@ export function t(key: MessageKey, substitutions?: string[]): string {
   // Try current locale first
   let messageData = currentMessages[key];
 
-  if (!messageData) {
-    // Fallback to English (like extension does)
-    messageData = fallbackMessages[key];
-  }
-
+  // Fallback to English if message doesn't exist or is empty
   if (!messageData?.message) {
+    messageData = fallbackMessages[key];
+
     // Last resort: return the key itself (for debugging)
-    logger.warn(`Missing translation for key: ${String(key)}`);
-    return String(key);
+    if (!messageData?.message) {
+      logger.warn(`Missing translation for key: ${String(key)}`);
+      return String(key);
+    }
   }
 
   const { message } = messageData;

@@ -166,7 +166,7 @@ export const PermissionHandlerContent = ({
             value={networkName}
             tooltip={t('networkTooltip')}
           />
-           {hasAsset && (
+          {hasAsset && (
             <TokenField
               label={t('tokenLabel')}
               tokenSymbol={tokenSymbol}
