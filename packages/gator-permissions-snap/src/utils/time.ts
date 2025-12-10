@@ -123,7 +123,9 @@ export const timestampToISO8601 = (timestamp: number): string => {
   const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
 
   if (isNaN(date.getTime())) {
-    throw new InvalidInputError('timestampToISO8601: Invalid timestamp');
+    throw new InvalidInputError(
+      `timestampToISO8601: Invalid timestamp: ${timestamp}`,
+    );
   }
 
   return date.toISOString();
@@ -140,7 +142,9 @@ export const iso8601ToTimestamp = (iso: string): number => {
   const date = new Date(iso);
 
   if (isNaN(date.getTime())) {
-    throw new InvalidInputError('iso8601ToTimestamp: Invalid ISO 8601 string');
+    throw new InvalidInputError(
+      `iso8601ToTimestamp: Invalid ISO 8601 string: ${iso}`,
+    );
   }
 
   return Math.floor(date.getTime() / 1000);
