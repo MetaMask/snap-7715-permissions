@@ -24,7 +24,7 @@ export const expiryRule: Erc20TokenRevocationRuleDefinition = {
     error: metadata.validationErrors.expiryError,
     disablePast: true,
   }),
-  updateContext: (context: Erc20TokenRevocationContext, value: any) => ({
+  updateContext: (context: Erc20TokenRevocationContext, value: string) => ({
     ...context,
     expiry: {
       ...context.expiry,
