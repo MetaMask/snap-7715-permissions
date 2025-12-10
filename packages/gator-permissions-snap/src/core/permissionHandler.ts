@@ -337,7 +337,7 @@ export class PermissionHandler<
               chainId: numberToHex(parseInt(chainId, 10)),
             });
           },
-          async (status, _isCancelled) => {
+          async (status) => {
             this.#accountUpgradeStatus = status;
             await rerender();
           },
