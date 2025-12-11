@@ -6,9 +6,10 @@
 'preserve_hierarchy': true
 
 files:
-  [
-    {
-      'source': 'packages/gator-permissions-snap/locales/en.json',
-      'translation': 'packages/gator-permissions-snap/locales/%two_letters_code%.json',
-    },
-  ]
+  - 'source': 'packages/gator-permissions-snap/locales/en.json'
+    'translation': 'packages/gator-permissions-snap/locales/%two_letters_code%.json'
+    'languages_mapping':
+      'two_letters_code':
+        'zh-CN': 'zh_CN'
+        'pt-BR': 'pt_BR'
+        'es-419': 'es_419'
