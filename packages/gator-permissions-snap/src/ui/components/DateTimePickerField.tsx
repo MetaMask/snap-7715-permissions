@@ -11,8 +11,8 @@ export type DateTimePickerFieldParams = Pick<
   name: string;
   /** ISO 8601 formatted date string with timezone */
   value: string | undefined;
-  /** Whether to disable selection of past dates */
-  disablePast?: boolean | undefined;
+  /** Whether to allow selection of past dates */
+  allowPastDate?: boolean | undefined;
 };
 
 export const DateTimePickerField = ({
@@ -22,7 +22,7 @@ export const DateTimePickerField = ({
   value,
   disabled,
   errorMessage,
-  disablePast,
+  allowPastDate,
 }: DateTimePickerFieldParams) => {
   if (disabled) {
     // Format the ISO date to a readable format for display
@@ -40,6 +40,9 @@ export const DateTimePickerField = ({
 
     return <TextField label={label} value={displayValue} tooltip={tooltip} />;
   }
+
+  // Convert allowPastDate to disablePast for the Snaps SDK component
+  const disablePast = allowPastDate === undefined ? undefined : !allowPastDate;
 
   return (
     <Field

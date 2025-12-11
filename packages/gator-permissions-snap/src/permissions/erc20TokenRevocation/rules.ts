@@ -22,7 +22,7 @@ export const expiryRule: Erc20TokenRevocationRuleDefinition = {
     isVisible: true,
     tooltip: 'The expiry date of the permission.',
     error: metadata.validationErrors.expiryError,
-    disablePast: true,
+    allowPastDate: false,
   }),
   updateContext: (context: Erc20TokenRevocationContext, value: string) => ({
     ...context,

@@ -39,7 +39,7 @@ export function renderRule<
     isVisible,
     options,
     isAdjustmentAllowed,
-    disablePast,
+    allowPastDate,
   } = rule.getRuleData({ context, metadata });
 
   if (!isVisible) {
@@ -101,7 +101,7 @@ export function renderRule<
           errorMessage={error}
           disabled={isDisabled}
           tooltip={tooltip}
-          disablePast={disablePast}
+          allowPastDate={allowPastDate}
         />
       );
     }

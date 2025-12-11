@@ -195,7 +195,7 @@ export type RuleData = {
   options?: string[] | undefined;
   isAdjustmentAllowed: boolean;
   /** For datetime rules: whether to disable selection of past dates. Defaults to false. */
-  disablePast?: boolean | undefined;
+  allowPastDate?: boolean | undefined;
 };
 
 /**

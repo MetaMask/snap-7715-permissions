@@ -79,7 +79,7 @@ export const startTimeRule: Erc20TokenStreamRuleDefinition = {
     isVisible: true,
     tooltip: 'The start time of the stream.',
     error: metadata.validationErrors.startTimeError,
-    disablePast: true,
+    allowPastDate: false,
   }),
   updateContext: (context: Erc20TokenStreamContext, value: string) => ({
     ...context,
@@ -141,7 +141,7 @@ export const expiryRule: Erc20TokenStreamRuleDefinition = {
     isVisible: true,
     tooltip: 'The expiry date of the permission.',
     error: metadata.validationErrors.expiryError,
-    disablePast: true,
+    allowPastDate: false,
   }),
   updateContext: (context: Erc20TokenStreamContext, value: string) => ({
     ...context,

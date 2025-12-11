@@ -101,7 +101,7 @@ export const startTimeRule: RuleDefinition<
     isVisible: true,
     tooltip: 'The time at which the first period begins.',
     error: metadata.validationErrors.startTimeError,
-    disablePast: true,
+    allowPastDate: false,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
@@ -125,7 +125,7 @@ export const expiryRule: RuleDefinition<
     isVisible: true,
     tooltip: 'The expiry date of the permission.',
     error: metadata.validationErrors.expiryError,
-    disablePast: true,
+    allowPastDate: false,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
