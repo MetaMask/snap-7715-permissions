@@ -151,9 +151,7 @@ describe('createCancellableOperation', () => {
           const secondaryResult = await secondaryOperationPromise;
 
           // Only push if not cancelled
-          if (!isCancelled()) {
-            stateUpdates.push(secondaryResult);
-          }
+          !isCancelled() && stateUpdates.push(secondaryResult);
         } else {
           stateUpdates.push(result);
         }
