@@ -4,18 +4,17 @@ import { createCancellableOperation } from '../../src/utils/cancellableOperation
 
 describe('createCancellableOperation', () => {
   it('should execute the operation and call onSuccess when not cancelled', async () => {
-    const operation = createCancellableOperation<string>();
-
     const mockOperation = jest.fn(async (arg: string) => `result-${arg}`);
     const mockOnSuccess = jest.fn(
       async (_result: string, _isCancelled: () => boolean) => Promise.resolve(),
     );
 
-    await operation.execute({
-      arg: 'test',
+    const execute = createCancellableOperation({
       operation: mockOperation,
       onSuccess: mockOnSuccess,
     });
+
+    await execute('test');
 
     expect(mockOperation).toHaveBeenCalledWith('test');
     expect(mockOnSuccess).toHaveBeenCalledWith(
@@ -25,14 +24,7 @@ describe('createCancellableOperation', () => {
   });
 
   it('should cancel previous call when a new call is made', async () => {
-    const operation = createCancellableOperation<number>();
-
-    const firstOnSuccess = jest.fn(
-      async (_result: string, _isCancelled: () => boolean) => Promise.resolve(),
-    );
-    const secondOnSuccess = jest.fn(
-      async (_result: string, _isCancelled: () => boolean) => Promise.resolve(),
-    );
+    const results: string[] = [];
 
     // Create a promise that we can control to simulate a slow operation
     let resolveFirst: ((value: string) => void) | undefined;
@@ -40,43 +32,15 @@ describe('createCancellableOperation', () => {
       resolveFirst = resolve;
     });
 
-    const firstOperation = jest.fn(async () => firstOperationPromise);
-    const secondOperation = jest.fn(async () => 'second-result');
-
-    // Start first operation (will be pending)
-    const firstExecute = operation.execute({
-      arg: 1,
-      operation: firstOperation,
-      onSuccess: firstOnSuccess,
+    let callCount = 0;
+    const operation = jest.fn(async (arg: number) => {
+      callCount += 1;
+      if (callCount === 1) {
+        return firstOperationPromise;
+      }
+      return `result-${arg}`;
     });
 
-    // Start second operation immediately (should cancel first)
-    await operation.execute({
-      arg: 2,
-      operation: secondOperation,
-      onSuccess: secondOnSuccess,
-    });
-
-    // Now resolve the first operation
-    if (resolveFirst) {
-      resolveFirst('first-result');
-    }
-    await firstExecute;
-
-    // First onSuccess should NOT have been called (cancelled)
-    expect(firstOnSuccess).not.toHaveBeenCalled();
-
-    // Second onSuccess SHOULD have been called
-    expect(secondOnSuccess).toHaveBeenCalledWith(
-      'second-result',
-      expect.any(Function),
-    );
-  });
-
-  it('should only invoke onSuccess for the latest call when multiple rapid calls are made', async () => {
-    const operation = createCancellableOperation<number>();
-
-    const results: string[] = [];
     const onSuccess = jest.fn(
       async (result: string, _isCancelled: () => boolean) => {
         results.push(result);
@@ -84,24 +48,54 @@ describe('createCancellableOperation', () => {
       },
     );
 
+    const execute = createCancellableOperation({ operation, onSuccess });
+
+    // Start first operation (will be pending)
+    const firstExecute = execute(1);
+
+    // Start second operation immediately (should cancel first)
+    await execute(2);
+
+    // Now resolve the first operation
+    if (resolveFirst) {
+      resolveFirst('result-1');
+    }
+    await firstExecute;
+
+    // Only the second result should be recorded (first was cancelled)
+    expect(results).toStrictEqual(['result-2']);
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(onSuccess).toHaveBeenCalledWith('result-2', expect.any(Function));
+  });
+
+  it('should only invoke onSuccess for the latest call when multiple rapid calls are made', async () => {
+    const results: string[] = [];
+
     // Create controllable promises for each operation
     const resolvers: ((value: string) => void)[] = [];
-    const createOperation = (index: number) =>
-      jest.fn(
-        async () =>
-          new Promise<string>((resolve) => {
-            resolvers[index] = resolve;
-          }),
-      );
+    let callIndex = 0;
 
-    const op1 = createOperation(0);
-    const op2 = createOperation(1);
-    const op3 = createOperation(2);
+    const operation = jest.fn(
+      async (_arg: number) =>
+        new Promise<string>((resolve) => {
+          resolvers[callIndex] = resolve;
+          callIndex += 1;
+        }),
+    );
+
+    const onSuccess = jest.fn(
+      async (result: string, _isCancelled: () => boolean) => {
+        results.push(result);
+        return Promise.resolve();
+      },
+    );
+
+    const execute = createCancellableOperation({ operation, onSuccess });
 
     // Start three operations in quick succession
-    const exec1 = operation.execute({ arg: 1, operation: op1, onSuccess });
-    const exec2 = operation.execute({ arg: 2, operation: op2, onSuccess });
-    const exec3 = operation.execute({ arg: 3, operation: op3, onSuccess });
+    const exec1 = execute(1);
+    const exec2 = execute(2);
+    const exec3 = execute(3);
 
     // Resolve them in order
     const resolver0 = resolvers[0];
@@ -127,8 +121,6 @@ describe('createCancellableOperation', () => {
   });
 
   it('should provide isCancelled function that detects cancellation during onSuccess async operations', async () => {
-    const operation = createCancellableOperation<number>();
-
     const stateUpdates: string[] = [];
     let capturedIsCancelled: (() => boolean) | undefined;
 
@@ -138,36 +130,40 @@ describe('createCancellableOperation', () => {
       resolveSecondaryOperation = resolve;
     });
 
-    const firstOnSuccess = jest.fn(
-      async (_result: string, isCancelled: () => boolean) => {
-        capturedIsCancelled = isCancelled;
-        // First state update (before secondary async operation)
-        stateUpdates.push('first-balance');
+    let operationCallCount = 0;
+    const operation = jest.fn(async (_arg: number) => {
+      operationCallCount += 1;
+      return `result-${operationCallCount}`;
+    });
 
-        // Simulate a secondary async operation (like fetching fiat balance)
-        const secondaryResult = await secondaryOperationPromise;
+    let onSuccessCallCount = 0;
+    const onSuccess = jest.fn(
+      async (result: string, isCancelled: () => boolean) => {
+        onSuccessCallCount += 1;
+        const isFirstCall = onSuccessCallCount === 1;
 
-        // Only push if not cancelled (using short-circuit evaluation to avoid if statement)
-        !isCancelled() && stateUpdates.push(secondaryResult);
+        if (isFirstCall) {
+          capturedIsCancelled = isCancelled;
+          // First state update (before secondary async operation)
+          stateUpdates.push('first-balance');
+
+          // Simulate a secondary async operation (like fetching fiat balance)
+          const secondaryResult = await secondaryOperationPromise;
+
+          // Only push if not cancelled
+          if (!isCancelled()) {
+            stateUpdates.push(secondaryResult);
+          }
+        } else {
+          stateUpdates.push(result);
+        }
       },
     );
 
-    const secondOnSuccess = jest.fn(
-      async (result: string, _isCancelled: () => boolean) => {
-        stateUpdates.push(result);
-        return Promise.resolve();
-      },
-    );
-
-    const firstOperation = jest.fn(async () => 'first-result');
-    const secondOperation = jest.fn(async () => 'second-result');
+    const execute = createCancellableOperation({ operation, onSuccess });
 
     // Start first operation
-    const firstExecute = operation.execute({
-      arg: 1,
-      operation: firstOperation,
-      onSuccess: firstOnSuccess,
-    });
+    const firstExecute = execute(1);
 
     // Wait for the first onSuccess to start (it will be waiting on secondaryOperationPromise)
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -177,11 +173,7 @@ describe('createCancellableOperation', () => {
     expect(capturedIsCancelled?.()).toBe(false);
 
     // Start second operation (should "cancel" the first)
-    const secondExecute = operation.execute({
-      arg: 2,
-      operation: secondOperation,
-      onSuccess: secondOnSuccess,
-    });
+    const secondExecute = execute(2);
 
     // Now isCancelled should return true for the first operation
     expect(capturedIsCancelled?.()).toBe(true);
@@ -198,10 +190,10 @@ describe('createCancellableOperation', () => {
     // The first operation should have:
     // 1. Updated state with 'first-balance' (before the secondary async operation)
     // 2. NOT updated state with 'first-fiat-balance' (because isCancelled() returned true)
-    // The second operation should have updated state with 'second-result'
+    // The second operation should have updated state with 'result-2'
     expect(stateUpdates).toStrictEqual([
       'first-balance',
-      'second-result',
+      'result-2',
       // 'first-fiat-balance' should NOT be here because the isCancelled check prevented it
     ]);
   });

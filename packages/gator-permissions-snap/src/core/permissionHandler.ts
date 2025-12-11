@@ -263,92 +263,86 @@ export class PermissionHandler<
         await updateContext({ updatedContext: currentContext });
       };
 
-      const balanceOperation = createCancellableOperation<TContext>();
-      const upgradeStatusOperation = createCancellableOperation<TContext>();
+      const fetchAccountBalance = createCancellableOperation<
+        TContext,
+        { balance: bigint; decimals: number; ctx: TContext }
+      >({
+        operation: async (ctx) => {
+          const { address } = parseCaipAccountId(ctx.accountAddressCaip10);
+          const {
+            assetReference,
+            chain: { reference: chainId },
+          } = parseCaipAssetType(ctx.tokenAddressCaip19);
 
-      const fetchAccountBalance = async (context: TContext) => {
-        const hasAsset = context.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
+          const assetAddress = isStrictHexString(assetReference)
+            ? assetReference
+            : ZERO_ADDRESS;
 
-        // todo: presently the permissionHandler has a presumption that the
-        // permission is related to a token from which a balance can be derived.
-        // this is not necessarily true, and this presumption must be removed. as
-        // a workaround, we check whether there's a token address associated with
-        // the context.
-        if (!hasAsset) {
-          return;
-        }
-
-        await balanceOperation.execute({
-          arg: context,
-          operation: async (ctx) => {
-            const { address } = parseCaipAccountId(ctx.accountAddressCaip10);
-            const {
-              assetReference,
-              chain: { reference: chainId },
-            } = parseCaipAssetType(ctx.tokenAddressCaip19);
-
-            const assetAddress = isStrictHexString(assetReference)
-              ? assetReference
-              : ZERO_ADDRESS;
-
-            const { balance, decimals } =
-              await this.#tokenMetadataService.getTokenBalanceAndMetadata({
-                chainId: parseInt(chainId, 10),
-                account: address as Hex,
-                assetAddress,
-              });
-
-            return { balance, decimals, ctx };
-          },
-          onSuccess: async ({ balance, decimals, ctx }, isCancelled) => {
-            this.#tokenBalance = formatUnits({ value: balance, decimals });
-            await rerender();
-
-            // Fetch fiat balance after token balance is set
-            const fiatBalance =
-              await this.#tokenPricesService.getCryptoToFiatConversion(
-                ctx.tokenAddressCaip19,
-                bigIntToHex(balance),
-                ctx.tokenMetadata.decimals,
-              );
-
-            // Check if this operation was cancelled during the fiat balance fetch
-            if (isCancelled()) {
-              return;
-            }
-
-            this.#tokenBalanceFiat = fiatBalance;
-            await rerender();
-          },
-        });
-      };
-
-      const fetchAccountUpgradeStatus = async (context: TContext) => {
-        await upgradeStatusOperation.execute({
-          arg: context,
-          operation: async (ctx) => {
-            const {
-              address,
-              chain: { reference: chainId },
-            } = parseCaipAccountId(ctx.accountAddressCaip10);
-
-            return this.#accountController.getAccountUpgradeStatus({
+          const { balance, decimals } =
+            await this.#tokenMetadataService.getTokenBalanceAndMetadata({
+              chainId: parseInt(chainId, 10),
               account: address as Hex,
-              chainId: numberToHex(parseInt(chainId, 10)),
+              assetAddress,
             });
-          },
-          onSuccess: async (status) => {
-            this.#accountUpgradeStatus = status;
-            await rerender();
-          },
-        });
-      };
+
+          return { balance, decimals, ctx };
+        },
+        onSuccess: async ({ balance, decimals, ctx }, isCancelled) => {
+          this.#tokenBalance = formatUnits({ value: balance, decimals });
+          await rerender();
+
+          // Fetch fiat balance after token balance is set
+          const fiatBalance =
+            await this.#tokenPricesService.getCryptoToFiatConversion(
+              ctx.tokenAddressCaip19,
+              bigIntToHex(balance),
+              ctx.tokenMetadata.decimals,
+            );
+
+          // Check if this operation was cancelled during the fiat balance fetch
+          if (isCancelled()) {
+            return;
+          }
+
+          this.#tokenBalanceFiat = fiatBalance;
+          await rerender();
+        },
+      });
+
+      const fetchAccountUpgradeStatus = createCancellableOperation<
+        TContext,
+        AccountUpgradeStatus
+      >({
+        operation: async (ctx) => {
+          const {
+            address,
+            chain: { reference: chainId },
+          } = parseCaipAccountId(ctx.accountAddressCaip10);
+
+          return this.#accountController.getAccountUpgradeStatus({
+            account: address as Hex,
+            chainId: numberToHex(parseInt(chainId, 10)),
+          });
+        },
+        onSuccess: async (status) => {
+          this.#accountUpgradeStatus = status;
+          await rerender();
+        },
+      });
 
       // Fetch account balance in the background (don't await)
-      fetchAccountBalance(currentContext).catch((error) => {
-        const { message } = error as Error;
-        logger.error(`Fetching account balance failed: ${message}`);
-      });
+      // todo: presently the permissionHandler has a presumption that the
+      // permission is related to a token from which a balance can be derived.
+      // this is not necessarily true, and this presumption must be removed. as
+      // a workaround, we check whether there's a token address associated with
+      // the context.
+      const hasAsset = currentContext.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
+      if (hasAsset) {
+        fetchAccountBalance(currentContext).catch((error) => {
+          const { message } = error as Error;
+          logger.error(`Fetching account balance failed: ${message}`);
+        });
+      }
 
       // Fetch account upgrade status in the background (don't await)
       fetchAccountUpgradeStatus(currentContext).catch(() => {
@@ -387,10 +381,14 @@ export class PermissionHandler<
           this.#accountUpgradeStatus = { isUpgraded: true }; // Reset to default while fetching
 
           // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
-          fetchAccountBalance(currentContext).catch((error) => {
-            const { message } = error as Error;
-            logger.error(`Fetching account balance failed: ${message}`);
-          });
+          const hasAssetForAccount =
+            currentContext.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
+          if (hasAssetForAccount) {
+            fetchAccountBalance(currentContext).catch((error) => {
+              const { message } = error as Error;
+              logger.error(`Fetching account balance failed: ${message}`);
+            });
+          }
 
           // Fetch account upgrade status for the new account in the background
           fetchAccountUpgradeStatus(currentContext).catch((error) => {
