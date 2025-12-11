@@ -6,7 +6,7 @@
       "description": "Label for the recipient field"
     },
     "recipientTooltip": {
-      "message": "Die Website, die die Berechtigung anfordert",
+      "message": "Die Website, die die Genehmigung anfordert",
       "description": "Tooltip for the recipient field"
     },
     "networkLabel": {
@@ -14,7 +14,7 @@
       "description": "Label for the network field"
     },
     "networkTooltip": {
-      "message": "Das Netzwerk, auf dem die Berechtigung angefordert wird",
+      "message": "Das Netzwerk, auf dem die Genehmigung angefordert wird",
       "description": "Tooltip for the network field"
     },
     "tokenLabel": {
@@ -30,7 +30,7 @@
       "description": "Label for the reason field"
     },
     "reasonTooltip": {
-      "message": "Der vom Empfänger angegebene Grund für die Anforderung dieser Berechtigung.",
+      "message": "Der vom Empfänger angegebene Grund für die Anforderung dieser Genehmigung.",
       "description": "Tooltip for the reason field"
     },
     "accountLabel": {
@@ -38,7 +38,7 @@
       "description": "Label for the account field"
     },
     "accountTooltip": {
-      "message": "Das Konto, von dem die Berechtigung erteilt wird.",
+      "message": "Das Konto, von dem die Genehmigung erteilt wird.",
       "description": "Tooltip for the account field"
     },
     "initialAmountLabel": {
@@ -74,7 +74,7 @@
       "description": "Label for the expiry field"
     },
     "expiryTooltip": {
-      "message": "Das Ablaufdatum der Berechtigung (TT/MM/JJJJ HH:MM:SS).",
+      "message": "Das Ablaufdatum der Genehmigung (TT/MM/JJJJ HH:MM:SS).",
       "description": "Tooltip for the expiry field"
     },
     "streamAmountLabel": {
@@ -118,7 +118,7 @@
       "description": "Tooltip for the period duration input field in seconds"
     },
     "permissionRequestTitle": {
-      "message": "Berechtigungsanfrage",
+      "message": "Genehmigungsanfrage",
       "description": "Title for permission request dialogs"
     },
     "showMoreButton": {
@@ -126,7 +126,7 @@
       "description": "Text for show more button"
     },
     "hideButton": {
-      "message": "Ausblenden",
+      "message": "Verbergen",
       "description": "Text for hide button"
     },
     "dateTimeFormat": {
@@ -154,7 +154,7 @@
       "description": "Stream rate value format with amount and symbol"
     },
     "cancelButton": {
-      "message": "Abbrechen",
+      "message": "Stornieren",
       "description": "Cancel button text"
     },
     "grantButton": {
@@ -190,11 +190,11 @@
       "description": "Available label for token balance"
     },
     "permissionRequestSubtitle": {
-      "message": "Diese Website möchte Berechtigungen, um Ihre Token auszugeben.",
+      "message": "Diese Website möchte Genehmigungen, um Ihre Token auszugeben.",
       "description": "Subtitle for permission request"
     },
     "accountUpgradeWarning": {
-      "message": "Dieses Konto wird auf ein Smart-Konto aktualisiert, um diese Berechtigung abzuschließen.",
+      "message": "Dieses Konto wird auf ein smart account aktualisiert, um diese Genehmigung abzuschließen.",
       "description": "Warning message when account needs to be upgraded"
     },
     "removeFieldAlt": {
@@ -258,7 +258,7 @@
       "description": "Fallback text when chain name is not available"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": "Diese Website möchte Berechtigungen, um Ihre ERC-20 Token-Genehmigungen zu widerrufen.",
+      "message": "Diese Website möchte Genehmigungen, um Ihre ERC-20 Token-Genehmigungen zu widerrufen.",
       "description": "Subtitle for ERC-20 token revocation permission request"
     }
   }
