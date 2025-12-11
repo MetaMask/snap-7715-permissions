@@ -9,7 +9,7 @@ describe('i18n utility', () => {
     });
 
     it('should fallback to English when unsupported locale is requested', async () => {
-      mockSnapGlobal('fr');
+      mockSnapGlobal('xx');
       await setupI18n();
       expect(getCurrentLocale()).toBe('en');
     });
