@@ -278,9 +278,9 @@ export class PermissionHandler<
           return;
         }
 
-        await balanceOperation.execute(
-          context,
-          async (ctx) => {
+        await balanceOperation.execute({
+          arg: context,
+          operation: async (ctx) => {
             const { address } = parseCaipAccountId(ctx.accountAddressCaip10);
             const {
               assetReference,
@@ -300,7 +300,7 @@ export class PermissionHandler<
 
             return { balance, decimals, ctx };
           },
-          async ({ balance, decimals, ctx }, isCancelled) => {
+          onSuccess: async ({ balance, decimals, ctx }, isCancelled) => {
             this.#tokenBalance = formatUnits({ value: balance, decimals });
             await rerender();
 
@@ -320,13 +320,13 @@ export class PermissionHandler<
             this.#tokenBalanceFiat = fiatBalance;
             await rerender();
           },
-        );
+        });
       };
 
       const fetchAccountUpgradeStatus = async (context: TContext) => {
-        await upgradeStatusOperation.execute(
-          context,
-          async (ctx) => {
+        await upgradeStatusOperation.execute({
+          arg: context,
+          operation: async (ctx) => {
             const {
               address,
               chain: { reference: chainId },
@@ -337,11 +337,11 @@ export class PermissionHandler<
               chainId: numberToHex(parseInt(chainId, 10)),
             });
           },
-          async (status) => {
+          onSuccess: async (status) => {
             this.#accountUpgradeStatus = status;
             await rerender();
           },
-        );
+        });
       };
 
       // Fetch account balance in the background (don't await)

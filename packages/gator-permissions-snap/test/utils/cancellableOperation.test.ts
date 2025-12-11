@@ -11,7 +11,11 @@ describe('createCancellableOperation', () => {
       async (_result: string, _isCancelled: () => boolean) => Promise.resolve(),
     );
 
-    await operation.execute('test', mockOperation, mockOnSuccess);
+    await operation.execute({
+      arg: 'test',
+      operation: mockOperation,
+      onSuccess: mockOnSuccess,
+    });
 
     expect(mockOperation).toHaveBeenCalledWith('test');
     expect(mockOnSuccess).toHaveBeenCalledWith(
@@ -40,10 +44,18 @@ describe('createCancellableOperation', () => {
     const secondOperation = jest.fn(async () => 'second-result');
 
     // Start first operation (will be pending)
-    const firstExecute = operation.execute(1, firstOperation, firstOnSuccess);
+    const firstExecute = operation.execute({
+      arg: 1,
+      operation: firstOperation,
+      onSuccess: firstOnSuccess,
+    });
 
     // Start second operation immediately (should cancel first)
-    await operation.execute(2, secondOperation, secondOnSuccess);
+    await operation.execute({
+      arg: 2,
+      operation: secondOperation,
+      onSuccess: secondOnSuccess,
+    });
 
     // Now resolve the first operation
     if (resolveFirst) {
@@ -87,9 +99,9 @@ describe('createCancellableOperation', () => {
     const op3 = createOperation(2);
 
     // Start three operations in quick succession
-    const exec1 = operation.execute(1, op1, onSuccess);
-    const exec2 = operation.execute(2, op2, onSuccess);
-    const exec3 = operation.execute(3, op3, onSuccess);
+    const exec1 = operation.execute({ arg: 1, operation: op1, onSuccess });
+    const exec2 = operation.execute({ arg: 2, operation: op2, onSuccess });
+    const exec3 = operation.execute({ arg: 3, operation: op3, onSuccess });
 
     // Resolve them in order
     const resolver0 = resolvers[0];
@@ -151,7 +163,11 @@ describe('createCancellableOperation', () => {
     const secondOperation = jest.fn(async () => 'second-result');
 
     // Start first operation
-    const firstExecute = operation.execute(1, firstOperation, firstOnSuccess);
+    const firstExecute = operation.execute({
+      arg: 1,
+      operation: firstOperation,
+      onSuccess: firstOnSuccess,
+    });
 
     // Wait for the first onSuccess to start (it will be waiting on secondaryOperationPromise)
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -161,11 +177,11 @@ describe('createCancellableOperation', () => {
     expect(capturedIsCancelled?.()).toBe(false);
 
     // Start second operation (should "cancel" the first)
-    const secondExecute = operation.execute(
-      2,
-      secondOperation,
-      secondOnSuccess,
-    );
+    const secondExecute = operation.execute({
+      arg: 2,
+      operation: secondOperation,
+      onSuccess: secondOnSuccess,
+    });
 
     // Now isCancelled should return true for the first operation
     expect(capturedIsCancelled?.()).toBe(true);
