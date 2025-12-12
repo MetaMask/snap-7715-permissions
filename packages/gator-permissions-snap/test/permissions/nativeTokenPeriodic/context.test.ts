@@ -14,10 +14,7 @@ import type {
   NativeTokenPeriodicPermissionRequest,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../../src/utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
@@ -25,7 +22,7 @@ const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
   data: {
     periodAmount: bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })), // 1 ETH per period
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-    startTime: convertReadableDateToTimestamp('10/26/2024'),
+    startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     justification: 'Permission to do something important',
   },
   isAdjustmentAllowed: true,
@@ -48,7 +45,7 @@ const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
       {
         type: 'expiry',
         data: {
-          timestamp: convertReadableDateToTimestamp('05/01/2024'),
+          timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
         },
         isAdjustmentAllowed: true,
       },
@@ -63,7 +60,7 @@ const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
       ...alreadyPopulatedPermission,
       data: {
         ...alreadyPopulatedPermission.data,
-        startTime: convertReadableDateToTimestamp('10/26/2024'),
+        startTime: 1729900800, // 10/26/2024 00:00:00 UTC
       },
     },
   };
@@ -352,7 +349,7 @@ describe('nativeTokenPeriodic:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            startTime: 1577836800, // 01/01/2020
+            startTime: 1577836800, // 01/01/2020 00:00:00 UTC
           },
         };
 
@@ -371,7 +368,7 @@ describe('nativeTokenPeriodic:context', () => {
         const contextWithExpiryInThePast = {
           ...context,
           expiry: {
-            timestamp: 499161600, // 10/26/1985
+            timestamp: 499161600, // 10/26/1985 00:00:00 UTC
             isAdjustmentAllowed: true,
           },
           permissionDetails: {

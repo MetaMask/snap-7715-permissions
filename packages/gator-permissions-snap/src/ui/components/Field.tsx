@@ -11,6 +11,7 @@ import type {
   AddressInputElement,
   AssetSelectorElement,
   CheckboxElement,
+  DateTimePickerElement,
   DropdownElement,
   FileInputElement,
   GenericSnapElement,
@@ -70,7 +71,8 @@ export type ComplexFieldProps = BaseFieldProps & {
     | SelectorElement
     | AssetSelectorElement
     | AddressInputElement
-    | AccountSelectorElement;
+    | AccountSelectorElement
+    | DateTimePickerElement;
 };
 
 export type FieldProps = InputFieldProps | ComplexFieldProps | ViewFieldProps;
