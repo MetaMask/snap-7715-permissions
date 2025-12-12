@@ -24,8 +24,6 @@ import {
 } from '@metamask/utils';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
-import type { SnapsMetricsService } from '../services/snapsMetricsService';
-import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
@@ -36,6 +34,7 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
+import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -46,8 +45,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
-  readonly #userEventDispatcher: UserEventDispatcher;
-
   readonly #nonceCaveatService: NonceCaveatService;
 
   readonly #snapsMetricsService: SnapsMetricsService;
@@ -55,19 +52,16 @@ export class PermissionRequestLifecycleOrchestrator {
   constructor({
     accountController,
     confirmationDialogFactory,
-    userEventDispatcher,
     nonceCaveatService,
     snapsMetricsService,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
-    userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
-    this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
   }

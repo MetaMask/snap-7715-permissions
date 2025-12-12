@@ -17,7 +17,6 @@ import type { ConfirmationDialogFactory } from '../../src/core/confirmationFacto
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
-import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 const randomAddress = () => {
   /* eslint-disable no-restricted-globals */
@@ -110,13 +109,6 @@ const mockConfirmationDialogFactory = {
   createConfirmation: jest.fn(),
 } as unknown as jest.Mocked<ConfirmationDialogFactory>;
 
-const mockUserEventDispatcher = {
-  on: jest.fn(),
-  off: jest.fn(),
-  createUserInputEventHandler: jest.fn(),
-  waitForPendingHandlers: jest.fn().mockResolvedValue(undefined),
-} as unknown as jest.Mocked<UserEventDispatcher>;
-
 const mockNonceCaveatService = {
   getNonce: jest.fn(),
 } as unknown as jest.Mocked<NonceCaveatService>;
@@ -194,7 +186,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       new PermissionRequestLifecycleOrchestrator({
         accountController: mockAccountController,
         confirmationDialogFactory: mockConfirmationDialogFactory,
-        userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
       });
@@ -205,7 +196,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       const instance = new PermissionRequestLifecycleOrchestrator({
         accountController: mockAccountController,
         confirmationDialogFactory: mockConfirmationDialogFactory,
-        userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
       });
