@@ -186,12 +186,6 @@ export type IconData = {
   iconAltText: string;
 };
 
-export type DateTimeParameterNames = {
-  timestampName: string;
-  dateName: string;
-  timeName: string;
-};
-
 export type RuleData = {
   value: string | undefined;
   isVisible: boolean;
@@ -200,7 +194,8 @@ export type RuleData = {
   error?: string | undefined;
   options?: string[] | undefined;
   isAdjustmentAllowed: boolean;
-  dateTimeParameterNames?: DateTimeParameterNames;
+  /** For datetime rules: whether to disable selection of past dates. Defaults to false. */
+  allowPastDate?: boolean | undefined;
 };
 
 /**

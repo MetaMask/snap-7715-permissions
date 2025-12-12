@@ -1,5 +1,6 @@
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
+import { timestampToISO8601, iso8601ToTimestamp } from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import type {
   Erc20TokenStreamContext,
@@ -73,30 +74,20 @@ export const startTimeRule: Erc20TokenStreamRuleDefinition = {
   label: 'Start Time',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.startTime.toString(),
+    value: timestampToISO8601(context.permissionDetails.startTime),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The start time of the stream(mm/dd/yyyy hh:mm:ss).',
+    tooltip: 'The start time of the stream.',
     error: metadata.validationErrors.startTimeError,
-    dateTimeParameterNames: {
-      timestampName: 'permissionDetails.startTime',
-      dateName: 'startTime.date',
-      timeName: 'startTime.time',
+    allowPastDate: false,
+  }),
+  updateContext: (context: Erc20TokenStreamContext, value: string) => ({
+    ...context,
+    permissionDetails: {
+      ...context.permissionDetails,
+      startTime: iso8601ToTimestamp(value),
     },
   }),
-  updateContext: (context: Erc20TokenStreamContext, value: any) => {
-    return {
-      ...context,
-      permissionDetails: {
-        ...context.permissionDetails,
-        startTime: value.timestamp,
-      },
-      startTime: {
-        date: value.date,
-        time: value.time,
-      },
-    };
-  },
 };
 
 export const streamAmountPerPeriodRule: Erc20TokenStreamRuleDefinition = {
@@ -145,26 +136,18 @@ export const expiryRule: Erc20TokenStreamRuleDefinition = {
   label: 'Expiry',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.expiry.timestamp.toString(),
+    value: timestampToISO8601(context.expiry.timestamp),
     isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',
+    tooltip: 'The expiry date of the permission.',
     error: metadata.validationErrors.expiryError,
-    dateTimeParameterNames: {
-      timestampName: 'expiry.timestamp',
-      dateName: 'expiryDate.date',
-      timeName: 'expiryDate.time',
-    },
+    allowPastDate: false,
   }),
-  updateContext: (context: Erc20TokenStreamContext, value: any) => ({
+  updateContext: (context: Erc20TokenStreamContext, value: string) => ({
     ...context,
     expiry: {
       ...context.expiry,
-      timestamp: value.timestamp,
-    },
-    expiryDate: {
-      date: value.date,
-      time: value.time,
+      timestamp: iso8601ToTimestamp(value),
     },
   }),
 };

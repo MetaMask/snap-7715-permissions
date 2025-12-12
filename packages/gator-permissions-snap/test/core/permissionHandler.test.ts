@@ -725,15 +725,7 @@ describe('PermissionHandler', () => {
                       },
                       "type": "AccountSelector",
                     },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": "This account will be upgraded to a smart account to complete this permission.",
-                        "color": "warning",
-                        "size": "sm",
-                      },
-                      "type": "Text",
-                    },
+                    false,
                     {
                       "key": null,
                       "props": {
@@ -1712,8 +1704,10 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
         });
 
-        // called once with the context updated to include the new account address
-        expect(updateContext).toHaveBeenCalledTimes(1);
+        // called twice:
+        // 1. with the context updated to include the new account address
+        // 2. after the account upgrade status is fetched for the new account
+        expect(updateContext).toHaveBeenCalledTimes(2);
         expect(updateContext).toHaveBeenCalledWith({
           updatedContext: {
             ...mockContext,
@@ -3275,14 +3269,15 @@ describe('PermissionHandler', () => {
         resolveTokenBalancePromise();
         await new Promise((resolve) => setTimeout(resolve, 0));
 
-        // update context is called 3 times:
+        // update context is called 4 times:
         // 1. After the account is changed
-        // 2. After the token balance is resolved for the second account
-        // 3. After the fiat balance is resolved for the second account
+        // 2. After the account upgrade status is fetched for the new account
+        // 3. After the token balance is resolved for the second account
+        // 4. After the fiat balance is resolved for the second account
         // if we didn't cancel the original balance loading, there would be another 2 instances
-        // 4. After the original token balance is resolved for the first account
-        // 5. After the original fiat balance is resolved for the first account
-        expect(updateContext).toHaveBeenCalledTimes(3);
+        // 5. After the original token balance is resolved for the first account
+        // 6. After the original fiat balance is resolved for the first account
+        expect(updateContext).toHaveBeenCalledTimes(4);
       });
 
       it('unbinds the event handlers when the confirmation is resolved', async () => {

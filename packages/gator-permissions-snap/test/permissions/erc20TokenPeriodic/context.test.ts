@@ -14,10 +14,7 @@ import type {
   Erc20TokenPeriodicPermissionRequest,
 } from '../../../src/permissions/erc20TokenPeriodic/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../../src/utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
@@ -31,7 +28,7 @@ const permissionWithoutOptionals: Erc20TokenPeriodicPermission = {
       parseUnits({ formatted: '100', decimals: tokenDecimals }),
     ), // 100 USDC per period
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-    startTime: convertReadableDateToTimestamp('10/26/2024'),
+    startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     tokenAddress,
     justification: 'Permission to do something important',
   },
@@ -52,7 +49,7 @@ const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
     {
       type: 'expiry',
       data: {
-        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+        timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
       },
       isAdjustmentAllowed: true,
     },
@@ -67,7 +64,7 @@ const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
     ...alreadyPopulatedPermission,
     data: {
       ...alreadyPopulatedPermission.data,
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     },
     isAdjustmentAllowed: true,
   },
@@ -362,7 +359,7 @@ describe('erc20TokenPeriodic:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            startTime: 1577836800, // 01/01/2020
+            startTime: 1577836800, // 01/01/2020 00:00:00 UTC
           },
         };
 
@@ -381,7 +378,7 @@ describe('erc20TokenPeriodic:context', () => {
         const contextWithExpiryInThePast = {
           ...context,
           expiry: {
-            timestamp: 499161600, // 10/26/1985
+            timestamp: 499161600, // 10/26/1985 00:00:00 UTC
             isAdjustmentAllowed: true,
           },
           permissionDetails: {
