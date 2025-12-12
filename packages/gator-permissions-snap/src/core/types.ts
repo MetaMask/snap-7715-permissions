@@ -17,6 +17,7 @@ import type { AccountController } from './accountController';
 import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type { TokenPricesService } from '../services/tokenPricesService';
+import type { MessageKey } from '../utils/i18n';
 
 /**
  * Represents the result of a permission request.
@@ -91,12 +92,12 @@ export type DeepRequired<TParent> = TParent extends (infer U)[]
  * An enum representing the time periods for which the stream rate can be calculated.
  */
 export enum TimePeriod {
-  HOURLY = 'Hourly',
-  DAILY = 'Daily',
-  WEEKLY = 'Weekly',
-  BIWEEKLY = 'Biweekly',
-  MONTHLY = 'Monthly',
-  YEARLY = 'Yearly',
+  HOURLY = 'hourly',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly',
 }
 
 /**
@@ -209,7 +210,7 @@ export type RuleDefinition<
 > = {
   name: string;
   isOptional?: boolean;
-  label: string;
+  label: MessageKey;
   type: RuleType;
   getRuleData: (config: { context: TContext; metadata: TMetadata }) => RuleData;
   // todo: it would be nice if we could make the value type more specific
@@ -254,8 +255,8 @@ export type PermissionDefinition<
     DeepRequired<TPermission> = DeepRequired<TPermission>,
 > = {
   rules: RuleDefinition<TContext, TMetadata>[];
-  title: string;
-  subtitle: string;
+  title: MessageKey;
+  subtitle: MessageKey;
   dependencies: PermissionHandlerDependencies<
     TRequest,
     TContext,
@@ -294,8 +295,8 @@ export type PermissionHandlerParams<
   tokenPricesService: TokenPricesService;
   tokenMetadataService: TokenMetadataService;
   rules: RuleDefinition<TContext, TMetadata>[];
-  title: string;
-  subtitle: string;
+  title: MessageKey;
+  subtitle: MessageKey;
 };
 
 /**

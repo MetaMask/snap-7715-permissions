@@ -327,7 +327,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -401,7 +401,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -600,56 +600,56 @@ describe('nativeTokenStream:content', () => {
                           "props": {
                             "children": [
                               {
-                                "key": "Hourly",
+                                "key": "hourly",
                                 "props": {
                                   "children": "Hourly",
-                                  "value": "Hourly",
+                                  "value": "hourly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Daily",
+                                "key": "daily",
                                 "props": {
                                   "children": "Daily",
-                                  "value": "Daily",
+                                  "value": "daily",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Weekly",
+                                "key": "weekly",
                                 "props": {
                                   "children": "Weekly",
-                                  "value": "Weekly",
+                                  "value": "weekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Biweekly",
+                                "key": "biweekly",
                                 "props": {
                                   "children": "Biweekly",
-                                  "value": "Biweekly",
+                                  "value": "biweekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Monthly",
+                                "key": "monthly",
                                 "props": {
                                   "children": "Monthly",
-                                  "value": "Monthly",
+                                  "value": "monthly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Yearly",
+                                "key": "yearly",
                                 "props": {
                                   "children": "Yearly",
-                                  "value": "Yearly",
+                                  "value": "yearly",
                                 },
                                 "type": "Option",
                               },
                             ],
                             "name": "native-token-stream-time-period",
-                            "value": "Weekly",
+                            "value": "weekly",
                           },
                           "type": "Dropdown",
                         },
@@ -1056,7 +1056,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -1130,7 +1130,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -1330,56 +1330,56 @@ describe('nativeTokenStream:content', () => {
                           "props": {
                             "children": [
                               {
-                                "key": "Hourly",
+                                "key": "hourly",
                                 "props": {
                                   "children": "Hourly",
-                                  "value": "Hourly",
+                                  "value": "hourly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Daily",
+                                "key": "daily",
                                 "props": {
                                   "children": "Daily",
-                                  "value": "Daily",
+                                  "value": "daily",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Weekly",
+                                "key": "weekly",
                                 "props": {
                                   "children": "Weekly",
-                                  "value": "Weekly",
+                                  "value": "weekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Biweekly",
+                                "key": "biweekly",
                                 "props": {
                                   "children": "Biweekly",
-                                  "value": "Biweekly",
+                                  "value": "biweekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Monthly",
+                                "key": "monthly",
                                 "props": {
                                   "children": "Monthly",
-                                  "value": "Monthly",
+                                  "value": "monthly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Yearly",
+                                "key": "yearly",
                                 "props": {
                                   "children": "Yearly",
-                                  "value": "Yearly",
+                                  "value": "yearly",
                                 },
                                 "type": "Option",
                               },
                             ],
                             "name": "native-token-stream-time-period",
-                            "value": "Weekly",
+                            "value": "weekly",
                           },
                           "type": "Dropdown",
                         },
@@ -1703,7 +1703,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -1778,7 +1778,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -2308,7 +2308,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -2382,7 +2382,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -2581,56 +2581,56 @@ describe('nativeTokenStream:content', () => {
                           "props": {
                             "children": [
                               {
-                                "key": "Hourly",
+                                "key": "hourly",
                                 "props": {
                                   "children": "Hourly",
-                                  "value": "Hourly",
+                                  "value": "hourly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Daily",
+                                "key": "daily",
                                 "props": {
                                   "children": "Daily",
-                                  "value": "Daily",
+                                  "value": "daily",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Weekly",
+                                "key": "weekly",
                                 "props": {
                                   "children": "Weekly",
-                                  "value": "Weekly",
+                                  "value": "weekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Biweekly",
+                                "key": "biweekly",
                                 "props": {
                                   "children": "Biweekly",
-                                  "value": "Biweekly",
+                                  "value": "biweekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Monthly",
+                                "key": "monthly",
                                 "props": {
                                   "children": "Monthly",
-                                  "value": "Monthly",
+                                  "value": "monthly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Yearly",
+                                "key": "yearly",
                                 "props": {
                                   "children": "Yearly",
-                                  "value": "Yearly",
+                                  "value": "yearly",
                                 },
                                 "type": "Option",
                               },
                             ],
                             "name": "native-token-stream-time-period",
-                            "value": "Weekly",
+                            "value": "weekly",
                           },
                           "type": "Dropdown",
                         },
@@ -3036,7 +3036,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -3110,7 +3110,7 @@ describe('nativeTokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -3309,56 +3309,56 @@ describe('nativeTokenStream:content', () => {
                           "props": {
                             "children": [
                               {
-                                "key": "Hourly",
+                                "key": "hourly",
                                 "props": {
                                   "children": "Hourly",
-                                  "value": "Hourly",
+                                  "value": "hourly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Daily",
+                                "key": "daily",
                                 "props": {
                                   "children": "Daily",
-                                  "value": "Daily",
+                                  "value": "daily",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Weekly",
+                                "key": "weekly",
                                 "props": {
                                   "children": "Weekly",
-                                  "value": "Weekly",
+                                  "value": "weekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Biweekly",
+                                "key": "biweekly",
                                 "props": {
                                   "children": "Biweekly",
-                                  "value": "Biweekly",
+                                  "value": "biweekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Monthly",
+                                "key": "monthly",
                                 "props": {
                                   "children": "Monthly",
-                                  "value": "Monthly",
+                                  "value": "monthly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Yearly",
+                                "key": "yearly",
                                 "props": {
                                   "children": "Yearly",
-                                  "value": "Yearly",
+                                  "value": "yearly",
                                 },
                                 "type": "Option",
                               },
                             ],
                             "name": "native-token-stream-time-period",
-                            "value": "Daily",
+                            "value": "daily",
                           },
                           "type": "Dropdown",
                         },
