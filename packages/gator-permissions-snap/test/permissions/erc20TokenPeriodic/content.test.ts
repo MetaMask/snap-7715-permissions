@@ -315,7 +315,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The time at which the first period begins.",
+                                      "children": "The time at which the first period begins",
                                     },
                                     "type": "Text",
                                   },
@@ -389,7 +389,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission",
                                     },
                                     "type": "Text",
                                   },
@@ -731,7 +731,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The time at which the first period begins.",
+                                      "children": "The time at which the first period begins",
                                     },
                                     "type": "Text",
                                   },
@@ -805,7 +805,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission",
                                     },
                                     "type": "Text",
                                   },
@@ -1140,7 +1140,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The time at which the first period begins.",
+                                      "children": "The time at which the first period begins",
                                     },
                                     "type": "Text",
                                   },
@@ -1214,7 +1214,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission",
                                     },
                                     "type": "Text",
                                   },
@@ -1540,7 +1540,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The time at which the first period begins.",
+                                      "children": "The time at which the first period begins",
                                     },
                                     "type": "Text",
                                   },
@@ -1614,7 +1614,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission",
                                     },
                                     "type": "Text",
                                   },
@@ -1941,7 +1941,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The time at which the first period begins.",
+                                      "children": "The time at which the first period begins",
                                     },
                                     "type": "Text",
                                   },
@@ -2015,7 +2015,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission",
                                     },
                                     "type": "Text",
                                   },
@@ -2353,7 +2353,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The time at which the first period begins.",
+                                      "children": "The time at which the first period begins",
                                     },
                                     "type": "Text",
                                   },
@@ -2428,7 +2428,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission",
                                     },
                                     "type": "Text",
                                   },
@@ -2756,7 +2756,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The time at which the first period begins.",
+                                      "children": "The time at which the first period begins",
                                     },
                                     "type": "Text",
                                   },
@@ -2830,7 +2830,7 @@ describe('erc20TokenPeriodic:content', () => {
                                   "content": {
                                     "key": null,
                                     "props": {
-                                      "children": "The expiry date of the permission.",
+                                      "children": "The expiry date of the permission",
                                     },
                                     "type": "Text",
                                   },

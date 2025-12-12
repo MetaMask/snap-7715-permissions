@@ -348,7 +348,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -422,7 +422,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -1111,7 +1111,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -1186,7 +1186,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
