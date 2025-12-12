@@ -146,7 +146,6 @@ const confirmationDialogFactory = new ConfirmationDialogFactory({
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
-  userEventDispatcher,
   nonceCaveatService,
   snapsMetricsService,
 });
@@ -157,7 +156,6 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
   tokenMetadataService,
   userEventDispatcher,
   orchestrator,
-  snapsMetricsService,
 });
 
 const rpcHandler = createRpcHandler({
