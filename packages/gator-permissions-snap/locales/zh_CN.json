@@ -62,11 +62,11 @@
       "description": "Label for the start time field"
     },
     "startTimeTooltip": {
-      "message": "首个周期开始的时间（mm/dd/yyyy hh:mm:ss）。",
+      "message": "首个周期开始的时间。",
       "description": "Tooltip for the start time field for periodic permissions"
     },
     "streamStartTimeTooltip": {
-      "message": "流开始的时间（mm/dd/yyyy hh:mm:ss）。",
+      "message": "流开始的时间",
       "description": "Tooltip for the start time field for stream permissions"
     },
     "expiryLabel": {
@@ -74,7 +74,7 @@
       "description": "Label for the expiry field"
     },
     "expiryTooltip": {
-      "message": "许可的到期时间（mm/dd/yyyy hh:mm:ss）。",
+      "message": "许可的到期时间",
       "description": "Tooltip for the expiry field"
     },
     "streamAmountLabel": {
