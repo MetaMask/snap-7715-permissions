@@ -68,14 +68,10 @@ export function validateStartTime(startTime: number): string | undefined {
     return t('errorInvalidStartTime');
   }
 
-  try {
-    if (startTime < getStartOfTodayLocal()) {
-      return t('errorStartTimeMustBeTodayOrLater');
-    }
-    return undefined;
-  } catch (error) {
-    return t('errorInvalidStartTime');
+  if (startTime < getStartOfTodayLocal()) {
+    return t('errorStartTimeMustBeTodayOrLater');
   }
+  return undefined;
 }
 
 /**
@@ -88,15 +84,11 @@ export function validateExpiry(expiry: number): string | undefined {
     return t('errorInvalidExpiry');
   }
 
-  try {
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    if (expiry < nowSeconds) {
-      return t('errorExpiryMustBeInFuture');
-    }
-    return undefined;
-  } catch (error) {
-    return t('errorInvalidExpiry');
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (expiry < nowSeconds) {
+    return t('errorExpiryMustBeInFuture');
   }
+  return undefined;
 }
 
 /**
@@ -109,14 +101,10 @@ export function validateStartTimeVsExpiry(
   startTime: number,
   expiry: number,
 ): string | undefined {
-  try {
-    if (startTime >= expiry) {
-      return t('errorStartTimeMustBeBeforeExpiry');
-    }
-    return undefined;
-  } catch (error) {
-    return undefined;
+  if (startTime >= expiry) {
+    return t('errorStartTimeMustBeBeforeExpiry');
   }
+  return undefined;
 }
 
 /**
@@ -166,16 +154,11 @@ export function validatePeriodDuration(periodDuration: number): {
   duration: number | undefined;
   error: string | undefined;
 } {
-  try {
-    const duration = periodDuration;
-    if (isNaN(duration) || duration <= 0) {
-      return {
-        duration: undefined,
-        error: t('errorPeriodDurationMustBeGreaterThanZero'),
-      };
-    }
-    return { duration, error: undefined };
-  } catch (error) {
-    return { duration: undefined, error: t('errorInvalidPeriodDuration') };
+  if (isNaN(periodDuration) || periodDuration <= 0) {
+    return {
+      duration: undefined,
+      error: t('errorPeriodDurationMustBeGreaterThanZero'),
+    };
   }
+  return { duration: periodDuration, error: undefined };
 }
