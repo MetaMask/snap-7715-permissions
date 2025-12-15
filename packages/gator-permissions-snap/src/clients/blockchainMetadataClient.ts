@@ -369,7 +369,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         isRetryableError: (error) => this.#isRetryableError(error),
       });
 
-      // TODO: Parse the transaction receipt
+      // TODO: Parse the transaction receipt and return false if the transaction is not confirmed
 
       logger.debug('Transaction receipt result', { result });
       return true;

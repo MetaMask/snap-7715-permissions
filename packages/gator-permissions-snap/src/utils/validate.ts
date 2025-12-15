@@ -8,6 +8,7 @@ import {
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
+import type { RevocationMetadata } from 'src/profileSync';
 import { z } from 'zod';
 
 export const validateGetGrantedPermissionsParams = (
@@ -40,7 +41,7 @@ export const validatePermissionRequestParam = (
 // Validation schema for revocation parameters
 const zRevocationParams = z.object({
   permissionContext: zHexStr,
-  txHash: zHexStr,
+  metadata: z.custom<RevocationMetadata>(),
 });
 
 /**
@@ -51,7 +52,7 @@ const zRevocationParams = z.object({
  */
 export function validateRevocationParams(params: Json): {
   permissionContext: Hex;
-  txHash: Hex;
+  metadata?: RevocationMetadata;
 } {
   try {
     if (!params || typeof params !== 'object') {
@@ -62,7 +63,7 @@ export function validateRevocationParams(params: Json): {
 
     return {
       permissionContext: validated.permissionContext,
-      txHash: validated.txHash,
+      metadata: validated.metadata,
     };
   } catch (error) {
     if (error instanceof z.ZodError) {

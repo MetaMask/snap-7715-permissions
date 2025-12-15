@@ -99,6 +99,7 @@ describe('profileSync', () => {
     isRevoked: false,
     metadata: {
       txHash: '0x' as Hex,
+      blockTimestamp: 'mock-block-timestamp',
     },
   };
   const mockPassAuth = () => {
@@ -219,7 +220,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
           ),
         );
         // Verify the stored data can be parsed and contains expected fields
@@ -250,7 +251,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo.slice(2)}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
           ),
         );
         // Verify the stored data can be parsed and contains expected fields
@@ -330,13 +331,13 @@ describe('profileSync', () => {
             [
               mockDelegationHash,
               expect.stringMatching(
-                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
               ),
             ],
             [
               mockDelegationHashTwo,
               expect.stringMatching(
-                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":""\}\}$/u,
               ),
             ],
           ],
@@ -464,7 +465,7 @@ describe('profileSync', () => {
           [
             mockDelegationHash,
             expect.stringMatching(
-              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x"\}\}$/u,
+              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
             ),
           ],
         ],
@@ -492,7 +493,10 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           true,
-          '0xMocked-tx-hash',
+          {
+            txHash: '0xMocked-tx-hash',
+            blockTimestamp: 'mock-block-timestamp',
+          },
         );
 
         // Should first get the existing permission
@@ -504,7 +508,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":true,"metadata":\{"txHash":"0xMocked-tx-hash"\}\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":true,"metadata":\{"txHash":"0xMocked-tx-hash","blockTimestamp":"mock-block-timestamp"\}\}$/u,
           ),
         );
 
@@ -532,14 +536,17 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           false,
-          '0xMocked-tx-hash',
+          {
+            txHash: '0xMocked-tx-hash',
+            blockTimestamp: 'mock-block-timestamp',
+          },
         );
 
         // Should store the updated permission with isRevoked=false
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0xMocked-tx-hash"\}\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0xMocked-tx-hash","blockTimestamp":"mock-block-timestamp"\}\}$/u,
           ),
         );
 
@@ -569,7 +576,10 @@ describe('profileSync', () => {
           profileSyncManager.updatePermissionRevocationStatus(
             nonExistentDelegationHash,
             true,
-            '0xMocked-tx-hash',
+            {
+              txHash: '0xMocked-tx-hash',
+              blockTimestamp: 'mock-block-timestamp',
+            },
           ),
         ).rejects.toThrow(
           `Permission not found for permission context: ${nonExistentDelegationHash}`,
@@ -593,7 +603,10 @@ describe('profileSync', () => {
           profileSyncManager.updatePermissionRevocationStatus(
             mockStoredGrantedPermission.permissionResponse.context,
             true,
-            '0xMocked-tx-hash',
+            {
+              txHash: '0xMocked-tx-hash',
+              blockTimestamp: 'mock-block-timestamp',
+            },
           ),
         ).rejects.toThrow('Auth failed');
       });
@@ -651,7 +664,10 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           true,
-          '0xMocked-tx-hash',
+          {
+            txHash: '0xMocked-tx-hash',
+            blockTimestamp: 'mock-block-timestamp',
+          },
         );
         expect(userStorageMock.getItem).not.toHaveBeenCalled();
         expect(userStorageMock.setItem).not.toHaveBeenCalled();

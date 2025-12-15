@@ -38,6 +38,7 @@ const TEST_CONTEXT = '0xabcd' as const;
 const TEST_VALID_TX_HASH =
   '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' as Hex;
 const TEST_EMPTY_TX_HASH = '0x' as Hex;
+const TEST_EMPTY_BLOCK_TIMESTAMP = '';
 
 const VALID_PERMISSION_REQUEST: PermissionRequest = {
   chainId: TEST_CHAIN_ID,
@@ -641,6 +642,7 @@ describe('RpcHandler', () => {
           isRevoked: false,
           metadata: {
             txHash: TEST_EMPTY_TX_HASH,
+            blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
         },
         {
@@ -677,6 +679,7 @@ describe('RpcHandler', () => {
           isRevoked: false,
           metadata: {
             txHash: TEST_EMPTY_TX_HASH,
+            blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
         },
       ];
@@ -784,6 +787,7 @@ describe('RpcHandler', () => {
           isRevoked: true,
           metadata: {
             txHash: TEST_VALID_TX_HASH,
+            blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
         },
         {
@@ -818,6 +822,7 @@ describe('RpcHandler', () => {
           isRevoked: false,
           metadata: {
             txHash: TEST_EMPTY_TX_HASH,
+            blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
         },
       ];
@@ -980,7 +985,7 @@ describe('RpcHandler', () => {
   describe('submitRevocation', () => {
     const validRevocationParams = {
       permissionContext: TEST_CONTEXT,
-      txHash: TEST_VALID_TX_HASH,
+      metadata: { txHash: TEST_VALID_TX_HASH },
     };
 
     it('should successfully submit revocation with valid parameters', async () => {
@@ -1015,6 +1020,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
         metadata: {
           txHash: TEST_EMPTY_TX_HASH,
+          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
       };
 
@@ -1039,7 +1045,9 @@ describe('RpcHandler', () => {
       ).toHaveBeenCalled();
       expect(
         mockProfileSyncManager.updatePermissionRevocationStatus,
-      ).toHaveBeenCalledWith(TEST_CONTEXT, true, TEST_VALID_TX_HASH);
+      ).toHaveBeenCalledWith(TEST_CONTEXT, true, {
+        txHash: TEST_VALID_TX_HASH,
+      });
     });
 
     it('should throw InvalidInputError when permissionContext is invalid', async () => {
@@ -1122,6 +1130,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
         metadata: {
           txHash: TEST_EMPTY_TX_HASH,
+          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
       };
 
@@ -1145,7 +1154,9 @@ describe('RpcHandler', () => {
 
       expect(
         mockProfileSyncManager.updatePermissionRevocationStatus,
-      ).toHaveBeenCalledWith(TEST_CONTEXT, true, TEST_VALID_TX_HASH);
+      ).toHaveBeenCalledWith(TEST_CONTEXT, true, {
+        txHash: TEST_VALID_TX_HASH,
+      });
     });
 
     it('should handle hex values with uppercase letters', async () => {
@@ -1185,6 +1196,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
         metadata: {
           txHash: TEST_EMPTY_TX_HASH,
+          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
       };
 
@@ -1245,6 +1257,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
         metadata: {
           txHash: TEST_EMPTY_TX_HASH,
+          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
       };
 
@@ -1301,6 +1314,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
         metadata: {
           txHash: TEST_EMPTY_TX_HASH,
+          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
       };
 
@@ -1358,6 +1372,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
         metadata: {
           txHash: TEST_EMPTY_TX_HASH,
+          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
       };
 
@@ -1416,6 +1431,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
         metadata: {
           txHash: TEST_EMPTY_TX_HASH,
+          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
       };
 
@@ -1474,6 +1490,7 @@ describe('RpcHandler', () => {
         isRevoked: false,
         metadata: {
           txHash: TEST_EMPTY_TX_HASH,
+          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
       };
 

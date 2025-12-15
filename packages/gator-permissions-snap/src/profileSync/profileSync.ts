@@ -26,6 +26,11 @@ import { z } from 'zod';
 
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
+export type RevocationMetadata = {
+  txHash: Hex;
+  blockTimestamp: string;
+};
+
 // Constants for validation
 const MAX_STORAGE_SIZE_BYTES = 400 * 1024; // 400kb limit as documented
 
@@ -35,10 +40,8 @@ const zStoredGrantedPermission = z.object({
   siteOrigin: z.string().min(1, 'Site origin cannot be empty'),
   isRevoked: z.boolean().default(false),
   metadata: z
-    .object({
-      txHash: z.custom<Hex>(),
-    })
-    .default({ txHash: '0x' }),
+    .custom<RevocationMetadata>()
+    .default({ txHash: '0x', blockTimestamp: '' }),
 });
 
 /**
@@ -111,7 +114,7 @@ export type ProfileSyncManager = {
   updatePermissionRevocationStatus: (
     permissionContext: Hex,
     isRevoked: boolean,
-    txHash: Hex,
+    metadata?: RevocationMetadata,
   ) => Promise<void>;
 };
 
@@ -119,9 +122,7 @@ export type StoredGrantedPermission = {
   permissionResponse: PermissionResponse;
   siteOrigin: string;
   isRevoked: boolean;
-  metadata?: {
-    txHash: Hex;
-  };
+  metadata?: RevocationMetadata;
 };
 
 /**
@@ -368,12 +369,12 @@ export function createProfileSyncManager(
    *
    * @param permissionContext - The context of the granted permission to update.
    * @param isRevoked - The new revocation status.
-   * @param txHash - The transaction hash of the revocation.
+   * @param metadata - The revocation transaction metadata.
    */
   async function updatePermissionRevocationStatus(
     permissionContext: Hex,
     isRevoked: boolean,
-    txHash: Hex,
+    metadata?: RevocationMetadata,
   ): Promise<void> {
     try {
       const existingPermission = await getGrantedPermission(permissionContext);
@@ -387,7 +388,7 @@ export function createProfileSyncManager(
       logger.debug('Profile Sync: Updating permission revocation status:', {
         existingPermission,
         isRevoked,
-        txHash,
+        metadata,
       });
 
       await authenticate();
@@ -395,10 +396,12 @@ export function createProfileSyncManager(
       const updatedPermission: StoredGrantedPermission = {
         ...existingPermission,
         isRevoked,
-        metadata: {
-          txHash,
-        },
       };
+
+      // Attach metadata when a transaction hash is given
+      if (metadata) {
+        updatedPermission.metadata = metadata;
+      }
 
       await storeGrantedPermission(updatedPermission);
       logger.debug('Profile Sync: Successfully stored updated permission');
