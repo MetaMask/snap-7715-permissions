@@ -23,12 +23,10 @@ import {
   parseCaipAccountId,
 } from '@metamask/utils';
 
-import type { PermissionIntroductionService } from './permissionIntroduction';
-import type { SnapsMetricsService } from '../services/snapsMetricsService';
-import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
+import type { PermissionIntroductionService } from './permissionIntroduction';
 import type {
   BaseContext,
   BaseMetadata,
@@ -37,6 +35,7 @@ import type {
   PermissionRequestResult,
 } from './types';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
+import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -47,8 +46,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
-  readonly #userEventDispatcher: UserEventDispatcher;
-
   readonly #nonceCaveatService: NonceCaveatService;
 
   readonly #snapsMetricsService: SnapsMetricsService;
@@ -58,21 +55,18 @@ export class PermissionRequestLifecycleOrchestrator {
   constructor({
     accountController,
     confirmationDialogFactory,
-    userEventDispatcher,
     nonceCaveatService,
     snapsMetricsService,
     permissionIntroductionService,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
-    userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
     permissionIntroductionService: PermissionIntroductionService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
-    this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
     this.#permissionIntroductionService = permissionIntroductionService;

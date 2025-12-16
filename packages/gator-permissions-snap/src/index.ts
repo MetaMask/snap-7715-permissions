@@ -153,7 +153,6 @@ const permissionIntroductionService = new PermissionIntroductionService({
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
-  userEventDispatcher,
   nonceCaveatService,
   snapsMetricsService,
   permissionIntroductionService,
@@ -165,7 +164,6 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
   tokenMetadataService,
   userEventDispatcher,
   orchestrator,
-  snapsMetricsService,
 });
 
 const rpcHandler = createRpcHandler({
