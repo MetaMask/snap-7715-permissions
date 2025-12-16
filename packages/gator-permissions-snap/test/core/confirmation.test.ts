@@ -14,7 +14,7 @@ describe('ConfirmationDialog', () => {
   let mockUnbindFunctions: jest.MockedFunction<() => void>[];
   let mockTimeoutFactory: jest.Mocked<TimeoutFactory>;
   let mockCancel: jest.MockedFunction<() => void>;
-  let triggerTimeout: (() => void) | undefined;
+  let triggerTimeout: (() => void | Promise<void>) | undefined;
   const mockInterfaceId = 'test-interface-id';
 
   const mockUi = Text({
@@ -231,7 +231,7 @@ describe('ConfirmationDialog', () => {
       const awaitingUserDecision =
         confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
-      triggerTimeout?.();
+      await triggerTimeout?.();
 
       await expect(awaitingUserDecision).rejects.toThrow(
         'Timeout waiting for user decision',
