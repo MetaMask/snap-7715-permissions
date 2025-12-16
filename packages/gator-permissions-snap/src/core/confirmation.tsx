@@ -31,22 +31,37 @@ export class ConfirmationDialog {
 
   readonly #onBeforeGrant: () => Promise<boolean>;
 
+  readonly #isDialogAlreadyShown: boolean;
+
   constructor({
     ui,
     isGrantDisabled,
     snaps,
     userEventDispatcher,
     onBeforeGrant,
+    existingInterfaceId,
+    isDialogAlreadyShown,
   }: ConfirmationProps) {
     this.#ui = ui;
     this.#isGrantDisabled = isGrantDisabled;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
     this.#onBeforeGrant = onBeforeGrant;
+    this.#interfaceId = existingInterfaceId;
+    this.#isDialogAlreadyShown = isDialogAlreadyShown ?? false;
   }
 
   async createInterface(): Promise<string> {
     if (this.#interfaceId) {
+      // If we have an existing interface (from intro screen), update it with confirmation content
+      await this.#snaps.request({
+        method: 'snap_updateInterface',
+        params: {
+          id: this.#interfaceId,
+          context: {},
+          ui: this.#buildConfirmation(),
+        },
+      });
       return this.#interfaceId;
     }
 
@@ -114,6 +129,12 @@ export class ConfirmationDialog {
       };
 
       this.#decisionReject = reject;
+
+      // If dialog is already shown (e.g., from intro screen), don't call snap_dialog again
+      if (this.#isDialogAlreadyShown) {
+        // Dialog is already open, just wait for button handlers
+        return;
+      }
 
       // we don't await this, because we only want to present the dialog, and
       // not wait for it to be resolved

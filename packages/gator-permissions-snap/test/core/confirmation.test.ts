@@ -70,18 +70,25 @@ describe('ConfirmationDialog', () => {
       });
     });
 
-    it('should return existing interface id if already created', async () => {
+    it('should update interface and return existing id if already created', async () => {
       mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
 
       // Create interface first time
       await confirmationDialog.createInterface();
       mockSnaps.request.mockClear();
 
-      // Create interface second time
+      // Create interface second time - should update existing interface
       const result = await confirmationDialog.createInterface();
 
       expect(result).toBe(mockInterfaceId);
-      expect(mockSnaps.request).not.toHaveBeenCalled();
+      expect(mockSnaps.request).toHaveBeenCalledWith({
+        method: 'snap_updateInterface',
+        params: {
+          id: mockInterfaceId,
+          context: {},
+          ui: expect.any(Object),
+        },
+      });
     });
   });
 

@@ -22,8 +22,8 @@ import {
   numberToHex,
   parseCaipAccountId,
 } from '@metamask/utils';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
+import type { PermissionIntroductionService } from './permissionIntroduction';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
@@ -36,6 +36,7 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
+import type { NonceCaveatService } from '../services/nonceCaveatService';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -52,24 +53,29 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #snapsMetricsService: SnapsMetricsService;
 
+  readonly #permissionIntroductionService: PermissionIntroductionService;
+
   constructor({
     accountController,
     confirmationDialogFactory,
     userEventDispatcher,
     nonceCaveatService,
     snapsMetricsService,
+    permissionIntroductionService,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
+    permissionIntroductionService: PermissionIntroductionService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
+    this.#permissionIntroductionService = permissionIntroductionService;
   }
 
   /**
@@ -131,6 +137,39 @@ export class PermissionRequestLifecycleOrchestrator {
       permissionData: permissionRequest.permission.data,
     });
 
+    // Check if we need to show introduction and get interface ID if so
+    let existingInterfaceId: string | undefined;
+    if (
+      await this.#permissionIntroductionService.shouldShowIntroduction(
+        permissionType,
+      )
+    ) {
+      const { interfaceId, wasCancelled } =
+        await this.#permissionIntroductionService.showIntroduction(
+          permissionType,
+        );
+
+      // If user cancelled the introduction, reject the permission request
+      if (wasCancelled) {
+        await this.#snapsMetricsService.trackPermissionRejected({
+          origin,
+          permissionType,
+          chainId: permissionRequest.chainId,
+          permissionData: permissionRequest.permission.data,
+        });
+
+        return {
+          approved: false,
+          reason: 'Permission request denied',
+        };
+      }
+
+      existingInterfaceId = interfaceId;
+      await this.#permissionIntroductionService.markIntroductionAsSeen(
+        permissionType,
+      );
+    }
+
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.
     await this.#accountController.getAccountAddresses();
@@ -159,12 +198,24 @@ export class PermissionRequestLifecycleOrchestrator {
       return !hasValidationErrors(metadata);
     };
 
+    // Create confirmation dialog, reusing the interface from intro if available
+    const skeletonUi =
+      await lifecycleHandlers.createSkeletonConfirmationContent();
     const confirmationDialog =
-      this.#confirmationDialogFactory.createConfirmation({
-        ui: await lifecycleHandlers.createSkeletonConfirmationContent(),
-        isGrantDisabled: true,
-        onBeforeGrant,
-      });
+      this.#confirmationDialogFactory.createConfirmation(
+        existingInterfaceId === undefined
+          ? {
+              ui: skeletonUi,
+              isGrantDisabled: true,
+              onBeforeGrant,
+            }
+          : {
+              ui: skeletonUi,
+              isGrantDisabled: true,
+              onBeforeGrant,
+              existingInterfaceId,
+            },
+      );
 
     const interfaceId = await confirmationDialog.createInterface();
 

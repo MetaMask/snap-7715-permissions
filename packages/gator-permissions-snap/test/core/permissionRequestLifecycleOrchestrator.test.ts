@@ -14,6 +14,7 @@ import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
+import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
@@ -131,6 +132,15 @@ const mockSnapsMetricsService = {
   trackProfileSync: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<SnapsMetricsService>;
 
+const mockPermissionIntroductionService = {
+  shouldShowIntroduction: jest.fn().mockResolvedValue(false),
+  markIntroductionAsSeen: jest.fn().mockResolvedValue(undefined),
+  buildIntroductionContent: jest.fn().mockReturnValue({ type: 'intro-ui' }),
+  showIntroduction: jest
+    .fn()
+    .mockResolvedValue({ interfaceId: undefined, wasCancelled: false }),
+} as unknown as jest.Mocked<PermissionIntroductionService>;
+
 type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
@@ -197,6 +207,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
+        permissionIntroductionService: mockPermissionIntroductionService,
       });
   });
 
@@ -208,6 +219,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         userEventDispatcher: mockUserEventDispatcher,
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
+        permissionIntroductionService: mockPermissionIntroductionService,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });
@@ -301,6 +313,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           ui: mockSkeletonUiContent,
           isGrantDisabled: true,
           onBeforeGrant: expect.any(Function),
+          existingInterfaceId: undefined,
         });
       });
 
@@ -871,6 +884,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           ui: mockSkeletonUiContent,
           isGrantDisabled: true,
           onBeforeGrant: expect.any(Function),
+          existingInterfaceId: undefined,
         });
 
         expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();

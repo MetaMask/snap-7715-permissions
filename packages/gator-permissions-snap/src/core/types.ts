@@ -106,6 +106,8 @@ export enum TimePeriod {
  * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
  * @property onBeforeGrant - Validation callback that runs before grant is confirmed
+ * @property existingInterfaceId - Optional existing interface ID to reuse instead of creating new one
+ * @property isDialogAlreadyShown - Whether the dialog is already shown (e.g., from intro screen)
  */
 export type ConfirmationProps = {
   ui: SnapElement;
@@ -113,6 +115,8 @@ export type ConfirmationProps = {
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
   onBeforeGrant: () => Promise<boolean>;
+  existingInterfaceId?: string;
+  isDialogAlreadyShown?: boolean;
 };
 
 /**

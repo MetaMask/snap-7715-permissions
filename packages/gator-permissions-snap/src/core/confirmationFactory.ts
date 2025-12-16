@@ -29,23 +29,33 @@ export class ConfirmationDialogFactory {
    * @param params.ui - The UI elements to be displayed in the confirmation dialog.
    * @param params.isGrantDisabled - Whether the user can grant the permission.
    * @param params.onBeforeGrant - Validation callback that runs before grant is confirmed.
+   * @param params.existingInterfaceId - Optional existing interface ID to reuse.
    * @returns A promise that resolves with the confirmation dialog.
    */
   createConfirmation({
     ui,
     isGrantDisabled,
     onBeforeGrant,
+    existingInterfaceId,
   }: {
     ui: SnapElement;
     isGrantDisabled: boolean;
     onBeforeGrant: () => Promise<boolean>;
+    existingInterfaceId?: string;
   }) {
-    return new ConfirmationDialog({
+    const baseProps = {
       ui,
       isGrantDisabled,
       snaps: this.#snap,
       userEventDispatcher: this.#userEventDispatcher,
       onBeforeGrant,
-    });
+    };
+
+    // If we have an existing interface, the dialog is already shown (e.g., from intro screen)
+    return new ConfirmationDialog(
+      existingInterfaceId === undefined
+        ? baseProps
+        : { ...baseProps, existingInterfaceId, isDialogAlreadyShown: true },
+    );
   }
 }

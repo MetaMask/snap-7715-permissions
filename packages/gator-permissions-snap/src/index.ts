@@ -26,6 +26,7 @@ import { PriceApiClient } from './clients/priceApiClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
+import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
 import {
   createProfileSyncOptions,
@@ -143,12 +144,19 @@ const confirmationDialogFactory = new ConfirmationDialogFactory({
   userEventDispatcher,
 });
 
+const permissionIntroductionService = new PermissionIntroductionService({
+  stateManager,
+  snap,
+  userEventDispatcher,
+});
+
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
   userEventDispatcher,
   nonceCaveatService,
   snapsMetricsService,
+  permissionIntroductionService,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
