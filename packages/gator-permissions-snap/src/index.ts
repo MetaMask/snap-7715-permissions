@@ -27,6 +27,7 @@ import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
+import { createTimeoutFactory } from './core/timeoutFactory';
 import {
   createProfileSyncOptions,
   getProfileSyncSdkEnv,
@@ -141,6 +142,7 @@ const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 const confirmationDialogFactory = new ConfirmationDialogFactory({
   snap,
   userEventDispatcher,
+  timeoutFactory: createTimeoutFactory({ timeoutMs: 5 * 60 * 1000 }), // todo: make the timeout configurable
 });
 
 const orchestrator = new PermissionRequestLifecycleOrchestrator({

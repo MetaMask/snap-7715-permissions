@@ -3,6 +3,7 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import { ConfirmationDialog } from './confirmation';
+import type { TimeoutFactory } from './timeoutFactory';
 
 /**
  * Factory for creating confirmation dialogs.
@@ -12,15 +13,20 @@ export class ConfirmationDialogFactory {
 
   #userEventDispatcher: UserEventDispatcher;
 
+  #timeoutFactory: TimeoutFactory;
+
   constructor({
     snap,
     userEventDispatcher,
+    timeoutFactory,
   }: {
     snap: SnapsProvider;
     userEventDispatcher: UserEventDispatcher;
+    timeoutFactory: TimeoutFactory;
   }) {
     this.#snap = snap;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#timeoutFactory = timeoutFactory;
   }
 
   /**
@@ -46,6 +52,7 @@ export class ConfirmationDialogFactory {
       snaps: this.#snap,
       userEventDispatcher: this.#userEventDispatcher,
       onBeforeGrant,
+      timeoutFactory: this.#timeoutFactory,
     });
   }
 }

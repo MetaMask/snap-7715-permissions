@@ -17,6 +17,7 @@ import type { AccountController } from './accountController';
 import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type { TokenPricesService } from '../services/tokenPricesService';
+import type { TimeoutFactory } from './timeoutFactory';
 
 /**
  * Represents the result of a permission request.
@@ -113,6 +114,7 @@ export type ConfirmationProps = {
   snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
   onBeforeGrant: () => Promise<boolean>;
+  timeoutFactory: TimeoutFactory;
 };
 
 /**

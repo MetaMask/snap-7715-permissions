@@ -4,6 +4,7 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { Timeout, TimeoutFactory } from './timeoutFactory';
 import type { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
@@ -24,6 +25,10 @@ export class ConfirmationDialog {
 
   #isGrantDisabled: boolean;
 
+  #timeoutFactory: TimeoutFactory;
+
+  #timeout: Timeout | undefined;
+
   // Track handlers and promise hooks so we can programmatically close the dialog on error
   #unbindHandlers: (() => void) | undefined;
 
@@ -37,12 +42,14 @@ export class ConfirmationDialog {
     snaps,
     userEventDispatcher,
     onBeforeGrant,
+    timeoutFactory,
   }: ConfirmationProps) {
     this.#ui = ui;
     this.#isGrantDisabled = isGrantDisabled;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
     this.#onBeforeGrant = onBeforeGrant;
+    this.#timeoutFactory = timeoutFactory;
   }
 
   async createInterface(): Promise<string> {
@@ -72,6 +79,14 @@ export class ConfirmationDialog {
     const interfaceId = this.#interfaceId;
 
     const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
+      this.#timeout = this.#timeoutFactory.register({
+        onTimeout: async () => {
+          await this.#cleanup();
+
+          reject(new Error('Timeout waiting for user decision'));
+        },
+      });
+
       const { unbind: unbindGrantButtonClick } = this.#userEventDispatcher.on({
         elementName: ConfirmationDialog.#grantButton,
         eventType: UserInputEventType.ButtonClickEvent,
@@ -91,7 +106,6 @@ export class ConfirmationDialog {
           }
 
           await this.#cleanup();
-          this.#interfaceId = undefined;
           resolve(true);
         },
       });
@@ -102,7 +116,7 @@ export class ConfirmationDialog {
         interfaceId,
         handler: async () => {
           await this.#cleanup();
-          this.#interfaceId = undefined;
+
           resolve(false);
         },
       });
@@ -148,6 +162,9 @@ export class ConfirmationDialog {
    * @param resolveInterface - Whether to resolve the interface. Defaults to true.
    */
   async #cleanup(resolveInterface = true): Promise<void> {
+    this.#timeout?.cancel();
+    this.#timeout = undefined;
+
     // Unbind any listeners to avoid leaks
     if (this.#unbindHandlers) {
       try {
