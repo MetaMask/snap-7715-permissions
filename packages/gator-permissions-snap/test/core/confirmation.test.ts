@@ -245,6 +245,65 @@ describe('ConfirmationDialog', () => {
         },
       });
     });
+
+    it('should ignore cancel click after timeout has fired', async () => {
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+      expect(mockTimeoutFactory.register).toHaveBeenCalledTimes(1);
+
+      const cancelButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
+        (call) => call[0].elementName === 'cancel-button',
+      )?.[0]?.handler;
+
+      if (cancelButtonHandler === undefined) {
+        throw new Error('Cancel button handler is undefined');
+      }
+
+      // Fire timeout first
+      await triggerTimeout?.();
+
+      // Then simulate cancel click after timeout
+      await cancelButtonHandler({
+        event: { type: UserInputEventType.ButtonClickEvent },
+        interfaceId: mockInterfaceId,
+      });
+
+      await expect(awaitingUserDecision).rejects.toThrow(
+        'Timeout waiting for user decision',
+      );
+
+      // Listeners unbound once by timeout cleanup
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
+      expect(mockCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('should cleanup and reject when snap_dialog fails', async () => {
+      // The next request (snap_dialog) should reject
+      mockSnaps.request.mockRejectedValueOnce(new Error('dialog failed'));
+
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      await expect(awaitingUserDecision).rejects.toThrow('dialog failed');
+
+      // Handlers cleaned up
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
+      // Timeout cancelled
+      expect(mockCancel).toHaveBeenCalledTimes(1);
+
+      // Interface should NOT be resolved in error catch path (cleanup(false))
+      expect(
+        mockSnaps.request.mock.calls.find(
+          (call) => call[0]?.method === 'snap_resolveInterface',
+        ),
+      ).toBeUndefined();
+    });
   });
 
   describe('closeWithError()', () => {
