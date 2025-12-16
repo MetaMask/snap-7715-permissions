@@ -16,8 +16,8 @@ import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import type { DelegationContracts } from './chainMetadata';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
-import type { TokenPricesService } from '../services/tokenPricesService';
 import type { TimeoutFactory } from './timeoutFactory';
+import type { TokenPricesService } from '../services/tokenPricesService';
 
 /**
  * Represents the result of a permission request.

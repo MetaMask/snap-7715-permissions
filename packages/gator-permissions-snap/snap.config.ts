@@ -9,6 +9,7 @@ dotenv.config();
 const {
   SNAP_ENV,
   PRICE_API_BASE_URL,
+  CONFIRMATION_TIMEOUT_MS,
   STORE_PERMISSIONS_ENABLED,
   ACCOUNT_API_BASE_URL,
   TOKENS_API_BASE_URL,
@@ -28,6 +29,12 @@ if (!KERNEL_SNAP_ID) {
 if (!PRICE_API_BASE_URL) {
   throw new InternalError(
     'PRICE_API_BASE_URL must be set as an environment variable.',
+  );
+}
+
+if (!CONFIRMATION_TIMEOUT_MS) {
+  throw new InternalError(
+    'CONFIRMATION_TIMEOUT_MS must be set as an environment variable.',
   );
 }
 
@@ -70,6 +77,7 @@ const config: SnapConfig = {
   environment: {
     SNAP_ENV,
     PRICE_API_BASE_URL,
+    CONFIRMATION_TIMEOUT_MS,
     STORE_PERMISSIONS_ENABLED,
     ACCOUNT_API_BASE_URL,
     TOKENS_API_BASE_URL,
