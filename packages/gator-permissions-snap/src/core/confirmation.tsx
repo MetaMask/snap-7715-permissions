@@ -29,6 +29,8 @@ export class ConfirmationDialog {
 
   #timeout: Timeout | undefined;
 
+  #hasTimedOut = false;
+
   // Track handlers and promise hooks so we can programmatically close the dialog on error
   #unbindHandlers: (() => void) | undefined;
 
@@ -81,6 +83,8 @@ export class ConfirmationDialog {
     const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
       this.#timeout = this.#timeoutFactory.register({
         onTimeout: async () => {
+          this.#hasTimedOut = true;
+
           await this.#cleanup();
 
           reject(new Error('Timeout waiting for user decision'));
@@ -101,7 +105,7 @@ export class ConfirmationDialog {
            */
           const isValid = await this.#onBeforeGrant();
           // If validation fails, don't resolve - keep dialog open with errors shown
-          if (!isValid) {
+          if (!isValid || this.#hasTimedOut) {
             return;
           }
 
@@ -116,6 +120,10 @@ export class ConfirmationDialog {
         interfaceId,
         handler: async () => {
           await this.#cleanup();
+
+          if (this.#hasTimedOut) {
+            return;
+          }
 
           resolve(false);
         },
@@ -164,6 +172,7 @@ export class ConfirmationDialog {
   async #cleanup(resolveInterface = true): Promise<void> {
     this.#timeout?.cancel();
     this.#timeout = undefined;
+    this.#hasTimedOut = false;
 
     // Unbind any listeners to avoid leaks
     if (this.#unbindHandlers) {
@@ -189,6 +198,8 @@ export class ConfirmationDialog {
         // silently ignore since dialog is already closed (probably from an internal error)
       }
     }
+
+    this.#interfaceId = undefined;
   }
 
   #buildConfirmation(): JSX.Element {
@@ -254,9 +265,6 @@ export class ConfirmationDialog {
 
     // Clean up handlers and resolve interface
     await this.#cleanup(true);
-
-    // Clear interface ID after cleanup
-    this.#interfaceId = undefined;
 
     if (this.#decisionReject) {
       this.#decisionReject(reason);

@@ -247,6 +247,58 @@ describe('ConfirmationDialog', () => {
     });
   });
 
+  describe('closeWithError()', () => {
+    it('should clean up, resolve interface, and reject pending decision', async () => {
+      mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
+      await confirmationDialog.createInterface();
+      mockSnaps.request.mockClear();
+
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      // Handlers registered (grant + cancel)
+      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(2);
+
+      const reason = new Error('Test failure');
+      await confirmationDialog.closeWithError(reason);
+
+      await expect(awaitingUserDecision).rejects.toThrow('Test failure');
+
+      // All listeners unbound
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
+      // Dialog interface resolved and timeout cancelled
+      expect(mockSnaps.request).toHaveBeenCalledWith({
+        method: 'snap_resolveInterface',
+        params: {
+          id: mockInterfaceId,
+          value: {},
+        },
+      });
+      expect(mockCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be safe to call multiple times', async () => {
+      mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
+      await confirmationDialog.createInterface();
+      mockSnaps.request.mockClear();
+
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      const reason = new Error('Second failure');
+      await confirmationDialog.closeWithError(reason);
+      await expect(awaitingUserDecision).rejects.toThrow('Second failure');
+
+      // Calling again should not throw
+      const result = await confirmationDialog.closeWithError(reason);
+
+      expect(result).toBeUndefined();
+    });
+  });
+
   describe('updateContent()', () => {
     it('should throw error if interface not created', async () => {
       const updatedUi = Text({
