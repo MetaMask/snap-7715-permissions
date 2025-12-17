@@ -63,10 +63,12 @@ if (!priceApiBaseUrl) {
   throw new InternalError('PRICE_API_BASE_URL is not set');
 }
 
-const confirmationTimeoutMs = process.env.CONFIRMATION_TIMEOUT_MS;
-if (!confirmationTimeoutMs) {
+const confirmationTimeoutMsString = process.env.CONFIRMATION_TIMEOUT_MS;
+if (!confirmationTimeoutMsString) {
   throw new InternalError('CONFIRMATION_TIMEOUT_MS is not set');
 }
+
+const confirmationTimeoutMs = parseInt(confirmationTimeoutMsString, 10);
 
 // set up dependencies
 
@@ -147,7 +149,9 @@ const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 const confirmationDialogFactory = new ConfirmationDialogFactory({
   snap,
   userEventDispatcher,
-  timeoutFactory: createTimeoutFactory({ timeoutMs: confirmationTimeoutMs }),
+  timeoutFactory: createTimeoutFactory({
+    timeoutMs: confirmationTimeoutMs,
+  }),
 });
 
 const orchestrator = new PermissionRequestLifecycleOrchestrator({

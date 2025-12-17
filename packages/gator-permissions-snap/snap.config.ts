@@ -38,6 +38,10 @@ if (!CONFIRMATION_TIMEOUT_MS) {
   );
 }
 
+if (isNaN(parseInt(CONFIRMATION_TIMEOUT_MS, 10))) {
+  throw new InternalError('CONFIRMATION_TIMEOUT_MS must be a valid number.');
+}
+
 if (!STORE_PERMISSIONS_ENABLED) {
   throw new InternalError(
     'STORE_PERMISSIONS_ENABLED must be set as an environment variable.',

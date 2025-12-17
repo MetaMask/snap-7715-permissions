@@ -199,6 +199,8 @@ export class ConfirmationDialog {
     resolveInterface: boolean;
   }): Promise<void> {
     this.#timeout?.cancel();
+    // although not strictly necessary, we clear the timeout handler to avoid unnecessarily calling cancel() multiple times
+    this.#timeout = undefined;
 
     // Unbind any listeners to avoid leaks
     if (this.#unbindHandlers) {
