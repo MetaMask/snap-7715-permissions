@@ -4,6 +4,7 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { Timeout, TimeoutFactory } from './timeoutFactory';
 import type { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
@@ -18,11 +19,17 @@ export class ConfirmationDialog {
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
+  readonly #timeoutFactory: TimeoutFactory;
+
   #ui: SnapElement;
 
   #interfaceId: string | undefined;
 
   #isGrantDisabled: boolean;
+
+  #timeout: Timeout | undefined;
+
+  #hasTimedOut = false;
 
   // Track handlers and promise hooks so we can programmatically close the dialog on error
   #unbindHandlers: (() => void) | undefined;
@@ -37,12 +44,14 @@ export class ConfirmationDialog {
     snaps,
     userEventDispatcher,
     onBeforeGrant,
+    timeoutFactory,
   }: ConfirmationProps) {
     this.#ui = ui;
     this.#isGrantDisabled = isGrantDisabled;
     this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
     this.#onBeforeGrant = onBeforeGrant;
+    this.#timeoutFactory = timeoutFactory;
   }
 
   async createInterface(): Promise<string> {
@@ -72,6 +81,42 @@ export class ConfirmationDialog {
     const interfaceId = this.#interfaceId;
 
     const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
+      const cleanupAndResolveIfNotTimedOut = async ({
+        decision,
+        resolveInterface,
+      }: {
+        decision: boolean;
+        resolveInterface: boolean;
+      }) => {
+        if (!this.#hasTimedOut) {
+          await this.#cleanup({ resolveInterface });
+        }
+
+        if (!this.#hasTimedOut) {
+          resolve(decision);
+        }
+      };
+
+      const cleanupAndRejectIfNotTimedOut = async (error: Error) => {
+        if (!this.#hasTimedOut) {
+          await this.#cleanup({ resolveInterface: false });
+        }
+
+        if (!this.#hasTimedOut) {
+          reject(error);
+        }
+      };
+
+      this.#timeout = this.#timeoutFactory.register({
+        onTimeout: async () => {
+          this.#hasTimedOut = true;
+
+          await this.#cleanup({ resolveInterface: true });
+
+          reject(new Error('Timeout waiting for user decision'));
+        },
+      });
+
       const { unbind: unbindGrantButtonClick } = this.#userEventDispatcher.on({
         elementName: ConfirmationDialog.#grantButton,
         eventType: UserInputEventType.ButtonClickEvent,
@@ -90,9 +135,10 @@ export class ConfirmationDialog {
             return;
           }
 
-          await this.#cleanup();
-          this.#interfaceId = undefined;
-          resolve(true);
+          await cleanupAndResolveIfNotTimedOut({
+            decision: true,
+            resolveInterface: true,
+          });
         },
       });
 
@@ -101,9 +147,10 @@ export class ConfirmationDialog {
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          await this.#cleanup();
-          this.#interfaceId = undefined;
-          resolve(false);
+          await cleanupAndResolveIfNotTimedOut({
+            decision: false,
+            resolveInterface: true,
+          });
         },
       });
 
@@ -127,15 +174,13 @@ export class ConfirmationDialog {
         .then(async (result) => {
           // Should resolve with false when dialog is closed.
           if (result === null) {
-            await this.#cleanup(false);
-
-            resolve(false);
+            await cleanupAndResolveIfNotTimedOut({
+              decision: false,
+              resolveInterface: true,
+            });
           }
         })
-        .catch((error) => {
-          const reason = error as Error;
-          reject(reason);
-        });
+        .catch(cleanupAndRejectIfNotTimedOut);
     });
 
     return {
@@ -145,9 +190,18 @@ export class ConfirmationDialog {
 
   /**
    * Clean up event handlers and optionally resolve the interface.
-   * @param resolveInterface - Whether to resolve the interface. Defaults to true.
+   * @param options - Options for the cleanup.
+   * @param options.resolveInterface - Whether to resolve the interface.
    */
-  async #cleanup(resolveInterface = true): Promise<void> {
+  async #cleanup({
+    resolveInterface,
+  }: {
+    resolveInterface: boolean;
+  }): Promise<void> {
+    this.#timeout?.cancel();
+    // although not strictly necessary, we clear the timeout handler to avoid unnecessarily calling cancel() multiple times
+    this.#timeout = undefined;
+
     // Unbind any listeners to avoid leaks
     if (this.#unbindHandlers) {
       try {
@@ -155,6 +209,7 @@ export class ConfirmationDialog {
       } catch {
         // ignore
       } finally {
+        // we should only call the unbindHandlers once
         this.#unbindHandlers = undefined;
       }
     }
@@ -236,10 +291,7 @@ export class ConfirmationDialog {
     }
 
     // Clean up handlers and resolve interface
-    await this.#cleanup(true);
-
-    // Clear interface ID after cleanup
-    this.#interfaceId = undefined;
+    await this.#cleanup({ resolveInterface: true });
 
     if (this.#decisionReject) {
       this.#decisionReject(reason);
