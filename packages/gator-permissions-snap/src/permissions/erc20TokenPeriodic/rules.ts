@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
-import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../../core/types';
+import { TimePeriod } from '../../core/types';
 import {
   getClosestTimePeriod,
   TIME_PERIOD_TO_SECONDS,
@@ -13,6 +13,7 @@ import type {
   Erc20TokenPeriodicContext,
   Erc20TokenPeriodicMetadata,
 } from './types';
+import { t } from '../../utils/i18n';
 
 export const PERIOD_AMOUNT_ELEMENT = 'erc20-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'erc20-token-periodic-period-type';
@@ -24,13 +25,13 @@ export const periodAmountRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: PERIOD_AMOUNT_ELEMENT,
-  label: 'Amount',
+  label: 'amountLabel',
   type: 'number',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.periodAmount,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The amount of tokens granted during each period',
+    tooltip: t('amountTooltip'),
     error: metadata.validationErrors.periodAmountError,
     iconData: getIconData(context),
   }),
@@ -48,13 +49,13 @@ export const periodDurationRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: PERIOD_TYPE_ELEMENT,
-  label: 'Frequency',
+  label: 'periodDurationLabel',
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     value: getClosestTimePeriod(context.permissionDetails.periodDuration),
     isVisible: true,
-    tooltip: 'The duration of the period',
+    tooltip: t('periodDurationTooltip'),
     options: Object.values(TimePeriod),
     error: metadata.validationErrors.periodDurationError,
   }),
@@ -93,13 +94,13 @@ export const startTimeRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: START_TIME_ELEMENT,
-  label: 'Start Time',
+  label: 'startTimeLabel',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: timestampToISO8601(context.permissionDetails.startTime),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The time at which the first period begins.',
+    tooltip: t('startTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
     allowPastDate: false,
   }),
@@ -117,13 +118,13 @@ export const expiryRule: RuleDefinition<
   Erc20TokenPeriodicMetadata
 > = {
   name: EXPIRY_ELEMENT,
-  label: 'Expiry',
+  label: 'expiryLabel',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: timestampToISO8601(context.expiry.timestamp),
     isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The expiry date of the permission.',
+    tooltip: t('expiryTooltip'),
     error: metadata.validationErrors.expiryError,
     allowPastDate: false,
   }),

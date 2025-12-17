@@ -25,9 +25,8 @@ export const erc20TokenRevocationPermissionDefinition: PermissionDefinition<
   PopulatedErc20TokenRevocationPermission
 > = {
   rules: allRules,
-  title: 'Permission request',
-  subtitle:
-    'This site wants permissions to revoke your ERC-20 token approvals.',
+  title: 'permissionRequestTitle',
+  subtitle: 'permissionRequestSubtitleRevocation',
   dependencies: {
     parseAndValidatePermission,
     buildContext,
