@@ -230,6 +230,7 @@ export class PermissionHandler<
 
       return PermissionHandlerContent({
         origin,
+        delegateAddress: this.#permissionRequest.signer.data.address,
         justification,
         networkName,
         tokenSymbol,

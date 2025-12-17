@@ -13,6 +13,7 @@ import { parseCaipAssetType } from '@metamask/utils';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
 import {
+  AddressField,
   ShowMoreText,
   SkeletonField,
   TextField,
@@ -26,8 +27,11 @@ export const ACCOUNT_LABEL = 'Account';
 export const ACCOUNT_TOOLTIP =
   'The account from which the permission is being granted.';
 
+export const APPLICATION_LABEL = 'Application';
+export const APPLICATION_TOOLTIP = 'The site requesting the permission';
 export const RECIPIENT_LABEL = 'Recipient';
-export const RECIPIENT_TOOLTIP = 'The site requesting the permission';
+export const RECIPIENT_TOOLTIP =
+  'The address that will receive the delegated permission';
 export const NETWORK_LABEL = 'Network';
 export const NETWORK_TOOLTIP =
   'The network on which the permission is being requested';
@@ -47,6 +51,7 @@ export type PermissionHandlerContentProps = {
   tokenIconData?: IconData | undefined;
   isJustificationCollapsed: boolean;
   origin: string;
+  delegateAddress: string;
   context: BaseContext;
   tokenBalance: string | null;
   tokenBalanceFiat: string | null;
@@ -62,6 +67,7 @@ export type PermissionHandlerContentProps = {
  * @param options.permissionTitle - The title of the permission.
  * @param options.permissionSubtitle - The subtitle of the permission.
  * @param options.origin - The origin of the permission request.
+ * @param options.delegateAddress - The address that will receive the delegated permission.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
  * @param options.tokenSymbol - The symbol of the token.
@@ -80,6 +86,7 @@ export const PermissionHandlerContent = ({
   permissionTitle,
   permissionSubtitle,
   origin,
+  delegateAddress,
   justification,
   networkName,
   tokenSymbol,
@@ -170,8 +177,13 @@ export const PermissionHandlerContent = ({
         </Section>
         <Section>
           <TextField
-            label={RECIPIENT_LABEL}
+            label={APPLICATION_LABEL}
             value={origin}
+            tooltip={APPLICATION_TOOLTIP}
+          />
+          <AddressField
+            label={RECIPIENT_LABEL}
+            address={delegateAddress}
             tooltip={RECIPIENT_TOOLTIP}
           />
           <TextField
@@ -225,6 +237,10 @@ export const SkeletonPermissionHandlerContent = ({
           <SkeletonField label={REASON_LABEL} tooltip={REASON_TOOLTIP} />
         </Section>
         <Section>
+          <SkeletonField
+            label={APPLICATION_LABEL}
+            tooltip={APPLICATION_TOOLTIP}
+          />
           <SkeletonField label={RECIPIENT_LABEL} tooltip={RECIPIENT_TOOLTIP} />
           <SkeletonField label={NETWORK_LABEL} tooltip={NETWORK_TOOLTIP} />
           <SkeletonField label={TOKEN_LABEL} tooltip={TOKEN_TOOLTIP} />

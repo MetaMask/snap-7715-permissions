@@ -1,3 +1,4 @@
+export { AddressField } from './AddressField';
 export { DropdownField } from './DropdownField';
 export { Field } from './Field';
 export { InputField } from './InputField';
