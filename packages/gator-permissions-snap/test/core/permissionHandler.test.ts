@@ -868,7 +868,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -916,6 +916,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The address that will receive the delegated permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -1405,7 +1488,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -1453,6 +1536,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The address that will receive the delegated permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -1972,7 +2138,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -2020,6 +2186,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The address that will receive the delegated permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -2474,7 +2723,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -2522,6 +2771,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The address that will receive the delegated permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -2978,7 +3310,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -3026,6 +3358,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The address that will receive the delegated permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
