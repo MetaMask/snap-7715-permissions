@@ -5,6 +5,7 @@ import { type SnapElement, Text } from '@metamask/snaps-sdk/jsx';
 
 import { ConfirmationDialog } from '../../src/core/confirmation';
 import { DialogInterface } from '../../src/core/dialogInterface';
+import { type TimeoutFactory } from '../../src/core/timeoutFactory';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 describe('ConfirmationDialog', () => {
@@ -13,6 +14,9 @@ describe('ConfirmationDialog', () => {
   let dialogInterface: DialogInterface;
   let confirmationDialog: ConfirmationDialog;
   let mockUnbindFunctions: jest.MockedFunction<() => void>[];
+  let mockTimeoutFactory: jest.Mocked<TimeoutFactory>;
+  let mockCancel: jest.MockedFunction<() => void>;
+  let triggerTimeout: (() => void | Promise<void>) | undefined;
   const mockInterfaceId = 'test-interface-id';
 
   const mockUi = Text({
@@ -27,6 +31,17 @@ describe('ConfirmationDialog', () => {
 
     // Reset the array of mock unbind functions for each test
     mockUnbindFunctions = [];
+    mockCancel = jest.fn();
+    const registerImpl: TimeoutFactory['register'] = (({ onTimeout }) => {
+      // Do not auto-invoke onTimeout by default; tests control when it fires
+      triggerTimeout = onTimeout;
+      return { cancel: mockCancel };
+    }) as TimeoutFactory['register'];
+    mockTimeoutFactory = {
+      register: jest.fn(registerImpl) as jest.MockedFunction<
+        TimeoutFactory['register']
+      >,
+    } as unknown as jest.Mocked<TimeoutFactory>;
 
     mockUserEventDispatcher = {
       on: jest.fn().mockImplementation(() => {
@@ -49,6 +64,7 @@ describe('ConfirmationDialog', () => {
       ui: mockUi,
       userEventDispatcher: mockUserEventDispatcher,
       onBeforeGrant: mockOnBeforeGrant,
+      timeoutFactory: mockTimeoutFactory,
     });
   });
 
@@ -138,6 +154,7 @@ describe('ConfirmationDialog', () => {
         ui: mockUi,
         userEventDispatcher: mockUserEventDispatcher,
         onBeforeGrant: mockOnBeforeGrant,
+        timeoutFactory: mockTimeoutFactory,
       });
 
       await expect(
@@ -148,6 +165,8 @@ describe('ConfirmationDialog', () => {
     it('should resolve with true when grant button clicked', async () => {
       const awaitingUserDecision =
         confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+      expect(mockTimeoutFactory.register).toHaveBeenCalledTimes(1);
+
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
         (call) => call[0].elementName === 'grant-button',
       )?.[0]?.handler;
@@ -163,11 +182,13 @@ describe('ConfirmationDialog', () => {
 
       const result = await awaitingUserDecision;
       expect(result).toStrictEqual({ isConfirmationGranted: true });
+      expect(mockCancel).toHaveBeenCalledTimes(1);
     });
 
     it('should resolve with false when cancel button clicked', async () => {
       const awaitingUserDecision =
         confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+      expect(mockTimeoutFactory.register).toHaveBeenCalledTimes(1);
       const cancelButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
         (call) => call[0].elementName === 'cancel-button',
       )?.[0]?.handler;
@@ -188,6 +209,7 @@ describe('ConfirmationDialog', () => {
     it('should clean up event listeners after decision', async () => {
       const awaitingUserDecision =
         confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+      expect(mockTimeoutFactory.register).toHaveBeenCalledTimes(1);
       const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
         (call) => call[0].elementName === 'grant-button',
       )?.[0]?.handler;
@@ -219,6 +241,60 @@ describe('ConfirmationDialog', () => {
           value: {},
         },
       });
+      expect(mockCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('should reject with timeout error when no user action occurs', async () => {
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      await triggerTimeout?.();
+
+      await expect(awaitingUserDecision).rejects.toThrow(
+        'Timeout waiting for user decision',
+      );
+
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
+        method: 'snap_resolveInterface',
+        params: {
+          id: mockInterfaceId,
+          value: {},
+        },
+      });
+    });
+
+    it('should ignore cancel click after timeout has fired', async () => {
+      const awaitingUserDecision =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+      expect(mockTimeoutFactory.register).toHaveBeenCalledTimes(1);
+
+      const cancelButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
+        (call) => call[0].elementName === 'cancel-button',
+      )?.[0]?.handler;
+
+      if (cancelButtonHandler === undefined) {
+        throw new Error('Cancel button handler is undefined');
+      }
+
+      // Fire timeout first
+      await triggerTimeout?.();
+
+      // Then simulate cancel click after timeout
+      await cancelButtonHandler({
+        event: { type: UserInputEventType.ButtonClickEvent },
+        interfaceId: mockInterfaceId,
+      });
+
+      await expect(awaitingUserDecision).rejects.toThrow(
+        'Timeout waiting for user decision',
+      );
+
+      // Listeners unbound once by timeout cleanup
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
+      expect(mockCancel).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -287,6 +363,21 @@ describe('ConfirmationDialog', () => {
       await confirmationDialog.closeWithError(error);
 
       await expect(decisionPromise).rejects.toThrow('Test error');
+
+      // All listeners unbound
+      mockUnbindFunctions.forEach((mockUnbindFn) => {
+        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
+      });
+
+      // Dialog interface resolved and timeout cancelled
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
+        method: 'snap_resolveInterface',
+        params: {
+          id: mockInterfaceId,
+          value: {},
+        },
+      });
+      expect(mockCancel).toHaveBeenCalledTimes(1);
     });
 
     it('should be safe to call multiple times', async () => {
@@ -307,9 +398,14 @@ describe('ConfirmationDialog', () => {
 
       await confirmationDialog.initialize();
 
+      const decisionPromise =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
       const error = new Error('Test error');
       await confirmationDialog.closeWithError(error);
-      // Should not throw on subsequent calls
+      await expect(decisionPromise).rejects.toThrow('Test error');
+
+      // Calling again should not throw
       await confirmationDialog.closeWithError(error);
 
       // Verify resolveInterface was called (at least once)

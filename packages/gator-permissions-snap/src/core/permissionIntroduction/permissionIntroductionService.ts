@@ -40,8 +40,7 @@ export class PermissionIntroductionService {
    */
   async shouldShowIntroduction(permissionType: string): Promise<boolean> {
     const state = await this.#stateManager.getState();
-    // return !state.seenPermissionIntroductions.includes(permissionType);
-    return true;
+    return !state.seenPermissionIntroductions.includes(permissionType);
   }
 
   /**

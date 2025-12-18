@@ -4,6 +4,7 @@ import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
 import type { DialogInterface } from './dialogInterface';
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import type { Timeout, TimeoutFactory } from './timeoutFactory';
 import type { ConfirmationProps } from './types';
 
 export class ConfirmationDialog {
@@ -15,9 +16,15 @@ export class ConfirmationDialog {
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
+  readonly #timeoutFactory: TimeoutFactory;
+
   #ui: SnapElement;
 
   #isGrantDisabled = true;
+
+  #timeout: Timeout | undefined;
+
+  #hasTimedOut = false;
 
   // Track handlers and promise hooks so we can programmatically close the dialog on error
   #unbindHandlers: (() => void) | undefined;
@@ -33,11 +40,13 @@ export class ConfirmationDialog {
     ui,
     userEventDispatcher,
     onBeforeGrant,
+    timeoutFactory,
   }: ConfirmationProps) {
     this.#dialogInterface = dialogInterface;
     this.#ui = ui;
     this.#userEventDispatcher = userEventDispatcher;
     this.#onBeforeGrant = onBeforeGrant;
+    this.#timeoutFactory = timeoutFactory;
   }
 
   /**
@@ -53,9 +62,11 @@ export class ConfirmationDialog {
 
   /**
    * Handles dialog close event (user clicked X button).
+   * DialogInterface already handles the actual dialog closing.
    */
   #handleDialogClose(): void {
-    this.#cleanup();
+    // Cancel timeout and unbind handlers (dialog is already closing)
+    this.#cleanupHandlers();
     if (this.#decisionResolve) {
       this.#decisionResolve(false);
       this.#decisionResolve = undefined;
@@ -78,6 +89,28 @@ export class ConfirmationDialog {
       this.#decisionResolve = resolve;
       this.#decisionReject = reject;
 
+      const cleanupAndResolveIfNotTimedOut = async (decision: boolean) => {
+        if (!this.#hasTimedOut) {
+          this.#cleanupHandlers();
+          await this.#dialogInterface.close();
+        }
+
+        if (!this.#hasTimedOut) {
+          resolve(decision);
+        }
+      };
+
+      this.#timeout = this.#timeoutFactory.register({
+        onTimeout: async () => {
+          this.#hasTimedOut = true;
+
+          this.#cleanupHandlers();
+          await this.#dialogInterface.close();
+
+          reject(new Error('Timeout waiting for user decision'));
+        },
+      });
+
       const { unbind: unbindGrantButtonClick } = this.#userEventDispatcher.on({
         elementName: ConfirmationDialog.#grantButton,
         eventType: UserInputEventType.ButtonClickEvent,
@@ -96,9 +129,7 @@ export class ConfirmationDialog {
             return;
           }
 
-          this.#cleanup();
-          await this.#dialogInterface.close();
-          resolve(true);
+          await cleanupAndResolveIfNotTimedOut(true);
         },
       });
 
@@ -107,9 +138,7 @@ export class ConfirmationDialog {
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          this.#cleanup();
-          await this.#dialogInterface.close();
-          resolve(false);
+          await cleanupAndResolveIfNotTimedOut(false);
         },
       });
 
@@ -126,15 +155,22 @@ export class ConfirmationDialog {
   }
 
   /**
-   * Clean up event handlers.
+   * Clean up timeout and event handlers.
+   * Does not close the dialog interface - caller should handle that separately if needed.
    */
-  #cleanup(): void {
+  #cleanupHandlers(): void {
+    this.#timeout?.cancel();
+    // although not strictly necessary, we clear the timeout handler to avoid unnecessarily calling cancel() multiple times
+    this.#timeout = undefined;
+
+    // Unbind any listeners to avoid leaks
     if (this.#unbindHandlers) {
       try {
         this.#unbindHandlers();
       } catch {
         // ignore
       } finally {
+        // we should only call the unbindHandlers once
         this.#unbindHandlers = undefined;
       }
     }
@@ -185,10 +221,10 @@ export class ConfirmationDialog {
    * @param reason - The error to reject the pending decision promise with.
    */
   async closeWithError(reason: Error): Promise<void> {
-    // Clean up handlers
-    this.#cleanup();
+    // Clean up timeout and handlers
+    this.#cleanupHandlers();
 
-    // Close the dialog
+    // Close the dialog interface
     await this.#dialogInterface.close();
 
     if (this.#decisionReject) {
