@@ -868,7 +868,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Application",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -1488,7 +1488,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Application",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -2138,7 +2138,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Application",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -2723,7 +2723,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Application",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -3310,7 +3310,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Application",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },

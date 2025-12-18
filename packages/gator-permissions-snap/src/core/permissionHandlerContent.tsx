@@ -27,8 +27,8 @@ export const ACCOUNT_LABEL = 'Account';
 export const ACCOUNT_TOOLTIP =
   'The account from which the permission is being granted.';
 
-export const APPLICATION_LABEL = 'Application';
-export const APPLICATION_TOOLTIP = 'The site requesting the permission';
+export const REQUEST_FROM_LABEL = 'Request from';
+export const REQUEST_FROM_TOOLTIP = 'The site requesting the permission';
 export const RECIPIENT_LABEL = 'Recipient';
 export const RECIPIENT_TOOLTIP =
   'The address that will receive the delegated permission';
@@ -177,9 +177,9 @@ export const PermissionHandlerContent = ({
         </Section>
         <Section>
           <TextField
-            label={APPLICATION_LABEL}
+            label={REQUEST_FROM_LABEL}
             value={origin}
-            tooltip={APPLICATION_TOOLTIP}
+            tooltip={REQUEST_FROM_TOOLTIP}
           />
           <AddressField
             label={RECIPIENT_LABEL}
@@ -238,8 +238,8 @@ export const SkeletonPermissionHandlerContent = ({
         </Section>
         <Section>
           <SkeletonField
-            label={APPLICATION_LABEL}
-            tooltip={APPLICATION_TOOLTIP}
+            label={REQUEST_FROM_LABEL}
+            tooltip={REQUEST_FROM_TOOLTIP}
           />
           <SkeletonField label={RECIPIENT_LABEL} tooltip={RECIPIENT_TOOLTIP} />
           <SkeletonField label={NETWORK_LABEL} tooltip={NETWORK_TOOLTIP} />
