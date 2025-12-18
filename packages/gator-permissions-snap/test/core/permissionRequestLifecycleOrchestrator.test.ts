@@ -1,3 +1,4 @@
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
   decodeDelegations,
@@ -99,8 +100,10 @@ const mockAccountController = {
   upgradeAccount: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<AccountController>;
 
+const mockSnapsProvider = createMockSnapsProvider();
+
 const mockConfirmationDialog = {
-  createInterface: jest.fn(),
+  initialize: jest.fn(),
   displayConfirmationDialogAndAwaitUserDecision: jest.fn(),
   updateContent: jest.fn(),
   closeWithError: jest.fn(),
@@ -128,9 +131,7 @@ const mockPermissionIntroductionService = {
   shouldShowIntroduction: jest.fn().mockResolvedValue(false),
   markIntroductionAsSeen: jest.fn().mockResolvedValue(undefined),
   buildIntroductionContent: jest.fn().mockReturnValue({ type: 'intro-ui' }),
-  showIntroduction: jest
-    .fn()
-    .mockResolvedValue({ interfaceId: undefined, wasCancelled: false }),
+  showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
 type TestLifecycleHandlersMocks = {
@@ -182,7 +183,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     mockConfirmationDialogFactory.createConfirmation.mockReturnValue(
       mockConfirmationDialog,
     );
-    mockConfirmationDialog.createInterface.mockResolvedValue(mockInterfaceId);
+    mockConfirmationDialog.initialize.mockResolvedValue(mockInterfaceId);
     mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
       {
         isConfirmationGranted: true,
@@ -199,6 +200,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
+        snap: mockSnapsProvider,
       });
   });
 
@@ -210,6 +212,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
+        snap: mockSnapsProvider,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });
@@ -300,10 +303,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(
           mockConfirmationDialogFactory.createConfirmation,
         ).toHaveBeenCalledWith({
+          dialogInterface: expect.any(Object),
           ui: mockSkeletonUiContent,
-          isGrantDisabled: true,
           onBeforeGrant: expect.any(Function),
-          existingInterfaceId: undefined,
         });
       });
 
@@ -871,13 +873,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(
           mockConfirmationDialogFactory.createConfirmation,
         ).toHaveBeenCalledWith({
+          dialogInterface: expect.any(Object),
           ui: mockSkeletonUiContent,
-          isGrantDisabled: true,
           onBeforeGrant: expect.any(Function),
-          existingInterfaceId: undefined,
         });
 
-        expect(mockConfirmationDialog.createInterface).toHaveBeenCalled();
+        expect(mockConfirmationDialog.initialize).toHaveBeenCalled();
 
         expect(
           mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision,

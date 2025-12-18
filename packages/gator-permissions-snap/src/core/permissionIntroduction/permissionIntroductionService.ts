@@ -1,4 +1,3 @@
-import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import {
@@ -11,6 +10,7 @@ import {
 import type { PermissionIntroductionConfig } from './types';
 import type { StateManager } from '../../stateManagement';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
+import type { DialogInterface } from '../dialogInterface';
 
 /**
  * Service for managing permission introduction state and dialog lifecycle.
@@ -20,21 +20,16 @@ import type { UserEventDispatcher } from '../../userEventDispatcher';
 export class PermissionIntroductionService {
   readonly #stateManager: StateManager;
 
-  readonly #snap: SnapsProvider;
-
   readonly #userEventDispatcher: UserEventDispatcher;
 
   constructor({
     stateManager,
-    snap,
     userEventDispatcher,
   }: {
     stateManager: StateManager;
-    snap: SnapsProvider;
     userEventDispatcher: UserEventDispatcher;
   }) {
     this.#stateManager = stateManager;
-    this.#snap = snap;
     this.#userEventDispatcher = userEventDispatcher;
   }
 
@@ -45,7 +40,8 @@ export class PermissionIntroductionService {
    */
   async shouldShowIntroduction(permissionType: string): Promise<boolean> {
     const state = await this.#stateManager.getState();
-    return !state.seenPermissionIntroductions.includes(permissionType);
+    // return !state.seenPermissionIntroductions.includes(permissionType);
+    return true;
   }
 
   /**
@@ -80,107 +76,90 @@ export class PermissionIntroductionService {
 
   /**
    * Shows the introduction content with 2-page navigation and waits for user to dismiss it.
-   * Creates the interface and dialog, returning the interface ID for reuse.
+   * Uses the provided DialogInterface to display content and manage the dialog.
+   * @param dialogInterface - The dialog interface to use for displaying content.
    * @param permissionType - The permission type to show introduction for.
-   * @returns Object with interfaceId (if intro was shown) and wasCancelled flag.
+   * @returns Object with wasCancelled flag indicating if user dismissed the intro.
    */
-  async showIntroduction(permissionType: string): Promise<{
-    interfaceId: string | undefined;
-    wasCancelled: boolean;
-  }> {
+  async showIntroduction(
+    dialogInterface: DialogInterface,
+    permissionType: string,
+  ): Promise<{ wasCancelled: boolean }> {
     const config = getPermissionIntroductionConfig(permissionType);
     if (!config) {
-      return { interfaceId: undefined, wasCancelled: false };
+      return { wasCancelled: false };
     }
 
     // Start on page 1
     let currentPage: 1 | 2 = 1;
 
-    const introContent = this.buildIntroductionContent(config, currentPage);
+    // Track unbind functions to clean up all handlers
+    const unbindFunctions: (() => void)[] = [];
 
-    // Create interface with intro content (page 1)
-    const interfaceId = await this.#snap.request({
-      method: 'snap_createInterface',
-      params: {
-        ui: introContent,
-      },
-    });
-
-    // Helper to update the interface with a new page
-    const updatePage = async (newPage: 1 | 2) => {
-      if (newPage === currentPage) {
-        return;
-      }
-      currentPage = newPage;
-      const newContent = this.buildIntroductionContent(config, currentPage);
-      await this.#snap.request({
-        method: 'snap_updateInterface',
-        params: {
-          id: interfaceId,
-          ui: newContent,
-        },
-      });
+    // Helper to unbind all handlers
+    const unbindAll = () => {
+      unbindFunctions.forEach((fn) => fn());
     };
 
     // Wait for user to click "Got it" or dismiss the dialog
-    // Returns true if user confirmed, false if cancelled
     const wasConfirmed = await new Promise<boolean>((resolve) => {
-      // Track unbind functions to clean up all handlers
-      const unbindFunctions: (() => void)[] = [];
+      // Show intro content - this creates interface and shows dialog on first call
+      const introContent = this.buildIntroductionContent(config, currentPage);
 
-      // Helper to unbind all handlers
-      const unbindAll = () => {
-        unbindFunctions.forEach((fn) => fn());
-      };
-
-      // Handler for "Got it" button
-      const { unbind: unbindConfirm } = this.#userEventDispatcher.on({
-        elementName: PERMISSION_INTRODUCTION_CONFIRM_BUTTON,
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId,
-        handler: async () => {
+      // The onClose handler is registered with DialogInterface
+      // When dialog is closed (X button), this handler fires
+      dialogInterface
+        .show(introContent, () => {
           unbindAll();
-          resolve(true); // User confirmed
-        },
-      });
-      unbindFunctions.push(unbindConfirm);
-
-      // Handler for page 1 dot
-      const { unbind: unbindPage1Dot } = this.#userEventDispatcher.on({
-        elementName: PERMISSION_INTRODUCTION_PAGE_1_DOT,
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId,
-        handler: async () => {
-          await updatePage(1);
-        },
-      });
-      unbindFunctions.push(unbindPage1Dot);
-
-      // Handler for page 2 dot
-      const { unbind: unbindPage2Dot } = this.#userEventDispatcher.on({
-        elementName: PERMISSION_INTRODUCTION_PAGE_2_DOT,
-        eventType: UserInputEventType.ButtonClickEvent,
-        interfaceId,
-        handler: async () => {
-          await updatePage(2);
-        },
-      });
-      unbindFunctions.push(unbindPage2Dot);
-
-      // Show the dialog (don't await - we resolve via button handler)
-      this.#snap
-        .request({
-          method: 'snap_dialog',
-          params: {
-            id: interfaceId,
-          },
+          resolve(false); // User cancelled via X button
         })
-        .then((result) => {
-          // Dialog closed via Cancel or clicking outside
-          if (result === null) {
-            unbindAll();
-            resolve(false); // User cancelled
-          }
+        .then((interfaceId) => {
+          // Helper to update the interface with a new page
+          const updatePage = async (newPage: 1 | 2) => {
+            if (newPage === currentPage) {
+              return;
+            }
+            currentPage = newPage;
+            const newContent = this.buildIntroductionContent(
+              config,
+              currentPage,
+            );
+            await dialogInterface.show(newContent);
+          };
+
+          // Handler for "Got it" button
+          const { unbind: unbindConfirm } = this.#userEventDispatcher.on({
+            elementName: PERMISSION_INTRODUCTION_CONFIRM_BUTTON,
+            eventType: UserInputEventType.ButtonClickEvent,
+            interfaceId,
+            handler: async () => {
+              unbindAll();
+              resolve(true); // User confirmed
+            },
+          });
+          unbindFunctions.push(unbindConfirm);
+
+          // Handler for page 1 dot
+          const { unbind: unbindPage1Dot } = this.#userEventDispatcher.on({
+            elementName: PERMISSION_INTRODUCTION_PAGE_1_DOT,
+            eventType: UserInputEventType.ButtonClickEvent,
+            interfaceId,
+            handler: async () => {
+              await updatePage(1);
+            },
+          });
+          unbindFunctions.push(unbindPage1Dot);
+
+          // Handler for page 2 dot
+          const { unbind: unbindPage2Dot } = this.#userEventDispatcher.on({
+            elementName: PERMISSION_INTRODUCTION_PAGE_2_DOT,
+            eventType: UserInputEventType.ButtonClickEvent,
+            interfaceId,
+            handler: async () => {
+              await updatePage(2);
+            },
+          });
+          unbindFunctions.push(unbindPage2Dot);
         })
         .catch(() => {
           unbindAll();
@@ -188,12 +167,6 @@ export class PermissionIntroductionService {
         });
     });
 
-    // If user cancelled, the interface is destroyed by snap_dialog
-    // Return undefined interfaceId so a new one is created
-    if (!wasConfirmed) {
-      return { interfaceId: undefined, wasCancelled: true };
-    }
-
-    return { interfaceId, wasCancelled: false };
+    return { wasCancelled: !wasConfirmed };
   }
 }

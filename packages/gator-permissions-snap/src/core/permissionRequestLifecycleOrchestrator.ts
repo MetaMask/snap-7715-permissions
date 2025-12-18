@@ -14,6 +14,7 @@ import {
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { InvalidInputError, InvalidParamsError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
@@ -26,6 +27,7 @@ import {
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
+import { DialogInterface } from './dialogInterface';
 import type { PermissionIntroductionService } from './permissionIntroduction';
 import type {
   BaseContext,
@@ -52,24 +54,29 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #permissionIntroductionService: PermissionIntroductionService;
 
+  readonly #snap: SnapsProvider;
+
   constructor({
     accountController,
     confirmationDialogFactory,
     nonceCaveatService,
     snapsMetricsService,
     permissionIntroductionService,
+    snap,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
     permissionIntroductionService: PermissionIntroductionService;
+    snap: SnapsProvider;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
     this.#permissionIntroductionService = permissionIntroductionService;
+    this.#snap = snap;
   }
 
   /**
@@ -131,15 +138,18 @@ export class PermissionRequestLifecycleOrchestrator {
       permissionData: permissionRequest.permission.data,
     });
 
-    // Check if we need to show introduction and get interface ID if so
-    let existingInterfaceId: string | undefined;
+    // Create shared dialog interface for both intro and confirmation
+    const dialogInterface = new DialogInterface(this.#snap);
+
+    // Check if we need to show introduction
     if (
       await this.#permissionIntroductionService.shouldShowIntroduction(
         permissionType,
       )
     ) {
-      const { interfaceId, wasCancelled } =
+      const { wasCancelled } =
         await this.#permissionIntroductionService.showIntroduction(
+          dialogInterface,
           permissionType,
         );
 
@@ -158,7 +168,6 @@ export class PermissionRequestLifecycleOrchestrator {
         };
       }
 
-      existingInterfaceId = interfaceId;
       await this.#permissionIntroductionService.markIntroductionAsSeen(
         permissionType,
       );
@@ -192,26 +201,17 @@ export class PermissionRequestLifecycleOrchestrator {
       return !hasValidationErrors(metadata);
     };
 
-    // Create confirmation dialog, reusing the interface from intro if available
+    // Create confirmation dialog with the shared dialog interface
     const skeletonUi =
       await lifecycleHandlers.createSkeletonConfirmationContent();
     const confirmationDialog =
-      this.#confirmationDialogFactory.createConfirmation(
-        existingInterfaceId === undefined
-          ? {
-              ui: skeletonUi,
-              isGrantDisabled: true,
-              onBeforeGrant,
-            }
-          : {
-              ui: skeletonUi,
-              isGrantDisabled: true,
-              onBeforeGrant,
-              existingInterfaceId,
-            },
-      );
+      this.#confirmationDialogFactory.createConfirmation({
+        dialogInterface,
+        ui: skeletonUi,
+        onBeforeGrant,
+      });
 
-    const interfaceId = await confirmationDialog.createInterface();
+    const interfaceId = await confirmationDialog.initialize();
 
     try {
       context = await lifecycleHandlers.buildContext(

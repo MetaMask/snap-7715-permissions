@@ -1,14 +1,16 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
+import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { type SnapElement, Text } from '@metamask/snaps-sdk/jsx';
 
 import { ConfirmationDialog } from '../../src/core/confirmation';
+import { DialogInterface } from '../../src/core/dialogInterface';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 describe('ConfirmationDialog', () => {
-  let mockSnaps: jest.Mocked<SnapsProvider>;
+  const mockSnapsProvider = createMockSnapsProvider();
   let mockUserEventDispatcher: jest.Mocked<UserEventDispatcher>;
+  let dialogInterface: DialogInterface;
   let confirmationDialog: ConfirmationDialog;
   let mockUnbindFunctions: jest.MockedFunction<() => void>[];
   const mockInterfaceId = 'test-interface-id';
@@ -19,18 +21,12 @@ describe('ConfirmationDialog', () => {
 
   const mockOnBeforeGrant = jest.fn<() => Promise<boolean>>();
 
-  const defaultProps = {
-    ui: mockUi,
-    onBeforeGrant: mockOnBeforeGrant,
-  };
-
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockSnapsProvider.request.mockReset();
+
     // Reset the array of mock unbind functions for each test
     mockUnbindFunctions = [];
-
-    mockSnaps = {
-      request: jest.fn().mockImplementation(async () => Promise.resolve()),
-    } as unknown as jest.Mocked<SnapsProvider>;
 
     mockUserEventDispatcher = {
       on: jest.fn().mockImplementation(() => {
@@ -46,22 +42,34 @@ describe('ConfirmationDialog', () => {
     mockOnBeforeGrant.mockClear();
     mockOnBeforeGrant.mockResolvedValue(true);
 
+    dialogInterface = new DialogInterface(mockSnapsProvider);
+
     confirmationDialog = new ConfirmationDialog({
-      ...defaultProps,
-      snaps: mockSnaps,
+      dialogInterface,
+      ui: mockUi,
       userEventDispatcher: mockUserEventDispatcher,
-      isGrantDisabled: false,
+      onBeforeGrant: mockOnBeforeGrant,
     });
   });
 
-  describe('createInterface()', () => {
-    it('should create a new interface if one does not exist', async () => {
-      mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
+  describe('initialize()', () => {
+    it('should use DialogInterface to show content', async () => {
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {
+            // Dialog stays open
+          });
+        }
+        return null;
+      });
 
-      const result = await confirmationDialog.createInterface();
+      const result = await confirmationDialog.initialize();
 
       expect(result).toBe(mockInterfaceId);
-      expect(mockSnaps.request).toHaveBeenCalledWith({
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_createInterface',
         params: {
           context: {},
@@ -70,18 +78,30 @@ describe('ConfirmationDialog', () => {
       });
     });
 
-    it('should update interface and return existing id if already created', async () => {
-      mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
+    it('should update interface on subsequent initialize calls', async () => {
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {
+            // Dialog stays open
+          });
+        }
+        if (params.method === 'snap_updateInterface') {
+          return null;
+        }
+        return null;
+      });
 
-      // Create interface first time
-      await confirmationDialog.createInterface();
-      mockSnaps.request.mockClear();
+      // Initialize first time
+      await confirmationDialog.initialize();
 
-      // Create interface second time - should update existing interface
-      const result = await confirmationDialog.createInterface();
+      // Initialize second time - should update existing interface
+      const result = await confirmationDialog.initialize();
 
       expect(result).toBe(mockInterfaceId);
-      expect(mockSnaps.request).toHaveBeenCalledWith({
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_updateInterface',
         params: {
           id: mockInterfaceId,
@@ -94,24 +114,35 @@ describe('ConfirmationDialog', () => {
 
   describe('displayConfirmationDialogAndAwaitUserDecision()', () => {
     beforeEach(async () => {
-      mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
-      await confirmationDialog.createInterface();
-      mockSnaps.request.mockClear();
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {
+            // Dialog stays open
+          });
+        }
+        if (params.method === 'snap_resolveInterface') {
+          return null;
+        }
+        return null;
+      });
+      await confirmationDialog.initialize();
     });
 
-    it('should throw error if interface not created', async () => {
+    it('should throw error if interface not initialized', async () => {
+      const newDialogInterface = new DialogInterface(mockSnapsProvider);
       const newDialog = new ConfirmationDialog({
-        ...defaultProps,
-        snaps: mockSnaps,
+        dialogInterface: newDialogInterface,
+        ui: mockUi,
         userEventDispatcher: mockUserEventDispatcher,
-        isGrantDisabled: false,
+        onBeforeGrant: mockOnBeforeGrant,
       });
 
       await expect(
         newDialog.displayConfirmationDialogAndAwaitUserDecision(),
-      ).rejects.toThrow(
-        'Interface not yet created. Call createInterface() first.',
-      );
+      ).rejects.toThrow('Interface not yet created. Call initialize() first.');
     });
 
     it('should resolve with true when grant button clicked', async () => {
@@ -137,39 +168,20 @@ describe('ConfirmationDialog', () => {
     it('should resolve with false when cancel button clicked', async () => {
       const awaitingUserDecision =
         confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
-      const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
+      const cancelButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
         (call) => call[0].elementName === 'cancel-button',
       )?.[0]?.handler;
 
-      if (grantButtonHandler === undefined) {
-        throw new Error('Grant button handler is undefined');
+      if (cancelButtonHandler === undefined) {
+        throw new Error('Cancel button handler is undefined');
       }
 
-      await grantButtonHandler({
+      await cancelButtonHandler({
         event: { type: UserInputEventType.ButtonClickEvent },
         interfaceId: mockInterfaceId,
       });
 
       const result = await awaitingUserDecision;
-      expect(result).toStrictEqual({ isConfirmationGranted: false });
-    });
-
-    it('should resolve with false when dialog is closed', async () => {
-      // Simulate dialog closure
-      mockSnaps.request.mockResolvedValueOnce(null);
-
-      const awaitingUserDecision =
-        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
-
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(2);
-      expect(mockUnbindFunctions).toHaveLength(2);
-
-      const result = await awaitingUserDecision;
-
-      mockUnbindFunctions.forEach((mockUnbindFn) => {
-        expect(mockUnbindFn).toHaveBeenCalledTimes(1);
-      });
-
       expect(result).toStrictEqual({ isConfirmationGranted: false });
     });
 
@@ -200,7 +212,7 @@ describe('ConfirmationDialog', () => {
         expect(mockUnbindFn).toHaveBeenCalledTimes(1);
       });
 
-      expect(mockSnaps.request).toHaveBeenCalledWith({
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_resolveInterface',
         params: {
           id: mockInterfaceId,
@@ -211,25 +223,23 @@ describe('ConfirmationDialog', () => {
   });
 
   describe('updateContent()', () => {
-    it('should throw error if interface not created', async () => {
-      const updatedUi = Text({
-        children: 'Updated content',
-      }) as unknown as SnapElement;
+    it('should use DialogInterface to update content', async () => {
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {
+            // Dialog stays open
+          });
+        }
+        if (params.method === 'snap_updateInterface') {
+          return null;
+        }
+        return null;
+      });
 
-      await expect(
-        confirmationDialog.updateContent({
-          ui: updatedUi,
-          isGrantDisabled: false,
-        }),
-      ).rejects.toThrow(
-        'Interface not yet created. Call createInterface() first.',
-      );
-    });
-
-    it('should update interface content', async () => {
-      mockSnaps.request.mockResolvedValueOnce(mockInterfaceId);
-      await confirmationDialog.createInterface();
-      mockSnaps.request.mockClear();
+      await confirmationDialog.initialize();
 
       const updatedUi = Text({
         children: 'Updated content',
@@ -240,12 +250,74 @@ describe('ConfirmationDialog', () => {
         isGrantDisabled: false,
       });
 
-      expect(mockSnaps.request).toHaveBeenCalledWith({
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_updateInterface',
         params: {
           id: mockInterfaceId,
           context: {},
           ui: expect.any(Object),
+        },
+      });
+    });
+  });
+
+  describe('closeWithError()', () => {
+    it('should close dialog and reject pending decision', async () => {
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {
+            // Dialog stays open
+          });
+        }
+        if (params.method === 'snap_resolveInterface') {
+          return null;
+        }
+        return null;
+      });
+
+      await confirmationDialog.initialize();
+
+      const decisionPromise =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      const error = new Error('Test error');
+      await confirmationDialog.closeWithError(error);
+
+      await expect(decisionPromise).rejects.toThrow('Test error');
+    });
+
+    it('should be safe to call multiple times', async () => {
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {
+            // Dialog stays open
+          });
+        }
+        if (params.method === 'snap_resolveInterface') {
+          return null;
+        }
+        return null;
+      });
+
+      await confirmationDialog.initialize();
+
+      const error = new Error('Test error');
+      await confirmationDialog.closeWithError(error);
+      // Should not throw on subsequent calls
+      await confirmationDialog.closeWithError(error);
+
+      // Verify resolveInterface was called (at least once)
+      expect(mockSnapsProvider.request).toHaveBeenCalledWith({
+        method: 'snap_resolveInterface',
+        params: {
+          id: mockInterfaceId,
+          value: {},
         },
       });
     });

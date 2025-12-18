@@ -140,13 +140,11 @@ const priceApiClient = new PriceApiClient({
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
 const confirmationDialogFactory = new ConfirmationDialogFactory({
-  snap,
   userEventDispatcher,
 });
 
 const permissionIntroductionService = new PermissionIntroductionService({
   stateManager,
-  snap,
   userEventDispatcher,
 });
 
@@ -156,6 +154,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   nonceCaveatService,
   snapsMetricsService,
   permissionIntroductionService,
+  snap,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({

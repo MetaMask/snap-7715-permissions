@@ -1,6 +1,7 @@
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
+import { DialogInterface } from '../../src/core/dialogInterface';
 import { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import type { StateManager } from '../../src/stateManagement';
 import { UserEventDispatcher } from '../../src/userEventDispatcher';
@@ -10,6 +11,7 @@ describe('PermissionIntroductionService', () => {
   let mockStateManager: jest.Mocked<StateManager>;
   let userEventDispatcher: UserEventDispatcher;
   let service: PermissionIntroductionService;
+  let dialogInterface: DialogInterface;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -24,9 +26,10 @@ describe('PermissionIntroductionService', () => {
 
     service = new PermissionIntroductionService({
       stateManager: mockStateManager,
-      snap: mockSnapsProvider,
       userEventDispatcher,
     });
+
+    dialogInterface = new DialogInterface(mockSnapsProvider);
   });
 
   describe('shouldShowIntroduction', () => {
@@ -128,18 +131,20 @@ describe('PermissionIntroductionService', () => {
   describe('showIntroduction', () => {
     const mockInterfaceId = 'intro-interface-123';
 
-    it('should return undefined interfaceId for unknown permission types', async () => {
-      const result = await service.showIntroduction('unknown-permission-type');
+    it('should return wasCancelled false for unknown permission types', async () => {
+      const result = await service.showIntroduction(
+        dialogInterface,
+        'unknown-permission-type',
+      );
 
       expect(result).toStrictEqual({
-        interfaceId: undefined,
         wasCancelled: false,
       });
       expect(mockSnapsProvider.request).not.toHaveBeenCalled();
     });
 
-    it('should create interface and return interfaceId on confirmation', async () => {
-      // Mock snap_createInterface
+    it('should use DialogInterface to show content and return success on confirmation', async () => {
+      // Mock snap_createInterface, snap_dialog
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
         if (params.method === 'snap_createInterface') {
           return mockInterfaceId;
@@ -154,7 +159,10 @@ describe('PermissionIntroductionService', () => {
       });
 
       // Start showIntroduction (will wait for user interaction)
-      const showPromise = service.showIntroduction('erc20-token-periodic');
+      const showPromise = service.showIntroduction(
+        dialogInterface,
+        'erc20-token-periodic',
+      );
 
       // Wait for interface to be created
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -172,13 +180,13 @@ describe('PermissionIntroductionService', () => {
       const result = await showPromise;
 
       expect(result).toStrictEqual({
-        interfaceId: mockInterfaceId,
         wasCancelled: false,
       });
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_createInterface',
         params: {
           ui: expect.any(Object),
+          context: {},
         },
       });
     });
@@ -196,10 +204,12 @@ describe('PermissionIntroductionService', () => {
         return null;
       });
 
-      const result = await service.showIntroduction('erc20-token-periodic');
+      const result = await service.showIntroduction(
+        dialogInterface,
+        'erc20-token-periodic',
+      );
 
       expect(result).toStrictEqual({
-        interfaceId: undefined,
         wasCancelled: true,
       });
     });
@@ -216,10 +226,12 @@ describe('PermissionIntroductionService', () => {
         return null;
       });
 
-      const result = await service.showIntroduction('erc20-token-periodic');
+      const result = await service.showIntroduction(
+        dialogInterface,
+        'erc20-token-periodic',
+      );
 
       expect(result).toStrictEqual({
-        interfaceId: undefined,
         wasCancelled: true,
       });
     });
