@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-restricted-globals */
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
-import { zPermissionResponse } from '@metamask/7715-permissions-shared/types';
+import {
+  zHexStr,
+  zPermissionResponse,
+} from '@metamask/7715-permissions-shared/types';
 import {
   logger,
   extractZodError,
@@ -28,7 +31,6 @@ import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 export type RevocationMetadata = {
   txHash: Hex;
-  blockTimestamp: string;
 };
 
 // Constants for validation
@@ -40,8 +42,10 @@ const zStoredGrantedPermission = z.object({
   siteOrigin: z.string().min(1, 'Site origin cannot be empty'),
   isRevoked: z.boolean().default(false),
   revocationMetadata: z
-    .custom<RevocationMetadata>()
-    .default({ txHash: '0x', blockTimestamp: '' }),
+    .object({
+      txHash: zHexStr,
+    })
+    .optional(),
 });
 
 /**
@@ -122,7 +126,7 @@ export type StoredGrantedPermission = {
   permissionResponse: PermissionResponse;
   siteOrigin: string;
   isRevoked: boolean;
-  revocationMetadata?: RevocationMetadata;
+  revocationMetadata?: RevocationMetadata | undefined;
 };
 
 /**

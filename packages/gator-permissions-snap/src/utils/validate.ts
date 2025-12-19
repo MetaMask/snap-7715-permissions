@@ -42,7 +42,11 @@ export const validatePermissionRequestParam = (
 // Validation schema for revocation parameters
 const zRevocationParams = z.object({
   permissionContext: zHexStr,
-  revocationMetadata: z.custom<RevocationMetadata>().optional(),
+  revocationMetadata: z
+    .object({
+      txHash: zHexStr,
+    })
+    .optional(),
 });
 
 /**

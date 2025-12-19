@@ -37,8 +37,6 @@ const TEST_EXPIRY = Math.floor(Date.now() / 1000) + 86400; // 24 hours from now
 const TEST_CONTEXT = '0xabcd' as const;
 const TEST_VALID_TX_HASH =
   '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' as Hex;
-const TEST_EMPTY_TX_HASH = '0x' as Hex;
-const TEST_EMPTY_BLOCK_TIMESTAMP = '';
 
 const VALID_PERMISSION_REQUEST: PermissionRequest = {
   chainId: TEST_CHAIN_ID,
@@ -145,7 +143,7 @@ describe('RpcHandler', () => {
 
     mockBlockchainMetadataClient = {
       checkDelegationDisabledOnChain: jest.fn(),
-      getTokenBalanceAndrevocationMetadata: jest.fn(),
+      getTokenBalanceAndMetadata: jest.fn(),
       checkTransactionReceipt: jest.fn(),
     } as unknown as jest.Mocked<BlockchainTokenMetadataClient>;
 
@@ -640,10 +638,6 @@ describe('RpcHandler', () => {
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
-          revocationMetadata: {
-            txHash: TEST_EMPTY_TX_HASH,
-            blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-          },
         },
         {
           permissionResponse: {
@@ -677,10 +671,6 @@ describe('RpcHandler', () => {
           },
           siteOrigin: 'https://another-example.com',
           isRevoked: false,
-          revocationMetadata: {
-            txHash: TEST_EMPTY_TX_HASH,
-            blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-          },
         },
       ];
 
@@ -787,7 +777,6 @@ describe('RpcHandler', () => {
           isRevoked: true,
           revocationMetadata: {
             txHash: TEST_VALID_TX_HASH,
-            blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
         },
         {
@@ -820,10 +809,6 @@ describe('RpcHandler', () => {
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
-          revocationMetadata: {
-            txHash: TEST_EMPTY_TX_HASH,
-            blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-          },
         },
       ];
 
@@ -1018,10 +1003,6 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        revocationMetadata: {
-          txHash: TEST_EMPTY_TX_HASH,
-          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-        },
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
@@ -1128,10 +1109,6 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        revocationMetadata: {
-          txHash: TEST_EMPTY_TX_HASH,
-          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-        },
       };
 
       const profileSyncError = new Error('Update failed');
@@ -1162,7 +1139,6 @@ describe('RpcHandler', () => {
     it('should handle hex values with uppercase letters', async () => {
       const upperCaseParams = {
         permissionContext: '0x1234567890ABCDEF1234567890ABCDEF',
-        txHash: TEST_VALID_TX_HASH,
       };
 
       const mockPermission = {
@@ -1194,10 +1170,6 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        revocationMetadata: {
-          txHash: TEST_EMPTY_TX_HASH,
-          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-        },
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
@@ -1255,10 +1227,6 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        revocationMetadata: {
-          txHash: TEST_EMPTY_TX_HASH,
-          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-        },
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
@@ -1312,10 +1280,6 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        revocationMetadata: {
-          txHash: TEST_EMPTY_TX_HASH,
-          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-        },
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
@@ -1370,10 +1334,6 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        revocationMetadata: {
-          txHash: TEST_EMPTY_TX_HASH,
-          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-        },
       };
 
       const resourceUnavailableError = new ResourceUnavailableError(
@@ -1429,10 +1389,6 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        revocationMetadata: {
-          txHash: TEST_EMPTY_TX_HASH,
-          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-        },
       };
 
       const chainDisconnectedError = new ChainDisconnectedError(
@@ -1488,10 +1444,6 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        revocationMetadata: {
-          txHash: TEST_EMPTY_TX_HASH,
-          blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
-        },
       };
 
       const invalidInputError = new InvalidInputError(
