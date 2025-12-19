@@ -98,7 +98,7 @@ export type TokenBalanceAndMetadata = {
 
 /**
  * Represents a transaction receipt from the blockchain.
- * As defined in the Ethereum JSON-RPC API(https://docs.metamask.io/services/reference/zksync/json-rpc-methods/eth_gettransactionreceipt/)
+ * As defined in the Ethereum JSON-RPC API(https://docs.metamask.io/services/reference/ethereum/json-rpc-methods/eth_gettransactionreceipt/)
  */
 export type TransactionReceipt = {
   blockHash: Hex;

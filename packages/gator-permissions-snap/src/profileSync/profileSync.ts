@@ -398,7 +398,7 @@ export function createProfileSyncManager(
         isRevoked,
       };
 
-      // Attach metadata when a transaction hash is given
+      // Attach metadata if specified
       if (metadata) {
         updatedPermission.metadata = metadata;
       }

@@ -338,7 +338,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
    * @param args.txHash - The hash of the transaction to check.
    * @param args.chainId - The chain ID in hex format.
    * @returns True if the transaction receipt is valid, false if it is not.
-   * @throws InvalidInputError if input parameters are invalid.
+   * @throws InvalidInputError if `chainId` is not specified
    * @throws ChainDisconnectedError if the provider is on the wrong chain.
    * @throws ResourceUnavailableError if the on-chain check fails and we cannot determine the status.
    */
@@ -369,16 +369,11 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
         isRetryableError: (error) => this.#isRetryableError(error),
       });
 
-      // Either 1 (success) or 0 (failure)
-      if (result.status === '0x0') {
-        return false;
-      }
-
-      return true;
+      return result.status === '0x1';
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.error(`Failed to check transaction receipt: ${errorMessage}`);
+      logger.error(`Failed to fetch transaction receipt: ${errorMessage}`);
 
       // Re-throw critical errors - they should propagate
       if (
@@ -391,7 +386,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
       // For other errors (network issues, contract call failures, etc.),
       // we cannot determine the status, so throw an error instead of returning false
       throw new ResourceUnavailableError(
-        `Failed to check transaction receipt: ${errorMessage}`,
+        `Failed to fetch transaction receipt: ${errorMessage}`,
       );
     }
   }

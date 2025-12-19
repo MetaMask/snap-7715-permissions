@@ -255,7 +255,7 @@ export function createRpcHandler({
       );
     }
 
-    // Check if the transaction have if confirmed on-chain
+    // Check if the transaction is confirmed on-chain
     if (metadata) {
       const { txHash } = metadata;
       const isTransactionValid =
@@ -266,7 +266,7 @@ export function createRpcHandler({
 
       if (!isTransactionValid) {
         throw new InvalidInputError(
-          `Transaction ${txHash} is not valid. Cannot process revocation.`,
+          `Transaction ${txHash} was not successful. Cannot process revocation.`,
         );
       }
     }
