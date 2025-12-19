@@ -25,6 +25,7 @@ import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
+import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
@@ -161,13 +162,17 @@ const permissionIntroductionService = new PermissionIntroductionService({
   userEventDispatcher,
 });
 
+const dialogInterfaceFactory = new DialogInterfaceFactory({
+  snap,
+});
+
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
   nonceCaveatService,
   snapsMetricsService,
   permissionIntroductionService,
-  snap,
+  dialogInterfaceFactory,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({

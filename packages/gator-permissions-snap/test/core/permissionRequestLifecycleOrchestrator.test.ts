@@ -1,4 +1,3 @@
-import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
   decodeDelegations,
@@ -15,6 +14,7 @@ import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
+import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFactory';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
@@ -100,7 +100,9 @@ const mockAccountController = {
   upgradeAccount: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<AccountController>;
 
-const mockSnapsProvider = createMockSnapsProvider();
+const mockDialogInterfaceFactory = {
+  createDialogInterface: jest.fn().mockReturnValue({}),
+} as unknown as jest.Mocked<DialogInterfaceFactory>;
 
 const mockConfirmationDialog = {
   initialize: jest.fn(),
@@ -193,6 +195,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
     mockNonceCaveatService.getNonce.mockResolvedValue(0n);
 
+    mockDialogInterfaceFactory.createDialogInterface.mockReturnValue({});
+
     permissionRequestLifecycleOrchestrator =
       new PermissionRequestLifecycleOrchestrator({
         accountController: mockAccountController,
@@ -200,7 +204,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
-        snap: mockSnapsProvider,
+        dialogInterfaceFactory: mockDialogInterfaceFactory,
       });
   });
 
@@ -212,7 +216,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
-        snap: mockSnapsProvider,
+        dialogInterfaceFactory: mockDialogInterfaceFactory,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });

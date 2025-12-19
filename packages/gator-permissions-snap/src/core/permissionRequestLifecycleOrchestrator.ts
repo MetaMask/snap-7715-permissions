@@ -14,7 +14,6 @@ import {
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import type { SnapsProvider } from '@metamask/snaps-sdk';
 import { InvalidInputError, InvalidParamsError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
@@ -27,7 +26,7 @@ import {
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
-import { DialogInterface } from './dialogInterface';
+import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
 import type { PermissionIntroductionService } from './permissionIntroduction';
 import type {
   BaseContext,
@@ -54,7 +53,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #permissionIntroductionService: PermissionIntroductionService;
 
-  readonly #snap: SnapsProvider;
+  readonly #dialogInterfaceFactory: DialogInterfaceFactory;
 
   constructor({
     accountController,
@@ -62,21 +61,21 @@ export class PermissionRequestLifecycleOrchestrator {
     nonceCaveatService,
     snapsMetricsService,
     permissionIntroductionService,
-    snap,
+    dialogInterfaceFactory,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
     permissionIntroductionService: PermissionIntroductionService;
-    snap: SnapsProvider;
+    dialogInterfaceFactory: DialogInterfaceFactory;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
     this.#permissionIntroductionService = permissionIntroductionService;
-    this.#snap = snap;
+    this.#dialogInterfaceFactory = dialogInterfaceFactory;
   }
 
   /**
@@ -139,7 +138,8 @@ export class PermissionRequestLifecycleOrchestrator {
     });
 
     // Create shared dialog interface for both intro and confirmation
-    const dialogInterface = new DialogInterface(this.#snap);
+    const dialogInterface =
+      this.#dialogInterfaceFactory.createDialogInterface();
 
     // Check if we need to show introduction
     if (
