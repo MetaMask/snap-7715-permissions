@@ -76,14 +76,18 @@ export class PermissionIntroductionService {
   /**
    * Shows the introduction content with 2-page navigation and waits for user to dismiss it.
    * Uses the provided DialogInterface to display content and manage the dialog.
-   * @param dialogInterface - The dialog interface to use for displaying content.
-   * @param permissionType - The permission type to show introduction for.
+   * @param options - The options object.
+   * @param options.dialogInterface - The dialog interface to use for displaying content.
+   * @param options.permissionType - The permission type to show introduction for.
    * @returns Object with wasCancelled flag indicating if user dismissed the intro.
    */
-  async showIntroduction(
-    dialogInterface: DialogInterface,
-    permissionType: string,
-  ): Promise<{ wasCancelled: boolean }> {
+  async showIntroduction({
+    dialogInterface,
+    permissionType,
+  }: {
+    dialogInterface: DialogInterface;
+    permissionType: string;
+  }): Promise<{ wasCancelled: boolean }> {
     const config = getPermissionIntroductionConfig(permissionType);
     if (!config) {
       return { wasCancelled: false };

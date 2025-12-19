@@ -132,10 +132,10 @@ describe('PermissionIntroductionService', () => {
     const mockInterfaceId = 'intro-interface-123';
 
     it('should return wasCancelled false for unknown permission types', async () => {
-      const result = await service.showIntroduction(
+      const result = await service.showIntroduction({
         dialogInterface,
-        'unknown-permission-type',
-      );
+        permissionType: 'unknown-permission-type',
+      });
 
       expect(result).toStrictEqual({
         wasCancelled: false,
@@ -159,10 +159,10 @@ describe('PermissionIntroductionService', () => {
       });
 
       // Start showIntroduction (will wait for user interaction)
-      const showPromise = service.showIntroduction(
+      const showPromise = service.showIntroduction({
         dialogInterface,
-        'erc20-token-periodic',
-      );
+        permissionType: 'erc20-token-periodic',
+      });
 
       // Wait for interface to be created
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -204,10 +204,10 @@ describe('PermissionIntroductionService', () => {
         return null;
       });
 
-      const result = await service.showIntroduction(
+      const result = await service.showIntroduction({
         dialogInterface,
-        'erc20-token-periodic',
-      );
+        permissionType: 'erc20-token-periodic',
+      });
 
       expect(result).toStrictEqual({
         wasCancelled: true,
@@ -226,10 +226,10 @@ describe('PermissionIntroductionService', () => {
         return null;
       });
 
-      const result = await service.showIntroduction(
+      const result = await service.showIntroduction({
         dialogInterface,
-        'erc20-token-periodic',
-      );
+        permissionType: 'erc20-token-periodic',
+      });
 
       expect(result).toStrictEqual({
         wasCancelled: true,

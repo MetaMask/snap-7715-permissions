@@ -148,10 +148,10 @@ export class PermissionRequestLifecycleOrchestrator {
       )
     ) {
       const { wasCancelled } =
-        await this.#permissionIntroductionService.showIntroduction(
+        await this.#permissionIntroductionService.showIntroduction({
           dialogInterface,
           permissionType,
-        );
+        });
 
       // If user cancelled the introduction, reject the permission request
       if (wasCancelled) {
