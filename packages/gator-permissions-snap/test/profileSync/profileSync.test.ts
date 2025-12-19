@@ -97,7 +97,7 @@ describe('profileSync', () => {
     },
     siteOrigin: 'https://example.com',
     isRevoked: false,
-    metadata: {
+    revocationMetadata: {
       txHash: '0x' as Hex,
       blockTimestamp: 'mock-block-timestamp',
     },
@@ -220,7 +220,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"revocationMetadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
           ),
         );
         // Verify the stored data can be parsed and contains expected fields
@@ -251,7 +251,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}${mockDelegationHashTwo.slice(2)}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"revocationMetadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
           ),
         );
         // Verify the stored data can be parsed and contains expected fields
@@ -331,13 +331,13 @@ describe('profileSync', () => {
             [
               mockDelegationHash,
               expect.stringMatching(
-                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"revocationMetadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
               ),
             ],
             [
               mockDelegationHashTwo,
               expect.stringMatching(
-                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":""\}\}$/u,
+                /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"revocationMetadata":\{"txHash":"0x","blockTimestamp":""\}\}$/u,
               ),
             ],
           ],
@@ -465,7 +465,7 @@ describe('profileSync', () => {
           [
             mockDelegationHash,
             expect.stringMatching(
-              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
+              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"revocationMetadata":\{"txHash":"0x","blockTimestamp":"mock-block-timestamp"\}\}$/u,
             ),
           ],
         ],
@@ -508,7 +508,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":true,"metadata":\{"txHash":"0xMocked-tx-hash","blockTimestamp":"mock-block-timestamp"\}\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":true,"revocationMetadata":\{"txHash":"0xMocked-tx-hash","blockTimestamp":"mock-block-timestamp"\}\}$/u,
           ),
         );
 
@@ -546,7 +546,7 @@ describe('profileSync', () => {
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"metadata":\{"txHash":"0xMocked-tx-hash","blockTimestamp":"mock-block-timestamp"\}\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":false,"revocationMetadata":\{"txHash":"0xMocked-tx-hash","blockTimestamp":"mock-block-timestamp"\}\}$/u,
           ),
         );
 
@@ -555,7 +555,7 @@ describe('profileSync', () => {
         expect(storedData).toBeDefined();
         const parsed = JSON.parse(storedData as string);
         expect(parsed.isRevoked).toBe(false);
-        expect(parsed.metadata.txHash).toBe('0xMocked-tx-hash');
+        expect(parsed.revocationMetadata.txHash).toBe('0xMocked-tx-hash');
       });
 
       it('should throw error when permission not found', async () => {

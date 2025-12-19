@@ -333,7 +333,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
   }
 
   /**
-   * Checks if a transaction receipt is valid by calling the eth_getTransactionReceipt method.
+   * Checks if a transaction was successful by calling the eth_getTransactionReceipt method.
    * @param args - The parameters for checking the transaction receipt.
    * @param args.txHash - The hash of the transaction to check.
    * @param args.chainId - The chain ID in hex format.

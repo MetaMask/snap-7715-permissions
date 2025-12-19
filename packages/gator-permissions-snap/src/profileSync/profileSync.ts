@@ -39,7 +39,7 @@ const zStoredGrantedPermission = z.object({
   permissionResponse: zPermissionResponse,
   siteOrigin: z.string().min(1, 'Site origin cannot be empty'),
   isRevoked: z.boolean().default(false),
-  metadata: z
+  revocationMetadata: z
     .custom<RevocationMetadata>()
     .default({ txHash: '0x', blockTimestamp: '' }),
 });
@@ -114,7 +114,7 @@ export type ProfileSyncManager = {
   updatePermissionRevocationStatus: (
     permissionContext: Hex,
     isRevoked: boolean,
-    metadata?: RevocationMetadata,
+    revocationMetadata?: RevocationMetadata,
   ) => Promise<void>;
 };
 
@@ -122,7 +122,7 @@ export type StoredGrantedPermission = {
   permissionResponse: PermissionResponse;
   siteOrigin: string;
   isRevoked: boolean;
-  metadata?: RevocationMetadata;
+  revocationMetadata?: RevocationMetadata;
 };
 
 /**
@@ -369,12 +369,12 @@ export function createProfileSyncManager(
    *
    * @param permissionContext - The context of the granted permission to update.
    * @param isRevoked - The new revocation status.
-   * @param metadata - The revocation transaction metadata.
+   * @param revocationMetadata - The revocation transaction metadata.
    */
   async function updatePermissionRevocationStatus(
     permissionContext: Hex,
     isRevoked: boolean,
-    metadata?: RevocationMetadata,
+    revocationMetadata?: RevocationMetadata,
   ): Promise<void> {
     try {
       const existingPermission = await getGrantedPermission(permissionContext);
@@ -388,7 +388,7 @@ export function createProfileSyncManager(
       logger.debug('Profile Sync: Updating permission revocation status:', {
         existingPermission,
         isRevoked,
-        metadata,
+        revocationMetadata,
       });
 
       await authenticate();
@@ -399,8 +399,8 @@ export function createProfileSyncManager(
       };
 
       // Attach metadata if specified
-      if (metadata) {
-        updatedPermission.metadata = metadata;
+      if (revocationMetadata) {
+        updatedPermission.revocationMetadata = revocationMetadata;
       }
 
       await storeGrantedPermission(updatedPermission);

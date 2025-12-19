@@ -191,7 +191,8 @@ export function createRpcHandler({
   const submitRevocation = async (params: Json): Promise<Json> => {
     logger.debug('submitRevocation() called with params:', params);
 
-    const { permissionContext, metadata } = validateRevocationParams(params);
+    const { permissionContext, revocationMetadata } =
+      validateRevocationParams(params);
 
     // First, get the existing permission to validate it exists
     logger.debug(
@@ -256,8 +257,8 @@ export function createRpcHandler({
     }
 
     // Check if the transaction is confirmed on-chain
-    if (metadata) {
-      const { txHash } = metadata;
+    if (revocationMetadata) {
+      const { txHash } = revocationMetadata;
       const isTransactionValid =
         await blockchainMetadataClient.checkTransactionReceipt({
           txHash,
@@ -274,7 +275,7 @@ export function createRpcHandler({
     await profileSyncManager.updatePermissionRevocationStatus(
       permissionContext,
       true,
-      metadata,
+      revocationMetadata,
     );
 
     return { success: true };

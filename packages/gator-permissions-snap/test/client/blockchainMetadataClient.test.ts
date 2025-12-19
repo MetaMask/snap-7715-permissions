@@ -673,5 +673,189 @@ describe('BlockchainTokenMetadataClient', () => {
     });
   });
 
-  // TODO: Add test cases for checkTransactionReceipt
+  describe('checkTransactionReceipt', () => {
+    const mockTxHash =
+      '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890' as const;
+    const mockChainId = '0xaa36a7' as const;
+
+    beforeEach(() => {
+      mockEthereumProvider.request.mockClear();
+    });
+
+    it('should return true when transaction receipt status is 0x1 (success)', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        status: '0x1',
+        transactionHash: mockTxHash,
+      }); // eth_getTransactionReceipt
+
+      const result = await client.checkTransactionReceipt({
+        txHash: mockTxHash,
+        chainId: mockChainId,
+      });
+
+      expect(result).toBe(true);
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
+      expect(mockEthereumProvider.request).toHaveBeenNthCalledWith(1, {
+        method: 'eth_chainId',
+        params: [],
+      });
+      expect(mockEthereumProvider.request).toHaveBeenNthCalledWith(2, {
+        method: 'eth_getTransactionReceipt',
+        params: [mockTxHash],
+      });
+    });
+
+    it('should return false when transaction receipt status is 0x0 (failure)', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        status: '0x0',
+        transactionHash: mockTxHash,
+      }); // eth_getTransactionReceipt
+
+      const result = await client.checkTransactionReceipt({
+        txHash: mockTxHash,
+        chainId: mockChainId,
+      });
+
+      expect(result).toBe(false);
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
+    });
+
+    it('should throw InvalidInputError when chainId is missing', async () => {
+      await expect(
+        client.checkTransactionReceipt({
+          txHash: mockTxHash,
+          chainId: '' as any,
+        }),
+      ).rejects.toThrow('No chain ID provided');
+
+      expect(mockEthereumProvider.request).not.toHaveBeenCalled();
+    });
+
+    it('should propagate ChainDisconnectedError from ensureChain', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce('0x1'); // Wrong chain
+      mockEthereumProvider.request.mockResolvedValueOnce('OK'); // switch chain
+      mockEthereumProvider.request.mockResolvedValueOnce('0x1'); // Still wrong chain
+
+      await expect(
+        client.checkTransactionReceipt({
+          txHash: mockTxHash,
+          chainId: mockChainId,
+        }),
+      ).rejects.toThrow('Selected chain does not match the requested chain');
+    });
+
+    it('should switch chain if selected chain does not match requested chain', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce('0x1'); // Wrong chain
+      mockEthereumProvider.request.mockResolvedValueOnce('OK'); // switch chain
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // Correct chain after switch
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        status: '0x1',
+        transactionHash: mockTxHash,
+      }); // eth_getTransactionReceipt
+
+      const result = await client.checkTransactionReceipt({
+        txHash: mockTxHash,
+        chainId: mockChainId,
+      });
+
+      expect(result).toBe(true);
+      expect(mockEthereumProvider.request).toHaveBeenCalledWith({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: mockChainId }],
+      });
+    });
+
+    it('should throw ResourceUnavailableError when getTransactionReceipt fails after retries', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      // First attempt fails
+      mockEthereumProvider.request.mockRejectedValueOnce(
+        new Error('RPC error'),
+      ); // eth_getTransactionReceipt (attempt 1)
+      // Retry also fails
+      mockEthereumProvider.request.mockRejectedValueOnce(
+        new Error('RPC error'),
+      ); // eth_getTransactionReceipt (retry)
+
+      await expect(
+        client.checkTransactionReceipt({
+          txHash: mockTxHash,
+          chainId: mockChainId,
+        }),
+      ).rejects.toThrow(ResourceUnavailableError);
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
+    });
+
+    it('should throw ResourceUnavailableError when transaction receipt is not found', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      // First attempt returns null
+      mockEthereumProvider.request.mockResolvedValueOnce(null); // eth_getTransactionReceipt (attempt 1)
+      // Retry also returns null
+      mockEthereumProvider.request.mockResolvedValueOnce(null); // eth_getTransactionReceipt (retry)
+
+      await expect(
+        client.checkTransactionReceipt({
+          txHash: mockTxHash,
+          chainId: mockChainId,
+        }),
+      ).rejects.toThrow(ResourceUnavailableError);
+    });
+
+    it('should not retry on InvalidInputError', async () => {
+      const invalidInputError = new InvalidInputError('Invalid input');
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      mockEthereumProvider.request.mockRejectedValueOnce(invalidInputError); // eth_getTransactionReceipt
+
+      await expect(
+        client.checkTransactionReceipt({
+          txHash: mockTxHash,
+          chainId: mockChainId,
+        }),
+      ).rejects.toThrow('Invalid input');
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not retry on ChainDisconnectedError from getTransactionReceipt', async () => {
+      const chainDisconnectedError = new ChainDisconnectedError(
+        'Chain disconnected',
+      );
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      mockEthereumProvider.request.mockRejectedValueOnce(
+        chainDisconnectedError,
+      ); // eth_getTransactionReceipt
+
+      await expect(
+        client.checkTransactionReceipt({
+          txHash: mockTxHash,
+          chainId: mockChainId,
+        }),
+      ).rejects.toThrow('Chain disconnected');
+
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
+    });
+
+    it('should retry on RPC error and succeed', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      // First attempt fails
+      mockEthereumProvider.request.mockRejectedValueOnce(
+        new Error('RPC error'),
+      ); // eth_getTransactionReceipt (attempt 1)
+      // Retry succeeds
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        status: '0x1',
+        transactionHash: mockTxHash,
+      }); // eth_getTransactionReceipt (retry)
+
+      const result = await client.checkTransactionReceipt({
+        txHash: mockTxHash,
+        chainId: mockChainId,
+      });
+
+      expect(result).toBe(true);
+      expect(mockEthereumProvider.request).toHaveBeenCalledTimes(3);
+    });
+  });
 });

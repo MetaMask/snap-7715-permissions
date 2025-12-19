@@ -145,7 +145,7 @@ describe('RpcHandler', () => {
 
     mockBlockchainMetadataClient = {
       checkDelegationDisabledOnChain: jest.fn(),
-      getTokenBalanceAndMetadata: jest.fn(),
+      getTokenBalanceAndrevocationMetadata: jest.fn(),
       checkTransactionReceipt: jest.fn(),
     } as unknown as jest.Mocked<BlockchainTokenMetadataClient>;
 
@@ -640,7 +640,7 @@ describe('RpcHandler', () => {
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
-          metadata: {
+          revocationMetadata: {
             txHash: TEST_EMPTY_TX_HASH,
             blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
@@ -677,7 +677,7 @@ describe('RpcHandler', () => {
           },
           siteOrigin: 'https://another-example.com',
           isRevoked: false,
-          metadata: {
+          revocationMetadata: {
             txHash: TEST_EMPTY_TX_HASH,
             blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
@@ -785,7 +785,7 @@ describe('RpcHandler', () => {
           },
           siteOrigin: 'https://another-example.com',
           isRevoked: true,
-          metadata: {
+          revocationMetadata: {
             txHash: TEST_VALID_TX_HASH,
             blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
@@ -820,7 +820,7 @@ describe('RpcHandler', () => {
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
-          metadata: {
+          revocationMetadata: {
             txHash: TEST_EMPTY_TX_HASH,
             blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
           },
@@ -985,7 +985,7 @@ describe('RpcHandler', () => {
   describe('submitRevocation', () => {
     const validRevocationParams = {
       permissionContext: TEST_CONTEXT,
-      metadata: { txHash: TEST_VALID_TX_HASH },
+      revocationMetadata: { txHash: TEST_VALID_TX_HASH },
     };
 
     it('should successfully submit revocation with valid parameters', async () => {
@@ -1018,7 +1018,7 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        metadata: {
+        revocationMetadata: {
           txHash: TEST_EMPTY_TX_HASH,
           blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
@@ -1128,7 +1128,7 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        metadata: {
+        revocationMetadata: {
           txHash: TEST_EMPTY_TX_HASH,
           blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
@@ -1194,7 +1194,7 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        metadata: {
+        revocationMetadata: {
           txHash: TEST_EMPTY_TX_HASH,
           blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
@@ -1255,7 +1255,7 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        metadata: {
+        revocationMetadata: {
           txHash: TEST_EMPTY_TX_HASH,
           blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
@@ -1312,7 +1312,7 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        metadata: {
+        revocationMetadata: {
           txHash: TEST_EMPTY_TX_HASH,
           blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
@@ -1370,7 +1370,7 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        metadata: {
+        revocationMetadata: {
           txHash: TEST_EMPTY_TX_HASH,
           blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
@@ -1429,7 +1429,7 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        metadata: {
+        revocationMetadata: {
           txHash: TEST_EMPTY_TX_HASH,
           blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
@@ -1488,7 +1488,7 @@ describe('RpcHandler', () => {
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
-        metadata: {
+        revocationMetadata: {
           txHash: TEST_EMPTY_TX_HASH,
           blockTimestamp: TEST_EMPTY_BLOCK_TIMESTAMP,
         },
