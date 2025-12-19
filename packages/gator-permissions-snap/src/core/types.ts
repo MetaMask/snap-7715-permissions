@@ -4,17 +4,14 @@ import type {
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import type { Hex, Caveat, Delegation } from '@metamask/delegation-core';
-import type {
-  CaipAccountId,
-  CaipAssetType,
-  SnapsProvider,
-} from '@metamask/snaps-sdk';
+import type { CaipAccountId, CaipAssetType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import type { DelegationContracts } from './chainMetadata';
+import type { DialogInterface } from './dialogInterface';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type { TimeoutFactory } from './timeoutFactory';
 import type { TokenPricesService } from '../services/tokenPricesService';
@@ -102,16 +99,14 @@ export enum TimePeriod {
 
 /**
  * Properties required for confirmation dialogs.
+ * @property dialogInterface - The dialog interface manager for showing content
  * @property ui - The UI element to be displayed in the confirmation dialog
- * @property isGrantDisabled - Whether the user can grant the permission
- * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
  * @property onBeforeGrant - Validation callback that runs before grant is confirmed
  */
 export type ConfirmationProps = {
+  dialogInterface: DialogInterface;
   ui: SnapElement;
-  isGrantDisabled: boolean;
-  snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
   onBeforeGrant: () => Promise<boolean>;
   timeoutFactory: TimeoutFactory;

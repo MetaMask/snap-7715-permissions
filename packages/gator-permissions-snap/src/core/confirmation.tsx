@@ -1,8 +1,8 @@
-import type { SnapsProvider } from '@metamask/snaps-sdk';
-import { MethodNotFoundError, UserInputEventType } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
+import type { DialogInterface } from './dialogInterface';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { Timeout, TimeoutFactory } from './timeoutFactory';
 import type { ConfirmationProps } from './types';
@@ -12,10 +12,7 @@ export class ConfirmationDialog {
 
   static #grantButton = 'grant-button';
 
-  static #interfaceNotCreatedError =
-    'Interface not yet created. Call createInterface() first.';
-
-  readonly #snaps: SnapsProvider;
+  readonly #dialogInterface: DialogInterface;
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
@@ -23,9 +20,7 @@ export class ConfirmationDialog {
 
   #ui: SnapElement;
 
-  #interfaceId: string | undefined;
-
-  #isGrantDisabled: boolean;
+  #isGrantDisabled = true;
 
   #timeout: Timeout | undefined;
 
@@ -36,60 +31,68 @@ export class ConfirmationDialog {
 
   #decisionReject: ((reason: Error) => void) | undefined;
 
+  #decisionResolve: ((value: boolean) => void) | undefined;
+
   readonly #onBeforeGrant: () => Promise<boolean>;
 
   constructor({
+    dialogInterface,
     ui,
-    isGrantDisabled,
-    snaps,
     userEventDispatcher,
     onBeforeGrant,
     timeoutFactory,
   }: ConfirmationProps) {
+    this.#dialogInterface = dialogInterface;
     this.#ui = ui;
-    this.#isGrantDisabled = isGrantDisabled;
-    this.#snaps = snaps;
     this.#userEventDispatcher = userEventDispatcher;
     this.#onBeforeGrant = onBeforeGrant;
     this.#timeoutFactory = timeoutFactory;
   }
 
-  async createInterface(): Promise<string> {
-    if (this.#interfaceId) {
-      return this.#interfaceId;
-    }
-
-    this.#interfaceId = await this.#snaps.request({
-      method: 'snap_createInterface',
-      params: {
-        context: {},
-        ui: this.#buildConfirmation(),
-      },
-    });
-
-    return this.#interfaceId;
+  /**
+   * Initializes the confirmation dialog by showing content via DialogInterface.
+   * This will create or update the interface, and show the dialog if not already shown.
+   * @returns The interface ID.
+   */
+  async initialize(): Promise<string> {
+    return this.#dialogInterface.show(this.#buildConfirmation(), () =>
+      this.#handleDialogClose(),
+    );
   }
 
+  /**
+   * Handles dialog close event (user clicked X button).
+   * DialogInterface already handles the actual dialog closing.
+   */
+  #handleDialogClose(): void {
+    // Cancel timeout and unbind handlers (dialog is already closing)
+    this.#cleanupHandlers();
+    if (this.#decisionResolve) {
+      this.#decisionResolve(false);
+      this.#decisionResolve = undefined;
+    }
+  }
+
+  /**
+   * Waits for the user to grant or cancel the confirmation.
+   * @returns Object with isConfirmationGranted boolean.
+   */
   async displayConfirmationDialogAndAwaitUserDecision(): Promise<{
     isConfirmationGranted: boolean;
   }> {
-    if (!this.#interfaceId) {
-      throw new MethodNotFoundError(
-        ConfirmationDialog.#interfaceNotCreatedError,
-      );
+    const { interfaceId } = this.#dialogInterface;
+    if (!interfaceId) {
+      throw new Error('Interface not yet created. Call initialize() first.');
     }
-    const interfaceId = this.#interfaceId;
 
     const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
-      const cleanupAndResolveIfNotTimedOut = async ({
-        decision,
-        resolveInterface,
-      }: {
-        decision: boolean;
-        resolveInterface: boolean;
-      }) => {
+      this.#decisionResolve = resolve;
+      this.#decisionReject = reject;
+
+      const cleanupAndResolveIfNotTimedOut = async (decision: boolean) => {
         if (!this.#hasTimedOut) {
-          await this.#cleanup({ resolveInterface });
+          this.#cleanupHandlers();
+          await this.#dialogInterface.close();
         }
 
         if (!this.#hasTimedOut) {
@@ -97,21 +100,12 @@ export class ConfirmationDialog {
         }
       };
 
-      const cleanupAndRejectIfNotTimedOut = async (error: Error) => {
-        if (!this.#hasTimedOut) {
-          await this.#cleanup({ resolveInterface: false });
-        }
-
-        if (!this.#hasTimedOut) {
-          reject(error);
-        }
-      };
-
       this.#timeout = this.#timeoutFactory.register({
         onTimeout: async () => {
           this.#hasTimedOut = true;
 
-          await this.#cleanup({ resolveInterface: true });
+          this.#cleanupHandlers();
+          await this.#dialogInterface.close();
 
           reject(new Error('Timeout waiting for user decision'));
         },
@@ -135,10 +129,7 @@ export class ConfirmationDialog {
             return;
           }
 
-          await cleanupAndResolveIfNotTimedOut({
-            decision: true,
-            resolveInterface: true,
-          });
+          await cleanupAndResolveIfNotTimedOut(true);
         },
       });
 
@@ -147,10 +138,7 @@ export class ConfirmationDialog {
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          await cleanupAndResolveIfNotTimedOut({
-            decision: false,
-            resolveInterface: true,
-          });
+          await cleanupAndResolveIfNotTimedOut(false);
         },
       });
 
@@ -159,28 +147,6 @@ export class ConfirmationDialog {
         unbindGrantButtonClick();
         unbindCancelButtonClick();
       };
-
-      this.#decisionReject = reject;
-
-      // we don't await this, because we only want to present the dialog, and
-      // not wait for it to be resolved
-      this.#snaps
-        .request({
-          method: 'snap_dialog',
-          params: {
-            id: interfaceId,
-          },
-        })
-        .then(async (result) => {
-          // Should resolve with false when dialog is closed.
-          if (result === null) {
-            await cleanupAndResolveIfNotTimedOut({
-              decision: false,
-              resolveInterface: true,
-            });
-          }
-        })
-        .catch(cleanupAndRejectIfNotTimedOut);
     });
 
     return {
@@ -189,15 +155,10 @@ export class ConfirmationDialog {
   }
 
   /**
-   * Clean up event handlers and optionally resolve the interface.
-   * @param options - Options for the cleanup.
-   * @param options.resolveInterface - Whether to resolve the interface.
+   * Clean up timeout and event handlers.
+   * Does not close the dialog interface - caller should handle that separately if needed.
    */
-  async #cleanup({
-    resolveInterface,
-  }: {
-    resolveInterface: boolean;
-  }): Promise<void> {
+  #cleanupHandlers(): void {
     this.#timeout?.cancel();
     // although not strictly necessary, we clear the timeout handler to avoid unnecessarily calling cancel() multiple times
     this.#timeout = undefined;
@@ -211,20 +172,6 @@ export class ConfirmationDialog {
       } finally {
         // we should only call the unbindHandlers once
         this.#unbindHandlers = undefined;
-      }
-    }
-
-    if (resolveInterface && this.#interfaceId) {
-      try {
-        await this.#snaps.request({
-          method: 'snap_resolveInterface',
-          params: {
-            id: this.#interfaceId,
-            value: {},
-          },
-        });
-      } catch (error) {
-        // silently ignore since dialog is already closed (probably from an internal error)
       }
     }
   }
@@ -249,6 +196,12 @@ export class ConfirmationDialog {
     );
   }
 
+  /**
+   * Updates the confirmation dialog content.
+   * @param options - The update options.
+   * @param options.ui - The new UI content.
+   * @param options.isGrantDisabled - Whether the grant button should be disabled.
+   */
   async updateContent({
     ui,
     isGrantDisabled,
@@ -256,23 +209,10 @@ export class ConfirmationDialog {
     ui: SnapElement;
     isGrantDisabled: boolean;
   }): Promise<void> {
-    if (!this.#interfaceId) {
-      throw new MethodNotFoundError(
-        ConfirmationDialog.#interfaceNotCreatedError,
-      );
-    }
-
     this.#ui = ui;
     this.#isGrantDisabled = isGrantDisabled;
 
-    await this.#snaps.request({
-      method: 'snap_updateInterface',
-      params: {
-        id: this.#interfaceId,
-        context: {},
-        ui: this.#buildConfirmation(),
-      },
-    });
+    await this.#dialogInterface.show(this.#buildConfirmation());
   }
 
   /**
@@ -281,17 +221,11 @@ export class ConfirmationDialog {
    * @param reason - The error to reject the pending decision promise with.
    */
   async closeWithError(reason: Error): Promise<void> {
-    if (!this.#interfaceId) {
-      // nothing to close
-      if (this.#decisionReject) {
-        this.#decisionReject(reason);
-        this.#decisionReject = undefined;
-      }
-      return;
-    }
+    // Clean up timeout and handlers
+    this.#cleanupHandlers();
 
-    // Clean up handlers and resolve interface
-    await this.#cleanup({ resolveInterface: true });
+    // Close the dialog interface
+    await this.#dialogInterface.close();
 
     if (this.#decisionReject) {
       this.#decisionReject(reason);
