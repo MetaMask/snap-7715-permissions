@@ -8,7 +8,7 @@ import {
 import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import { sleep } from './httpClient';
-import type { RetryOptions } from '../clients/types';
+import type { RetryOptions, TransactionReceipt } from '../clients/types';
 
 /**
  * Ensures the ethereum provider is connected to the specified chain.
@@ -118,4 +118,68 @@ export async function callContract({
   }
 
   throw new InternalError(`Contract call failed after ${retries + 1} attempts`);
+}
+
+/**
+ * Gets a transaction receipt from the blockchain with retry logic.
+ * Note: The caller is responsible for ensuring the provider is on the correct chain using `ensureChain`.
+ *
+ * @param args - The parameters for the transaction receipt.
+ * @param args.ethereumProvider - The ethereum provider to use for the call.
+ * @param args.txHash - The hash of the transaction to get the receipt for.
+ * @param args.retryOptions - Optional retry configuration. When not provided, defaults to 1 retry attempt with 1000ms delay.
+ * @param args.isRetryableError - Optional function to determine if an error is retryable. Defaults to retrying all errors except ChainDisconnectedError.
+ * @returns The transaction receipt.
+ * @throws ResourceNotFoundError if the transaction receipt is not found after all retries.
+ * @throws The original error if it's not retryable.
+ */
+export async function getTransactionReceipt({
+  ethereumProvider,
+  txHash,
+  retryOptions,
+  isRetryableError,
+}: {
+  ethereumProvider: SnapsEthereumProvider;
+  txHash: Hex;
+  retryOptions?: RetryOptions | undefined;
+  isRetryableError?: ((error: unknown) => boolean) | undefined;
+}): Promise<TransactionReceipt> {
+  const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
+  const defaultIsRetryableError = (error: unknown): boolean => {
+    return !(error instanceof ChainDisconnectedError);
+  };
+  const shouldRetry = isRetryableError ?? defaultIsRetryableError;
+
+  // Try up to initial attempt + retry attempts
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const result = await ethereumProvider.request<TransactionReceipt>({
+        method: 'eth_getTransactionReceipt',
+        params: [txHash],
+      });
+
+      if (!result) {
+        throw new ResourceNotFoundError('Transaction receipt not found');
+      }
+
+      return result as TransactionReceipt;
+    } catch (error) {
+      // Check if this is a retryable error
+      if (shouldRetry(error)) {
+        if (attempt < retries) {
+          await sleep(delayMs);
+          continue;
+        }
+        throw new ResourceNotFoundError(
+          'Transaction receipt not found after retries',
+        );
+      }
+      // Re-throw non-retryable errors immediately
+      throw error;
+    }
+  }
+
+  throw new InternalError(
+    `Transaction receipt not found after ${retries + 1} attempts`,
+  );
 }
