@@ -102,6 +102,8 @@ export function renderRule<
           disabled={isDisabled}
           tooltip={tooltip}
           allowPastDate={allowPastDate}
+          removeFieldButtonName={removeFieldButtonName}
+          addFieldButtonName={addFieldButtonName}
         />
       );
     }

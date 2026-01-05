@@ -187,36 +187,30 @@ describe('nativeTokenPeriodic:context', () => {
       });
     });
 
-    it('throws an error if the expiry rule is not found', async () => {
+    it('builds context without expiry when the expiry rule is not found', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: [],
       };
 
-      await expect(
-        buildContext({
-          permissionRequest,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
 
-    it('throws an error if the permission request has no rules', async () => {
+    it('builds context without expiry when the permission request has no rules', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
-        rules: [],
+        rules: undefined,
       };
 
-      await expect(
-        buildContext({
-          permissionRequest,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
   });
 
@@ -444,17 +438,20 @@ describe('nativeTokenPeriodic:context', () => {
       );
     });
 
-    it('throws an error if the expiry rule is not found in the original request', async () => {
-      const applyingContext = applyContext({
+    it('adds an expiry rule if it is not in the original request', async () => {
+      const permissionRequest = await applyContext({
         context: alreadyPopulatedContext,
         originalRequest: {
           ...alreadyPopulatedPermissionRequest,
           rules: [],
         },
       });
-
-      await expect(applyingContext).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
+      const expiryRule = permissionRequest.rules.find(
+        (rule) => rule.type === 'expiry',
+      );
+      expect(expiryRule).toBeDefined();
+      expect(expiryRule?.data.timestamp).toBe(
+        alreadyPopulatedContext.expiry?.timestamp,
       );
     });
   });

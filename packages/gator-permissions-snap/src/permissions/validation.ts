@@ -56,14 +56,13 @@ export function validateStartTime(
   const expiryRule = rules?.find(
     (rule) => extractDescriptorName(rule.type) === 'expiry',
   );
-  // expiry rule is validated by the zod schema, but we need the expiry in order
-  // to validate the startTime
+  // If there is no expiry rule, skip validating startTime vs expiry.
   if (!expiryRule) {
-    throw new InvalidInputError('Expiry rule is required');
+    return;
   }
   const expiry = expiryRule.data.timestamp as number;
 
-  // If startTime is not provided it default to Date.now(), expiry is always in the future so no need to check.
+  // If startTime is not provided it defaults to Date.now(). If expiry is specified, the startTime must be before expiry.
   if (startTime && startTime >= expiry) {
     throw new InvalidInputError('Invalid startTime: must be before expiry');
   }

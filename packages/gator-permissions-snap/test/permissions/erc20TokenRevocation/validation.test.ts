@@ -40,6 +40,17 @@ describe('erc20TokenRevocation:validation', () => {
       expect(result).toStrictEqual(validPermissionRequest);
     });
 
+    it('allows missing expiry', () => {
+      const missingExpiryRequest = {
+        ...validPermissionRequest,
+        rules: [],
+      };
+
+      expect(() =>
+        parseAndValidatePermission(missingExpiryRequest as any),
+      ).not.toThrow();
+    });
+
     it('should throw for invalid permission type', () => {
       const invalidTypeRequest = {
         ...validPermissionRequest,
