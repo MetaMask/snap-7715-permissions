@@ -25,8 +25,11 @@ import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
+import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
+import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
+import { createTimeoutFactory } from './core/timeoutFactory';
 import {
   createProfileSyncOptions,
   getProfileSyncSdkEnv,
@@ -62,6 +65,13 @@ const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
 if (!priceApiBaseUrl) {
   throw new InternalError('PRICE_API_BASE_URL is not set');
 }
+
+const confirmationTimeoutMsString = process.env.CONFIRMATION_TIMEOUT_MS;
+if (!confirmationTimeoutMsString) {
+  throw new InternalError('CONFIRMATION_TIMEOUT_MS is not set');
+}
+
+const confirmationTimeoutMs = parseInt(confirmationTimeoutMsString, 10);
 
 // set up dependencies
 
@@ -139,17 +149,31 @@ const priceApiClient = new PriceApiClient({
 
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
+const timeoutFactory = createTimeoutFactory({
+  timeoutMs: confirmationTimeoutMs,
+});
+
 const confirmationDialogFactory = new ConfirmationDialogFactory({
-  snap,
   userEventDispatcher,
+  timeoutFactory,
+});
+
+const permissionIntroductionService = new PermissionIntroductionService({
+  stateManager,
+  userEventDispatcher,
+});
+
+const dialogInterfaceFactory = new DialogInterfaceFactory({
+  snap,
 });
 
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
-  userEventDispatcher,
   nonceCaveatService,
   snapsMetricsService,
+  permissionIntroductionService,
+  dialogInterfaceFactory,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
@@ -158,7 +182,6 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
   tokenMetadataService,
   userEventDispatcher,
   orchestrator,
-  snapsMetricsService,
 });
 
 const rpcHandler = createRpcHandler({

@@ -22,13 +22,12 @@ import {
   numberToHex,
   parseCaipAccountId,
 } from '@metamask/utils';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
-import type { SnapsMetricsService } from '../services/snapsMetricsService';
-import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
+import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
+import type { PermissionIntroductionService } from './permissionIntroduction';
 import type {
   BaseContext,
   BaseMetadata,
@@ -36,6 +35,8 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
+import type { NonceCaveatService } from '../services/nonceCaveatService';
+import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -46,30 +47,35 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
-  readonly #userEventDispatcher: UserEventDispatcher;
-
   readonly #nonceCaveatService: NonceCaveatService;
 
   readonly #snapsMetricsService: SnapsMetricsService;
 
+  readonly #permissionIntroductionService: PermissionIntroductionService;
+
+  readonly #dialogInterfaceFactory: DialogInterfaceFactory;
+
   constructor({
     accountController,
     confirmationDialogFactory,
-    userEventDispatcher,
     nonceCaveatService,
     snapsMetricsService,
+    permissionIntroductionService,
+    dialogInterfaceFactory,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
-    userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
+    permissionIntroductionService: PermissionIntroductionService;
+    dialogInterfaceFactory: DialogInterfaceFactory;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
-    this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
+    this.#permissionIntroductionService = permissionIntroductionService;
+    this.#dialogInterfaceFactory = dialogInterfaceFactory;
   }
 
   /**
@@ -131,6 +137,42 @@ export class PermissionRequestLifecycleOrchestrator {
       permissionData: permissionRequest.permission.data,
     });
 
+    // Create shared dialog interface for both intro and confirmation
+    const dialogInterface =
+      this.#dialogInterfaceFactory.createDialogInterface();
+
+    // Check if we need to show introduction
+    if (
+      await this.#permissionIntroductionService.shouldShowIntroduction(
+        permissionType,
+      )
+    ) {
+      const { wasCancelled } =
+        await this.#permissionIntroductionService.showIntroduction({
+          dialogInterface,
+          permissionType,
+        });
+
+      // If user cancelled the introduction, reject the permission request
+      if (wasCancelled) {
+        await this.#snapsMetricsService.trackPermissionRejected({
+          origin,
+          permissionType,
+          chainId: permissionRequest.chainId,
+          permissionData: permissionRequest.permission.data,
+        });
+
+        return {
+          approved: false,
+          reason: 'Permission request denied',
+        };
+      }
+
+      await this.#permissionIntroductionService.markIntroductionAsSeen(
+        permissionType,
+      );
+    }
+
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.
     await this.#accountController.getAccountAddresses();
@@ -159,14 +201,17 @@ export class PermissionRequestLifecycleOrchestrator {
       return !hasValidationErrors(metadata);
     };
 
+    // Create confirmation dialog with the shared dialog interface
+    const skeletonUi =
+      await lifecycleHandlers.createSkeletonConfirmationContent();
     const confirmationDialog =
       this.#confirmationDialogFactory.createConfirmation({
-        ui: await lifecycleHandlers.createSkeletonConfirmationContent(),
-        isGrantDisabled: true,
+        dialogInterface,
+        ui: skeletonUi,
         onBeforeGrant,
       });
 
-    const interfaceId = await confirmationDialog.createInterface();
+    const interfaceId = await confirmationDialog.initialize();
 
     try {
       context = await lifecycleHandlers.buildContext(

@@ -5,6 +5,7 @@ import { ManageStateOperation, SnapError } from '@metamask/snaps-sdk';
 export type GatorPermissionsState = {
   profileSyncAuthenticationSession: LoginResponse | null;
   profileSyncUserStorageKey: string | null;
+  seenPermissionIntroductions: string[];
 };
 
 export type StateManager = {
@@ -37,10 +38,15 @@ export function createStateManager(
         return {
           profileSyncAuthenticationSession: null,
           profileSyncUserStorageKey: null,
+          seenPermissionIntroductions: [],
         };
       }
 
-      return state;
+      // Ensure backward compatibility for existing states without seenPermissionIntroductions
+      return {
+        ...state,
+        seenPermissionIntroductions: state.seenPermissionIntroductions ?? [],
+      };
     } catch (error: any) {
       throw new SnapError('Failed to get state', error);
     }

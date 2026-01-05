@@ -13,6 +13,7 @@ import { parseCaipAssetType } from '@metamask/utils';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
 import {
+  AddressField,
   ShowMoreText,
   SkeletonField,
   TextField,
@@ -35,6 +36,7 @@ export type PermissionHandlerContentProps = {
   tokenIconData?: IconData | undefined;
   isJustificationCollapsed: boolean;
   origin: string;
+  delegateAddress: string;
   context: BaseContext;
   tokenBalance: string | null;
   tokenBalanceFiat: string | null;
@@ -50,6 +52,7 @@ export type PermissionHandlerContentProps = {
  * @param options.permissionTitle - The title of the permission.
  * @param options.permissionSubtitle - The subtitle of the permission.
  * @param options.origin - The origin of the permission request.
+ * @param options.delegateAddress - The address that will receive the delegated permission.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
  * @param options.tokenSymbol - The symbol of the token.
@@ -68,6 +71,7 @@ export const PermissionHandlerContent = ({
   permissionTitle,
   permissionSubtitle,
   origin,
+  delegateAddress,
   justification,
   networkName,
   tokenSymbol,
@@ -157,8 +161,13 @@ export const PermissionHandlerContent = ({
         </Section>
         <Section>
           <TextField
-            label={t('recipientLabel')}
+            label={t('requestFromLabel')}
             value={origin}
+            tooltip={t('requestFromTooltip')}
+          />
+          <AddressField
+            label={t('recipientLabel')}
+            address={delegateAddress}
             tooltip={t('recipientTooltip')}
           />
           <TextField
@@ -198,19 +207,41 @@ export const SkeletonPermissionHandlerContent = ({
           <Text>{t(permissionSubtitle)}</Text>
         </Box>
         <Section>
+         
+          <Box direction="vertical">
+            <Box direction="horizontal" alignment="space-between">
+              <Box direction="horizontal">
+                <Text>{t('accountLabel')}</Text>
+                <TooltipIcon tooltip={t('accountTooltip')} />
+              </Box>
+            </Box>
+            <Skeleton />
+          </Box>
+        </Section>
+        <Section>
+        <SkeletonField
+            label={t('reasonLabel')}
+            tooltip={t('reasonTooltip')}
+          />
+        </Section>
+        <Section>
           <SkeletonField
+            label={t('requestFromLabel')}
+            tooltip={t('requestFromTooltip')}
+          />
+           <SkeletonField
             label={t('recipientLabel')}
             tooltip={t('recipientTooltip')}
           />
-          <SkeletonField
+           <SkeletonField
             label={t('networkLabel')}
             tooltip={t('networkTooltip')}
           />
           <SkeletonField label={t('tokenLabel')} tooltip={t('tokenTooltip')} />
-          <SkeletonField
-            label={t('reasonLabel')}
-            tooltip={t('reasonTooltip')}
-          />
+        </Section>
+        <Section>
+          <Skeleton />
+          <Skeleton />
         </Section>
       </Box>
     </Box>

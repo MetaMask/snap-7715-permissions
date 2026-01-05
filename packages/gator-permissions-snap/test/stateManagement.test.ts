@@ -40,6 +40,7 @@ describe('KernelStateManager', () => {
       expect(result).toStrictEqual({
         profileSyncAuthenticationSession: null,
         profileSyncUserStorageKey: null,
+        seenPermissionIntroductions: [],
       });
     });
 
@@ -78,6 +79,7 @@ describe('KernelStateManager', () => {
       await stateManager.setState({
         profileSyncAuthenticationSession: mockLoginResponse,
         profileSyncUserStorageKey: 'user.storage.test',
+        seenPermissionIntroductions: [],
       });
 
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({
@@ -102,6 +104,7 @@ describe('KernelStateManager', () => {
         stateManager.setState({
           profileSyncAuthenticationSession: mockLoginResponse,
           profileSyncUserStorageKey: 'user.storage.test',
+          seenPermissionIntroductions: [],
         }),
       ).rejects.toThrow('Failed to set state');
     });
