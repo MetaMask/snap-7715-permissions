@@ -30,7 +30,7 @@ import { z } from 'zod';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 export type RevocationMetadata = {
-  txHash: Hex;
+  txHash?: Hex | undefined;
 };
 
 // Constants for validation
@@ -41,11 +41,9 @@ const zStoredGrantedPermission = z.object({
   permissionResponse: zPermissionResponse,
   siteOrigin: z.string().min(1, 'Site origin cannot be empty'),
   isRevoked: z.boolean().default(false),
-  revocationMetadata: z
-    .object({
-      txHash: zHexStr,
-    })
-    .optional(),
+  revocationMetadata: z.object({
+    txHash: zHexStr.optional(),
+  }),
 });
 
 /**
@@ -118,7 +116,7 @@ export type ProfileSyncManager = {
   updatePermissionRevocationStatus: (
     permissionContext: Hex,
     isRevoked: boolean,
-    revocationMetadata?: RevocationMetadata,
+    revocationMetadata: RevocationMetadata,
   ) => Promise<void>;
 };
 
@@ -126,7 +124,7 @@ export type StoredGrantedPermission = {
   permissionResponse: PermissionResponse;
   siteOrigin: string;
   isRevoked: boolean;
-  revocationMetadata?: RevocationMetadata | undefined;
+  revocationMetadata: RevocationMetadata;
 };
 
 /**
@@ -378,7 +376,7 @@ export function createProfileSyncManager(
   async function updatePermissionRevocationStatus(
     permissionContext: Hex,
     isRevoked: boolean,
-    revocationMetadata?: RevocationMetadata,
+    revocationMetadata: RevocationMetadata,
   ): Promise<void> {
     try {
       const existingPermission = await getGrantedPermission(permissionContext);
@@ -402,10 +400,9 @@ export function createProfileSyncManager(
         isRevoked,
       };
 
-      // Attach metadata if specified
-      if (revocationMetadata) {
-        updatedPermission.revocationMetadata = revocationMetadata;
-      }
+      isRevoked
+        ? (updatedPermission.revocationMetadata = revocationMetadata)
+        : (updatedPermission.revocationMetadata.txHash = undefined);
 
       await storeGrantedPermission(updatedPermission);
       logger.debug('Profile Sync: Successfully stored updated permission');

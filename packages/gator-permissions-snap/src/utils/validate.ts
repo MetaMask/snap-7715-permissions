@@ -42,11 +42,9 @@ export const validatePermissionRequestParam = (
 // Validation schema for revocation parameters
 const zRevocationParams = z.object({
   permissionContext: zHexStr,
-  revocationMetadata: z
-    .object({
-      txHash: zHexStr,
-    })
-    .optional(),
+  revocationMetadata: z.object({
+    txHash: zHexStr.optional(),
+  }),
 });
 
 /**
@@ -57,23 +55,14 @@ const zRevocationParams = z.object({
  */
 export function validateRevocationParams(params: Json): {
   permissionContext: Hex;
-  revocationMetadata?: RevocationMetadata;
+  revocationMetadata: RevocationMetadata;
 } {
   try {
     if (!params || typeof params !== 'object') {
       throw new InvalidInputError('Parameters are required');
     }
 
-    const validated = zRevocationParams.parse(params);
-
-    return validated.revocationMetadata
-      ? {
-          revocationMetadata: validated.revocationMetadata,
-          permissionContext: validated.permissionContext,
-        }
-      : {
-          permissionContext: validated.permissionContext,
-        };
+    return zRevocationParams.parse(params);
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new InvalidInputError(extractZodError(error.errors));

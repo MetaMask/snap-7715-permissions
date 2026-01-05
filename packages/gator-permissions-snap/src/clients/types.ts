@@ -121,7 +121,7 @@ export type TransactionReceipt = {
   }[];
   logsBloom: Hex;
   status: Hex;
-  to: Hex;
+  to: Hex | null;
   transactionHash: Hex;
   transactionIndex: Hex;
   type: Hex;

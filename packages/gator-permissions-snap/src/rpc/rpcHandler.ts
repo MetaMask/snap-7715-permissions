@@ -101,6 +101,7 @@ export function createRpcHandler({
         permissionResponse: permissionResponse.response,
         siteOrigin,
         isRevoked: false,
+        revocationMetadata: {},
       };
       permissionsToStore.push(storedPermission);
     }
@@ -257,8 +258,8 @@ export function createRpcHandler({
     }
 
     // Check if the transaction is confirmed on-chain
-    if (revocationMetadata) {
-      const { txHash } = revocationMetadata;
+    const { txHash } = revocationMetadata;
+    if (txHash) {
       const isTransactionValid =
         await blockchainMetadataClient.checkTransactionReceipt({
           txHash,
