@@ -41,9 +41,11 @@ const zStoredGrantedPermission = z.object({
   permissionResponse: zPermissionResponse,
   siteOrigin: z.string().min(1, 'Site origin cannot be empty'),
   isRevoked: z.boolean().default(false),
-  revocationMetadata: z.object({
-    txHash: zHexStr.optional(),
-  }),
+  revocationMetadata: z
+    .object({
+      txHash: zHexStr.optional(),
+    })
+    .default({}),
 });
 
 /**
@@ -366,8 +368,7 @@ export function createProfileSyncManager(
   }
 
   /**
-   * Updates the revocation status of a granted permission when you already have the permission object.
-   * This is an optimized version that avoids re-fetching the permission.
+   * Updates the revocation status of a granted permission.
    *
    * @param permissionContext - The context of the granted permission to update.
    * @param isRevoked - The new revocation status.
