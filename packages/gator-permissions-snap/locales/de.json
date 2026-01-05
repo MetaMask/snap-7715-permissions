@@ -41,6 +41,14 @@
       "message": "Das Konto, von dem die Genehmigung erteilt wird.",
       "description": "Tooltip for the account field"
     },
+    "requestFromLabel": {
+      "message": "Anfrage von",
+      "description": "Label for the request from field"
+    },
+    "requestFromTooltip": {
+      "message": "Die Website, die die Genehmigung anfordert",
+      "description": "Tooltip for the request from field"
+    },
     "initialAmountLabel": {
       "message": "Anfangsbetrag",
       "description": "Label for the initial amount field"
@@ -260,6 +268,82 @@
     "permissionRequestSubtitleRevocation": {
       "message": "Diese Website möchte Genehmigungen, um Ihre ERC-20 Token-Genehmigungen zu widerrufen.",
       "description": "Subtitle for ERC-20 token revocation permission request"
+    },
+    "introAdvancedPermissionsTitle": {
+      "message": "Erweiterte Genehmigungen geben Ihnen die Kontrolle",
+      "description": "Title for the advanced permissions introduction page"
+    },
+    "introSecureLimitedAccessTitle": {
+      "message": "Sicherer, eingeschränkter Zugriff",
+      "description": "Title for the secure limited access bullet point"
+    },
+    "introSecureLimitedAccessDescription": {
+      "message": "Beschränken Sie Websites und widerrufen Sie Zugriffe ohne Gasgebühren.",
+      "description": "Description for the secure limited access bullet point"
+    },
+    "introFullyCustomizableControlTitle": {
+      "message": "Vollständig anpassbare Kontrolle",
+      "description": "Title for the fully customizable control bullet point"
+    },
+    "introFullyCustomizableControlDescription": {
+      "message": "Überprüfen, bearbeiten oder fügen Sie Regeln hinzu, damit Genehmigungen Ihren Anforderungen entsprechen.",
+      "description": "Description for the fully customizable control bullet point"
+    },
+    "introTransparentConvenientTitle": {
+      "message": "Transparent und bequem",
+      "description": "Title for the transparent and convenient bullet point"
+    },
+    "introTransparentConvenientDescription": {
+      "message": "Verwalten, automatisieren und bearbeiten Sie Genehmigungen einfach von einem Ort aus.",
+      "description": "Description for the transparent and convenient bullet point"
+    },
+    "introSubscriptionTitle": {
+      "message": "Diese Website möchte ein Token-Abonnement erstellen",
+      "description": "Title for the subscription permission introduction page"
+    },
+    "introRecurringPaymentsTitle": {
+      "message": "Wiederkehrende Zahlungen, Ihre Bedingungen",
+      "description": "Title for the recurring payments bullet point"
+    },
+    "introRecurringPaymentsDescription": {
+      "message": "Erlauben Sie dieser Website, Token automatisch in regelmäßigen Abständen aus Ihrer Wallet abzuheben – wie ein Abonnementdienst für die Blockchain.",
+      "description": "Description for the recurring payments bullet point"
+    },
+    "introStreamTitle": {
+      "message": "Diese Website möchte einen Token-Stream erstellen",
+      "description": "Title for the stream permission introduction page"
+    },
+    "introContinuousTokenFlowTitle": {
+      "message": "Kontinuierlicher Token-Fluss",
+      "description": "Title for the continuous token flow bullet point"
+    },
+    "introContinuousTokenFlowDescription": {
+      "message": "Ermöglichen Sie schrittweise Echtzeit-Token-Transfers aus Ihrer Wallet – Token fließen stetig über die Zeit, anstatt alles auf einmal zu bewegen.",
+      "description": "Description for the continuous token flow bullet point"
+    },
+    "introRevocationTitle": {
+      "message": "Diese Website bittet um Token-Widerrufsgenehmigungen",
+      "description": "Title for the revocation permission introduction page"
+    },
+    "introManageTokenApprovalsTitle": {
+      "message": "Verwalten Sie Ihre Token-Genehmigungen",
+      "description": "Title for the manage token approvals bullet point"
+    },
+    "introManageTokenApprovalsDescription": {
+      "message": "Erlauben Sie dieser Website, bestehende Token-Genehmigungen in Ihrem Namen zu widerrufen – hilft Ihnen, alte Genehmigungen aufzuräumen und Risiken zu reduzieren.",
+      "description": "Description for the manage token approvals bullet point"
+    },
+    "introPermissionInControlTitle": {
+      "message": "Genehmigung unter Ihrer Kontrolle",
+      "description": "Title for the permission in your control bullet point"
+    },
+    "introPermissionInControlDescription": {
+      "message": "Sie können diese Genehmigung jederzeit in den erweiterten Genehmigungen bearbeiten oder widerrufen.",
+      "description": "Description for the permission in your control bullet point"
+    },
+    "introGotItButton": {
+      "message": "Verstanden",
+      "description": "Text for the got it button on introduction pages"
     }
   }
 }

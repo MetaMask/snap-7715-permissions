@@ -41,6 +41,14 @@
       "message": "授予许可的账户。",
       "description": "Tooltip for the account field"
     },
+    "requestFromLabel": {
+      "message": "请求来源",
+      "description": "Label for the request from field"
+    },
+    "requestFromTooltip": {
+      "message": "请求许可的网站",
+      "description": "Tooltip for the request from field"
+    },
     "initialAmountLabel": {
       "message": "初始金额",
       "description": "Label for the initial amount field"
@@ -260,6 +268,82 @@
     "permissionRequestSubtitleRevocation": {
       "message": "此网站请求撤销您的 ERC-20 代币授权。",
       "description": "Subtitle for ERC-20 token revocation permission request"
+    },
+    "introAdvancedPermissionsTitle": {
+      "message": "高级许可让您掌控一切",
+      "description": "Title for the advanced permissions introduction page"
+    },
+    "introSecureLimitedAccessTitle": {
+      "message": "安全、受限的访问",
+      "description": "Title for the secure limited access bullet point"
+    },
+    "introSecureLimitedAccessDescription": {
+      "message": "限制网站访问并撤销许可，无需支付 Gas 费用。",
+      "description": "Description for the secure limited access bullet point"
+    },
+    "introFullyCustomizableControlTitle": {
+      "message": "完全可自定义的控制",
+      "description": "Title for the fully customizable control bullet point"
+    },
+    "introFullyCustomizableControlDescription": {
+      "message": "查看、编辑或添加规则，使许可符合您的需求。",
+      "description": "Description for the fully customizable control bullet point"
+    },
+    "introTransparentConvenientTitle": {
+      "message": "透明且便捷",
+      "description": "Title for the transparent and convenient bullet point"
+    },
+    "introTransparentConvenientDescription": {
+      "message": "在一个地方轻松管理、自动化和编辑许可。",
+      "description": "Description for the transparent and convenient bullet point"
+    },
+    "introSubscriptionTitle": {
+      "message": "此网站想要创建代币订阅",
+      "description": "Title for the subscription permission introduction page"
+    },
+    "introRecurringPaymentsTitle": {
+      "message": "定期付款，由您掌控",
+      "description": "Title for the recurring payments bullet point"
+    },
+    "introRecurringPaymentsDescription": {
+      "message": "允许此网站定期自动从您的钱包中提取代币——就像区块链上的订阅服务。",
+      "description": "Description for the recurring payments bullet point"
+    },
+    "introStreamTitle": {
+      "message": "此网站想要创建代币流",
+      "description": "Title for the stream permission introduction page"
+    },
+    "introContinuousTokenFlowTitle": {
+      "message": "持续的代币流动",
+      "description": "Title for the continuous token flow bullet point"
+    },
+    "introContinuousTokenFlowDescription": {
+      "message": "启用从您钱包的渐进式实时代币转账——代币随时间稳定流动，而不是一次性全部转移。",
+      "description": "Description for the continuous token flow bullet point"
+    },
+    "introRevocationTitle": {
+      "message": "此网站正在请求代币撤销许可",
+      "description": "Title for the revocation permission introduction page"
+    },
+    "introManageTokenApprovalsTitle": {
+      "message": "管理您的代币授权",
+      "description": "Title for the manage token approvals bullet point"
+    },
+    "introManageTokenApprovalsDescription": {
+      "message": "允许此网站代您撤销现有的代币许可——帮助您清理旧授权并降低风险。",
+      "description": "Description for the manage token approvals bullet point"
+    },
+    "introPermissionInControlTitle": {
+      "message": "许可由您掌控",
+      "description": "Title for the permission in your control bullet point"
+    },
+    "introPermissionInControlDescription": {
+      "message": "您可以随时在高级许可中编辑或撤销此许可。",
+      "description": "Description for the permission in your control bullet point"
+    },
+    "introGotItButton": {
+      "message": "知道了",
+      "description": "Text for the got it button on introduction pages"
     }
   }
 }

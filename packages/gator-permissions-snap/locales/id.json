@@ -41,6 +41,14 @@
       "message": "",
       "description": "Tooltip for the account field"
     },
+    "requestFromLabel": {
+      "message": "",
+      "description": "Label for the request from field"
+    },
+    "requestFromTooltip": {
+      "message": "",
+      "description": "Tooltip for the request from field"
+    },
     "initialAmountLabel": {
       "message": "",
       "description": "Label for the initial amount field"
@@ -260,6 +268,82 @@
     "permissionRequestSubtitleRevocation": {
       "message": "",
       "description": "Subtitle for ERC-20 token revocation permission request"
+    },
+    "introAdvancedPermissionsTitle": {
+      "message": "",
+      "description": "Title for the advanced permissions introduction page"
+    },
+    "introSecureLimitedAccessTitle": {
+      "message": "",
+      "description": "Title for the secure limited access bullet point"
+    },
+    "introSecureLimitedAccessDescription": {
+      "message": "",
+      "description": "Description for the secure limited access bullet point"
+    },
+    "introFullyCustomizableControlTitle": {
+      "message": "",
+      "description": "Title for the fully customizable control bullet point"
+    },
+    "introFullyCustomizableControlDescription": {
+      "message": "",
+      "description": "Description for the fully customizable control bullet point"
+    },
+    "introTransparentConvenientTitle": {
+      "message": "",
+      "description": "Title for the transparent and convenient bullet point"
+    },
+    "introTransparentConvenientDescription": {
+      "message": "",
+      "description": "Description for the transparent and convenient bullet point"
+    },
+    "introSubscriptionTitle": {
+      "message": "",
+      "description": "Title for the subscription permission introduction page"
+    },
+    "introRecurringPaymentsTitle": {
+      "message": "",
+      "description": "Title for the recurring payments bullet point"
+    },
+    "introRecurringPaymentsDescription": {
+      "message": "",
+      "description": "Description for the recurring payments bullet point"
+    },
+    "introStreamTitle": {
+      "message": "",
+      "description": "Title for the stream permission introduction page"
+    },
+    "introContinuousTokenFlowTitle": {
+      "message": "",
+      "description": "Title for the continuous token flow bullet point"
+    },
+    "introContinuousTokenFlowDescription": {
+      "message": "",
+      "description": "Description for the continuous token flow bullet point"
+    },
+    "introRevocationTitle": {
+      "message": "",
+      "description": "Title for the revocation permission introduction page"
+    },
+    "introManageTokenApprovalsTitle": {
+      "message": "",
+      "description": "Title for the manage token approvals bullet point"
+    },
+    "introManageTokenApprovalsDescription": {
+      "message": "",
+      "description": "Description for the manage token approvals bullet point"
+    },
+    "introPermissionInControlTitle": {
+      "message": "",
+      "description": "Title for the permission in your control bullet point"
+    },
+    "introPermissionInControlDescription": {
+      "message": "",
+      "description": "Description for the permission in your control bullet point"
+    },
+    "introGotItButton": {
+      "message": "",
+      "description": "Text for the got it button on introduction pages"
     }
   }
 }

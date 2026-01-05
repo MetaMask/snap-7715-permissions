@@ -16,6 +16,7 @@ import type {
 } from './types';
 import advancedPermissionsImage from '../../../images/advanced-permissions.svg';
 import newPermissionTypeImage from '../../../images/new-permission-type.svg';
+import { t } from '../../utils/i18n';
 
 // Button name constants for event handling
 export const PERMISSION_INTRODUCTION_CONFIRM_BUTTON =
@@ -29,80 +30,73 @@ export const PERMISSION_INTRODUCTION_PAGE_2_DOT = 'intro-page-2-dot';
  */
 const fixedPage2Content: PermissionIntroductionPageConfig = {
   headerImageSvg: advancedPermissionsImage,
-  title: 'Advanced permissions keep you in control',
+  title: 'introAdvancedPermissionsTitle',
   bulletPoints: [
     {
       icon: 'security-key',
-      title: 'Secure, limited access',
-      description: 'Restrict sites and revoke access with no gas fees.',
+      title: 'introSecureLimitedAccessTitle',
+      description: 'introSecureLimitedAccessDescription',
     },
     {
       icon: 'customize',
-      title: 'Fully customizable control',
-      description: 'Review, edit, or add rules so permissions meet your needs.',
+      title: 'introFullyCustomizableControlTitle',
+      description: 'introFullyCustomizableControlDescription',
     },
     {
       icon: 'sparkle',
-      title: 'Transparent and convenient',
-      description:
-        'Easily manage, automate, and edit permissions all from one place.',
+      title: 'introTransparentConvenientTitle',
+      description: 'introTransparentConvenientDescription',
     },
   ],
 };
 
 const subscriptionPage1Content: PermissionIntroductionPageConfig = {
   headerImageSvg: newPermissionTypeImage,
-  title: 'This site wants to create a token subscription',
+  title: 'introSubscriptionTitle',
   bulletPoints: [
     {
       icon: 'info',
-      title: 'Recurring payments, your terms',
-      description:
-        'Allow this site to automatically withdraw tokens from your wallet at regular intervals—like a subscription service for the blockchain.',
+      title: 'introRecurringPaymentsTitle',
+      description: 'introRecurringPaymentsDescription',
     },
     {
       icon: 'edit',
-      title: 'Permission in your control',
-      description:
-        'You can edit or revoke this permission at any time in advanced permissions.',
+      title: 'introPermissionInControlTitle',
+      description: 'introPermissionInControlDescription',
     },
   ],
 };
 
 const streamPage1Content: PermissionIntroductionPageConfig = {
   headerImageSvg: newPermissionTypeImage,
-  title: 'This site wants to create a token stream',
+  title: 'introStreamTitle',
   bulletPoints: [
     {
       icon: 'info',
-      title: 'Continuous token flow',
-      description:
-        'Enable gradual, real-time token transfers from your wallet—tokens flow steadily over time rather than moving all at once.',
+      title: 'introContinuousTokenFlowTitle',
+      description: 'introContinuousTokenFlowDescription',
     },
     {
       icon: 'edit',
-      title: 'Permission in your control',
-      description:
-        'You can edit or revoke this permission at any time in advanced permissions.',
+      title: 'introPermissionInControlTitle',
+      description: 'introPermissionInControlDescription',
     },
   ],
 };
 
 const revocationPage1Content: PermissionIntroductionPageConfig = {
   headerImageSvg: newPermissionTypeImage,
-  title: 'This site is asking for token revocation permissions',
+  title: 'introRevocationTitle',
   bulletPoints: [
     {
       icon: 'info',
-      title: 'Manage your token approvals',
-      description:
-        'Allow this site to revoke existing token permissions on your behalf—helping you clean up old approvals and reduce risk.',
+      title: 'introManageTokenApprovalsTitle',
+      description: 'introManageTokenApprovalsDescription',
     },
     {
       icon: 'edit',
-      title: 'Permission in your control',
-      description:
-        'You can edit or revoke this permission at any time in advanced permissions.',
+      title: 'introPermissionInControlTitle',
+      description: 'introPermissionInControlDescription',
     },
   ],
 };
@@ -167,7 +161,7 @@ export function buildIntroductionContent(
           src={pageConfig.headerImageSvg}
           alt="Introduction illustration"
         />
-        <Heading size="md">{pageConfig.title}</Heading>
+        <Heading size="md">{t(pageConfig.title)}</Heading>
         {pageConfig.bulletPoints.map((point, index) => (
           <Box key={`bullet-${index}`} direction="horizontal" alignment="start">
             <Box>
@@ -175,9 +169,9 @@ export function buildIntroductionContent(
             </Box>
             <Box direction="vertical">
               <Text size="md">
-                <Bold>{point.title}</Bold>
+                <Bold>{t(point.title)}</Bold>
               </Text>
-              <Text>{point.description}</Text>
+              <Text>{t(point.description)}</Text>
             </Box>
           </Box>
         ))}
@@ -191,7 +185,9 @@ export function buildIntroductionContent(
         </Box>
       </Box>
       <Footer>
-        <Button name={PERMISSION_INTRODUCTION_CONFIRM_BUTTON}>Got it</Button>
+        <Button name={PERMISSION_INTRODUCTION_CONFIRM_BUTTON}>
+          {t('introGotItButton')}
+        </Button>
       </Footer>
     </Container>
   );

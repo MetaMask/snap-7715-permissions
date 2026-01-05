@@ -41,6 +41,14 @@
       "message": "La cuenta desde la cual se otorga el permiso.",
       "description": "Tooltip for the account field"
     },
+    "requestFromLabel": {
+      "message": "Solicitud de",
+      "description": "Label for the request from field"
+    },
+    "requestFromTooltip": {
+      "message": "El sitio que solicita el permiso",
+      "description": "Tooltip for the request from field"
+    },
     "initialAmountLabel": {
       "message": "Monto inicial",
       "description": "Label for the initial amount field"
@@ -260,6 +268,82 @@
     "permissionRequestSubtitleRevocation": {
       "message": "Este sitio quiere permisos para revocar tus aprobaciones de tokens ERC-20.",
       "description": "Subtitle for ERC-20 token revocation permission request"
+    },
+    "introAdvancedPermissionsTitle": {
+      "message": "Los permisos avanzados te mantienen en control",
+      "description": "Title for the advanced permissions introduction page"
+    },
+    "introSecureLimitedAccessTitle": {
+      "message": "Acceso seguro y limitado",
+      "description": "Title for the secure limited access bullet point"
+    },
+    "introSecureLimitedAccessDescription": {
+      "message": "Restringe sitios y revoca accesos sin tarifas de gas.",
+      "description": "Description for the secure limited access bullet point"
+    },
+    "introFullyCustomizableControlTitle": {
+      "message": "Control totalmente personalizable",
+      "description": "Title for the fully customizable control bullet point"
+    },
+    "introFullyCustomizableControlDescription": {
+      "message": "Revisa, edita o agrega reglas para que los permisos se ajusten a tus necesidades.",
+      "description": "Description for the fully customizable control bullet point"
+    },
+    "introTransparentConvenientTitle": {
+      "message": "Transparente y conveniente",
+      "description": "Title for the transparent and convenient bullet point"
+    },
+    "introTransparentConvenientDescription": {
+      "message": "Administra, automatiza y edita permisos fácilmente desde un solo lugar.",
+      "description": "Description for the transparent and convenient bullet point"
+    },
+    "introSubscriptionTitle": {
+      "message": "Este sitio quiere crear una suscripción de tokens",
+      "description": "Title for the subscription permission introduction page"
+    },
+    "introRecurringPaymentsTitle": {
+      "message": "Pagos recurrentes, tus términos",
+      "description": "Title for the recurring payments bullet point"
+    },
+    "introRecurringPaymentsDescription": {
+      "message": "Permite que este sitio retire tokens automáticamente de tu billetera a intervalos regulares, como un servicio de suscripción para blockchain.",
+      "description": "Description for the recurring payments bullet point"
+    },
+    "introStreamTitle": {
+      "message": "Este sitio quiere crear un flujo de tokens",
+      "description": "Title for the stream permission introduction page"
+    },
+    "introContinuousTokenFlowTitle": {
+      "message": "Flujo continuo de tokens",
+      "description": "Title for the continuous token flow bullet point"
+    },
+    "introContinuousTokenFlowDescription": {
+      "message": "Habilita transferencias graduales de tokens en tiempo real desde tu billetera: los tokens fluyen constantemente en lugar de moverse todos a la vez.",
+      "description": "Description for the continuous token flow bullet point"
+    },
+    "introRevocationTitle": {
+      "message": "Este sitio solicita permisos de revocación de tokens",
+      "description": "Title for the revocation permission introduction page"
+    },
+    "introManageTokenApprovalsTitle": {
+      "message": "Administra tus aprobaciones de tokens",
+      "description": "Title for the manage token approvals bullet point"
+    },
+    "introManageTokenApprovalsDescription": {
+      "message": "Permite que este sitio revoque permisos de tokens existentes en tu nombre, ayudándote a limpiar aprobaciones antiguas y reducir riesgos.",
+      "description": "Description for the manage token approvals bullet point"
+    },
+    "introPermissionInControlTitle": {
+      "message": "Permiso bajo tu control",
+      "description": "Title for the permission in your control bullet point"
+    },
+    "introPermissionInControlDescription": {
+      "message": "Puedes editar o revocar este permiso en cualquier momento en permisos avanzados.",
+      "description": "Description for the permission in your control bullet point"
+    },
+    "introGotItButton": {
+      "message": "Entendido",
+      "description": "Text for the got it button on introduction pages"
     }
   }
 }

@@ -41,6 +41,14 @@
       "message": "The account from which the permission is being granted.",
       "description": "Tooltip for the account field"
     },
+    "requestFromLabel": {
+      "message": "Request from",
+      "description": "Label for the request from field"
+    },
+    "requestFromTooltip": {
+      "message": "The site requesting the permission",
+      "description": "Tooltip for the request from field"
+    },
     "initialAmountLabel": {
       "message": "Initial Amount",
       "description": "Label for the initial amount field"
@@ -260,6 +268,82 @@
     "permissionRequestSubtitleRevocation": {
       "message": "This site wants permissions to revoke your ERC-20 token approvals.",
       "description": "Subtitle for ERC-20 token revocation permission request"
+    },
+    "introAdvancedPermissionsTitle": {
+      "message": "Advanced permissions keep you in control",
+      "description": "Title for the advanced permissions introduction page"
+    },
+    "introSecureLimitedAccessTitle": {
+      "message": "Secure, limited access",
+      "description": "Title for the secure limited access bullet point"
+    },
+    "introSecureLimitedAccessDescription": {
+      "message": "Restrict sites and revoke access with no gas fees.",
+      "description": "Description for the secure limited access bullet point"
+    },
+    "introFullyCustomizableControlTitle": {
+      "message": "Fully customizable control",
+      "description": "Title for the fully customizable control bullet point"
+    },
+    "introFullyCustomizableControlDescription": {
+      "message": "Review, edit, or add rules so permissions meet your needs.",
+      "description": "Description for the fully customizable control bullet point"
+    },
+    "introTransparentConvenientTitle": {
+      "message": "Transparent and convenient",
+      "description": "Title for the transparent and convenient bullet point"
+    },
+    "introTransparentConvenientDescription": {
+      "message": "Easily manage, automate, and edit permissions all from one place.",
+      "description": "Description for the transparent and convenient bullet point"
+    },
+    "introSubscriptionTitle": {
+      "message": "This site wants to create a token subscription",
+      "description": "Title for the subscription permission introduction page"
+    },
+    "introRecurringPaymentsTitle": {
+      "message": "Recurring payments, your terms",
+      "description": "Title for the recurring payments bullet point"
+    },
+    "introRecurringPaymentsDescription": {
+      "message": "Allow this site to automatically withdraw tokens from your wallet at regular intervals—like a subscription service for the blockchain.",
+      "description": "Description for the recurring payments bullet point"
+    },
+    "introStreamTitle": {
+      "message": "This site wants to create a token stream",
+      "description": "Title for the stream permission introduction page"
+    },
+    "introContinuousTokenFlowTitle": {
+      "message": "Continuous token flow",
+      "description": "Title for the continuous token flow bullet point"
+    },
+    "introContinuousTokenFlowDescription": {
+      "message": "Enable gradual, real-time token transfers from your wallet—tokens flow steadily over time rather than moving all at once.",
+      "description": "Description for the continuous token flow bullet point"
+    },
+    "introRevocationTitle": {
+      "message": "This site is asking for token revocation permissions",
+      "description": "Title for the revocation permission introduction page"
+    },
+    "introManageTokenApprovalsTitle": {
+      "message": "Manage your token approvals",
+      "description": "Title for the manage token approvals bullet point"
+    },
+    "introManageTokenApprovalsDescription": {
+      "message": "Allow this site to revoke existing token permissions on your behalf—helping you clean up old approvals and reduce risk.",
+      "description": "Description for the manage token approvals bullet point"
+    },
+    "introPermissionInControlTitle": {
+      "message": "Permission in your control",
+      "description": "Title for the permission in your control bullet point"
+    },
+    "introPermissionInControlDescription": {
+      "message": "You can edit or revoke this permission at any time in advanced permissions.",
+      "description": "Description for the permission in your control bullet point"
+    },
+    "introGotItButton": {
+      "message": "Got it",
+      "description": "Text for the got it button on introduction pages"
     }
   }
 }

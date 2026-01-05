@@ -207,7 +207,6 @@ export const SkeletonPermissionHandlerContent = ({
           <Text>{t(permissionSubtitle)}</Text>
         </Box>
         <Section>
-         
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
               <Box direction="horizontal">
@@ -219,7 +218,7 @@ export const SkeletonPermissionHandlerContent = ({
           </Box>
         </Section>
         <Section>
-        <SkeletonField
+          <SkeletonField
             label={t('reasonLabel')}
             tooltip={t('reasonTooltip')}
           />
@@ -229,11 +228,11 @@ export const SkeletonPermissionHandlerContent = ({
             label={t('requestFromLabel')}
             tooltip={t('requestFromTooltip')}
           />
-           <SkeletonField
+          <SkeletonField
             label={t('recipientLabel')}
             tooltip={t('recipientTooltip')}
           />
-           <SkeletonField
+          <SkeletonField
             label={t('networkLabel')}
             tooltip={t('networkTooltip')}
           />
