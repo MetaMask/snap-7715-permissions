@@ -13,7 +13,6 @@ import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
 } from './types';
-import { createExpiryRule } from '../rules';
 
 export const PERIOD_AMOUNT_ELEMENT = 'native-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'native-token-periodic-period-type';
@@ -113,10 +112,29 @@ export const startTimeRule: RuleDefinition<
   }),
 };
 
-export const expiryRule = createExpiryRule<
+export const expiryRule: RuleDefinition<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
->({ elementName: EXPIRY_ELEMENT });
+> = {
+  name: EXPIRY_ELEMENT,
+  label: 'Expiry',
+  type: 'datetime',
+  getRuleData: ({ context, metadata }) => ({
+    value: timestampToISO8601(context.expiry.timestamp),
+    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
+    isVisible: true,
+    tooltip: 'The expiry date of the permission.',
+    error: metadata.validationErrors.expiryError,
+    allowPastDate: false,
+  }),
+  updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
+    ...context,
+    expiry: {
+      ...context.expiry,
+      timestamp: iso8601ToTimestamp(value),
+    },
+  }),
+};
 
 export const allRules = [
   periodAmountRule,
