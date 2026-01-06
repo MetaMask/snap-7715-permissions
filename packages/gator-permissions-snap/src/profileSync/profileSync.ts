@@ -180,7 +180,11 @@ export function createProfileSyncManager(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
       );
     },
-    updatePermissionRevocationStatus: async (_: Hex, __: boolean) => {
+    updatePermissionRevocationStatus: async (
+      _: Hex,
+      __: boolean,
+      ___: RevocationMetadata,
+    ) => {
       logger.debug(
         'unConfiguredProfileSyncManager.updatePermissionRevocationStatus()',
       );
