@@ -3,7 +3,7 @@ import { type Hex } from 'viem';
 export type BasePermissionRequest = {
   justification: string | null;
   startTime: number | null;
-  expiry: number;
+  expiry: number | null;
   isAdjustmentAllowed: boolean;
 };
 
