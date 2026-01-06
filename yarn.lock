@@ -2997,6 +2997,7 @@ __metadata:
     "@metamask/eslint-config-typescript": "npm:12.1.0"
     "@metamask/snaps-cli": "npm:8.1.1"
     "@metamask/snaps-jest": "npm:9.3.0"
+    "@metamask/snaps-sdk": "npm:10.2.0"
     "@metamask/utils": "npm:11.4.2"
     "@types/react": "npm:18.2.4"
     "@types/react-dom": "npm:18.2.4"

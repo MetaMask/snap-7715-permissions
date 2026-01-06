@@ -1,5 +1,8 @@
 /* eslint-disable no-restricted-globals */
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  logger,
+  getErrorTracker,
+} from '@metamask/7715-permissions-shared/utils';
 import {
   AuthType,
   JwtBearerAuth,
@@ -218,23 +221,35 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  logger.debug(`RPC request (origin="${origin}"): method="${request.method}"`);
+  const errorTracker = getErrorTracker();
 
-  if (!isMethodAllowedForOrigin(origin, request.method)) {
-    throw new InvalidRequestError(
-      `Origin '${origin}' is not allowed to call '${request.method}'`,
+  try {
+    logger.debug(
+      `RPC request (origin="${origin}"): method="${request.method}"`,
     );
+
+    if (!isMethodAllowedForOrigin(origin, request.method)) {
+      throw new InvalidRequestError(
+        `Origin '${origin}' is not allowed to call '${request.method}'`,
+      );
+    }
+
+    const handler = boundRpcHandlers[request.method];
+
+    if (!handler) {
+      throw new MethodNotFoundError(`Method ${request.method} not found.`);
+    }
+
+    const result = await handler(request.params);
+
+    return result;
+  } catch (error) {
+    await errorTracker.captureError(error, request.method, {
+      origin,
+      errorType: 'rpc_request_handler',
+    });
+    throw error;
   }
-
-  const handler = boundRpcHandlers[request.method];
-
-  if (!handler) {
-    throw new MethodNotFoundError(`Method ${request.method} not found.`);
-  }
-
-  const result = await handler(request.params);
-
-  return result;
 };
 
 /**

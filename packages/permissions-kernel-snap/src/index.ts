@@ -1,4 +1,7 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  logger,
+  getErrorTracker,
+} from '@metamask/7715-permissions-shared/utils';
 import {
   InvalidParamsError,
   LimitExceededError,
@@ -48,6 +51,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
+  const errorTracker = getErrorTracker();
+
   // Check if another request is already being processed
   if (activeProcessingLock !== null) {
     logger.warn(
@@ -97,6 +102,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     });
 
     return result;
+  } catch (error) {
+    await errorTracker.captureError(error, request.method || 'unknown', {
+      origin,
+      errorType: 'rpc_request_handler',
+      snapName: 'permissions-kernel-snap',
+    });
+    throw error;
   } finally {
     // Always release the processing lock we acquired, regardless of success or failure
     // Only release if we still hold the lock to avoid clobbering a newer lock
