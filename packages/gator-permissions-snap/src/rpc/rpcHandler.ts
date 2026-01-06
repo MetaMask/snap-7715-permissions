@@ -6,7 +6,7 @@ import {
 } from '@metamask/snaps-sdk';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { BlockchainTokenMetadataClient } from '../clients/blockchainMetadataClient';
+import type { BlockchainMetadataClient } from '../clients/blockchainMetadataClient';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
@@ -71,7 +71,7 @@ export function createRpcHandler({
 }: {
   permissionHandlerFactory: PermissionHandlerFactory;
   profileSyncManager: ProfileSyncManager;
-  blockchainMetadataClient: BlockchainTokenMetadataClient;
+  blockchainMetadataClient: BlockchainMetadataClient;
 }): RpcHandler {
   /**
    * Handles grant permission requests.

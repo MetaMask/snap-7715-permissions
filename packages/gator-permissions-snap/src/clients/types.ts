@@ -1,5 +1,7 @@
+import { zHexStr } from '@metamask/7715-permissions-shared/types';
 import type { Hex } from '@metamask/delegation-core';
 import type { CaipAssetType } from '@metamask/utils';
+import { z } from 'zod';
 
 /**
  * Options for configuring retry behavior.
@@ -126,6 +128,36 @@ export type TransactionReceipt = {
   transactionIndex: Hex;
   type: Hex;
 };
+
+// Zod schema for runtime validation of TransactionReceipt
+export const zTransactionReceipt = z.object({
+  blockHash: zHexStr,
+  blockNumber: zHexStr,
+  contractAddress: zHexStr.nullable(),
+  cumulativeGasUsed: zHexStr,
+  effectiveGasPrice: zHexStr,
+  from: zHexStr,
+  gasUsed: zHexStr,
+  logs: z.array(
+    z.object({
+      address: zHexStr,
+      blockHash: zHexStr,
+      blockNumber: zHexStr,
+      data: zHexStr,
+      logIndex: zHexStr,
+      removed: z.boolean(),
+      topics: z.array(zHexStr),
+      transactionHash: zHexStr,
+      transactionIndex: zHexStr,
+    }),
+  ),
+  logsBloom: zHexStr,
+  status: zHexStr,
+  to: zHexStr.nullable(),
+  transactionHash: zHexStr,
+  transactionIndex: zHexStr,
+  type: zHexStr,
+});
 
 /**
  * Interface for token metadata clients that can fetch token balance and metadata

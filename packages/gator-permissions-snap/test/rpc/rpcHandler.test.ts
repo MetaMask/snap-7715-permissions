@@ -15,7 +15,7 @@ import {
   type Json,
 } from '@metamask/snaps-sdk';
 
-import type { BlockchainTokenMetadataClient } from '../../src/clients/blockchainMetadataClient';
+import type { BlockchainMetadataClient } from '../../src/clients/blockchainMetadataClient';
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
 import type {
@@ -104,7 +104,7 @@ describe('RpcHandler', () => {
   let mockHandler: jest.Mocked<PermissionHandlerType>;
   let mockHandlerFactory: jest.Mocked<PermissionHandlerFactory>;
   let mockProfileSyncManager: jest.Mocked<ProfileSyncManager>;
-  let mockBlockchainMetadataClient: jest.Mocked<BlockchainTokenMetadataClient>;
+  let mockBlockchainMetadataClient: jest.Mocked<BlockchainMetadataClient>;
 
   beforeEach(() => {
     // Reset mocks
@@ -143,9 +143,8 @@ describe('RpcHandler', () => {
 
     mockBlockchainMetadataClient = {
       checkDelegationDisabledOnChain: jest.fn(),
-      getTokenBalanceAndMetadata: jest.fn(),
       checkTransactionReceipt: jest.fn(),
-    } as unknown as jest.Mocked<BlockchainTokenMetadataClient>;
+    } as unknown as jest.Mocked<BlockchainMetadataClient>;
 
     handler = createRpcHandler({
       permissionHandlerFactory: mockHandlerFactory,

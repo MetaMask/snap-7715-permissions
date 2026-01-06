@@ -20,7 +20,10 @@ import type {
 } from '@metamask/snaps-sdk';
 
 import { AccountApiClient } from './clients/accountApiClient';
-import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
+import {
+  BlockchainMetadataClient,
+  BlockchainTokenMetadataClient,
+} from './clients/blockchainMetadataClient';
 import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
 import { AccountController } from './core/accountController';
@@ -90,6 +93,10 @@ const nonceCaveatService = new NonceCaveatService({
 
 const accountController = new AccountController({
   snapsProvider: snap,
+  ethereumProvider: ethereum,
+});
+
+const blockchainMetadataClient = new BlockchainMetadataClient({
   ethereumProvider: ethereum,
 });
 
@@ -163,7 +170,7 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
 const rpcHandler = createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
-  blockchainMetadataClient: tokenMetadataClient,
+  blockchainMetadataClient,
 });
 
 // configure RPC methods bindings

@@ -5,7 +5,11 @@ import {
 } from '@metamask/snaps-sdk';
 import { numberToHex } from '@metamask/utils';
 
-import { BlockchainTokenMetadataClient } from '../../src/clients/blockchainMetadataClient';
+import {
+  BlockchainMetadataClient,
+  BlockchainTokenMetadataClient,
+} from '../../src/clients/blockchainMetadataClient';
+import type { TransactionReceipt } from '../../src/clients/types';
 
 describe('BlockchainTokenMetadataClient', () => {
   const mockEthereumProvider = {
@@ -477,6 +481,26 @@ describe('BlockchainTokenMetadataClient', () => {
       });
     });
   });
+});
+
+describe('BlockchainMetadataClient', () => {
+  const mockEthereumProvider = {
+    request: jest.fn(),
+  };
+  let client = new BlockchainMetadataClient({
+    ethereumProvider: mockEthereumProvider,
+  });
+
+  beforeEach(() => {
+    mockEthereumProvider.request.mockClear();
+    mockEthereumProvider.request.mockReset();
+    mockEthereumProvider.request.mockImplementation(() => {
+      throw new Error('Unexpected mock call');
+    });
+    client = new BlockchainMetadataClient({
+      ethereumProvider: mockEthereumProvider,
+    });
+  });
 
   describe('checkDelegationDisabledOnChain', () => {
     const mockDelegationHash =
@@ -677,6 +701,26 @@ describe('BlockchainTokenMetadataClient', () => {
     const mockTxHash =
       '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890' as const;
     const mockChainId = '0xaa36a7' as const;
+    const mockTransactionReceipt: TransactionReceipt = {
+      blockHash:
+        '0x1234567890123456789012345678901234567890123456789012345678901234',
+      blockNumber: '0x0',
+      contractAddress: '0x1234567890123456789012345678901234567890',
+      cumulativeGasUsed: '0x1',
+      effectiveGasPrice: '0x1',
+      from: '0x1234567890123456789012345678901234567895',
+      gasUsed:
+        '0x1234567890123456789012345678901234567890123456789012345678901234',
+      status: '0x1',
+      transactionHash: mockTxHash,
+      transactionIndex:
+        '0x1234567890123456789012345678901234567890123456789012345678901234',
+      type: '0x2',
+      logs: [],
+      logsBloom:
+        '0x1234567890123456789012345678901234567890123456789012345678901234',
+      to: '0x1234567890123456789012345678901234567892',
+    };
 
     beforeEach(() => {
       mockEthereumProvider.request.mockClear();
@@ -684,10 +728,9 @@ describe('BlockchainTokenMetadataClient', () => {
 
     it('should return true when transaction receipt status is 0x1 (success)', async () => {
       mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
-      mockEthereumProvider.request.mockResolvedValueOnce({
-        status: '0x1',
-        transactionHash: mockTxHash,
-      }); // eth_getTransactionReceipt
+      mockEthereumProvider.request.mockResolvedValueOnce(
+        mockTransactionReceipt,
+      ); // eth_getTransactionReceipt
 
       const result = await client.checkTransactionReceipt({
         txHash: mockTxHash,
@@ -709,8 +752,8 @@ describe('BlockchainTokenMetadataClient', () => {
     it('should return false when transaction receipt status is 0x0 (failure)', async () => {
       mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
       mockEthereumProvider.request.mockResolvedValueOnce({
+        ...mockTransactionReceipt,
         status: '0x0',
-        transactionHash: mockTxHash,
       }); // eth_getTransactionReceipt
 
       const result = await client.checkTransactionReceipt({
@@ -722,6 +765,18 @@ describe('BlockchainTokenMetadataClient', () => {
       expect(mockEthereumProvider.request).toHaveBeenCalledTimes(2);
     });
 
+    it('should throw ResourceNotFoundError when transaction receipt is not found', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      mockEthereumProvider.request.mockResolvedValueOnce(null); // eth_getTransactionReceipt
+
+      await expect(
+        client.checkTransactionReceipt({
+          txHash: mockTxHash,
+          chainId: mockChainId,
+        }),
+      ).rejects.toThrow('Transaction receipt not found');
+    });
+
     it('should throw InvalidInputError when chainId is missing', async () => {
       await expect(
         client.checkTransactionReceipt({
@@ -731,6 +786,21 @@ describe('BlockchainTokenMetadataClient', () => {
       ).rejects.toThrow('No chain ID provided');
 
       expect(mockEthereumProvider.request).not.toHaveBeenCalled();
+    });
+
+    it('should throw InvalidInputError when transaction receipt schema is invalid', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // eth_chainId from ensureChain
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        extraField: 'extraField',
+      }); // eth_getTransactionReceipt
+      await expect(
+        client.checkTransactionReceipt({
+          txHash: mockTxHash,
+          chainId: mockChainId,
+        }),
+      ).rejects.toThrow(
+        'Failed type validation: blockHash: Required, blockNumber: Required, contractAddress: Required, cumulativeGasUsed: Required, effectiveGasPrice: Required, from: Required, gasUsed: Required, logs: Required, logsBloom: Required, status: Required, to: Required, transactionHash: Required, transactionIndex: Required, type: Required',
+      );
     });
 
     it('should propagate ChainDisconnectedError from ensureChain', async () => {
@@ -750,10 +820,9 @@ describe('BlockchainTokenMetadataClient', () => {
       mockEthereumProvider.request.mockResolvedValueOnce('0x1'); // Wrong chain
       mockEthereumProvider.request.mockResolvedValueOnce('OK'); // switch chain
       mockEthereumProvider.request.mockResolvedValueOnce(mockChainId); // Correct chain after switch
-      mockEthereumProvider.request.mockResolvedValueOnce({
-        status: '0x1',
-        transactionHash: mockTxHash,
-      }); // eth_getTransactionReceipt
+      mockEthereumProvider.request.mockResolvedValueOnce(
+        mockTransactionReceipt,
+      ); // eth_getTransactionReceipt
 
       const result = await client.checkTransactionReceipt({
         txHash: mockTxHash,
@@ -844,10 +913,9 @@ describe('BlockchainTokenMetadataClient', () => {
         new Error('RPC error'),
       ); // eth_getTransactionReceipt (attempt 1)
       // Retry succeeds
-      mockEthereumProvider.request.mockResolvedValueOnce({
-        status: '0x1',
-        transactionHash: mockTxHash,
-      }); // eth_getTransactionReceipt (retry)
+      mockEthereumProvider.request.mockResolvedValueOnce(
+        mockTransactionReceipt,
+      ); // eth_getTransactionReceipt (retry)
 
       const result = await client.checkTransactionReceipt({
         txHash: mockTxHash,

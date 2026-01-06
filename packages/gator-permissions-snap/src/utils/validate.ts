@@ -10,6 +10,8 @@ import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
+import type { TransactionReceipt } from '../clients/types';
+import { zTransactionReceipt } from '../clients/types';
 import type { RevocationMetadata } from '../profileSync';
 
 export const validateGetGrantedPermissionsParams = (
@@ -70,3 +72,23 @@ export function validateRevocationParams(params: Json): {
     throw error;
   }
 }
+
+/**
+ * Validates the transaction receipt.
+ * @param transactionReceipt - The transaction receipt to validate.
+ * @returns The validated transaction receipt.
+ * @throws InvalidInputError if validation fails.
+ */
+export const validateTransactionReceipt = (
+  transactionReceipt: unknown,
+): TransactionReceipt => {
+  const validatedTransactionReceipt =
+    zTransactionReceipt.safeParse(transactionReceipt);
+  if (!validatedTransactionReceipt.success) {
+    throw new InvalidInputError(
+      extractZodError(validatedTransactionReceipt.error.errors),
+    );
+  }
+
+  return validatedTransactionReceipt.data;
+};

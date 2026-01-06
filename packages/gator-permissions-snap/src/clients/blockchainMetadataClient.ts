@@ -44,9 +44,6 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
   // keccak256('symbol()')
   static readonly #symbolCalldata = '0x95d89b41';
 
-  // keccak256('disabledDelegations(bytes32)')
-  static readonly #disabledDelegationsCalldata = '0x2d40d052';
-
   constructor({
     ethereumProvider,
   }: {
@@ -232,6 +229,42 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
     // Retry other errors (network issues, temporary failures, etc.)
     return true;
   }
+}
+
+/**
+ * Client that fetches blockchain metadata using the ethereum provider for on-chain checks.
+ */
+export class BlockchainMetadataClient {
+  readonly #ethereumProvider: SnapsEthereumProvider;
+
+  // keccak256('disabledDelegations(bytes32)')
+  static readonly #disabledDelegationsCalldata = '0x2d40d052';
+
+  constructor({
+    ethereumProvider,
+  }: {
+    ethereumProvider: SnapsEthereumProvider;
+  }) {
+    this.#ethereumProvider = ethereumProvider;
+  }
+
+  /**
+   * Determines if an error is retryable.
+   * @param error - The error to check.
+   * @returns True if the error is retryable.
+   */
+  #isRetryableError(error: unknown): boolean {
+    // Don't retry chain disconnection errors or invalid input errors
+    if (
+      error instanceof ChainDisconnectedError ||
+      error instanceof InvalidInputError
+    ) {
+      return false;
+    }
+
+    // Retry other errors (network issues, temporary failures, etc.)
+    return true;
+  }
 
   /**
    * Checks if a delegation is disabled on-chain by calling the DelegationManager contract.
@@ -291,7 +324,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
     // Encode the function call data for disabledDelegations(bytes32)
     const encodedParams = delegationHash.slice(2).padStart(64, '0'); // Remove 0x and pad to 32 bytes
     const callData =
-      `${BlockchainTokenMetadataClient.#disabledDelegationsCalldata}${encodedParams}` as Hex;
+      `${BlockchainMetadataClient.#disabledDelegationsCalldata}${encodedParams}` as Hex;
 
     try {
       const result = await callContract({
@@ -349,7 +382,7 @@ export class BlockchainTokenMetadataClient implements TokenMetadataClient {
     txHash: Hex;
     chainId: Hex;
   }): Promise<boolean> {
-    logger.debug('BlockchainTokenMetadataClient:checkTransactionReceipt()', {
+    logger.debug('BlockchainMetadataClient:checkTransactionReceipt()', {
       txHash,
       chainId,
     });

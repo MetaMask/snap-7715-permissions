@@ -403,7 +403,7 @@ export function createProfileSyncManager(
 
       isRevoked
         ? (updatedPermission.revocationMetadata = revocationMetadata)
-        : (updatedPermission.revocationMetadata.txHash = undefined);
+        : (updatedPermission.revocationMetadata = {});
 
       await storeGrantedPermission(updatedPermission);
       logger.debug('Profile Sync: Successfully stored updated permission');

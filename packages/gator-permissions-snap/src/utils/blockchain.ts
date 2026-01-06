@@ -8,6 +8,7 @@ import {
 import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import { sleep } from './httpClient';
+import { validateTransactionReceipt } from './validate';
 import type { RetryOptions, TransactionReceipt } from '../clients/types';
 
 /**
@@ -162,7 +163,7 @@ export async function getTransactionReceipt({
         throw new ResourceNotFoundError('Transaction receipt not found');
       }
 
-      return result as TransactionReceipt;
+      return validateTransactionReceipt(result);
     } catch (error) {
       // Check if this is a retryable error
       if (shouldRetry(error)) {
