@@ -98,14 +98,12 @@ export const applyExpiryRule = <
 
   let rules: (typeof originalRequest)['rules'] = originalRequest.rules || [];
 
-  const existingExpiryRule = rules.find(
+  const existingRuleIndex = rules.findIndex(
     (rule) => extractDescriptorName(rule.type) === 'expiry',
   );
 
   if (expiryTimestamp) {
-    if (existingExpiryRule) {
-      existingExpiryRule.data.timestamp = expiryTimestamp;
-    } else {
+    if (existingRuleIndex === -1) {
       rules = [
         ...rules,
         {
@@ -114,9 +112,19 @@ export const applyExpiryRule = <
           isAdjustmentAllowed: true,
         },
       ];
+    } else {
+      rules = rules.map((rule, index) => {
+        if (index === existingRuleIndex) {
+          return {
+            ...rule,
+            data: { ...rule.data, timestamp: expiryTimestamp },
+          };
+        }
+        return rule;
+      });
     }
-  } else if (existingExpiryRule) {
-    rules = rules.filter((rule) => rule !== existingExpiryRule);
+  } else if (existingRuleIndex !== -1) {
+    rules = rules.filter((_, index) => index !== existingRuleIndex);
   }
 
   return {
