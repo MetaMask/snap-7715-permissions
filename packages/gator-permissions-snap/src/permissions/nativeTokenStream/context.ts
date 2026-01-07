@@ -163,7 +163,7 @@ export async function buildContext({
         timestamp: expiryRule.data.timestamp,
         isAdjustmentAllowed: expiryRule?.isAdjustmentAllowed ?? true,
       }
-    : undefined;
+    : null;
 
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,
@@ -204,7 +204,7 @@ export async function buildContext({
   );
 
   return {
-    ...(expiry ? { expiry } : {}),
+    expiry,
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,

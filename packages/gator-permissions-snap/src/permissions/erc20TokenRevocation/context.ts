@@ -113,7 +113,7 @@ export async function buildContext({
         timestamp: expiryRule.data.timestamp,
         isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
       }
-    : undefined;
+    : null;
 
   const accountAddressCaip10 = toCaipAccountId(
     CHAIN_NAMESPACE,
@@ -122,7 +122,7 @@ export async function buildContext({
   );
 
   return {
-    ...(expiry ? { expiry } : {}),
+    expiry,
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,
