@@ -9,11 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.0]
 
-### Uncategorized
+### Changed
 
-- chore: implement datetime picker ([#235](https://github.com/MetaMask/snap-7715-permissions/pull/235))
-- better error handling and messages ([#232](https://github.com/MetaMask/snap-7715-permissions/pull/232))
-- Correct yarn upgrade ([#222](https://github.com/MetaMask/snap-7715-permissions/pull/222))
+- Expiry is now optional ([#240](https://github.com/MetaMask/snap-7715-permissions/pull/240))
 
 ## [0.5.0]
 
