@@ -56,7 +56,7 @@ export const createExpiryRule = <
       error: metadata.validationErrors.expiryError,
       allowPastDate: false,
     }),
-    updateContext: (context: TContext, value: string) => {
+    updateContext: (context: TContext, value: string | undefined) => {
       let expiry:
         | { timestamp: number; isAdjustmentAllowed: boolean }
         | undefined;
