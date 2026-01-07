@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- Expiry is now optional ([#240](https://github.com/MetaMask/snap-7715-permissions/pull/240))
+- fix: resolve 0 balance when token data is returned, but not the requested token ([#241](https://github.com/MetaMask/snap-7715-permissions/pull/241))
+- feat: add permission introduction logic ([#238](https://github.com/MetaMask/snap-7715-permissions/pull/238))
+- chore: show recipient field ([#239](https://github.com/MetaMask/snap-7715-permissions/pull/239))
+- feat: timeout when user doesn't respond ([#237](https://github.com/MetaMask/snap-7715-permissions/pull/237))
+- Remove (unused) UserEventDispatcher from Orchestrator, and don't pass SnapsMetricsService to PermissionHandlerFactory constructor. ([#236](https://github.com/MetaMask/snap-7715-permissions/pull/236))
+- chore: implement datetime picker ([#235](https://github.com/MetaMask/snap-7715-permissions/pull/235))
+- feat: add `erc-20-token-revocation` permission type ([#234](https://github.com/MetaMask/snap-7715-permissions/pull/234))
+- better error handling and messages ([#232](https://github.com/MetaMask/snap-7715-permissions/pull/232))
+- chore: make token fetching more robust ([#233](https://github.com/MetaMask/snap-7715-permissions/pull/233))
+- Allow zero initial amount. ([#230](https://github.com/MetaMask/snap-7715-permissions/pull/230))
+- Change Streaming period to Monthly ([#229](https://github.com/MetaMask/snap-7715-permissions/pull/229))
+
 ## [0.7.0]
 
 ### Fixed

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- chore: implement datetime picker ([#235](https://github.com/MetaMask/snap-7715-permissions/pull/235))
+- better error handling and messages ([#232](https://github.com/MetaMask/snap-7715-permissions/pull/232))
+- Correct yarn upgrade ([#222](https://github.com/MetaMask/snap-7715-permissions/pull/222))
+
 ## [0.5.0]
 
 ### Fixed
