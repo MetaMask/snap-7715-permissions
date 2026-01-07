@@ -8,7 +8,7 @@ type ERC20TokenRevocationFormProps = {
 export const ERC20TokenRevocationForm = ({
   onChange,
 }: ERC20TokenRevocationFormProps) => {
-  const [expiry, setExpiry] = useState(
+  const [expiry, setExpiry] = useState<number | null>(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30,
   );
   const [justification, setJustification] = useState(
@@ -27,7 +27,11 @@ export const ERC20TokenRevocationForm = ({
 
   const handleExpiryChange = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setExpiry(Number(value));
+      if (value.trim() === '') {
+        setExpiry(null);
+      } else {
+        setExpiry(Number(value));
+      }
     },
     [],
   );
@@ -67,7 +71,7 @@ export const ERC20TokenRevocationForm = ({
           type="number"
           id="expiry"
           name="expiry"
-          value={expiry}
+          value={expiry ?? ''}
           onChange={handleExpiryChange}
         />
       </div>

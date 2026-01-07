@@ -21,8 +21,10 @@ export const ERC20TokenStreamForm = ({
   const [maxAmount, setMaxAmount] = useState<bigint | null>(
     BigInt(bigIntToHex(parseUnits('2.5', decimals))),
   );
-  const [startTime, setStartTime] = useState<number | null>(Math.floor(Date.now() / 1000));
-  const [expiry, setExpiry] = useState(
+  const [startTime, setStartTime] = useState<number | null>(
+    Math.floor(Date.now() / 1000),
+  );
+  const [expiry, setExpiry] = useState<number | null>(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
   );
   const [justification, setJustification] = useState(
@@ -94,7 +96,11 @@ export const ERC20TokenStreamForm = ({
     ({
       target: { value: inputValue },
     }: React.ChangeEvent<HTMLInputElement>) => {
-      setExpiry(Number(inputValue));
+      if (inputValue.trim() === '') {
+        setExpiry(null);
+      } else {
+        setExpiry(Number(inputValue));
+      }
     },
     [],
   );
@@ -208,7 +214,7 @@ export const ERC20TokenStreamForm = ({
           type="number"
           id="expiry"
           name="expiry"
-          value={expiry}
+          value={expiry ?? ''}
           onChange={handleExpiryChange}
         />
       </div>

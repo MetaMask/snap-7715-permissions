@@ -2,6 +2,7 @@ import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
 import { timestampToISO8601, iso8601ToTimestamp } from '../../utils/time';
 import { getIconData } from '../iconUtil';
+import { createExpiryRule } from '../rules';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
@@ -33,10 +34,7 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
     tooltip: 'The initial amount of tokens that can be streamed.',
     error: metadata.validationErrors.initialAmountError,
   }),
-  updateContext: (
-    context: NativeTokenStreamContext,
-    value: string | undefined,
-  ) => ({
+  updateContext: (context: NativeTokenStreamContext, value: string | null) => ({
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
@@ -58,10 +56,7 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
     iconData: getIconData(context),
     error: metadata.validationErrors.maxAmountError,
   }),
-  updateContext: (
-    context: NativeTokenStreamContext,
-    value: string | undefined,
-  ) => ({
+  updateContext: (context: NativeTokenStreamContext, value: string | null) => ({
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
@@ -132,26 +127,10 @@ export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
   }),
 };
 
-export const expiryRule: NativeTokenStreamRuleDefinition = {
-  name: EXPIRY_ELEMENT,
-  label: 'Expiry',
-  type: 'datetime',
-  getRuleData: ({ context, metadata }) => ({
-    value: timestampToISO8601(context.expiry.timestamp),
-    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
-    isVisible: true,
-    tooltip: 'The expiry date of the permission.',
-    error: metadata.validationErrors.expiryError,
-    allowPastDate: false,
-  }),
-  updateContext: (context: NativeTokenStreamContext, value: string) => ({
-    ...context,
-    expiry: {
-      ...context.expiry,
-      timestamp: iso8601ToTimestamp(value),
-    },
-  }),
-};
+export const expiryRule = createExpiryRule<
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata
+>({ elementName: EXPIRY_ELEMENT });
 
 export const allRules = [
   initialAmountRule,

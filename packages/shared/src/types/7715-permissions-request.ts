@@ -54,18 +54,6 @@ export const zPermissionRequest = z.object({
    * Defines the allowed behavior the signer can do on behalf of the account.
    */
   rules: z.array(zRule).superRefine((rules, ctx) => {
-    // Check for expiry rule
-    const hasExpiryRule = rules.some(
-      (rule) => extractDescriptorName(rule.type) === 'expiry',
-    );
-
-    if (!hasExpiryRule) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Expiry rule is required',
-      });
-    }
-
     // Check for duplicate rule types
     const ruleTypes = rules.map((rule) => extractDescriptorName(rule.type));
     const uniqueRuleTypes = new Set(ruleTypes);

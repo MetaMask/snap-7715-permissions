@@ -47,7 +47,7 @@ describe('nativeTokenPeriodic:validation', () => {
       expect(result).toStrictEqual(validPermissionRequest);
     });
 
-    it('should throw for missing expiry', () => {
+    it('allows missing expiry', () => {
       const missingExpiryRequest = {
         ...validPermissionRequest,
         rules: [],
@@ -55,7 +55,7 @@ describe('nativeTokenPeriodic:validation', () => {
 
       expect(() =>
         parseAndValidatePermission(missingExpiryRequest as any),
-      ).toThrow('Expiry rule is required');
+      ).not.toThrow();
     });
 
     it('should throw for invalid permission type', () => {

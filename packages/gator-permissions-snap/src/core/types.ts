@@ -38,10 +38,12 @@ export type TypedPermissionRequest<TPermission extends Permission> =
  * Each permission type will extend this with their specific context needs.
  */
 export type BaseContext = {
-  expiry: {
-    timestamp: number;
-    isAdjustmentAllowed: boolean;
-  };
+  expiry:
+    | {
+        timestamp: number;
+        isAdjustmentAllowed: boolean;
+      }
+    | undefined;
   isAdjustmentAllowed: boolean;
   justification: string;
   accountAddressCaip10: CaipAccountId;
