@@ -145,7 +145,7 @@ export async function buildContext({
         timestamp: expiryRule.data.timestamp,
         isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
       }
-    : null;
+    : undefined;
 
   const periodAmount = formatUnitsFromHex({
     value: data.periodAmount,

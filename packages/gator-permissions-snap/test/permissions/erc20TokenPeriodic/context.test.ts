@@ -214,7 +214,8 @@ describe('erc20TokenPeriodic:context', () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: undefined,
-      };
+        // rules is optional, but may not be explicitly set to undefined
+      } as unknown as Erc20TokenPeriodicPermissionRequest;
 
       const context = await buildContext({
         permissionRequest,

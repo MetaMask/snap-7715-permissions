@@ -166,7 +166,7 @@ export async function buildContext({
         timestamp: expiryRule.data.timestamp,
         isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
       }
-    : null;
+    : undefined;
 
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,

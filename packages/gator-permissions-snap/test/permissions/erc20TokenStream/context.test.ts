@@ -260,7 +260,8 @@ describe('erc20TokenStream:context', () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: undefined,
-      };
+        // rules is optional, but may not be explicitly set to undefined
+      } as unknown as Erc20TokenStreamPermissionRequest;
 
       const context = await buildContext({
         permissionRequest,

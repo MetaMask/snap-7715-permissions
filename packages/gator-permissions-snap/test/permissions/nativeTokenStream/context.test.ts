@@ -209,7 +209,8 @@ describe('nativeTokenStream:context', () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: undefined,
-      };
+        // rules is optional, but may not be explicitly set to undefined
+      } as unknown as NativeTokenStreamPermissionRequest;
 
       const context = await buildContext({
         permissionRequest,
