@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.0]
 
-### Uncategorized
+### Changed
 
-- Update introduction content ([#245](https://github.com/MetaMask/snap-7715-permissions/pull/245))
+- Update introduction content to ensure accuracy, and better communicate permission types ([#245](https://github.com/MetaMask/snap-7715-permissions/pull/245))
 - Convert introduction images to webp ([#244](https://github.com/MetaMask/snap-7715-permissions/pull/244))
 
 ## [0.8.0]
