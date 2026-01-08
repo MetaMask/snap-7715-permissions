@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0]
+
+### Changed
+
+- Update introduction content to ensure accuracy, and better communicate permission types ([#245](https://github.com/MetaMask/snap-7715-permissions/pull/245))
+- Convert introduction images to webp ([#244](https://github.com/MetaMask/snap-7715-permissions/pull/244))
+
 ## [0.8.0]
 
 ### Added
@@ -257,7 +264,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.8.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.9.0...HEAD
+[0.9.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.8.0...@metamask/gator-permissions-snap@0.9.0
 [0.8.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.7.0...@metamask/gator-permissions-snap@0.8.0
 [0.7.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.6.1...@metamask/gator-permissions-snap@0.7.0
 [0.6.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.6.0...@metamask/gator-permissions-snap@0.6.1
