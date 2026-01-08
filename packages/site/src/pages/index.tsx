@@ -58,12 +58,12 @@ import {
 } from '../styles';
 import { isLocalSnap } from '../utils';
 
-/* eslint-disable no-restricted-globals */
-const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
+const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
 
-const ALL_CHAINS = Object.values(chains);
 
-const supportedChainsString = process.env.GATSBY_SUPPORTED_CHAINS;
+const ALL_CHAINS = [...Object.values(chains)];
+
+const supportedChainsString = import.meta.env.VITE_SUPPORTED_CHAINS;
 
 const DEFAULT_CHAINS = [chains.sepolia];
 

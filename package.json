@@ -25,7 +25,7 @@
     "test": "yarn workspaces foreach --worktree --parallel --interlaced --verbose run test"
   },
   "devDependencies": {
-    "@lavamoat/allow-scripts": "3.3.4",
+    "@lavamoat/allow-scripts": "3.4.1",
     "@lavamoat/preinstall-always-fail": "2.1.1",
     "@metamask/create-release-branch": "4.1.3",
     "@metamask/eslint-config": "12.2.0",
@@ -44,7 +44,7 @@
     "eslint-plugin-promise": "6.6.0",
     "prettier": "3.6.2",
     "prettier-plugin-packagejson": "2.5.18",
-    "sharp": "0.32.6",
+    "sharp": "0.34.5",
     "typescript": "5.8.3"
   },
   "packageManager": "yarn@4.10.1",
@@ -58,6 +58,7 @@
     }
   },
   "resolutions": {
-    "gatsby/path-to-regexp": "0.1.12"
+    "qs": "^6.14.1",
+    "sharp": "0.34.5"
   }
 }
