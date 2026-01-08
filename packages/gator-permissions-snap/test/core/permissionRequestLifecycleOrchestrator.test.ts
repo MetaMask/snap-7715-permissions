@@ -462,7 +462,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result).toBeDefined();
       });
 
-      it('throws an error when expiry rule is not present', async () => {
+      it('does not throw an error when expiry rule is not present', async () => {
         const mockPermissionRequestWithRandomRule = {
           ...mockPermissionRequest,
           rules: [
@@ -488,12 +488,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
             lifecycleHandlerMocks,
           );
 
-        await expect(orchestrationPromise).rejects.toThrow(
-          'Expiry rule not found. An expiry is required on all permissions.',
-        );
+        const result = await orchestrationPromise;
+        expect(result).toBeDefined();
       });
 
-      it('throws an error when rules are not defined', async () => {
+      it('does not throw an error when rules are not defined', async () => {
         const mockPermissionRequestWithRandomRule = {
           ...mockPermissionRequest,
           rules: undefined,
@@ -513,10 +512,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
             lifecycleHandlerMocks,
           );
 
-        await expect(orchestrationPromise).rejects.toThrow(
-          'Expiry rule not found. An expiry is required on all permissions.',
-        );
+        const result = await orchestrationPromise;
+
+        expect(result).toBeDefined();
       });
+
       it('checks account upgrade status and triggers upgrade when needed', async () => {
         mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
           isUpgraded: false,

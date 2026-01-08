@@ -190,6 +190,8 @@ export function t(key: MessageKey, substitutions?: string[]): string {
   return substituteVariables(message, substitutions);
 }
 
+export type TranslateFunction = typeof t;
+
 /**
  * Get current locale code.
  *

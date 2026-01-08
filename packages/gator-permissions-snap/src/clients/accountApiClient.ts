@@ -4,7 +4,7 @@ import {
 } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { type Hex } from '@metamask/delegation-core';
-import { InvalidInputError, ResourceNotFoundError } from '@metamask/snaps-sdk';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
 import type { TokenBalanceAndMetadata, RetryOptions } from './types';
@@ -146,7 +146,7 @@ export class AccountApiClient {
     chainId: number;
     account: Hex;
     assetAddress?: Hex | undefined;
-    retryOptions?: RetryOptions;
+    retryOptions?: RetryOptions | undefined;
   }): Promise<bigint> {
     if (!chainId) {
       const message = 'No chainId provided to fetch token balance';
@@ -172,25 +172,18 @@ export class AccountApiClient {
     // Parse and validate the response
     const { balances, count } = response;
 
-    // If count is 0 or balances array is empty, it means the token has no balance (0 balance)
-    if (count === 0 || balances.length === 0) {
-      logger.info(
-        `No balance found for token ${tokenAddress} on account ${account}`,
-      );
-      return 0n;
-    }
-
     // Find the token in the balances array
     const tokenAddressLowerCase = tokenAddress.toLowerCase();
     const tokenData = balances.find(
       (token) => token.address.toLowerCase() === tokenAddressLowerCase,
     );
 
-    if (!tokenData) {
-      logger.error(`Token ${tokenAddress} not found in balance response`);
-      throw new ResourceNotFoundError(
-        `Token ${tokenAddress} not found in balance response`,
+    // If count is 0 or no data is found for the token, it means the token has no balance (0 balance)
+    if (count === 0 || tokenData === undefined) {
+      logger.info(
+        `No balance found for token ${tokenAddress} on account ${account}`,
       );
+      return 0n;
     }
 
     // Convert balance string to BigInt
@@ -220,7 +213,7 @@ export class AccountApiClient {
   }: {
     chainId: number;
     assetAddress?: Hex | undefined;
-    retryOptions?: RetryOptions;
+    retryOptions?: RetryOptions | undefined;
   }): Promise<{ decimals: number; symbol: string; iconUrl?: string }> {
     if (!chainId) {
       const message = 'No chainId provided to fetch token metadata';
@@ -275,13 +268,18 @@ export class AccountApiClient {
     retryOptions?: RetryOptions;
   }): Promise<TokenBalanceAndMetadata> {
     // Fetch balance and metadata in parallel for better performance
-    const balancePromise = retryOptions
-      ? this.getTokenBalance({ chainId, assetAddress, account, retryOptions })
-      : this.getTokenBalance({ chainId, assetAddress, account });
+    const balancePromise = this.getTokenBalance({
+      chainId,
+      assetAddress,
+      account,
+      retryOptions,
+    });
 
-    const metadataPromise = retryOptions
-      ? this.getTokenMetadata({ chainId, assetAddress, retryOptions })
-      : this.getTokenMetadata({ chainId, assetAddress });
+    const metadataPromise = this.getTokenMetadata({
+      chainId,
+      assetAddress,
+      retryOptions,
+    });
 
     const [balance, metadata] = await Promise.all([
       balancePromise,

@@ -7,9 +7,9 @@ import type { MessageKey } from '../../utils/i18n';
  */
 export type PermissionIntroductionBulletPoint = {
   /** The icon to display next to the bullet point */
-  icon: `${IconName}`;
+  icon?: `${IconName}`;
   /** The translation key for the bold title text */
-  title: MessageKey;
+  title?: MessageKey;
   /** The translation key for the description text */
   description: MessageKey;
 };

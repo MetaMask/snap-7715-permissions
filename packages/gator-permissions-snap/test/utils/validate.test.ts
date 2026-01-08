@@ -137,6 +137,30 @@ describe('validatePermissionRequestParam', () => {
         expect(result).toStrictEqual(expiryRuleParam);
       }).not.toThrow();
     });
+
+    it('should validate with rules without expiry rule', () => {
+      const withoutExpiryRule = {
+        permissionsRequest: [
+          {
+            ...validPermissionRequest,
+            rules: [
+              {
+                type: 'allowance',
+                isAdjustmentAllowed: true,
+                data: {
+                  timestamp: Math.floor(Date.now() / 1000) + 86400,
+                },
+              },
+            ],
+          },
+        ],
+        siteOrigin: 'https://example.com',
+      };
+      expect(() => {
+        const result = validatePermissionRequestParam(withoutExpiryRule);
+        expect(result).toStrictEqual(withoutExpiryRule);
+      }).not.toThrow();
+    });
   });
 
   describe('invalid cases', () => {
@@ -251,28 +275,6 @@ describe('validatePermissionRequestParam', () => {
       expect(() => {
         validatePermissionRequestParam({
           permissionsRequest: [invalidPermission],
-          siteOrigin: 'https://example.com',
-        });
-      }).toThrow(InvalidInputError);
-    });
-
-    it('should throw InvalidInputError for rules without expiry rule', () => {
-      expect(() => {
-        validatePermissionRequestParam({
-          permissionsRequest: [
-            {
-              ...validPermissionRequest,
-              rules: [
-                {
-                  type: 'allowance',
-                  isAdjustmentAllowed: true,
-                  data: {
-                    timestamp: Math.floor(Date.now() / 1000) + 86400,
-                  },
-                },
-              ],
-            },
-          ],
           siteOrigin: 'https://example.com',
         });
       }).toThrow(InvalidInputError);

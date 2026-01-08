@@ -2,6 +2,7 @@ import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
 import { timestampToISO8601, iso8601ToTimestamp } from '../../utils/time';
 import { getIconData } from '../iconUtil';
+import { createExpiryRule } from '../rules';
 import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
@@ -33,10 +34,7 @@ export const initialAmountRule: Erc20TokenStreamRuleDefinition = {
     iconData: getIconData(context),
     error: metadata.validationErrors.initialAmountError,
   }),
-  updateContext: (
-    context: Erc20TokenStreamContext,
-    value: string | undefined,
-  ) => ({
+  updateContext: (context: Erc20TokenStreamContext, value: string | null) => ({
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
@@ -58,10 +56,7 @@ export const maxAmountRule: Erc20TokenStreamRuleDefinition = {
     iconData: getIconData(context),
     error: metadata.validationErrors.maxAmountError,
   }),
-  updateContext: (
-    context: Erc20TokenStreamContext,
-    value: string | undefined,
-  ) => ({
+  updateContext: (context: Erc20TokenStreamContext, value: string | null) => ({
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
@@ -132,26 +127,10 @@ export const streamPeriodRule: Erc20TokenStreamRuleDefinition = {
   }),
 };
 
-export const expiryRule: Erc20TokenStreamRuleDefinition = {
-  name: EXPIRY_ELEMENT,
-  label: 'expiryLabel',
-  type: 'datetime',
-  getRuleData: ({ context, metadata }) => ({
-    value: timestampToISO8601(context.expiry.timestamp),
-    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
-    isVisible: true,
-    tooltip: t('expiryTooltip'),
-    error: metadata.validationErrors.expiryError,
-    allowPastDate: false,
-  }),
-  updateContext: (context: Erc20TokenStreamContext, value: string) => ({
-    ...context,
-    expiry: {
-      ...context.expiry,
-      timestamp: iso8601ToTimestamp(value),
-    },
-  }),
-};
+export const expiryRule = createExpiryRule<
+  Erc20TokenStreamContext,
+  Erc20TokenStreamMetadata
+>({ elementName: EXPIRY_ELEMENT, translate: t });
 
 export const allRules = [
   initialAmountRule,

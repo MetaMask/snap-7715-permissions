@@ -28,7 +28,7 @@ import {
   calculateAmountPerSecond,
   validateStartTimeVsExpiry,
 } from '../contextValidation';
-
+import { applyExpiryRule } from '../rules';
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const DEFAULT_INITIAL_AMOUNT = '0x0';
@@ -38,9 +38,9 @@ const CHAIN_NAMESPACE = 'eip155';
 /**
  * Construct an amended Erc20TokenStreamPermissionRequest, based on the specified request,
  * with the changes made by the specified context.
- * @param options0 - The options object containing the context and original request.
- * @param options0.context - The Erc20 token stream context containing the updated permission details.
- * @param options0.originalRequest - The original permission request to be amended.
+ * @param options - The options object containing the context and original request.
+ * @param options.context - The Erc20 token stream context containing the updated permission details.
+ * @param options.originalRequest - The original permission request to be amended.
  * @returns A new permission request with the context changes applied.
  */
 export async function applyContext({
@@ -54,27 +54,8 @@ export async function applyContext({
     permissionDetails,
     tokenMetadata: { decimals },
   } = context;
-  const expiry = context.expiry.timestamp;
 
-  let isExpiryRuleFound = false;
-
-  const rules: Erc20TokenStreamPermissionRequest['rules'] =
-    originalRequest.rules?.map((rule) => {
-      if (extractDescriptorName(rule.type) === 'expiry') {
-        isExpiryRuleFound = true;
-        return {
-          ...rule,
-          data: { ...rule.data, timestamp: expiry },
-        };
-      }
-      return rule;
-    }) ?? [];
-
-  if (!isExpiryRuleFound) {
-    throw new InvalidInputError(
-      'Expiry rule not found. An expiry is required on all permissions.',
-    );
-  }
+  const { rules } = applyExpiryRule(context, originalRequest);
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
@@ -180,16 +161,12 @@ export async function buildContext({
     (rule) => extractDescriptorName(rule.type) === 'expiry',
   );
 
-  if (!expiryRule) {
-    throw new InvalidInputError(
-      'Expiry rule not found. An expiry is required on all permissions.',
-    );
-  }
-
-  const expiry = {
-    timestamp: expiryRule.data.timestamp,
-    isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
-  };
+  const expiry = expiryRule
+    ? {
+        timestamp: expiryRule.data.timestamp,
+        isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
+      }
+    : undefined;
 
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,
@@ -314,14 +291,20 @@ export async function deriveMetadata({
     validationErrors.startTimeError = startTimeError;
   }
 
-  // Validate expiry
-  const expiryError = validateExpiry(expiry.timestamp);
-  if (expiryError) {
-    validationErrors.expiryError = expiryError;
+  // Validate expiry if present
+  if (expiry) {
+    const expiryError = validateExpiry(expiry.timestamp);
+    if (expiryError) {
+      validationErrors.expiryError = expiryError;
+    }
   }
 
-  // Validate start time vs expiry (only if individual validations passed)
-  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+  // Validate start time vs expiry (only if individual validations passed and expiry present)
+  if (
+    expiry &&
+    !validationErrors.startTimeError &&
+    !validationErrors.expiryError
+  ) {
     const startTimeVsExpiryError = validateStartTimeVsExpiry(
       permissionDetails.startTime,
       expiry.timestamp,

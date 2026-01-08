@@ -468,10 +468,6 @@ export class PermissionRequestLifecycleOrchestrator {
         }),
         args: '0x',
       });
-    } else {
-      throw new InvalidInputError(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
     }
 
     const nonce = await this.#nonceCaveatService.getNonce({

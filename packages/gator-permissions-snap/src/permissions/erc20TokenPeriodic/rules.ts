@@ -13,6 +13,7 @@ import type {
   Erc20TokenPeriodicContext,
   Erc20TokenPeriodicMetadata,
 } from './types';
+import { createExpiryRule } from '../rules';
 import { t } from '../../utils/i18n';
 
 export const PERIOD_AMOUNT_ELEMENT = 'erc20-token-periodic-period-amount';
@@ -113,29 +114,10 @@ export const startTimeRule: RuleDefinition<
   }),
 };
 
-export const expiryRule: RuleDefinition<
+export const expiryRule = createExpiryRule<
   Erc20TokenPeriodicContext,
   Erc20TokenPeriodicMetadata
-> = {
-  name: EXPIRY_ELEMENT,
-  label: 'expiryLabel',
-  type: 'datetime',
-  getRuleData: ({ context, metadata }) => ({
-    value: timestampToISO8601(context.expiry.timestamp),
-    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
-    isVisible: true,
-    tooltip: t('expiryTooltip'),
-    error: metadata.validationErrors.expiryError,
-    allowPastDate: false,
-  }),
-  updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({
-    ...context,
-    expiry: {
-      ...context.expiry,
-      timestamp: iso8601ToTimestamp(value),
-    },
-  }),
-};
+>({ elementName: EXPIRY_ELEMENT, translate: t });
 
 export const allRules = [
   periodAmountRule,

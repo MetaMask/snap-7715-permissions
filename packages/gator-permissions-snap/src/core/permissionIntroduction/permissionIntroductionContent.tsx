@@ -11,6 +11,7 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 
 import type {
+  PermissionIntroductionBulletPoint,
   PermissionIntroductionConfig,
   PermissionIntroductionPageConfig,
 } from './types';
@@ -55,13 +56,9 @@ const subscriptionPage1Content: PermissionIntroductionPageConfig = {
   title: 'introSubscriptionTitle',
   bulletPoints: [
     {
-      icon: 'info',
-      title: 'introRecurringPaymentsTitle',
       description: 'introRecurringPaymentsDescription',
     },
     {
-      icon: 'edit',
-      title: 'introPermissionInControlTitle',
       description: 'introPermissionInControlDescription',
     },
   ],
@@ -72,13 +69,9 @@ const streamPage1Content: PermissionIntroductionPageConfig = {
   title: 'introStreamTitle',
   bulletPoints: [
     {
-      icon: 'info',
-      title: 'introContinuousTokenFlowTitle',
       description: 'introContinuousTokenFlowDescription',
     },
     {
-      icon: 'edit',
-      title: 'introPermissionInControlTitle',
       description: 'introPermissionInControlDescription',
     },
   ],
@@ -89,13 +82,9 @@ const revocationPage1Content: PermissionIntroductionPageConfig = {
   title: 'introRevocationTitle',
   bulletPoints: [
     {
-      icon: 'info',
-      title: 'introManageTokenApprovalsTitle',
       description: 'introManageTokenApprovalsDescription',
     },
     {
-      icon: 'edit',
-      title: 'introPermissionInControlTitle',
       description: 'introPermissionInControlDescription',
     },
   ],
@@ -154,6 +143,28 @@ export function buildIntroductionContent(
 ): JSX.Element {
   const pageConfig = currentPage === 1 ? config.page1 : config.page2;
 
+  const getIconContent = (point: PermissionIntroductionBulletPoint) => {
+    if (point.icon) {
+      return (
+        <Box>
+          <Icon name={point.icon} color="primary" size="inherit" />
+        </Box>
+      );
+    }
+    return null;
+  };
+
+  const getTitleContent = (point: PermissionIntroductionBulletPoint) => {
+    if (point.title) {
+      return (
+        <Text size="md">
+          <Bold>{t(point.title)}</Bold>
+        </Text>
+      );
+    }
+    return null;
+  };
+
   return (
     <Container>
       <Box direction="vertical">
@@ -164,13 +175,10 @@ export function buildIntroductionContent(
         <Heading size="md">{t(pageConfig.title)}</Heading>
         {pageConfig.bulletPoints.map((point, index) => (
           <Box key={`bullet-${index}`} direction="horizontal" alignment="start">
-            <Box>
-              <Icon name={point.icon} color="primary" size="inherit" />
-            </Box>
+            {getIconContent(point)}
+
             <Box direction="vertical">
-              <Text size="md">
-                <Bold>{t(point.title)}</Bold>
-              </Text>
+              {getTitleContent(point)}
               <Text>{t(point.description)}</Text>
             </Box>
           </Box>

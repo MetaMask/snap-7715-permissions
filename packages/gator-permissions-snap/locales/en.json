@@ -278,7 +278,7 @@
       "description": "Title for the secure limited access bullet point"
     },
     "introSecureLimitedAccessDescription": {
-      "message": "Restrict sites and revoke access with no gas fees.",
+      "message": "Restrict sites and revoke access on your terms.",
       "description": "Description for the secure limited access bullet point"
     },
     "introFullyCustomizableControlTitle": {
@@ -294,48 +294,32 @@
       "description": "Title for the transparent and convenient bullet point"
     },
     "introTransparentConvenientDescription": {
-      "message": "Easily manage, automate, and edit permissions all from one place.",
+      "message": "Easily manage permissions all from one place.",
       "description": "Description for the transparent and convenient bullet point"
     },
     "introSubscriptionTitle": {
       "message": "This site wants to create a token subscription",
       "description": "Title for the subscription permission introduction page"
     },
-    "introRecurringPaymentsTitle": {
-      "message": "Recurring payments, your terms",
-      "description": "Title for the recurring payments bullet point"
-    },
     "introRecurringPaymentsDescription": {
-      "message": "Allow this site to automatically withdraw tokens from your wallet at regular intervals—like a subscription service for the blockchain.",
+      "message": "Token subscriptions give sites permission to pull tokens from your wallet on the schedule you set.",
       "description": "Description for the recurring payments bullet point"
     },
     "introStreamTitle": {
       "message": "This site wants to create a token stream",
       "description": "Title for the stream permission introduction page"
     },
-    "introContinuousTokenFlowTitle": {
-      "message": "Continuous token flow",
-      "description": "Title for the continuous token flow bullet point"
-    },
     "introContinuousTokenFlowDescription": {
-      "message": "Enable gradual, real-time token transfers from your wallet—tokens flow steadily over time rather than moving all at once.",
+      "message": "Token streams give sites permission to pull increments of tokens from your wallet over a period of time you set.",
       "description": "Description for the continuous token flow bullet point"
     },
     "introRevocationTitle": {
       "message": "This site is asking for token revocation permissions",
       "description": "Title for the revocation permission introduction page"
     },
-    "introManageTokenApprovalsTitle": {
-      "message": "Manage your token approvals",
-      "description": "Title for the manage token approvals bullet point"
-    },
     "introManageTokenApprovalsDescription": {
-      "message": "Allow this site to revoke existing token permissions on your behalf—helping you clean up old approvals and reduce risk.",
+      "message": "Token revocation allows sites to revoke token approvals on your behalf.",
       "description": "Description for the manage token approvals bullet point"
-    },
-    "introPermissionInControlTitle": {
-      "message": "Permission in your control",
-      "description": "Title for the permission in your control bullet point"
     },
     "introPermissionInControlDescription": {
       "message": "You can edit or revoke this permission at any time in advanced permissions.",
