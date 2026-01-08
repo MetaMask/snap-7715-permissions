@@ -117,14 +117,6 @@
       "message": "",
       "description": "Tooltip for the period duration dropdown field"
     },
-    "periodDurationSecondsLabel": {
-      "message": "",
-      "description": "Label for the period duration input field in seconds"
-    },
-    "periodDurationSecondsTooltip": {
-      "message": "",
-      "description": "Tooltip for the period duration input field in seconds"
-    },
     "permissionRequestTitle": {
       "message": "",
       "description": "Title for permission request dialogs"
@@ -136,18 +128,6 @@
     "hideButton": {
       "message": "",
       "description": "Text for hide button"
-    },
-    "dateTimeFormat": {
-      "message": "",
-      "description": "Date time format display"
-    },
-    "datePlaceholder": {
-      "message": "",
-      "description": "Placeholder for date input"
-    },
-    "timePlaceholder": {
-      "message": "",
-      "description": "Placeholder for time input"
     },
     "streamRateLabel": {
       "message": "",
@@ -253,10 +233,6 @@
       "message": "",
       "description": "Validation error when period duration is zero or negative"
     },
-    "errorInvalidPeriodDuration": {
-      "message": "",
-      "description": "Validation error for invalid period duration"
-    },
     "unknownStreamRate": {
       "message": "",
       "description": "Fallback text when stream rate cannot be calculated"
@@ -301,10 +277,6 @@
       "message": "",
       "description": "Title for the subscription permission introduction page"
     },
-    "introRecurringPaymentsTitle": {
-      "message": "",
-      "description": "Title for the recurring payments bullet point"
-    },
     "introRecurringPaymentsDescription": {
       "message": "",
       "description": "Description for the recurring payments bullet point"
@@ -312,10 +284,6 @@
     "introStreamTitle": {
       "message": "",
       "description": "Title for the stream permission introduction page"
-    },
-    "introContinuousTokenFlowTitle": {
-      "message": "",
-      "description": "Title for the continuous token flow bullet point"
     },
     "introContinuousTokenFlowDescription": {
       "message": "",
@@ -325,17 +293,9 @@
       "message": "",
       "description": "Title for the revocation permission introduction page"
     },
-    "introManageTokenApprovalsTitle": {
-      "message": "",
-      "description": "Title for the manage token approvals bullet point"
-    },
     "introManageTokenApprovalsDescription": {
       "message": "",
       "description": "Description for the manage token approvals bullet point"
-    },
-    "introPermissionInControlTitle": {
-      "message": "",
-      "description": "Title for the permission in your control bullet point"
     },
     "introPermissionInControlDescription": {
       "message": "",

@@ -117,14 +117,6 @@
       "message": "La duración del período",
       "description": "Tooltip for the period duration dropdown field"
     },
-    "periodDurationSecondsLabel": {
-      "message": "Duración (segundos)",
-      "description": "Label for the period duration input field in seconds"
-    },
-    "periodDurationSecondsTooltip": {
-      "message": "La duración de cada período en segundos",
-      "description": "Tooltip for the period duration input field in seconds"
-    },
     "permissionRequestTitle": {
       "message": "Solicitud de permiso",
       "description": "Title for permission request dialogs"
@@ -136,18 +128,6 @@
     "hideButton": {
       "message": "Ocultar",
       "description": "Text for hide button"
-    },
-    "dateTimeFormat": {
-      "message": "dd/mm/aaaa hh:mm:ss",
-      "description": "Date time format display"
-    },
-    "datePlaceholder": {
-      "message": "dd/mm/aaaa",
-      "description": "Placeholder for date input"
-    },
-    "timePlaceholder": {
-      "message": "HH:MM:SS",
-      "description": "Placeholder for time input"
     },
     "streamRateLabel": {
       "message": "Tasa de transmisión",
@@ -253,10 +233,6 @@
       "message": "La duración del período debe ser mayor que 0",
       "description": "Validation error when period duration is zero or negative"
     },
-    "errorInvalidPeriodDuration": {
-      "message": "Duración del período inválida",
-      "description": "Validation error for invalid period duration"
-    },
     "unknownStreamRate": {
       "message": "Desconocido",
       "description": "Fallback text when stream rate cannot be calculated"
@@ -301,10 +277,6 @@
       "message": "Este sitio quiere crear una suscripción de tokens",
       "description": "Title for the subscription permission introduction page"
     },
-    "introRecurringPaymentsTitle": {
-      "message": "Pagos recurrentes, tus términos",
-      "description": "Title for the recurring payments bullet point"
-    },
     "introRecurringPaymentsDescription": {
       "message": "Permite que este sitio retire tokens automáticamente de tu billetera a intervalos regulares, como un servicio de suscripción para blockchain.",
       "description": "Description for the recurring payments bullet point"
@@ -312,10 +284,6 @@
     "introStreamTitle": {
       "message": "Este sitio quiere crear un flujo de tokens",
       "description": "Title for the stream permission introduction page"
-    },
-    "introContinuousTokenFlowTitle": {
-      "message": "Flujo continuo de tokens",
-      "description": "Title for the continuous token flow bullet point"
     },
     "introContinuousTokenFlowDescription": {
       "message": "Habilita transferencias graduales de tokens en tiempo real desde tu billetera: los tokens fluyen constantemente en lugar de moverse todos a la vez.",
@@ -325,17 +293,9 @@
       "message": "Este sitio solicita permisos de revocación de tokens",
       "description": "Title for the revocation permission introduction page"
     },
-    "introManageTokenApprovalsTitle": {
-      "message": "Administra tus aprobaciones de tokens",
-      "description": "Title for the manage token approvals bullet point"
-    },
     "introManageTokenApprovalsDescription": {
       "message": "Permite que este sitio revoque permisos de tokens existentes en tu nombre, ayudándote a limpiar aprobaciones antiguas y reducir riesgos.",
       "description": "Description for the manage token approvals bullet point"
-    },
-    "introPermissionInControlTitle": {
-      "message": "Permiso bajo tu control",
-      "description": "Title for the permission in your control bullet point"
     },
     "introPermissionInControlDescription": {
       "message": "Puedes editar o revocar este permiso en cualquier momento en permisos avanzados.",

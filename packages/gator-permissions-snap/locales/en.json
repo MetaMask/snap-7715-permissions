@@ -117,14 +117,6 @@
       "message": "The duration of the period",
       "description": "Tooltip for the period duration dropdown field"
     },
-    "periodDurationSecondsLabel": {
-      "message": "Duration (seconds)",
-      "description": "Label for the period duration input field in seconds"
-    },
-    "periodDurationSecondsTooltip": {
-      "message": "The length of each period in seconds",
-      "description": "Tooltip for the period duration input field in seconds"
-    },
     "permissionRequestTitle": {
       "message": "Permission request",
       "description": "Title for permission request dialogs"
@@ -136,18 +128,6 @@
     "hideButton": {
       "message": "Hide",
       "description": "Text for hide button"
-    },
-    "dateTimeFormat": {
-      "message": "mm/dd/yyyy hh:mm:ss",
-      "description": "Date time format display"
-    },
-    "datePlaceholder": {
-      "message": "mm/dd/yyyy",
-      "description": "Placeholder for date input"
-    },
-    "timePlaceholder": {
-      "message": "HH:MM:SS",
-      "description": "Placeholder for time input"
     },
     "streamRateLabel": {
       "message": "Stream rate",
@@ -252,10 +232,6 @@
     "errorPeriodDurationMustBeGreaterThanZero": {
       "message": "Period duration must be greater than 0",
       "description": "Validation error when period duration is zero or negative"
-    },
-    "errorInvalidPeriodDuration": {
-      "message": "Invalid period duration",
-      "description": "Validation error for invalid period duration"
     },
     "unknownStreamRate": {
       "message": "Unknown",

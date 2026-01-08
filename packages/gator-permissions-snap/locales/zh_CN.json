@@ -117,14 +117,6 @@
       "message": "周期的时长",
       "description": "Tooltip for the period duration dropdown field"
     },
-    "periodDurationSecondsLabel": {
-      "message": "时长（秒）",
-      "description": "Label for the period duration input field in seconds"
-    },
-    "periodDurationSecondsTooltip": {
-      "message": "每个周期的长度（秒）",
-      "description": "Tooltip for the period duration input field in seconds"
-    },
     "permissionRequestTitle": {
       "message": "许可请求",
       "description": "Title for permission request dialogs"
@@ -136,18 +128,6 @@
     "hideButton": {
       "message": "隐藏",
       "description": "Text for hide button"
-    },
-    "dateTimeFormat": {
-      "message": "mm/dd/yyyy hh:mm:ss",
-      "description": "Date time format display"
-    },
-    "datePlaceholder": {
-      "message": "mm/dd/yyyy",
-      "description": "Placeholder for date input"
-    },
-    "timePlaceholder": {
-      "message": "HH:MM:SS",
-      "description": "Placeholder for time input"
     },
     "streamRateLabel": {
       "message": "流速",
@@ -253,10 +233,6 @@
       "message": "周期时长必须大于 0",
       "description": "Validation error when period duration is zero or negative"
     },
-    "errorInvalidPeriodDuration": {
-      "message": "无效的周期时长",
-      "description": "Validation error for invalid period duration"
-    },
     "unknownStreamRate": {
       "message": "未知",
       "description": "Fallback text when stream rate cannot be calculated"
@@ -301,10 +277,6 @@
       "message": "此网站想要创建代币订阅",
       "description": "Title for the subscription permission introduction page"
     },
-    "introRecurringPaymentsTitle": {
-      "message": "定期付款，由您掌控",
-      "description": "Title for the recurring payments bullet point"
-    },
     "introRecurringPaymentsDescription": {
       "message": "允许此网站定期自动从您的钱包中提取代币——就像区块链上的订阅服务。",
       "description": "Description for the recurring payments bullet point"
@@ -312,10 +284,6 @@
     "introStreamTitle": {
       "message": "此网站想要创建代币流",
       "description": "Title for the stream permission introduction page"
-    },
-    "introContinuousTokenFlowTitle": {
-      "message": "持续的代币流动",
-      "description": "Title for the continuous token flow bullet point"
     },
     "introContinuousTokenFlowDescription": {
       "message": "启用从您钱包的渐进式实时代币转账——代币随时间稳定流动，而不是一次性全部转移。",
@@ -325,17 +293,9 @@
       "message": "此网站正在请求代币撤销许可",
       "description": "Title for the revocation permission introduction page"
     },
-    "introManageTokenApprovalsTitle": {
-      "message": "管理您的代币授权",
-      "description": "Title for the manage token approvals bullet point"
-    },
     "introManageTokenApprovalsDescription": {
       "message": "允许此网站代您撤销现有的代币许可——帮助您清理旧授权并降低风险。",
       "description": "Description for the manage token approvals bullet point"
-    },
-    "introPermissionInControlTitle": {
-      "message": "许可由您掌控",
-      "description": "Title for the permission in your control bullet point"
     },
     "introPermissionInControlDescription": {
       "message": "您可以随时在高级许可中编辑或撤销此许可。",
