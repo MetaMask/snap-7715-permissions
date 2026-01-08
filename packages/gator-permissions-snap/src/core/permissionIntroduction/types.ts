@@ -5,9 +5,9 @@ import type { IconName } from '@metamask/snaps-sdk/jsx';
  */
 export type PermissionIntroductionBulletPoint = {
   /** The icon to display next to the bullet point */
-  icon: `${IconName}`;
+  icon?: `${IconName}`;
   /** The bold title text for the bullet point */
-  title: string;
+  title?: string;
   /** The description text for the bullet point */
   description: string;
 };

@@ -11,6 +11,7 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 
 import type {
+  PermissionIntroductionBulletPoint,
   PermissionIntroductionConfig,
   PermissionIntroductionPageConfig,
 } from './types';
@@ -34,7 +35,7 @@ const fixedPage2Content: PermissionIntroductionPageConfig = {
     {
       icon: 'security-key',
       title: 'Secure, limited access',
-      description: 'Restrict sites and revoke access with no gas fees.',
+      description: 'Restrict sites and revoke access on your terms.',
     },
     {
       icon: 'customize',
@@ -44,8 +45,7 @@ const fixedPage2Content: PermissionIntroductionPageConfig = {
     {
       icon: 'sparkle',
       title: 'Transparent and convenient',
-      description:
-        'Easily manage, automate, and edit permissions all from one place.',
+      description: 'Easily manage permissions all from one place.',
     },
   ],
 };
@@ -55,14 +55,10 @@ const subscriptionPage1Content: PermissionIntroductionPageConfig = {
   title: 'This site wants to create a token subscription',
   bulletPoints: [
     {
-      icon: 'info',
-      title: 'Recurring payments, your terms',
       description:
-        'Allow this site to automatically withdraw tokens from your wallet at regular intervals—like a subscription service for the blockchain.',
+        'Token subscriptions give sites permission to pull tokens from your wallet on the schedule you set.',
     },
     {
-      icon: 'edit',
-      title: 'Permission in your control',
       description:
         'You can edit or revoke this permission at any time in advanced permissions.',
     },
@@ -74,14 +70,10 @@ const streamPage1Content: PermissionIntroductionPageConfig = {
   title: 'This site wants to create a token stream',
   bulletPoints: [
     {
-      icon: 'info',
-      title: 'Continuous token flow',
       description:
-        'Enable gradual, real-time token transfers from your wallet—tokens flow steadily over time rather than moving all at once.',
+        'Token streams give sites permission to pull increments of tokens from your wallet over a period of time you set.',
     },
     {
-      icon: 'edit',
-      title: 'Permission in your control',
       description:
         'You can edit or revoke this permission at any time in advanced permissions.',
     },
@@ -93,14 +85,10 @@ const revocationPage1Content: PermissionIntroductionPageConfig = {
   title: 'This site is asking for token revocation permissions',
   bulletPoints: [
     {
-      icon: 'info',
-      title: 'Manage your token approvals',
       description:
-        'Allow this site to revoke existing token permissions on your behalf—helping you clean up old approvals and reduce risk.',
+        'Token revocation allows sites to revoke token approvals on your behalf.',
     },
     {
-      icon: 'edit',
-      title: 'Permission in your control',
       description:
         'You can edit or revoke this permission at any time in advanced permissions.',
     },
@@ -160,6 +148,28 @@ export function buildIntroductionContent(
 ): JSX.Element {
   const pageConfig = currentPage === 1 ? config.page1 : config.page2;
 
+  const getIconContent = (point: PermissionIntroductionBulletPoint) => {
+    if (point.icon) {
+      return (
+        <Box>
+          <Icon name={point.icon} color="primary" size="inherit" />
+        </Box>
+      );
+    }
+    return null;
+  };
+
+  const getTitleContent = (point: PermissionIntroductionBulletPoint) => {
+    if (point.title) {
+      return (
+        <Text size="md">
+          <Bold>{point.title}</Bold>
+        </Text>
+      );
+    }
+    return null;
+  };
+
   return (
     <Container>
       <Box direction="vertical">
@@ -170,13 +180,10 @@ export function buildIntroductionContent(
         <Heading size="md">{pageConfig.title}</Heading>
         {pageConfig.bulletPoints.map((point, index) => (
           <Box key={`bullet-${index}`} direction="horizontal" alignment="start">
-            <Box>
-              <Icon name={point.icon} color="primary" size="inherit" />
-            </Box>
+            {getIconContent(point)}
+
             <Box direction="vertical">
-              <Text size="md">
-                <Bold>{point.title}</Bold>
-              </Text>
+              {getTitleContent(point)}
               <Text>{point.description}</Text>
             </Box>
           </Box>
