@@ -29,6 +29,7 @@ import {
   validateStartTimeVsExpiry,
 } from '../contextValidation';
 import { applyExpiryRule } from '../rules';
+
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const DEFAULT_INITIAL_AMOUNT = '0x0';

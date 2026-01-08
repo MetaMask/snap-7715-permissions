@@ -2,6 +2,7 @@ import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
+import { t } from '../../utils/i18n';
 import {
   getClosestTimePeriod,
   TIME_PERIOD_TO_SECONDS,
@@ -14,7 +15,6 @@ import type {
   Erc20TokenPeriodicMetadata,
 } from './types';
 import { createExpiryRule } from '../rules';
-import { t } from '../../utils/i18n';
 
 export const PERIOD_AMOUNT_ELEMENT = 'erc20-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'erc20-token-periodic-period-type';

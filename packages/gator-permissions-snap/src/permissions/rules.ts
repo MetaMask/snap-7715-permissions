@@ -13,13 +13,12 @@ import {
   type RuleDefinition,
   type TypedPermissionRequest,
 } from '../core/types';
+import type { TranslateFunction } from '../utils/i18n';
 import {
   iso8601ToTimestamp,
   TIME_PERIOD_TO_SECONDS,
   timestampToISO8601,
 } from '../utils/time';
-
-import type { TranslateFunction } from '../utils/i18n';
 
 export type ExpiryRuleContext = BaseContext;
 

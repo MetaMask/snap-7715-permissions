@@ -26,7 +26,9 @@ describe('createExpiryRule', () => {
 
   beforeEach(() => {
     mockTranslateFunction.mockClear();
-    mockTranslateFunction.mockImplementation((key) => `translation of: ${key}`);
+    mockTranslateFunction.mockImplementation(
+      (key: string) => `translation of: ${key}`,
+    );
   });
 
   it('returns rule definition with correct static properties', () => {
