@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-restricted-globals */
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
-import { zPermissionResponse } from '@metamask/7715-permissions-shared/types';
+import {
+  zHexStr,
+  zPermissionResponse,
+} from '@metamask/7715-permissions-shared/types';
 import {
   logger,
   extractZodError,
@@ -26,6 +29,10 @@ import { z } from 'zod';
 
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
+export type RevocationMetadata = {
+  txHash?: Hex | undefined;
+};
+
 // Constants for validation
 const MAX_STORAGE_SIZE_BYTES = 400 * 1024; // 400kb limit as documented
 
@@ -34,6 +41,11 @@ const zStoredGrantedPermission = z.object({
   permissionResponse: zPermissionResponse,
   siteOrigin: z.string().min(1, 'Site origin cannot be empty'),
   isRevoked: z.boolean().default(false),
+  revocationMetadata: z
+    .object({
+      txHash: zHexStr.optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -106,6 +118,7 @@ export type ProfileSyncManager = {
   updatePermissionRevocationStatus: (
     permissionContext: Hex,
     isRevoked: boolean,
+    revocationMetadata: RevocationMetadata,
   ) => Promise<void>;
 };
 
@@ -113,6 +126,7 @@ export type StoredGrantedPermission = {
   permissionResponse: PermissionResponse;
   siteOrigin: string;
   isRevoked: boolean;
+  revocationMetadata?: RevocationMetadata | undefined;
 };
 
 /**
@@ -166,7 +180,11 @@ export function createProfileSyncManager(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
       );
     },
-    updatePermissionRevocationStatus: async (_: Hex, __: boolean) => {
+    updatePermissionRevocationStatus: async (
+      _: Hex,
+      __: boolean,
+      ___: RevocationMetadata,
+    ) => {
       logger.debug(
         'unConfiguredProfileSyncManager.updatePermissionRevocationStatus()',
       );
@@ -354,15 +372,16 @@ export function createProfileSyncManager(
   }
 
   /**
-   * Updates the revocation status of a granted permission when you already have the permission object.
-   * This is an optimized version that avoids re-fetching the permission.
+   * Updates the revocation status of a granted permission.
    *
    * @param permissionContext - The context of the granted permission to update.
    * @param isRevoked - The new revocation status.
+   * @param revocationMetadata - The revocation transaction metadata.
    */
   async function updatePermissionRevocationStatus(
     permissionContext: Hex,
     isRevoked: boolean,
+    revocationMetadata: RevocationMetadata,
   ): Promise<void> {
     try {
       const existingPermission = await getGrantedPermission(permissionContext);
@@ -376,6 +395,7 @@ export function createProfileSyncManager(
       logger.debug('Profile Sync: Updating permission revocation status:', {
         existingPermission,
         isRevoked,
+        revocationMetadata,
       });
 
       await authenticate();
@@ -384,6 +404,10 @@ export function createProfileSyncManager(
         ...existingPermission,
         isRevoked,
       };
+
+      isRevoked
+        ? (updatedPermission.revocationMetadata = revocationMetadata)
+        : (updatedPermission.revocationMetadata = undefined);
 
       await storeGrantedPermission(updatedPermission);
       logger.debug('Profile Sync: Successfully stored updated permission');
