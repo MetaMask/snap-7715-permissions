@@ -186,7 +186,7 @@
       "description": "Warning message when account needs to be upgraded"
     },
     "removeFieldAlt": {
-      "message": " entfernen",
+      "message": "$1 entfernen",
       "description": "Alt text for remove field button"
     },
     "addFieldAlt": {
