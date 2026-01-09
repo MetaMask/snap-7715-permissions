@@ -264,17 +264,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.9.0...HEAD
-[0.9.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.8.0...v0.9.0
-[0.8.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.7.0...v0.8.0
-[0.7.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.6.1...v0.7.0
-[0.6.1]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.6.0...v0.6.1
-[0.6.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.4.1...v0.5.0
-[0.4.1]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.4.0...v0.4.1
-[0.4.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.2.1...v0.3.0
-[0.2.1]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/v0.0.1...v0.1.0
-[0.0.1]: https://github.com/MetaMask/snap-7715-permissions/releases/tag/v0.0.1
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.9.0...HEAD
+[0.9.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.8.0...@metamask/gator-permissions-snap@0.9.0
+[0.8.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.7.0...@metamask/gator-permissions-snap@0.8.0
+[0.7.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.6.1...@metamask/gator-permissions-snap@0.7.0
+[0.6.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.6.0...@metamask/gator-permissions-snap@0.6.1
+[0.6.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.5.0...@metamask/gator-permissions-snap@0.6.0
+[0.5.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.4.1...@metamask/gator-permissions-snap@0.5.0
+[0.4.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.4.0...@metamask/gator-permissions-snap@0.4.1
+[0.4.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.3.0...@metamask/gator-permissions-snap@0.4.0
+[0.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.2.1...@metamask/gator-permissions-snap@0.3.0
+[0.2.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.2.0...@metamask/gator-permissions-snap@0.2.1
+[0.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.1.0...@metamask/gator-permissions-snap@0.2.0
+[0.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.0.1...@metamask/gator-permissions-snap@0.1.0
+[0.0.1]: https://github.com/MetaMask/snap-7715-permissions/releases/tag/@metamask/gator-permissions-snap@0.0.1
