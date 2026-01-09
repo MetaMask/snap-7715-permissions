@@ -35,7 +35,7 @@
     "clean": "rimraf dist",
     "lint": "yarn lint:eslint",
     "lint:complete": "yarn lint:eslint && yarn lint:constraints && yarn lint:misc --check && yarn lint:dependencies --check && yarn lint:changelog",
-    "lint:changelog": "auto-changelog validate --prettier",
+    "lint:changelog": "auto-changelog validate --prettier --tag-prefix \"@metamask/gator-permissions-snap@\"",
     "lint:constraints": "yarn constraints",
     "lint:dependencies": "depcheck && yarn dedupe --check",
     "lint:eslint": "eslint . --cache",
