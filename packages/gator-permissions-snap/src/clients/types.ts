@@ -98,37 +98,6 @@ export type TokenBalanceAndMetadata = {
   iconUrl?: string;
 };
 
-/**
- * Represents a transaction receipt from the blockchain.
- * As defined in the Ethereum JSON-RPC API(https://docs.metamask.io/services/reference/ethereum/json-rpc-methods/eth_gettransactionreceipt/)
- */
-export type TransactionReceipt = {
-  blockHash: Hex;
-  blockNumber: Hex;
-  contractAddress: Hex | null;
-  cumulativeGasUsed: Hex;
-  effectiveGasPrice: Hex;
-  from: Hex;
-  gasUsed: Hex;
-  logs: {
-    address: Hex;
-    blockHash: Hex;
-    blockNumber: Hex;
-    data: Hex;
-    logIndex: Hex;
-    removed: boolean;
-    topics: Hex[];
-    transactionHash: Hex;
-    transactionIndex: Hex;
-  }[];
-  logsBloom: Hex;
-  status: Hex;
-  to: Hex | null;
-  transactionHash: Hex;
-  transactionIndex: Hex;
-  type: Hex;
-};
-
 // Zod schema for runtime validation of TransactionReceipt
 export const zTransactionReceipt = z.object({
   blockHash: zHexStr,
@@ -158,6 +127,12 @@ export const zTransactionReceipt = z.object({
   transactionIndex: zHexStr,
   type: zHexStr,
 });
+
+/**
+ * Represents a transaction receipt from the blockchain.
+ * As defined in the Ethereum JSON-RPC API(https://docs.metamask.io/services/reference/ethereum/json-rpc-methods/eth_gettransactionreceipt/)
+ */
+export type TransactionReceipt = z.infer<typeof zTransactionReceipt>;
 
 /**
  * Interface for token metadata clients that can fetch token balance and metadata

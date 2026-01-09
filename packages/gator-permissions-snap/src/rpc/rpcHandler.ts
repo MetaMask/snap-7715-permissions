@@ -6,7 +6,7 @@ import {
 } from '@metamask/snaps-sdk';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { BlockchainMetadataClient } from '../clients/blockchainMetadataClient';
+import type { BlockchainClient } from '../clients/blockchainClient';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
@@ -61,17 +61,17 @@ export type RpcHandler = {
  * @param config - The parameters for creating the RPC handler.
  * @param config.permissionHandlerFactory - The factory for creating permission handlers.
  * @param config.profileSyncManager - The profile sync manager.
- * @param config.blockchainMetadataClient - The blockchain metadata client for on-chain checks.
+ * @param config.blockchainClient - The blockchain client for on-chain checks.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
-  blockchainMetadataClient,
+  blockchainClient,
 }: {
   permissionHandlerFactory: PermissionHandlerFactory;
   profileSyncManager: ProfileSyncManager;
-  blockchainMetadataClient: BlockchainMetadataClient;
+  blockchainClient: BlockchainClient;
 }): RpcHandler {
   /**
    * Handles grant permission requests.
@@ -101,7 +101,6 @@ export function createRpcHandler({
         permissionResponse: permissionResponse.response,
         siteOrigin,
         isRevoked: false,
-        revocationMetadata: {},
       };
       permissionsToStore.push(storedPermission);
     }
@@ -245,7 +244,7 @@ export function createRpcHandler({
 
     const delegationHash = hashDelegation(firstDelegation);
     const isDelegationDisabled =
-      await blockchainMetadataClient.checkDelegationDisabledOnChain({
+      await blockchainClient.checkDelegationDisabledOnChain({
         delegationHash,
         chainId: permissionChainId,
         delegationManagerAddress: delegationManager,
@@ -260,13 +259,13 @@ export function createRpcHandler({
     // Check if the transaction is confirmed on-chain
     const { txHash } = revocationMetadata;
     if (txHash) {
-      const isTransactionValid =
-        await blockchainMetadataClient.checkTransactionReceipt({
+      const isTransactionSuccessful =
+        await blockchainClient.checkTransactionReceipt({
           txHash,
           chainId: permissionChainId,
         });
 
-      if (!isTransactionValid) {
+      if (!isTransactionSuccessful) {
         throw new InvalidInputError(
           `Transaction ${txHash} was not successful. Cannot process revocation.`,
         );

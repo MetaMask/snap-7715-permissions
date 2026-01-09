@@ -45,7 +45,7 @@ const zStoredGrantedPermission = z.object({
     .object({
       txHash: zHexStr.optional(),
     })
-    .default({}),
+    .optional(),
 });
 
 /**
@@ -126,7 +126,7 @@ export type StoredGrantedPermission = {
   permissionResponse: PermissionResponse;
   siteOrigin: string;
   isRevoked: boolean;
-  revocationMetadata: RevocationMetadata;
+  revocationMetadata?: RevocationMetadata | undefined;
 };
 
 /**
@@ -407,7 +407,7 @@ export function createProfileSyncManager(
 
       isRevoked
         ? (updatedPermission.revocationMetadata = revocationMetadata)
-        : (updatedPermission.revocationMetadata = {});
+        : (updatedPermission.revocationMetadata = undefined);
 
       await storeGrantedPermission(updatedPermission);
       logger.debug('Profile Sync: Successfully stored updated permission');
