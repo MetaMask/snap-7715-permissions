@@ -176,6 +176,12 @@ export class BlockchainClient {
       throw new InvalidInputError(message);
     }
 
+    if (!txHash) {
+      const message = 'No transaction hash provided';
+      logger.error(message);
+      throw new InvalidInputError(message);
+    }
+
     await ensureChain(this.#ethereumProvider, chainId);
 
     try {
