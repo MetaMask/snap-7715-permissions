@@ -130,7 +130,7 @@
       "description": "Text for hide button"
     },
     "streamRateLabel": {
-      "message": "Stream-Rate",
+      "message": "Stream-Betrag",
       "description": "Label for stream rate field"
     },
     "streamRateTooltip": {
@@ -174,11 +174,11 @@
       "description": "Yearly time period option"
     },
     "availableLabel": {
-      "message": "verfügbar",
+      "message": "verfügbares Guthaben",
       "description": "Available label for token balance"
     },
     "permissionRequestSubtitle": {
-      "message": "Diese Website möchte Genehmigungen, um Ihre Token auszugeben.",
+      "message": "Diese Website möchte Genehmigungen, um Ihren Token auszugeben.",
       "description": "Subtitle for permission request"
     },
     "accountUpgradeWarning": {
@@ -186,7 +186,7 @@
       "description": "Warning message when account needs to be upgraded"
     },
     "removeFieldAlt": {
-      "message": "$1 entfernen",
+      "message": " entfernen",
       "description": "Alt text for remove field button"
     },
     "addFieldAlt": {
@@ -242,7 +242,7 @@
       "description": "Fallback text when chain name is not available"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": "Diese Website möchte Genehmigungen, um Ihre ERC-20 Token-Genehmigungen zu widerrufen.",
+      "message": "Diese Website möchte Genehmigungen, um Ihre ERC-20 Token Approvals zu widerrufen.",
       "description": "Subtitle for ERC-20 token revocation permission request"
     },
     "introAdvancedPermissionsTitle": {
@@ -254,7 +254,7 @@
       "description": "Title for the secure limited access bullet point"
     },
     "introSecureLimitedAccessDescription": {
-      "message": "Beschränken Sie Websites und widerrufen Sie Zugriffe ohne Gasgebühren.",
+      "message": "Beschränken Sie Websites und widerrufen Sie Zugriffe nach Ihren eigenen Vorgaben.",
       "description": "Description for the secure limited access bullet point"
     },
     "introFullyCustomizableControlTitle": {
@@ -294,7 +294,7 @@
       "description": "Title for the revocation permission introduction page"
     },
     "introManageTokenApprovalsDescription": {
-      "message": "Erlauben Sie dieser Website, bestehende Token-Genehmigungen in Ihrem Namen zu widerrufen – hilft Ihnen, alte Genehmigungen aufzuräumen und Risiken zu reduzieren.",
+      "message": "Erlauben Sie dieser Website, bestehende Token Approvals in Ihrem Namen zu widerrufen – hilft Ihnen, alte Genehmigungen aufzuräumen und Risiken zu reduzieren.",
       "description": "Description for the manage token approvals bullet point"
     },
     "introPermissionInControlDescription": {
