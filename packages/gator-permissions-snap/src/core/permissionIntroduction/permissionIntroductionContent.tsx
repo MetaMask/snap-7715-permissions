@@ -148,7 +148,9 @@ export function buildIntroductionContent(
 ): JSX.Element {
   const pageConfig = currentPage === 1 ? config.page1 : config.page2;
 
-  const getIconContent = (point: PermissionIntroductionBulletPoint) => {
+  const getIconContent = (
+    point: PermissionIntroductionBulletPoint,
+  ): JSX.Element | null => {
     if (point.icon) {
       return (
         <Box>
@@ -159,7 +161,9 @@ export function buildIntroductionContent(
     return null;
   };
 
-  const getTitleContent = (point: PermissionIntroductionBulletPoint) => {
+  const getTitleContent = (
+    point: PermissionIntroductionBulletPoint,
+  ): JSX.Element | null => {
     if (point.title) {
       return (
         <Text size="md">

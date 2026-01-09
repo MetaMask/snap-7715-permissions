@@ -3,14 +3,11 @@ import type { Hex } from '@metamask/delegation-core';
 import type { SnapsProvider } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/utils';
 
-import { type PriceApiClient } from '../clients/priceApiClient';
+import type { PriceApiClient } from '../clients/priceApiClient';
 import type { VsCurrencyParam } from '../clients/types';
 import { SUPPORTED_CURRENCIES } from '../constants';
-import {
-  FALLBACK_PREFERENCE,
-  formatAsCurrency,
-  type Preferences,
-} from '../utils/locale';
+import { FALLBACK_PREFERENCE, formatAsCurrency } from '../utils/locale';
+import type { Preferences } from '../utils/locale';
 import { formatUnits } from '../utils/value';
 
 /**
@@ -61,7 +58,7 @@ export class TokenPricesService {
    * Get the user's preferences.
    * @returns The user's preferences.
    */
-  #getPreferences = async (): Promise<Preferences> => {
+  readonly #getPreferences = async (): Promise<Preferences> => {
     const preferences = (await this.#snapsProvider.request({
       method: 'snap_getPreferences',
     })) as Preferences;
@@ -125,7 +122,7 @@ export class TokenPricesService {
       );
 
       return humanReadableValue;
-    } catch (error) {
+    } catch {
       logger.error(
         'TokenPricesService:getCryptoToFiatConversion() - failed to fetch token spot price',
       );

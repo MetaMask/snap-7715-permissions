@@ -83,7 +83,7 @@ export class PermissionRequestLifecycleOrchestrator {
    * @param chainId - The chain ID to validate.
    * @throws If the chain ID is not supported.
    */
-  #assertIsSupportedChainId(chainId: number) {
+  #assertIsSupportedChainId(chainId: number): void {
     try {
       getChainMetadata({ chainId });
     } catch (error) {
@@ -228,7 +228,7 @@ export class PermissionRequestLifecycleOrchestrator {
     }: {
       newContext: TContext;
       isGrantDisabled: boolean;
-    }) => {
+    }): Promise<void> => {
       context = newContext;
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
@@ -277,7 +277,7 @@ export class PermissionRequestLifecycleOrchestrator {
         updatedContext,
       }: {
         updatedContext: TContext;
-      }) => {
+      }): Promise<void> => {
         try {
           await updateConfirmation({
             newContext: updatedContext,
@@ -331,7 +331,7 @@ export class PermissionRequestLifecycleOrchestrator {
               });
             }
           }
-        } catch (error) {
+        } catch {
           // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
           // TODO: When we know extension has support for account upgrade, we can show an error to the user
         }
@@ -376,7 +376,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
   /**
    * Resolves a permission request into a final permission response.
-   * @private
    * @template TRequest - Type of permission request
    * @template TContext - Type of context for the permission request.
    * @template TMetadata - Type of metadata associated with the permission request.

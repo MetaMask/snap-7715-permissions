@@ -1,8 +1,8 @@
 import {
-  type Caveat,
   createERC20StreamingTerms,
   createValueLteTerms,
 } from '@metamask/delegation-core';
+import type { Caveat } from '@metamask/delegation-core';
 
 import type { PopulatedErc20TokenStreamPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';

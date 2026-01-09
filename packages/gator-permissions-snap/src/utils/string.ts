@@ -29,7 +29,7 @@ export function shortenString(
     truncatedEndChars: TRUNCATED_ADDRESS_END_CHARS,
     skipCharacterInEnd: false,
   },
-) {
+): string {
   if (stringToShorten.length < truncatedCharLimit) {
     return stringToShorten;
   }
@@ -50,7 +50,7 @@ export function shortenString(
  * @returns The shortened address, or the original if it was no longer
  * than 10 characters.
  */
-export function shortenAddress(address = '') {
+export function shortenAddress(address = ''): string {
   return shortenString(address, {
     truncatedCharLimit: TRUNCATED_NAME_CHAR_LIMIT,
     truncatedStartChars: TRUNCATED_ADDRESS_START_CHARS,

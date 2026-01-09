@@ -101,10 +101,10 @@ export enum TimePeriod {
 
 /**
  * Properties required for confirmation dialogs.
- * @property dialogInterface - The dialog interface manager for showing content
- * @property ui - The UI element to be displayed in the confirmation dialog
- * @property userEventDispatcher - The dispatcher for handling user events during confirmation
- * @property onBeforeGrant - Validation callback that runs before grant is confirmed
+ * dialogInterface - The dialog interface manager for showing content
+ * ui - The UI element to be displayed in the confirmation dialog
+ * userEventDispatcher - The dispatcher for handling user events during confirmation
+ * onBeforeGrant - Validation callback that runs before grant is confirmed
  */
 export type ConfirmationProps = {
   dialogInterface: DialogInterface;

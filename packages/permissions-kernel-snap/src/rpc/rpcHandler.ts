@@ -1,10 +1,6 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import {
-  InternalError,
-  InvalidInputError,
-  type Json,
-  type SnapsProvider,
-} from '@metamask/snaps-sdk';
+import { InternalError, InvalidInputError } from '@metamask/snaps-sdk';
+import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 
 import type { PermissionOfferRegistryManager } from '../registryManager';
 import {

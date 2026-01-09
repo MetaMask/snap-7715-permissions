@@ -14,8 +14,12 @@ export type TimeoutFactory = {
  * @param config.timeoutMs - The timeout in milliseconds.
  * @returns A timeout factory that can be used to register timeouts.
  */
-export function createTimeoutFactory({ timeoutMs }: { timeoutMs: number }) {
-  const register = (config: { onTimeout: () => Promise<void> }) => {
+export function createTimeoutFactory({
+  timeoutMs,
+}: {
+  timeoutMs: number;
+}): TimeoutFactory {
+  const register = (config: { onTimeout: () => Promise<void> }): Timeout => {
     const timeout = setTimeout(() => {
       config.onTimeout().catch((error: Error) => {
         logger.error('Error in timeout callback:', error);
@@ -23,7 +27,7 @@ export function createTimeoutFactory({ timeoutMs }: { timeoutMs: number }) {
     }, timeoutMs);
 
     return {
-      cancel: () => clearTimeout(timeout),
+      cancel: (): void => clearTimeout(timeout),
     };
   };
 

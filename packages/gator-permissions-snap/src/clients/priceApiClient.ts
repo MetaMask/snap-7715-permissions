@@ -41,11 +41,11 @@ export class PriceApiClient {
 
   constructor({
     baseUrl,
-    fetch = globalThis.fetch,
+    fetch: fetchFn = globalThis.fetch,
     timeoutMs,
     maxResponseSizeBytes,
   }: PriceApiClientConfig) {
-    this.#fetch = fetch;
+    this.#fetch = fetchFn;
     this.#baseUrl = baseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
     this.#timeoutMs = timeoutMs;
     this.#maxResponseSizeBytes = maxResponseSizeBytes;

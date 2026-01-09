@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 
 import { SnapsMetricsService } from '../../src/services/snapsMetricsService';

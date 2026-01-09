@@ -11,7 +11,7 @@ export type ValidationErrors = {
  * @param str - The string to convert.
  * @returns The converted string.
  */
-const toSentenceCase = (str: string) => {
+const toSentenceCase = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
@@ -48,7 +48,7 @@ export function validateAndParseAmount(
       };
     }
     return { amount: parsedAmount, error: null };
-  } catch (error) {
+  } catch {
     return { amount: null, error: `Invalid ${fieldName}` };
   }
 }
@@ -68,7 +68,7 @@ export function validateStartTime(startTime: number): string | undefined {
       return 'Start time must be today or later';
     }
     return undefined;
-  } catch (error) {
+  } catch {
     return 'Invalid start time';
   }
 }
@@ -89,7 +89,7 @@ export function validateExpiry(expiry: number): string | undefined {
       return 'Expiry must be in the future';
     }
     return undefined;
-  } catch (error) {
+  } catch {
     return 'Invalid expiry';
   }
 }
@@ -109,7 +109,7 @@ export function validateStartTimeVsExpiry(
       return 'Start time must be before expiry';
     }
     return undefined;
-  } catch (error) {
+  } catch {
     return undefined;
   }
 }
@@ -170,7 +170,7 @@ export function validatePeriodDuration(periodDuration: number): {
       };
     }
     return { duration, error: undefined };
-  } catch (error) {
+  } catch {
     return { duration: undefined, error: 'Invalid period duration' };
   }
 }

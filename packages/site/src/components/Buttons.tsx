@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 import styled from 'styled-components';
 
-import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
+import FlaskFox from '../assets/flask_fox.svg?react';
 import { kernelSnapOrigin } from '../config';
 import { useMetaMask, useRequestSnap } from '../hooks';
 import { shouldDisplayReconnectButton } from '../utils';

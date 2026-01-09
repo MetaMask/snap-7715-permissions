@@ -13,7 +13,7 @@ export const ShowMoreText = ({
   text,
   buttonName,
   isCollapsed,
-}: ShowMoreTextProps) => {
+}: ShowMoreTextProps): JSX.Element => {
   const displayText =
     text.length > MAX_TEXT_LENGTH && isCollapsed
       ? `${text.slice(0, ELLIPSIS_TEXT_LENGTH)}...`

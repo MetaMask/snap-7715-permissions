@@ -2,8 +2,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "jsx": "preserve"
+    "jsx": "react-jsx",
+    "exactOptionalPropertyTypes": false,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"]
   },
-  "include": ["src", "gatsby-browser.tsx", "gatsby-config.ts", "gatsby-ssr.tsx"]
+  "include": ["src", "vite.config.ts"]
 }

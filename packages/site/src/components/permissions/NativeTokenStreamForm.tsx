@@ -1,8 +1,8 @@
+import { bigIntToHex } from '@metamask/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
-import type { NativeTokenStreamPermissionRequest } from './types';
 
-import { bigIntToHex } from '@metamask/utils';
+import type { NativeTokenStreamPermissionRequest } from './types';
 
 type NativeTokenStreamFormProps = {
   onChange: (request: NativeTokenStreamPermissionRequest) => void;

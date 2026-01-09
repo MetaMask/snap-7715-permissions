@@ -6,8 +6,9 @@ import {
   ResourceNotFoundError,
   ResourceUnavailableError,
 } from '@metamask/snaps-sdk';
-import type { RetryOptions } from 'src/clients/types';
 import type { z } from 'zod';
+
+import type { RetryOptions } from 'src/clients/types';
 
 /**
  * Configuration for making HTTP requests with limits
@@ -80,14 +81,18 @@ async function makeValidatedRequest<
   config: HttpClientConfig,
   responseSchema: TSchema,
 ): Promise<TResponse> {
-  const { timeoutMs, maxResponseSizeBytes, fetch = globalThis.fetch } = config;
+  const {
+    timeoutMs,
+    maxResponseSizeBytes,
+    fetch: fetchFn = globalThis.fetch,
+  } = config;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   let response: globalThis.Response;
 
   try {
-    response = await fetch(url, {
+    response = await fetchFn(url, {
       signal: controller.signal,
       headers: {
         ...config.headers,
@@ -132,14 +137,14 @@ async function makeValidatedRequest<
   let responseData: unknown;
   try {
     responseData = await response.json();
-  } catch (error) {
+  } catch {
     throw new ParseError('Failed to parse JSON response');
   }
 
   // Validate response structure and content with zod
   try {
     return responseSchema.parse(responseData);
-  } catch (error) {
+  } catch {
     throw new InternalError('Invalid response structure');
   }
 }

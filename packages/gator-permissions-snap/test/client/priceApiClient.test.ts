@@ -18,7 +18,7 @@ describe('PriceApiClient', () => {
     it('fetches spot price successfully', async () => {
       const mockResponse = {
         ok: true,
-        json: async () => ({
+        json: async (): Promise<object> => ({
           'eip155:1/slip44:60': {
             usd: 1000,
           },
@@ -72,7 +72,7 @@ describe('PriceApiClient', () => {
     it('throws an error if caip19 asset type not in response', async () => {
       const mockResponse = {
         ok: true,
-        json: async () => ({
+        json: async (): Promise<object> => ({
           'eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f': {
             usd: 1000,
           },
@@ -104,7 +104,7 @@ describe('PriceApiClient', () => {
     it('throws an error if vsCurrency spot price for the asset type not in response', async () => {
       const mockResponse = {
         ok: true,
-        json: async () => ({
+        json: async (): Promise<object> => ({
           'eip155:1/slip44:60': {},
         }),
         headers: {
@@ -327,7 +327,7 @@ describe('PriceApiClient', () => {
     it('throws an error for invalid JSON response', async () => {
       const mockResponse = {
         ok: true,
-        json: async () => {
+        json: async (): Promise<object> => {
           throw new Error('Invalid JSON');
         },
         headers: {
@@ -345,7 +345,7 @@ describe('PriceApiClient', () => {
     it('throws an error for invalid response structure', async () => {
       const mockResponse = {
         ok: true,
-        json: async () => ({
+        json: async (): Promise<object> => ({
           // Invalid structure - missing required fields
           'eip155:1/slip44:60': 'invalid', // Should be an object with currency keys
         }),
@@ -393,7 +393,7 @@ describe('PriceApiClient', () => {
     it('validates price values are within reasonable bounds', async () => {
       const mockResponse = {
         ok: true,
-        json: async () => ({
+        json: async (): Promise<object> => ({
           'eip155:1/slip44:60': {
             usd: 1e15, // 1 quadrillion - exceeds max limit
           },
