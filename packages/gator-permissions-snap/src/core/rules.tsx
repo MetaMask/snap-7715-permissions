@@ -1,5 +1,5 @@
 import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
-import { type SnapElement } from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { DateTimePickerField } from '../ui/components/DateTimePickerField';
 import { DropdownField } from '../ui/components/DropdownField';

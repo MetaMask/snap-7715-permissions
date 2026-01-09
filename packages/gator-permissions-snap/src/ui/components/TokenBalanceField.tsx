@@ -12,7 +12,9 @@ type TokenBalanceFieldProps = {
  * @param props.tokenBalance - The token balance to display.
  * @returns A JSX element containing the token balance or a skeleton if not available.
  */
-export const TokenBalanceField = ({ tokenBalance }: TokenBalanceFieldProps) => {
+export const TokenBalanceField = ({
+  tokenBalance,
+}: TokenBalanceFieldProps): JSX.Element => {
   if (!tokenBalance) {
     return <Skeleton />;
   }

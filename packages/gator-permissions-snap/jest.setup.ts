@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 
-dotenv.config();
+config();
 
 // Mock toLocaleString to use consistent 'en-US' locale for deterministic test snapshots
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -9,6 +9,6 @@ const originalToLocaleString = Date.prototype.toLocaleString;
 Date.prototype.toLocaleString = function (
   locales?: string | string[],
   options?: Intl.DateTimeFormatOptions,
-) {
+): string {
   return originalToLocaleString.call(this, locales ?? 'en-US', options);
 };

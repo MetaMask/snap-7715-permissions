@@ -1,4 +1,5 @@
-import { formatAsCurrency, type Preferences } from '../../src/utils/locale';
+import { formatAsCurrency } from '../../src/utils/locale';
+import type { Preferences } from '../../src/utils/locale';
 
 describe('formatAsCurrency', () => {
   describe('USD', () => {

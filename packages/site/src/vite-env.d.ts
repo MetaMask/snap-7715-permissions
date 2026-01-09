@@ -1,4 +1,4 @@
-/* eslint-disable import/unambiguous, @typescript-eslint/naming-convention */
+/* eslint-disable import-x/unambiguous, @typescript-eslint/naming-convention */
 // / <reference types="vite/client" />
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions

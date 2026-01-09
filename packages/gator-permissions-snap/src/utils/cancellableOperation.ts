@@ -16,7 +16,7 @@ export function createCancellableOperation<TArg, TResult>({
 }: {
   operation: (arg: TArg) => Promise<TResult>;
   onSuccess: (result: TResult, isCancelled: () => boolean) => Promise<void>;
-}) {
+}): (arg: TArg) => Promise<void> {
   let callCounter = 0;
 
   /**
@@ -37,7 +37,7 @@ export function createCancellableOperation<TArg, TResult>({
       return;
     }
 
-    const isCancelled = () => currentCall !== callCounter;
+    const isCancelled = (): boolean => currentCall !== callCounter;
     await onSuccess(result, isCancelled);
   };
 }

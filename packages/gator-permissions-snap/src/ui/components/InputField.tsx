@@ -30,7 +30,7 @@ export const InputField = ({
   disabled,
   errorMessage,
   iconData,
-}: InputFieldParams) => {
+}: InputFieldParams): JSX.Element => {
   if (disabled) {
     return (
       <TextField

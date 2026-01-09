@@ -78,7 +78,7 @@ describe('Kernel Snap', () => {
             cause: null,
             method: 'snapRpc',
             params: expect.arrayContaining([
-              expect.stringMatching(/^local:http:\/\/localhost:\d+$/),
+              expect.stringMatching(/^local:http:\/\/localhost:\d+$/u),
               'onRpcRequest',
               'https://metamask.io',
               expect.objectContaining({

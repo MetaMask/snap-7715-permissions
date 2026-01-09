@@ -3,9 +3,11 @@ import {
   InvalidParamsError,
   LimitExceededError,
   MethodNotFoundError,
-  type Json,
-  type JsonRpcParams,
-  type OnRpcRequestHandler,
+} from '@metamask/snaps-sdk';
+import type {
+  Json,
+  JsonRpcParams,
+  OnRpcRequestHandler,
 } from '@metamask/snaps-sdk';
 
 import { createPermissionOfferRegistryManager } from './registryManager';

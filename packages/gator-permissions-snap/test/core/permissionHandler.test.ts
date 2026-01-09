@@ -1,8 +1,8 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import type { TokenBalanceAndMetadata } from 'src/clients/types';
 
+import type { TokenBalanceAndMetadata } from '../../src/clients/types';
 import type { AccountController } from '../../src/core/accountController';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
@@ -84,6 +84,7 @@ const mockTokenBalanceAndMetadata: TokenBalanceAndMetadata = {
 };
 const mockMetadata: TestMetadataType = {};
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const setupTest = () => {
   const title = 'Test permission';
   const subtitle = 'This site wants a test permission.';
@@ -103,11 +104,11 @@ const setupTest = () => {
     eventType: string;
     interfaceId: string;
     handler: UserEventHandler<UserInputEventType>;
-  }) => {
+  }): { unbind: () => void; dispatcher: jest.Mocked<UserEventDispatcher> } => {
     boundEvents.set(`${elementName}:${eventType}:${interfaceId}`, handler);
 
     return {
-      unbind: () => {
+      unbind: (): void => {
         unboundEvents.set(
           `${elementName}:${eventType}:${interfaceId}`,
           handler,
@@ -121,7 +122,7 @@ const setupTest = () => {
     elementName: string;
     eventType: string;
     interfaceId: string;
-  }) => {
+  }): UserEventHandler<UserInputEventType> | undefined => {
     return boundEvents.get(
       `${args.elementName}:${args.eventType}:${args.interfaceId}`,
     );
@@ -131,7 +132,7 @@ const setupTest = () => {
     elementName: string;
     eventType: string;
     interfaceId: string;
-  }) => {
+  }): UserEventHandler<UserInputEventType> | undefined => {
     return unboundEvents.get(
       `${args.elementName}:${args.eventType}:${args.interfaceId}`,
     );
@@ -205,7 +206,7 @@ const setupTest = () => {
     permissionHandlerDependencies,
   );
 
-  const getLifecycleHandlers = () => {
+  const getLifecycleHandlers = (): TestLifecycleHandlersType => {
     const call = orchestrator.orchestrate.mock.calls[0];
     if (!call) {
       throw new Error('No call found');
@@ -1816,12 +1817,12 @@ describe('PermissionHandler', () => {
           updateContext,
         } = setupTest();
 
-        let resolveTokenBalancePromise: () => void = () => {
+        let resolveTokenBalancePromise: () => void = (): void => {
           throw new Error('Function should never be called');
         };
         const tokenBalancePromise = new Promise<TokenBalanceAndMetadata>(
           (resolve) => {
-            resolveTokenBalancePromise = () =>
+            resolveTokenBalancePromise = (): void =>
               resolve(mockTokenBalanceAndMetadata);
           },
         );
@@ -1830,11 +1831,11 @@ describe('PermissionHandler', () => {
           tokenBalancePromise,
         );
 
-        let resolveFiatBalancePromise: () => void = () => {
+        let resolveFiatBalancePromise: () => void = (): void => {
           throw new Error('Function should never be called');
         };
         const fiatBalancePromise = new Promise<string>((resolve) => {
-          resolveFiatBalancePromise = () => resolve(mockTokenBalanceFiat);
+          resolveFiatBalancePromise = (): void => resolve(mockTokenBalanceFiat);
         });
         tokenPricesService.getCryptoToFiatConversion.mockReturnValue(
           fiatBalancePromise,
@@ -3637,12 +3638,12 @@ describe('PermissionHandler', () => {
           updateContext,
         } = setupTest();
 
-        let resolveTokenBalancePromise: () => void = () => {
+        let resolveTokenBalancePromise: () => void = (): void => {
           throw new Error('Function should never be called');
         };
         const tokenBalancePromise = new Promise<TokenBalanceAndMetadata>(
           (resolve) => {
-            resolveTokenBalancePromise = () =>
+            resolveTokenBalancePromise = (): void =>
               resolve(mockTokenBalanceAndMetadata);
           },
         );

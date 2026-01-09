@@ -5,8 +5,8 @@ import {
   parseCaipAccountId,
   toCaipAssetType,
   toCaipAccountId,
-  type Hex,
 } from '@metamask/utils';
+import type { Hex } from '@metamask/utils';
 
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';

@@ -1,7 +1,5 @@
-import {
-  erc7715ProviderActions,
-  type RequestExecutionPermissionsParameters,
-} from '@metamask/smart-accounts-kit/actions';
+import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
+import type { RequestExecutionPermissionsParameters } from '@metamask/smart-accounts-kit/actions';
 import { useCallback, useMemo, useState } from 'react';
 import {
   createClient,
@@ -10,7 +8,7 @@ import {
   createPublicClient,
   extractChain,
 } from 'viem';
-import { type Chain, type Hex } from 'viem';
+import type { Chain, Hex } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
 import * as chains from 'viem/chains';
 
@@ -59,7 +57,6 @@ import {
 import { isLocalSnap } from '../utils';
 
 const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
-
 
 const ALL_CHAINS = [...Object.values(chains)];
 

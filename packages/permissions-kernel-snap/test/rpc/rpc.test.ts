@@ -6,7 +6,8 @@ import type {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { PermissionOfferRegistryManager } from '../../src/registryManager';
-import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
+import { createRpcHandler } from '../../src/rpc/rpcHandler';
+import type { RpcHandler } from '../../src/rpc/rpcHandler';
 import { ExternalMethod } from '../../src/rpc/rpcMethod';
 
 describe('RpcHandler', () => {
@@ -61,7 +62,7 @@ describe('RpcHandler', () => {
      * Helper function to set up successful permission flow mocks.
      * This reduces test duplication by centralizing common mock setup.
      */
-    const setupSuccessfulPermissionFlow = () => {
+    const setupSuccessfulPermissionFlow = (): void => {
       mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
         {
           'test-provider': [],

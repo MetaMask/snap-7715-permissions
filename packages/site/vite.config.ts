@@ -15,10 +15,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       manifest: {
         name: 'Template Snap',
-        /* eslint-disable @typescript-eslint/naming-convention */
+
         theme_color: '#6F4CFF',
         background_color: '#FFFFFF',
-        /* eslint-enable @typescript-eslint/naming-convention */
+
         display: 'standalone',
         icons: [
           {

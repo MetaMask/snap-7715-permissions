@@ -1,6 +1,8 @@
+import { bigIntToHex } from '@metamask/utils';
+import type { Hex } from '@metamask/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
-import { bigIntToHex, type Hex } from '@metamask/utils';
+
 import type { ERC20TokenStreamPermissionRequest } from './types';
 
 type ERC20TokenStreamFormProps = {

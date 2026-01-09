@@ -64,9 +64,9 @@ export function deserializeSnapError(
       : 'Unknown error';
 
   // Look up the error constructor by code
-  const ErrorConstructor = ERROR_CODE_TO_CONSTRUCTOR_MAP.get(code);
-  if (ErrorConstructor) {
-    const reconstructedError = new ErrorConstructor(message);
+  const MatchedErrorConstructor = ERROR_CODE_TO_CONSTRUCTOR_MAP.get(code);
+  if (MatchedErrorConstructor) {
+    const reconstructedError = new MatchedErrorConstructor(message);
 
     // Preserve stack trace if available (useful for debugging)
     if ('stack' in error && typeof error.stack === 'string') {

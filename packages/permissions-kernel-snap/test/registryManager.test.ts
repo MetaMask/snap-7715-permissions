@@ -2,10 +2,8 @@ import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testi
 import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 
-import {
-  createPermissionOfferRegistryManager,
-  type PermissionOfferRegistryManager,
-} from '../src/registryManager';
+import { createPermissionOfferRegistryManager } from '../src/registryManager';
+import type { PermissionOfferRegistryManager } from '../src/registryManager';
 import { ExternalMethod } from '../src/rpc/rpcMethod';
 
 describe('PermissionOfferRegistryManager', () => {
