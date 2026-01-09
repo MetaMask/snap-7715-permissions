@@ -17,6 +17,7 @@ import type {
 } from './types';
 import advancedPermissionsImage from '../../../images/advanced-permissions.svg';
 import newPermissionTypeImage from '../../../images/new-permission-type.svg';
+import { t } from '../../utils/i18n';
 
 // Button name constants for event handling
 export const PERMISSION_INTRODUCTION_CONFIRM_BUTTON =
@@ -30,67 +31,61 @@ export const PERMISSION_INTRODUCTION_PAGE_2_DOT = 'intro-page-2-dot';
  */
 const fixedPage2Content: PermissionIntroductionPageConfig = {
   headerImageSvg: advancedPermissionsImage,
-  title: 'Advanced permissions keep you in control',
+  title: 'introAdvancedPermissionsTitle',
   bulletPoints: [
     {
       icon: 'security-key',
-      title: 'Secure, limited access',
-      description: 'Restrict sites and revoke access on your terms.',
+      title: 'introSecureLimitedAccessTitle',
+      description: 'introSecureLimitedAccessDescription',
     },
     {
       icon: 'customize',
-      title: 'Fully customizable control',
-      description: 'Review, edit, or add rules so permissions meet your needs.',
+      title: 'introFullyCustomizableControlTitle',
+      description: 'introFullyCustomizableControlDescription',
     },
     {
       icon: 'sparkle',
-      title: 'Transparent and convenient',
-      description: 'Easily manage permissions all from one place.',
+      title: 'introTransparentConvenientTitle',
+      description: 'introTransparentConvenientDescription',
     },
   ],
 };
 
 const subscriptionPage1Content: PermissionIntroductionPageConfig = {
   headerImageSvg: newPermissionTypeImage,
-  title: 'This site wants to create a token subscription',
+  title: 'introSubscriptionTitle',
   bulletPoints: [
     {
-      description:
-        'Token subscriptions give sites permission to pull tokens from your wallet on the schedule you set.',
+      description: 'introRecurringPaymentsDescription',
     },
     {
-      description:
-        'You can edit or revoke this permission at any time in advanced permissions.',
+      description: 'introPermissionInControlDescription',
     },
   ],
 };
 
 const streamPage1Content: PermissionIntroductionPageConfig = {
   headerImageSvg: newPermissionTypeImage,
-  title: 'This site wants to create a token stream',
+  title: 'introStreamTitle',
   bulletPoints: [
     {
-      description:
-        'Token streams give sites permission to pull increments of tokens from your wallet over a period of time you set.',
+      description: 'introContinuousTokenFlowDescription',
     },
     {
-      description:
-        'You can edit or revoke this permission at any time in advanced permissions.',
+      description: 'introPermissionInControlDescription',
     },
   ],
 };
 
 const revocationPage1Content: PermissionIntroductionPageConfig = {
   headerImageSvg: newPermissionTypeImage,
-  title: 'This site is asking for token revocation permissions',
+  title: 'introRevocationTitle',
   bulletPoints: [
     {
-      description:
-        'Token revocation allows sites to revoke token approvals on your behalf.',
+      description: 'introManageTokenApprovalsDescription',
     },
     {
-      description:
-        'You can edit or revoke this permission at any time in advanced permissions.',
+      description: 'introPermissionInControlDescription',
     },
   ],
 };
@@ -163,7 +158,7 @@ export function buildIntroductionContent(
     if (point.title) {
       return (
         <Text size="md">
-          <Bold>{point.title}</Bold>
+          <Bold>{t(point.title)}</Bold>
         </Text>
       );
     }
@@ -177,14 +172,14 @@ export function buildIntroductionContent(
           src={pageConfig.headerImageSvg}
           alt="Introduction illustration"
         />
-        <Heading size="md">{pageConfig.title}</Heading>
+        <Heading size="md">{t(pageConfig.title)}</Heading>
         {pageConfig.bulletPoints.map((point, index) => (
           <Box key={`bullet-${index}`} direction="horizontal" alignment="start">
             {getIconContent(point)}
 
             <Box direction="vertical">
               {getTitleContent(point)}
-              <Text>{point.description}</Text>
+              <Text>{t(point.description)}</Text>
             </Box>
           </Box>
         ))}
@@ -198,7 +193,9 @@ export function buildIntroductionContent(
         </Box>
       </Box>
       <Footer>
-        <Button name={PERMISSION_INTRODUCTION_CONFIRM_BUTTON}>Got it</Button>
+        <Button name={PERMISSION_INTRODUCTION_CONFIRM_BUTTON}>
+          {t('introGotItButton')}
+        </Button>
       </Footer>
     </Container>
   );

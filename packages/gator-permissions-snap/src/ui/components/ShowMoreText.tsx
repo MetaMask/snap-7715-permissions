@@ -1,5 +1,7 @@
 import { Box, Text, Button } from '@metamask/snaps-sdk/jsx';
 
+import { t } from '../../utils/i18n';
+
 export type ShowMoreTextProps = {
   text: string;
   buttonName: string;
@@ -18,7 +20,7 @@ export const ShowMoreText = ({
     text.length > MAX_TEXT_LENGTH && isCollapsed
       ? `${text.slice(0, ELLIPSIS_TEXT_LENGTH)}...`
       : text;
-  const buttonText = isCollapsed ? 'Show' : 'Hide';
+  const buttonText = isCollapsed ? t('showMoreButton') : t('hideButton');
   const showMoreButtonContent =
     text.length > MAX_TEXT_LENGTH ? (
       <Box direction="horizontal" alignment="end">

@@ -45,6 +45,7 @@ import type {
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
 import { createCancellableOperation } from '../utils/cancellableOperation';
+import type { MessageKey } from '../utils/i18n';
 import { formatUnits } from '../utils/value';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
@@ -83,9 +84,9 @@ export class PermissionHandler<
 
   readonly #rules: RuleDefinition<TContext, TMetadata>[];
 
-  readonly #permissionTitle: string;
+  readonly #permissionTitle: MessageKey;
 
-  readonly #permissionSubtitle: string;
+  readonly #permissionSubtitle: MessageKey;
 
   #isJustificationCollapsed = true;
 

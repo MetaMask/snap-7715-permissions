@@ -963,7 +963,7 @@ describe('PermissionHandler', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The address that will receive the delegated permission",
+                                          "children": "The site requesting the permission",
                                         },
                                         "type": "Text",
                                       },
@@ -1356,7 +1356,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
@@ -1583,7 +1584,7 @@ describe('PermissionHandler', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The address that will receive the delegated permission",
+                                          "children": "The site requesting the permission",
                                         },
                                         "type": "Text",
                                       },
@@ -2233,7 +2234,7 @@ describe('PermissionHandler', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The address that will receive the delegated permission",
+                                          "children": "The site requesting the permission",
                                         },
                                         "type": "Text",
                                       },
@@ -2591,7 +2592,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
@@ -2818,7 +2820,7 @@ describe('PermissionHandler', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The address that will receive the delegated permission",
+                                          "children": "The site requesting the permission",
                                         },
                                         "type": "Text",
                                       },
@@ -3178,7 +3180,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
@@ -3405,7 +3408,7 @@ describe('PermissionHandler', () => {
                                       "content": {
                                         "key": null,
                                         "props": {
-                                          "children": "The address that will receive the delegated permission",
+                                          "children": "The site requesting the permission",
                                         },
                                         "type": "Text",
                                       },

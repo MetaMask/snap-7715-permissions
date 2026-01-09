@@ -1,4 +1,5 @@
 import type { TimePeriod } from '../core/types';
+import { t } from '../utils/i18n';
 import { getStartOfTodayLocal, TIME_PERIOD_TO_SECONDS } from '../utils/time';
 import { parseUnits, formatUnits } from '../utils/value';
 
@@ -38,18 +39,22 @@ export function validateAndParseAmount(
     if (!allowZero && parsedAmount <= 0n) {
       return {
         amount: null,
-        error: `${toSentenceCase(fieldName)} must be greater than 0`,
+        error: t('errorAmountMustBeGreaterThanZero', [
+          toSentenceCase(fieldName),
+        ]),
       };
     }
     if (allowZero && parsedAmount < 0n) {
       return {
         amount: null,
-        error: `${toSentenceCase(fieldName)} must be greater than or equal to 0`,
+        error: t('errorAmountMustBeGreaterThanOrEqualToZero', [
+          toSentenceCase(fieldName),
+        ]),
       };
     }
     return { amount: parsedAmount, error: null };
   } catch (error) {
-    return { amount: null, error: `Invalid ${fieldName}` };
+    return { amount: null, error: t('errorInvalidAmount', [fieldName]) };
   }
 }
 
@@ -60,17 +65,13 @@ export function validateAndParseAmount(
  */
 export function validateStartTime(startTime: number): string | undefined {
   if (startTime === -1) {
-    return 'Invalid start time';
+    return t('errorInvalidStartTime');
   }
 
-  try {
-    if (startTime < getStartOfTodayLocal()) {
-      return 'Start time must be today or later';
-    }
-    return undefined;
-  } catch (error) {
-    return 'Invalid start time';
+  if (startTime < getStartOfTodayLocal()) {
+    return t('errorStartTimeMustBeTodayOrLater');
   }
+  return undefined;
 }
 
 /**
@@ -80,18 +81,14 @@ export function validateStartTime(startTime: number): string | undefined {
  */
 export function validateExpiry(expiry: number): string | undefined {
   if (expiry === -1) {
-    return 'Invalid expiry';
+    return t('errorInvalidExpiry');
   }
 
-  try {
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    if (expiry < nowSeconds) {
-      return 'Expiry must be in the future';
-    }
-    return undefined;
-  } catch (error) {
-    return 'Invalid expiry';
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (expiry < nowSeconds) {
+    return t('errorExpiryMustBeInFuture');
   }
+  return undefined;
 }
 
 /**
@@ -104,14 +101,10 @@ export function validateStartTimeVsExpiry(
   startTime: number,
   expiry: number,
 ): string | undefined {
-  try {
-    if (startTime >= expiry) {
-      return 'Start time must be before expiry';
-    }
-    return undefined;
-  } catch (error) {
-    return undefined;
+  if (startTime >= expiry) {
+    return t('errorStartTimeMustBeBeforeExpiry');
   }
+  return undefined;
 }
 
 /**
@@ -129,7 +122,7 @@ export function validateMaxAmountVsInitialAmount(
     initialAmount !== null &&
     maxAmount < initialAmount
   ) {
-    return 'Max amount must be greater than initial amount';
+    return t('errorMaxAmountMustBeGreaterThanInitialAmount');
   }
   return null;
 }
@@ -161,16 +154,11 @@ export function validatePeriodDuration(periodDuration: number): {
   duration: number | undefined;
   error: string | undefined;
 } {
-  try {
-    const duration = periodDuration;
-    if (isNaN(duration) || duration <= 0) {
-      return {
-        duration: undefined,
-        error: 'Period duration must be greater than 0',
-      };
-    }
-    return { duration, error: undefined };
-  } catch (error) {
-    return { duration: undefined, error: 'Invalid period duration' };
+  if (isNaN(periodDuration) || periodDuration <= 0) {
+    return {
+      duration: undefined,
+      error: t('errorPeriodDurationMustBeGreaterThanZero'),
+    };
   }
+  return { duration: periodDuration, error: undefined };
 }

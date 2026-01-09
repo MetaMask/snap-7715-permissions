@@ -1,0 +1,309 @@
+{
+  "locale": "en",
+  "messages": {
+    "recipientLabel": {
+      "message": "Recipient",
+      "description": "Label for the recipient field"
+    },
+    "recipientTooltip": {
+      "message": "The site requesting the permission",
+      "description": "Tooltip for the recipient field"
+    },
+    "networkLabel": {
+      "message": "Network",
+      "description": "Label for the network field"
+    },
+    "networkTooltip": {
+      "message": "The network on which the permission is being requested",
+      "description": "Tooltip for the network field"
+    },
+    "tokenLabel": {
+      "message": "Token",
+      "description": "Label for the token field"
+    },
+    "tokenTooltip": {
+      "message": "The token being requested",
+      "description": "Tooltip for the token field"
+    },
+    "reasonLabel": {
+      "message": "Reason",
+      "description": "Label for the reason field"
+    },
+    "reasonTooltip": {
+      "message": "Reason given by the recipient for requesting this permission.",
+      "description": "Tooltip for the reason field"
+    },
+    "accountLabel": {
+      "message": "Account",
+      "description": "Label for the account field"
+    },
+    "accountTooltip": {
+      "message": "The account from which the permission is being granted.",
+      "description": "Tooltip for the account field"
+    },
+    "requestFromLabel": {
+      "message": "Request from",
+      "description": "Label for the request from field"
+    },
+    "requestFromTooltip": {
+      "message": "The site requesting the permission",
+      "description": "Tooltip for the request from field"
+    },
+    "initialAmountLabel": {
+      "message": "Initial Amount",
+      "description": "Label for the initial amount field"
+    },
+    "initialAmountTooltip": {
+      "message": "The initial amount of tokens that can be streamed.",
+      "description": "Tooltip for the initial amount field"
+    },
+    "maxAmountLabel": {
+      "message": "Max Amount",
+      "description": "Label for the max amount field"
+    },
+    "maxAmountTooltip": {
+      "message": "The maximum amount of tokens that can be streamed.",
+      "description": "Tooltip for the max amount field"
+    },
+    "startTimeLabel": {
+      "message": "Start Time",
+      "description": "Label for the start time field"
+    },
+    "startTimeTooltip": {
+      "message": "The time at which the first period begins",
+      "description": "Tooltip for the start time field for periodic permissions"
+    },
+    "streamStartTimeTooltip": {
+      "message": "The start time of the stream",
+      "description": "Tooltip for the start time field for stream permissions"
+    },
+    "expiryLabel": {
+      "message": "Expiry",
+      "description": "Label for the expiry field"
+    },
+    "expiryTooltip": {
+      "message": "The expiry date of the permission",
+      "description": "Tooltip for the expiry field"
+    },
+    "streamAmountLabel": {
+      "message": "Stream Amount",
+      "description": "Label for the stream amount field"
+    },
+    "streamAmountTooltip": {
+      "message": "The amount of tokens that can be streamed per period.",
+      "description": "Tooltip for the stream amount field"
+    },
+    "streamPeriodLabel": {
+      "message": "Stream Period",
+      "description": "Label for the stream period field"
+    },
+    "streamPeriodTooltip": {
+      "message": "The period of the stream.",
+      "description": "Tooltip for the stream period field"
+    },
+    "amountLabel": {
+      "message": "Amount",
+      "description": "Label for the amount field"
+    },
+    "amountTooltip": {
+      "message": "The amount of tokens granted during each period",
+      "description": "Tooltip for the amount field"
+    },
+    "periodDurationLabel": {
+      "message": "Frequency",
+      "description": "Label for the period duration dropdown field"
+    },
+    "periodDurationTooltip": {
+      "message": "The duration of the period",
+      "description": "Tooltip for the period duration dropdown field"
+    },
+    "permissionRequestTitle": {
+      "message": "Permission request",
+      "description": "Title for permission request dialogs"
+    },
+    "showMoreButton": {
+      "message": "Show",
+      "description": "Text for show more button"
+    },
+    "hideButton": {
+      "message": "Hide",
+      "description": "Text for hide button"
+    },
+    "streamRateLabel": {
+      "message": "Stream rate",
+      "description": "Label for stream rate field"
+    },
+    "streamRateTooltip": {
+      "message": "The amount of tokens to stream per second.",
+      "description": "Tooltip for stream rate field"
+    },
+    "streamRateValue": {
+      "message": "$1 $2/sec",
+      "description": "Stream rate value format with amount and symbol"
+    },
+    "cancelButton": {
+      "message": "Cancel",
+      "description": "Cancel button text"
+    },
+    "grantButton": {
+      "message": "Grant",
+      "description": "Grant button text"
+    },
+    "hourly": {
+      "message": "Hourly",
+      "description": "Hourly time period option"
+    },
+    "daily": {
+      "message": "Daily",
+      "description": "Daily time period option"
+    },
+    "weekly": {
+      "message": "Weekly",
+      "description": "Weekly time period option"
+    },
+    "biweekly": {
+      "message": "Biweekly",
+      "description": "Biweekly time period option"
+    },
+    "monthly": {
+      "message": "Monthly",
+      "description": "Monthly time period option"
+    },
+    "yearly": {
+      "message": "Yearly",
+      "description": "Yearly time period option"
+    },
+    "availableLabel": {
+      "message": "available",
+      "description": "Available label for token balance"
+    },
+    "permissionRequestSubtitle": {
+      "message": "This site wants permissions to spend your tokens.",
+      "description": "Subtitle for permission request"
+    },
+    "accountUpgradeWarning": {
+      "message": "This account will be upgraded to a smart account to complete this permission.",
+      "description": "Warning message when account needs to be upgraded"
+    },
+    "removeFieldAlt": {
+      "message": "Remove $1",
+      "description": "Alt text for remove field button"
+    },
+    "addFieldAlt": {
+      "message": "Add $1",
+      "description": "Alt text for add field button"
+    },
+    "errorAmountMustBeGreaterThanZero": {
+      "message": "$1 must be greater than 0",
+      "description": "Validation error when amount must be positive"
+    },
+    "errorAmountMustBeGreaterThanOrEqualToZero": {
+      "message": "$1 must be greater than or equal to 0",
+      "description": "Validation error when amount must be non-negative"
+    },
+    "errorInvalidAmount": {
+      "message": "Invalid $1",
+      "description": "Validation error for invalid amount"
+    },
+    "errorInvalidStartTime": {
+      "message": "Invalid start time",
+      "description": "Validation error for invalid start time"
+    },
+    "errorStartTimeMustBeTodayOrLater": {
+      "message": "Start time must be today or later",
+      "description": "Validation error when start time is in the past"
+    },
+    "errorInvalidExpiry": {
+      "message": "Invalid expiry",
+      "description": "Validation error for invalid expiry date"
+    },
+    "errorExpiryMustBeInFuture": {
+      "message": "Expiry must be in the future",
+      "description": "Validation error when expiry is not in the future"
+    },
+    "errorStartTimeMustBeBeforeExpiry": {
+      "message": "Start time must be before expiry",
+      "description": "Validation error when start time is after expiry"
+    },
+    "errorMaxAmountMustBeGreaterThanInitialAmount": {
+      "message": "Max amount must be greater than initial amount",
+      "description": "Validation error when max amount is less than initial amount"
+    },
+    "errorPeriodDurationMustBeGreaterThanZero": {
+      "message": "Period duration must be greater than 0",
+      "description": "Validation error when period duration is zero or negative"
+    },
+    "unknownStreamRate": {
+      "message": "Unknown",
+      "description": "Fallback text when stream rate cannot be calculated"
+    },
+    "unknownChain": {
+      "message": "Unknown chain $1",
+      "description": "Fallback text when chain name is not available"
+    },
+    "permissionRequestSubtitleRevocation": {
+      "message": "This site wants permissions to revoke your ERC-20 token approvals.",
+      "description": "Subtitle for ERC-20 token revocation permission request"
+    },
+    "introAdvancedPermissionsTitle": {
+      "message": "Advanced permissions keep you in control",
+      "description": "Title for the advanced permissions introduction page"
+    },
+    "introSecureLimitedAccessTitle": {
+      "message": "Secure, limited access",
+      "description": "Title for the secure limited access bullet point"
+    },
+    "introSecureLimitedAccessDescription": {
+      "message": "Restrict sites and revoke access on your terms.",
+      "description": "Description for the secure limited access bullet point"
+    },
+    "introFullyCustomizableControlTitle": {
+      "message": "Fully customizable control",
+      "description": "Title for the fully customizable control bullet point"
+    },
+    "introFullyCustomizableControlDescription": {
+      "message": "Review, edit, or add rules so permissions meet your needs.",
+      "description": "Description for the fully customizable control bullet point"
+    },
+    "introTransparentConvenientTitle": {
+      "message": "Transparent and convenient",
+      "description": "Title for the transparent and convenient bullet point"
+    },
+    "introTransparentConvenientDescription": {
+      "message": "Easily manage permissions all from one place.",
+      "description": "Description for the transparent and convenient bullet point"
+    },
+    "introSubscriptionTitle": {
+      "message": "This site wants to create a token subscription",
+      "description": "Title for the subscription permission introduction page"
+    },
+    "introRecurringPaymentsDescription": {
+      "message": "Token subscriptions give sites permission to pull tokens from your wallet on the schedule you set.",
+      "description": "Description for the recurring payments bullet point"
+    },
+    "introStreamTitle": {
+      "message": "This site wants to create a token stream",
+      "description": "Title for the stream permission introduction page"
+    },
+    "introContinuousTokenFlowDescription": {
+      "message": "Token streams give sites permission to pull increments of tokens from your wallet over a period of time you set.",
+      "description": "Description for the continuous token flow bullet point"
+    },
+    "introRevocationTitle": {
+      "message": "This site is asking for token revocation permissions",
+      "description": "Title for the revocation permission introduction page"
+    },
+    "introManageTokenApprovalsDescription": {
+      "message": "Token revocation allows sites to revoke token approvals on your behalf.",
+      "description": "Description for the manage token approvals bullet point"
+    },
+    "introPermissionInControlDescription": {
+      "message": "You can edit or revoke this permission at any time in advanced permissions.",
+      "description": "Description for the permission in your control bullet point"
+    },
+    "introGotItButton": {
+      "message": "Got it",
+      "description": "Text for the got it button on introduction pages"
+    }
+  }
+}

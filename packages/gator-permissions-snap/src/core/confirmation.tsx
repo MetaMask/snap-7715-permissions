@@ -6,6 +6,7 @@ import type { DialogInterface } from './dialogInterface';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { Timeout, TimeoutFactory } from './timeoutFactory';
 import type { ConfirmationProps } from './types';
+import { t } from '../utils/i18n';
 
 export class ConfirmationDialog {
   static #cancelButton = 'cancel-button';
@@ -182,14 +183,14 @@ export class ConfirmationDialog {
         {this.#ui}
         <Footer>
           <Button name={ConfirmationDialog.#cancelButton} variant="destructive">
-            Cancel
+            {t('cancelButton')}
           </Button>
           <Button
             name={ConfirmationDialog.#grantButton}
             variant="primary"
             disabled={this.#isGrantDisabled}
           >
-            Grant
+            {t('grantButton')}
           </Button>
         </Footer>
       </Container>
