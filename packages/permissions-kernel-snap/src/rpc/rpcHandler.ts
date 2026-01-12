@@ -1,4 +1,3 @@
-import type { GetSupportedPermissionsResult } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import {
   InternalError,
