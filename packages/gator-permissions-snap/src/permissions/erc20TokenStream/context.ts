@@ -8,8 +8,16 @@ import {
   type Hex,
 } from '@metamask/utils';
 
+import type {
+  Erc20TokenStreamContext,
+  Erc20TokenStreamPermissionRequest,
+  Erc20TokenStreamMetadata,
+  PopulatedErc20TokenStreamPermission,
+  Erc20TokenStreamPermission,
+} from './types';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import { t } from '../../utils/i18n';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
@@ -20,13 +28,6 @@ import {
   calculateAmountPerSecond,
   validateStartTimeVsExpiry,
 } from '../contextValidation';
-import type {
-  Erc20TokenStreamContext,
-  Erc20TokenStreamPermissionRequest,
-  Erc20TokenStreamMetadata,
-  PopulatedErc20TokenStreamPermission,
-  Erc20TokenStreamPermission,
-} from './types';
 import { applyExpiryRule } from '../rules';
 
 const DEFAULT_MAX_AMOUNT =
@@ -274,7 +275,7 @@ export async function deriveMetadata({
     decimals,
     'amount per period',
   );
-  let amountPerSecond = 'Unknown';
+  let amountPerSecond = t('unknownStreamRate');
   if (amountPerPeriodResult.error) {
     validationErrors.amountPerPeriodError = amountPerPeriodResult.error;
   } else if (amountPerPeriodResult.amount) {

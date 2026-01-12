@@ -13,6 +13,7 @@ import {
   type RuleDefinition,
   type TypedPermissionRequest,
 } from '../core/types';
+import type { TranslateFunction } from '../utils/i18n';
 import {
   iso8601ToTimestamp,
   TIME_PERIOD_TO_SECONDS,
@@ -32,12 +33,14 @@ export const createExpiryRule = <
   TMetadata extends ExpiryRuleMetadata,
 >({
   elementName,
+  translate,
 }: {
   elementName: string;
+  translate: TranslateFunction;
 }): RuleDefinition<TContext, TMetadata> => {
   return {
     name: elementName,
-    label: 'Expiry',
+    label: 'expiryLabel',
     type: 'datetime',
     isOptional: true,
     getRuleData: ({
@@ -52,7 +55,7 @@ export const createExpiryRule = <
         : undefined,
       isAdjustmentAllowed: context.expiry?.isAdjustmentAllowed ?? true,
       isVisible: true,
-      tooltip: 'The expiry date of the permission.',
+      tooltip: translate('expiryTooltip'),
       error: metadata.validationErrors.expiryError,
       allowPastDate: false,
     }),

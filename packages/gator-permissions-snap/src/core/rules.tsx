@@ -1,6 +1,7 @@
 import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
 import { type SnapElement } from '@metamask/snaps-sdk/jsx';
 
+import type { BaseContext, RuleDefinition } from './types';
 import { DateTimePickerField } from '../ui/components/DateTimePickerField';
 import { DropdownField } from '../ui/components/DropdownField';
 import { InputField } from '../ui/components/InputField';
@@ -8,7 +9,8 @@ import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../userEventDispatcher';
-import type { BaseContext, RuleDefinition } from './types';
+import type { MessageKey } from '../utils/i18n';
+import { t } from '../utils/i18n';
 
 /**
  * Renders a single rule with the provided configuration, context and metadata.
@@ -58,7 +60,7 @@ export function renderRule<
     case 'text': {
       return (
         <InputField
-          label={label}
+          label={t(label)}
           name={name}
           value={value}
           errorMessage={error}
@@ -82,20 +84,20 @@ export function renderRule<
 
       return (
         <DropdownField
-          label={label}
+          label={t(label)}
           name={name}
-          value={value ?? ''}
+          value={value as MessageKey}
           errorMessage={error}
           disabled={isDisabled}
           tooltip={tooltip}
-          options={options}
+          options={options as MessageKey[]}
         />
       );
     }
     case 'datetime': {
       return (
         <DateTimePickerField
-          label={label}
+          label={t(label)}
           name={name}
           value={value}
           errorMessage={error}

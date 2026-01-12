@@ -26,6 +26,7 @@ import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
 import toggleDisabledImage from '../../../images/toggle_disabled.svg';
 import toggleEnabledImage from '../../../images/toggle_enabled.svg';
+import { t } from '../../utils/i18n';
 
 export type BaseFieldProps = {
   label: string;
@@ -140,7 +141,11 @@ export const Field = (props: FieldProps) => {
         <Button name={toggleFieldButtonName}>
           <Image
             src={isFieldEnabled ? toggleEnabledImage : toggleDisabledImage}
-            alt={isFieldEnabled ? `Remove ${label}` : `Add ${label}`}
+            alt={
+              isFieldEnabled
+                ? t('removeFieldAlt', [label])
+                : t('addFieldAlt', [label])
+            }
           />
         </Button>
       );

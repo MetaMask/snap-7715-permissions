@@ -5,6 +5,8 @@ import { applyExpiryRule, createExpiryRule } from '../../src/permissions/rules';
 import { timestampToISO8601 } from '../../src/utils/time';
 
 describe('createExpiryRule', () => {
+  const mockTranslateFunction = jest.fn();
+
   const baseContext: BaseContext = {
     expiry: {
       timestamp: 1893456000, // 2030-01-01T00:00:00.000Z
@@ -22,16 +24,24 @@ describe('createExpiryRule', () => {
     },
   };
 
+  beforeEach(() => {
+    mockTranslateFunction.mockClear();
+    mockTranslateFunction.mockImplementation(
+      (key: string) => `translation of: ${key}`,
+    );
+  });
+
   it('returns rule definition with correct static properties', () => {
     const rule = createExpiryRule<
       BaseContext,
       { validationErrors: { expiryError?: string } }
     >({
       elementName: 'expiry',
+      translate: mockTranslateFunction,
     });
 
     expect(rule.name).toBe('expiry');
-    expect(rule.label).toBe('Expiry');
+    expect(rule.label).toBe('expiryLabel');
     expect(rule.type).toBe('datetime');
   });
 
@@ -41,6 +51,7 @@ describe('createExpiryRule', () => {
       { validationErrors: { expiryError?: string } }
     >({
       elementName: 'expiry',
+      translate: mockTranslateFunction,
     });
 
     const metadata = { validationErrors: { expiryError: 'Required' } };
@@ -50,6 +61,8 @@ describe('createExpiryRule', () => {
       metadata,
     });
 
+    expect(mockTranslateFunction).toHaveBeenCalledWith('expiryTooltip');
+
     expect(data.value).toStrictEqual(
       timestampToISO8601(baseContext.expiry?.timestamp ?? 0),
     );
@@ -57,7 +70,7 @@ describe('createExpiryRule', () => {
       baseContext.expiry?.isAdjustmentAllowed ?? true,
     );
     expect(data.isVisible).toBe(true);
-    expect(data.tooltip).toBe('The expiry date of the permission.');
+    expect(data.tooltip).toBe('translation of: expiryTooltip');
     expect(data.error).toBe('Required');
     expect(data.allowPastDate).toBe(false);
   });
@@ -68,6 +81,7 @@ describe('createExpiryRule', () => {
       { validationErrors: { expiryError?: string } }
     >({
       elementName: 'expiry',
+      translate: mockTranslateFunction,
     });
 
     const newTimestamp = 1893542400; // 2030-01-02T00:00:00.000Z
@@ -99,6 +113,7 @@ describe('createExpiryRule', () => {
       { validationErrors: { expiryError?: string } }
     >({
       elementName: 'expiry',
+      translate: mockTranslateFunction,
     });
 
     expect(() => rule.updateContext(baseContext, 'not-an-iso-string')).toThrow(
@@ -173,7 +188,7 @@ describe('applyExpiryRule', () => {
     const updated = applyExpiryRule(
       {
         ...baseContext,
-        expiry: null,
+        expiry: undefined,
       },
       originalRequest,
     );
@@ -194,7 +209,7 @@ describe('applyExpiryRule', () => {
     const updated = applyExpiryRule(
       {
         ...baseContext,
-        expiry: null,
+        expiry: undefined,
       },
       originalRequest,
     );

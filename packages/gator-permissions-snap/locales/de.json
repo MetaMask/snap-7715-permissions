@@ -1,0 +1,309 @@
+{
+  "locale": "de",
+  "messages": {
+    "recipientLabel": {
+      "message": "Empfänger",
+      "description": "Label for the recipient field"
+    },
+    "recipientTooltip": {
+      "message": "Die Website, die die Genehmigung anfordert",
+      "description": "Tooltip for the recipient field"
+    },
+    "networkLabel": {
+      "message": "Netzwerk",
+      "description": "Label for the network field"
+    },
+    "networkTooltip": {
+      "message": "Das Netzwerk, auf dem die Genehmigung angefordert wird",
+      "description": "Tooltip for the network field"
+    },
+    "tokenLabel": {
+      "message": "Token",
+      "description": "Label for the token field"
+    },
+    "tokenTooltip": {
+      "message": "Der angeforderte Token",
+      "description": "Tooltip for the token field"
+    },
+    "reasonLabel": {
+      "message": "Grund",
+      "description": "Label for the reason field"
+    },
+    "reasonTooltip": {
+      "message": "Der vom Empfänger angegebene Grund für die Anforderung dieser Genehmigung.",
+      "description": "Tooltip for the reason field"
+    },
+    "accountLabel": {
+      "message": "Konto",
+      "description": "Label for the account field"
+    },
+    "accountTooltip": {
+      "message": "Das Konto, von dem die Genehmigung erteilt wird.",
+      "description": "Tooltip for the account field"
+    },
+    "requestFromLabel": {
+      "message": "Anfrage von",
+      "description": "Label for the request from field"
+    },
+    "requestFromTooltip": {
+      "message": "Die Website, die die Genehmigung anfordert",
+      "description": "Tooltip for the request from field"
+    },
+    "initialAmountLabel": {
+      "message": "Anfangsbetrag",
+      "description": "Label for the initial amount field"
+    },
+    "initialAmountTooltip": {
+      "message": "Der anfängliche Betrag an Token, der gestreamt werden kann.",
+      "description": "Tooltip for the initial amount field"
+    },
+    "maxAmountLabel": {
+      "message": "Maximalbetrag",
+      "description": "Label for the max amount field"
+    },
+    "maxAmountTooltip": {
+      "message": "Der maximale Betrag an Token, der gestreamt werden kann.",
+      "description": "Tooltip for the max amount field"
+    },
+    "startTimeLabel": {
+      "message": "Startzeit",
+      "description": "Label for the start time field"
+    },
+    "startTimeTooltip": {
+      "message": "Der Zeitpunkt, zu dem die erste Periode beginnt",
+      "description": "Tooltip for the start time field for periodic permissions"
+    },
+    "streamStartTimeTooltip": {
+      "message": "Die Startzeit des Streams",
+      "description": "Tooltip for the start time field for stream permissions"
+    },
+    "expiryLabel": {
+      "message": "Ablauf",
+      "description": "Label for the expiry field"
+    },
+    "expiryTooltip": {
+      "message": "Das Ablaufdatum der Genehmigung",
+      "description": "Tooltip for the expiry field"
+    },
+    "streamAmountLabel": {
+      "message": "Stream-Betrag",
+      "description": "Label for the stream amount field"
+    },
+    "streamAmountTooltip": {
+      "message": "Der Betrag an Token, der pro Periode gestreamt werden kann.",
+      "description": "Tooltip for the stream amount field"
+    },
+    "streamPeriodLabel": {
+      "message": "Stream-Periode",
+      "description": "Label for the stream period field"
+    },
+    "streamPeriodTooltip": {
+      "message": "Die Periode des Streams.",
+      "description": "Tooltip for the stream period field"
+    },
+    "amountLabel": {
+      "message": "Betrag",
+      "description": "Label for the amount field"
+    },
+    "amountTooltip": {
+      "message": "Der Betrag an Token, der während jeder Periode gewährt wird",
+      "description": "Tooltip for the amount field"
+    },
+    "periodDurationLabel": {
+      "message": "Häufigkeit",
+      "description": "Label for the period duration dropdown field"
+    },
+    "periodDurationTooltip": {
+      "message": "Die Dauer der Periode",
+      "description": "Tooltip for the period duration dropdown field"
+    },
+    "permissionRequestTitle": {
+      "message": "Genehmigungsanfrage",
+      "description": "Title for permission request dialogs"
+    },
+    "showMoreButton": {
+      "message": "Anzeigen",
+      "description": "Text for show more button"
+    },
+    "hideButton": {
+      "message": "Verbergen",
+      "description": "Text for hide button"
+    },
+    "streamRateLabel": {
+      "message": "Stream-Betrag",
+      "description": "Label for stream rate field"
+    },
+    "streamRateTooltip": {
+      "message": "Der Betrag an Token, der pro Sekunde gestreamt wird.",
+      "description": "Tooltip for stream rate field"
+    },
+    "streamRateValue": {
+      "message": "$1 $2/Sek.",
+      "description": "Stream rate value format with amount and symbol"
+    },
+    "cancelButton": {
+      "message": "Stornieren",
+      "description": "Cancel button text"
+    },
+    "grantButton": {
+      "message": "Gewähren",
+      "description": "Grant button text"
+    },
+    "hourly": {
+      "message": "Stündlich",
+      "description": "Hourly time period option"
+    },
+    "daily": {
+      "message": "Täglich",
+      "description": "Daily time period option"
+    },
+    "weekly": {
+      "message": "Wöchentlich",
+      "description": "Weekly time period option"
+    },
+    "biweekly": {
+      "message": "Zweiwöchentlich",
+      "description": "Biweekly time period option"
+    },
+    "monthly": {
+      "message": "Monatlich",
+      "description": "Monthly time period option"
+    },
+    "yearly": {
+      "message": "Jährlich",
+      "description": "Yearly time period option"
+    },
+    "availableLabel": {
+      "message": "verfügbares Guthaben",
+      "description": "Available label for token balance"
+    },
+    "permissionRequestSubtitle": {
+      "message": "Diese Website möchte Genehmigungen, um Ihren Token auszugeben.",
+      "description": "Subtitle for permission request"
+    },
+    "accountUpgradeWarning": {
+      "message": "Dieses Konto wird auf ein smart account aktualisiert, um diese Genehmigung abzuschließen.",
+      "description": "Warning message when account needs to be upgraded"
+    },
+    "removeFieldAlt": {
+      "message": "$1 entfernen",
+      "description": "Alt text for remove field button"
+    },
+    "addFieldAlt": {
+      "message": "$1 hinzufügen",
+      "description": "Alt text for add field button"
+    },
+    "errorAmountMustBeGreaterThanZero": {
+      "message": "$1 muss größer als 0 sein",
+      "description": "Validation error when amount must be positive"
+    },
+    "errorAmountMustBeGreaterThanOrEqualToZero": {
+      "message": "$1 muss größer oder gleich 0 sein",
+      "description": "Validation error when amount must be non-negative"
+    },
+    "errorInvalidAmount": {
+      "message": "Ungültiger $1",
+      "description": "Validation error for invalid amount"
+    },
+    "errorInvalidStartTime": {
+      "message": "Ungültige Startzeit",
+      "description": "Validation error for invalid start time"
+    },
+    "errorStartTimeMustBeTodayOrLater": {
+      "message": "Startzeit muss heute oder später sein",
+      "description": "Validation error when start time is in the past"
+    },
+    "errorInvalidExpiry": {
+      "message": "Ungültiges Ablaufdatum",
+      "description": "Validation error for invalid expiry date"
+    },
+    "errorExpiryMustBeInFuture": {
+      "message": "Ablaufdatum muss in der Zukunft liegen",
+      "description": "Validation error when expiry is not in the future"
+    },
+    "errorStartTimeMustBeBeforeExpiry": {
+      "message": "Startzeit muss vor dem Ablaufdatum liegen",
+      "description": "Validation error when start time is after expiry"
+    },
+    "errorMaxAmountMustBeGreaterThanInitialAmount": {
+      "message": "Maximalbetrag muss größer als der Anfangsbetrag sein",
+      "description": "Validation error when max amount is less than initial amount"
+    },
+    "errorPeriodDurationMustBeGreaterThanZero": {
+      "message": "Periodendauer muss größer als 0 sein",
+      "description": "Validation error when period duration is zero or negative"
+    },
+    "unknownStreamRate": {
+      "message": "Unbekannt",
+      "description": "Fallback text when stream rate cannot be calculated"
+    },
+    "unknownChain": {
+      "message": "Unbekannte Chain $1",
+      "description": "Fallback text when chain name is not available"
+    },
+    "permissionRequestSubtitleRevocation": {
+      "message": "Diese Website möchte Genehmigungen, um Ihre ERC-20 Token Approvals zu widerrufen.",
+      "description": "Subtitle for ERC-20 token revocation permission request"
+    },
+    "introAdvancedPermissionsTitle": {
+      "message": "Erweiterte Genehmigungen geben Ihnen die Kontrolle",
+      "description": "Title for the advanced permissions introduction page"
+    },
+    "introSecureLimitedAccessTitle": {
+      "message": "Sicherer, eingeschränkter Zugriff",
+      "description": "Title for the secure limited access bullet point"
+    },
+    "introSecureLimitedAccessDescription": {
+      "message": "Beschränken Sie Websites und widerrufen Sie Zugriffe nach Ihren eigenen Vorgaben.",
+      "description": "Description for the secure limited access bullet point"
+    },
+    "introFullyCustomizableControlTitle": {
+      "message": "Vollständig anpassbare Kontrolle",
+      "description": "Title for the fully customizable control bullet point"
+    },
+    "introFullyCustomizableControlDescription": {
+      "message": "Überprüfen, bearbeiten oder fügen Sie Regeln hinzu, damit Genehmigungen Ihren Anforderungen entsprechen.",
+      "description": "Description for the fully customizable control bullet point"
+    },
+    "introTransparentConvenientTitle": {
+      "message": "Transparent und bequem",
+      "description": "Title for the transparent and convenient bullet point"
+    },
+    "introTransparentConvenientDescription": {
+      "message": "Verwalten, automatisieren und bearbeiten Sie Genehmigungen einfach von einem Ort aus.",
+      "description": "Description for the transparent and convenient bullet point"
+    },
+    "introSubscriptionTitle": {
+      "message": "Diese Website möchte ein Token-Abonnement erstellen",
+      "description": "Title for the subscription permission introduction page"
+    },
+    "introRecurringPaymentsDescription": {
+      "message": "Erlauben Sie dieser Website, Token automatisch in regelmäßigen Abständen aus Ihrer Wallet abzuheben – wie ein Abonnementdienst für die Blockchain.",
+      "description": "Description for the recurring payments bullet point"
+    },
+    "introStreamTitle": {
+      "message": "Diese Website möchte einen Token-Stream erstellen",
+      "description": "Title for the stream permission introduction page"
+    },
+    "introContinuousTokenFlowDescription": {
+      "message": "Ermöglichen Sie schrittweise Echtzeit-Token-Transfers aus Ihrer Wallet – Token fließen stetig über die Zeit, anstatt alles auf einmal zu bewegen.",
+      "description": "Description for the continuous token flow bullet point"
+    },
+    "introRevocationTitle": {
+      "message": "Diese Website bittet um Token-Widerrufsgenehmigungen",
+      "description": "Title for the revocation permission introduction page"
+    },
+    "introManageTokenApprovalsDescription": {
+      "message": "Erlauben Sie dieser Website, bestehende Token Approvals in Ihrem Namen zu widerrufen – hilft Ihnen, alte Genehmigungen aufzuräumen und Risiken zu reduzieren.",
+      "description": "Description for the manage token approvals bullet point"
+    },
+    "introPermissionInControlDescription": {
+      "message": "Sie können diese Genehmigung jederzeit in den erweiterten Genehmigungen bearbeiten oder widerrufen.",
+      "description": "Description for the permission in your control bullet point"
+    },
+    "introGotItButton": {
+      "message": "Verstanden",
+      "description": "Text for the got it button on introduction pages"
+    }
+  }
+}
