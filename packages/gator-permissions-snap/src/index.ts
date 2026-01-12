@@ -203,6 +203,8 @@ const boundRpcHandlers: {
   [RpcMethod.PermissionsProviderSubmitRevocation]: async (
     params?: JsonRpcParams,
   ) => rpcHandler.submitRevocation(params as Json),
+  [RpcMethod.PermissionsProviderGetSupportedPermissions]:
+    rpcHandler.getSupportedPermissions.bind(rpcHandler),
 };
 
 /**
