@@ -174,8 +174,7 @@ export function createRpcHandler({
     if (typeof delegationManager === 'string') {
       filteredPermissions = filteredPermissions.filter(
         (permission) =>
-          permission.permissionResponse.signerMeta.delegationManager ===
-          delegationManager,
+          permission.permissionResponse.delegationManager === delegationManager,
       );
     }
 
@@ -208,14 +207,12 @@ export function createRpcHandler({
     }
 
     // Extract delegationManager and chainId from the permission response for logging
-    const { chainId: permissionChainId, signerMeta } =
+    const { chainId: permissionChainId, delegationManager } =
       existingPermission.permissionResponse;
-    const { delegationManager } = signerMeta;
 
     logger.debug('Permission details extracted:', {
       chainId: permissionChainId,
-      delegationManager: delegationManager ?? 'undefined',
-      signerMeta,
+      delegationManager,
     });
 
     if (!delegationManager) {

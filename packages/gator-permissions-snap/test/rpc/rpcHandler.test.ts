@@ -37,13 +37,9 @@ const VALID_PERMISSION_REQUEST: PermissionRequest = {
       data: {
         timestamp: TEST_EXPIRY,
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: { address: TEST_ADDRESS },
-  },
+  to: TEST_ADDRESS,
   permission: {
     type: 'test-permission',
     data: {
@@ -66,23 +62,17 @@ const VALID_PERMISSION_RESPONSE: PermissionResponse = {
       data: {
         timestamp: TEST_EXPIRY,
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: { address: TEST_ADDRESS },
-  },
+  to: TEST_ADDRESS,
   permission: {
     type: 'test-permission',
     data: { justification: 'Testing permission request' },
     isAdjustmentAllowed: true,
   },
   context: TEST_CONTEXT,
-  dependencyInfo: [],
-  signerMeta: {
-    delegationManager: TEST_ADDRESS,
-  },
+  dependencies: [],
+  delegationManager: TEST_ADDRESS,
 };
 
 const MOCK_SUCCESS_RESPONSE = {
@@ -608,23 +598,17 @@ describe('RpcHandler', () => {
                 data: {
                   timestamp: TEST_EXPIRY,
                 },
-                isAdjustmentAllowed: true,
               },
             ],
-            signer: {
-              type: 'account' as const,
-              data: { address: TEST_ADDRESS },
-            },
+            to: TEST_ADDRESS,
             permission: {
               type: 'test-permission',
               data: { justification: 'Testing permission request' },
               isAdjustmentAllowed: true,
             },
             context: TEST_CONTEXT,
-            dependencyInfo: [],
-            signerMeta: {
-              delegationManager: TEST_ADDRESS,
-            },
+            dependencies: [],
+            delegationManager: TEST_ADDRESS,
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
@@ -632,24 +616,16 @@ describe('RpcHandler', () => {
         {
           permissionResponse: {
             chainId: TEST_CHAIN_ID,
-            expiry: TEST_EXPIRY + 1000,
-            signer: {
-              type: 'account' as const,
-              data: {
-                address: '0x0987654321098765432109876543210987654321' as const,
-              },
-            },
+            to: '0x0987654321098765432109876543210987654321' as const,
             permission: {
               type: 'different-permission',
               data: { justification: 'Another permission' },
               isAdjustmentAllowed: true,
             },
             context: '0xefgh' as const,
-            dependencyInfo: [],
-            signerMeta: {
-              delegationManager:
-                '0x0987654321098765432109876543210987654321' as const,
-            },
+            dependencies: [],
+            delegationManager:
+              '0x0987654321098765432109876543210987654321' as const,
           },
           siteOrigin: 'https://another-example.com',
           isRevoked: false,
@@ -704,23 +680,17 @@ describe('RpcHandler', () => {
                 data: {
                   timestamp: TEST_EXPIRY,
                 },
-                isAdjustmentAllowed: true,
               },
             ],
-            signer: {
-              type: 'account' as const,
-              data: { address: TEST_ADDRESS },
-            },
+            to: TEST_ADDRESS,
             permission: {
               type: 'test-permission',
               data: { justification: 'Testing permission request' },
               isAdjustmentAllowed: true,
             },
             context: TEST_CONTEXT,
-            dependencyInfo: [],
-            signerMeta: {
-              delegationManager: TEST_ADDRESS,
-            },
+            dependencies: [],
+            delegationManager: TEST_ADDRESS,
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
@@ -734,26 +704,18 @@ describe('RpcHandler', () => {
                 data: {
                   timestamp: TEST_EXPIRY + 1000,
                 },
-                isAdjustmentAllowed: true,
               },
             ],
-            signer: {
-              type: 'account' as const,
-              data: {
-                address: '0x0987654321098765432109876543210987654321' as const,
-              },
-            },
+            to: '0x0987654321098765432109876543210987654321',
             permission: {
               type: 'different-permission',
               data: { justification: 'Another permission' },
               isAdjustmentAllowed: true,
             },
             context: '0xefgh' as const,
-            dependencyInfo: [],
-            signerMeta: {
-              delegationManager:
-                '0x0987654321098765432109876543210987654321' as const,
-            },
+            dependencies: [],
+            delegationManager:
+              '0x0987654321098765432109876543210987654321' as const,
           },
           siteOrigin: 'https://another-example.com',
           isRevoked: true,
@@ -767,24 +729,18 @@ describe('RpcHandler', () => {
                 data: {
                   timestamp: TEST_EXPIRY,
                 },
-                isAdjustmentAllowed: true,
               },
             ],
-            signer: {
-              type: 'account' as const,
-              data: { address: TEST_ADDRESS },
-            },
+            to: TEST_ADDRESS,
             permission: {
               type: 'third-permission',
               data: { justification: 'Third permission' },
               isAdjustmentAllowed: true,
             },
             context: '0xijkl' as const,
-            dependencyInfo: [],
-            signerMeta: {
-              delegationManager:
-                '0x1111111111111111111111111111111111111111' as const,
-            },
+            dependencies: [],
+            delegationManager:
+              '0x1111111111111111111111111111111111111111' as const,
           },
           siteOrigin: TEST_SITE_ORIGIN,
           isRevoked: false,
@@ -865,9 +821,9 @@ describe('RpcHandler', () => {
           mockProfileSyncManager.getAllGrantedPermissions,
         ).toHaveBeenCalledTimes(1);
         expect(result).toHaveLength(1);
-        expect(
-          (result as any[])[0].permissionResponse.signerMeta.delegationManager,
-        ).toBe(TEST_ADDRESS);
+        expect((result as any[])[0].permissionResponse.delegationManager).toBe(
+          TEST_ADDRESS,
+        );
       });
 
       it('should combine multiple filters', async () => {
@@ -886,7 +842,7 @@ describe('RpcHandler', () => {
         expect(permission.isRevoked).toBe(false);
         expect(permission.siteOrigin).toBe(TEST_SITE_ORIGIN);
         expect(permission.permissionResponse.chainId).toBe(TEST_CHAIN_ID);
-        expect(permission.permissionResponse.signerMeta.delegationManager).toBe(
+        expect(permission.permissionResponse.delegationManager).toBe(
           TEST_ADDRESS,
         );
       });
@@ -961,23 +917,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
@@ -1062,23 +1012,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
@@ -1118,23 +1062,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
@@ -1172,23 +1110,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
@@ -1222,23 +1154,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
@@ -1273,23 +1199,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
@@ -1328,23 +1248,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
@@ -1383,23 +1297,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,

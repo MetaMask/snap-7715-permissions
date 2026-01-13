@@ -37,11 +37,6 @@ export const zRule = z
     type: zTypeDescriptor,
 
     /**
-     * Whether the rule can be adjusted
-     */
-    isAdjustmentAllowed: z.boolean(),
-
-    /**
      * Data structure varies by rule type.
      */
     data: z.record(z.string(), z.any()),
