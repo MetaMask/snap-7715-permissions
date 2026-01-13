@@ -214,11 +214,6 @@ export function createRpcHandler(config: {
         },
       });
 
-      // Extract permissionResponse from each StoredGrantedPermission
-      if (!Array.isArray(grantedPermissions)) {
-        return [];
-      }
-
       return (grantedPermissions as { permissionResponse: Json }[]).map(
         (permission) => permission.permissionResponse,
       );

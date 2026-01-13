@@ -26,7 +26,7 @@ export const zWalletSigner = z.object({
  * A wallet is the signer for these permissions
  * `data` is not necessary for this signer type as the wallet is both the signer and grantor of these permissions.
  */
-export type WalletSigner = z.infer<typeof zAccountSigner>;
+export type WalletSigner = z.infer<typeof zWalletSigner>;
 
 export const zPermissionRequest = z
   .object({
@@ -48,12 +48,12 @@ export const zPermissionRequest = z
     signer: zAccountSigner,
 
     /**
-     * Defines the allowed behavior the signer can do on behalf of the account.
+     * The type of action the signer is permitted to perform (e.g., native token transfer, contract call).
      */
     permission: zPermission,
 
     /**
-     * Defines the allowed behavior the signer can do on behalf of the account.
+     * Constraints that limit how the permission can be used (e.g., expiry time).
      */
     rules: z.array(zRule).superRefine((rules, ctx) => {
       // Check for duplicate rule types
