@@ -8,6 +8,7 @@
 files:
   - 'source': 'packages/gator-permissions-snap/locales/en.json'
     'translation': 'packages/gator-permissions-snap/locales/%two_letters_code%.json'
+    'type': 'chrome'
     'languages_mapping':
       'two_letters_code':
         'zh-CN': 'zh_CN'
