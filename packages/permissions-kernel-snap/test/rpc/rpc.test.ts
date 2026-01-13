@@ -31,12 +31,7 @@ describe('RpcHandler', () => {
     const mockPermissions: PermissionsRequest = [
       {
         chainId: '0x1',
-        signer: {
-          type: 'account',
-          data: {
-            address: '0x1234567890123456789012345678901234567890',
-          },
-        },
+        to: '0x1234567890123456789012345678901234567890',
         permission: {
           type: 'native-token-transfer',
           isAdjustmentAllowed: true,
@@ -48,7 +43,6 @@ describe('RpcHandler', () => {
         rules: [
           {
             type: 'expiry',
-            isAdjustmentAllowed: true,
             data: {
               timestamp: 123456,
             },
@@ -82,12 +76,7 @@ describe('RpcHandler', () => {
       const mockPartialPermissions: PermissionsRequest = [
         {
           chainId: '0x1',
-          signer: {
-            type: 'account',
-            data: {
-              address: '0x1234567890123456789012345678901234567890',
-            },
-          },
+          to: '0x1234567890123456789012345678901234567890',
           permission: {
             type: 'native-token-transfer',
             isAdjustmentAllowed: true,
@@ -99,7 +88,6 @@ describe('RpcHandler', () => {
           rules: [
             {
               type: 'expiry',
-              isAdjustmentAllowed: true,
               data: {
                 timestamp: 123456,
               },
@@ -144,12 +132,7 @@ describe('RpcHandler', () => {
       const mockGrantedPermissions: PermissionsResponse = [
         {
           chainId: '0x1',
-          signer: {
-            type: 'account',
-            data: {
-              address: '0x1234567890123456789012345678901234567890',
-            },
-          },
+          to: '0x1234567890123456789012345678901234567890',
           permission: {
             type: 'native-token-transfer',
             isAdjustmentAllowed: true,
@@ -161,23 +144,20 @@ describe('RpcHandler', () => {
           rules: [
             {
               type: 'expiry',
-              isAdjustmentAllowed: true,
               data: {
                 timestamp: 123456,
               },
             },
           ],
-          address: '0x1234567890123456789012345678901234567890',
+          from: '0x1234567890123456789012345678901234567890',
           context: '0x1',
-          dependencyInfo: [
+          dependencies: [
             {
               factory: '0x1234567890123456789012345678901234567890',
               factoryData: '0x',
             },
           ],
-          signerMeta: {
-            delegationManager: '0x1234567890123456789012345678901234567890',
-          },
+          delegationManager: '0x1234567890123456789012345678901234567890',
         },
       ];
       setupSuccessfulPermissionFlow();
