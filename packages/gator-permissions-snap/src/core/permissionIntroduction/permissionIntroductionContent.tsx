@@ -15,22 +15,23 @@ import type {
   PermissionIntroductionConfig,
   PermissionIntroductionPageConfig,
 } from './types';
-import advancedPermissionsImage from '../../../images/advanced-permissions.svg';
-import newPermissionTypeImage from '../../../images/new-permission-type.svg';
+import indicatorSelected from '../../../images/indicator-selected.svg';
+import indicatorUnselected from '../../../images/indicator-unselected.svg';
+import permissionRequestImage from '../../../images/permission-request.svg';
 import { t } from '../../utils/i18n';
 
 // Button name constants for event handling
 export const PERMISSION_INTRODUCTION_CONFIRM_BUTTON =
   'permission-introduction-confirm';
-export const PERMISSION_INTRODUCTION_PAGE_1_DOT = 'intro-page-1-dot';
-export const PERMISSION_INTRODUCTION_PAGE_2_DOT = 'intro-page-2-dot';
+export const PERMISSION_INTRODUCTION_PREV_ARROW = 'intro-prev-arrow';
+export const PERMISSION_INTRODUCTION_NEXT_ARROW = 'intro-next-arrow';
 
 /**
  * Fixed page 2 content shared by all permission types.
  * This contains general information about advanced permissions.
  */
 const fixedPage2Content: PermissionIntroductionPageConfig = {
-  headerImageSvg: advancedPermissionsImage,
+  headerImageSvg: permissionRequestImage,
   title: 'introAdvancedPermissionsTitle',
   bulletPoints: [
     {
@@ -52,7 +53,7 @@ const fixedPage2Content: PermissionIntroductionPageConfig = {
 };
 
 const subscriptionPage1Content: PermissionIntroductionPageConfig = {
-  headerImageSvg: newPermissionTypeImage,
+  headerImageSvg: permissionRequestImage,
   title: 'introSubscriptionTitle',
   bulletPoints: [
     {
@@ -65,7 +66,7 @@ const subscriptionPage1Content: PermissionIntroductionPageConfig = {
 };
 
 const streamPage1Content: PermissionIntroductionPageConfig = {
-  headerImageSvg: newPermissionTypeImage,
+  headerImageSvg: permissionRequestImage,
   title: 'introStreamTitle',
   bulletPoints: [
     {
@@ -78,7 +79,7 @@ const streamPage1Content: PermissionIntroductionPageConfig = {
 };
 
 const revocationPage1Content: PermissionIntroductionPageConfig = {
-  headerImageSvg: newPermissionTypeImage,
+  headerImageSvg: permissionRequestImage,
   title: 'introRevocationTitle',
   bulletPoints: [
     {
@@ -166,13 +167,15 @@ export function buildIntroductionContent(
   };
 
   return (
-    <Container>
+    <Container backgroundColor="alternative">
       <Box direction="vertical">
+        <Box center={true}>
+          <Heading size="md">{t(pageConfig.title)}</Heading>
+        </Box>
         <Image
           src={pageConfig.headerImageSvg}
           alt="Introduction illustration"
         />
-        <Heading size="md">{t(pageConfig.title)}</Heading>
         {pageConfig.bulletPoints.map((point, index) => (
           <Box key={`bullet-${index}`} direction="horizontal" alignment="start">
             {getIconContent(point)}
@@ -183,12 +186,28 @@ export function buildIntroductionContent(
             </Box>
           </Box>
         ))}
-        <Box direction="horizontal" alignment="center">
-          <Button name={PERMISSION_INTRODUCTION_PAGE_1_DOT} variant="primary">
-            {currentPage === 1 ? '●' : '○'}
+        <Box direction="horizontal" alignment="space-between">
+          <Button
+            name={PERMISSION_INTRODUCTION_PREV_ARROW}
+            disabled={currentPage === 1}
+          >
+            <Icon name="arrow-left" size="md" />
           </Button>
-          <Button name={PERMISSION_INTRODUCTION_PAGE_2_DOT} variant="primary">
-            {currentPage === 2 ? '●' : '○'}
+          <Box direction="horizontal" alignment="center">
+            <Image
+              src={currentPage === 1 ? indicatorSelected : indicatorUnselected}
+              alt="Page 1"
+            />
+            <Image
+              src={currentPage === 2 ? indicatorSelected : indicatorUnselected}
+              alt="Page 2"
+            />
+          </Box>
+          <Button
+            name={PERMISSION_INTRODUCTION_NEXT_ARROW}
+            disabled={currentPage === 2}
+          >
+            <Icon name="arrow-right" size="md" />
           </Button>
         </Box>
       </Box>
