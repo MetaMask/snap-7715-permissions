@@ -4,8 +4,8 @@ import {
   buildIntroductionContent as buildContent,
   getPermissionIntroductionConfig,
   PERMISSION_INTRODUCTION_CONFIRM_BUTTON,
-  PERMISSION_INTRODUCTION_PAGE_1_DOT,
-  PERMISSION_INTRODUCTION_PAGE_2_DOT,
+  PERMISSION_INTRODUCTION_PREV_ARROW,
+  PERMISSION_INTRODUCTION_NEXT_ARROW,
 } from './permissionIntroductionContent';
 import type { PermissionIntroductionConfig } from './types';
 import type { StateManager } from '../../stateManagement';
@@ -142,27 +142,27 @@ export class PermissionIntroductionService {
           });
           unbindFunctions.push(unbindConfirm);
 
-          // Handler for page 1 dot
-          const { unbind: unbindPage1Dot } = this.#userEventDispatcher.on({
-            elementName: PERMISSION_INTRODUCTION_PAGE_1_DOT,
+          // Handler for previous arrow
+          const { unbind: unbindPrevArrow } = this.#userEventDispatcher.on({
+            elementName: PERMISSION_INTRODUCTION_PREV_ARROW,
             eventType: UserInputEventType.ButtonClickEvent,
             interfaceId,
             handler: async () => {
               await updatePage(1);
             },
           });
-          unbindFunctions.push(unbindPage1Dot);
+          unbindFunctions.push(unbindPrevArrow);
 
-          // Handler for page 2 dot
-          const { unbind: unbindPage2Dot } = this.#userEventDispatcher.on({
-            elementName: PERMISSION_INTRODUCTION_PAGE_2_DOT,
+          // Handler for next arrow
+          const { unbind: unbindNextArrow } = this.#userEventDispatcher.on({
+            elementName: PERMISSION_INTRODUCTION_NEXT_ARROW,
             eventType: UserInputEventType.ButtonClickEvent,
             interfaceId,
             handler: async () => {
               await updatePage(2);
             },
           });
-          unbindFunctions.push(unbindPage2Dot);
+          unbindFunctions.push(unbindNextArrow);
         })
         .catch(() => {
           unbindAll();
