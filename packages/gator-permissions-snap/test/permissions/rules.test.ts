@@ -143,7 +143,6 @@ describe('applyExpiryRule', () => {
     const existingRule = {
       type: 'expiry',
       data: { timestamp: 1111111111 },
-      isAdjustmentAllowed: false,
     };
     const originalRequest: any = { rules: [existingRule] };
     const newTimestamp = 1893542400; // 2030-01-02T00:00:00.000Z
@@ -151,22 +150,19 @@ describe('applyExpiryRule', () => {
     const updated = applyExpiryRule(
       {
         ...baseRuleContext,
-        expiry: { timestamp: newTimestamp, isAdjustmentAllowed: true },
+        expiry: { timestamp: newTimestamp },
       },
       originalRequest,
     );
 
     expect(updated.rules).toHaveLength(1);
     expect(updated.rules[0].data.timestamp).toBe(newTimestamp);
-    // ensure other properties remain untouched during update
-    expect(updated.rules[0].isAdjustmentAllowed).toBe(false);
   });
 
   it('removes expiry rule when no timestamp is set but rule exists', () => {
     const existingRule = {
       type: 'expiry',
       data: { timestamp: 1111111111 },
-      isAdjustmentAllowed: true,
     };
     const anotherRule = { type: 'other', data: { foo: 'bar' } };
     const originalRequest: any = { rules: [anotherRule, existingRule] };
