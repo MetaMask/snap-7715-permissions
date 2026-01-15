@@ -1,5 +1,6 @@
 import {
   logger,
+  createErrorTracker,
   getErrorTracker,
 } from '@metamask/7715-permissions-shared/utils';
 import {
@@ -20,6 +21,12 @@ import { validateJsonRpcRequest } from './utils';
 const rpcHandler = createRpcHandler({
   permissionOfferRegistryManager: createPermissionOfferRegistryManager(snap),
   snapsProvider: snap,
+});
+
+// Initialize error tracker
+createErrorTracker({
+  enabled: true,
+  snapName: 'permissions-kernel-snap',
 });
 
 // configure RPC methods bindings
@@ -107,11 +114,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     return result;
   } catch (error) {
-    await errorTracker.captureError(error, request.method || 'unknown', {
-      origin,
-      errorType: 'rpc_request_handler',
-      snapName: 'permissions-kernel-snap',
-    });
+    await errorTracker.captureError(error, request.method || 'unknown');
     throw error;
   } finally {
     // Always release the processing lock we acquired, regardless of success or failure

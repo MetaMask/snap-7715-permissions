@@ -22,13 +22,11 @@ type RpcHandler = (options: RpcHandlerOptions) => Promise<Json>;
  *
  * @param handler - The original RPC handler function.
  * @param methodName - The RPC method name (for error tracking).
- * @param tags - Optional tags for categorizing errors.
  * @returns A wrapped RPC handler with error tracking.
  */
 export function wrapRpcHandlerWithErrorTracking(
   handler: RpcHandler,
   methodName: string,
-  tags?: Record<string, string | number>,
 ): RpcHandler {
   return async (options: RpcHandlerOptions): Promise<Json> => {
     const errorTracker = getErrorTracker();
@@ -43,16 +41,12 @@ export function wrapRpcHandlerWithErrorTracking(
         'error' in result &&
         (result as any).error
       ) {
-        await errorTracker.captureResponseError(result, methodName, tags);
+        await errorTracker.captureResponseError(result, methodName);
       }
 
       return result;
     } catch (error) {
-      await errorTracker.captureError(error, methodName, {
-        errorType: 'rpc_handler',
-        origin: options.siteOrigin,
-        ...tags,
-      });
+      await errorTracker.captureError(error, methodName);
       throw error;
     }
   };
@@ -63,20 +57,15 @@ export function wrapRpcHandlerWithErrorTracking(
  * Useful for wrapping all RPC handlers in a batch operation.
  *
  * @param handlers - An object mapping method names to RPC handler functions.
- * @param baseTags - Optional base tags to apply to all handlers.
  * @returns An object with wrapped handlers.
  */
 export function wrapRpcHandlersWithErrorTracking(
   handlers: Record<string, RpcHandler>,
-  baseTags?: Record<string, string | number>,
 ): Record<string, RpcHandler> {
   const wrapped: Record<string, RpcHandler> = {};
 
   for (const [methodName, handler] of Object.entries(handlers)) {
-    wrapped[methodName] = wrapRpcHandlerWithErrorTracking(handler, methodName, {
-      method: methodName,
-      ...baseTags,
-    });
+    wrapped[methodName] = wrapRpcHandlerWithErrorTracking(handler, methodName);
   }
 
   return wrapped;

@@ -4,6 +4,7 @@ import { getJsonError } from '@metamask/snaps-sdk';
  * Error information that will be tracked.
  */
 export type ErrorTrackingInfo = {
+  snapName: string;
   method: string;
   url?: string | undefined;
   statusCode?: number | undefined;
@@ -11,9 +12,6 @@ export type ErrorTrackingInfo = {
   errorStack?: string | undefined;
   responseData?: any | undefined;
   requestParams?: any | undefined;
-  tags?: Record<string, string | number>;
-  context?: Record<string, any>;
-  timestamp?: number;
 };
 
 /**
@@ -21,7 +19,7 @@ export type ErrorTrackingInfo = {
  */
 export type ErrorTrackingConfig = {
   enabled: boolean;
-  environment?: string;
+  snapName: string;
   shouldTrackError?: (error: any) => boolean;
 };
 
@@ -32,13 +30,13 @@ export type ErrorTrackingConfig = {
 export class SnapErrorTracker {
   #enabled: boolean;
 
-  readonly #environment: string;
+  readonly #snapName: string;
 
   readonly #shouldTrackError: (error: any) => boolean;
 
-  constructor(config: ErrorTrackingConfig = { enabled: true }) {
+  constructor(config: ErrorTrackingConfig) {
     this.#enabled = config.enabled;
-    this.#environment = config.environment ?? 'development';
+    this.#snapName = config.snapName;
     this.#shouldTrackError =
       config.shouldTrackError ??
       ((error: any) => {
@@ -59,9 +57,9 @@ export class SnapErrorTracker {
    */
   #extractErrorInfo(error: any, method: string): ErrorTrackingInfo {
     const errorInfo: ErrorTrackingInfo = {
+      snapName: this.#snapName,
       method,
       errorMessage: 'Unknown error',
-      timestamp: Date.now(),
     };
 
     // Check if the error has a currentUrl property
@@ -155,28 +153,13 @@ export class SnapErrorTracker {
    *
    * @param error - The error to capture.
    * @param method - The method/operation name.
-   * @param tags - Optional tags for categorizing the error.
-   * @param context - Optional context information.
    */
-  async captureError(
-    error: any,
-    method: string,
-    tags?: Record<string, string | number>,
-    context?: Record<string, any>,
-  ): Promise<void> {
+  async captureError(error: any, method: string): Promise<void> {
     if (!this.#enabled || !this.#shouldTrackError(error)) {
       return;
     }
 
     const errorInfo = this.#extractErrorInfo(error, method);
-    errorInfo.tags = {
-      environment: this.#environment,
-      ...tags,
-    };
-    if (context) {
-      errorInfo.context = context;
-    }
-
     await this.#trackErrorViaSnap(errorInfo);
   }
 
@@ -185,27 +168,17 @@ export class SnapErrorTracker {
    *
    * @param response - The response object.
    * @param method - The method/operation name.
-   * @param tags - Optional tags for categorizing the error.
    */
-  async captureResponseError(
-    response: any,
-    method: string,
-    tags?: Record<string, string | number>,
-  ): Promise<void> {
+  async captureResponseError(response: any, method: string): Promise<void> {
     if (!this.#enabled || !this.#isErrorResponse(response)) {
       return;
     }
 
     const errorInfo: ErrorTrackingInfo = {
+      snapName: this.#snapName,
       method,
       errorMessage: `Response error: ${JSON.stringify(response)}`,
       responseData: response,
-      timestamp: Date.now(),
-      tags: {
-        environment: this.#environment,
-        errorType: 'response_error',
-        ...tags,
-      },
     };
 
     await this.#trackErrorViaSnap(errorInfo);
@@ -216,19 +189,17 @@ export class SnapErrorTracker {
    *
    * @param fn - The function to wrap.
    * @param methodName - The name of the method (for error tracking).
-   * @param tags - Optional tags for categorizing errors.
    * @returns The wrapped function.
    */
   wrapAsync<TFn extends (...args: any[]) => Promise<any>>(
     fn: TFn,
     methodName: string,
-    tags?: Record<string, string | number>,
   ): TFn {
     return (async (...args: any[]) => {
       try {
         return await fn(...args);
       } catch (error) {
-        await this.captureError(error, methodName, tags);
+        await this.captureError(error, methodName);
         throw error;
       }
     }) as TFn;
@@ -239,15 +210,11 @@ export class SnapErrorTracker {
    * Returns the original error to maintain error flow.
    *
    * @param methodName - The RPC method name.
-   * @param tags - Optional tags for categorizing errors.
    * @returns An error handler function.
    */
-  createRpcErrorHandler(
-    methodName: string,
-    tags?: Record<string, string | number>,
-  ): (error: any) => Promise<void> {
+  createRpcErrorHandler(methodName: string): (error: any) => Promise<void> {
     return async (error: any) => {
-      await this.captureError(error, methodName, tags);
+      await this.captureError(error, methodName);
     };
   }
 
@@ -273,7 +240,7 @@ export class SnapErrorTracker {
 /**
  * Creates and returns a singleton error tracker instance.
  *
- * @param config - Optional configuration for the error tracker.
+ * @param config - Configuration for the error tracker.
  * @returns The error tracker instance.
  */
 let errorTrackerInstance: SnapErrorTracker | null = null;
@@ -281,11 +248,11 @@ let errorTrackerInstance: SnapErrorTracker | null = null;
 /**
  * Creates a singleton error tracker instance.
  *
- * @param config - Optional configuration for the error tracker.
+ * @param config - Configuration for the error tracker.
  * @returns The singleton error tracker instance.
  */
 export function createErrorTracker(
-  config?: ErrorTrackingConfig,
+  config: ErrorTrackingConfig,
 ): SnapErrorTracker {
   if (!errorTrackerInstance) {
     errorTrackerInstance = new SnapErrorTracker(config);
@@ -295,13 +262,14 @@ export function createErrorTracker(
 
 /**
  * Gets the current error tracker instance.
- * Creates a default one if none exists.
  *
  * @returns The error tracker instance.
  */
 export function getErrorTracker(): SnapErrorTracker {
   if (!errorTrackerInstance) {
-    errorTrackerInstance = new SnapErrorTracker();
+    throw new Error(
+      'Error tracker not initialized. Call createErrorTracker with config first.',
+    );
   }
   return errorTrackerInstance;
 }

@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import {
   logger,
+  createErrorTracker,
   getErrorTracker,
 } from '@metamask/7715-permissions-shared/utils';
 import {
@@ -193,6 +194,12 @@ const rpcHandler = createRpcHandler({
   blockchainMetadataClient: tokenMetadataClient,
 });
 
+// Initialize error tracker
+createErrorTracker({
+  enabled: true,
+  snapName: 'gator-permissions-snap',
+});
+
 // configure RPC methods bindings
 const boundRpcHandlers: {
   [RpcMethod: string]: (params?: JsonRpcParams) => Promise<Json>;
@@ -251,10 +258,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     return result;
   } catch (error) {
-    await errorTracker.captureError(error, request.method, {
-      origin,
-      errorType: 'rpc_request_handler',
-    });
+    await errorTracker.captureError(error, request.method);
     throw error;
   }
 };
