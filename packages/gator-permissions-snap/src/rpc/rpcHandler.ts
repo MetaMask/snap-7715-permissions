@@ -1,12 +1,19 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { GetSupportedPermissionsResult } from '@metamask/7715-permissions-shared/types';
+import { SUPPORTED_RULE_TYPES } from '@metamask/7715-permissions-shared/types';
+import {
+  extractDescriptorName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
 import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
 import {
   InvalidInputError,
   UserRejectedRequestError,
 } from '@metamask/snaps-sdk';
 import type { Json } from '@metamask/snaps-sdk';
+import { numberToHex } from '@metamask/utils';
 
 import type { BlockchainTokenMetadataClient } from '../clients/blockchainMetadataClient';
+import { nameAndExplorerUrlByChainId } from '../core/chainMetadata';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
@@ -53,6 +60,13 @@ export type RpcHandler = {
    * @returns Success confirmation.
    */
   submitRevocation(params: Json): Promise<Json>;
+
+  /**
+   * Handles get supported permissions requests.
+   *
+   * @returns The supported permission types with their chainIds and ruleTypes.
+   */
+  getSupportedPermissions(): Promise<Json>;
 };
 
 /**
@@ -260,10 +274,42 @@ export function createRpcHandler({
     return { success: true };
   };
 
+  /**
+   * Handles get supported permissions requests.
+   * Returns the supported permission types with their chainIds and ruleTypes.
+   *
+   * @returns The supported permission types with their chainIds and ruleTypes.
+   */
+  const getSupportedPermissions = async (): Promise<Json> => {
+    logger.debug('getSupportedPermissions()');
+
+    const chainIds = Object.keys(nameAndExplorerUrlByChainId).map((id) =>
+      numberToHex(Number(id)),
+    );
+
+    const supportedPermissions: GetSupportedPermissionsResult = {};
+
+    for (const offer of DEFAULT_GATOR_PERMISSION_TO_OFFER) {
+      const permissionType = extractDescriptorName(offer.type);
+      const ruleTypes =
+        SUPPORTED_RULE_TYPES[
+          permissionType as keyof typeof SUPPORTED_RULE_TYPES
+        ];
+
+      supportedPermissions[permissionType] = {
+        chainIds,
+        ruleTypes: ruleTypes ? [...ruleTypes] : [],
+      };
+    }
+
+    return supportedPermissions as Json;
+  };
+
   return {
     grantPermission,
     getPermissionOffers,
     getGrantedPermissions,
     submitRevocation,
+    getSupportedPermissions,
   };
 }

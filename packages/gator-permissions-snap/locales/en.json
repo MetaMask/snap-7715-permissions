@@ -274,7 +274,7 @@
       "description": "Description for the transparent and convenient bullet point"
     },
     "introSubscriptionTitle": {
-      "message": "This site wants to create a token subscription",
+      "message": "Token subscription request",
       "description": "Title for the subscription permission introduction page"
     },
     "introRecurringPaymentsDescription": {
@@ -282,7 +282,7 @@
       "description": "Description for the recurring payments bullet point"
     },
     "introStreamTitle": {
-      "message": "This site wants to create a token stream",
+      "message": "Token streaming request",
       "description": "Title for the stream permission introduction page"
     },
     "introContinuousTokenFlowDescription": {
@@ -290,7 +290,7 @@
       "description": "Description for the continuous token flow bullet point"
     },
     "introRevocationTitle": {
-      "message": "This site is asking for token revocation permissions",
+      "message": "Token revocation request",
       "description": "Title for the revocation permission introduction page"
     },
     "introManageTokenApprovalsDescription": {
