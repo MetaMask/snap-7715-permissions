@@ -65,7 +65,7 @@ export async function applyContext({
 
   return {
     ...originalRequest,
-    address: address as Hex,
+    from: address as Hex,
     permission: {
       type: 'native-token-periodic',
       data: permissionData,
@@ -113,11 +113,11 @@ export async function buildContext({
   const chainId = Number(permissionRequest.chainId);
 
   const {
-    address,
+    from,
     permission: { data, isAdjustmentAllowed },
   } = permissionRequest;
 
-  if (!address) {
+  if (!from) {
     throw new InvalidInputError(
       'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
     );
@@ -126,7 +126,7 @@ export async function buildContext({
   const { decimals, symbol, iconUrl } =
     await tokenMetadataService.getTokenBalanceAndMetadata({
       chainId,
-      account: address,
+      account: from,
     });
 
   const iconDataResponse =
@@ -143,7 +143,6 @@ export async function buildContext({
   const expiry = expiryRule
     ? {
         timestamp: expiryRule.data.timestamp,
-        isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
       }
     : undefined;
 
@@ -167,7 +166,7 @@ export async function buildContext({
   const accountAddressCaip10 = toCaipAccountId(
     CHAIN_NAMESPACE,
     chainId.toString(),
-    address,
+    from,
   );
 
   return {

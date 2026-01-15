@@ -29,7 +29,6 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.initialAmount ?? undefined,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     iconData: getIconData(context),
     tooltip: t('initialAmountTooltip'),
@@ -51,7 +50,6 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.maxAmount ?? undefined,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: t('maxAmountTooltip'),
     iconData: getIconData(context),
@@ -72,7 +70,6 @@ export const startTimeRule: NativeTokenStreamRuleDefinition = {
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: timestampToISO8601(context.permissionDetails.startTime),
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: t('streamStartTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
@@ -94,7 +91,6 @@ export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.amountPerPeriod,
     isVisible: true,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     tooltip: t('streamAmountTooltip'),
     iconData: getIconData(context),
     error: metadata.validationErrors.amountPerPeriodError,
@@ -114,7 +110,6 @@ export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
   type: 'dropdown',
   getRuleData: ({ context }) => ({
     value: context.permissionDetails.timePeriod,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: t('streamPeriodTooltip'),
     options: Object.values(TimePeriod),

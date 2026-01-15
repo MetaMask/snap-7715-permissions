@@ -42,12 +42,7 @@ type TestLifecycleHandlersType = LifecycleOrchestrationHandlers<
 
 const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
-  signer: {
-    type: 'account',
-    data: {
-      address: mockAddress,
-    },
-  },
+  to: mockAddress,
   permission: {
     type: 'native-token-stream',
     data: {
@@ -72,7 +67,6 @@ const mockContext: TestContextType = {
   tokenAddressCaip19: `eip155:1/erc20:${mockAssetAddress}`,
   expiry: {
     timestamp: 1234567890,
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: false,
 };
@@ -311,14 +305,14 @@ describe('PermissionHandler', () => {
       await lifecycleHandlers.buildContext({
         ...mockPermissionRequest,
         // it's already undefined, but we make sure here
-        address: undefined,
+        from: undefined,
       });
 
       expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
 
       const permissionRequestWithResolvedAddress = {
         ...mockPermissionRequest,
-        address: mockAddress,
+        from: mockAddress,
       };
 
       expect(dependencies.buildContext).toHaveBeenCalledWith({
@@ -349,14 +343,14 @@ describe('PermissionHandler', () => {
 
         await lifecycleHandlers.buildContext({
           ...mockPermissionRequest,
-          address: specifiedAddress,
+          from: specifiedAddress,
         });
 
         expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
 
         const permissionRequestWithResolvedAddress = {
           ...mockPermissionRequest,
-          address: specifiedAddress,
+          from: specifiedAddress,
         };
 
         expect(dependencies.buildContext).toHaveBeenCalledWith({
@@ -382,7 +376,7 @@ describe('PermissionHandler', () => {
       await expect(
         lifecycleHandlers.buildContext({
           ...mockPermissionRequest,
-          address: '0x9876543210987654321098765432109876543210',
+          from: '0x9876543210987654321098765432109876543210',
         }),
       ).rejects.toThrow('Requested address not found');
 

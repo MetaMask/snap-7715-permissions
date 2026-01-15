@@ -43,7 +43,7 @@ const alreadyPopulatedPermission: Erc20TokenPeriodicPermission = {
 };
 
 const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
-  address: ACCOUNT_ADDRESS,
+  from: ACCOUNT_ADDRESS,
   chainId: '0x1',
   rules: [
     {
@@ -51,15 +51,9 @@ const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
       data: {
         timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     ...alreadyPopulatedPermission,
     data: {
@@ -73,7 +67,6 @@ const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
 const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
   expiry: {
     timestamp: 1714521600,
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',

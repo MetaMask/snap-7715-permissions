@@ -5,29 +5,6 @@ import { zPermission, zRule, zTimestamp } from './7715-permissions-types';
 import { zAddress, zHexStr } from './common';
 import { extractDescriptorName } from '../utils';
 
-export const zAccountSigner = z.object({
-  type: z.literal('account'),
-  data: z.object({
-    address: zAddress,
-  }),
-});
-
-/**
- * An account that can be granted with permissions as in ERC-7710.
- */
-export type AccountSigner = z.infer<typeof zAccountSigner>;
-
-export const zWalletSigner = z.object({
-  type: z.literal('wallet'),
-  data: z.object({}),
-});
-
-/**
- * A wallet is the signer for these permissions
- * `data` is not necessary for this signer type as the wallet is both the signer and grantor of these permissions.
- */
-export type WalletSigner = z.infer<typeof zWalletSigner>;
-
 export const zPermissionRequest = z
   .object({
     /**
@@ -40,12 +17,12 @@ export const zPermissionRequest = z
      * The account being targeted for this permission request.
      * It is optional to let the user choose which account to grant permission for.
      */
-    address: zAddress.optional().nullable(),
+    from: zAddress.optional().nullable(),
 
     /**
      * An account that can be granted with permissions as in ERC-7710
      */
-    signer: zAccountSigner,
+    to: zAddress,
 
     /**
      * The type of action the signer is permitted to perform (e.g., native token transfer, contract call).

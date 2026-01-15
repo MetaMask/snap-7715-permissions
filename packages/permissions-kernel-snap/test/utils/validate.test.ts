@@ -34,12 +34,7 @@ describe('validate utils', () => {
         parsePermissionRequestParam([
           {
             chainId: '0x1',
-            signer: {
-              type: 'account',
-              data: {
-                address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-              },
-            },
+            to: '0x016562aA41A8697720ce0943F003141f5dEAe006',
           },
         ]),
       ).toThrow('Failed type validation: 0.permission: Required');
@@ -61,12 +56,7 @@ describe('validate utils', () => {
       const validResponse = [
         {
           chainId: '0x1',
-          signer: {
-            type: 'account',
-            data: {
-              address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-            },
-          },
+          to: '0x016562aA41A8697720ce0943F003141f5dEAe006',
           permission: {
             type: 'eth_signTransaction',
             isAdjustmentAllowed: true,
@@ -77,22 +67,19 @@ describe('validate utils', () => {
           rules: [
             {
               type: 'expiry',
-              isAdjustmentAllowed: true,
               data: {
                 timestamp: 123456,
               },
             },
           ],
           context: '0x1234',
-          dependencyInfo: [
+          dependencies: [
             {
               factory: '0x016562aA41A8697720ce0943F003141f5dEAe006',
               factoryData: '0x',
             },
           ],
-          signerMeta: {
-            delegationManager: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-          },
+          delegationManager: '0x016562aA41A8697720ce0943F003141f5dEAe006',
         },
       ];
       expect(parsePermissionsResponseParam(validResponse)).toStrictEqual(
@@ -118,7 +105,7 @@ describe('validate utils', () => {
           },
         ]),
       ).toThrow(
-        'Failed type validation: 0.signer: Required, 0.permission: Required, 0.context: Required, 0.dependencyInfo: Required, 0.signerMeta: Required',
+        'Failed type validation: 0.to: Required, 0.permission: Required, 0.context: Required, 0.dependencies: Required, 0.delegationManager: Required',
       );
     });
 

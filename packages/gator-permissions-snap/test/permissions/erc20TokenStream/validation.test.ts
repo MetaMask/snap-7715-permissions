@@ -15,15 +15,9 @@ const validPermissionRequest: Erc20TokenStreamPermissionRequest = {
       data: {
         timestamp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     type: 'erc20-token-stream',
     data: {

@@ -37,7 +37,7 @@ const fixedCaip10Address = `eip155:1:${grantingAccountAddress}`;
 const mockContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
-  address: grantingAccountAddress,
+  from: grantingAccountAddress,
   accountAddressCaip10: fixedCaip10Address,
 };
 
@@ -57,12 +57,7 @@ const requestingAccountAddress = randomAddress();
 const expiryTimestamp = Math.floor(Date.now() / 1000 + 3600);
 const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
-  signer: {
-    type: 'account',
-    data: {
-      address: requestingAccountAddress,
-    },
-  },
+  to: requestingAccountAddress,
   permission: {
     type: 'test-permission',
     data: {},
@@ -74,14 +69,13 @@ const mockPermissionRequest: PermissionRequest = {
       data: {
         timestamp: expiryTimestamp,
       },
-      isAdjustmentAllowed: true,
     },
   ],
 };
 
 const mockResolvedPermissionRequest = {
   ...mockPermissionRequest,
-  address: grantingAccountAddress,
+  from: grantingAccountAddress,
   permission: {
     ...mockPermissionRequest.permission,
     data: { resolved: true },
@@ -240,25 +234,18 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result.approved).toBe(true);
         expect(result.approved && result.response).toStrictEqual({
           ...mockPermissionRequest,
-          dependencyInfo: [],
+          dependencies: [],
           permission: mockPopulatedPermission,
-          address: grantingAccountAddress,
+          from: grantingAccountAddress,
           context: expect.stringMatching(/^0x[0-9a-fA-F]+$/u),
           isAdjustmentAllowed: true,
-          signer: {
-            data: {
-              address: requestingAccountAddress,
-            },
-            type: 'account',
-          },
-          signerMeta: {
-            delegationManager,
-          },
+          to: requestingAccountAddress,
+          delegationManager,
         });
       });
 
       it('creates a skeleton confirmation before the context is resolved', async () => {
-        // this never resolves, because we are testing the behaviour _before_ the context is returned.
+        // this never resolves, because we are testing the behavior _before_ the context is returned.
         const contextPromise = new Promise<BaseContext>((_resolve) => {
           console.log('Arrow function cannot be empty');
         });
@@ -287,7 +274,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       it('creates the confirmation dialog with a disabled grant button', async () => {
-        // this never resolves, because we are testing the behaviour _before_ the context is returned.
+        // this never resolves, because we are testing the behavior _before_ the context is returned.
         const contextPromise = new Promise<BaseContext>((_resolve) => {
           console.log('Arrow function cannot be empty');
         });

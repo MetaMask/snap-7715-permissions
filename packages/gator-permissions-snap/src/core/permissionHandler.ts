@@ -165,14 +165,14 @@ export class PermissionHandler<
     TPopulatedPermission
   > {
     const buildContextHandler = async (request: TRequest) => {
-      const requestedAddressLowercase = request.address?.toLowerCase() as
+      const requestedAddressLowercase = request.from?.toLowerCase() as
         | Hex
         | undefined;
 
       const allAvailableAddresses =
         await this.#accountController.getAccountAddresses();
 
-      let address: Hex;
+      let from: Hex;
 
       if (requestedAddressLowercase) {
         // validate that the requested address is one of the addresses available for the account
@@ -184,14 +184,14 @@ export class PermissionHandler<
         ) {
           throw new ResourceNotFoundError('Requested address not found');
         }
-        address = request.address as Hex;
+        from = request.from as Hex;
       } else {
         // use the first address available for the account
-        address = allAvailableAddresses[0];
+        from = allAvailableAddresses[0];
       }
 
       return await this.#dependencies.buildContext({
-        permissionRequest: { ...request, address },
+        permissionRequest: { ...request, from },
         tokenMetadataService: this.#tokenMetadataService,
       });
     };
@@ -223,6 +223,11 @@ export class PermissionHandler<
         tokenMetadata: { symbol: tokenSymbol },
       } = context;
 
+      const delegateAddress = this.#permissionRequest.to;
+      if (!delegateAddress) {
+        throw new InvalidRequestError('Delegate address is undefined');
+      }
+
       const permissionContent =
         await this.#dependencies.createConfirmationContent({
           context,
@@ -231,7 +236,7 @@ export class PermissionHandler<
 
       return PermissionHandlerContent({
         origin,
-        delegateAddress: this.#permissionRequest.signer.data.address,
+        delegateAddress,
         justification,
         networkName,
         tokenSymbol,

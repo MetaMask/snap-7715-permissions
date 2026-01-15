@@ -253,12 +253,7 @@ const Index = () => {
     const permissionsRequests: RequestExecutionPermissionsParameters = [
       {
         chainId,
-        signer: {
-          type: 'account',
-          data: {
-            address: delegateAccount.address,
-          },
-        },
+        to: delegateAccount.address,
         expiry,
         isAdjustmentAllowed,
         permission: {
@@ -266,7 +261,7 @@ const Index = () => {
           // permission types that are _not_ native token stream are using Hex for token amount types
           data: permissionData as any,
         },
-      } as const,
+      },
     ];
 
     // Generate a unique identifier for this permission request
@@ -313,10 +308,8 @@ const Index = () => {
   const handleGetSupportedPermissions = async () => {
     setPermissionResponseError(null);
     try {
-      const response = await provider?.request({
-        method: 'wallet_getSupportedExecutionPermissions',
-        params: [],
-      });
+      const response =
+        await metaMaskClient?.getSupportedExecutionPermissions();
       setSupportedPermissionsResponse(response);
     } catch (error) {
       setPermissionResponseError(error as Error);
@@ -326,10 +319,7 @@ const Index = () => {
   const handleGetGrantedPermissions = async () => {
     setPermissionResponseError(null);
     try {
-      const response = await provider?.request({
-        method: 'wallet_getGrantedExecutionPermissions',
-        params: [],
-      });
+      const response = await metaMaskClient?.getGrantedExecutionPermissions();
       setGrantedPermissionsResponse(response);
     } catch (error) {
       setPermissionResponseError(error as Error);

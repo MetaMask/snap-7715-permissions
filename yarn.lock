@@ -2978,10 +2978,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/7715-permission-types@npm:0.4.0, @metamask/7715-permission-types@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "@metamask/7715-permission-types@npm:0.4.0"
-  checksum: 10/70748053e7b9fcd89d044a7602b48168137cc0761f8606ad17fdaafc13ac69271a75230c727a64df49dfedc59a0b3f60bd6fa46c60e06df40691985b9823881d
+"@metamask/7715-permission-types@npm:0.5.0, @metamask/7715-permission-types@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@metamask/7715-permission-types@npm:0.5.0"
+  checksum: 10/f01dcf7ffc3e39536f7cc4d54c088ea659c392de5bdfcaafb9f4d67bbe6b56010358ed2a2ba3adba4e454af51412a2fd5be377cac5c7ab101b032d30711e0b37
   languageName: node
   linkType: hard
 
@@ -3150,10 +3150,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-deployments@npm:^0.15.0":
-  version: 0.15.0
-  resolution: "@metamask/delegation-deployments@npm:0.15.0"
-  checksum: 10/b37933e4b1c7d5cad5b6ec8861dc0b883eb4dd17cc29a9d804b3fbdb2c39aadb7ff47b8a42d1195b637eefbae15e7e3cea6bde3e7ff34f64eee11c1026767413
+"@metamask/delegation-deployments@npm:^0.16.0":
+  version: 0.16.0
+  resolution: "@metamask/delegation-deployments@npm:0.16.0"
+  checksum: 10/94d2917a572280839b95e30402923122c7f6f109d13b101c4c818c56ace6009f86f874d0caf01677198804311f42e1639bd3398162b3c30d180223043e75cf30
   languageName: node
   linkType: hard
 
@@ -3584,19 +3584,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/smart-accounts-kit@npm:0.2.0":
-  version: 0.2.0
-  resolution: "@metamask/smart-accounts-kit@npm:0.2.0"
+"@metamask/smart-accounts-kit@npm:0.4.0-beta.0":
+  version: 0.4.0-beta.0
+  resolution: "@metamask/smart-accounts-kit@npm:0.4.0-beta.0"
   dependencies:
-    "@metamask/7715-permission-types": "npm:^0.4.0"
+    "@metamask/7715-permission-types": "npm:^0.5.0"
     "@metamask/delegation-abis": "npm:^0.11.0"
     "@metamask/delegation-core": "npm:^0.3.0"
-    "@metamask/delegation-deployments": "npm:^0.15.0"
+    "@metamask/delegation-deployments": "npm:^0.16.0"
     buffer: "npm:^6.0.3"
     webauthn-p256: "npm:^0.0.10"
   peerDependencies:
     viem: ^2.31.4
-  checksum: 10/5d9a0a4816d5f91899ab993bb5322ad26cee0a63c65c0fff5ff1324ccf531f7f54f2eabaddb1e9bab6aaba2e0ba8c1984194844509a797fec0ef0096f9ff1fda
+  checksum: 10/f512b87059bbe136135095132329726de7cdbcd6125d5af43c2ed0184ab472a07539d8c37066e05a4f191dd8496364c6df91a236cc00395777fa9131dab49bc9
   languageName: node
   linkType: hard
 
@@ -18209,14 +18209,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask/7715-permission-types": "npm:0.4.0"
+    "@metamask/7715-permission-types": "npm:0.5.0"
     "@metamask/eslint-config": "npm:12.2.0"
     "@metamask/eslint-config-browser": "npm:12.1.0"
     "@metamask/eslint-config-jest": "npm:12.1.0"
     "@metamask/eslint-config-nodejs": "npm:12.1.0"
     "@metamask/eslint-config-typescript": "npm:12.1.0"
     "@metamask/providers": "npm:22.1.0"
-    "@metamask/smart-accounts-kit": "npm:0.2.0"
+    "@metamask/smart-accounts-kit": "npm:0.4.0-beta.0"
     "@svgr/webpack": "npm:8.1.0"
     "@types/jest": "npm:27.5.2"
     "@types/react": "npm:18.2.4"

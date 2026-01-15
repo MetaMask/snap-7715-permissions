@@ -42,14 +42,9 @@ const alreadyPopulatedPermission: Erc20TokenStreamPermission = {
 };
 
 const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
-  address: ACCOUNT_ADDRESS,
+  from: ACCOUNT_ADDRESS,
   chainId: '0x1',
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     ...alreadyPopulatedPermission,
     data: {
@@ -63,7 +58,6 @@ const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
       data: {
         timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
       },
-      isAdjustmentAllowed: true,
     },
   ],
 };
@@ -71,7 +65,6 @@ const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
 const alreadyPopulatedContext: Erc20TokenStreamContext = {
   expiry: {
     timestamp: 1714521600,
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
