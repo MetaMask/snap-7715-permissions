@@ -308,10 +308,8 @@ const Index = () => {
   const handleGetSupportedPermissions = async () => {
     setPermissionResponseError(null);
     try {
-      const response = await provider?.request({
-        method: 'wallet_getSupportedExecutionPermissions',
-        params: [],
-      });
+      const response =
+        await metaMaskClient?.getSupportedExecutionPermissions();
       setSupportedPermissionsResponse(response);
     } catch (error) {
       setPermissionResponseError(error as Error);
@@ -321,10 +319,7 @@ const Index = () => {
   const handleGetGrantedPermissions = async () => {
     setPermissionResponseError(null);
     try {
-      const response = await provider?.request({
-        method: 'wallet_getGrantedExecutionPermissions',
-        params: [],
-      });
+      const response = await metaMaskClient?.getGrantedExecutionPermissions();
       setGrantedPermissionsResponse(response);
     } catch (error) {
       setPermissionResponseError(error as Error);
