@@ -223,6 +223,11 @@ export class PermissionHandler<
         tokenMetadata: { symbol: tokenSymbol },
       } = context;
 
+      const delegateAddress = this.#permissionRequest.to;
+      if (!delegateAddress) {
+        throw new InvalidRequestError('Delegate address is undefined');
+      }
+
       const permissionContent =
         await this.#dependencies.createConfirmationContent({
           context,
@@ -231,7 +236,7 @@ export class PermissionHandler<
 
       return PermissionHandlerContent({
         origin,
-        delegateAddress: this.#permissionRequest.to,
+        delegateAddress,
         justification,
         networkName,
         tokenSymbol,

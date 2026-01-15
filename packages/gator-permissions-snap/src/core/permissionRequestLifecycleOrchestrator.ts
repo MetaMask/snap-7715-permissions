@@ -440,9 +440,12 @@ export class PermissionRequestLifecycleOrchestrator {
       isAdjustmentAllowed,
     };
 
-    const { from } = grantedPermissionRequest;
+    const { from, to } = grantedPermissionRequest;
     if (!from) {
       throw new InvalidInputError('Address is undefined');
+    }
+    if (!to) {
+      throw new InvalidInputError('Delegate address is undefined');
     }
 
     const { contracts } = getChainMetadata({ chainId });
@@ -488,7 +491,7 @@ export class PermissionRequestLifecycleOrchestrator {
     const salt = bytesToHex(saltBytes);
 
     const delegation = {
-      delegate: grantedPermissionRequest.to,
+      delegate: to,
       authority: ROOT_AUTHORITY,
       delegator: from,
       caveats,
