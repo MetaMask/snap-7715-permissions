@@ -1,5 +1,6 @@
 import { Skeleton, Text, Tooltip } from '@metamask/snaps-sdk/jsx';
 
+import { t } from '../../utils/i18n';
 import { truncateDecimalPlaces } from '../../utils/string';
 
 type TokenBalanceFieldProps = {
@@ -18,11 +19,17 @@ export const TokenBalanceField = ({ tokenBalance }: TokenBalanceFieldProps) => {
   }
   const truncatedTokenBalance = truncateDecimalPlaces(tokenBalance);
   if (truncatedTokenBalance === tokenBalance) {
-    return <Text>{truncatedTokenBalance} available</Text>;
+    return (
+      <Text>
+        {truncatedTokenBalance} {t('availableLabel')}
+      </Text>
+    );
   }
   return (
     <Tooltip content={<Text>{tokenBalance}</Text>}>
-      <Text>{truncatedTokenBalance} available</Text>
+      <Text>
+        {truncatedTokenBalance} {t('availableLabel')}
+      </Text>
     </Tooltip>
   );
 };

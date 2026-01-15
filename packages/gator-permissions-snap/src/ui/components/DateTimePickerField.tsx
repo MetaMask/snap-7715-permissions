@@ -6,7 +6,12 @@ import { TextField } from './TextField';
 
 export type DateTimePickerFieldParams = Pick<
   BaseFieldProps,
-  'label' | 'tooltip' | 'disabled' | 'errorMessage'
+  | 'label'
+  | 'tooltip'
+  | 'disabled'
+  | 'errorMessage'
+  | 'removeFieldButtonName'
+  | 'addFieldButtonName'
 > & {
   name: string;
   /** ISO 8601 formatted date string with timezone */
@@ -23,7 +28,11 @@ export const DateTimePickerField = ({
   disabled,
   errorMessage,
   allowPastDate,
+  addFieldButtonName,
+  removeFieldButtonName,
 }: DateTimePickerFieldParams) => {
+  const isFieldEnabled = value !== null && value !== undefined;
+
   if (disabled) {
     // Format the ISO date to a readable format for display
     let displayValue = value ?? '';
@@ -50,7 +59,10 @@ export const DateTimePickerField = ({
       tooltip={tooltip}
       errorMessage={errorMessage}
       disabled={disabled}
+      isFieldEnabled={isFieldEnabled}
       variant="form"
+      addFieldButtonName={addFieldButtonName}
+      removeFieldButtonName={removeFieldButtonName}
     >
       <DateTimePicker
         name={name}

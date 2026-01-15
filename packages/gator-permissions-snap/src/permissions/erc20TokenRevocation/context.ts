@@ -12,6 +12,7 @@ import type {
   Erc20TokenRevocationPermissionRequest,
   PopulatedErc20TokenRevocationPermission,
 } from './types';
+import { applyExpiryRule } from '../rules';
 
 const CHAIN_NAMESPACE = 'eip155';
 // presently BaseContext assumes that a token is associated with a permission.
@@ -40,30 +41,9 @@ export async function applyContext({
   context: Erc20TokenRevocationContext;
   originalRequest: Erc20TokenRevocationPermissionRequest;
 }): Promise<Erc20TokenRevocationPermissionRequest> {
-  const {
-    justification,
-    expiry: { timestamp: expiry },
-  } = context;
+  const { justification } = context;
 
-  let isExpiryRuleFound = false;
-
-  const rules: Erc20TokenRevocationPermissionRequest['rules'] =
-    originalRequest.rules?.map((rule) => {
-      if (extractDescriptorName(rule.type) === 'expiry') {
-        isExpiryRuleFound = true;
-        return {
-          ...rule,
-          data: { ...rule.data, timestamp: expiry },
-        };
-      }
-      return rule;
-    }) ?? [];
-
-  if (!isExpiryRuleFound) {
-    throw new InvalidInputError(
-      'Expiry rule not found. An expiry is required on all permissions.',
-    );
-  }
+  const { rules } = applyExpiryRule(context, originalRequest);
 
   const { address } = parseCaipAccountId(context.accountAddressCaip10);
 
@@ -128,16 +108,12 @@ export async function buildContext({
     (rule) => extractDescriptorName(rule.type) === 'expiry',
   );
 
-  if (!expiryRule) {
-    throw new InvalidInputError(
-      'Expiry rule not found. An expiry is required on all permissions.',
-    );
-  }
-
-  const expiry = {
-    timestamp: expiryRule.data.timestamp,
-    isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
-  };
+  const expiry = expiryRule
+    ? {
+        timestamp: expiryRule.data.timestamp,
+        isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
+      }
+    : undefined;
 
   const accountAddressCaip10 = toCaipAccountId(
     CHAIN_NAMESPACE,
@@ -170,9 +146,11 @@ export async function deriveMetadata({
 
   const validationErrors: Erc20TokenRevocationMetadata['validationErrors'] = {};
 
-  const expiryError = validateExpiry(expiry.timestamp);
-  if (expiryError) {
-    validationErrors.expiryError = expiryError;
+  if (expiry) {
+    const expiryError = validateExpiry(expiry.timestamp);
+    if (expiryError) {
+      validationErrors.expiryError = expiryError;
+    }
   }
 
   return {

@@ -47,6 +47,7 @@ import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
+import { setupI18n } from './utils/i18n';
 
 const isStorePermissionsFeatureEnabled =
   process.env.STORE_PERMISSIONS_ENABLED === 'true';
@@ -205,6 +206,8 @@ const boundRpcHandlers: {
   [RpcMethod.PermissionsProviderSubmitRevocation]: async (
     params?: JsonRpcParams,
   ) => rpcHandler.submitRevocation(params as Json),
+  [RpcMethod.PermissionsProviderGetSupportedPermissions]:
+    rpcHandler.getSupportedPermissions.bind(rpcHandler),
 };
 
 /**
@@ -227,6 +230,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     logger.debug(
       `RPC request (origin="${origin}"): method="${request.method}"`,
     );
+
+  // Ensure i18n is initialized on every snap invocation
+  // This handles both initial load and locale changes in the extension
+  await setupI18n();
 
     if (!isMethodAllowedForOrigin(origin, request.method)) {
       throw new InvalidRequestError(
@@ -264,6 +271,8 @@ export const onUserInput: OnUserInputHandler =
   userEventDispatcher.createUserInputEventHandler();
 
 export const onInstall: OnInstallHandler = async () => {
+  await setupI18n();
+
   /**
    * Local Development Only
    *

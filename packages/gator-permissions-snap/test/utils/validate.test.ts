@@ -137,6 +137,60 @@ describe('validatePermissionRequestParam', () => {
         expect(result).toStrictEqual(expiryRuleParam);
       }).not.toThrow();
     });
+
+    it('should validate with empty rules array for supported permission type', () => {
+      const withEmptyRules = {
+        permissionsRequest: [
+          {
+            ...validPermissionRequest,
+            permission: {
+              type: 'native-token-stream',
+              data: {
+                justification: 'Test justification',
+              },
+              isAdjustmentAllowed: true,
+            },
+            rules: [],
+          },
+        ],
+        siteOrigin: 'https://example.com',
+      };
+      expect(() => {
+        const result = validatePermissionRequestParam(withEmptyRules);
+        expect(result).toStrictEqual(withEmptyRules);
+      }).not.toThrow();
+    });
+
+    it('should validate with expiry rule for supported permission type', () => {
+      const withExpiryRule = {
+        permissionsRequest: [
+          {
+            ...validPermissionRequest,
+            permission: {
+              type: 'native-token-stream',
+              data: {
+                justification: 'Test justification',
+              },
+              isAdjustmentAllowed: true,
+            },
+            rules: [
+              {
+                type: 'expiry',
+                isAdjustmentAllowed: true,
+                data: {
+                  timestamp: Math.floor(Date.now() / 1000) + 86400,
+                },
+              },
+            ],
+          },
+        ],
+        siteOrigin: 'https://example.com',
+      };
+      expect(() => {
+        const result = validatePermissionRequestParam(withExpiryRule);
+        expect(result).toStrictEqual(withExpiryRule);
+      }).not.toThrow();
+    });
   });
 
   describe('invalid cases', () => {
@@ -256,28 +310,6 @@ describe('validatePermissionRequestParam', () => {
       }).toThrow(InvalidInputError);
     });
 
-    it('should throw InvalidInputError for rules without expiry rule', () => {
-      expect(() => {
-        validatePermissionRequestParam({
-          permissionsRequest: [
-            {
-              ...validPermissionRequest,
-              rules: [
-                {
-                  type: 'allowance',
-                  isAdjustmentAllowed: true,
-                  data: {
-                    timestamp: Math.floor(Date.now() / 1000) + 86400,
-                  },
-                },
-              ],
-            },
-          ],
-          siteOrigin: 'https://example.com',
-        });
-      }).toThrow(InvalidInputError);
-    });
-
     it.each([
       { timestamp: 'the timestamp is not a number' },
       'the data is not an object',
@@ -335,6 +367,37 @@ describe('validatePermissionRequestParam', () => {
           siteOrigin: 'https://example.com',
         });
       }).toThrow(InvalidInputError);
+    });
+
+    it('should throw InvalidInputError for unsupported rule type on native-token-stream', () => {
+      expect(() => {
+        validatePermissionRequestParam({
+          permissionsRequest: [
+            {
+              ...validPermissionRequest,
+              permission: {
+                type: 'native-token-stream',
+                data: {
+                  justification: 'Test justification',
+                },
+                isAdjustmentAllowed: true,
+              },
+              rules: [
+                {
+                  type: 'unsupported-rule',
+                  isAdjustmentAllowed: true,
+                  data: {
+                    someData: 'value',
+                  },
+                },
+              ],
+            },
+          ],
+          siteOrigin: 'https://example.com',
+        });
+      }).toThrow(
+        'Rule type "unsupported-rule" is not supported for permission type "native-token-stream". Supported: expiry',
+      );
     });
 
     it('should throw InvalidInputError for invalid address format', () => {

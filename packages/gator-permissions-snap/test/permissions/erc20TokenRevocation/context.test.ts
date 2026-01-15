@@ -87,20 +87,17 @@ describe('erc20TokenRevocation:context', () => {
       } satisfies Erc20TokenRevocationContext);
     });
 
-    it('throws an error if the expiry rule is not found', async () => {
+    it('builds context without expiry when the expiry rule is not found', async () => {
       const request: Erc20TokenRevocationPermissionRequest = {
         ...permissionRequest,
         rules: [],
       };
 
-      await expect(
-        buildContext({
-          permissionRequest: request,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest: request,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
 
     it('throws an error if the address is missing', async () => {
@@ -203,7 +200,7 @@ describe('erc20TokenRevocation:context', () => {
       ).toBe(updatedExpiry);
     });
 
-    it('throws an error if the expiry rule is not found in the original request', async () => {
+    it('adds an expiry rule if it is not in the original request', async () => {
       const context: Erc20TokenRevocationContext = {
         expiry: {
           timestamp: Math.floor(Date.now() / 1000) + 60,
@@ -226,14 +223,13 @@ describe('erc20TokenRevocation:context', () => {
           rules: [],
         };
 
-      await expect(
-        applyContext({
-          context,
-          originalRequest: originalRequestWithoutExpiry,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const result = await applyContext({
+        context,
+        originalRequest: originalRequestWithoutExpiry,
+      });
+      const expiryRule = result.rules.find((rule) => rule.type === 'expiry');
+      expect(expiryRule).toBeDefined();
+      expect(expiryRule?.data.timestamp).toBe(context.expiry?.timestamp);
     });
   });
 });

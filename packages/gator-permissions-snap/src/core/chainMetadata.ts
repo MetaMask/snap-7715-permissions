@@ -1,6 +1,8 @@
 import type { Hex } from '@metamask/delegation-core';
 import { numberToHex } from '@metamask/utils';
 
+import { t } from '../utils/i18n';
+
 export type DelegationContracts = {
   delegationManager: Hex;
   eip7702StatelessDeleGatorImpl: Hex;
@@ -114,7 +116,7 @@ export const getChainMetadata = ({
 
   const metadata = {
     contracts,
-    name: name ?? `Unknown chain ${numberToHex(chainId)}`,
+    name: name ?? t('unknownChain', [numberToHex(chainId)]),
     explorerUrl,
   };
 

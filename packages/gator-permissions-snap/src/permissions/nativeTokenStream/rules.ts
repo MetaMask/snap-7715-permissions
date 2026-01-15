@@ -2,10 +2,12 @@ import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
 import { timestampToISO8601, iso8601ToTimestamp } from '../../utils/time';
 import { getIconData } from '../iconUtil';
+import { createExpiryRule } from '../rules';
 import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
+import { t } from '../../utils/i18n';
 
 export const INITIAL_AMOUNT_ELEMENT = 'native-token-stream-initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'native-token-stream-max-amount';
@@ -22,7 +24,7 @@ type NativeTokenStreamRuleDefinition = RuleDefinition<
 
 export const initialAmountRule: NativeTokenStreamRuleDefinition = {
   name: INITIAL_AMOUNT_ELEMENT,
-  label: 'Initial Amount',
+  label: 'initialAmountLabel',
   type: 'number',
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
@@ -30,13 +32,10 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     iconData: getIconData(context),
-    tooltip: 'The initial amount of tokens that can be streamed.',
+    tooltip: t('initialAmountTooltip'),
     error: metadata.validationErrors.initialAmountError,
   }),
-  updateContext: (
-    context: NativeTokenStreamContext,
-    value: string | undefined,
-  ) => ({
+  updateContext: (context: NativeTokenStreamContext, value: string | null) => ({
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
@@ -47,21 +46,18 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
 
 export const maxAmountRule: NativeTokenStreamRuleDefinition = {
   name: MAX_AMOUNT_ELEMENT,
-  label: 'Max Amount',
+  label: 'maxAmountLabel',
   type: 'number',
   isOptional: true,
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.maxAmount ?? undefined,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The maximum amount of tokens that can be streamed.',
+    tooltip: t('maxAmountTooltip'),
     iconData: getIconData(context),
     error: metadata.validationErrors.maxAmountError,
   }),
-  updateContext: (
-    context: NativeTokenStreamContext,
-    value: string | undefined,
-  ) => ({
+  updateContext: (context: NativeTokenStreamContext, value: string | null) => ({
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
@@ -72,13 +68,13 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
 
 export const startTimeRule: NativeTokenStreamRuleDefinition = {
   name: START_TIME_ELEMENT,
-  label: 'Start Time',
+  label: 'startTimeLabel',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: timestampToISO8601(context.permissionDetails.startTime),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The start time of the stream.',
+    tooltip: t('streamStartTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
     allowPastDate: false,
   }),
@@ -93,13 +89,13 @@ export const startTimeRule: NativeTokenStreamRuleDefinition = {
 
 export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
   name: AMOUNT_PER_PERIOD_ELEMENT,
-  label: 'Stream Amount',
+  label: 'streamAmountLabel',
   type: 'number',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.amountPerPeriod,
     isVisible: true,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
-    tooltip: 'The amount of tokens that can be streamed per period.',
+    tooltip: t('streamAmountTooltip'),
     iconData: getIconData(context),
     error: metadata.validationErrors.amountPerPeriodError,
   }),
@@ -114,13 +110,13 @@ export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
 
 export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
   name: TIME_PERIOD_ELEMENT,
-  label: 'Stream Period',
+  label: 'streamPeriodLabel',
   type: 'dropdown',
   getRuleData: ({ context }) => ({
     value: context.permissionDetails.timePeriod,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The period of the stream.',
+    tooltip: t('streamPeriodTooltip'),
     options: Object.values(TimePeriod),
   }),
   updateContext: (context: NativeTokenStreamContext, value: TimePeriod) => ({
@@ -132,26 +128,10 @@ export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
   }),
 };
 
-export const expiryRule: NativeTokenStreamRuleDefinition = {
-  name: EXPIRY_ELEMENT,
-  label: 'Expiry',
-  type: 'datetime',
-  getRuleData: ({ context, metadata }) => ({
-    value: timestampToISO8601(context.expiry.timestamp),
-    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
-    isVisible: true,
-    tooltip: 'The expiry date of the permission.',
-    error: metadata.validationErrors.expiryError,
-    allowPastDate: false,
-  }),
-  updateContext: (context: NativeTokenStreamContext, value: string) => ({
-    ...context,
-    expiry: {
-      ...context.expiry,
-      timestamp: iso8601ToTimestamp(value),
-    },
-  }),
-};
+export const expiryRule = createExpiryRule<
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata
+>({ elementName: EXPIRY_ELEMENT, translate: t });
 
 export const allRules = [
   initialAmountRule,

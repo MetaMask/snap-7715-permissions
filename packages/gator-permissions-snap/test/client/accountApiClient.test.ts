@@ -50,7 +50,7 @@ describe('AccountApiClient', () => {
         account: mockAccount,
       });
 
-      expect(result).toBe(BigInt('1000000000000000000'));
+      expect(result).toBe(1000000000000000000n);
 
       expect(mockFetch).toHaveBeenCalledWith(
         `${mockApiBaseUrl}/v2/accounts/${mockAccount}/balances?networks=${mockChainId}&filterSupportedTokens=false&includeTokenAddresses=0x0000000000000000000000000000000000000000&includeStakedAssets=false`,
@@ -82,7 +82,36 @@ describe('AccountApiClient', () => {
         assetAddress: mockTokenAddress,
       });
 
-      expect(result).toBe(BigInt(0));
+      expect(result).toBe(0n);
+    });
+
+    it('returns zero balance when no balance found for the specified token', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          count: 1,
+          balances: [
+            {
+              address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+              balance: '1.000000000000000000',
+              decimals: 18,
+              symbol: 'USDC',
+              name: 'USD Coin',
+              object: 'token',
+              chainId: 1,
+            },
+          ],
+          unprocessedNetworks: [],
+        }),
+      });
+
+      const result = await client.getTokenBalance({
+        chainId: mockChainId,
+        account: mockAccount,
+        assetAddress: mockTokenAddress,
+      });
+
+      expect(result).toBe(0n);
     });
   });
 
@@ -233,7 +262,7 @@ describe('AccountApiClient', () => {
       });
 
       expect(result).toStrictEqual({
-        balance: BigInt('1000000000000000000'),
+        balance: 1000000000000000000n,
         decimals: 18,
         symbol: 'ETH',
         iconUrl:
@@ -290,7 +319,7 @@ describe('AccountApiClient', () => {
       });
 
       expect(result).toStrictEqual({
-        balance: BigInt('2000000000000000000'),
+        balance: 2000000000000000000n,
         decimals: 18,
         symbol: 'DAI',
         iconUrl:
@@ -332,7 +361,7 @@ describe('AccountApiClient', () => {
       });
 
       expect(result).toStrictEqual({
-        balance: BigInt(0),
+        balance: 0n,
         decimals: 6,
         symbol: 'USDC',
         iconUrl:
@@ -561,7 +590,7 @@ describe('AccountApiClient', () => {
       });
 
       expect(result).toStrictEqual({
-        balance: BigInt('1000000000000000000'),
+        balance: 1000000000000000000n,
         decimals: 18,
         symbol: 'ST',
       });
@@ -637,7 +666,7 @@ describe('AccountApiClient', () => {
         });
 
         expect(result).toStrictEqual({
-          balance: BigInt('1000000000000000000'),
+          balance: 1000000000000000000n,
           decimals: 18,
           symbol: 'ETH',
           iconUrl:
@@ -720,7 +749,7 @@ describe('AccountApiClient', () => {
         });
 
         expect(result).toStrictEqual({
-          balance: BigInt('1000000000000000000'),
+          balance: 1000000000000000000n,
           decimals: 18,
           symbol: 'ETH',
           iconUrl:
@@ -880,7 +909,7 @@ describe('AccountApiClient', () => {
         });
 
         expect(result).toStrictEqual({
-          balance: BigInt('1000000000000000000'),
+          balance: 1000000000000000000n,
           decimals: 18,
           symbol: 'ETH',
           iconUrl:
@@ -943,7 +972,7 @@ describe('AccountApiClient', () => {
         });
 
         expect(result).toStrictEqual({
-          balance: BigInt('1000000000000000000'),
+          balance: 1000000000000000000n,
           decimals: 18,
           symbol: 'ETH',
           iconUrl:

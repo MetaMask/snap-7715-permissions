@@ -348,7 +348,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -422,7 +422,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -434,7 +434,34 @@ describe('erc20TokenStream:content', () => {
                             },
                             "type": "Box",
                           },
-                          null,
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alt": "Remove Expiry",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                    },
+                                    "type": "Image",
+                                  },
+                                  "name": "erc20-token-stream-expiry_removeFieldButton",
+                                },
+                                "type": "Button",
+                              },
+                            },
+                            "type": "Box",
+                          },
                         ],
                         "direction": "horizontal",
                       },
@@ -630,56 +657,56 @@ describe('erc20TokenStream:content', () => {
                           "props": {
                             "children": [
                               {
-                                "key": "Hourly",
+                                "key": "hourly",
                                 "props": {
                                   "children": "Hourly",
-                                  "value": "Hourly",
+                                  "value": "hourly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Daily",
+                                "key": "daily",
                                 "props": {
                                   "children": "Daily",
-                                  "value": "Daily",
+                                  "value": "daily",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Weekly",
+                                "key": "weekly",
                                 "props": {
                                   "children": "Weekly",
-                                  "value": "Weekly",
+                                  "value": "weekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Biweekly",
+                                "key": "biweekly",
                                 "props": {
                                   "children": "Biweekly",
-                                  "value": "Biweekly",
+                                  "value": "biweekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Monthly",
+                                "key": "monthly",
                                 "props": {
                                   "children": "Monthly",
-                                  "value": "Monthly",
+                                  "value": "monthly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Yearly",
+                                "key": "yearly",
                                 "props": {
                                   "children": "Yearly",
-                                  "value": "Yearly",
+                                  "value": "yearly",
                                 },
                                 "type": "Option",
                               },
                             ],
                             "name": "erc20-token-stream-time-period",
-                            "value": "Weekly",
+                            "value": "weekly",
                           },
                           "type": "Dropdown",
                         },
@@ -1111,7 +1138,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The start time of the stream.",
+                                        "children": "The start time of the stream",
                                       },
                                       "type": "Text",
                                     },
@@ -1186,7 +1213,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission.",
+                                        "children": "The expiry date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -1198,7 +1225,34 @@ describe('erc20TokenStream:content', () => {
                             },
                             "type": "Box",
                           },
-                          null,
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "alt": "Remove Expiry",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                                    },
+                                    "type": "Image",
+                                  },
+                                  "name": "erc20-token-stream-expiry_removeFieldButton",
+                                },
+                                "type": "Button",
+                              },
+                            },
+                            "type": "Box",
+                          },
                         ],
                         "direction": "horizontal",
                       },
@@ -1396,56 +1450,56 @@ describe('erc20TokenStream:content', () => {
                           "props": {
                             "children": [
                               {
-                                "key": "Hourly",
+                                "key": "hourly",
                                 "props": {
                                   "children": "Hourly",
-                                  "value": "Hourly",
+                                  "value": "hourly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Daily",
+                                "key": "daily",
                                 "props": {
                                   "children": "Daily",
-                                  "value": "Daily",
+                                  "value": "daily",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Weekly",
+                                "key": "weekly",
                                 "props": {
                                   "children": "Weekly",
-                                  "value": "Weekly",
+                                  "value": "weekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Biweekly",
+                                "key": "biweekly",
                                 "props": {
                                   "children": "Biweekly",
-                                  "value": "Biweekly",
+                                  "value": "biweekly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Monthly",
+                                "key": "monthly",
                                 "props": {
                                   "children": "Monthly",
-                                  "value": "Monthly",
+                                  "value": "monthly",
                                 },
                                 "type": "Option",
                               },
                               {
-                                "key": "Yearly",
+                                "key": "yearly",
                                 "props": {
                                   "children": "Yearly",
-                                  "value": "Yearly",
+                                  "value": "yearly",
                                 },
                                 "type": "Option",
                               },
                             ],
                             "name": "erc20-token-stream-time-period",
-                            "value": "Weekly",
+                            "value": "weekly",
                           },
                           "type": "Dropdown",
                         },
