@@ -7,6 +7,8 @@ const allowedPermissionsByOrigin: { [origin: string]: string[] } = {
     [process.env.KERNEL_SNAP_ID]: [
       RpcMethod.PermissionsProviderGrantPermissions,
       RpcMethod.PermissionsProviderGetPermissionOffers,
+      RpcMethod.PermissionsProviderGetGrantedPermissions,
+      RpcMethod.PermissionsProviderGetSupportedPermissions,
     ],
   }),
   metamask: [

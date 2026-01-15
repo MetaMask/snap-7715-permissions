@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { SUPPORTED_RULE_TYPES } from './7715-permissions-supported';
 import { zPermission, zRule, zTimestamp } from './7715-permissions-types';
 import { zAddress, zHexStr } from './common';
 import { extractDescriptorName } from '../utils';
@@ -25,47 +26,73 @@ export const zWalletSigner = z.object({
  * A wallet is the signer for these permissions
  * `data` is not necessary for this signer type as the wallet is both the signer and grantor of these permissions.
  */
-export type WalletSigner = z.infer<typeof zAccountSigner>;
+export type WalletSigner = z.infer<typeof zWalletSigner>;
 
-export const zPermissionRequest = z.object({
-  /**
-   * hex-encoding of uint256 defined the chain with EIP-155
-   */
-  chainId: zHexStr,
+export const zPermissionRequest = z
+  .object({
+    /**
+     * hex-encoding of uint256 defined the chain with EIP-155
+     */
+    chainId: zHexStr,
 
-  /**
-   *
-   * The account being targeted for this permission request.
-   * It is optional to let the user choose which account to grant permission for.
-   */
-  address: zAddress.optional().nullable(),
+    /**
+     *
+     * The account being targeted for this permission request.
+     * It is optional to let the user choose which account to grant permission for.
+     */
+    address: zAddress.optional().nullable(),
 
-  /**
-   * An account that can be granted with permissions as in ERC-7710
-   */
-  signer: zAccountSigner,
+    /**
+     * An account that can be granted with permissions as in ERC-7710
+     */
+    signer: zAccountSigner,
 
-  /**
-   * Defines the allowed behavior the signer can do on behalf of the account.
-   */
-  permission: zPermission,
+    /**
+     * The type of action the signer is permitted to perform (e.g., native token transfer, contract call).
+     */
+    permission: zPermission,
 
-  /**
-   * Defines the allowed behavior the signer can do on behalf of the account.
-   */
-  rules: z.array(zRule).superRefine((rules, ctx) => {
-    // Check for duplicate rule types
-    const ruleTypes = rules.map((rule) => extractDescriptorName(rule.type));
-    const uniqueRuleTypes = new Set(ruleTypes);
+    /**
+     * Constraints that limit how the permission can be used (e.g., expiry time).
+     */
+    rules: z.array(zRule).superRefine((rules, ctx) => {
+      // Check for duplicate rule types
+      const ruleTypes = rules.map((rule) => extractDescriptorName(rule.type));
+      const uniqueRuleTypes = new Set(ruleTypes);
 
-    if (uniqueRuleTypes.size !== ruleTypes.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Duplicate rule types are not allowed',
-      });
+      if (uniqueRuleTypes.size !== ruleTypes.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Duplicate rule types are not allowed',
+        });
+      }
+    }),
+  })
+  .superRefine((data, ctx) => {
+    // Validate that each rule type is supported for the permission type
+    const permissionType = extractDescriptorName(data.permission.type);
+    const supportedRules =
+      SUPPORTED_RULE_TYPES[permissionType as keyof typeof SUPPORTED_RULE_TYPES];
+
+    // If permission type is not in SUPPORTED_RULE_TYPES, skip rule validation
+    // (unknown permission types are handled elsewhere)
+    if (!supportedRules) {
+      return;
     }
-  }),
-});
+
+    for (const rule of data.rules) {
+      const ruleType = extractDescriptorName(rule.type);
+      if (
+        !supportedRules.includes(ruleType as (typeof supportedRules)[number])
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Rule type "${ruleType}" is not supported for permission type "${permissionType}". Supported: ${supportedRules.join(', ') || 'none'}`,
+          path: ['rules'],
+        });
+      }
+    }
+  });
 export const zPermissionsRequest = z.array(zPermissionRequest);
 
 export type PermissionRequest = z.infer<typeof zPermissionRequest>;

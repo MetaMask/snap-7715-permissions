@@ -946,6 +946,70 @@ describe('RpcHandler', () => {
     });
   });
 
+  describe('getSupportedPermissions', () => {
+    it('should return all supported permission types with chainIds and ruleTypes', async () => {
+      const result = await handler.getSupportedPermissions();
+
+      // Should return an object with all 5 permission types
+      expect(result).toHaveProperty('native-token-stream');
+      expect(result).toHaveProperty('native-token-periodic');
+      expect(result).toHaveProperty('erc20-token-stream');
+      expect(result).toHaveProperty('erc20-token-periodic');
+      expect(result).toHaveProperty('erc20-token-revocation');
+
+      // Each permission type should have chainIds and ruleTypes
+      const typedResult = result as {
+        [key: string]: { chainIds: string[]; ruleTypes: string[] };
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const nativeTokenStream = typedResult['native-token-stream']!;
+
+      // Verify structure for one permission type
+      expect(nativeTokenStream).toHaveProperty('chainIds');
+      expect(nativeTokenStream).toHaveProperty('ruleTypes');
+      expect(Array.isArray(nativeTokenStream.chainIds)).toBe(true);
+      expect(Array.isArray(nativeTokenStream.ruleTypes)).toBe(true);
+
+      // Chain IDs should be hex strings
+      expect(nativeTokenStream.chainIds.length).toBeGreaterThan(0);
+      expect(nativeTokenStream.chainIds[0]).toMatch(/^0x/u);
+
+      // All permission types should support 'expiry' rule
+      expect(nativeTokenStream.ruleTypes).toContain('expiry');
+      expect(typedResult['native-token-periodic']?.ruleTypes).toContain(
+        'expiry',
+      );
+      expect(typedResult['erc20-token-stream']?.ruleTypes).toContain('expiry');
+      expect(typedResult['erc20-token-periodic']?.ruleTypes).toContain(
+        'expiry',
+      );
+      expect(typedResult['erc20-token-revocation']?.ruleTypes).toContain(
+        'expiry',
+      );
+    });
+
+    it('should return the same chainIds for all permission types', async () => {
+      const result = (await handler.getSupportedPermissions()) as {
+        [key: string]: { chainIds: string[]; ruleTypes: string[] };
+      };
+
+      const nativeStreamChainIds = result['native-token-stream']?.chainIds;
+      expect(result['native-token-periodic']?.chainIds).toStrictEqual(
+        nativeStreamChainIds,
+      );
+      expect(result['erc20-token-stream']?.chainIds).toStrictEqual(
+        nativeStreamChainIds,
+      );
+      expect(result['erc20-token-periodic']?.chainIds).toStrictEqual(
+        nativeStreamChainIds,
+      );
+      expect(result['erc20-token-revocation']?.chainIds).toStrictEqual(
+        nativeStreamChainIds,
+      );
+    });
+  });
+
   describe('submitRevocation', () => {
     const validRevocationParams = {
       permissionContext: TEST_CONTEXT,

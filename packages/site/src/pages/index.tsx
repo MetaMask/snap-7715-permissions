@@ -131,6 +131,12 @@ const Index = () => {
     useState<PermissionRequest | null>(null);
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [supportedPermissionsResponse, setSupportedPermissionsResponse] =
+    useState<any>(null);
+  const [grantedPermissionsResponse, setGrantedPermissionsResponse] =
+    useState<any>(null);
+  const [supportedIsCopied, setSupportedIsCopied] = useState(false);
+  const [grantedIsCopied, setGrantedIsCopied] = useState(false);
   const [to, setTo] = useState<Hex>('0x');
   const [data, setData] = useState<Hex>('0x');
   const [value, setValue] = useState<bigint>(0n);
@@ -297,6 +303,60 @@ const Index = () => {
         .then(() => {
           setIsCopied(true);
           setTimeout(() => setIsCopied(false), 2000);
+        })
+        .catch((clipboardError) => {
+          console.error('Failed to copy: ', clipboardError);
+        });
+    }
+  };
+
+  const handleGetSupportedPermissions = async () => {
+    setPermissionResponseError(null);
+    try {
+      const response = await provider?.request({
+        method: 'wallet_getSupportedExecutionPermissions',
+        params: [],
+      });
+      setSupportedPermissionsResponse(response);
+    } catch (error) {
+      setPermissionResponseError(error as Error);
+    }
+  };
+
+  const handleGetGrantedPermissions = async () => {
+    setPermissionResponseError(null);
+    try {
+      const response = await provider?.request({
+        method: 'wallet_getGrantedExecutionPermissions',
+        params: [],
+      });
+      setGrantedPermissionsResponse(response);
+    } catch (error) {
+      setPermissionResponseError(error as Error);
+    }
+  };
+
+  const handleCopySupportedToClipboard = () => {
+    if (supportedPermissionsResponse) {
+      navigator.clipboard
+        .writeText(JSON.stringify(supportedPermissionsResponse, null, 2))
+        .then(() => {
+          setSupportedIsCopied(true);
+          setTimeout(() => setSupportedIsCopied(false), 2000);
+        })
+        .catch((clipboardError) => {
+          console.error('Failed to copy: ', clipboardError);
+        });
+    }
+  };
+
+  const handleCopyGrantedToClipboard = () => {
+    if (grantedPermissionsResponse) {
+      navigator.clipboard
+        .writeText(JSON.stringify(grantedPermissionsResponse, null, 2))
+        .then(() => {
+          setGrantedIsCopied(true);
+          setTimeout(() => setGrantedIsCopied(false), 2000);
         })
         .catch((clipboardError) => {
           console.error('Failed to copy: ', clipboardError);
@@ -488,6 +548,57 @@ const Index = () => {
               $text="Grant Permission"
               onClick={handleGrantPermissions}
             />
+          </Box>
+        )}
+
+        {metaMaskClient && (
+          <Box>
+            <Title>Permission Queries</Title>
+            <div
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                marginTop: '1rem',
+                marginBottom: '1rem',
+              }}
+            >
+              <CustomMessageButton
+                $text="Get Supported Permissions"
+                onClick={handleGetSupportedPermissions}
+              />
+              <CustomMessageButton
+                $text="Get Granted Permissions"
+                onClick={handleGetGrantedPermissions}
+              />
+            </div>
+            {supportedPermissionsResponse && (
+              <ResponseContainer>
+                <Title>Supported Permissions</Title>
+                <CopyButton
+                  onClick={handleCopySupportedToClipboard}
+                  title={'Copy to clipboard'}
+                >
+                  {supportedIsCopied ? '✅' : '📝'}
+                </CopyButton>
+                <pre>
+                  {JSON.stringify(supportedPermissionsResponse, null, 2)}
+                </pre>
+              </ResponseContainer>
+            )}
+            {grantedPermissionsResponse && (
+              <ResponseContainer style={{ marginTop: '1rem' }}>
+                <Title>Granted Permissions</Title>
+                <CopyButton
+                  onClick={handleCopyGrantedToClipboard}
+                  title={'Copy to clipboard'}
+                >
+                  {grantedIsCopied ? '✅' : '📝'}
+                </CopyButton>
+                <pre>
+                  {JSON.stringify(grantedPermissionsResponse, null, 2)}
+                </pre>
+              </ResponseContainer>
+            )}
           </Box>
         )}
 
