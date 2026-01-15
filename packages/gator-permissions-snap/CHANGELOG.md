@@ -9,13 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0]
 
-### Uncategorized
+### Added
 
-- chore: Update packages to comply with 7715 spec revisions ([#252](https://github.com/MetaMask/snap-7715-permissions/pull/252))
-- remove unused export ([#253](https://github.com/MetaMask/snap-7715-permissions/pull/253))
-- feat: add 7715 discoverability methods ([#249](https://github.com/MetaMask/snap-7715-permissions/pull/249))
-- chore: update permission popup ([#251](https://github.com/MetaMask/snap-7715-permissions/pull/251))
+- Added 7715 discoverability methods ([#249](https://github.com/MetaMask/snap-7715-permissions/pull/249))
 - Implement translations ([#199](https://github.com/MetaMask/snap-7715-permissions/pull/199))
+
+### Changed
+
+- chore: update permission popup ([#251](https://github.com/MetaMask/snap-7715-permissions/pull/251))
+- Removed unused export ([#253](https://github.com/MetaMask/snap-7715-permissions/pull/253))
+- Updated packages to comply with 7715 spec revisions ([#252](https://github.com/MetaMask/snap-7715-permissions/pull/252))
 
 ## [0.9.0]
 
