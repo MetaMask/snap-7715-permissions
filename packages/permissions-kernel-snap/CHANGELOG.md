@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- chore: Update packages to comply with 7715 spec revisions ([#252](https://github.com/MetaMask/snap-7715-permissions/pull/252))
+- feat: add 7715 discoverability methods ([#249](https://github.com/MetaMask/snap-7715-permissions/pull/249))
+
 ## [0.6.0]
 
 ### Changed
