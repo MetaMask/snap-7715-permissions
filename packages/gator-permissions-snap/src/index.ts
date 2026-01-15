@@ -231,9 +231,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       `RPC request (origin="${origin}"): method="${request.method}"`,
     );
 
-  // Ensure i18n is initialized on every snap invocation
-  // This handles both initial load and locale changes in the extension
-  await setupI18n();
+    // Ensure i18n is initialized on every snap invocation
+    // This handles both initial load and locale changes in the extension
+    await setupI18n();
 
     if (!isMethodAllowedForOrigin(origin, request.method)) {
       throw new InvalidRequestError(
