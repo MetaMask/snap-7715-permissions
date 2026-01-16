@@ -30,7 +30,7 @@ const manifest: SnapManifest = {
       snaps: false,
     },
   },
-  platformVersion: '8.1.0',
+  platformVersion: '10.2.0',
   manifestVersion: '0.1',
 };
 

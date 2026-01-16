@@ -15,15 +15,9 @@ const validPermissionRequest: Erc20TokenStreamPermissionRequest = {
       data: {
         timestamp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     type: 'erc20-token-stream',
     data: {
@@ -55,7 +49,7 @@ describe('erc20TokenStream:validation', () => {
       expect(result).toStrictEqual(validPermissionRequest);
     });
 
-    it('should throw for missing expiry', () => {
+    it('allows missing expiry', () => {
       const missingExpiryRequest = {
         ...validPermissionRequest,
         rules: [],
@@ -63,7 +57,7 @@ describe('erc20TokenStream:validation', () => {
 
       expect(() =>
         parseAndValidatePermission(missingExpiryRequest as any),
-      ).toThrow('Expiry rule is required');
+      ).not.toThrow();
     });
 
     it('should throw for invalid permission type', () => {

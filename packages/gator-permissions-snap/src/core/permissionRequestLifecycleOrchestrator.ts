@@ -1,5 +1,5 @@
 import type {
-  DependencyInfo,
+  Dependency,
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
@@ -22,13 +22,12 @@ import {
   numberToHex,
   parseCaipAccountId,
 } from '@metamask/utils';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
-import type { SnapsMetricsService } from '../services/snapsMetricsService';
-import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
+import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
+import type { PermissionIntroductionService } from './permissionIntroduction';
 import type {
   BaseContext,
   BaseMetadata,
@@ -36,6 +35,8 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
+import type { NonceCaveatService } from '../services/nonceCaveatService';
+import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -46,30 +47,35 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
-  readonly #userEventDispatcher: UserEventDispatcher;
-
   readonly #nonceCaveatService: NonceCaveatService;
 
   readonly #snapsMetricsService: SnapsMetricsService;
 
+  readonly #permissionIntroductionService: PermissionIntroductionService;
+
+  readonly #dialogInterfaceFactory: DialogInterfaceFactory;
+
   constructor({
     accountController,
     confirmationDialogFactory,
-    userEventDispatcher,
     nonceCaveatService,
     snapsMetricsService,
+    permissionIntroductionService,
+    dialogInterfaceFactory,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
-    userEventDispatcher: UserEventDispatcher;
     nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
+    permissionIntroductionService: PermissionIntroductionService;
+    dialogInterfaceFactory: DialogInterfaceFactory;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
-    this.#userEventDispatcher = userEventDispatcher;
     this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
+    this.#permissionIntroductionService = permissionIntroductionService;
+    this.#dialogInterfaceFactory = dialogInterfaceFactory;
   }
 
   /**
@@ -131,6 +137,42 @@ export class PermissionRequestLifecycleOrchestrator {
       permissionData: permissionRequest.permission.data,
     });
 
+    // Create shared dialog interface for both intro and confirmation
+    const dialogInterface =
+      this.#dialogInterfaceFactory.createDialogInterface();
+
+    // Check if we need to show introduction
+    if (
+      await this.#permissionIntroductionService.shouldShowIntroduction(
+        permissionType,
+      )
+    ) {
+      const { wasCancelled } =
+        await this.#permissionIntroductionService.showIntroduction({
+          dialogInterface,
+          permissionType,
+        });
+
+      // If user cancelled the introduction, reject the permission request
+      if (wasCancelled) {
+        await this.#snapsMetricsService.trackPermissionRejected({
+          origin,
+          permissionType,
+          chainId: permissionRequest.chainId,
+          permissionData: permissionRequest.permission.data,
+        });
+
+        return {
+          approved: false,
+          reason: 'Permission request denied',
+        };
+      }
+
+      await this.#permissionIntroductionService.markIntroductionAsSeen(
+        permissionType,
+      );
+    }
+
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.
     await this.#accountController.getAccountAddresses();
@@ -159,14 +201,17 @@ export class PermissionRequestLifecycleOrchestrator {
       return !hasValidationErrors(metadata);
     };
 
+    // Create confirmation dialog with the shared dialog interface
+    const skeletonUi =
+      await lifecycleHandlers.createSkeletonConfirmationContent();
     const confirmationDialog =
       this.#confirmationDialogFactory.createConfirmation({
-        ui: await lifecycleHandlers.createSkeletonConfirmationContent(),
-        isGrantDisabled: true,
+        dialogInterface,
+        ui: skeletonUi,
         onBeforeGrant,
       });
 
-    const interfaceId = await confirmationDialog.createInterface();
+    const interfaceId = await confirmationDialog.initialize();
 
     try {
       context = await lifecycleHandlers.buildContext(
@@ -395,9 +440,12 @@ export class PermissionRequestLifecycleOrchestrator {
       isAdjustmentAllowed,
     };
 
-    const { address } = grantedPermissionRequest;
-    if (!address) {
+    const { from, to } = grantedPermissionRequest;
+    if (!from) {
       throw new InvalidInputError('Address is undefined');
+    }
+    if (!to) {
+      throw new InvalidInputError('Delegate address is undefined');
     }
 
     const { contracts } = getChainMetadata({ chainId });
@@ -423,15 +471,11 @@ export class PermissionRequestLifecycleOrchestrator {
         }),
         args: '0x',
       });
-    } else {
-      throw new InvalidInputError(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
     }
 
     const nonce = await this.#nonceCaveatService.getNonce({
       chainId,
-      account: address,
+      account: from,
     });
 
     caveats.push({
@@ -447,9 +491,9 @@ export class PermissionRequestLifecycleOrchestrator {
     const salt = bytesToHex(saltBytes);
 
     const delegation = {
-      delegate: grantedPermissionRequest.signer.data.address,
+      delegate: to,
       authority: ROOT_AUTHORITY,
-      delegator: address,
+      delegator: from,
       caveats,
       salt: BigInt(salt),
     } as const;
@@ -463,7 +507,7 @@ export class PermissionRequestLifecycleOrchestrator {
       signedDelegation = await this.#accountController.signDelegation({
         chainId,
         delegation,
-        address,
+        address: from,
         origin,
         justification,
       });
@@ -483,18 +527,16 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
-    // dependencyInfo is always empty for EIP-7702 accounts
-    const dependencyInfo: DependencyInfo[] = [];
+    // dependencies is always empty for EIP-7702 accounts
+    const dependencies: Dependency[] = [];
 
     const response: PermissionResponse = {
       ...grantedPermissionRequest,
       chainId: numberToHex(chainId),
-      address,
-      dependencyInfo,
+      from,
+      dependencies,
       context,
-      signerMeta: {
-        delegationManager: contracts.delegationManager,
-      },
+      delegationManager: contracts.delegationManager,
     };
 
     // Track successful permission grant

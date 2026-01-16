@@ -14,7 +14,6 @@ import type {
   Erc20TokenStreamPermissionRequest,
 } from '../../../src/permissions/erc20TokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 const USDC_ADDRESS = '0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F';
@@ -25,7 +24,7 @@ const permissionWithoutOptionals: Erc20TokenStreamPermission = {
   data: {
     tokenAddress: USDC_ADDRESS,
     amountPerSecond: numberToHex(500_000), // 0.5 USDC per second (6 decimals)
-    startTime: 1729987200, // 10/26/2024,
+    startTime: 1729987200, // 10/27/2024 00:00:00 UTC
     justification: 'Permission to do something important',
   },
   isAdjustmentAllowed: true,
@@ -43,28 +42,22 @@ const alreadyPopulatedPermission: Erc20TokenStreamPermission = {
 };
 
 const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
-  address: ACCOUNT_ADDRESS,
+  from: ACCOUNT_ADDRESS,
   chainId: '0x1',
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     ...alreadyPopulatedPermission,
     data: {
       ...alreadyPopulatedPermission.data,
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     },
   },
   rules: [
     {
       type: 'expiry',
       data: {
-        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+        timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
       },
-      isAdjustmentAllowed: true,
     },
   ],
 };
@@ -72,7 +65,6 @@ const alreadyPopulatedPermissionRequest: Erc20TokenStreamPermissionRequest = {
 const alreadyPopulatedContext: Erc20TokenStreamContext = {
   expiry: {
     timestamp: 1714521600,
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
@@ -244,36 +236,31 @@ describe('erc20TokenStream:context', () => {
       expect(context.permissionDetails.maxAmount).toBe('10');
     });
 
-    it('throws an error if the expiry rule is not found', async () => {
+    it('builds context without expiry when expiry rule is not found', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: [],
       };
 
-      await expect(
-        buildContext({
-          permissionRequest,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
 
-    it('throws an error if the permission request has no rules', async () => {
+    it('builds context without expiry when the permission request has no rules', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: undefined,
-      };
+        // rules is optional, but may not be explicitly set to undefined
+      } as unknown as Erc20TokenStreamPermissionRequest;
 
-      await expect(
-        buildContext({
-          permissionRequest,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
   });
 
@@ -451,7 +438,7 @@ describe('erc20TokenStream:context', () => {
             ...context,
             permissionDetails: {
               ...context.permissionDetails,
-              startTime: 499161600, // 10/26/1985
+              startTime: 499161600, // 10/26/1985 00:00:00 UTC
             },
           };
 
@@ -510,7 +497,7 @@ describe('erc20TokenStream:context', () => {
         const contextWithExpiryInThePast = {
           ...context,
           expiry: {
-            timestamp: 499161600, // 10/26/1985
+            timestamp: 499161600, // 10/26/1985 00:00:00 UTC
             isAdjustmentAllowed: true,
           },
           permissionDetails: {
@@ -586,17 +573,20 @@ describe('erc20TokenStream:context', () => {
       );
     });
 
-    it('throws an error if the expiry rule is not found in the original request', async () => {
-      const applyingContext = applyContext({
+    it('adds an expiry rule if it is not in the original request', async () => {
+      const permissionRequest = await applyContext({
         context: alreadyPopulatedContext,
         originalRequest: {
           ...alreadyPopulatedPermissionRequest,
           rules: [],
         },
       });
-
-      await expect(applyingContext).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
+      const expiryRule = permissionRequest.rules.find(
+        (rule) => rule.type === 'expiry',
+      );
+      expect(expiryRule).toBeDefined();
+      expect(expiryRule?.data.timestamp).toBe(
+        alreadyPopulatedContext.expiry?.timestamp,
       );
     });
   });

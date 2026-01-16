@@ -11,6 +11,7 @@ import type {
   AddressInputElement,
   AssetSelectorElement,
   CheckboxElement,
+  DateTimePickerElement,
   DropdownElement,
   FileInputElement,
   GenericSnapElement,
@@ -25,6 +26,7 @@ import { TokenIcon } from './TokenIcon';
 import { TooltipIcon } from './TooltipIcon';
 import toggleDisabledImage from '../../../images/toggle_disabled.svg';
 import toggleEnabledImage from '../../../images/toggle_enabled.svg';
+import { t } from '../../utils/i18n';
 
 export type BaseFieldProps = {
   label: string;
@@ -69,7 +71,8 @@ export type ComplexFieldProps = BaseFieldProps & {
     | SelectorElement
     | AssetSelectorElement
     | AddressInputElement
-    | AccountSelectorElement;
+    | AccountSelectorElement
+    | DateTimePickerElement;
 };
 
 export type FieldProps = InputFieldProps | ComplexFieldProps | ViewFieldProps;
@@ -138,7 +141,11 @@ export const Field = (props: FieldProps) => {
         <Button name={toggleFieldButtonName}>
           <Image
             src={isFieldEnabled ? toggleEnabledImage : toggleDisabledImage}
-            alt={isFieldEnabled ? `Remove ${label}` : `Add ${label}`}
+            alt={
+              isFieldEnabled
+                ? t('removeFieldAlt', [label])
+                : t('addFieldAlt', [label])
+            }
           />
         </Button>
       );

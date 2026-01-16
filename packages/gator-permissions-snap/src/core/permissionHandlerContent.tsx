@@ -13,6 +13,7 @@ import { parseCaipAssetType } from '@metamask/utils';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
 import {
+  AddressField,
   ShowMoreText,
   SkeletonField,
   TextField,
@@ -20,33 +21,22 @@ import {
   TokenBalanceField,
   TokenField,
 } from '../ui/components';
+import type { MessageKey } from '../utils/i18n';
+import { t } from '../utils/i18n';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
-export const ACCOUNT_LABEL = 'Account';
-export const ACCOUNT_TOOLTIP =
-  'The account from which the permission is being granted.';
-
-export const RECIPIENT_LABEL = 'Recipient';
-export const RECIPIENT_TOOLTIP = 'The site requesting the permission';
-export const NETWORK_LABEL = 'Network';
-export const NETWORK_TOOLTIP =
-  'The network on which the permission is being requested';
-export const TOKEN_LABEL = 'Token';
-export const TOKEN_TOOLTIP = 'The token being requested';
-export const REASON_LABEL = 'Reason';
-export const REASON_TOOLTIP =
-  'Reason given by the recipient for requesting this permission.';
 
 export type PermissionHandlerContentProps = {
   children: SnapElement;
-  permissionTitle: string;
-  permissionSubtitle: string;
+  permissionTitle: MessageKey;
+  permissionSubtitle: MessageKey;
   justification: string;
   networkName: string;
   tokenSymbol: string;
   tokenIconData?: IconData | undefined;
   isJustificationCollapsed: boolean;
   origin: string;
+  delegateAddress: string;
   context: BaseContext;
   tokenBalance: string | null;
   tokenBalanceFiat: string | null;
@@ -62,6 +52,7 @@ export type PermissionHandlerContentProps = {
  * @param options.permissionTitle - The title of the permission.
  * @param options.permissionSubtitle - The subtitle of the permission.
  * @param options.origin - The origin of the permission request.
+ * @param options.delegateAddress - The address that will receive the delegated permission.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
  * @param options.tokenSymbol - The symbol of the token.
@@ -80,6 +71,7 @@ export const PermissionHandlerContent = ({
   permissionTitle,
   permissionSubtitle,
   origin,
+  delegateAddress,
   justification,
   networkName,
   tokenSymbol,
@@ -122,15 +114,15 @@ export const PermissionHandlerContent = ({
     <Box>
       <Box direction="vertical">
         <Box center={true}>
-          <Heading size="lg">{permissionTitle}</Heading>
-          <Text>{permissionSubtitle}</Text>
+          <Heading size="lg">{t(permissionTitle)}</Heading>
+          <Text>{t(permissionSubtitle)}</Text>
         </Box>
         <Section>
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
               <Box direction="horizontal">
-                <Text>{ACCOUNT_LABEL}</Text>
-                <TooltipIcon tooltip={ACCOUNT_TOOLTIP} />
+                <Text>{t('accountLabel')}</Text>
+                <TooltipIcon tooltip={t('accountTooltip')} />
               </Box>
             </Box>
             <AccountSelector
@@ -141,8 +133,7 @@ export const PermissionHandlerContent = ({
             />
             {!isAccountUpgraded && (
               <Text size="sm" color="warning">
-                This account will be upgraded to a smart account to complete
-                this permission.
+                {t('accountUpgradeWarning')}
               </Text>
             )}
             {hasAsset && (
@@ -156,8 +147,8 @@ export const PermissionHandlerContent = ({
         <Section>
           <Box direction="horizontal" alignment="space-between">
             <Box direction="horizontal">
-              <Text>{REASON_LABEL}</Text>
-              <TooltipIcon tooltip={REASON_TOOLTIP} />
+              <Text>{t('reasonLabel')}</Text>
+              <TooltipIcon tooltip={t('reasonTooltip')} />
             </Box>
             <Box direction="horizontal">
               <ShowMoreText
@@ -170,22 +161,27 @@ export const PermissionHandlerContent = ({
         </Section>
         <Section>
           <TextField
-            label={RECIPIENT_LABEL}
+            label={t('requestFromLabel')}
             value={origin}
-            tooltip={RECIPIENT_TOOLTIP}
+            tooltip={t('requestFromTooltip')}
+          />
+          <AddressField
+            label={t('recipientLabel')}
+            address={delegateAddress}
+            tooltip={t('recipientTooltip')}
           />
           <TextField
-            label={NETWORK_LABEL}
+            label={t('networkLabel')}
             value={networkName}
-            tooltip={NETWORK_TOOLTIP}
+            tooltip={t('networkTooltip')}
           />
           {hasAsset && (
             <TokenField
-              label={TOKEN_LABEL}
+              label={t('tokenLabel')}
               tokenSymbol={tokenSymbol}
               tokenAddress={tokenAddress}
               explorerUrl={tokenExplorerUrl}
-              tooltip={TOKEN_TOOLTIP}
+              tooltip={t('tokenTooltip')}
               iconData={tokenIconData}
             />
           )}
@@ -200,34 +196,47 @@ export const SkeletonPermissionHandlerContent = ({
   permissionTitle,
   permissionSubtitle,
 }: {
-  permissionTitle: string;
-  permissionSubtitle: string;
+  permissionTitle: MessageKey;
+  permissionSubtitle: MessageKey;
 }) => {
   return (
     <Box>
       <Box direction="vertical">
         <Box center={true}>
-          <Heading size="lg">{permissionTitle}</Heading>
-          <Text>{permissionSubtitle}</Text>
+          <Heading size="lg">{t(permissionTitle)}</Heading>
+          <Text>{t(permissionSubtitle)}</Text>
         </Box>
         <Section>
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
               <Box direction="horizontal">
-                <Text>{ACCOUNT_LABEL}</Text>
-                <TooltipIcon tooltip={ACCOUNT_TOOLTIP} />
+                <Text>{t('accountLabel')}</Text>
+                <TooltipIcon tooltip={t('accountTooltip')} />
               </Box>
             </Box>
             <Skeleton />
           </Box>
         </Section>
         <Section>
-          <SkeletonField label={REASON_LABEL} tooltip={REASON_TOOLTIP} />
+          <SkeletonField
+            label={t('reasonLabel')}
+            tooltip={t('reasonTooltip')}
+          />
         </Section>
         <Section>
-          <SkeletonField label={RECIPIENT_LABEL} tooltip={RECIPIENT_TOOLTIP} />
-          <SkeletonField label={NETWORK_LABEL} tooltip={NETWORK_TOOLTIP} />
-          <SkeletonField label={TOKEN_LABEL} tooltip={TOKEN_TOOLTIP} />
+          <SkeletonField
+            label={t('requestFromLabel')}
+            tooltip={t('requestFromTooltip')}
+          />
+          <SkeletonField
+            label={t('recipientLabel')}
+            tooltip={t('recipientTooltip')}
+          />
+          <SkeletonField
+            label={t('networkLabel')}
+            tooltip={t('networkTooltip')}
+          />
+          <SkeletonField label={t('tokenLabel')} tooltip={t('tokenTooltip')} />
         </Section>
         <Section>
           <Skeleton />

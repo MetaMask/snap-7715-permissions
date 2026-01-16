@@ -42,12 +42,7 @@ type TestLifecycleHandlersType = LifecycleOrchestrationHandlers<
 
 const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
-  signer: {
-    type: 'account',
-    data: {
-      address: mockAddress,
-    },
-  },
+  to: mockAddress,
   permission: {
     type: 'native-token-stream',
     data: {
@@ -72,7 +67,6 @@ const mockContext: TestContextType = {
   tokenAddressCaip19: `eip155:1/erc20:${mockAssetAddress}`,
   expiry: {
     timestamp: 1234567890,
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: false,
 };
@@ -311,14 +305,14 @@ describe('PermissionHandler', () => {
       await lifecycleHandlers.buildContext({
         ...mockPermissionRequest,
         // it's already undefined, but we make sure here
-        address: undefined,
+        from: undefined,
       });
 
       expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
 
       const permissionRequestWithResolvedAddress = {
         ...mockPermissionRequest,
-        address: mockAddress,
+        from: mockAddress,
       };
 
       expect(dependencies.buildContext).toHaveBeenCalledWith({
@@ -349,14 +343,14 @@ describe('PermissionHandler', () => {
 
         await lifecycleHandlers.buildContext({
           ...mockPermissionRequest,
-          address: specifiedAddress,
+          from: specifiedAddress,
         });
 
         expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
 
         const permissionRequestWithResolvedAddress = {
           ...mockPermissionRequest,
-          address: specifiedAddress,
+          from: specifiedAddress,
         };
 
         expect(dependencies.buildContext).toHaveBeenCalledWith({
@@ -382,7 +376,7 @@ describe('PermissionHandler', () => {
       await expect(
         lifecycleHandlers.buildContext({
           ...mockPermissionRequest,
-          address: '0x9876543210987654321098765432109876543210',
+          from: '0x9876543210987654321098765432109876543210',
         }),
       ).rejects.toThrow('Requested address not found');
 
@@ -725,15 +719,7 @@ describe('PermissionHandler', () => {
                       },
                       "type": "AccountSelector",
                     },
-                    {
-                      "key": null,
-                      "props": {
-                        "children": "This account will be upgraded to a smart account to complete this permission.",
-                        "color": "warning",
-                        "size": "sm",
-                      },
-                      "type": "Text",
-                    },
+                    false,
                     {
                       "key": null,
                       "props": {
@@ -876,7 +862,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -924,6 +910,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -1281,7 +1350,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
@@ -1413,7 +1483,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -1461,6 +1531,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -1712,8 +1865,10 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
         });
 
-        // called once with the context updated to include the new account address
-        expect(updateContext).toHaveBeenCalledTimes(1);
+        // called twice:
+        // 1. with the context updated to include the new account address
+        // 2. after the account upgrade status is fetched for the new account
+        expect(updateContext).toHaveBeenCalledTimes(2);
         expect(updateContext).toHaveBeenCalledWith({
           updatedContext: {
             ...mockContext,
@@ -1978,7 +2133,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -2026,6 +2181,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -2348,7 +2586,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
@@ -2480,7 +2719,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -2528,6 +2767,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -2852,7 +3174,8 @@ describe('PermissionHandler', () => {
                             "props": {
                               "children": [
                                 "1",
-                                " available",
+                                " ",
+                                "available",
                               ],
                             },
                             "type": "Text",
@@ -2984,7 +3307,7 @@ describe('PermissionHandler', () => {
                                   {
                                     "key": null,
                                     "props": {
-                                      "children": "Recipient",
+                                      "children": "Request from",
                                     },
                                     "type": "Text",
                                   },
@@ -3032,6 +3355,89 @@ describe('PermissionHandler', () => {
                                 "children": "https://example.com",
                               },
                               "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
+                {
+                  "key": null,
+                  "props": {
+                    "alignment": "space-between",
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "space-between",
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Recipient",
+                                    },
+                                    "type": "Text",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "color": "muted",
+                                          "name": "question",
+                                          "size": "inherit",
+                                        },
+                                        "type": "Icon",
+                                      },
+                                      "content": {
+                                        "key": null,
+                                        "props": {
+                                          "children": "The site requesting the permission",
+                                        },
+                                        "type": "Text",
+                                      },
+                                    },
+                                    "type": "Tooltip",
+                                  },
+                                ],
+                                "direction": "horizontal",
+                              },
+                              "type": "Box",
+                            },
+                            null,
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            null,
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "0x12345...67890",
+                                  },
+                                  "type": "Text",
+                                },
+                                "content": "0x1234567890123456789012345678901234567890",
+                              },
+                              "type": "Tooltip",
                             },
                           ],
                           "direction": "horizontal",
@@ -3275,14 +3681,15 @@ describe('PermissionHandler', () => {
         resolveTokenBalancePromise();
         await new Promise((resolve) => setTimeout(resolve, 0));
 
-        // update context is called 3 times:
+        // update context is called 4 times:
         // 1. After the account is changed
-        // 2. After the token balance is resolved for the second account
-        // 3. After the fiat balance is resolved for the second account
+        // 2. After the account upgrade status is fetched for the new account
+        // 3. After the token balance is resolved for the second account
+        // 4. After the fiat balance is resolved for the second account
         // if we didn't cancel the original balance loading, there would be another 2 instances
-        // 4. After the original token balance is resolved for the first account
-        // 5. After the original fiat balance is resolved for the first account
-        expect(updateContext).toHaveBeenCalledTimes(3);
+        // 5. After the original token balance is resolved for the first account
+        // 6. After the original fiat balance is resolved for the first account
+        expect(updateContext).toHaveBeenCalledTimes(4);
       });
 
       it('unbinds the event handlers when the confirmation is resolved', async () => {

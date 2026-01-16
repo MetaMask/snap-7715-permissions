@@ -4,19 +4,18 @@ import type {
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import type { Hex, Caveat, Delegation } from '@metamask/delegation-core';
-import type {
-  CaipAccountId,
-  CaipAssetType,
-  SnapsProvider,
-} from '@metamask/snaps-sdk';
+import type { CaipAccountId, CaipAssetType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
 import type { DelegationContracts } from './chainMetadata';
+import type { DialogInterface } from './dialogInterface';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
+import type { TimeoutFactory } from './timeoutFactory';
 import type { TokenPricesService } from '../services/tokenPricesService';
+import type { MessageKey } from '../utils/i18n';
 
 /**
  * Represents the result of a permission request.
@@ -40,10 +39,11 @@ export type TypedPermissionRequest<TPermission extends Permission> =
  * Each permission type will extend this with their specific context needs.
  */
 export type BaseContext = {
-  expiry: {
-    timestamp: number;
-    isAdjustmentAllowed: boolean;
-  };
+  expiry:
+    | {
+        timestamp: number;
+      }
+    | undefined;
   isAdjustmentAllowed: boolean;
   justification: string;
   accountAddressCaip10: CaipAccountId;
@@ -54,6 +54,11 @@ export type BaseContext = {
     iconDataBase64: string | null;
   };
 };
+
+/**
+ * Base interface for all context rule objects used in confirmation dialogs.
+ */
+export type BaseRuleContext = Omit<BaseContext, 'isAdjustmentAllowed'>;
 
 export type BaseMetadata = {
   validationErrors?: object;
@@ -91,28 +96,27 @@ export type DeepRequired<TParent> = TParent extends (infer U)[]
  * An enum representing the time periods for which the stream rate can be calculated.
  */
 export enum TimePeriod {
-  HOURLY = 'Hourly',
-  DAILY = 'Daily',
-  WEEKLY = 'Weekly',
-  BIWEEKLY = 'Biweekly',
-  MONTHLY = 'Monthly',
-  YEARLY = 'Yearly',
+  HOURLY = 'hourly',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly',
 }
 
 /**
  * Properties required for confirmation dialogs.
+ * @property dialogInterface - The dialog interface manager for showing content
  * @property ui - The UI element to be displayed in the confirmation dialog
- * @property isGrantDisabled - Whether the user can grant the permission
- * @property snaps - The Snaps provider instance for interacting with the Snaps API
  * @property userEventDispatcher - The dispatcher for handling user events during confirmation
  * @property onBeforeGrant - Validation callback that runs before grant is confirmed
  */
 export type ConfirmationProps = {
+  dialogInterface: DialogInterface;
   ui: SnapElement;
-  isGrantDisabled: boolean;
-  snaps: SnapsProvider;
   userEventDispatcher: UserEventDispatcher;
   onBeforeGrant: () => Promise<boolean>;
+  timeoutFactory: TimeoutFactory;
 };
 
 /**
@@ -186,12 +190,6 @@ export type IconData = {
   iconAltText: string;
 };
 
-export type DateTimeParameterNames = {
-  timestampName: string;
-  dateName: string;
-  timeName: string;
-};
-
 export type RuleData = {
   value: string | undefined;
   isVisible: boolean;
@@ -199,8 +197,8 @@ export type RuleData = {
   iconData?: IconData | undefined;
   error?: string | undefined;
   options?: string[] | undefined;
-  isAdjustmentAllowed: boolean;
-  dateTimeParameterNames?: DateTimeParameterNames;
+  /** For datetime rules: whether to disable selection of past dates. Defaults to false. */
+  allowPastDate?: boolean | undefined;
 };
 
 /**
@@ -209,12 +207,12 @@ export type RuleData = {
  * @template TMetadata - The type of metadata object used for request processing
  */
 export type RuleDefinition<
-  TContext extends BaseContext = BaseContext,
+  TContext extends BaseRuleContext = BaseRuleContext,
   TMetadata extends object = object,
 > = {
   name: string;
   isOptional?: boolean;
-  label: string;
+  label: MessageKey;
   type: RuleType;
   getRuleData: (config: { context: TContext; metadata: TMetadata }) => RuleData;
   // todo: it would be nice if we could make the value type more specific
@@ -259,8 +257,8 @@ export type PermissionDefinition<
     DeepRequired<TPermission> = DeepRequired<TPermission>,
 > = {
   rules: RuleDefinition<TContext, TMetadata>[];
-  title: string;
-  subtitle: string;
+  title: MessageKey;
+  subtitle: MessageKey;
   dependencies: PermissionHandlerDependencies<
     TRequest,
     TContext,
@@ -299,8 +297,8 @@ export type PermissionHandlerParams<
   tokenPricesService: TokenPricesService;
   tokenMetadataService: TokenMetadataService;
   rules: RuleDefinition<TContext, TMetadata>[];
-  title: string;
-  subtitle: string;
+  title: MessageKey;
+  subtitle: MessageKey;
 };
 
 /**

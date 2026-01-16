@@ -14,10 +14,7 @@ import type {
   Erc20TokenPeriodicPermissionRequest,
 } from '../../../src/permissions/erc20TokenPeriodic/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../../src/utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
@@ -31,7 +28,7 @@ const permissionWithoutOptionals: Erc20TokenPeriodicPermission = {
       parseUnits({ formatted: '100', decimals: tokenDecimals }),
     ), // 100 USDC per period
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-    startTime: convertReadableDateToTimestamp('10/26/2024'),
+    startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     tokenAddress,
     justification: 'Permission to do something important',
   },
@@ -46,28 +43,22 @@ const alreadyPopulatedPermission: Erc20TokenPeriodicPermission = {
 };
 
 const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
-  address: ACCOUNT_ADDRESS,
+  from: ACCOUNT_ADDRESS,
   chainId: '0x1',
   rules: [
     {
       type: 'expiry',
       data: {
-        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+        timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     ...alreadyPopulatedPermission,
     data: {
       ...alreadyPopulatedPermission.data,
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     },
     isAdjustmentAllowed: true,
   },
@@ -76,7 +67,6 @@ const alreadyPopulatedPermissionRequest: Erc20TokenPeriodicPermissionRequest = {
 const alreadyPopulatedContext: Erc20TokenPeriodicContext = {
   expiry: {
     timestamp: 1714521600,
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
@@ -200,36 +190,31 @@ describe('erc20TokenPeriodic:context', () => {
       });
     });
 
-    it('throws an error if the expiry rule is not found', async () => {
+    it('builds context without expiry when the expiry rule is not found', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: [],
       };
 
-      await expect(
-        buildContext({
-          permissionRequest,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
 
-    it('throws an error if the permission request has no rules', async () => {
+    it('builds context without expiry when the permission request has no rules', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
-        rules: [],
-      };
+        rules: undefined,
+        // rules is optional, but may not be explicitly set to undefined
+      } as unknown as Erc20TokenPeriodicPermissionRequest;
 
-      await expect(
-        buildContext({
-          permissionRequest,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
   });
 
@@ -362,7 +347,7 @@ describe('erc20TokenPeriodic:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            startTime: 1577836800, // 01/01/2020
+            startTime: 1577836800, // 01/01/2020 00:00:00 UTC
           },
         };
 
@@ -381,7 +366,7 @@ describe('erc20TokenPeriodic:context', () => {
         const contextWithExpiryInThePast = {
           ...context,
           expiry: {
-            timestamp: 499161600, // 10/26/1985
+            timestamp: 499161600, // 10/26/1985 00:00:00 UTC
             isAdjustmentAllowed: true,
           },
           permissionDetails: {

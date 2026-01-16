@@ -5,10 +5,7 @@ import type { DelegationContracts } from '../../../src/core/chainMetadata';
 import { TimePeriod } from '../../../src/core/types';
 import { createPermissionCaveats } from '../../../src/permissions/nativeTokenPeriodic/caveats';
 import type { PopulatedNativeTokenPeriodicPermission } from '../../../src/permissions/nativeTokenPeriodic/types';
-import {
-  convertReadableDateToTimestamp,
-  TIME_PERIOD_TO_SECONDS,
-} from '../../../src/utils/time';
+import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 // Define the contracts with enforcers
@@ -43,7 +40,7 @@ describe('nativeTokenPeriodic:caveats', () => {
             parseUnits({ formatted: '1', decimals: 18 }),
           ), // 1 ETH per period
           periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]), // 1 day in seconds
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
+          startTime: 499132800, // 10/26/1985 00:00:00 UTC
           justification: 'Permission to do something important',
         },
         isAdjustmentAllowed: true,
@@ -76,7 +73,7 @@ describe('nativeTokenPeriodic:caveats', () => {
             parseUnits({ formatted: '1', decimals: 18 }),
           ), // 1 ETH per period
           periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY]), // 1 week in seconds
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
+          startTime: 499132800, // 10/26/1985 00:00:00 UTC
           justification: 'Permission to do something important',
         },
         isAdjustmentAllowed: true,
@@ -108,7 +105,7 @@ describe('nativeTokenPeriodic:caveats', () => {
             parseUnits({ formatted: '1', decimals: 18 }),
           ), // 1 ETH per period
           periodDuration: 123456, // Custom duration in seconds
-          startTime: convertReadableDateToTimestamp('10/26/1985'),
+          startTime: 499132800, // 10/26/1985 00:00:00 UTC
           justification: 'Permission to do something important',
         },
         isAdjustmentAllowed: true,

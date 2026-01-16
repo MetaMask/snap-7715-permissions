@@ -4,7 +4,6 @@ import { bigIntToHex } from '@metamask/utils';
 import type { DelegationContracts } from '../../../src/core/chainMetadata';
 import { createPermissionCaveats } from '../../../src/permissions/erc20TokenStream/caveats';
 import type { PopulatedErc20TokenStreamPermission } from '../../../src/permissions/erc20TokenStream/types';
-import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 describe('erc20TokenStream:caveats', () => {
@@ -19,7 +18,7 @@ describe('erc20TokenStream:caveats', () => {
     const amountPerSecond = bigIntToHex(
       parseUnits({ formatted: '.5', decimals: tokenDecimals }),
     );
-    const startTime = convertReadableDateToTimestamp('10/26/2024');
+    const startTime = 1729900800; // 10/26/2024 00:00:00 UTC
     const tokenAddress = '0x1234567890123456789012345678901234567890';
 
     const contracts = {

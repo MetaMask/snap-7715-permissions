@@ -57,15 +57,11 @@ export class TokenMetadataService {
   #getTokenMetadataClientForChainId(config: {
     chainId: number;
   }): TokenMetadataClient[] {
-    const clients: TokenMetadataClient[] = [];
-
     if (this.#accountApiClient.isChainIdSupported(config)) {
-      clients.push(this.#accountApiClient);
+      return [this.#accountApiClient, this.#tokenMetadataClient];
     }
 
-    clients.push(this.#tokenMetadataClient);
-
-    return clients;
+    return [this.#tokenMetadataClient];
   }
 
   /**

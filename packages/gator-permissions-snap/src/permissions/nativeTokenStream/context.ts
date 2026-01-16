@@ -8,8 +8,16 @@ import {
   type Hex,
 } from '@metamask/utils';
 
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamPermissionRequest,
+  NativeTokenStreamMetadata,
+  PopulatedNativeTokenStreamPermission,
+  NativeTokenStreamPermission,
+} from './types';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import { t } from '../../utils/i18n';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
@@ -20,13 +28,7 @@ import {
   calculateAmountPerSecond,
   validateStartTimeVsExpiry,
 } from '../contextValidation';
-import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamPermissionRequest,
-  NativeTokenStreamMetadata,
-  PopulatedNativeTokenStreamPermission,
-  NativeTokenStreamPermission,
-} from './types';
+import { applyExpiryRule } from '../rules';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -54,27 +56,8 @@ export async function applyContext({
     permissionDetails,
     tokenMetadata: { decimals },
   } = context;
-  const expiry = context.expiry.timestamp;
 
-  let isExpiryRuleFound = false;
-
-  const rules: NativeTokenStreamPermissionRequest['rules'] =
-    originalRequest.rules?.map((rule) => {
-      if (extractDescriptorName(rule.type) === 'expiry') {
-        isExpiryRuleFound = true;
-        return {
-          ...rule,
-          data: { ...rule.data, timestamp: expiry },
-        };
-      }
-      return rule;
-    }) ?? [];
-
-  if (!isExpiryRuleFound) {
-    throw new InvalidInputError(
-      'Expiry rule not found. An expiry is required on all permissions.',
-    );
-  }
+  const { rules } = applyExpiryRule(context, originalRequest);
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
@@ -99,7 +82,7 @@ export async function applyContext({
 
   return {
     ...originalRequest,
-    address: address as Hex,
+    from: address as Hex,
     permission: {
       type: 'native-token-stream',
       data: permissionData,
@@ -149,11 +132,11 @@ export async function buildContext({
   const chainId = Number(permissionRequest.chainId);
 
   const {
-    address,
+    from,
     permission: { data, isAdjustmentAllowed },
   } = permissionRequest;
 
-  if (!address) {
+  if (!from) {
     throw new InvalidInputError(
       'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
     );
@@ -162,7 +145,7 @@ export async function buildContext({
   const { decimals, symbol, iconUrl } =
     await tokenMetadataService.getTokenBalanceAndMetadata({
       chainId,
-      account: address,
+      account: from,
     });
 
   const iconDataResponse =
@@ -176,16 +159,11 @@ export async function buildContext({
     (rule) => extractDescriptorName(rule.type) === 'expiry',
   );
 
-  if (!expiryRule) {
-    throw new InvalidInputError(
-      'Expiry rule not found. An expiry is required on all permissions.',
-    );
-  }
-
-  const expiry = {
-    timestamp: expiryRule.data.timestamp,
-    isAdjustmentAllowed: expiryRule?.isAdjustmentAllowed ?? true,
-  };
+  const expiry = expiryRule
+    ? {
+        timestamp: expiryRule.data.timestamp,
+      }
+    : undefined;
 
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,
@@ -222,7 +200,7 @@ export async function buildContext({
   const accountAddressCaip10 = toCaipAccountId(
     CHAIN_NAMESPACE,
     chainId.toString(),
-    address,
+    from,
   );
 
   return {
@@ -293,7 +271,7 @@ export async function deriveMetadata({
     decimals,
     'amount per period',
   );
-  let amountPerSecond = 'Unknown';
+  let amountPerSecond = t('unknownStreamRate');
   if (amountPerPeriodResult.error) {
     validationErrors.amountPerPeriodError = amountPerPeriodResult.error;
   } else if (amountPerPeriodResult.amount) {
@@ -310,14 +288,20 @@ export async function deriveMetadata({
     validationErrors.startTimeError = startTimeError;
   }
 
-  // Validate expiry
-  const expiryError = validateExpiry(expiry.timestamp);
-  if (expiryError) {
-    validationErrors.expiryError = expiryError;
+  // Validate expiry if present
+  if (expiry) {
+    const expiryError = validateExpiry(expiry.timestamp);
+    if (expiryError) {
+      validationErrors.expiryError = expiryError;
+    }
   }
 
-  // Validate start time vs expiry (only if individual validations passed)
-  if (!validationErrors.startTimeError && !validationErrors.expiryError) {
+  // Validate start time vs expiry (only if individual validations passed and expiry present)
+  if (
+    expiry &&
+    !validationErrors.startTimeError &&
+    !validationErrors.expiryError
+  ) {
     const startTimeVsExpiryError = validateStartTimeVsExpiry(
       permissionDetails.startTime,
       expiry.timestamp,

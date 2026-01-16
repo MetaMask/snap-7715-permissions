@@ -42,7 +42,7 @@ const getUserInputEventKey = ({
 /**
  * Debounce configuration
  */
-const DEBOUNCE_DELAY = 500; // 500ms debounce delay
+const DEBOUNCE_DELAY = 300; // 300ms debounce delay
 
 /**
  * Class responsible for dispatching user input events to registered handlers.

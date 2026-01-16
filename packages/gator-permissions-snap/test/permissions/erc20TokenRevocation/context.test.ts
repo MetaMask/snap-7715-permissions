@@ -25,7 +25,7 @@ const permission: Erc20TokenRevocationPermission = {
 };
 
 const permissionRequest: Erc20TokenRevocationPermissionRequest = {
-  address: ACCOUNT_ADDRESS,
+  from: ACCOUNT_ADDRESS,
   chainId: '0x1',
   rules: [
     {
@@ -33,15 +33,9 @@ const permissionRequest: Erc20TokenRevocationPermissionRequest = {
       data: {
         timestamp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // +1 day
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission,
 };
 
@@ -73,7 +67,6 @@ describe('erc20TokenRevocation:context', () => {
       expect(context).toStrictEqual({
         expiry: {
           timestamp: permissionRequest.rules[0]?.data.timestamp,
-          isAdjustmentAllowed: true,
         },
         justification: permission.data.justification,
         isAdjustmentAllowed: true,
@@ -87,26 +80,23 @@ describe('erc20TokenRevocation:context', () => {
       } satisfies Erc20TokenRevocationContext);
     });
 
-    it('throws an error if the expiry rule is not found', async () => {
+    it('builds context without expiry when the expiry rule is not found', async () => {
       const request: Erc20TokenRevocationPermissionRequest = {
         ...permissionRequest,
         rules: [],
       };
 
-      await expect(
-        buildContext({
-          permissionRequest: request,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest: request,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
 
     it('throws an error if the address is missing', async () => {
       const request: Erc20TokenRevocationPermissionRequest = {
         ...permissionRequest,
-        address: undefined as any,
+        from: undefined as any,
       };
 
       await expect(
@@ -125,7 +115,6 @@ describe('erc20TokenRevocation:context', () => {
       const context: Erc20TokenRevocationContext = {
         expiry: {
           timestamp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // +1 day
-          isAdjustmentAllowed: true,
         },
         justification: 'Permission to revoke approvals',
         isAdjustmentAllowed: true,
@@ -148,7 +137,6 @@ describe('erc20TokenRevocation:context', () => {
       const context: Erc20TokenRevocationContext = {
         expiry: {
           timestamp: 499161600, // 10/26/1985
-          isAdjustmentAllowed: true,
         },
         justification: 'Permission to revoke approvals',
         isAdjustmentAllowed: true,
@@ -174,7 +162,6 @@ describe('erc20TokenRevocation:context', () => {
       const context: Erc20TokenRevocationContext = {
         expiry: {
           timestamp: updatedExpiry,
-          isAdjustmentAllowed: true,
         },
         justification: 'Permission to revoke approvals',
         isAdjustmentAllowed: true,
@@ -197,17 +184,16 @@ describe('erc20TokenRevocation:context', () => {
         permissionRequest.permission.data.justification,
       );
       expect(result.permission.isAdjustmentAllowed).toBe(true);
-      expect(result.address).toBe(ACCOUNT_ADDRESS);
+      expect(result.from).toBe(ACCOUNT_ADDRESS);
       expect(
         result.rules.find((rule) => rule.type === 'expiry')?.data.timestamp,
       ).toBe(updatedExpiry);
     });
 
-    it('throws an error if the expiry rule is not found in the original request', async () => {
+    it('adds an expiry rule if it is not in the original request', async () => {
       const context: Erc20TokenRevocationContext = {
         expiry: {
           timestamp: Math.floor(Date.now() / 1000) + 60,
-          isAdjustmentAllowed: true,
         },
         justification: 'Permission to revoke approvals',
         isAdjustmentAllowed: true,
@@ -226,14 +212,13 @@ describe('erc20TokenRevocation:context', () => {
           rules: [],
         };
 
-      await expect(
-        applyContext({
-          context,
-          originalRequest: originalRequestWithoutExpiry,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const result = await applyContext({
+        context,
+        originalRequest: originalRequestWithoutExpiry,
+      });
+      const expiryRule = result.rules.find((rule) => rule.type === 'expiry');
+      expect(expiryRule).toBeDefined();
+      expect(expiryRule?.data.timestamp).toBe(context.expiry?.timestamp);
     });
   });
 });

@@ -1,13 +1,20 @@
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
-import { TimePeriod } from '../../core/types';
 import type { RuleDefinition } from '../../core/types';
-import { getClosestTimePeriod, TIME_PERIOD_TO_SECONDS } from '../../utils/time';
+import { TimePeriod } from '../../core/types';
+import { t } from '../../utils/i18n';
+import {
+  getClosestTimePeriod,
+  TIME_PERIOD_TO_SECONDS,
+  timestampToISO8601,
+  iso8601ToTimestamp,
+} from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
 } from './types';
+import { createExpiryRule } from '../rules';
 
 export const PERIOD_AMOUNT_ELEMENT = 'native-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'native-token-periodic-period-type';
@@ -19,13 +26,12 @@ export const periodAmountRule: RuleDefinition<
   NativeTokenPeriodicMetadata
 > = {
   name: PERIOD_AMOUNT_ELEMENT,
-  label: 'Amount',
+  label: 'amountLabel',
   type: 'number',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.periodAmount,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
-    tooltip: 'The amount of tokens granted during each period',
+    tooltip: t('amountTooltip'),
     error: metadata.validationErrors.periodAmountError,
     iconData: getIconData(context),
   }),
@@ -43,13 +49,12 @@ export const periodDurationRule: RuleDefinition<
   NativeTokenPeriodicMetadata
 > = {
   name: PERIOD_TYPE_ELEMENT,
-  label: 'Frequency',
+  label: 'periodDurationLabel',
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     value: getClosestTimePeriod(context.permissionDetails.periodDuration),
     isVisible: true,
-    tooltip: 'The duration of the period',
+    tooltip: t('periodDurationTooltip'),
     options: Object.values(TimePeriod),
     error: metadata.validationErrors.periodDurationError,
   }),
@@ -88,66 +93,28 @@ export const startTimeRule: RuleDefinition<
   NativeTokenPeriodicMetadata
 > = {
   name: START_TIME_ELEMENT,
-  label: 'Start Time',
+  label: 'startTimeLabel',
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.startTime.toString(),
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    value: timestampToISO8601(context.permissionDetails.startTime),
     isVisible: true,
-    tooltip: 'The time at which the first period begins(mm/dd/yyyy hh:mm:ss).',
+    tooltip: t('startTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
-    dateTimeParameterNames: {
-      timestampName: 'permissionDetails.startTime',
-      dateName: 'startTime.date',
-      timeName: 'startTime.time',
+    allowPastDate: false,
+  }),
+  updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
+    ...context,
+    permissionDetails: {
+      ...context.permissionDetails,
+      startTime: iso8601ToTimestamp(value),
     },
   }),
-  updateContext: (context: NativeTokenPeriodicContext, value: any) => {
-    return {
-      ...context,
-      permissionDetails: {
-        ...context.permissionDetails,
-        startTime: value.timestamp,
-      },
-      startTime: {
-        date: value.date,
-        time: value.time,
-      },
-    };
-  },
 };
 
-export const expiryRule: RuleDefinition<
+export const expiryRule = createExpiryRule<
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata
-> = {
-  name: EXPIRY_ELEMENT,
-  label: 'Expiry',
-  type: 'datetime',
-  getRuleData: ({ context, metadata }) => ({
-    value: context.expiry.timestamp.toString(),
-    isAdjustmentAllowed: context.expiry.isAdjustmentAllowed,
-    isVisible: true,
-    tooltip: 'The expiry date of the permission(mm/dd/yyyy hh:mm:ss).',
-    error: metadata.validationErrors.expiryError,
-    dateTimeParameterNames: {
-      timestampName: 'expiry.timestamp',
-      dateName: 'expiryDate.date',
-      timeName: 'expiryDate.time',
-    },
-  }),
-  updateContext: (context: NativeTokenPeriodicContext, value: any) => ({
-    ...context,
-    expiry: {
-      ...context.expiry,
-      timestamp: value.timestamp,
-    },
-    expiryDate: {
-      date: value.date,
-      time: value.time,
-    },
-  }),
-};
+>({ elementName: EXPIRY_ELEMENT, translate: t });
 
 export const allRules = [
   periodAmountRule,

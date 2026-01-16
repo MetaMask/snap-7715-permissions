@@ -21,4 +21,9 @@ export enum RpcMethod {
    * This method is used by MetaMask origin to submit a revocation and update the isRevoked flag.
    */
   PermissionsProviderSubmitRevocation = 'permissionsProvider_submitRevocation',
+
+  /**
+   * This method is used by the kernel to get supported permission types and rule types.
+   */
+  PermissionsProviderGetSupportedPermissions = 'permissionsProvider_getSupportedPermissions',
 }

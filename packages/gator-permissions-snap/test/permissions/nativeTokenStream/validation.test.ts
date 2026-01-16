@@ -13,15 +13,9 @@ const validPermissionRequest: NativeTokenStreamPermissionRequest = {
       data: {
         timestamp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     type: 'native-token-stream',
     data: {
@@ -48,7 +42,7 @@ describe('nativeTokenStream:validation', () => {
       expect(result).toStrictEqual(validPermissionRequest);
     });
 
-    it('should throw for missing expiry', () => {
+    it('allows missing expiry', () => {
       const missingExpiryRequest = {
         ...validPermissionRequest,
         rules: [],
@@ -56,7 +50,7 @@ describe('nativeTokenStream:validation', () => {
 
       expect(() =>
         parseAndValidatePermission(missingExpiryRequest as any),
-      ).toThrow('Expiry rule is required');
+      ).not.toThrow();
     });
 
     it('should throw for invalid permission type', () => {

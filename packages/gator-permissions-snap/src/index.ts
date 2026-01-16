@@ -26,8 +26,11 @@ import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
+import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
+import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
+import { createTimeoutFactory } from './core/timeoutFactory';
 import {
   createProfileSyncOptions,
   getProfileSyncSdkEnv,
@@ -42,6 +45,7 @@ import { TokenMetadataService } from './services/tokenMetadataService';
 import { TokenPricesService } from './services/tokenPricesService';
 import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
+import { setupI18n } from './utils/i18n';
 
 const isStorePermissionsFeatureEnabled =
   process.env.STORE_PERMISSIONS_ENABLED === 'true';
@@ -62,6 +66,13 @@ const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
 if (!priceApiBaseUrl) {
   throw new InternalError('PRICE_API_BASE_URL is not set');
 }
+
+const confirmationTimeoutMsString = process.env.CONFIRMATION_TIMEOUT_MS;
+if (!confirmationTimeoutMsString) {
+  throw new InternalError('CONFIRMATION_TIMEOUT_MS is not set');
+}
+
+const confirmationTimeoutMs = parseInt(confirmationTimeoutMsString, 10);
 
 // set up dependencies
 
@@ -143,17 +154,31 @@ const priceApiClient = new PriceApiClient({
 
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
+const timeoutFactory = createTimeoutFactory({
+  timeoutMs: confirmationTimeoutMs,
+});
+
 const confirmationDialogFactory = new ConfirmationDialogFactory({
-  snap,
   userEventDispatcher,
+  timeoutFactory,
+});
+
+const permissionIntroductionService = new PermissionIntroductionService({
+  stateManager,
+  userEventDispatcher,
+});
+
+const dialogInterfaceFactory = new DialogInterfaceFactory({
+  snap,
 });
 
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
-  userEventDispatcher,
   nonceCaveatService,
   snapsMetricsService,
+  permissionIntroductionService,
+  dialogInterfaceFactory,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({
@@ -162,7 +187,6 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
   tokenMetadataService,
   userEventDispatcher,
   orchestrator,
-  snapsMetricsService,
 });
 
 const rpcHandler = createRpcHandler({
@@ -184,6 +208,8 @@ const boundRpcHandlers: {
   [RpcMethod.PermissionsProviderSubmitRevocation]: async (
     params?: JsonRpcParams,
   ) => rpcHandler.submitRevocation(params as Json),
+  [RpcMethod.PermissionsProviderGetSupportedPermissions]:
+    rpcHandler.getSupportedPermissions.bind(rpcHandler),
 };
 
 /**
@@ -201,6 +227,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
 }) => {
   logger.debug(`RPC request (origin="${origin}"): method="${request.method}"`);
+
+  // Ensure i18n is initialized on every snap invocation
+  // This handles both initial load and locale changes in the extension
+  await setupI18n();
 
   if (!isMethodAllowedForOrigin(origin, request.method)) {
     throw new InvalidRequestError(
@@ -231,6 +261,8 @@ export const onUserInput: OnUserInputHandler =
   userEventDispatcher.createUserInputEventHandler();
 
 export const onInstall: OnInstallHandler = async () => {
+  await setupI18n();
+
   /**
    * Local Development Only
    *

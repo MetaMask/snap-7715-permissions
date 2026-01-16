@@ -14,14 +14,13 @@ import type {
   NativeTokenStreamPermissionRequest,
 } from '../../../src/permissions/nativeTokenStream/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
-import { convertReadableDateToTimestamp } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
 const permissionWithoutOptionals: NativeTokenStreamPermission = {
   type: 'native-token-stream',
   data: {
     amountPerSecond: bigIntToHex(parseUnits({ formatted: '.5', decimals: 18 })), // 0.5 eth per second
-    startTime: convertReadableDateToTimestamp('10/26/2024'),
+    startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     justification: 'Permission to do something important',
   },
   isAdjustmentAllowed: true,
@@ -42,28 +41,22 @@ const alreadyPopulatedPermission: NativeTokenStreamPermission = {
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
 const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
-  address: ACCOUNT_ADDRESS,
+  from: ACCOUNT_ADDRESS,
   chainId: '0x1',
   rules: [
     {
       type: 'expiry',
       data: {
-        timestamp: convertReadableDateToTimestamp('05/01/2024'),
+        timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     ...alreadyPopulatedPermission,
     data: {
       ...alreadyPopulatedPermission.data,
-      startTime: convertReadableDateToTimestamp('10/26/2024'),
+      startTime: 1729900800, // 10/26/2024 00:00:00 UTC
     },
   },
 };
@@ -71,7 +64,6 @@ const alreadyPopulatedPermissionRequest: NativeTokenStreamPermissionRequest = {
 const alreadyPopulatedContext: NativeTokenStreamContext = {
   expiry: {
     timestamp: 1714521600,
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
@@ -193,36 +185,31 @@ describe('nativeTokenStream:context', () => {
       });
     });
 
-    it('throws an error if the expiry rule is not found', async () => {
+    it('builds context without expiry when the expiry rule is not found', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: [],
       };
 
-      await expect(
-        buildContext({
-          permissionRequest,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
 
-    it('throws an error if the permission request has no rules', async () => {
+    it('builds context without expiry when the permission request has no rules', async () => {
       const permissionRequest = {
         ...alreadyPopulatedPermissionRequest,
         rules: undefined,
-      };
+        // rules is optional, but may not be explicitly set to undefined
+      } as unknown as NativeTokenStreamPermissionRequest;
 
-      await expect(
-        buildContext({
-          permissionRequest,
-          tokenMetadataService: mockTokenMetadataService,
-        }),
-      ).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
-      );
+      const context = await buildContext({
+        permissionRequest,
+        tokenMetadataService: mockTokenMetadataService,
+      });
+      expect(context.expiry).toBeUndefined();
     });
   });
 
@@ -399,7 +386,7 @@ describe('nativeTokenStream:context', () => {
           ...context,
           permissionDetails: {
             ...context.permissionDetails,
-            startTime: 499161600, // 10/26/1985
+            startTime: 499161600, // 10/26/1985 00:00:00 UTC
           },
         };
 
@@ -457,7 +444,7 @@ describe('nativeTokenStream:context', () => {
         const contextWithExpiryInThePast = {
           ...context,
           expiry: {
-            timestamp: 499161600, // 10/26/1985
+            timestamp: 499161600, // 10/26/1985 00:00:00 UTC
             isAdjustmentAllowed: true,
           },
           permissionDetails: {
@@ -533,17 +520,20 @@ describe('nativeTokenStream:context', () => {
       );
     });
 
-    it('throws an error if the expiry rule is not found in the original request', async () => {
-      const applyingContext = applyContext({
+    it('adds an expiry rule if it is not in the original request', async () => {
+      const permissionRequest = await applyContext({
         context: alreadyPopulatedContext,
         originalRequest: {
           ...alreadyPopulatedPermissionRequest,
           rules: [],
         },
       });
-
-      await expect(applyingContext).rejects.toThrow(
-        'Expiry rule not found. An expiry is required on all permissions.',
+      const expiryRule = permissionRequest.rules.find(
+        (rule) => rule.type === 'expiry',
+      );
+      expect(expiryRule).toBeDefined();
+      expect(expiryRule?.data.timestamp).toBe(
+        alreadyPopulatedContext.expiry?.timestamp,
       );
     });
   });
