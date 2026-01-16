@@ -32,6 +32,7 @@ export const initialAmountRule: Erc20TokenStreamRuleDefinition = {
     tooltip: t('initialAmountTooltip'),
     iconData: getIconData(context),
     error: metadata.validationErrors.initialAmountError,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenStreamContext, value: string | null) => ({
     ...context,
@@ -53,6 +54,7 @@ export const maxAmountRule: Erc20TokenStreamRuleDefinition = {
     tooltip: t('maxAmountTooltip'),
     iconData: getIconData(context),
     error: metadata.validationErrors.maxAmountError,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenStreamContext, value: string | null) => ({
     ...context,
@@ -73,6 +75,7 @@ export const startTimeRule: Erc20TokenStreamRuleDefinition = {
     tooltip: t('streamStartTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
     allowPastDate: false,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenStreamContext, value: string) => ({
     ...context,
@@ -93,6 +96,7 @@ export const streamAmountPerPeriodRule: Erc20TokenStreamRuleDefinition = {
     tooltip: t('streamAmountTooltip'),
     iconData: getIconData(context),
     error: metadata.validationErrors.amountPerPeriodError,
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenStreamContext, value: string) => ({
     ...context,
@@ -112,6 +116,7 @@ export const streamPeriodRule: Erc20TokenStreamRuleDefinition = {
     isVisible: true,
     tooltip: t('streamPeriodTooltip'),
     options: Object.values(TimePeriod),
+    isAdjustmentAllowed: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenStreamContext, value: TimePeriod) => ({
     ...context,
