@@ -305,8 +305,7 @@ const Index = () => {
   const handleGetSupportedPermissions = async () => {
     setPermissionResponseError(null);
     try {
-      const response =
-        await metaMaskClient?.getSupportedExecutionPermissions();
+      const response = await metaMaskClient?.getSupportedExecutionPermissions();
       setSupportedPermissionsResponse(response);
     } catch (error) {
       setPermissionResponseError(error as Error);
@@ -581,9 +580,7 @@ const Index = () => {
                 >
                   {grantedIsCopied ? '✅' : '📝'}
                 </CopyButton>
-                <pre>
-                  {JSON.stringify(grantedPermissionsResponse, null, 2)}
-                </pre>
+                <pre>{JSON.stringify(grantedPermissionsResponse, null, 2)}</pre>
               </ResponseContainer>
             )}
           </Box>

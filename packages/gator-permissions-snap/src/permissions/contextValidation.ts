@@ -53,7 +53,7 @@ export function validateAndParseAmount(
       };
     }
     return { amount: parsedAmount, error: null };
-  } catch (error) {
+  } catch {
     return { amount: null, error: t('errorInvalidAmount', [fieldName]) };
   }
 }

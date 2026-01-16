@@ -1,11 +1,11 @@
 import { config } from 'dotenv';
+
 import { setupI18n } from './src/utils/i18n';
 
 config();
 
 // Mock snap global for i18n
-export const mockSnapGlobal = (locale = 'en') => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const mockSnapGlobal = (locale = 'en'): void => {
   (globalThis as any).snap = {
     request: jest.fn().mockResolvedValue({ locale }),
   };

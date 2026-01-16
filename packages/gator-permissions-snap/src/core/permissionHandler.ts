@@ -164,7 +164,9 @@ export class PermissionHandler<
     TPermission,
     TPopulatedPermission
   > {
-    const buildContextHandler = async (request: TRequest) => {
+    const buildContextHandler = async (
+      request: TRequest,
+    ): Promise<TContext> => {
       const requestedAddressLowercase = request.from?.toLowerCase() as
         | Hex
         | undefined;

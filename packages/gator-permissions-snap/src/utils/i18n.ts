@@ -45,7 +45,7 @@ export type SupportedLocale =
 // All available locales
 const locales: Record<SupportedLocale, LocaleMessages> = {
   en: enLocale.messages,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+
   zh_CN: zhCNLocale.messages,
   fr: frLocale.messages,
   de: deLocale.messages,
@@ -54,10 +54,10 @@ const locales: Record<SupportedLocale, LocaleMessages> = {
   id: idLocale.messages,
   ja: jaLocale.messages,
   ko: koLocale.messages,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+
   pt_BR: ptBRLocale.messages,
   ru: ruLocale.messages,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+
   es_419: es419Locale.messages,
   tl: tlLocale.messages,
   tr: trLocale.messages,
@@ -85,7 +85,7 @@ export async function setupI18n(): Promise<void> {
     return initializationPromise;
   }
 
-  initializationPromise = (async () => {
+  initializationPromise = (async (): Promise<void> => {
     try {
       // Get user's locale preference
       const preferences = await snap.request({
@@ -122,7 +122,6 @@ export async function setupI18n(): Promise<void> {
       }
       logger.error('Failed to fetch user preferences for i18n', error);
     } finally {
-      // eslint-disable-next-line require-atomic-updates
       initializationPromise = null;
     }
   })();
