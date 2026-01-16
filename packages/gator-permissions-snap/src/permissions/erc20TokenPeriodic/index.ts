@@ -25,8 +25,8 @@ export const erc20TokenPeriodicPermissionDefinition: PermissionDefinition<
   PopulatedErc20TokenPeriodicPermission
 > = {
   rules: allRules,
-  title: 'Permission request',
-  subtitle: 'This site wants permissions to spend your tokens.',
+  title: 'permissionRequestTitle',
+  subtitle: 'permissionRequestSubtitle',
   dependencies: {
     parseAndValidatePermission,
     buildContext,

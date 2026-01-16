@@ -10,13 +10,8 @@ import { validatePermissionRequestParam } from '../../src/utils/validate';
 describe('validatePermissionRequestParam', () => {
   const validPermissionRequest: PermissionRequest = {
     chainId: '0x1',
-    address: '0x1234567890123456789012345678901234567890',
-    signer: {
-      type: 'account',
-      data: {
-        address: '0xABcdEFABcdEFabcdEfAbCdefabcdeFABcDEFabCD',
-      },
-    },
+    from: '0x1234567890123456789012345678901234567890',
+    to: '0xABcdEFABcdEFabcdEfAbCdefabcdeFABcDEFabCD',
     permission: {
       type: 'native-token-recurring-allowance',
       data: {
@@ -28,7 +23,6 @@ describe('validatePermissionRequestParam', () => {
     rules: [
       {
         type: 'expiry',
-        isAdjustmentAllowed: true,
         data: {
           timestamp: Math.floor(Date.now() / 1000) + 86400, // 1 day from now
         },
@@ -67,7 +61,7 @@ describe('validatePermissionRequestParam', () => {
         permissionsRequest: [
           {
             ...validPermissionRequest,
-            address: null,
+            from: null,
           },
         ],
       };
@@ -79,7 +73,7 @@ describe('validatePermissionRequestParam', () => {
     });
 
     it('should validate with optional address omitted', () => {
-      const { address, ...permissionWithoutAddress } = validPermissionRequest;
+      const { from, ...permissionWithoutAddress } = validPermissionRequest;
       const paramWithoutAddress = {
         ...validRequestParam,
         permissionsRequest: [permissionWithoutAddress],
@@ -124,7 +118,6 @@ describe('validatePermissionRequestParam', () => {
             rules: [
               {
                 type: { name: 'expiry' },
-                isAdjustmentAllowed: true,
                 data: { timestamp: Math.floor(Date.now() / 1000) + 86400 },
               },
             ],
@@ -138,15 +131,44 @@ describe('validatePermissionRequestParam', () => {
       }).not.toThrow();
     });
 
-    it('should validate with rules without expiry rule', () => {
-      const withoutExpiryRule = {
+    it('should validate with empty rules array for supported permission type', () => {
+      const withEmptyRules = {
         permissionsRequest: [
           {
             ...validPermissionRequest,
+            permission: {
+              type: 'native-token-stream',
+              data: {
+                justification: 'Test justification',
+              },
+              isAdjustmentAllowed: true,
+            },
+            rules: [],
+          },
+        ],
+        siteOrigin: 'https://example.com',
+      };
+      expect(() => {
+        const result = validatePermissionRequestParam(withEmptyRules);
+        expect(result).toStrictEqual(withEmptyRules);
+      }).not.toThrow();
+    });
+
+    it('should validate with expiry rule for supported permission type', () => {
+      const withExpiryRule = {
+        permissionsRequest: [
+          {
+            ...validPermissionRequest,
+            permission: {
+              type: 'native-token-stream',
+              data: {
+                justification: 'Test justification',
+              },
+              isAdjustmentAllowed: true,
+            },
             rules: [
               {
-                type: 'allowance',
-                isAdjustmentAllowed: true,
+                type: 'expiry',
                 data: {
                   timestamp: Math.floor(Date.now() / 1000) + 86400,
                 },
@@ -157,8 +179,8 @@ describe('validatePermissionRequestParam', () => {
         siteOrigin: 'https://example.com',
       };
       expect(() => {
-        const result = validatePermissionRequestParam(withoutExpiryRule);
-        expect(result).toStrictEqual(withoutExpiryRule);
+        const result = validatePermissionRequestParam(withExpiryRule);
+        expect(result).toStrictEqual(withExpiryRule);
       }).not.toThrow();
     });
   });
@@ -231,30 +253,11 @@ describe('validatePermissionRequestParam', () => {
       }).toThrow(InvalidInputError);
     });
 
-    it('should throw InvalidInputError for missing signer', () => {
-      const { signer, ...invalidPermission } = validPermissionRequest;
+    it('should throw InvalidInputError for missing to property', () => {
+      const { to, ...invalidPermission } = validPermissionRequest;
       expect(() => {
         validatePermissionRequestParam({
           permissionsRequest: [invalidPermission],
-          siteOrigin: 'https://example.com',
-        });
-      }).toThrow(InvalidInputError);
-    });
-
-    it('should throw InvalidInputError for invalid signer type', () => {
-      expect(() => {
-        validatePermissionRequestParam({
-          permissionsRequest: [
-            {
-              ...validPermissionRequest,
-              signer: {
-                type: 'invalid-type',
-                data: {
-                  address: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-                },
-              },
-            },
-          ],
           siteOrigin: 'https://example.com',
         });
       }).toThrow(InvalidInputError);
@@ -298,7 +301,6 @@ describe('validatePermissionRequestParam', () => {
                 rules: [
                   {
                     type: 'expiry',
-                    isAdjustmentAllowed: true,
                     data: ruleData,
                   },
                 ],
@@ -319,14 +321,12 @@ describe('validatePermissionRequestParam', () => {
               rules: [
                 {
                   type: 'expiry',
-                  isAdjustmentAllowed: true,
                   data: {
                     timestamp: Math.floor(Date.now() / 1000) + 86400,
                   },
                 },
                 {
                   type: 'expiry',
-                  isAdjustmentAllowed: true,
                   data: {
                     timestamp: Math.floor(Date.now() / 1000) + 172800,
                   },
@@ -339,13 +339,44 @@ describe('validatePermissionRequestParam', () => {
       }).toThrow(InvalidInputError);
     });
 
+    it('should throw InvalidInputError for unsupported rule type on native-token-stream', () => {
+      expect(() => {
+        validatePermissionRequestParam({
+          permissionsRequest: [
+            {
+              ...validPermissionRequest,
+              permission: {
+                type: 'native-token-stream',
+                data: {
+                  justification: 'Test justification',
+                },
+                isAdjustmentAllowed: true,
+              },
+              rules: [
+                {
+                  type: 'unsupported-rule',
+                  isAdjustmentAllowed: true,
+                  data: {
+                    someData: 'value',
+                  },
+                },
+              ],
+            },
+          ],
+          siteOrigin: 'https://example.com',
+        });
+      }).toThrow(
+        'Rule type "unsupported-rule" is not supported for permission type "native-token-stream". Supported: expiry',
+      );
+    });
+
     it('should throw InvalidInputError for invalid address format', () => {
       expect(() => {
         validatePermissionRequestParam({
           permissionsRequest: [
             {
               ...validPermissionRequest,
-              address: 'invalid-address',
+              from: 'invalid-address',
             },
           ],
           siteOrigin: 'https://example.com',
@@ -359,12 +390,7 @@ describe('validatePermissionRequestParam', () => {
           permissionsRequest: [
             {
               ...validPermissionRequest,
-              signer: {
-                type: 'account',
-                data: {
-                  address: 'invalid-address',
-                },
-              },
+              to: 'invalid-address',
             },
           ],
           siteOrigin: 'https://example.com',

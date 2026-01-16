@@ -3,12 +3,12 @@ import { z } from 'zod';
 import { zPermissionRequest } from './7715-permissions-request';
 import { zAddress, zHexStr } from './common';
 
-const zDependencyInfo = z.object({
+const zDependency = z.object({
   factory: zAddress,
   factoryData: zHexStr,
 });
 
-export type DependencyInfo = z.infer<typeof zDependencyInfo>;
+export type Dependency = z.infer<typeof zDependency>;
 
 export const zGrantedPermission = z.object({
   /**
@@ -18,20 +18,16 @@ export const zGrantedPermission = z.object({
   context: zHexStr,
 
   /**
-   * The dependencyInfo is an array of objects, each containing fields for `factory` and `factoryData`
+   * The dependencies is an array of objects, each containing fields for `factory` and `factoryData`
    * as defined in ERC-4337. Either both `factory` and `factoryData` must be specified in an entry, or neither.
    * This array is used describe accounts that are not yet deployed but MUST be deployed in order for a permission to be successfully redeemed.
    */
-  dependencyInfo: z.array(zDependencyInfo),
+  dependencies: z.array(zDependency),
 
   /**
-   * Account to assign the permissions to and is dependent on the account type.
+   * Is required as defined in ERC-7710.
    */
-  signerMeta: z.object({
-    userOpBuilder: zAddress.optional(),
-
-    delegationManager: zAddress.optional(),
-  }),
+  delegationManager: zAddress,
 });
 export const zGrantedPermissions = z.array(zGrantedPermission);
 

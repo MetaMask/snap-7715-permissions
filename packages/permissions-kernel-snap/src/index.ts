@@ -30,6 +30,10 @@ const boundRpcHandlers: {
 } = {
   [RpcMethod.WalletRequestExecutionPermissions]:
     rpcHandler.requestExecutionPermissions.bind(rpcHandler),
+  [RpcMethod.WalletGetSupportedExecutionPermissions]:
+    rpcHandler.getSupportedExecutionPermissions.bind(rpcHandler),
+  [RpcMethod.WalletGetGrantedExecutionPermissions]:
+    rpcHandler.getGrantedExecutionPermissions.bind(rpcHandler),
 };
 
 // Processing lock to ensure only one RPC request is processed at a time

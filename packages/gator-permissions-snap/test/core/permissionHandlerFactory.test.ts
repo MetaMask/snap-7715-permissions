@@ -1,7 +1,7 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 
-import type { AccountController } from '../../src/accountController';
+import type { AccountController } from '../../src/core/accountController';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
@@ -21,36 +21,28 @@ describe('PermissionHandlerFactory', () => {
 
   const mockPermissionRequest: PermissionRequest = {
     chainId: '0x1',
-    expiry: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
-    signer: {
-      type: 'account',
-      data: {
-        address: TEST_ADDRESS,
-      },
-    },
+    to: TEST_ADDRESS,
     permission: {
       type: 'native-token-stream',
+      isAdjustmentAllowed: false,
       data: {
         amountPerSecond: '0x1',
         startTime: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
         justification: 'test',
       },
     },
+    rules: [],
   };
 
   const mockUnsupportedPermissionRequest: PermissionRequest = {
     chainId: '0x1',
-    expiry: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
-    signer: {
-      type: 'account',
-      data: {
-        address: TEST_ADDRESS,
-      },
-    },
+    to: TEST_ADDRESS,
     permission: {
       type: 'unsupported-permission',
+      isAdjustmentAllowed: false,
       data: {},
     },
+    rules: [],
   };
 
   beforeEach(() => {

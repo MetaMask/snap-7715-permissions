@@ -4,8 +4,8 @@ import {
   buildIntroductionContent as buildContent,
   getPermissionIntroductionConfig,
   PERMISSION_INTRODUCTION_CONFIRM_BUTTON,
-  PERMISSION_INTRODUCTION_PAGE_1_DOT,
-  PERMISSION_INTRODUCTION_PAGE_2_DOT,
+  PERMISSION_INTRODUCTION_PREV_ARROW,
+  PERMISSION_INTRODUCTION_NEXT_ARROW,
 } from './permissionIntroductionContent';
 import type { PermissionIntroductionConfig } from './types';
 import type { StateManager } from '../../stateManagement';
@@ -109,54 +109,6 @@ export class PermissionIntroductionService {
       // Show intro content - this creates interface and shows dialog on first call
       const introContent = this.buildIntroductionContent(config, currentPage);
 
-      // Helper to setup handlers after dialog is shown
-      const setupHandlers = (interfaceId: string): string => {
-        // Helper to update the interface with a new page
-        const updatePage = async (newPage: 1 | 2): Promise<void> => {
-          if (newPage === currentPage) {
-            return;
-          }
-          currentPage = newPage;
-          const newContent = this.buildIntroductionContent(config, currentPage);
-          await dialogInterface.show(newContent);
-        };
-
-        // Handler for "Got it" button
-        const { unbind: unbindConfirm } = this.#userEventDispatcher.on({
-          elementName: PERMISSION_INTRODUCTION_CONFIRM_BUTTON,
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: async () => {
-            unbindAll();
-            resolve(true); // User confirmed
-          },
-        });
-        unbindFunctions.push(unbindConfirm);
-
-        // Handler for page 1 dot
-        const { unbind: unbindPage1Dot } = this.#userEventDispatcher.on({
-          elementName: PERMISSION_INTRODUCTION_PAGE_1_DOT,
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: async () => {
-            await updatePage(1);
-          },
-        });
-        unbindFunctions.push(unbindPage1Dot);
-
-        // Handler for page 2 dot
-        const { unbind: unbindPage2Dot } = this.#userEventDispatcher.on({
-          elementName: PERMISSION_INTRODUCTION_PAGE_2_DOT,
-          eventType: UserInputEventType.ButtonClickEvent,
-          interfaceId,
-          handler: async () => {
-            await updatePage(2);
-          },
-        });
-        unbindFunctions.push(unbindPage2Dot);
-        return interfaceId;
-      };
-
       // The onClose handler is registered with DialogInterface
       // When dialog is closed (X button), this handler fires
       dialogInterface
@@ -164,7 +116,54 @@ export class PermissionIntroductionService {
           unbindAll();
           resolve(false); // User cancelled via X button
         })
-        .then(setupHandlers)
+        .then((interfaceId) => {
+          // Helper to update the interface with a new page
+          const updatePage = async (newPage: 1 | 2) => {
+            if (newPage === currentPage) {
+              return;
+            }
+            currentPage = newPage;
+            const newContent = this.buildIntroductionContent(
+              config,
+              currentPage,
+            );
+            await dialogInterface.show(newContent);
+          };
+
+          // Handler for "Got it" button
+          const { unbind: unbindConfirm } = this.#userEventDispatcher.on({
+            elementName: PERMISSION_INTRODUCTION_CONFIRM_BUTTON,
+            eventType: UserInputEventType.ButtonClickEvent,
+            interfaceId,
+            handler: async () => {
+              unbindAll();
+              resolve(true); // User confirmed
+            },
+          });
+          unbindFunctions.push(unbindConfirm);
+
+          // Handler for previous arrow
+          const { unbind: unbindPrevArrow } = this.#userEventDispatcher.on({
+            elementName: PERMISSION_INTRODUCTION_PREV_ARROW,
+            eventType: UserInputEventType.ButtonClickEvent,
+            interfaceId,
+            handler: async () => {
+              await updatePage(1);
+            },
+          });
+          unbindFunctions.push(unbindPrevArrow);
+
+          // Handler for next arrow
+          const { unbind: unbindNextArrow } = this.#userEventDispatcher.on({
+            elementName: PERMISSION_INTRODUCTION_NEXT_ARROW,
+            eventType: UserInputEventType.ButtonClickEvent,
+            interfaceId,
+            handler: async () => {
+              await updatePage(2);
+            },
+          });
+          unbindFunctions.push(unbindNextArrow);
+        })
         .catch(() => {
           unbindAll();
           resolve(false); // Error = treat as cancelled

@@ -113,6 +113,7 @@ describe('Kernel Snap', () => {
           jsonrpc: '2.0',
           method: 'wallet_requestExecutionPermissions',
           params: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             __proto__: 'malicious',
             normalKey: 'value',
           },
@@ -131,6 +132,7 @@ describe('Kernel Snap', () => {
           method: 'wallet_requestExecutionPermissions',
           params: {
             normalKey: {
+              // eslint-disable-next-line @typescript-eslint/naming-convention
               __proto__: 'malicious',
             },
           },
@@ -180,12 +182,7 @@ describe('Kernel Snap', () => {
           params: [
             {
               chainId: '0x1',
-              signer: {
-                type: 'account',
-                data: {
-                  address: '0x1234567890123456789012345678901234567890',
-                },
-              },
+              to: '0x1234567890123456789012345678901234567890',
               permission: {
                 type: 'native-token-transfer',
                 isAdjustmentAllowed: true,
@@ -197,7 +194,6 @@ describe('Kernel Snap', () => {
               rules: [
                 {
                   type: 'expiry',
-                  isAdjustmentAllowed: true,
                   data: { timestamp: 123456 },
                 },
               ],

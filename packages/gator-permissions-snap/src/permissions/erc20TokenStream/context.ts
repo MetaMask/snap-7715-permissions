@@ -8,8 +8,16 @@ import {
 } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
+import type {
+  Erc20TokenStreamContext,
+  Erc20TokenStreamPermissionRequest,
+  Erc20TokenStreamMetadata,
+  PopulatedErc20TokenStreamPermission,
+  Erc20TokenStreamPermission,
+} from './types';
 import { TimePeriod } from '../../core/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import { t } from '../../utils/i18n';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
 import {
@@ -20,13 +28,6 @@ import {
   calculateAmountPerSecond,
   validateStartTimeVsExpiry,
 } from '../contextValidation';
-import type {
-  Erc20TokenStreamContext,
-  Erc20TokenStreamPermissionRequest,
-  Erc20TokenStreamMetadata,
-  PopulatedErc20TokenStreamPermission,
-  Erc20TokenStreamPermission,
-} from './types';
 import { applyExpiryRule } from '../rules';
 
 const DEFAULT_MAX_AMOUNT =
@@ -83,7 +84,7 @@ export async function applyContext({
 
   return {
     ...originalRequest,
-    address: address as Hex,
+    from: address as Hex,
     permission: {
       type: 'erc20-token-stream',
       data: permissionData,
@@ -133,11 +134,11 @@ export async function buildContext({
   const chainId = Number(permissionRequest.chainId);
 
   const {
-    address,
+    from,
     permission: { data, isAdjustmentAllowed },
   } = permissionRequest;
 
-  if (!address) {
+  if (!from) {
     throw new InvalidInputError(
       'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
     );
@@ -146,7 +147,7 @@ export async function buildContext({
   const { decimals, symbol, iconUrl } =
     await tokenMetadataService.getTokenBalanceAndMetadata({
       chainId,
-      account: address,
+      account: from,
       assetAddress: data.tokenAddress,
     });
 
@@ -164,7 +165,6 @@ export async function buildContext({
   const expiry = expiryRule
     ? {
         timestamp: expiryRule.data.timestamp,
-        isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
       }
     : undefined;
 
@@ -203,7 +203,7 @@ export async function buildContext({
   const accountAddressCaip10 = toCaipAccountId(
     CHAIN_NAMESPACE,
     chainId.toString(),
-    address,
+    from,
   );
 
   return {
@@ -274,7 +274,7 @@ export async function deriveMetadata({
     decimals,
     'amount per period',
   );
-  let amountPerSecond = 'Unknown';
+  let amountPerSecond = t('unknownStreamRate');
   if (amountPerPeriodResult.error) {
     validationErrors.amountPerPeriodError = amountPerPeriodResult.error;
   } else if (amountPerPeriodResult.amount) {

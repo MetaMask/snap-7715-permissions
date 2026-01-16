@@ -26,6 +26,24 @@ export type RpcHandler = {
     siteOrigin: string;
     params?: Json;
   }): Promise<Json>;
+
+  /**
+   * Handles get supported execution permissions requests.
+   *
+   * @returns The supported permission types with their chainIds and ruleTypes.
+   */
+  getSupportedExecutionPermissions(): Promise<Json>;
+
+  /**
+   * Handles get granted execution permissions requests.
+   *
+   * @param options - The configuration for retrieving granted permissions.
+   * @param options.siteOrigin - The origin of the site requesting the permissions.
+   * @returns The granted permissions filtered by site origin and not revoked.
+   */
+  getGrantedExecutionPermissions(options: {
+    siteOrigin: string;
+  }): Promise<Json>;
 };
 
 /**
@@ -118,7 +136,95 @@ export function createRpcHandler(config: {
     }
   };
 
+  /**
+   * Handles get supported execution permissions requests.
+   *
+   * @returns The supported permission types with their chainIds and ruleTypes.
+   */
+  const getSupportedExecutionPermissions = async (): Promise<Json> => {
+    logger.debug('getSupportedExecutionPermissions()');
+
+    const gatorPermissionsProviderSnapId =
+      // eslint-disable-next-line no-restricted-globals
+      process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
+
+    if (!gatorPermissionsProviderSnapId) {
+      throw new InternalError(
+        'GATOR_PERMISSIONS_PROVIDER_SNAP_ID must be set as an environment variable.',
+      );
+    }
+
+    try {
+      return await snapsProvider.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: gatorPermissionsProviderSnapId,
+          request: {
+            method: ExternalMethod.PermissionsProviderGetSupportedPermissions,
+          },
+        },
+      });
+    } catch (error) {
+      const deserializedError = deserializeSnapError(error);
+      if (deserializedError) {
+        throw deserializedError;
+      }
+      throw error;
+    }
+  };
+
+  /**
+   * Handles get granted execution permissions requests.
+   *
+   * @param options - The configuration for retrieving granted permissions.
+   * @param options.siteOrigin - The origin of the site requesting the permissions.
+   * @returns The granted permissions filtered by site origin and not revoked.
+   */
+  const getGrantedExecutionPermissions = async (options: {
+    siteOrigin: string;
+  }): Promise<Json> => {
+    logger.debug({ options }, 'getGrantedExecutionPermissions()');
+
+    const gatorPermissionsProviderSnapId =
+      // eslint-disable-next-line no-restricted-globals
+      process.env.GATOR_PERMISSIONS_PROVIDER_SNAP_ID;
+
+    if (!gatorPermissionsProviderSnapId) {
+      throw new InternalError(
+        'GATOR_PERMISSIONS_PROVIDER_SNAP_ID must be set as an environment variable.',
+      );
+    }
+
+    try {
+      const grantedPermissions = await snapsProvider.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: gatorPermissionsProviderSnapId,
+          request: {
+            method: ExternalMethod.PermissionsProviderGetGrantedPermissions,
+            params: {
+              siteOrigin: options.siteOrigin,
+              isRevoked: false,
+            } as Json,
+          },
+        },
+      });
+
+      return (grantedPermissions as { permissionResponse: Json }[]).map(
+        (permission) => permission.permissionResponse,
+      );
+    } catch (error) {
+      const deserializedError = deserializeSnapError(error);
+      if (deserializedError) {
+        throw deserializedError;
+      }
+      throw error;
+    }
+  };
+
   return {
     requestExecutionPermissions,
+    getSupportedExecutionPermissions,
+    getGrantedExecutionPermissions,
   };
 }

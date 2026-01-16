@@ -55,7 +55,6 @@ describe('profileSync', () => {
 
   const expiryRule = {
     type: 'expiry',
-    isAdjustmentAllowed: false,
     data: {
       timestamp: 1234,
     },
@@ -67,11 +66,8 @@ describe('profileSync', () => {
   const mockStoredGrantedPermission: StoredGrantedPermission = {
     permissionResponse: {
       chainId: '0xaa36a7',
-      address,
-      signer: {
-        data: { address: sessionAccount },
-        type: 'account',
-      },
+      from: address,
+      to: sessionAccount,
       permission: {
         data: {
           justification: 'shh...permission',
@@ -85,16 +81,14 @@ describe('profileSync', () => {
         isAdjustmentAllowed: true,
       },
       context: encodeDelegations([mockDelegation]),
-      dependencyInfo: [
+      dependencies: [
         {
           factory: '0x1234567890123456789012345678901234567890',
           factoryData:
             '0x0000000000000000000000000000000000000000000000000000000000000000',
         },
       ],
-      signerMeta: {
-        delegationManager: '0x1234567890123456789012345678901234567890',
-      },
+      delegationManager: '0x1234567890123456789012345678901234567890',
       rules: [expiryRule],
     },
     siteOrigin: 'https://example.com',
@@ -226,7 +220,7 @@ describe('profileSync', () => {
         expect(storedData).toBeDefined();
         const parsed = JSON.parse(storedData as string);
         expect(parsed.permissionResponse.chainId).toBe('0xaa36a7');
-        expect(parsed.permissionResponse.address).toBe(
+        expect(parsed.permissionResponse.from).toBe(
           '0x1234567890123456789012345678901234567890',
         );
         expect(parsed.siteOrigin).toBe('https://example.com');
@@ -257,7 +251,7 @@ describe('profileSync', () => {
         expect(storedData).toBeDefined();
         const parsed = JSON.parse(storedData as string);
         expect(parsed.permissionResponse.chainId).toBe('0xaa36a7');
-        expect(parsed.permissionResponse.address).toBe(
+        expect(parsed.permissionResponse.from).toBe(
           '0x1234567890123456789012345678901234567890',
         );
         expect(parsed.siteOrigin).toBe('https://example.com');
@@ -284,11 +278,8 @@ describe('profileSync', () => {
           {
             permissionResponse: {
               chainId: '0xaa36a7',
-              address: addressTwo,
-              signer: {
-                data: { address: sessionAccount },
-                type: 'account',
-              },
+              from: addressTwo,
+              to: sessionAccount,
               permission: {
                 data: {
                   justification: 'shh...permission',
@@ -302,16 +293,14 @@ describe('profileSync', () => {
                 isAdjustmentAllowed: true,
               },
               context: encodeDelegations([mockDelegationTwo]),
-              dependencyInfo: [
+              dependencies: [
                 {
                   factory: '0x1234567890123456789012345678901234567890',
                   factoryData:
                     '0x0000000000000000000000000000000000000000000000000000000000000000',
                 },
               ],
-              signerMeta: {
-                delegationManager: '0x1234567890123456789012345678901234567890',
-              },
+              delegationManager: '0x1234567890123456789012345678901234567890',
               rules: [expiryRule],
             },
             siteOrigin: 'https://example.com',
@@ -347,11 +336,11 @@ describe('profileSync', () => {
         const firstStored = JSON.parse((batchCalls as any)[0]?.[1] as string);
         const secondStored = JSON.parse((batchCalls as any)[1]?.[1] as string);
         expect(firstStored.permissionResponse.chainId).toBe('0xaa36a7');
-        expect(firstStored.permissionResponse.address).toBe(
+        expect(firstStored.permissionResponse.from).toBe(
           '0x1234567890123456789012345678901234567890',
         );
         expect(secondStored.permissionResponse.chainId).toBe('0xaa36a7');
-        expect(secondStored.permissionResponse.address).toBe(
+        expect(secondStored.permissionResponse.from).toBe(
           '0x1234567890123456789012345678901234567891',
         );
       });
@@ -474,7 +463,7 @@ describe('profileSync', () => {
       expect(batchCalls).toHaveLength(1);
       const storedData = JSON.parse((batchCalls as any)[0]?.[1] as string);
       expect(storedData.permissionResponse.chainId).toBe('0xaa36a7');
-      expect(storedData.permissionResponse.address).toBe(
+      expect(storedData.permissionResponse.from).toBe(
         '0x1234567890123456789012345678901234567890',
       );
       expect(storedData.siteOrigin).toBe('https://example.com');

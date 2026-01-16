@@ -39,7 +39,7 @@ const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
 const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
   {
-    address: ACCOUNT_ADDRESS,
+    from: ACCOUNT_ADDRESS,
     chainId: '0x1',
     rules: [
       {
@@ -47,15 +47,9 @@ const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
         data: {
           timestamp: 1714521600, // 05/01/2024 00:00:00 UTC
         },
-        isAdjustmentAllowed: true,
       },
     ],
-    signer: {
-      type: 'account',
-      data: {
-        address: '0x1',
-      },
-    },
+    to: '0x1',
     permission: {
       ...alreadyPopulatedPermission,
       data: {
@@ -68,7 +62,6 @@ const alreadyPopulatedPermissionRequest: NativeTokenPeriodicPermissionRequest =
 const alreadyPopulatedContext: NativeTokenPeriodicContext = {
   expiry: {
     timestamp: 1714521600,
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',

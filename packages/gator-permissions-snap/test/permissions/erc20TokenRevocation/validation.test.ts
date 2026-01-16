@@ -11,15 +11,9 @@ const validPermissionRequest: Erc20TokenRevocationPermissionRequest = {
       data: {
         timestamp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days from now
       },
-      isAdjustmentAllowed: true,
     },
   ],
-  signer: {
-    type: 'account',
-    data: {
-      address: '0x1',
-    },
-  },
+  to: '0x1',
   permission: {
     type: 'erc20-token-revocation',
     data: {
