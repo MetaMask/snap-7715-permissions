@@ -1052,23 +1052,17 @@ describe('RpcHandler', () => {
               data: {
                 timestamp: TEST_EXPIRY,
               },
-              isAdjustmentAllowed: true,
             },
           ],
-          signer: {
-            type: 'account' as const,
-            data: { address: TEST_ADDRESS },
-          },
+          to: TEST_ADDRESS,
           permission: {
             type: 'test-permission',
             data: { justification: 'Testing permission request' },
             isAdjustmentAllowed: true,
           },
           context: TEST_CONTEXT,
-          dependencyInfo: [],
-          signerMeta: {
-            delegationManager: TEST_ADDRESS,
-          },
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
         isRevoked: false,
