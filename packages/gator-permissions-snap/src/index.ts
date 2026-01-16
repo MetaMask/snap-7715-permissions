@@ -1,5 +1,9 @@
 /* eslint-disable no-restricted-globals */
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  logger,
+  createErrorTracker,
+  getErrorTracker,
+} from '@metamask/7715-permissions-shared/utils';
 import {
   AuthType,
   JwtBearerAuth,
@@ -190,6 +194,12 @@ const rpcHandler = createRpcHandler({
   blockchainMetadataClient: tokenMetadataClient,
 });
 
+// Initialize error tracker
+createErrorTracker({
+  enabled: true,
+  snapName: 'gator-permissions-snap',
+});
+
 // configure RPC methods bindings
 const boundRpcHandlers: {
   [RpcMethod: string]: (params?: JsonRpcParams) => Promise<Json>;
@@ -221,27 +231,36 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  logger.debug(`RPC request (origin="${origin}"): method="${request.method}"`);
+  const errorTracker = getErrorTracker();
 
-  // Ensure i18n is initialized on every snap invocation
-  // This handles both initial load and locale changes in the extension
-  await setupI18n();
-
-  if (!isMethodAllowedForOrigin(origin, request.method)) {
-    throw new InvalidRequestError(
-      `Origin '${origin}' is not allowed to call '${request.method}'`,
+  try {
+    logger.debug(
+      `RPC request (origin="${origin}"): method="${request.method}"`,
     );
+
+    // Ensure i18n is initialized on every snap invocation
+    // This handles both initial load and locale changes in the extension
+    await setupI18n();
+
+    if (!isMethodAllowedForOrigin(origin, request.method)) {
+      throw new InvalidRequestError(
+        `Origin '${origin}' is not allowed to call '${request.method}'`,
+      );
+    }
+
+    const handler = boundRpcHandlers[request.method];
+
+    if (!handler) {
+      throw new MethodNotFoundError(`Method ${request.method} not found.`);
+    }
+
+    const result = await handler(request.params);
+
+    return result;
+  } catch (error) {
+    await errorTracker.captureError(error, request.method);
+    throw error;
   }
-
-  const handler = boundRpcHandlers[request.method];
-
-  if (!handler) {
-    throw new MethodNotFoundError(`Method ${request.method} not found.`);
-  }
-
-  const result = await handler(request.params);
-
-  return result;
 };
 
 /**
