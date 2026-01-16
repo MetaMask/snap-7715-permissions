@@ -232,6 +232,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       `Origin '${origin}' is not allowed to call '${request.method}'`,
     );
   }
+  console.log('gator-snap-index(incoming rpc request)', request);
 
   const handler = boundRpcHandlers[request.method];
 
