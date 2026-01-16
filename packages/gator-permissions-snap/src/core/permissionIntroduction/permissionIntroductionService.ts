@@ -100,7 +100,7 @@ export class PermissionIntroductionService {
     const unbindFunctions: (() => void)[] = [];
 
     // Helper to unbind all handlers
-    const unbindAll = () => {
+    const unbindAll = (): void => {
       unbindFunctions.forEach((fn) => fn());
     };
 
@@ -118,7 +118,7 @@ export class PermissionIntroductionService {
         })
         .then((interfaceId) => {
           // Helper to update the interface with a new page
-          const updatePage = async (newPage: 1 | 2) => {
+          const updatePage = async (newPage: 1 | 2): Promise<void> => {
             if (newPage === currentPage) {
               return;
             }
@@ -163,6 +163,8 @@ export class PermissionIntroductionService {
             },
           });
           unbindFunctions.push(unbindNextArrow);
+
+          return undefined;
         })
         .catch(() => {
           unbindAll();

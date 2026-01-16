@@ -13,7 +13,7 @@ import { MOCK_PERMISSIONS_REQUEST_SINGLE } from '../constants';
 jest.mock('@metamask/7715-permissions-shared/utils', () => {
   const actual = jest.requireActual('@metamask/7715-permissions-shared/utils');
   return {
-    ...(actual || {}),
+    ...(actual ?? {}),
     logger: {
       warn: jest.fn(),
       debug: jest.fn(),
@@ -290,7 +290,7 @@ describe('validate utils', () => {
         {
           jsonrpc: '2.0' as const,
           method: RpcMethod.WalletRequestExecutionPermissions,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+
           params: { my__proto__field: 'safe' },
         },
         {
@@ -306,13 +306,13 @@ describe('validate utils', () => {
         {
           jsonrpc: '2.0' as const,
           method: RpcMethod.WalletRequestExecutionPermissions,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+
           params: { __proto__test: 'safe' },
         },
         {
           jsonrpc: '2.0' as const,
           method: RpcMethod.WalletRequestExecutionPermissions,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+
           params: { test__proto__: 'safe' },
         },
       ];

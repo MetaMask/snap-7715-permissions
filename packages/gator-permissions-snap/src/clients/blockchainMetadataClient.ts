@@ -8,8 +8,8 @@ import {
   InternalError,
   ResourceNotFoundError,
   ResourceUnavailableError,
-  type SnapsEthereumProvider,
 } from '@metamask/snaps-sdk';
+import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
 
 import type {
   RetryOptions,

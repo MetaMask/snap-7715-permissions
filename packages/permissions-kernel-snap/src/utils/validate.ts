@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-throw-literal */
 import {
-  type PermissionsRequest,
-  type PermissionsResponse,
   zPermissionsRequest,
   zPermissionsResponse,
+} from '@metamask/7715-permissions-shared/types';
+import type {
+  PermissionsRequest,
+  PermissionsResponse,
 } from '@metamask/7715-permissions-shared/types';
 import {
   extractZodError,

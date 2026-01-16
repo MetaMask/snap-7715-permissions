@@ -12,7 +12,7 @@ export type ValidationErrors = {
  * @param str - The string to convert.
  * @returns The converted string.
  */
-const toSentenceCase = (str: string) => {
+const toSentenceCase = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
@@ -53,7 +53,7 @@ export function validateAndParseAmount(
       };
     }
     return { amount: parsedAmount, error: null };
-  } catch (error) {
+  } catch {
     return { amount: null, error: t('errorInvalidAmount', [fieldName]) };
   }
 }

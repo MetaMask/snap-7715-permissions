@@ -20,7 +20,7 @@ export const DropdownField = ({
   options,
   disabled,
   errorMessage,
-}: DropdownFieldParams) => {
+}: DropdownFieldParams): JSX.Element => {
   if (disabled) {
     return <TextField label={label} value={t(value)} tooltip={tooltip} />;
   }

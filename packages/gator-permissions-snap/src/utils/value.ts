@@ -71,7 +71,7 @@ export function parseUnits({
 }: {
   formatted: string;
   decimals: number;
-}) {
+}): bigint {
   if (!/^(-?)([0-9]*)\.?([0-9]*)$/u.test(formatted)) {
     throw new InvalidInputError(`Invalid numeric value: ${formatted}`);
   }

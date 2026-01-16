@@ -112,7 +112,7 @@ describe('DialogInterface', () => {
 
     it('should register close handler', async () => {
       const onClose = jest.fn();
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
+
       let dialogResolve: (value: null) => void = () => {};
 
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
@@ -141,7 +141,7 @@ describe('DialogInterface', () => {
     it('should replace close handler on subsequent calls with handler', async () => {
       const onClose1 = jest.fn();
       const onClose2 = jest.fn();
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
+
       let dialogResolve: (value: null) => void = () => {};
 
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
@@ -175,7 +175,7 @@ describe('DialogInterface', () => {
 
     it('should keep existing close handler when subsequent call has no handler', async () => {
       const onClose = jest.fn();
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
+
       let dialogResolve: (value: null) => void = () => {};
 
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
@@ -216,7 +216,6 @@ describe('DialogInterface', () => {
           return mockInterfaceId;
         }
         if (params.method === 'snap_dialog') {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           return new Promise(() => {});
         }
         if (params.method === 'snap_resolveInterface') {
@@ -247,7 +246,6 @@ describe('DialogInterface', () => {
           return mockInterfaceId;
         }
         if (params.method === 'snap_dialog') {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           return new Promise(() => {});
         }
         if (params.method === 'snap_resolveInterface') {
@@ -273,7 +271,6 @@ describe('DialogInterface', () => {
           return mockInterfaceId;
         }
         if (params.method === 'snap_dialog') {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           return new Promise(() => {});
         }
         return null;

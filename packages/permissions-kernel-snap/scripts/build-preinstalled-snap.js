@@ -1,4 +1,3 @@
-/* eslint-disable jsdoc/valid-types */
 // @ts-nocheck
 /* eslint-disable n/no-sync */
 
@@ -13,6 +12,7 @@ console.log(
 
 /**
  * Read the contents of a file and return as a string.
+ *
  * @param {string} filePath - Path to file.
  * @returns {string} File as utf-8 string.
  */

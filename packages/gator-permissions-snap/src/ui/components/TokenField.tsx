@@ -35,7 +35,7 @@ export const TokenField = ({
   explorerUrl,
   tooltip,
   iconData,
-}: TokenFieldParams) => {
+}: TokenFieldParams): JSX.Element => {
   return (
     <Field
       label={label}

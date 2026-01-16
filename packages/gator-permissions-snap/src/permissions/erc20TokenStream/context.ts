@@ -5,8 +5,8 @@ import {
   parseCaipAccountId,
   toCaipAccountId,
   toCaipAssetType,
-  type Hex,
 } from '@metamask/utils';
+import type { Hex } from '@metamask/utils';
 
 import type {
   Erc20TokenStreamContext,

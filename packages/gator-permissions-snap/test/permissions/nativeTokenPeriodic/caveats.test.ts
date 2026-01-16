@@ -18,7 +18,7 @@ const contracts = {
 // Helper function to create expected terms
 const createExpectedTerms = (
   permission: PopulatedNativeTokenPeriodicPermission,
-) => {
+): string => {
   const periodAmountHex = permission.data.periodAmount
     .slice(2)
     .padStart(64, '0');

@@ -7,7 +7,7 @@ import {
   createPaymasterClient,
 } from 'viem/account-abstraction';
 
-// a static bundler rpc url is required for gatsby build
+// a static bundler rpc url is required for build
 const STATIC_BUNDLER_RPC_URL =
   'https://api.pimlico.io/v2/11155111/rpc?apikey=<api-key>';
 

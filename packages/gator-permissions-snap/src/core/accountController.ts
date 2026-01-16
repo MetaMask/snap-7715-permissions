@@ -1,12 +1,11 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { type Hex, type Delegation } from '@metamask/delegation-core';
+import type { Hex, Delegation } from '@metamask/delegation-core';
 import {
   InternalError,
   ResourceNotFoundError,
   ResourceUnavailableError,
-  type SnapsEthereumProvider,
-  type SnapsProvider,
 } from '@metamask/snaps-sdk';
+import type { SnapsEthereumProvider, SnapsProvider } from '@metamask/snaps-sdk';
 import { bigIntToHex, hexToNumber } from '@metamask/utils';
 
 import { getChainMetadata } from './chainMetadata';
@@ -30,7 +29,7 @@ export type AccountUpgradeParams = {
  * Controls EOA account operations including address retrieval, delegation signing, and balance queries.
  */
 export class AccountController {
-  #ethereumProvider: SnapsEthereumProvider;
+  readonly #ethereumProvider: SnapsEthereumProvider;
 
   /**
    * Initializes a new AccountController instance.
@@ -121,7 +120,18 @@ export class AccountController {
     delegation: Omit<Delegation, 'signature'>;
     origin: string;
     justification: string;
-  }) {
+  }): {
+    domain: {
+      chainId: number;
+      name: string;
+      version: string;
+      verifyingContract: Hex;
+    };
+    types: Record<string, { name: string; type: string }[]>;
+    primaryType: string;
+    message: Record<string, unknown>;
+    metadata: { origin: string; justification: string };
+  } {
     logger.debug('AccountController:#getSignDelegationArgs()');
 
     const domain = {

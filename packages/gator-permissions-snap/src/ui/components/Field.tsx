@@ -110,7 +110,7 @@ const isDisplayFieldProps = (props: FieldProps): props is ViewFieldProps => {
  *
  * @returns The rendered Field component.
  */
-export const Field = (props: FieldProps) => {
+export const Field = (props: FieldProps): JSX.Element => {
   const {
     label,
     tooltip,

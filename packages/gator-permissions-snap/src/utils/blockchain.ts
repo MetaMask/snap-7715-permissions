@@ -3,8 +3,8 @@ import {
   ChainDisconnectedError,
   InternalError,
   ResourceNotFoundError,
-  type SnapsEthereumProvider,
 } from '@metamask/snaps-sdk';
+import type { SnapsEthereumProvider } from '@metamask/snaps-sdk';
 import { hexToNumber, numberToHex } from '@metamask/utils';
 
 import { sleep } from './httpClient';

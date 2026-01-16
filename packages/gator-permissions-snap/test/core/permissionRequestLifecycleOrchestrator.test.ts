@@ -8,7 +8,6 @@ import {
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
@@ -19,9 +18,9 @@ import type { PermissionIntroductionService } from '../../src/core/permissionInt
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
+import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
-const randomAddress = () => {
-  /* eslint-disable no-restricted-globals */
+const randomAddress = (): Hex => {
   const randomBytes = new Uint8Array(20);
   for (let i = 0; i < 20; i++) {
     randomBytes[i] = Math.floor(Math.random() * 256);

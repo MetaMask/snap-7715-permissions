@@ -198,7 +198,7 @@ export const SkeletonPermissionHandlerContent = ({
 }: {
   permissionTitle: MessageKey;
   permissionSubtitle: MessageKey;
-}) => {
+}): JSX.Element => {
   return (
     <Box>
       <Box direction="vertical">

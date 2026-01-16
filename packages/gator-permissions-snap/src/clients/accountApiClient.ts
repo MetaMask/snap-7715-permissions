@@ -3,7 +3,7 @@ import {
   ZERO_ADDRESS,
 } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { type Hex } from '@metamask/delegation-core';
+import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
@@ -94,11 +94,11 @@ export class AccountApiClient {
   constructor({
     accountBaseUrl,
     tokensBaseUrl,
-    fetch = globalThis.fetch,
+    fetch: fetchFn = globalThis.fetch,
     timeoutMs,
     maxResponseSizeBytes,
   }: AccountApiClientConfig) {
-    this.#fetch = fetch;
+    this.#fetch = fetchFn;
     this.#accountBaseUrl = accountBaseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
     this.#tokensBaseUrl = tokensBaseUrl.replace(/\/+$/u, ''); // Remove trailing slashes
     this.#timeoutMs = timeoutMs;

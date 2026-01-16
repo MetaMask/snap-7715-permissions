@@ -37,7 +37,7 @@ const getUserInputEventKey = ({
   elementName: string;
   eventType: UserInputEventType;
   interfaceId: string;
-}) => `${elementName}:${eventType}:${interfaceId}`;
+}): string => `${elementName}:${eventType}:${interfaceId}`;
 
 /**
  * Debounce configuration
@@ -127,7 +127,7 @@ export class UserEventDispatcher {
 
     return {
       dispatcher: this,
-      unbind: () => {
+      unbind: (): void => {
         this.off<TUserInputEventType>(args);
       },
     };
@@ -193,7 +193,7 @@ export class UserEventDispatcher {
       const handlers = this.#eventHandlers[eventKey];
 
       if (!handlers?.length) {
-        return;
+        return undefined;
       }
 
       // Execute handlers sequentially to prevent race conditions where multiple handlers
@@ -211,6 +211,7 @@ export class UserEventDispatcher {
           );
         }
       }
+      return undefined;
     });
   }
 

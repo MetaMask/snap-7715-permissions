@@ -30,7 +30,7 @@ export const DateTimePickerField = ({
   allowPastDate,
   addFieldButtonName,
   removeFieldButtonName,
-}: DateTimePickerFieldParams) => {
+}: DateTimePickerFieldParams): JSX.Element => {
   const isFieldEnabled = value !== null && value !== undefined;
 
   if (disabled) {

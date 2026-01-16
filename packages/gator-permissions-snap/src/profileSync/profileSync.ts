@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-restricted-globals */
+
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { zPermissionResponse } from '@metamask/7715-permissions-shared/types';
 import {
   logger,
   extractZodError,
 } from '@metamask/7715-permissions-shared/utils';
-import {
-  hashDelegation,
-  decodeDelegations,
-  type Hex,
-} from '@metamask/delegation-core';
+import { hashDelegation, decodeDelegations } from '@metamask/delegation-core';
+import type { Hex } from '@metamask/delegation-core';
 import type {
   UserStorageGenericPathWithFeatureAndKey,
   JwtBearerAuth,
@@ -147,26 +144,33 @@ export function createProfileSyncManager(
   const FEATURE = 'gator_7715_permissions';
   const { auth, userStorage, isFeatureEnabled, snapsMetricsService } = config;
   const unConfiguredProfileSyncManager = {
-    getAllGrantedPermissions: async () => {
+    getAllGrantedPermissions: async (): Promise<StoredGrantedPermission[]> => {
       logger.debug('unConfiguredProfileSyncManager.getAllGrantedPermissions()');
       return [];
     },
-    getGrantedPermission: async (_: Hex) => {
+    getGrantedPermission: async (_: Hex): Promise<StoredGrantedPermission> => {
       throw new UnsupportedMethodError(
         'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
       );
     },
-    storeGrantedPermission: async (_: StoredGrantedPermission) => {
+    storeGrantedPermission: async (
+      _: StoredGrantedPermission,
+    ): Promise<void> => {
       logger.debug(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
       );
     },
-    storeGrantedPermissionBatch: async (_: StoredGrantedPermission[]) => {
+    storeGrantedPermissionBatch: async (
+      _: StoredGrantedPermission[],
+    ): Promise<void> => {
       logger.debug(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
       );
     },
-    updatePermissionRevocationStatus: async (_: Hex, __: boolean) => {
+    updatePermissionRevocationStatus: async (
+      _: Hex,
+      __: boolean,
+    ): Promise<void> => {
       logger.debug(
         'unConfiguredProfileSyncManager.updatePermissionRevocationStatus()',
       );
@@ -212,7 +216,7 @@ export function createProfileSyncManager(
         try {
           const permission = safeDeserializeStoredGrantedPermission(item);
           validPermissions.push(permission);
-        } catch (error) {
+        } catch {
           logger.warn('Skipping invalid permission data');
         }
       }
@@ -325,7 +329,7 @@ export function createProfileSyncManager(
             generateObjectKey(permission.permissionResponse.context), // key
             serializedPermission, // value
           ]);
-        } catch (error) {
+        } catch {
           logger.warn('Skipping invalid permission in batch');
         }
       }

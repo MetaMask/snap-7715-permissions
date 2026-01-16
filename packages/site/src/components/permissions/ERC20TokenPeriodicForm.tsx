@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { parseUnits, toHex, type Hex } from 'viem';
+import { parseUnits, toHex } from 'viem';
+import type { Hex } from 'viem';
 
 import type { ERC20TokenPeriodicPermissionRequest } from './types';
 

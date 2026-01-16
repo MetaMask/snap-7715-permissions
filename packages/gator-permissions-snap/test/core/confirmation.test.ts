@@ -1,11 +1,12 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
 import { UserInputEventType } from '@metamask/snaps-sdk';
-import { type SnapElement, Text } from '@metamask/snaps-sdk/jsx';
+import { Text } from '@metamask/snaps-sdk/jsx';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { ConfirmationDialog } from '../../src/core/confirmation';
 import { DialogInterface } from '../../src/core/dialogInterface';
-import { type TimeoutFactory } from '../../src/core/timeoutFactory';
+import type { TimeoutFactory } from '../../src/core/timeoutFactory';
 import type { UserEventDispatcher } from '../../src/userEventDispatcher';
 
 describe('ConfirmationDialog', () => {
