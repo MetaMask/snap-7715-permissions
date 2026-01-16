@@ -469,7 +469,8 @@ describe('profileSync', () => {
 
     describe('updatePermissionRevocationStatus', () => {
       it('should update permission revocation status successfully', async () => {
-        // Mock getting the existing permission
+        const mockTxHash =
+          '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
         userStorageMock.getItem.mockResolvedValueOnce(
           JSON.stringify(mockStoredGrantedPermission),
         );
@@ -478,27 +479,28 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           true,
+          {
+            txHash: mockTxHash,
+          },
         );
 
-        // Should first get the existing permission
         expect(userStorageMock.getItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
         );
 
-        // Should then store the updated permission with isRevoked=true
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
           expect.stringMatching(
-            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":true\}$/u,
+            /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com","isRevoked":true,"revocationMetadata":\{"txHash":"0x[a-f0-9]+"\}\}$/u,
           ),
         );
 
-        // Verify the stored data has isRevoked=true
         const storedData = userStorageMock.setItem.mock.calls[0]?.[1];
         expect(storedData).toBeDefined();
         const parsed = JSON.parse(storedData as string);
         expect(parsed.isRevoked).toBe(true);
         expect(parsed.siteOrigin).toBe('https://example.com');
+        expect(parsed.revocationMetadata.txHash).toBe(mockTxHash);
       });
 
       it('should set permission revocation status to false', async () => {
@@ -517,6 +519,7 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           false,
+          {},
         );
 
         // Should store the updated permission with isRevoked=false
@@ -552,6 +555,9 @@ describe('profileSync', () => {
           profileSyncManager.updatePermissionRevocationStatus(
             nonExistentDelegationHash,
             true,
+            {
+              txHash: '0xMocked-tx-hash',
+            },
           ),
         ).rejects.toThrow(
           `Permission not found for permission context: ${nonExistentDelegationHash}`,
@@ -575,6 +581,9 @@ describe('profileSync', () => {
           profileSyncManager.updatePermissionRevocationStatus(
             mockStoredGrantedPermission.permissionResponse.context,
             true,
+            {
+              txHash: '0xMocked-tx-hash',
+            },
           ),
         ).rejects.toThrow('Auth failed');
       });
@@ -632,6 +641,9 @@ describe('profileSync', () => {
         await profileSyncManager.updatePermissionRevocationStatus(
           mockStoredGrantedPermission.permissionResponse.context,
           true,
+          {
+            txHash: '0xMocked-tx-hash',
+          },
         );
         expect(userStorageMock.getItem).not.toHaveBeenCalled();
         expect(userStorageMock.setItem).not.toHaveBeenCalled();
