@@ -12,8 +12,7 @@
     "./utils": "./src/utils/index.ts",
     "./types": "./src/types/index.ts",
     "./constants": "./src/constants/index.ts",
-    "./testing": "./src/testing/index.ts",
-    "./error-tracking": "./src/utils/errorTracking.ts"
+    "./testing": "./src/testing/index.ts"
   },
   "main": "./src",
   "types": "./src",
