@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Json, SnapsProvider } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';

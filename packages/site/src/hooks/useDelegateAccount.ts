@@ -1,8 +1,8 @@
 import {
   Implementation,
-  type MetaMaskSmartAccount,
   toMetaMaskSmartAccount,
 } from '@metamask/smart-accounts-kit';
+import type { MetaMaskSmartAccount } from '@metamask/smart-accounts-kit';
 import { useEffect, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import type { Chain } from 'viem';

@@ -113,7 +113,6 @@ describe('Kernel Snap', () => {
           jsonrpc: '2.0',
           method: 'wallet_requestExecutionPermissions',
           params: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             __proto__: 'malicious',
             normalKey: 'value',
           },
@@ -132,7 +131,6 @@ describe('Kernel Snap', () => {
           method: 'wallet_requestExecutionPermissions',
           params: {
             normalKey: {
-              // eslint-disable-next-line @typescript-eslint/naming-convention
               __proto__: 'malicious',
             },
           },

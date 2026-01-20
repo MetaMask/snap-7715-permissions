@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-/* eslint-disable import/no-unassigned-import */
-/* eslint-disable import/no-nodejs-modules */
+/* eslint-disable import-x/no-unassigned-import */
+/* eslint-disable import-x/no-nodejs-modules */
 /* eslint-disable no-restricted-globals */
 
 import { access, writeFile } from 'fs/promises';
@@ -61,7 +61,7 @@ if (!packageDir) {
 }
 
 // Run the manifest generation
-(async () => {
+(async (): Promise<void> => {
   await generateManifest(packageDir);
 })().catch((error: unknown) => {
   console.error('❌ Script failed:', error);

@@ -1,0 +1,2 @@
+ignores: ["@typescript-eslint/*", "eslint-*", "typescript-eslint", "typescript", "ts-jest", "rimraf", "@types/*"]
+ignore-patterns: ["dist", "coverage"]

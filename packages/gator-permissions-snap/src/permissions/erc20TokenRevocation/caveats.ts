@@ -1,8 +1,8 @@
 import {
   createValueLteTerms,
   createAllowedCalldataTerms,
-  type Caveat,
 } from '@metamask/delegation-core';
+import type { Caveat } from '@metamask/delegation-core';
 
 import type { PopulatedErc20TokenRevocationPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';

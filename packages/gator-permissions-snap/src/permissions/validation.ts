@@ -22,7 +22,7 @@ export function validateHexInteger({
   value: Hex | undefined | null;
   allowZero: boolean;
   required: boolean;
-}) {
+}): void {
   if (value === undefined || value === null) {
     if (!required) {
       return;
@@ -34,7 +34,7 @@ export function validateHexInteger({
 
   try {
     parsedValue = BigInt(value);
-  } catch (error) {
+  } catch {
     throw new InvalidInputError(`Invalid ${name}: must be a valid hex integer`);
   }
 
@@ -52,7 +52,7 @@ export function validateHexInteger({
 export function validateStartTime(
   startTime: number | undefined | null,
   rules: PermissionRequest['rules'],
-) {
+): void {
   const expiryRule = rules?.find(
     (rule) => extractDescriptorName(rule.type) === 'expiry',
   );

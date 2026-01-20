@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import type { ERC20TokenRevocationPermissionRequest } from './types';
 
 type ERC20TokenRevocationFormProps = {

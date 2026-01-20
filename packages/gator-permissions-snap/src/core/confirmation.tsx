@@ -8,10 +8,14 @@ import type { Timeout, TimeoutFactory } from './timeoutFactory';
 import type { ConfirmationProps } from './types';
 import { t } from '../utils/i18n';
 
+/**
+ * Dialog for handling user confirmation of permission grants.
+ * Manages the UI state, timeout behavior, and user interactions.
+ */
 export class ConfirmationDialog {
-  static #cancelButton = 'cancel-button';
+  static readonly #cancelButton = 'cancel-button';
 
-  static #grantButton = 'grant-button';
+  static readonly #grantButton = 'grant-button';
 
   readonly #dialogInterface: DialogInterface;
 
@@ -90,7 +94,9 @@ export class ConfirmationDialog {
       this.#decisionResolve = resolve;
       this.#decisionReject = reject;
 
-      const cleanupAndResolveIfNotTimedOut = async (decision: boolean) => {
+      const cleanupAndResolveIfNotTimedOut = async (
+        decision: boolean,
+      ): Promise<void> => {
         if (!this.#hasTimedOut) {
           this.#cleanupHandlers();
           await this.#dialogInterface.close();
@@ -144,7 +150,7 @@ export class ConfirmationDialog {
       });
 
       // store hooks so we can close/reject programmatically on error
-      this.#unbindHandlers = () => {
+      this.#unbindHandlers = (): void => {
         unbindGrantButtonClick();
         unbindCancelButtonClick();
       };
