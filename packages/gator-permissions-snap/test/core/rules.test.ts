@@ -587,8 +587,7 @@ describe('rules', () => {
 `);
     });
 
-    it('should render disabled field when is7715RuleType is true regardless of isAdjustmentAllowed', () => {
-      // Even though isAdjustmentAllowed is true, the field should be disabled because is7715RuleType is true
+    it('should render enabled field when is7715RuleType is true regardless of isAdjustmentAllowed', () => {
       const result = renderRule({
         rule: is7715RuleTypeRule,
         context: { ...mockContext, isAdjustmentAllowed: true },
@@ -599,7 +598,6 @@ describe('rules', () => {
 {
   "key": null,
   "props": {
-    "alignment": "space-between",
     "children": [
       {
         "key": null,
@@ -654,21 +652,35 @@ describe('rules', () => {
         "key": null,
         "props": {
           "children": [
-            null,
             {
               "key": null,
               "props": {
-                "children": "test-value",
+                "children": null,
               },
-              "type": "Text",
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "name": "test-7715-rule",
+                "type": "text",
+                "value": "test-value",
+              },
+              "type": "Input",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
             },
           ],
-          "direction": "horizontal",
         },
-        "type": "Box",
+        "type": "Field",
       },
     ],
-    "direction": "horizontal",
+    "direction": "vertical",
   },
   "type": "Box",
 }
