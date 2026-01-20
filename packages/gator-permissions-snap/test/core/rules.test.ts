@@ -590,7 +590,7 @@ describe('rules', () => {
     it('should render enabled field when is7715RuleType is true regardless of isAdjustmentAllowed', () => {
       const result = renderRule({
         rule: is7715RuleTypeRule,
-        context: { ...mockContext, isAdjustmentAllowed: true },
+        context: { ...mockContext, isAdjustmentAllowed: false },
         metadata: mockMetadata,
       });
 
