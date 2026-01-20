@@ -34,6 +34,7 @@ export const initialAmountRule: NativeTokenStreamRuleDefinition = {
     tooltip: t('initialAmountTooltip'),
     error: metadata.validationErrors.initialAmountError,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
+    is7715RuleType: false,
   }),
   updateContext: (context: NativeTokenStreamContext, value: string | null) => ({
     ...context,
@@ -56,6 +57,7 @@ export const maxAmountRule: NativeTokenStreamRuleDefinition = {
     iconData: getIconData(context),
     error: metadata.validationErrors.maxAmountError,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
+    is7715RuleType: false,
   }),
   updateContext: (context: NativeTokenStreamContext, value: string | null) => ({
     ...context,
@@ -77,6 +79,7 @@ export const startTimeRule: NativeTokenStreamRuleDefinition = {
     error: metadata.validationErrors.startTimeError,
     allowPastDate: false,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
+    is7715RuleType: false,
   }),
   updateContext: (context: NativeTokenStreamContext, value: string) => ({
     ...context,
@@ -98,6 +101,7 @@ export const streamAmountPerPeriodRule: NativeTokenStreamRuleDefinition = {
     iconData: getIconData(context),
     error: metadata.validationErrors.amountPerPeriodError,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
+    is7715RuleType: false,
   }),
   updateContext: (context: NativeTokenStreamContext, value: string) => ({
     ...context,
@@ -118,6 +122,7 @@ export const streamPeriodRule: NativeTokenStreamRuleDefinition = {
     tooltip: t('streamPeriodTooltip'),
     options: Object.values(TimePeriod),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
+    is7715RuleType: false,
   }),
   updateContext: (context: NativeTokenStreamContext, value: TimePeriod) => ({
     ...context,

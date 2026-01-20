@@ -35,6 +35,7 @@ export const periodAmountRule: RuleDefinition<
     error: metadata.validationErrors.periodAmountError,
     iconData: getIconData(context),
     isAdjustmentAllowed: context.isAdjustmentAllowed,
+    is7715RuleType: false,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
@@ -59,6 +60,7 @@ export const periodDurationRule: RuleDefinition<
     options: Object.values(TimePeriod),
     error: metadata.validationErrors.periodDurationError,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
+    is7715RuleType: false,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => {
     // Validate that value is a valid TimePeriod
@@ -104,6 +106,7 @@ export const startTimeRule: RuleDefinition<
     error: metadata.validationErrors.startTimeError,
     allowPastDate: false,
     isAdjustmentAllowed: context.isAdjustmentAllowed,
+    is7715RuleType: false,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,

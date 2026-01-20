@@ -9,7 +9,7 @@ import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 
 import { TimePeriod } from '../core/types';
 import type {
-  BaseRuleContext,
+  BaseContext,
   RuleDefinition,
   TypedPermissionRequest,
 } from '../core/types';

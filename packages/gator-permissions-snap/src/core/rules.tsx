@@ -49,9 +49,9 @@ export function renderRule<
     return null;
   }
 
-  // Rules that are defined in the 7715 specification always default to disabled input, since there is no adjustment allowed as defined by ERC-7715
-  // All other rules will use the isAdjustmentAllowed flag to determine if the input should be disabled.
-  const isDisabled = is7715RuleType ? true : !isAdjustmentAllowed;
+  // 7715 standard rule types (e.g., expiry) always default to disabled input, since there is no adjustment allowed as defined by ERC-7715.
+  // 7715 permission data fields (e.g., amount, period) use isAdjustmentAllowed to determine if the input should be disabled.
+  const isDisabled = is7715RuleType === true || !isAdjustmentAllowed;
 
   const addFieldButtonName = isOptional ? `${name}_addFieldButton` : undefined;
   const removeFieldButtonName = isOptional
