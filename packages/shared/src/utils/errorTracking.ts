@@ -39,7 +39,7 @@ export class SnapErrorTracker {
     this.#snapName = config.snapName;
     this.#shouldTrackError =
       config.shouldTrackError ??
-      ((error: any) => {
+      ((error: any): boolean => {
         // By default, track all errors that are Error instances or have error-like properties
         return (
           error instanceof Error ||
@@ -76,10 +76,15 @@ export class SnapErrorTracker {
     } else if (error?.message) {
       errorInfo.errorMessage = error.message;
     } else if (error?.error) {
-      errorInfo.errorMessage =
-        typeof error.error === 'string'
-          ? error.error
-          : JSON.stringify(error.error);
+      if (typeof error.error === 'string') {
+        errorInfo.errorMessage = error.error;
+      } else {
+        try {
+          errorInfo.errorMessage = JSON.stringify(error.error);
+        } catch {
+          errorInfo.errorMessage = String(error.error);
+        }
+      }
     }
 
     // Get status code if available
@@ -174,10 +179,17 @@ export class SnapErrorTracker {
       return;
     }
 
+    let errorMessage: string;
+    try {
+      errorMessage = `Response error: ${JSON.stringify(response)}`;
+    } catch {
+      errorMessage = `Response error: ${String(response)}`;
+    }
+
     const errorInfo: ErrorTrackingInfo = {
       snapName: this.#snapName,
       method,
-      errorMessage: `Response error: ${JSON.stringify(response)}`,
+      errorMessage,
       responseData: response,
     };
 
@@ -254,9 +266,7 @@ let errorTrackerInstance: SnapErrorTracker | null = null;
 export function createErrorTracker(
   config: ErrorTrackingConfig,
 ): SnapErrorTracker {
-  if (!errorTrackerInstance) {
-    errorTrackerInstance = new SnapErrorTracker(config);
-  }
+  errorTrackerInstance ??= new SnapErrorTracker(config);
   return errorTrackerInstance;
 }
 
