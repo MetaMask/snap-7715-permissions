@@ -164,7 +164,9 @@ export class PermissionHandler<
     TPermission,
     TPopulatedPermission
   > {
-    const buildContextHandler = async (request: TRequest) => {
+    const buildContextHandler = async (
+      request: TRequest,
+    ): Promise<TContext> => {
       const requestedAddressLowercase = request.from?.toLowerCase() as
         | Hex
         | undefined;
@@ -196,12 +198,13 @@ export class PermissionHandler<
       });
     };
 
-    const createSkeletonConfirmationContentHandler = async () => {
-      return SkeletonPermissionHandlerContent({
-        permissionTitle: this.#permissionTitle,
-        permissionSubtitle: this.#permissionSubtitle,
-      });
-    };
+    const createSkeletonConfirmationContentHandler =
+      async (): Promise<JSX.Element> => {
+        return SkeletonPermissionHandlerContent({
+          permissionTitle: this.#permissionTitle,
+          permissionSubtitle: this.#permissionSubtitle,
+        });
+      };
 
     const createConfirmationContentHandler = async ({
       context,
@@ -213,7 +216,7 @@ export class PermissionHandler<
       metadata: TMetadata;
       origin: string;
       chainId: number;
-    }) => {
+    }): Promise<JSX.Element> => {
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
       const tokenIconData = getIconData(context);
@@ -264,9 +267,9 @@ export class PermissionHandler<
       initialContext: TContext;
       updateContext: (args: { updatedContext: TContext }) => Promise<void>;
       isAdjustmentAllowed: boolean;
-    }) => {
+    }): void => {
       let currentContext = initialContext;
-      const rerender = async () => {
+      const rerender = async (): Promise<void> => {
         await updateContext({ updatedContext: currentContext });
       };
 
@@ -418,18 +421,18 @@ export class PermissionHandler<
               await rerender();
             },
           })
-        : () => {
+        : (): void => {
             // No-op function when adjustment is not allowed
           };
 
-      this.#unbindHandlers = () => {
+      this.#unbindHandlers = (): void => {
         unbindRuleHandlers();
         unbindShowMoreButtonClick();
         unbindAccountSelected();
       };
     };
 
-    const onConfirmationResolvedHandler = () => {
+    const onConfirmationResolvedHandler = (): void => {
       this.#unbindHandlers?.();
     };
 

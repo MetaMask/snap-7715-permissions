@@ -15,7 +15,7 @@ export const TextField = ({
   value,
   tooltip,
   iconData,
-}: TextFieldParams) => {
+}: TextFieldParams): JSX.Element => {
   return (
     <Field
       label={label}

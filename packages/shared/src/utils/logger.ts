@@ -66,7 +66,7 @@ const DEFAULT_CONTEXT: LoggerContext = {
  * @param data - The object to stringify.
  * @returns The stringified object.
  */
-export const objStringify = (data: any) => {
+export const objStringify = (data: any): string => {
   return JSON.stringify(data, (_: any, value: any) => {
     if (typeof value === 'bigint') {
       return bigIntToHex(value);
@@ -75,8 +75,12 @@ export const objStringify = (data: any) => {
   });
 };
 
+/**
+ * Logger utility for structured logging with configurable log levels.
+ * Supports JSON stringification of log data including BigInt values.
+ */
 export class Logger {
-  #context: LoggerContext;
+  readonly #context: LoggerContext;
 
   constructor(context: Partial<LoggerContext> = {}) {
     this.#context = {

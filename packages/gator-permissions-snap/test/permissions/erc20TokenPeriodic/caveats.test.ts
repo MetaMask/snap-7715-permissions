@@ -19,7 +19,7 @@ const contracts = {
 // Helper function to create expected terms
 const createExpectedTerms = (
   permission: PopulatedErc20TokenPeriodicPermission,
-) => {
+): string => {
   const periodAmountHex = permission.data.periodAmount
     .slice(2)
     .padStart(64, '0');

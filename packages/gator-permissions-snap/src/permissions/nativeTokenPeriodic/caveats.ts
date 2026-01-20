@@ -1,8 +1,8 @@
 import {
-  type Caveat,
   createExactCalldataTerms,
   createNativeTokenPeriodTransferTerms,
 } from '@metamask/delegation-core';
+import type { Caveat } from '@metamask/delegation-core';
 
 import type { PopulatedNativeTokenPeriodicPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';

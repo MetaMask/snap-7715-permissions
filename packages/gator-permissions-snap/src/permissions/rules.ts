@@ -7,11 +7,11 @@
 import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 
-import {
-  TimePeriod,
-  type BaseRuleContext,
-  type RuleDefinition,
-  type TypedPermissionRequest,
+import { TimePeriod } from '../core/types';
+import type {
+  BaseRuleContext,
+  RuleDefinition,
+  TypedPermissionRequest,
 } from '../core/types';
 import type { TranslateFunction } from '../utils/i18n';
 import {
@@ -58,7 +58,7 @@ export const createExpiryRule = <
       error: metadata.validationErrors.expiryError,
       allowPastDate: false,
     }),
-    updateContext: (context: TContext, value: string | undefined) => {
+    updateContext: (context: TContext, value: string | undefined): TContext => {
       let expiry: { timestamp: number } | undefined;
 
       // We want to set the expiry if value is a date, _or_ if it's an empty
@@ -91,7 +91,7 @@ export const applyExpiryRule = <
 >(
   context: TContext,
   originalRequest: TPermissionRequest,
-) => {
+): TPermissionRequest => {
   const expiryTimestamp = context.expiry?.timestamp;
 
   let rules: (typeof originalRequest)['rules'] = originalRequest.rules || [];

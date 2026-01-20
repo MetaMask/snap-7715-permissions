@@ -53,6 +53,7 @@ export class DialogInterface {
           if (result === null) {
             this.#onDialogClose?.();
           }
+          return result;
         })
         .catch(() => {
           // Dialog closed with error, treat as user cancel
