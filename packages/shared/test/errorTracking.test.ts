@@ -61,7 +61,7 @@ describe('SnapErrorTracker', () => {
     // Test custom filter
     const customTracker = new SnapErrorTracker({
       ...defaultConfig,
-      shouldTrackError: () => false,
+      shouldTrackError: (): boolean => false,
     });
     await customTracker.captureError(new Error('Test'), 'testMethod');
     expect(mockSnapRequest).not.toHaveBeenCalled();
@@ -72,7 +72,9 @@ describe('SnapErrorTracker', () => {
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      .mockImplementation(() => {});
+      .mockImplementation(() => {
+        /* empty */
+      });
 
     await tracker.captureError(new Error('Test'), 'testMethod');
     expect(consoleWarnSpy).toHaveBeenCalled();
