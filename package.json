@@ -1,6 +1,6 @@
 {
   "name": "@metamask/snap-7715-permissions-monorepo",
-  "version": "13.0.0",
+  "version": "14.0.0",
   "private": true,
   "description": "Monorepo for 7715 permissions snaps.",
   "repository": {
@@ -25,27 +25,28 @@
     "test": "yarn workspaces foreach --worktree --parallel --interlaced --verbose run test"
   },
   "devDependencies": {
-    "@lavamoat/allow-scripts": "3.3.4",
+    "@lavamoat/allow-scripts": "3.4.1",
     "@lavamoat/preinstall-always-fail": "2.1.1",
     "@metamask/create-release-branch": "4.1.3",
-    "@metamask/eslint-config": "12.2.0",
-    "@metamask/eslint-config-jest": "12.1.0",
-    "@metamask/eslint-config-nodejs": "12.1.0",
-    "@metamask/eslint-config-typescript": "12.1.0",
-    "@typescript-eslint/eslint-plugin": "5.62.0",
-    "@typescript-eslint/parser": "5.62.0",
-    "eslint": "8.57.1",
-    "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-jest": "27.9.0",
-    "eslint-plugin-jsdoc": "48.11.0",
-    "eslint-plugin-n": "16.6.2",
-    "eslint-plugin-prettier": "5.5.1",
-    "eslint-plugin-promise": "6.6.0",
+    "@metamask/eslint-config": "15.0.0",
+    "@metamask/eslint-config-jest": "15.0.0",
+    "@metamask/eslint-config-nodejs": "15.0.0",
+    "@metamask/eslint-config-typescript": "15.0.0",
+    "depcheck": "^1.4.7",
+    "eslint": "^9.11.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-import-x": "^4.3.0",
+    "eslint-plugin-jest": "^28.8.3",
+    "eslint-plugin-jsdoc": "^50.2.4",
+    "eslint-plugin-n": "^17.10.3",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-promise": "^7.1.0",
     "prettier": "3.6.2",
     "prettier-plugin-packagejson": "2.5.18",
-    "sharp": "0.32.6",
-    "typescript": "5.8.3"
+    "sharp": "0.34.5",
+    "typescript": "5.8.3",
+    "typescript-eslint": "^8.39.0"
   },
   "packageManager": "yarn@4.10.1",
   "engines": {
@@ -54,10 +55,13 @@
   "lavamoat": {
     "allowScripts": {
       "@lavamoat/preinstall-always-fail": false,
-      "sharp": true
+      "sharp": true,
+      "eslint-plugin-import-x>unrs-resolver": false
     }
   },
   "resolutions": {
-    "gatsby/path-to-regexp": "0.1.12"
+    "qs": "^6.14.1",
+    "sharp": "0.34.5",
+    "glob@^10": "10.5.0"
   }
 }

@@ -2,10 +2,8 @@ import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testi
 import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 
-import {
-  createPermissionOfferRegistryManager,
-  type PermissionOfferRegistryManager,
-} from '../src/registryManager';
+import { createPermissionOfferRegistryManager } from '../src/registryManager';
+import type { PermissionOfferRegistryManager } from '../src/registryManager';
 import { ExternalMethod } from '../src/rpc/rpcMethod';
 
 describe('PermissionOfferRegistryManager', () => {
@@ -157,33 +155,37 @@ describe('PermissionOfferRegistryManager', () => {
     const mockPermissionsToGrant: PermissionsRequest = [
       {
         chainId: '0x1' as `0x${string}`,
-        expiry: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
-        signer: {
-          type: 'account' as const,
-          data: {
-            address:
-              '0x1234567890123456789012345678901234567890' as `0x${string}`,
-          },
-        },
+        to: '0x1234567890123456789012345678901234567890',
         permission: {
           type: 'native-token-transfer',
+          isAdjustmentAllowed: true,
           data: {},
         },
+        rules: [
+          {
+            type: 'expiry',
+            data: {
+              timestamp: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
+            },
+          },
+        ],
       },
       {
         chainId: '0x1' as `0x${string}`,
-        expiry: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
-        signer: {
-          type: 'account' as const,
-          data: {
-            address:
-              '0x1234567890123456789012345678901234567890' as `0x${string}`,
-          },
-        },
+        to: '0x1234567890123456789012345678901234567890',
         permission: {
           type: 'native-token-stream',
+          isAdjustmentAllowed: true,
           data: {},
         },
+        rules: [
+          {
+            type: 'expiry',
+            data: {
+              timestamp: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
+            },
+          },
+        ],
       },
     ];
 

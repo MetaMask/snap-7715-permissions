@@ -78,7 +78,7 @@ describe('Kernel Snap', () => {
             cause: null,
             method: 'snapRpc',
             params: expect.arrayContaining([
-              expect.stringMatching(/^local:http:\/\/localhost:\d+$/),
+              expect.stringMatching(/^local:http:\/\/localhost:\d+$/u),
               'onRpcRequest',
               'https://metamask.io',
               expect.objectContaining({
@@ -180,12 +180,7 @@ describe('Kernel Snap', () => {
           params: [
             {
               chainId: '0x1',
-              signer: {
-                type: 'account',
-                data: {
-                  address: '0x1234567890123456789012345678901234567890',
-                },
-              },
+              to: '0x1234567890123456789012345678901234567890',
               permission: {
                 type: 'native-token-transfer',
                 isAdjustmentAllowed: true,
@@ -197,7 +192,6 @@ describe('Kernel Snap', () => {
               rules: [
                 {
                   type: 'expiry',
-                  isAdjustmentAllowed: true,
                   data: { timestamp: 123456 },
                 },
               ],

@@ -1,5 +1,5 @@
 import type {
-  DependencyInfo,
+  Dependency,
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
@@ -83,7 +83,7 @@ export class PermissionRequestLifecycleOrchestrator {
    * @param chainId - The chain ID to validate.
    * @throws If the chain ID is not supported.
    */
-  #assertIsSupportedChainId(chainId: number) {
+  #assertIsSupportedChainId(chainId: number): void {
     try {
       getChainMetadata({ chainId });
     } catch (error) {
@@ -228,7 +228,7 @@ export class PermissionRequestLifecycleOrchestrator {
     }: {
       newContext: TContext;
       isGrantDisabled: boolean;
-    }) => {
+    }): Promise<void> => {
       context = newContext;
 
       const metadata = await lifecycleHandlers.deriveMetadata({ context });
@@ -277,7 +277,7 @@ export class PermissionRequestLifecycleOrchestrator {
         updatedContext,
       }: {
         updatedContext: TContext;
-      }) => {
+      }): Promise<void> => {
         try {
           await updateConfirmation({
             newContext: updatedContext,
@@ -331,7 +331,7 @@ export class PermissionRequestLifecycleOrchestrator {
               });
             }
           }
-        } catch (error) {
+        } catch {
           // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
           // TODO: When we know extension has support for account upgrade, we can show an error to the user
         }
@@ -376,7 +376,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
   /**
    * Resolves a permission request into a final permission response.
-   * @private
    * @template TRequest - Type of permission request
    * @template TContext - Type of context for the permission request.
    * @template TMetadata - Type of metadata associated with the permission request.
@@ -440,9 +439,12 @@ export class PermissionRequestLifecycleOrchestrator {
       isAdjustmentAllowed,
     };
 
-    const { address } = grantedPermissionRequest;
-    if (!address) {
+    const { from, to } = grantedPermissionRequest;
+    if (!from) {
       throw new InvalidInputError('Address is undefined');
+    }
+    if (!to) {
+      throw new InvalidInputError('Delegate address is undefined');
     }
 
     const { contracts } = getChainMetadata({ chainId });
@@ -472,7 +474,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const nonce = await this.#nonceCaveatService.getNonce({
       chainId,
-      account: address,
+      account: from,
     });
 
     caveats.push({
@@ -488,9 +490,9 @@ export class PermissionRequestLifecycleOrchestrator {
     const salt = bytesToHex(saltBytes);
 
     const delegation = {
-      delegate: grantedPermissionRequest.signer.data.address,
+      delegate: to,
       authority: ROOT_AUTHORITY,
-      delegator: address,
+      delegator: from,
       caveats,
       salt: BigInt(salt),
     } as const;
@@ -504,7 +506,7 @@ export class PermissionRequestLifecycleOrchestrator {
       signedDelegation = await this.#accountController.signDelegation({
         chainId,
         delegation,
-        address,
+        address: from,
         origin,
         justification,
       });
@@ -524,18 +526,16 @@ export class PermissionRequestLifecycleOrchestrator {
 
     const context = encodeDelegations([signedDelegation], { out: 'hex' });
 
-    // dependencyInfo is always empty for EIP-7702 accounts
-    const dependencyInfo: DependencyInfo[] = [];
+    // dependencies is always empty for EIP-7702 accounts
+    const dependencies: Dependency[] = [];
 
     const response: PermissionResponse = {
       ...grantedPermissionRequest,
       chainId: numberToHex(chainId),
-      address,
-      dependencyInfo,
+      from,
+      dependencies,
       context,
-      signerMeta: {
-        delegationManager: contracts.delegationManager,
-      },
+      delegationManager: contracts.delegationManager,
     };
 
     // Track successful permission grant

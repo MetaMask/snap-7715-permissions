@@ -42,7 +42,6 @@ export type BaseContext = {
   expiry:
     | {
         timestamp: number;
-        isAdjustmentAllowed: boolean;
       }
     | undefined;
   isAdjustmentAllowed: boolean;
@@ -55,6 +54,11 @@ export type BaseContext = {
     iconDataBase64: string | null;
   };
 };
+
+/**
+ * Base interface for all context rule objects used in confirmation dialogs.
+ */
+export type BaseRuleContext = Omit<BaseContext, 'isAdjustmentAllowed'>;
 
 export type BaseMetadata = {
   validationErrors?: object;
@@ -102,10 +106,10 @@ export enum TimePeriod {
 
 /**
  * Properties required for confirmation dialogs.
- * @property dialogInterface - The dialog interface manager for showing content
- * @property ui - The UI element to be displayed in the confirmation dialog
- * @property userEventDispatcher - The dispatcher for handling user events during confirmation
- * @property onBeforeGrant - Validation callback that runs before grant is confirmed
+ * dialogInterface - The dialog interface manager for showing content
+ * ui - The UI element to be displayed in the confirmation dialog
+ * userEventDispatcher - The dispatcher for handling user events during confirmation
+ * onBeforeGrant - Validation callback that runs before grant is confirmed
  */
 export type ConfirmationProps = {
   dialogInterface: DialogInterface;
@@ -193,7 +197,6 @@ export type RuleData = {
   iconData?: IconData | undefined;
   error?: string | undefined;
   options?: string[] | undefined;
-  isAdjustmentAllowed: boolean;
   /** For datetime rules: whether to disable selection of past dates. Defaults to false. */
   allowPastDate?: boolean | undefined;
 };
@@ -204,7 +207,7 @@ export type RuleData = {
  * @template TMetadata - The type of metadata object used for request processing
  */
 export type RuleDefinition<
-  TContext extends BaseContext = BaseContext,
+  TContext extends BaseRuleContext = BaseRuleContext,
   TMetadata extends object = object,
 > = {
   name: string;

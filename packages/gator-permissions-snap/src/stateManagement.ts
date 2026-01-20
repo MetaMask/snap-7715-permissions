@@ -56,7 +56,7 @@ export function createStateManager(
    * Persists the given state.
    * @param newState - The new state to set.
    */
-  async function setState(newState: GatorPermissionsState) {
+  async function setState(newState: GatorPermissionsState): Promise<void> {
     try {
       await snapsProvider.request({
         method: 'snap_manageState',

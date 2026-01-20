@@ -8,7 +8,6 @@ import {
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
@@ -19,9 +18,9 @@ import type { PermissionIntroductionService } from '../../src/core/permissionInt
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
+import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
-const randomAddress = () => {
-  /* eslint-disable no-restricted-globals */
+const randomAddress = (): Hex => {
   const randomBytes = new Uint8Array(20);
   for (let i = 0; i < 20; i++) {
     randomBytes[i] = Math.floor(Math.random() * 256);
@@ -37,7 +36,7 @@ const fixedCaip10Address = `eip155:1:${grantingAccountAddress}`;
 const mockContext = {
   expiry: '2024-12-31',
   isAdjustmentAllowed: true,
-  address: grantingAccountAddress,
+  from: grantingAccountAddress,
   accountAddressCaip10: fixedCaip10Address,
 };
 
@@ -57,12 +56,7 @@ const requestingAccountAddress = randomAddress();
 const expiryTimestamp = Math.floor(Date.now() / 1000 + 3600);
 const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
-  signer: {
-    type: 'account',
-    data: {
-      address: requestingAccountAddress,
-    },
-  },
+  to: requestingAccountAddress,
   permission: {
     type: 'test-permission',
     data: {},
@@ -74,14 +68,13 @@ const mockPermissionRequest: PermissionRequest = {
       data: {
         timestamp: expiryTimestamp,
       },
-      isAdjustmentAllowed: true,
     },
   ],
 };
 
 const mockResolvedPermissionRequest = {
   ...mockPermissionRequest,
-  address: grantingAccountAddress,
+  from: grantingAccountAddress,
   permission: {
     ...mockPermissionRequest.permission,
     data: { resolved: true },
@@ -240,25 +233,18 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(result.approved).toBe(true);
         expect(result.approved && result.response).toStrictEqual({
           ...mockPermissionRequest,
-          dependencyInfo: [],
+          dependencies: [],
           permission: mockPopulatedPermission,
-          address: grantingAccountAddress,
+          from: grantingAccountAddress,
           context: expect.stringMatching(/^0x[0-9a-fA-F]+$/u),
           isAdjustmentAllowed: true,
-          signer: {
-            data: {
-              address: requestingAccountAddress,
-            },
-            type: 'account',
-          },
-          signerMeta: {
-            delegationManager,
-          },
+          to: requestingAccountAddress,
+          delegationManager,
         });
       });
 
       it('creates a skeleton confirmation before the context is resolved', async () => {
-        // this never resolves, because we are testing the behaviour _before_ the context is returned.
+        // this never resolves, because we are testing the behavior _before_ the context is returned.
         const contextPromise = new Promise<BaseContext>((_resolve) => {
           console.log('Arrow function cannot be empty');
         });
@@ -287,7 +273,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       it('creates the confirmation dialog with a disabled grant button', async () => {
-        // this never resolves, because we are testing the behaviour _before_ the context is returned.
+        // this never resolves, because we are testing the behavior _before_ the context is returned.
         const contextPromise = new Promise<BaseContext>((_resolve) => {
           console.log('Arrow function cannot be empty');
         });

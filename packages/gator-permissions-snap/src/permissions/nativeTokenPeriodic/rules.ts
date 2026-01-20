@@ -30,7 +30,6 @@ export const periodAmountRule: RuleDefinition<
   type: 'number',
   getRuleData: ({ context, metadata }) => ({
     value: context.permissionDetails.periodAmount,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: t('amountTooltip'),
     error: metadata.validationErrors.periodAmountError,
@@ -53,7 +52,6 @@ export const periodDurationRule: RuleDefinition<
   label: 'periodDurationLabel',
   type: 'dropdown',
   getRuleData: ({ context, metadata }) => ({
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     value: getClosestTimePeriod(context.permissionDetails.periodDuration),
     isVisible: true,
     tooltip: t('periodDurationTooltip'),
@@ -99,7 +97,6 @@ export const startTimeRule: RuleDefinition<
   type: 'datetime',
   getRuleData: ({ context, metadata }) => ({
     value: timestampToISO8601(context.permissionDetails.startTime),
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
     isVisible: true,
     tooltip: t('startTimeTooltip'),
     error: metadata.validationErrors.startTimeError,

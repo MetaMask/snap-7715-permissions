@@ -3,10 +3,8 @@ import type { Hex } from '@metamask/delegation-core';
 
 import type { AccountApiClient } from '../../src/clients/accountApiClient';
 import type { TokenMetadataClient } from '../../src/clients/types';
-import {
-  TokenMetadataService,
-  type GetTokenBalanceAndMetadataOptions,
-} from '../../src/services/tokenMetadataService';
+import { TokenMetadataService } from '../../src/services/tokenMetadataService';
+import type { GetTokenBalanceAndMetadataOptions } from '../../src/services/tokenMetadataService';
 import { parseUnits } from '../../src/utils/value';
 
 describe('TokenMetadataService', () => {

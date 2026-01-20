@@ -13,7 +13,7 @@ import { MOCK_PERMISSIONS_REQUEST_SINGLE } from '../constants';
 jest.mock('@metamask/7715-permissions-shared/utils', () => {
   const actual = jest.requireActual('@metamask/7715-permissions-shared/utils');
   return {
-    ...(actual || {}),
+    ...(actual ?? {}),
     logger: {
       warn: jest.fn(),
       debug: jest.fn(),
@@ -34,12 +34,7 @@ describe('validate utils', () => {
         parsePermissionRequestParam([
           {
             chainId: '0x1',
-            signer: {
-              type: 'account',
-              data: {
-                address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-              },
-            },
+            to: '0x016562aA41A8697720ce0943F003141f5dEAe006',
           },
         ]),
       ).toThrow('Failed type validation: 0.permission: Required');
@@ -61,12 +56,7 @@ describe('validate utils', () => {
       const validResponse = [
         {
           chainId: '0x1',
-          signer: {
-            type: 'account',
-            data: {
-              address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-            },
-          },
+          to: '0x016562aA41A8697720ce0943F003141f5dEAe006',
           permission: {
             type: 'eth_signTransaction',
             isAdjustmentAllowed: true,
@@ -77,22 +67,19 @@ describe('validate utils', () => {
           rules: [
             {
               type: 'expiry',
-              isAdjustmentAllowed: true,
               data: {
                 timestamp: 123456,
               },
             },
           ],
           context: '0x1234',
-          dependencyInfo: [
+          dependencies: [
             {
               factory: '0x016562aA41A8697720ce0943F003141f5dEAe006',
               factoryData: '0x',
             },
           ],
-          signerMeta: {
-            delegationManager: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-          },
+          delegationManager: '0x016562aA41A8697720ce0943F003141f5dEAe006',
         },
       ];
       expect(parsePermissionsResponseParam(validResponse)).toStrictEqual(
@@ -118,7 +105,7 @@ describe('validate utils', () => {
           },
         ]),
       ).toThrow(
-        'Failed type validation: 0.signer: Required, 0.permission: Required, 0.context: Required, 0.dependencyInfo: Required, 0.signerMeta: Required',
+        'Failed type validation: 0.to: Required, 0.permission: Required, 0.context: Required, 0.dependencies: Required, 0.delegationManager: Required',
       );
     });
 
@@ -303,7 +290,7 @@ describe('validate utils', () => {
         {
           jsonrpc: '2.0' as const,
           method: RpcMethod.WalletRequestExecutionPermissions,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+
           params: { my__proto__field: 'safe' },
         },
         {
@@ -319,13 +306,13 @@ describe('validate utils', () => {
         {
           jsonrpc: '2.0' as const,
           method: RpcMethod.WalletRequestExecutionPermissions,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+
           params: { __proto__test: 'safe' },
         },
         {
           jsonrpc: '2.0' as const,
           method: RpcMethod.WalletRequestExecutionPermissions,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+
           params: { test__proto__: 'safe' },
         },
       ];

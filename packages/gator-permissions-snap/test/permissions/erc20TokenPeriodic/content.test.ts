@@ -13,7 +13,6 @@ const tokenDecimals = 6;
 const mockContext: Erc20TokenPeriodicContext = {
   expiry: {
     timestamp: 1714521600, // 05/01/2024
-    isAdjustmentAllowed: true,
   },
   isAdjustmentAllowed: true,
   justification: 'Permission to do periodic ERC20 token transfers',
@@ -56,6 +55,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -113,47 +113,34 @@ describe('erc20TokenPeriodic:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            "alt": "USDC",
+                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
-                              },
-                              "type": "Image",
-                            },
                           },
-                          "type": "Box",
+                          "type": "Image",
                         },
                         {
                           "key": null,
                           "props": {
-                            "name": "erc20-token-periodic-period-amount",
-                            "type": "number",
-                            "value": "100",
+                            "children": "100",
                           },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                          "type": "Text",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -207,69 +194,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": "hourly",
-                              "props": {
-                                "children": "Hourly",
-                                "value": "hourly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "daily",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "biweekly",
-                              "props": {
-                                "children": "Biweekly",
-                                "value": "biweekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "monthly",
-                              "props": {
-                                "children": "Monthly",
-                                "value": "monthly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "yearly",
-                              "props": {
-                                "children": "Yearly",
-                                "value": "yearly",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "erc20-token-periodic-period-type",
-                          "value": "daily",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "Daily",
+                          },
+                          "type": "Text",
                         },
-                        "type": "Dropdown",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -283,6 +223,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -336,27 +277,29 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-start-date",
-                          "type": "datetime",
-                          "value": "1985-10-26T08:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "10/26/1985, 8:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -401,34 +344,7 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Expiry",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "erc20-token-periodic-expiry_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -437,21 +353,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-expiry",
-                          "type": "datetime",
-                          "value": "2024-05-01T00:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "5/1/2024, 12:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -498,6 +415,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -555,48 +473,34 @@ describe('erc20TokenPeriodic:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            "alt": "USDC",
+                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
-                              },
-                              "type": "Image",
-                            },
                           },
-                          "type": "Box",
+                          "type": "Image",
                         },
                         {
                           "key": null,
                           "props": {
-                            "name": "erc20-token-periodic-period-amount",
-                            "type": "number",
-                            "value": "invalid",
+                            "children": "invalid",
                           },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                          "type": "Text",
                         },
                       ],
-                      "error": "Invalid Period amount",
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -650,69 +554,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": "hourly",
-                              "props": {
-                                "children": "Hourly",
-                                "value": "hourly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "daily",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "biweekly",
-                              "props": {
-                                "children": "Biweekly",
-                                "value": "biweekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "monthly",
-                              "props": {
-                                "children": "Monthly",
-                                "value": "monthly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "yearly",
-                              "props": {
-                                "children": "Yearly",
-                                "value": "yearly",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "erc20-token-periodic-period-type",
-                          "value": "daily",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "Daily",
+                          },
+                          "type": "Text",
                         },
-                        "type": "Dropdown",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -726,6 +583,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -779,27 +637,29 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-start-date",
-                          "type": "datetime",
-                          "value": "1985-10-26T08:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "10/26/1985, 8:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -844,34 +704,7 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Expiry",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "erc20-token-periodic-expiry_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -880,21 +713,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-expiry",
-                          "type": "datetime",
-                          "value": "2024-05-01T00:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "5/1/2024, 12:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -935,6 +769,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -992,47 +827,34 @@ describe('erc20TokenPeriodic:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            "alt": "USDC",
+                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
-                              },
-                              "type": "Image",
-                            },
                           },
-                          "type": "Box",
+                          "type": "Image",
                         },
                         {
                           "key": null,
                           "props": {
-                            "name": "erc20-token-periodic-period-amount",
-                            "type": "number",
-                            "value": "100",
+                            "children": "100",
                           },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                          "type": "Text",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1086,69 +908,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": "hourly",
-                              "props": {
-                                "children": "Hourly",
-                                "value": "hourly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "daily",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "biweekly",
-                              "props": {
-                                "children": "Biweekly",
-                                "value": "biweekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "monthly",
-                              "props": {
-                                "children": "Monthly",
-                                "value": "monthly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "yearly",
-                              "props": {
-                                "children": "Yearly",
-                                "value": "yearly",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "erc20-token-periodic-period-type",
-                          "value": "weekly",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "Weekly",
+                          },
+                          "type": "Text",
                         },
-                        "type": "Dropdown",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -1162,6 +937,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1215,27 +991,29 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-start-date",
-                          "type": "datetime",
-                          "value": "1985-10-26T08:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "10/26/1985, 8:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1280,34 +1058,7 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Expiry",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "erc20-token-periodic-expiry_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -1316,21 +1067,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-expiry",
-                          "type": "datetime",
-                          "value": "2024-05-01T00:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "5/1/2024, 12:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -1371,6 +1123,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1425,41 +1178,28 @@ describe('erc20TokenPeriodic:content', () => {
                     "key": null,
                     "props": {
                       "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
-                            "children": null,
+                            "children": "100",
                           },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "name": "erc20-token-periodic-period-amount",
-                            "type": "number",
-                            "value": "100",
-                          },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                          "type": "Text",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1513,69 +1253,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": "hourly",
-                              "props": {
-                                "children": "Hourly",
-                                "value": "hourly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "daily",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "biweekly",
-                              "props": {
-                                "children": "Biweekly",
-                                "value": "biweekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "monthly",
-                              "props": {
-                                "children": "Monthly",
-                                "value": "monthly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "yearly",
-                              "props": {
-                                "children": "Yearly",
-                                "value": "yearly",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "erc20-token-periodic-period-type",
-                          "value": "daily",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "Daily",
+                          },
+                          "type": "Text",
                         },
-                        "type": "Dropdown",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -1589,6 +1282,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1642,27 +1336,29 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-start-date",
-                          "type": "datetime",
-                          "value": "1985-10-26T08:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "10/26/1985, 8:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1707,34 +1403,7 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Expiry",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "erc20-token-periodic-expiry_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -1743,21 +1412,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-expiry",
-                          "type": "datetime",
-                          "value": "2024-05-01T00:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "5/1/2024, 12:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -1790,6 +1460,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1847,47 +1518,34 @@ describe('erc20TokenPeriodic:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            "alt": "USDC",
+                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
-                              },
-                              "type": "Image",
-                            },
                           },
-                          "type": "Box",
+                          "type": "Image",
                         },
                         {
                           "key": null,
                           "props": {
-                            "name": "erc20-token-periodic-period-amount",
-                            "type": "number",
-                            "value": "100",
+                            "children": "100",
                           },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                          "type": "Text",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -1941,69 +1599,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": "hourly",
-                              "props": {
-                                "children": "Hourly",
-                                "value": "hourly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "daily",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "biweekly",
-                              "props": {
-                                "children": "Biweekly",
-                                "value": "biweekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "monthly",
-                              "props": {
-                                "children": "Monthly",
-                                "value": "monthly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "yearly",
-                              "props": {
-                                "children": "Yearly",
-                                "value": "yearly",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "erc20-token-periodic-period-type",
-                          "value": "daily",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "Daily",
+                          },
+                          "type": "Text",
                         },
-                        "type": "Dropdown",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -2017,6 +1628,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2070,27 +1682,29 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-start-date",
-                          "type": "datetime",
-                          "value": "1985-10-26T08:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "10/26/1985, 8:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2135,34 +1749,7 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Expiry",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "erc20-token-periodic-expiry_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -2171,21 +1758,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-expiry",
-                          "type": "datetime",
-                          "value": "2024-05-01T00:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "5/1/2024, 12:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -2227,6 +1815,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2284,48 +1873,34 @@ describe('erc20TokenPeriodic:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            "alt": "USDC",
+                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
-                              },
-                              "type": "Image",
-                            },
                           },
-                          "type": "Box",
+                          "type": "Image",
                         },
                         {
                           "key": null,
                           "props": {
-                            "name": "erc20-token-periodic-period-amount",
-                            "type": "number",
-                            "value": "100",
+                            "children": "100",
                           },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                          "type": "Text",
                         },
                       ],
-                      "error": "Invalid period amount",
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2379,70 +1954,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": "hourly",
-                              "props": {
-                                "children": "Hourly",
-                                "value": "hourly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "daily",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "biweekly",
-                              "props": {
-                                "children": "Biweekly",
-                                "value": "biweekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "monthly",
-                              "props": {
-                                "children": "Monthly",
-                                "value": "monthly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "yearly",
-                              "props": {
-                                "children": "Yearly",
-                                "value": "yearly",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "erc20-token-periodic-period-type",
-                          "value": "daily",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "Daily",
+                          },
+                          "type": "Text",
                         },
-                        "type": "Dropdown",
-                      },
-                      "error": "Invalid period duration",
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -2456,6 +1983,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2509,28 +2037,29 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-start-date",
-                          "type": "datetime",
-                          "value": "1985-10-26T08:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "10/26/1985, 8:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
-                      "error": "Invalid start time",
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2575,34 +2104,7 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Expiry",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "erc20-token-periodic-expiry_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -2611,22 +2113,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-expiry",
-                          "type": "datetime",
-                          "value": "2024-05-01T00:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "5/1/2024, 12:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
-                      "error": "Invalid expiry",
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -2659,6 +2161,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2716,47 +2219,34 @@ describe('erc20TokenPeriodic:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            "alt": "USDC",
+                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
-                              },
-                              "type": "Image",
-                            },
                           },
-                          "type": "Box",
+                          "type": "Image",
                         },
                         {
                           "key": null,
                           "props": {
-                            "name": "erc20-token-periodic-period-amount",
-                            "type": "number",
-                            "value": "100",
+                            "children": "100",
                           },
-                          "type": "Input",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": null,
-                          },
-                          "type": "Box",
+                          "type": "Text",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2810,69 +2300,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": "hourly",
-                              "props": {
-                                "children": "Hourly",
-                                "value": "hourly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "daily",
-                              "props": {
-                                "children": "Daily",
-                                "value": "daily",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "weekly",
-                              "props": {
-                                "children": "Weekly",
-                                "value": "weekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "biweekly",
-                              "props": {
-                                "children": "Biweekly",
-                                "value": "biweekly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "monthly",
-                              "props": {
-                                "children": "Monthly",
-                                "value": "monthly",
-                              },
-                              "type": "Option",
-                            },
-                            {
-                              "key": "yearly",
-                              "props": {
-                                "children": "Yearly",
-                                "value": "yearly",
-                              },
-                              "type": "Option",
-                            },
-                          ],
-                          "name": "erc20-token-periodic-period-type",
-                          "value": "daily",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "Daily",
+                          },
+                          "type": "Text",
                         },
-                        "type": "Dropdown",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
@@ -2886,6 +2329,7 @@ describe('erc20TokenPeriodic:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -2939,27 +2383,29 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-start-date",
-                          "type": "datetime",
-                          "value": "1985-10-26T08:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "10/26/1985, 8:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },
             {
               "key": null,
               "props": {
+                "alignment": "space-between",
                 "children": [
                   {
                     "key": null,
@@ -3004,34 +2450,7 @@ describe('erc20TokenPeriodic:content', () => {
                           },
                           "type": "Box",
                         },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Remove Expiry",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
-
-  <!-- Toggle circle (on right) -->
-  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
-</svg>
-",
-                                  },
-                                  "type": "Image",
-                                },
-                                "name": "erc20-token-periodic-expiry_removeFieldButton",
-                              },
-                              "type": "Button",
-                            },
-                          },
-                          "type": "Box",
-                        },
+                        null,
                       ],
                       "direction": "horizontal",
                     },
@@ -3040,21 +2459,22 @@ describe('erc20TokenPeriodic:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "disablePast": true,
-                          "name": "erc20-token-periodic-expiry",
-                          "type": "datetime",
-                          "value": "2024-05-01T00:00:00.000Z",
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": "5/1/2024, 12:00:00 AM",
+                          },
+                          "type": "Text",
                         },
-                        "type": "DateTimePicker",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
-                "direction": "vertical",
+                "direction": "horizontal",
               },
               "type": "Box",
             },

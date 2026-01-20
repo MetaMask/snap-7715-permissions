@@ -164,15 +164,17 @@ export class PermissionHandler<
     TPermission,
     TPopulatedPermission
   > {
-    const buildContextHandler = async (request: TRequest) => {
-      const requestedAddressLowercase = request.address?.toLowerCase() as
+    const buildContextHandler = async (
+      request: TRequest,
+    ): Promise<TContext> => {
+      const requestedAddressLowercase = request.from?.toLowerCase() as
         | Hex
         | undefined;
 
       const allAvailableAddresses =
         await this.#accountController.getAccountAddresses();
 
-      let address: Hex;
+      let from: Hex;
 
       if (requestedAddressLowercase) {
         // validate that the requested address is one of the addresses available for the account
@@ -184,24 +186,25 @@ export class PermissionHandler<
         ) {
           throw new ResourceNotFoundError('Requested address not found');
         }
-        address = request.address as Hex;
+        from = request.from as Hex;
       } else {
         // use the first address available for the account
-        address = allAvailableAddresses[0];
+        from = allAvailableAddresses[0];
       }
 
       return await this.#dependencies.buildContext({
-        permissionRequest: { ...request, address },
+        permissionRequest: { ...request, from },
         tokenMetadataService: this.#tokenMetadataService,
       });
     };
 
-    const createSkeletonConfirmationContentHandler = async () => {
-      return SkeletonPermissionHandlerContent({
-        permissionTitle: this.#permissionTitle,
-        permissionSubtitle: this.#permissionSubtitle,
-      });
-    };
+    const createSkeletonConfirmationContentHandler =
+      async (): Promise<JSX.Element> => {
+        return SkeletonPermissionHandlerContent({
+          permissionTitle: this.#permissionTitle,
+          permissionSubtitle: this.#permissionSubtitle,
+        });
+      };
 
     const createConfirmationContentHandler = async ({
       context,
@@ -213,7 +216,7 @@ export class PermissionHandler<
       metadata: TMetadata;
       origin: string;
       chainId: number;
-    }) => {
+    }): Promise<JSX.Element> => {
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
       const tokenIconData = getIconData(context);
@@ -223,6 +226,11 @@ export class PermissionHandler<
         tokenMetadata: { symbol: tokenSymbol },
       } = context;
 
+      const delegateAddress = this.#permissionRequest.to;
+      if (!delegateAddress) {
+        throw new InvalidRequestError('Delegate address is undefined');
+      }
+
       const permissionContent =
         await this.#dependencies.createConfirmationContent({
           context,
@@ -231,7 +239,7 @@ export class PermissionHandler<
 
       return PermissionHandlerContent({
         origin,
-        delegateAddress: this.#permissionRequest.signer.data.address,
+        delegateAddress,
         justification,
         networkName,
         tokenSymbol,
@@ -259,9 +267,9 @@ export class PermissionHandler<
       initialContext: TContext;
       updateContext: (args: { updatedContext: TContext }) => Promise<void>;
       isAdjustmentAllowed: boolean;
-    }) => {
+    }): void => {
       let currentContext = initialContext;
-      const rerender = async () => {
+      const rerender = async (): Promise<void> => {
         await updateContext({ updatedContext: currentContext });
       };
 
@@ -413,18 +421,18 @@ export class PermissionHandler<
               await rerender();
             },
           })
-        : () => {
+        : (): void => {
             // No-op function when adjustment is not allowed
           };
 
-      this.#unbindHandlers = () => {
+      this.#unbindHandlers = (): void => {
         unbindRuleHandlers();
         unbindShowMoreButtonClick();
         unbindAccountSelected();
       };
     };
 
-    const onConfirmationResolvedHandler = () => {
+    const onConfirmationResolvedHandler = (): void => {
       this.#unbindHandlers?.();
     };
 

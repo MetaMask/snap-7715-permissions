@@ -135,7 +135,7 @@ export class TokenMetadataService {
       const imageDataBase64 = `data:image/png;base64,${buffer.toString('base64')}`;
 
       return { success: true, imageDataBase64 };
-    } catch (error) {
+    } catch {
       logger.error('Error fetching icon data');
       return { success: false };
     }

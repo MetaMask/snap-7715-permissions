@@ -7,11 +7,11 @@
 import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 
-import {
-  TimePeriod,
-  type BaseContext,
-  type RuleDefinition,
-  type TypedPermissionRequest,
+import { TimePeriod } from '../core/types';
+import type {
+  BaseRuleContext,
+  RuleDefinition,
+  TypedPermissionRequest,
 } from '../core/types';
 import type { TranslateFunction } from '../utils/i18n';
 import {
@@ -20,7 +20,7 @@ import {
   timestampToISO8601,
 } from '../utils/time';
 
-export type ExpiryRuleContext = BaseContext;
+export type ExpiryRuleContext = BaseRuleContext;
 
 export type ExpiryRuleMetadata = {
   validationErrors: {
@@ -53,16 +53,13 @@ export const createExpiryRule = <
       value: context.expiry
         ? timestampToISO8601(context.expiry.timestamp)
         : undefined,
-      isAdjustmentAllowed: context.expiry?.isAdjustmentAllowed ?? true,
       isVisible: true,
       tooltip: translate('expiryTooltip'),
       error: metadata.validationErrors.expiryError,
       allowPastDate: false,
     }),
-    updateContext: (context: TContext, value: string | undefined) => {
-      let expiry:
-        | { timestamp: number; isAdjustmentAllowed: boolean }
-        | undefined;
+    updateContext: (context: TContext, value: string | undefined): TContext => {
+      let expiry: { timestamp: number } | undefined;
 
       // We want to set the expiry if value is a date, _or_ if it's an empty
       // string. Empty string coalesces to false, so we do a type check.
@@ -77,8 +74,6 @@ export const createExpiryRule = <
 
         expiry = {
           timestamp,
-          // if the expiry is being modified, then adjustment is allowed
-          isAdjustmentAllowed: true,
         };
       }
 
@@ -91,12 +86,12 @@ export const createExpiryRule = <
 };
 
 export const applyExpiryRule = <
-  TContext extends BaseContext,
+  TContext extends BaseRuleContext,
   TPermissionRequest extends TypedPermissionRequest<Permission>,
 >(
   context: TContext,
   originalRequest: TPermissionRequest,
-) => {
+): TPermissionRequest => {
   const expiryTimestamp = context.expiry?.timestamp;
 
   let rules: (typeof originalRequest)['rules'] = originalRequest.rules || [];
@@ -112,7 +107,6 @@ export const applyExpiryRule = <
         {
           type: 'expiry',
           data: { timestamp: expiryTimestamp },
-          isAdjustmentAllowed: true,
         },
       ];
     } else {

@@ -7,7 +7,8 @@ import type {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { PermissionOfferRegistryManager } from '../../src/registryManager';
-import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
+import { createRpcHandler } from '../../src/rpc/rpcHandler';
+import type { RpcHandler } from '../../src/rpc/rpcHandler';
 import { ExternalMethod } from '../../src/rpc/rpcMethod';
 
 describe('RpcHandler', () => {
@@ -32,12 +33,7 @@ describe('RpcHandler', () => {
     const mockPermissions: PermissionsRequest = [
       {
         chainId: '0x1',
-        signer: {
-          type: 'account',
-          data: {
-            address: '0x1234567890123456789012345678901234567890',
-          },
-        },
+        to: '0x1234567890123456789012345678901234567890',
         permission: {
           type: 'native-token-transfer',
           isAdjustmentAllowed: true,
@@ -49,7 +45,6 @@ describe('RpcHandler', () => {
         rules: [
           {
             type: 'expiry',
-            isAdjustmentAllowed: true,
             data: {
               timestamp: 123456,
             },
@@ -62,7 +57,7 @@ describe('RpcHandler', () => {
      * Helper function to set up successful permission flow mocks.
      * This reduces test duplication by centralizing common mock setup.
      */
-    const setupSuccessfulPermissionFlow = () => {
+    const setupSuccessfulPermissionFlow = (): void => {
       mockPermissionOfferRegistryManager.buildPermissionOffersRegistry.mockResolvedValue(
         {
           'test-provider': [],
@@ -83,12 +78,7 @@ describe('RpcHandler', () => {
       const mockPartialPermissions: PermissionsRequest = [
         {
           chainId: '0x1',
-          signer: {
-            type: 'account',
-            data: {
-              address: '0x1234567890123456789012345678901234567890',
-            },
-          },
+          to: '0x1234567890123456789012345678901234567890',
           permission: {
             type: 'native-token-transfer',
             isAdjustmentAllowed: true,
@@ -100,7 +90,6 @@ describe('RpcHandler', () => {
           rules: [
             {
               type: 'expiry',
-              isAdjustmentAllowed: true,
               data: {
                 timestamp: 123456,
               },
@@ -145,12 +134,7 @@ describe('RpcHandler', () => {
       const mockGrantedPermissions: PermissionsResponse = [
         {
           chainId: '0x1',
-          signer: {
-            type: 'account',
-            data: {
-              address: '0x1234567890123456789012345678901234567890',
-            },
-          },
+          to: '0x1234567890123456789012345678901234567890',
           permission: {
             type: 'native-token-transfer',
             isAdjustmentAllowed: true,
@@ -162,23 +146,20 @@ describe('RpcHandler', () => {
           rules: [
             {
               type: 'expiry',
-              isAdjustmentAllowed: true,
               data: {
                 timestamp: 123456,
               },
             },
           ],
-          address: '0x1234567890123456789012345678901234567890',
+          from: '0x1234567890123456789012345678901234567890',
           context: '0x1',
-          dependencyInfo: [
+          dependencies: [
             {
               factory: '0x1234567890123456789012345678901234567890',
               factoryData: '0x',
             },
           ],
-          signerMeta: {
-            delegationManager: '0x1234567890123456789012345678901234567890',
-          },
+          delegationManager: '0x1234567890123456789012345678901234567890',
         },
       ];
       setupSuccessfulPermissionFlow();

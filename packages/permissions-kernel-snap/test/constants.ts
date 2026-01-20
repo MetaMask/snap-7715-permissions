@@ -3,12 +3,7 @@ import type { PermissionsRequest } from '@metamask/7715-permissions-shared/types
 export const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
   {
     chainId: '0x1',
-    signer: {
-      type: 'account',
-      data: {
-        address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-      },
-    },
+    to: '0x016562aA41A8697720ce0943F003141f5dEAe006',
     permission: {
       type: 'native-token-transfer',
       isAdjustmentAllowed: true,
@@ -20,7 +15,6 @@ export const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
     rules: [
       {
         type: 'expiry',
-        isAdjustmentAllowed: true,
         data: {
           timestamp: 123456,
         },
@@ -32,12 +26,7 @@ export const MOCK_PERMISSIONS_REQUEST_SINGLE: PermissionsRequest = [
 export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
   {
     chainId: '0x1',
-    signer: {
-      type: 'account',
-      data: {
-        address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-      },
-    },
+    to: '0x016562aA41A8697720ce0943F003141f5dEAe006',
     permission: {
       type: 'native-token-transfer',
       isAdjustmentAllowed: true,
@@ -49,7 +38,6 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
     rules: [
       {
         type: 'expiry',
-        isAdjustmentAllowed: true,
         data: {
           timestamp: 123456,
         },
@@ -58,12 +46,7 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
   },
   {
     chainId: '0x1',
-    signer: {
-      type: 'account',
-      data: {
-        address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-      },
-    },
+    to: '0x016562aA41A8697720ce0943F003141f5dEAe006',
     permission: {
       type: 'erc20-token-transfer',
       isAdjustmentAllowed: true,
@@ -76,7 +59,6 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
     rules: [
       {
         type: 'expiry',
-        isAdjustmentAllowed: true,
         data: {
           timestamp: 123456,
         },
@@ -88,12 +70,7 @@ export const MOCK_PERMISSIONS_REQUEST_MULTIPLE: PermissionsRequest = [
 export const MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED: PermissionsRequest = [
   {
     chainId: '0x1',
-    signer: {
-      type: 'account',
-      data: {
-        address: '0x016562aA41A8697720ce0943F003141f5dEAe006',
-      },
-    },
+    to: '0x016562aA41A8697720ce0943F003141f5dEAe006',
     permission: {
       type: 'non-supported-permission-type',
       isAdjustmentAllowed: true,
@@ -105,7 +82,6 @@ export const MOCK_PERMISSIONS_REQUEST_NON_SUPPORTED: PermissionsRequest = [
     rules: [
       {
         type: 'expiry',
-        isAdjustmentAllowed: true,
         data: {
           timestamp: 123456,
         },

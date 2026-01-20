@@ -1,7 +1,8 @@
 import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
-import { parseCaipAccountId, toCaipAccountId, type Hex } from '@metamask/utils';
+import { parseCaipAccountId, toCaipAccountId } from '@metamask/utils';
+import type { Hex } from '@metamask/utils';
 
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { validateExpiry } from '../contextValidation';
@@ -49,7 +50,7 @@ export async function applyContext({
 
   return {
     ...originalRequest,
-    address: address as Hex,
+    from: address as Hex,
     permission: {
       type: 'erc20-token-revocation',
       data: {
@@ -94,11 +95,11 @@ export async function buildContext({
   const chainId = Number(permissionRequest.chainId);
 
   const {
-    address,
+    from,
     permission: { data, isAdjustmentAllowed },
   } = permissionRequest;
 
-  if (!address) {
+  if (!from) {
     throw new InvalidInputError(
       'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
     );
@@ -111,14 +112,13 @@ export async function buildContext({
   const expiry = expiryRule
     ? {
         timestamp: expiryRule.data.timestamp,
-        isAdjustmentAllowed: expiryRule.isAdjustmentAllowed ?? true,
       }
     : undefined;
 
   const accountAddressCaip10 = toCaipAccountId(
     CHAIN_NAMESPACE,
     chainId.toString(),
-    address,
+    from,
   );
 
   return {

@@ -1,7 +1,5 @@
-import {
-  erc7715ProviderActions,
-  type RequestExecutionPermissionsParameters,
-} from '@metamask/smart-accounts-kit/actions';
+import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
+import type { RequestExecutionPermissionsParameters } from '@metamask/smart-accounts-kit/actions';
 import { useCallback, useMemo, useState } from 'react';
 import {
   createClient,
@@ -10,7 +8,7 @@ import {
   createPublicClient,
   extractChain,
 } from 'viem';
-import { type Chain, type Hex } from 'viem';
+import type { Chain, Hex } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
 import * as chains from 'viem/chains';
 
@@ -58,12 +56,11 @@ import {
 } from '../styles';
 import { isLocalSnap } from '../utils';
 
-/* eslint-disable no-restricted-globals */
-const BUNDLER_RPC_URL = process.env.GATSBY_BUNDLER_RPC_URL;
+const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
 
-const ALL_CHAINS = Object.values(chains);
+const ALL_CHAINS = [...Object.values(chains)];
 
-const supportedChainsString = process.env.GATSBY_SUPPORTED_CHAINS;
+const supportedChainsString = import.meta.env.VITE_SUPPORTED_CHAINS;
 
 const DEFAULT_CHAINS = [chains.sepolia];
 
@@ -253,12 +250,7 @@ const Index = () => {
     const permissionsRequests: RequestExecutionPermissionsParameters = [
       {
         chainId,
-        signer: {
-          type: 'account',
-          data: {
-            address: delegateAccount.address,
-          },
-        },
+        to: delegateAccount.address,
         expiry,
         isAdjustmentAllowed,
         permission: {
@@ -266,7 +258,7 @@ const Index = () => {
           // permission types that are _not_ native token stream are using Hex for token amount types
           data: permissionData as any,
         },
-      } as const,
+      },
     ];
 
     // Generate a unique identifier for this permission request
@@ -313,10 +305,7 @@ const Index = () => {
   const handleGetSupportedPermissions = async () => {
     setPermissionResponseError(null);
     try {
-      const response = await provider?.request({
-        method: 'wallet_getSupportedExecutionPermissions',
-        params: [],
-      });
+      const response = await metaMaskClient?.getSupportedExecutionPermissions();
       setSupportedPermissionsResponse(response);
     } catch (error) {
       setPermissionResponseError(error as Error);
@@ -326,10 +315,7 @@ const Index = () => {
   const handleGetGrantedPermissions = async () => {
     setPermissionResponseError(null);
     try {
-      const response = await provider?.request({
-        method: 'wallet_getGrantedExecutionPermissions',
-        params: [],
-      });
+      const response = await metaMaskClient?.getGrantedExecutionPermissions();
       setGrantedPermissionsResponse(response);
     } catch (error) {
       setPermissionResponseError(error as Error);
@@ -594,9 +580,7 @@ const Index = () => {
                 >
                   {grantedIsCopied ? '✅' : '📝'}
                 </CopyButton>
-                <pre>
-                  {JSON.stringify(grantedPermissionsResponse, null, 2)}
-                </pre>
+                <pre>{JSON.stringify(grantedPermissionsResponse, null, 2)}</pre>
               </ResponseContainer>
             )}
           </Box>
