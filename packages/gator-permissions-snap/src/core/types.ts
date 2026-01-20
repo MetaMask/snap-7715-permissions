@@ -193,7 +193,7 @@ export type RuleData = {
   error?: string | undefined;
   options?: string[] | undefined;
   isAdjustmentAllowed: boolean;
-  /** For rules types that are defined in the 7715 specification, this will be true. And, are not allowed to be adjusted. */
+  /** For rules types that are defined in the 7715 specification, this will be true. And, are always allowed to be adjusted. */
   is7715RuleType?: boolean;
   /** For datetime rules: whether to disable selection of past dates. Defaults to false. */
   allowPastDate?: boolean | undefined;
