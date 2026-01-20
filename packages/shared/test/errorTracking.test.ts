@@ -2,8 +2,8 @@ import {
   SnapErrorTracker,
   createErrorTracker,
   getErrorTracker,
-  type ErrorTrackingConfig,
 } from '../src/utils/errorTracking';
+import type { ErrorTrackingConfig } from '../src/utils/errorTracking';
 
 // Mock the global snap object
 const mockSnapRequest = jest.fn();
