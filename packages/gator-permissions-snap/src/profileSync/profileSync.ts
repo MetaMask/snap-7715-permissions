@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import {
   zHexStr,
@@ -42,7 +40,7 @@ const zStoredGrantedPermission = z.object({
   revocationMetadata: z
     .object({
       txHash: zHexStr.optional(),
-      recordedAt: zTimestamp
+      recordedAt: zTimestamp,
     })
     .optional(),
 });
@@ -65,8 +63,8 @@ function safeDeserializeStoredGrantedPermission(
     if (parsed.isRevoked && validated.revocationMetadata === undefined) {
       validated.revocationMetadata = {
         recordedAt: 0,
-      }
-    };
+      };
+    }
 
     return validated;
   } catch (error) {
@@ -193,9 +191,7 @@ export function createProfileSyncManager(
       _permissionContext: Hex,
       _revocationMetadata: RevocationMetadata,
     ): Promise<void> => {
-      logger.debug(
-        'unConfiguredProfileSyncManager.markPermissionRevoked()',
-      );
+      logger.debug('unConfiguredProfileSyncManager.markPermissionRevoked()');
     },
   };
 
@@ -413,17 +409,14 @@ export function createProfileSyncManager(
 
       const updatedPermission: StoredGrantedPermission = {
         ...existingPermission,
-        revocationMetadata
+        revocationMetadata,
       };
 
       await storeGrantedPermission(updatedPermission);
 
       logger.debug('Profile Sync: Successfully stored updated permission');
     } catch (error) {
-      logger.error(
-        'Error marking permission as revoked',
-        error,
-      );
+      logger.error('Error marking permission as revoked', error);
       throw error;
     }
   }

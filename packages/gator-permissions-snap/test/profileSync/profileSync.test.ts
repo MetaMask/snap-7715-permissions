@@ -142,8 +142,8 @@ describe('profileSync', () => {
       });
 
       it('parses stored permission with isRevoked set (legacy storage - instead of revocationMetadata)', async () => {
-        userStorageMock.getAllFeatureItems.mockResolvedValueOnce(
-          [JSON.stringify({
+        userStorageMock.getAllFeatureItems.mockResolvedValueOnce([
+          JSON.stringify({
             ...mockStoredGrantedPermission,
             isRevoked: true,
           }),
@@ -151,17 +151,19 @@ describe('profileSync', () => {
         mockPassAuth();
 
         const permissions = await profileSyncManager.getAllGrantedPermissions();
-        expect(permissions).toStrictEqual([{
-          ...mockStoredGrantedPermission,
-          revocationMetadata: {
-            recordedAt: 0,
+        expect(permissions).toStrictEqual([
+          {
+            ...mockStoredGrantedPermission,
+            revocationMetadata: {
+              recordedAt: 0,
+            },
           },
-        }]);
+        ]);
       });
 
       it('parses stored permission with isRevoked set to false (legacy storage - instead of revocationMetadata)', async () => {
-        userStorageMock.getAllFeatureItems.mockResolvedValueOnce(
-          [JSON.stringify({
+        userStorageMock.getAllFeatureItems.mockResolvedValueOnce([
+          JSON.stringify({
             ...mockStoredGrantedPermission,
             isRevoked: false,
           }),
@@ -169,31 +171,31 @@ describe('profileSync', () => {
         mockPassAuth();
 
         const permissions = await profileSyncManager.getAllGrantedPermissions();
-        expect(permissions).toStrictEqual([
-            mockStoredGrantedPermission,
-        ]);
+        expect(permissions).toStrictEqual([mockStoredGrantedPermission]);
       });
 
       it('parses stored permission with isRevoked set, without overwriting revocationMetadata', async () => {
-        userStorageMock.getAllFeatureItems.mockResolvedValueOnce(
-          [JSON.stringify({
+        userStorageMock.getAllFeatureItems.mockResolvedValueOnce([
+          JSON.stringify({
             ...mockStoredGrantedPermission,
             isRevoked: true,
             revocationMetadata: {
               recordedAt: 123456,
-            }
+            },
           }),
         ]);
 
         mockPassAuth();
 
         const permissions = await profileSyncManager.getAllGrantedPermissions();
-        expect(permissions).toStrictEqual([{
-          ...mockStoredGrantedPermission,
-          revocationMetadata: {
-            recordedAt: 123456,
+        expect(permissions).toStrictEqual([
+          {
+            ...mockStoredGrantedPermission,
+            revocationMetadata: {
+              recordedAt: 123456,
+            },
           },
-        }]);
+        ]);
       });
 
       it('should return empty array when storage throws error', async () => {
@@ -415,11 +417,10 @@ describe('profileSync', () => {
 
     describe('setPermissionRevoked()', () => {
       const mockTxHash =
-          '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+        '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
       const mockRecordedAt = 123456;
 
       it('sets permission as revoked successfully', async () => {
-        
         userStorageMock.getItem.mockResolvedValueOnce(
           JSON.stringify(mockStoredGrantedPermission),
         );
@@ -429,7 +430,7 @@ describe('profileSync', () => {
           mockStoredGrantedPermission.permissionResponse.context,
           {
             txHash: mockTxHash,
-            recordedAt: mockRecordedAt
+            recordedAt: mockRecordedAt,
           },
         );
 
@@ -437,12 +438,11 @@ describe('profileSync', () => {
           `gator_7715_permissions.${mockDelegationHash}`,
         );
 
-
         const expectedRevocationMetadata = `"revocationMetadata":{"txHash":"${mockTxHash}","recordedAt":${mockRecordedAt}}`;
 
         expect(userStorageMock.setItem).toHaveBeenCalledWith(
           `gator_7715_permissions.${mockDelegationHash}`,
-          expect.stringContaining(expectedRevocationMetadata)
+          expect.stringContaining(expectedRevocationMetadata),
         );
 
         const storedData = userStorageMock.setItem.mock.calls[0]?.[1];
@@ -467,13 +467,10 @@ describe('profileSync', () => {
         mockPassAuth();
 
         await expect(
-          profileSyncManager.markPermissionRevoked(
-            nonExistentDelegationHash,
-            {
-              txHash: '0xMocked-tx-hash',
-              recordedAt: 123456
-            },
-          ),
+          profileSyncManager.markPermissionRevoked(nonExistentDelegationHash, {
+            txHash: '0xMocked-tx-hash',
+            recordedAt: 123456,
+          }),
         ).rejects.toThrow(
           `Permission not found for permission context: ${nonExistentDelegationHash}`,
         );
@@ -491,7 +488,10 @@ describe('profileSync', () => {
         userStorageMock.getItem.mockResolvedValueOnce(
           JSON.stringify({
             ...mockStoredGrantedPermission,
-            revocationMetadata: { txHash: mockTxHash, recordedAt: mockRecordedAt },
+            revocationMetadata: {
+              txHash: mockTxHash,
+              recordedAt: mockRecordedAt,
+            },
           }),
         );
         mockPassAuth();
@@ -514,7 +514,7 @@ describe('profileSync', () => {
             mockStoredGrantedPermission.permissionResponse.context,
             {
               txHash: '0xMocked-tx-hash',
-              recordedAt: 123456
+              recordedAt: 123456,
             },
           ),
         ).rejects.toThrow('Auth failed');

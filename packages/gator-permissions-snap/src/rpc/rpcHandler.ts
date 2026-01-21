@@ -172,7 +172,8 @@ export function createRpcHandler({
       filteredPermissions = filteredPermissions.filter(
         // if isRevoked is true, include only permissions that have a revocation metadata
         // if isRevoked is false, include only permissions that do not have a revocation metadata
-        (permission) => (permission.revocationMetadata === undefined) !== isRevoked,
+        (permission) =>
+          (permission.revocationMetadata === undefined) !== isRevoked,
       );
     }
 
@@ -207,8 +208,7 @@ export function createRpcHandler({
   const submitRevocation = async (params: Json): Promise<Json> => {
     logger.debug('submitRevocation() called with params:', params);
 
-    const { permissionContext, txHash } =
-      validateRevocationParams(params);
+    const { permissionContext, txHash } = validateRevocationParams(params);
 
     // First, get the existing permission to validate it exists
     logger.debug(

@@ -3,11 +3,8 @@ import type {
   PermissionRequest,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import {
-  decodeDelegations,
-  hashDelegation,
-  type Hex,
-} from '@metamask/delegation-core';
+import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
+import type { Hex } from '@metamask/delegation-core';
 import {
   ChainDisconnectedError,
   InvalidInputError,
@@ -18,7 +15,10 @@ import type { Json } from '@metamask/snaps-sdk';
 import type { BlockchainClient } from '../../src/clients/blockchainClient';
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
-import type { ProfileSyncManager, StoredGrantedPermission } from '../../src/profileSync';
+import type {
+  ProfileSyncManager,
+  StoredGrantedPermission,
+} from '../../src/profileSync';
 import { createRpcHandler } from '../../src/rpc/rpcHandler';
 import type { RpcHandler } from '../../src/rpc/rpcHandler';
 
@@ -618,7 +618,6 @@ describe('RpcHandler', () => {
             delegationManager: TEST_ADDRESS,
           },
           siteOrigin: TEST_SITE_ORIGIN,
-          
         },
         {
           permissionResponse: {
@@ -733,7 +732,7 @@ describe('RpcHandler', () => {
           siteOrigin: 'https://another-example.com',
           revocationMetadata: {
             txHash: TEST_VALID_TX_HASH,
-            recordedAt: 123456
+            recordedAt: 123456,
           },
         },
         {
@@ -775,7 +774,9 @@ describe('RpcHandler', () => {
           mockProfileSyncManager.getAllGrantedPermissions,
         ).toHaveBeenCalledTimes(1);
         expect(result).toHaveLength(1);
-        expect((result as [StoredGrantedPermission])[0].revocationMetadata).toBeDefined();
+        expect(
+          (result as [StoredGrantedPermission])[0].revocationMetadata,
+        ).toBeDefined();
       });
 
       it('should filter by isRevoked=false', async () => {
@@ -852,9 +853,9 @@ describe('RpcHandler', () => {
         expect(
           mockProfileSyncManager.getAllGrantedPermissions,
         ).toHaveBeenCalledTimes(1);
-        
+
         expect(result).toHaveLength(1);
-        
+
         const permission = (result as [StoredGrantedPermission])[0];
         expect(permission.revocationMetadata).toBeUndefined();
         expect(permission.siteOrigin).toBe(TEST_SITE_ORIGIN);
@@ -1031,9 +1032,10 @@ describe('RpcHandler', () => {
       expect(
         mockBlockchainClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
-      expect(
-        mockProfileSyncManager.markPermissionRevoked,
-      ).toHaveBeenCalledWith(TEST_CONTEXT, { txHash: TEST_VALID_TX_HASH, recordedAt: expect.any(Number) });
+      expect(mockProfileSyncManager.markPermissionRevoked).toHaveBeenCalledWith(
+        TEST_CONTEXT,
+        { txHash: TEST_VALID_TX_HASH, recordedAt: expect.any(Number) },
+      );
     });
 
     it('throws an error when transaction hash was unsuccessful', async () => {
@@ -1087,11 +1089,14 @@ describe('RpcHandler', () => {
       );
     });
 
-    it.each([null, undefined, 'invalid'])('throws InvalidInputError when params is %s', async (params) => {
-      await expect(handler.submitRevocation(params as any)).rejects.toThrow(
-        'Parameters are required',
-      );
-    });
+    it.each([null, undefined, 'invalid'])(
+      'throws InvalidInputError when params is %s',
+      async (params) => {
+        await expect(handler.submitRevocation(params as any)).rejects.toThrow(
+          'Parameters are required',
+        );
+      },
+    );
 
     it('throws InvalidInputError when permissionContext is missing', async () => {
       const invalidParams = {};
@@ -1142,9 +1147,10 @@ describe('RpcHandler', () => {
         handler.submitRevocation(validRevocationParams),
       ).rejects.toThrow('Update failed');
 
-      expect(
-        mockProfileSyncManager.markPermissionRevoked,
-      ).toHaveBeenCalledWith(TEST_CONTEXT, { txHash: TEST_VALID_TX_HASH, recordedAt: expect.any(Number) });
+      expect(mockProfileSyncManager.markPermissionRevoked).toHaveBeenCalledWith(
+        TEST_CONTEXT,
+        { txHash: TEST_VALID_TX_HASH, recordedAt: expect.any(Number) },
+      );
     });
 
     it('handles hex values with uppercase letters', async () => {
