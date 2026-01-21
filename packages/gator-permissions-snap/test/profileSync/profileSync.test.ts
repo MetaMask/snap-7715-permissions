@@ -155,7 +155,8 @@ describe('profileSync', () => {
           {
             ...mockStoredGrantedPermission,
             revocationMetadata: {
-              recordedAt: 0,
+              // this will be set to the current timestamp when the permission is retrieved
+              recordedAt: expect.any(Number),
             },
           },
         ]);

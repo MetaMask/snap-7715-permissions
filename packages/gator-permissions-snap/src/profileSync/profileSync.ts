@@ -62,7 +62,13 @@ function safeDeserializeStoredGrantedPermission(
     // handle legacy storage where `isRevoked` is set instead of `revocationMetadata`
     if (parsed.isRevoked && validated.revocationMetadata === undefined) {
       validated.revocationMetadata = {
-        recordedAt: 0,
+        // We haven't persisted the `recordedAt` timestamp, so we just use the
+        // current timestamp to indicate that it was "noticed" just now. This
+        // should never really happen in production, as only permissions revoked
+        // with pre-production versions would have been marked with `isRevoked`
+        // instead of `revocationMetadata`. The value is inconsequential, as
+        // it's only included for debugging purposes.
+        recordedAt: Math.floor(Date.now() / 1000),
       };
     }
 

@@ -115,7 +115,6 @@ export function createRpcHandler({
       const storedPermission: StoredGrantedPermission = {
         permissionResponse: permissionResponse.response,
         siteOrigin,
-        isRevoked: false,
       };
       permissionsToStore.push(storedPermission);
     }
