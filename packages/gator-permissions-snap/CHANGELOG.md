@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- feat: Store metadata when revoking a permission ([#228](https://github.com/MetaMask/snap-7715-permissions/pull/228))
+- bugfix: Add a is7715RuleType flag to RuleData to ensure 7715 rule types default to enabled input ([#256](https://github.com/MetaMask/snap-7715-permissions/pull/256))
+- chore: update dependencies ([#247](https://github.com/MetaMask/snap-7715-permissions/pull/247))
+
 ## [1.0.0]
 
 ### Added
