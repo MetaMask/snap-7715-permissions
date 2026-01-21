@@ -73,14 +73,11 @@ export class BlockchainClient {
     delegationManagerAddress: Hex;
     retryOptions?: RetryOptions;
   }): Promise<boolean> {
-    logger.debug(
-      'BlockchainClient:checkDelegationDisabledOnChain()',
-      {
-        delegationHash,
-        chainId,
-        delegationManagerAddress,
-      },
-    );
+    logger.debug('BlockchainClient:checkDelegationDisabledOnChain()', {
+      delegationHash,
+      chainId,
+      delegationManagerAddress,
+    });
 
     if (!delegationHash) {
       const message = 'No delegation hash provided';
