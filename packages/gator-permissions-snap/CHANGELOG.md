@@ -9,11 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.0]
 
-### Uncategorized
+### Changed
 
-- feat: Store metadata when revoking a permission ([#228](https://github.com/MetaMask/snap-7715-permissions/pull/228))
-- bugfix: Add a is7715RuleType flag to RuleData to ensure 7715 rule types default to enabled input ([#256](https://github.com/MetaMask/snap-7715-permissions/pull/256))
-- chore: update dependencies ([#247](https://github.com/MetaMask/snap-7715-permissions/pull/247))
+- Now store metadata when a permission has been revoked ([#228](https://github.com/MetaMask/snap-7715-permissions/pull/228))
+- "rules" as defined by EIP-7715 are now always editable (presently just `expiry`) ([#256](https://github.com/MetaMask/snap-7715-permissions/pull/256))
+
+### Fixed
+
+- `isAdjustmentAllowed` now works to allow users to change details of the permission ([#256](https://github.com/MetaMask/snap-7715-permissions/pull/256))
 
 ## [1.0.0]
 
