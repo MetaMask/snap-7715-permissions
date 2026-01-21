@@ -12,7 +12,6 @@ import { z } from 'zod';
 
 import type { TransactionReceipt } from '../clients/types';
 import { zTransactionReceipt } from '../clients/types';
-import type { RevocationMetadata } from '../profileSync';
 
 export const validateGetGrantedPermissionsParams = (
   params: unknown,
@@ -44,9 +43,7 @@ export const validatePermissionRequestParam = (
 // Validation schema for revocation parameters
 const zRevocationParams = z.object({
   permissionContext: zHexStr,
-  revocationMetadata: z.object({
-    txHash: zHexStr.optional(),
-  }),
+  txHash: zHexStr.optional(),
 });
 
 /**
@@ -57,7 +54,7 @@ const zRevocationParams = z.object({
  */
 export function validateRevocationParams(params: Json): {
   permissionContext: Hex;
-  revocationMetadata: RevocationMetadata;
+  txHash?: Hex | undefined;
 } {
   try {
     if (!params || typeof params !== 'object') {
