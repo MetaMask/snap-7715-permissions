@@ -74,7 +74,7 @@ export class BlockchainClient {
     retryOptions?: RetryOptions;
   }): Promise<boolean> {
     logger.debug(
-      'BlockchainTokenMetadataClient:checkDelegationDisabledOnChain()',
+      'BlockchainClient:checkDelegationDisabledOnChain()',
       {
         delegationHash,
         chainId,
@@ -165,7 +165,7 @@ export class BlockchainClient {
     txHash: Hex;
     chainId: Hex;
   }): Promise<boolean> {
-    logger.debug('BlockchainMetadataClient:checkTransactionReceipt()', {
+    logger.debug('BlockchainClient:checkTransactionReceipt()', {
       txHash,
       chainId,
     });
