@@ -12,8 +12,9 @@ describe('UserEventDispatcher', () => {
   let userEventDispatcher: UserEventDispatcher;
   const eventType = UserInputEventType.ButtonClickEvent;
   const elementName = 'test-button';
-  const createHandlerMock = () => jest.fn<() => void>();
-  const createAsyncHandlerMock = () => jest.fn<() => Promise<void>>();
+  const createHandlerMock = (): jest.Mock<() => void> => jest.fn<() => void>();
+  const createAsyncHandlerMock = (): jest.Mock<() => Promise<void>> =>
+    jest.fn<() => Promise<void>>();
   const interfaceId = '123';
 
   beforeEach(() => {
@@ -601,12 +602,12 @@ describe('UserEventDispatcher', () => {
         const dispatcher = new UserEventDispatcher();
         const executionOrder: string[] = [];
 
-        const inputHandler = (args: any) => {
+        const inputHandler = (args: any): void => {
           const inputEvent = args.event as { value: string };
           executionOrder.push(`input-handler-value: ${inputEvent.value}`);
         };
 
-        const buttonHandler = () => {
+        const buttonHandler = (): void => {
           executionOrder.push('button-handler');
         };
 
@@ -954,6 +955,7 @@ describe('UserEventDispatcher', () => {
       // Call waitForPendingHandlers (this should wait for all events to complete)
       await testDispatcher.waitForPendingHandlers().then(() => {
         waitForPendingHandlersResolved = true;
+        return undefined;
       });
 
       // Verify all events completed

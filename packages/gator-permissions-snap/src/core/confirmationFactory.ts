@@ -9,9 +9,9 @@ import type { TimeoutFactory } from './timeoutFactory';
  * Factory for creating confirmation dialogs.
  */
 export class ConfirmationDialogFactory {
-  #userEventDispatcher: UserEventDispatcher;
+  readonly #userEventDispatcher: UserEventDispatcher;
 
-  #timeoutFactory: TimeoutFactory;
+  readonly #timeoutFactory: TimeoutFactory;
 
   constructor({
     userEventDispatcher,

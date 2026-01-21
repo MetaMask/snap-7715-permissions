@@ -1,7 +1,8 @@
 import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
-import { parseCaipAccountId, toCaipAccountId, type Hex } from '@metamask/utils';
+import { parseCaipAccountId, toCaipAccountId } from '@metamask/utils';
+import type { Hex } from '@metamask/utils';
 
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { validateExpiry } from '../contextValidation';

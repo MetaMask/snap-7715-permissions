@@ -441,9 +441,6 @@ describe('AccountApiClient', () => {
         headers: {
           get: jest.fn().mockReturnValue('1024'),
         },
-        headers: {
-          get: jest.fn().mockReturnValue('1024'),
-        },
       });
 
       await expect(
@@ -483,7 +480,7 @@ describe('AccountApiClient', () => {
       // Mock metadata API response with invalid structure (missing required field)
       const mockResponse = {
         ok: true,
-        json: async () => ({
+        json: async (): Promise<object> => ({
           // Missing required 'address' field - this will fail zod validation
           chainId: mockChainId,
           decimals: 18,
@@ -569,7 +566,7 @@ describe('AccountApiClient', () => {
       // Mock metadata API response (succeeds)
       const mockResponse = {
         ok: true,
-        json: async () => ({
+        json: async (): Promise<object> => ({
           chainId: mockChainId,
           decimals: 18,
           address: mockTokenAddress,

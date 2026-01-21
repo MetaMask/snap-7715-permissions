@@ -12,17 +12,15 @@ import {
   ChainDisconnectedError,
   InvalidInputError,
   ResourceUnavailableError,
-  type Json,
 } from '@metamask/snaps-sdk';
+import type { Json } from '@metamask/snaps-sdk';
 
 import type { BlockchainClient } from '../../src/clients/blockchainClient';
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
-import type {
-  ProfileSyncManager,
-  StoredGrantedPermission,
-} from '../../src/profileSync';
-import { createRpcHandler, type RpcHandler } from '../../src/rpc/rpcHandler';
+import type { ProfileSyncManager, StoredGrantedPermission } from '../../src/profileSync';
+import { createRpcHandler } from '../../src/rpc/rpcHandler';
+import type { RpcHandler } from '../../src/rpc/rpcHandler';
 
 // Mock the delegation-core functions
 jest.mock('@metamask/delegation-core', () => ({

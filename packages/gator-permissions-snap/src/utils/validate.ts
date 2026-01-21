@@ -1,13 +1,16 @@
 import {
-  type RequestExecutionPermissionsParam,
-  type GetGrantedPermissionsParam,
   zRequestExecutionPermissionsParam,
   zGetGrantedPermissionsParam,
   zHexStr,
 } from '@metamask/7715-permissions-shared/types';
+import type {
+  RequestExecutionPermissionsParam,
+  GetGrantedPermissionsParam,
+} from '@metamask/7715-permissions-shared/types';
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
-import { InvalidInputError, type Json } from '@metamask/snaps-sdk';
+import { InvalidInputError } from '@metamask/snaps-sdk';
+import type { Json } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
 import type { TransactionReceipt } from '../clients/types';

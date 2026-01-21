@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-restricted-globals */
 
 import type { SnapManifest } from '@metamask/7715-permissions-shared/types';
 
-// eslint-disable-next-line import/no-relative-packages
 import packageJson from './package.json' with { type: 'json' };
 
 const kernelSnapId = process.env.KERNEL_SNAP_ID;

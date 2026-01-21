@@ -26,7 +26,7 @@ export const AddressField = ({
   address,
   tooltip,
   iconData,
-}: AddressFieldParams) => {
+}: AddressFieldParams): JSX.Element => {
   return (
     <Field
       label={label}

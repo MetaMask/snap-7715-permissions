@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-restricted-globals */
+
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import {
   zHexStr,
@@ -10,11 +10,8 @@ import {
   logger,
   extractZodError,
 } from '@metamask/7715-permissions-shared/utils';
-import {
-  hashDelegation,
-  decodeDelegations,
-  type Hex,
-} from '@metamask/delegation-core';
+import { hashDelegation, decodeDelegations } from '@metamask/delegation-core';
+import type { Hex } from '@metamask/delegation-core';
 import type {
   UserStorageGenericPathWithFeatureAndKey,
   JwtBearerAuth,
@@ -173,17 +170,21 @@ export function createProfileSyncManager(
       logger.debug('unConfiguredProfileSyncManager.getAllGrantedPermissions()');
       return [];
     },
-    getGrantedPermission: async (_: Hex) => {
+    getGrantedPermission: async (_: Hex): Promise<StoredGrantedPermission> => {
       throw new UnsupportedMethodError(
         'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
       );
     },
-    storeGrantedPermission: async (_: StoredGrantedPermission) => {
+    storeGrantedPermission: async (
+      _: StoredGrantedPermission,
+    ): Promise<void> => {
       logger.debug(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
       );
     },
-    storeGrantedPermissionBatch: async (_: StoredGrantedPermission[]) => {
+    storeGrantedPermissionBatch: async (
+      _: StoredGrantedPermission[],
+    ): Promise<void> => {
       logger.debug(
         'unConfiguredProfileSyncManager.storeGrantedPermissionBatch()',
       );
@@ -191,9 +192,9 @@ export function createProfileSyncManager(
     markPermissionRevoked: async (
       _permissionContext: Hex,
       _revocationMetadata: RevocationMetadata,
-    ) => {
+    ): Promise<void> => {
       logger.debug(
-        'unConfiguredProfileSyncManager.updatePermissionRevocationStatus()',
+        'unConfiguredProfileSyncManager.markPermissionRevoked()',
       );
     },
   };
@@ -237,7 +238,7 @@ export function createProfileSyncManager(
         try {
           const permission = safeDeserializeStoredGrantedPermission(item);
           validPermissions.push(permission);
-        } catch (error) {
+        } catch {
           logger.warn('Skipping invalid permission data');
         }
       }
@@ -350,7 +351,7 @@ export function createProfileSyncManager(
             generateObjectKey(permission.permissionResponse.context), // key
             serializedPermission, // value
           ]);
-        } catch (error) {
+        } catch {
           logger.warn('Skipping invalid permission in batch');
         }
       }

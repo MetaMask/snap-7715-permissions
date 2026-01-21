@@ -12,8 +12,10 @@ import type {
 import {
   createProfileSyncManager,
   generateObjectKey,
-  type ProfileSyncManager,
-  type StoredGrantedPermission,
+} from '../../src/profileSync';
+import type {
+  ProfileSyncManager,
+  StoredGrantedPermission,
 } from '../../src/profileSync';
 
 describe('profileSync', () => {
@@ -91,7 +93,7 @@ describe('profileSync', () => {
     },
     siteOrigin: 'https://example.com',
   };
-  const mockPassAuth = () => {
+  const mockPassAuth = (): void => {
     jwtBearerAuthMock.getAccessToken.mockResolvedValueOnce('aaa.bbb.ccc');
     jwtBearerAuthMock.getUserProfile.mockResolvedValueOnce({
       identifierId: '0x00_some_permission_context',
@@ -99,7 +101,7 @@ describe('profileSync', () => {
       metaMetricsId: '0x789',
     });
   };
-  const mockFailAuth = () => {
+  const mockFailAuth = (): void => {
     jwtBearerAuthMock.getAccessToken.mockRejectedValue(
       new Error('Failed to fetch access token'),
     );

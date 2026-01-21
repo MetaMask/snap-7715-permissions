@@ -1,8 +1,8 @@
 import {
-  type Caveat,
   createNativeTokenStreamingTerms,
   createExactCalldataTerms,
 } from '@metamask/delegation-core';
+import type { Caveat } from '@metamask/delegation-core';
 
 import type { PopulatedNativeTokenStreamPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';

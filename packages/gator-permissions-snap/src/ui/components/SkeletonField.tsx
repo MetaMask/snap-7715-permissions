@@ -5,7 +5,10 @@ import { Field } from './Field';
 
 export type SkeletonFieldParams = Pick<BaseFieldProps, 'label' | 'tooltip'>;
 
-export const SkeletonField = ({ label, tooltip }: SkeletonFieldParams) => {
+export const SkeletonField = ({
+  label,
+  tooltip,
+}: SkeletonFieldParams): JSX.Element => {
   return (
     <Field label={label} tooltip={tooltip} variant="display">
       <Skeleton />

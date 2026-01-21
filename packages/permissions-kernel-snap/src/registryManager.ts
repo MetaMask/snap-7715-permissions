@@ -1,18 +1,18 @@
-/* eslint-disable @typescript-eslint/no-throw-literal */
-import {
-  type PermissionOffers,
-  type PermissionsRequest,
-  zPermissionOffers,
-  type RegisteredPermissionOffer,
-  type RegisteredPermissionOffers,
-  type PermissionOfferRegistry,
+import { zPermissionOffers } from '@metamask/7715-permissions-shared/types';
+import type {
+  PermissionOffers,
+  PermissionsRequest,
+  RegisteredPermissionOffer,
+  RegisteredPermissionOffers,
+  PermissionOfferRegistry,
 } from '@metamask/7715-permissions-shared/types';
 import {
   extractDescriptorName,
   extractZodError,
   logger,
 } from '@metamask/7715-permissions-shared/utils';
-import { InvalidParamsError, type SnapsProvider } from '@metamask/snaps-sdk';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
+import type { SnapsProvider } from '@metamask/snaps-sdk';
 
 import { ExternalMethod } from './rpc/rpcMethod';
 
@@ -105,14 +105,14 @@ export const createPermissionOfferRegistryManager = (
             `Snap ${snapId} supports ${ExternalMethod.PermissionsProviderGetPermissionOffers}, adding to registry...`,
           );
         }
-      } catch (error) {
+      } catch {
         logger.error(
           `Snap ${snapId} does not support ${ExternalMethod.PermissionsProviderGetPermissionOffers}, or returned an invalid response, skipping...`,
         );
       }
 
       return ephemeralPermissionOfferRegistry;
-    } catch (error) {
+    } catch {
       logger.error('Error building permission offer registry');
       return ephemeralPermissionOfferRegistry;
     }
@@ -172,7 +172,7 @@ export const createPermissionOfferRegistryManager = (
       return {
         permissionsToGrant: [],
         missingPermissions,
-        errorMessage: `The following permissions can not be granted by the permissions provider: ${missingPermissions.map((permission) => permission.permission.type).join(', ')}`,
+        errorMessage: `The following permissions can not be granted by the permissions provider: ${missingPermissions.map((permission) => permission.permission.type as string).join(', ')}`,
       };
     }
 

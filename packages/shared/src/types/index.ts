@@ -4,6 +4,6 @@ export * from './7715-permissions-get-granted-permissions';
 export * from './7715-permissions-supported';
 export * from './7715-permissions-types';
 export * from './snap-permission-registry';
-export * from './snap';
+export type * from './snap';
 export * from './common';
-export * from './manifest';
+export type * from './manifest';
