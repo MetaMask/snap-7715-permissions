@@ -1156,7 +1156,7 @@ describe('RpcHandler', () => {
     it('handles hex values with uppercase letters', async () => {
       const upperCaseParams = {
         permissionContext: '0x1234567890ABCDEF1234567890ABCDEF',
-        TEST_VALID_TX_HASH,
+        txHash: TEST_VALID_TX_HASH,
       };
 
       const mockPermission = {
