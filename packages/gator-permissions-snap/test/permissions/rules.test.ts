@@ -1,16 +1,17 @@
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
-import type { BaseRuleContext } from '../../src/core/types';
+import type { BaseContext } from '../../src/core/types';
 import { applyExpiryRule, createExpiryRule } from '../../src/permissions/rules';
 import { timestampToISO8601 } from '../../src/utils/time';
 
 describe('createExpiryRule', () => {
   const mockTranslateFunction = jest.fn();
 
-  const baseRuleContext: BaseRuleContext = {
+  const baseRuleContext: BaseContext = {
     expiry: {
       timestamp: 1893456000, // 2030-01-01T00:00:00.000Z
     },
+    isAdjustmentAllowed: false,
     justification: 'test justification',
     accountAddressCaip10: 'eip155:1:0x0000000000000000000000000000000000000000',
     tokenAddressCaip19:
@@ -31,7 +32,7 @@ describe('createExpiryRule', () => {
 
   it('returns rule definition with correct static properties', () => {
     const rule = createExpiryRule<
-      BaseRuleContext,
+      BaseContext,
       { validationErrors: { expiryError?: string } }
     >({
       elementName: 'expiry',
@@ -45,7 +46,7 @@ describe('createExpiryRule', () => {
 
   it('maps context and metadata to rule data correctly', () => {
     const rule = createExpiryRule<
-      BaseRuleContext,
+      BaseContext,
       { validationErrors: { expiryError?: string } }
     >({
       elementName: 'expiry',
@@ -72,7 +73,7 @@ describe('createExpiryRule', () => {
 
   it('updates only the expiry timestamp on context', () => {
     const rule = createExpiryRule<
-      BaseRuleContext,
+      BaseContext,
       { validationErrors: { expiryError?: string } }
     >({
       elementName: 'expiry',
@@ -98,7 +99,7 @@ describe('createExpiryRule', () => {
 
   it('throws InvalidInputError for invalid ISO 8601 value', () => {
     const rule = createExpiryRule<
-      BaseRuleContext,
+      BaseContext,
       { validationErrors: { expiryError?: string } }
     >({
       elementName: 'expiry',
@@ -112,10 +113,11 @@ describe('createExpiryRule', () => {
 });
 
 describe('applyExpiryRule', () => {
-  const baseRuleContext: BaseRuleContext = {
+  const baseRuleContext: BaseContext = {
     expiry: {
       timestamp: 1893456000, // 2030-01-01T00:00:00.000Z
     },
+    isAdjustmentAllowed: false,
     justification: 'test justification',
     accountAddressCaip10: 'eip155:1:0x0000000000000000000000000000000000000000',
     tokenAddressCaip19:
