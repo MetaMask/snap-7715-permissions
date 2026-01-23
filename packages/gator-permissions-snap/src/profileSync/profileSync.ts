@@ -31,8 +31,8 @@ export type RevocationMetadata = {
   recordedAt: number;
 };
 
-// Constants for validation
-const MAX_STORAGE_SIZE_BYTES = 400 * 1024; // 400kb limit as documented
+// 400kb limit as documented a stored permissions is generally in the realm of 3000 bytes -> 5000 bytes
+const MAX_STORAGE_SIZE_BYTES = 400 * 1024;
 
 // Zod schema for runtime validation of StoredGrantedPermission
 const zStoredGrantedPermission = z.object({
@@ -169,7 +169,7 @@ export function createProfileSyncManager(
   config: ProfileSyncManagerConfig,
 ): ProfileSyncManager {
   const FEATURE = 'gator_7715_permissions';
-  const { auth, userStorage, isFeatureEnabled, snapsMetricsService } = config;
+  const { userStorage, isFeatureEnabled, snapsMetricsService } = config;
   const unConfiguredProfileSyncManager = {
     getAllGrantedPermissions: async (): Promise<StoredGrantedPermission[]> => {
       logger.debug('unConfiguredProfileSyncManager.getAllGrantedPermissions()');
@@ -203,19 +203,6 @@ export function createProfileSyncManager(
   };
 
   /**
-   * Authenticates the user with profile sync.
-   *
-   */
-  async function authenticate(): Promise<void> {
-    try {
-      await auth.getAccessToken();
-    } catch (error) {
-      logger.error('Error fetching access token:', error);
-      throw error;
-    }
-  }
-
-  /**
    * Retrieve all granted permission items under the "7715_permissions" feature will result in GET /api/v1/userstorage/7715_permissions
    * VALUES: decrypted("JSONstringifyPermission1", storage_key), decrypted("JSONstringifyPermission2", storage_key).
    * @returns All granted permissions.
@@ -224,8 +211,6 @@ export function createProfileSyncManager(
     StoredGrantedPermission[]
   > {
     try {
-      await authenticate();
-
       const items = await userStorage.getAllFeatureItems(FEATURE);
       if (!items) {
         await snapsMetricsService?.trackProfileSync({
@@ -272,8 +257,6 @@ export function createProfileSyncManager(
     permissionContext: Hex,
   ): Promise<StoredGrantedPermission | null> {
     try {
-      await authenticate();
-
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(permissionContext)}`;
       const permission = await userStorage.getItem(path);
 
@@ -302,8 +285,6 @@ export function createProfileSyncManager(
     storedGrantedPermission: StoredGrantedPermission,
   ): Promise<void> {
     try {
-      await authenticate();
-
       // Validate and serialize with size check
       const serializedPermission = safeSerializeStoredGrantedPermission(
         storedGrantedPermission,
@@ -352,8 +333,6 @@ export function createProfileSyncManager(
     storedGrantedPermissions: StoredGrantedPermission[],
   ): Promise<void> {
     try {
-      await authenticate();
-
       // Validate and serialize all permissions with size checks
       const validatedItems: [string, string][] = [];
 
@@ -433,8 +412,6 @@ export function createProfileSyncManager(
         existingPermission,
         revocationMetadata,
       });
-
-      await authenticate();
 
       const updatedPermission: StoredGrantedPermission = {
         ...existingPermission,

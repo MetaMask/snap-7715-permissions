@@ -3,7 +3,7 @@ import {
   hashDelegation,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import type { Hex, Delegation } from '@metamask/delegation-core';
+import type { Delegation } from '@metamask/delegation-core';
 import type {
   JwtBearerAuth,
   UserStorage,
@@ -93,19 +93,6 @@ describe('profileSync', () => {
     },
     siteOrigin: 'https://example.com',
   };
-  const mockPassAuth = (): void => {
-    jwtBearerAuthMock.getAccessToken.mockResolvedValueOnce('aaa.bbb.ccc');
-    jwtBearerAuthMock.getUserProfile.mockResolvedValueOnce({
-      identifierId: '0x00_some_permission_context',
-      profileId: '0x456',
-      metaMetricsId: '0x789',
-    });
-  };
-  const mockFailAuth = (): void => {
-    jwtBearerAuthMock.getAccessToken.mockRejectedValue(
-      new Error('Failed to fetch access token'),
-    );
-  };
 
   describe('Profile Sync feature enabled', () => {
     beforeEach(() => {
@@ -124,7 +111,6 @@ describe('profileSync', () => {
             JSON.stringify(permission),
           ),
         );
-        mockPassAuth();
 
         const res = await profileSyncManager.getAllGrantedPermissions();
         expect(res).toStrictEqual(mockStoredGrantedPermissions);
@@ -135,7 +121,6 @@ describe('profileSync', () => {
 
       it('should return empty array when no items exist', async () => {
         userStorageMock.getAllFeatureItems.mockResolvedValueOnce(null);
-        mockPassAuth();
 
         const permissions = await profileSyncManager.getAllGrantedPermissions();
         expect(permissions).toStrictEqual([]);
@@ -148,7 +133,6 @@ describe('profileSync', () => {
             isRevoked: true,
           }),
         ]);
-        mockPassAuth();
 
         const permissions = await profileSyncManager.getAllGrantedPermissions();
         expect(permissions).toStrictEqual([
@@ -169,7 +153,6 @@ describe('profileSync', () => {
             isRevoked: false,
           }),
         ]);
-        mockPassAuth();
 
         const permissions = await profileSyncManager.getAllGrantedPermissions();
         expect(permissions).toStrictEqual([mockStoredGrantedPermission]);
@@ -186,8 +169,6 @@ describe('profileSync', () => {
           }),
         ]);
 
-        mockPassAuth();
-
         const permissions = await profileSyncManager.getAllGrantedPermissions();
         expect(permissions).toStrictEqual([
           {
@@ -203,19 +184,10 @@ describe('profileSync', () => {
         userStorageMock.getAllFeatureItems.mockRejectedValueOnce(
           new Error('Storage error'),
         );
-        mockPassAuth();
 
         await expect(
           profileSyncManager.getAllGrantedPermissions(),
         ).rejects.toThrow('Storage error');
-      });
-
-      it('should return null if it fails to fetch access token(ie, user fails auth)', async () => {
-        mockFailAuth();
-
-        await expect(
-          profileSyncManager.getAllGrantedPermissions(),
-        ).rejects.toThrow('Failed to fetch access token');
       });
     });
 
@@ -224,7 +196,6 @@ describe('profileSync', () => {
         userStorageMock.getItem.mockResolvedValueOnce(
           JSON.stringify(mockStoredGrantedPermission),
         );
-        mockPassAuth();
 
         const res = await profileSyncManager.getGrantedPermission(
           mockStoredGrantedPermission.permissionResponse.context,
@@ -237,7 +208,6 @@ describe('profileSync', () => {
 
       it('should return null when granted permission does not exist in profile sync', async () => {
         userStorageMock.getItem.mockResolvedValueOnce(null);
-        mockPassAuth();
 
         const permission = await profileSyncManager.getGrantedPermission(
           mockStoredGrantedPermission.permissionResponse.context,
@@ -249,7 +219,6 @@ describe('profileSync', () => {
         userStorageMock.getItem.mockRejectedValueOnce(
           new Error('Storage error'),
         );
-        mockPassAuth();
 
         await expect(
           profileSyncManager.getGrantedPermission(
@@ -301,7 +270,6 @@ describe('profileSync', () => {
           },
         };
 
-        mockPassAuth();
         let storedValue: string | undefined;
         userStorageMock.setItem.mockImplementationOnce(async (_path, value) => {
           storedValue = value;
@@ -335,7 +303,6 @@ describe('profileSync', () => {
         userStorageMock.setItem.mockRejectedValueOnce(
           new Error('Storage error'),
         );
-        mockPassAuth();
 
         await expect(
           profileSyncManager.storeGrantedPermission(
@@ -391,7 +358,6 @@ describe('profileSync', () => {
             siteOrigin: 'https://example.com',
           },
         ];
-        mockPassAuth();
         const storedItems = new Map<string, string>();
         userStorageMock.batchSetItems.mockImplementationOnce(
           async (_feature, items) => {
@@ -448,8 +414,6 @@ describe('profileSync', () => {
           new Error('Storage error'),
         );
 
-        mockPassAuth();
-
         const promise = profileSyncManager.storeGrantedPermissionBatch(
           mockStoredGrantedPermissions,
         );
@@ -483,7 +447,6 @@ describe('profileSync', () => {
           .mockResolvedValueOnce(JSON.stringify(mockStoredGrantedPermission))
           .mockImplementationOnce(async () => storedValue ?? null);
 
-        mockPassAuth();
         await profileSyncManager.markPermissionRevoked(
           mockStoredGrantedPermission.permissionResponse.context,
           {
@@ -522,8 +485,6 @@ describe('profileSync', () => {
         // Mock no permission found
         userStorageMock.getItem.mockResolvedValueOnce(null);
 
-        mockPassAuth();
-
         await expect(
           profileSyncManager.markPermissionRevoked(nonExistentDelegationHash, {
             txHash: '0xMocked-tx-hash',
@@ -552,7 +513,6 @@ describe('profileSync', () => {
             },
           }),
         );
-        mockPassAuth();
 
         await expect(
           profileSyncManager.markPermissionRevoked(
@@ -560,22 +520,6 @@ describe('profileSync', () => {
             { recordedAt: 123456 },
           ),
         ).rejects.toThrow('Permission already revoked');
-      });
-
-      it('rethrows authentication errors', async () => {
-        jwtBearerAuthMock.getAccessToken.mockRejectedValueOnce(
-          new Error('Auth failed'),
-        );
-
-        await expect(
-          profileSyncManager.markPermissionRevoked(
-            mockStoredGrantedPermission.permissionResponse.context,
-            {
-              txHash: '0xMocked-tx-hash',
-              recordedAt: 123456,
-            },
-          ),
-        ).rejects.toThrow('Auth failed');
       });
     });
   });
@@ -592,7 +536,6 @@ describe('profileSync', () => {
     it('should validate permission data structure and reject invalid data', async () => {
       const invalidData = '{"invalid": "structure"}';
       userStorageMock.getItem.mockResolvedValueOnce(invalidData);
-      mockPassAuth();
 
       await expect(
         profileSyncManager.getGrantedPermission(
@@ -616,8 +559,6 @@ describe('profileSync', () => {
         },
       };
 
-      mockPassAuth();
-
       await expect(
         profileSyncManager.storeGrantedPermission(largePermission),
       ).rejects.toThrow('Permission data exceeds size limit');
@@ -639,7 +580,6 @@ describe('profileSync', () => {
         invalidItem,
         validItem2,
       ]);
-      mockPassAuth();
 
       const result = await profileSyncManager.getAllGrantedPermissions();
 
@@ -656,8 +596,6 @@ describe('profileSync', () => {
         permissionResponse: { chainId: '0xaa36a7' }, // Missing required fields
         siteOrigin: 'https://example.com',
       } as unknown as StoredGrantedPermission;
-
-      mockPassAuth();
 
       await expect(
         profileSyncManager.storeGrantedPermissionBatch([
@@ -690,7 +628,7 @@ describe('profileSync', () => {
       it('should throw error when profile sync feature is disabled', async () => {
         await expect(
           profileSyncManager.getGrantedPermission(
-            '0x00_some_permission_context' as Hex,
+            '0x00_some_permission_context',
           ),
         ).rejects.toThrow(
           'unConfiguredProfileSyncManager.getPermissionByHash not implemented',
