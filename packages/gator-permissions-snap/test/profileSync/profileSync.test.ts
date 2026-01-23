@@ -262,6 +262,15 @@ describe('profileSync', () => {
     describe('storeGrantedPermission', () => {
       it('should store granted permission successfully in profile sync', async () => {
         mockPassAuth();
+
+        let storedValue: string | undefined;
+        userStorageMock.setItem.mockImplementationOnce(async (_path, value) => {
+          storedValue = value;
+        });
+        userStorageMock.getItem.mockImplementationOnce(
+          async () => storedValue ?? null,
+        );
+
         await profileSyncManager.storeGrantedPermission(
           mockStoredGrantedPermission,
         );
@@ -293,6 +302,14 @@ describe('profileSync', () => {
         };
 
         mockPassAuth();
+        let storedValue: string | undefined;
+        userStorageMock.setItem.mockImplementationOnce(async (_path, value) => {
+          storedValue = value;
+        });
+        userStorageMock.getItem.mockImplementationOnce(
+          async () => storedValue ?? null,
+        );
+
         await profileSyncManager.storeGrantedPermission(
           mockStoredGrantedPermissionWithMultipleDelegations,
         );
@@ -325,6 +342,17 @@ describe('profileSync', () => {
             mockStoredGrantedPermission,
           ),
         ).rejects.toThrow('Storage error');
+      });
+
+      it('should throw error when stored permission does not match retrieved value', async () => {
+        userStorageMock.setItem.mockResolvedValueOnce(undefined);
+        userStorageMock.getItem.mockResolvedValueOnce('mismatched-value');
+
+        await expect(
+          profileSyncManager.storeGrantedPermission(
+            mockStoredGrantedPermission,
+          ),
+        ).rejects.toThrow('Unable to retrieve stored item with key');
       });
     });
 
@@ -364,6 +392,19 @@ describe('profileSync', () => {
           },
         ];
         mockPassAuth();
+        const storedItems = new Map<string, string>();
+        userStorageMock.batchSetItems.mockImplementationOnce(
+          async (_feature, items) => {
+            for (const [key, value] of items) {
+              storedItems.set(`gator_7715_permissions.${key}`, value);
+            }
+          },
+        );
+        userStorageMock.getItem
+          .mockImplementationOnce(async (path) => storedItems.get(path) ?? null)
+          .mockImplementationOnce(
+            async (path) => storedItems.get(path) ?? null,
+          );
 
         await profileSyncManager.storeGrantedPermissionBatch(
           mockStoredGrantedPermissions,
@@ -414,6 +455,18 @@ describe('profileSync', () => {
         );
         await expect(promise).rejects.toThrow('Storage error');
       });
+
+      it('should throw error when a stored item cannot be retrieved', async () => {
+        const mockStoredGrantedPermissions = [mockStoredGrantedPermission];
+        userStorageMock.batchSetItems.mockResolvedValueOnce(undefined);
+        userStorageMock.getItem.mockResolvedValueOnce(null);
+
+        await expect(
+          profileSyncManager.storeGrantedPermissionBatch(
+            mockStoredGrantedPermissions,
+          ),
+        ).rejects.toThrow('Unable to retrieve stored item with key');
+      });
     });
 
     describe('setPermissionRevoked()', () => {
@@ -422,9 +475,13 @@ describe('profileSync', () => {
       const mockRecordedAt = 123456;
 
       it('sets permission as revoked successfully', async () => {
-        userStorageMock.getItem.mockResolvedValueOnce(
-          JSON.stringify(mockStoredGrantedPermission),
-        );
+        let storedValue: string | undefined;
+        userStorageMock.setItem.mockImplementationOnce(async (_path, value) => {
+          storedValue = value;
+        });
+        userStorageMock.getItem
+          .mockResolvedValueOnce(JSON.stringify(mockStoredGrantedPermission))
+          .mockImplementationOnce(async () => storedValue ?? null);
 
         mockPassAuth();
         await profileSyncManager.markPermissionRevoked(
@@ -593,7 +650,7 @@ describe('profileSync', () => {
       );
     });
 
-    it('should skip invalid permissions in batch operations', async () => {
+    it('should fail the batch when any permission is invalid', async () => {
       const validPermission = mockStoredGrantedPermission;
       const invalidPermission = {
         permissionResponse: { chainId: '0xaa36a7' }, // Missing required fields
@@ -602,32 +659,14 @@ describe('profileSync', () => {
 
       mockPassAuth();
 
-      await profileSyncManager.storeGrantedPermissionBatch([
-        validPermission,
-        invalidPermission,
-      ]);
+      await expect(
+        profileSyncManager.storeGrantedPermissionBatch([
+          validPermission,
+          invalidPermission,
+        ]),
+      ).rejects.toThrow('Failed type validation');
 
-      expect(userStorageMock.batchSetItems).toHaveBeenCalledWith(
-        'gator_7715_permissions',
-        [
-          [
-            mockDelegationHash,
-            expect.stringMatching(
-              /^\{"permissionResponse":\{.*\},"siteOrigin":"https:\/\/example\.com"\}$/u,
-            ),
-          ],
-        ],
-      );
-      // Verify the stored data can be parsed and contains expected fields
-      const batchCalls = userStorageMock.batchSetItems.mock.calls[0]?.[1];
-      expect(batchCalls).toBeDefined();
-      expect(batchCalls).toHaveLength(1);
-      const storedData = JSON.parse((batchCalls as any)[0]?.[1] as string);
-      expect(storedData.permissionResponse.chainId).toBe('0xaa36a7');
-      expect(storedData.permissionResponse.from).toBe(
-        '0x1234567890123456789012345678901234567890',
-      );
-      expect(storedData.siteOrigin).toBe('https://example.com');
+      expect(userStorageMock.batchSetItems).not.toHaveBeenCalled();
     });
   });
 

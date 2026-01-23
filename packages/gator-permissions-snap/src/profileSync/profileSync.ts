@@ -16,6 +16,7 @@ import type {
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 import {
+  InternalError,
   InvalidInputError,
   LimitExceededError,
   ParseError,
@@ -308,8 +309,19 @@ export function createProfileSyncManager(
         storedGrantedPermission,
       );
 
-      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${generateObjectKey(storedGrantedPermission.permissionResponse.context)}`;
+      const key = generateObjectKey(
+        storedGrantedPermission.permissionResponse.context,
+      );
+
+      const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${key}`;
       await userStorage.setItem(path, serializedPermission);
+
+      const retrievedValue = await userStorage.getItem(path);
+      if (serializedPermission !== retrievedValue) {
+        throw new InternalError(
+          `Unable to retrieve stored item with key: ${key}`,
+        );
+      }
 
       await snapsMetricsService?.trackProfileSync({
         operation: 'store',
@@ -346,16 +358,13 @@ export function createProfileSyncManager(
       const validatedItems: [string, string][] = [];
 
       for (const permission of storedGrantedPermissions) {
-        try {
-          const serializedPermission =
-            safeSerializeStoredGrantedPermission(permission);
-          validatedItems.push([
-            generateObjectKey(permission.permissionResponse.context), // key
-            serializedPermission, // value
-          ]);
-        } catch {
-          logger.warn('Skipping invalid permission in batch');
-        }
+        const serializedPermission =
+          safeSerializeStoredGrantedPermission(permission);
+
+        validatedItems.push([
+          generateObjectKey(permission.permissionResponse.context), // key
+          serializedPermission, // value
+        ]);
       }
 
       if (validatedItems.length === 0) {
@@ -365,6 +374,20 @@ export function createProfileSyncManager(
       }
 
       await userStorage.batchSetItems(FEATURE, validatedItems);
+
+      // ensure that all items were stored correctly
+      const fetchedItems = validatedItems.map(async ([key, value]) => {
+        const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${key}`;
+        const retrievedValue = await userStorage.getItem(path);
+
+        if (value !== retrievedValue) {
+          throw new InternalError(
+            `Unable to retrieve stored item with key: ${key}`,
+          );
+        }
+      });
+
+      await Promise.all(fetchedItems);
 
       await snapsMetricsService?.trackProfileSync({
         operation: 'batch_store',
