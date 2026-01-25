@@ -230,8 +230,6 @@ describe('profileSync', () => {
 
     describe('storeGrantedPermission', () => {
       it('should store granted permission successfully in profile sync', async () => {
-        mockPassAuth();
-
         let storedValue: string | undefined;
         userStorageMock.setItem.mockImplementationOnce(async (_path, value) => {
           storedValue = value;
@@ -311,6 +309,17 @@ describe('profileSync', () => {
         ).rejects.toThrow('Storage error');
       });
 
+      it('should throw error when stored permission is missing after store', async () => {
+        userStorageMock.setItem.mockResolvedValueOnce(undefined);
+        userStorageMock.getItem.mockResolvedValueOnce(null);
+
+        await expect(
+          profileSyncManager.storeGrantedPermission(
+            mockStoredGrantedPermission,
+          ),
+        ).rejects.toThrow('Unable to retrieve stored item with key');
+      });
+
       it('should throw error when stored permission does not match retrieved value', async () => {
         userStorageMock.setItem.mockResolvedValueOnce(undefined);
         userStorageMock.getItem.mockResolvedValueOnce('mismatched-value');
@@ -319,7 +328,7 @@ describe('profileSync', () => {
           profileSyncManager.storeGrantedPermission(
             mockStoredGrantedPermission,
           ),
-        ).rejects.toThrow('Unable to retrieve stored item with key');
+        ).rejects.toThrow('does not match expected value');
       });
     });
 
@@ -542,26 +551,6 @@ describe('profileSync', () => {
           mockStoredGrantedPermission.permissionResponse.context,
         ),
       ).rejects.toThrow('Failed type validation');
-    });
-
-    it('should enforce 400kb size limit and reject oversized data', async () => {
-      const largePermission = {
-        ...mockStoredGrantedPermission,
-        permissionResponse: {
-          ...mockStoredGrantedPermission.permissionResponse,
-          permission: {
-            ...mockStoredGrantedPermission.permissionResponse.permission,
-            data: {
-              ...mockStoredGrantedPermission.permissionResponse.permission.data,
-              largeData: 'x'.repeat(500 * 1024), // 500kb of data
-            },
-          },
-        },
-      };
-
-      await expect(
-        profileSyncManager.storeGrantedPermission(largePermission),
-      ).rejects.toThrow('Permission data exceeds size limit');
     });
 
     it('should skip invalid items and return only valid ones in getAllGrantedPermissions', async () => {

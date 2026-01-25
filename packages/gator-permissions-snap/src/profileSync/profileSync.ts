@@ -18,7 +18,6 @@ import type {
 import {
   InternalError,
   InvalidInputError,
-  LimitExceededError,
   ParseError,
   UnsupportedMethodError,
 } from '@metamask/snaps-sdk';
@@ -30,9 +29,6 @@ export type RevocationMetadata = {
   txHash?: Hex | undefined;
   recordedAt: number;
 };
-
-// 400kb limit as documented a stored permissions is generally in the realm of 3000 bytes -> 5000 bytes
-const MAX_STORAGE_SIZE_BYTES = 400 * 1024;
 
 // Zod schema for runtime validation of StoredGrantedPermission
 const zStoredGrantedPermission = z.object({
@@ -84,10 +80,9 @@ function safeDeserializeStoredGrantedPermission(
 }
 
 /**
- * Safely serializes a StoredGrantedPermission object with size validation.
+ * Safely serializes a StoredGrantedPermission object.
  * @param permission - The permission object to serialize.
  * @returns The JSON string.
- * @throws LimitExceededError if size limit exceeded.
  */
 function safeSerializeStoredGrantedPermission(
   permission: StoredGrantedPermission,
@@ -99,19 +94,12 @@ function safeSerializeStoredGrantedPermission(
     // Serialize to JSON
     const jsonString = JSON.stringify(validated);
 
-    // Check size limit
-    const sizeBytes = new TextEncoder().encode(jsonString).length;
-    if (sizeBytes > MAX_STORAGE_SIZE_BYTES) {
-      throw new LimitExceededError(
-        `Permission data exceeds size limit: ${sizeBytes} bytes > ${MAX_STORAGE_SIZE_BYTES} bytes`,
-      );
-    }
-
     return jsonString;
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new InvalidInputError(extractZodError(error.errors));
     }
+
     throw error;
   }
 }
@@ -272,6 +260,36 @@ export function createProfileSyncManager(
   }
 
   /**
+   * Validates that the stored permission value for the given key matches the expected value.
+   *
+   * Retrieves the item from user storage using the provided key and compares it to the expected value.
+   * Throws an InternalError if the item does not exist or if the stored value does not match the expected value.
+   *
+   * @param key - The key for the item in user storage.
+   * @param expectedValue - The expected serialized value to compare against the retrieved value.
+   * @throws {InternalError} If the stored item is missing or does not match the expected value.
+   */
+  async function validatePermissionStored(
+    key: string,
+    expectedValue: string,
+  ): Promise<void> {
+    const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${key}`;
+    const retrievedValue = await userStorage.getItem(path);
+
+    if (!retrievedValue) {
+      throw new InternalError(
+        `Unable to retrieve stored item with key: ${key}`,
+      );
+    }
+
+    if (expectedValue !== retrievedValue) {
+      throw new InternalError(
+        `Retrieved stored item with key: ${key} but does not match expected value`,
+      );
+    }
+  }
+
+  /**
    * Store the granted permission in profile sync.
    *
    * Persisting "<permissionContext>" key under "gator_7715_permissions" feature
@@ -284,7 +302,13 @@ export function createProfileSyncManager(
   async function storeGrantedPermission(
     storedGrantedPermission: StoredGrantedPermission,
   ): Promise<void> {
+    const performanceData = {
+      permissionCount: 1,
+      permissionsStoredElapsedMs: -1,
+      storedPermissionsValidatedElapsedMs: -1,
+    };
     try {
+      const startTime = Date.now();
       // Validate and serialize with size check
       const serializedPermission = safeSerializeStoredGrantedPermission(
         storedGrantedPermission,
@@ -297,16 +321,17 @@ export function createProfileSyncManager(
       const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${key}`;
       await userStorage.setItem(path, serializedPermission);
 
-      const retrievedValue = await userStorage.getItem(path);
-      if (serializedPermission !== retrievedValue) {
-        throw new InternalError(
-          `Unable to retrieve stored item with key: ${key}`,
-        );
-      }
+      performanceData.permissionsStoredElapsedMs = Date.now() - startTime;
+
+      await validatePermissionStored(key, serializedPermission);
+
+      performanceData.storedPermissionsValidatedElapsedMs =
+        Date.now() - startTime;
 
       await snapsMetricsService?.trackProfileSync({
         operation: 'store',
         success: true,
+        performanceData,
       });
     } catch (error) {
       logger.error('Error storing granted permission');
@@ -314,6 +339,7 @@ export function createProfileSyncManager(
         operation: 'store',
         success: false,
         errorMessage: (error as Error).message,
+        performanceData,
       });
       throw error;
     }
@@ -332,7 +358,14 @@ export function createProfileSyncManager(
   async function storeGrantedPermissionBatch(
     storedGrantedPermissions: StoredGrantedPermission[],
   ): Promise<void> {
+    const performanceData = {
+      permissionCount: storedGrantedPermissions.length,
+      permissionsStoredElapsedMs: -1,
+      storedPermissionsValidatedElapsedMs: -1,
+    };
+
     try {
+      const startTime = Date.now();
       // Validate and serialize all permissions with size checks
       const validatedItems: [string, string][] = [];
 
@@ -354,23 +387,22 @@ export function createProfileSyncManager(
 
       await userStorage.batchSetItems(FEATURE, validatedItems);
 
-      // ensure that all items were stored correctly
-      const fetchedItems = validatedItems.map(async ([key, value]) => {
-        const path: UserStorageGenericPathWithFeatureAndKey = `${FEATURE}.${key}`;
-        const retrievedValue = await userStorage.getItem(path);
+      performanceData.permissionsStoredElapsedMs = Date.now() - startTime;
 
-        if (value !== retrievedValue) {
-          throw new InternalError(
-            `Unable to retrieve stored item with key: ${key}`,
-          );
-        }
-      });
+      // ensure that all items were stored correctly
+      const fetchedItems = validatedItems.map(async ([key, value]) =>
+        validatePermissionStored(key, value),
+      );
 
       await Promise.all(fetchedItems);
+
+      performanceData.storedPermissionsValidatedElapsedMs =
+        Date.now() - startTime;
 
       await snapsMetricsService?.trackProfileSync({
         operation: 'batch_store',
         success: true,
+        performanceData,
       });
     } catch (error) {
       logger.error('Error storing granted permission batch');
@@ -378,6 +410,7 @@ export function createProfileSyncManager(
         operation: 'batch_store',
         success: false,
         errorMessage: (error as Error).message,
+        performanceData,
       });
       throw error;
     }
