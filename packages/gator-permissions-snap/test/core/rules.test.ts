@@ -7,11 +7,11 @@ import {
   bindRuleHandlers,
 } from '../../src/core/rules';
 import type { BaseContext, RuleDefinition } from '../../src/core/types';
-import type { MessageKey } from '../../src/utils/i18n';
 import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../../src/userEventDispatcher';
+import type { MessageKey } from '../../src/utils/i18n';
 
 type TestContext = BaseContext & {
   testValue?: string;

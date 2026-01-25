@@ -409,15 +409,15 @@ export class PermissionHandler<
       });
 
       const unbindRuleHandlers = bindRuleHandlers({
-            rules: this.#rules,
-            userEventDispatcher: this.#userEventDispatcher,
-            interfaceId,
-            getContext: () => currentContext,
-            onContextChanged: async ({ context }) => {
-              currentContext = context;
-              await rerender();
-            },
-          });
+        rules: this.#rules,
+        userEventDispatcher: this.#userEventDispatcher,
+        interfaceId,
+        getContext: () => currentContext,
+        onContextChanged: async ({ context }) => {
+          currentContext = context;
+          await rerender();
+        },
+      });
 
       this.#unbindHandlers = (): void => {
         unbindRuleHandlers();

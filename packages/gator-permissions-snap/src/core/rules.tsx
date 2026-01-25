@@ -48,8 +48,6 @@ export function renderRule<
     return null;
   }
 
-  const isDisabled = !isEditable;
-
   const addFieldButtonName = isOptional ? `${name}_addFieldButton` : undefined;
   const removeFieldButtonName = isOptional
     ? `${name}_removeFieldButton`
@@ -64,7 +62,7 @@ export function renderRule<
           name={name}
           value={value}
           errorMessage={error}
-          disabled={isDisabled}
+          isEditable={isEditable}
           tooltip={tooltip}
           type={type}
           addFieldButtonName={addFieldButtonName}
@@ -88,7 +86,7 @@ export function renderRule<
           name={name}
           value={value as MessageKey}
           errorMessage={error}
-          disabled={isDisabled}
+          isEditable={isEditable}
           tooltip={tooltip}
           options={options as MessageKey[]}
         />
@@ -101,7 +99,7 @@ export function renderRule<
           name={name}
           value={value}
           errorMessage={error}
-          disabled={isDisabled}
+          isEditable={isEditable}
           tooltip={tooltip}
           allowPastDate={allowPastDate}
           removeFieldButtonName={removeFieldButtonName}
@@ -166,7 +164,9 @@ export function bindRuleHandlers<
 }): () => void {
   const unbinders = rules.reduce<(() => void)[]>((acc, rule) => {
     const { name, isOptional } = rule;
-    // todo: ideally we would only bind this handler if isEditable is true
+    // todo: ideally we would only bind this handler if isEditable is true but
+    // that requires resolving the RuleData which is added complexity that we
+    // don't need
 
     const handleInputChange: UserEventHandler<
       UserInputEventType.InputChangeEvent
