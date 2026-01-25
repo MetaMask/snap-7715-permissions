@@ -7,6 +7,7 @@ import {
   bindRuleHandlers,
 } from '../../src/core/rules';
 import type { BaseContext, RuleDefinition } from '../../src/core/types';
+import type { MessageKey } from '../../src/utils/i18n';
 import type {
   UserEventDispatcher,
   UserEventHandler,
@@ -24,7 +25,7 @@ type TestMetadata = {
 };
 
 const mockContext: TestContext = {
-  expiry: '2024-12-31',
+  expiry: undefined,
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: 'eip155:1:0x1234567890123456789012345678901234567890',
@@ -47,12 +48,12 @@ const mockMetadata: TestMetadata = {
 
 const textRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-text-rule',
-  label: 'Test Text Rule',
+  label: 'Test Text Rule' as MessageKey,
   type: 'text',
   getRuleData: ({ context, metadata }) => ({
     value: context.testValue,
     isVisible: true,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isEditable: context.isAdjustmentAllowed,
     tooltip: 'This is a test text rule',
     error: metadata.validationErrors.testValue,
   }),
@@ -61,24 +62,24 @@ const textRule: RuleDefinition<TestContext, TestMetadata> = {
 
 const numberRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-number-rule',
-  label: 'Test Number Rule',
+  label: 'Test Number Rule' as MessageKey,
   type: 'number',
   getRuleData: ({ context }) => ({
     value: context.numberValue,
     isVisible: true,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context, value) => ({ ...context, numberValue: value }),
 };
 
 const dropdownRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-dropdown-rule',
-  label: 'Test Dropdown Rule',
+  label: 'Test Dropdown Rule' as MessageKey,
   type: 'dropdown',
   getRuleData: ({ context }) => ({
     value: context.dropdownValue,
     isVisible: true,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isEditable: context.isAdjustmentAllowed,
     options: ['option1', 'option2', 'option3'],
   }),
   updateContext: (context, value) => ({ ...context, dropdownValue: value }),
@@ -86,40 +87,25 @@ const dropdownRule: RuleDefinition<TestContext, TestMetadata> = {
 
 const optionalRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-optional-rule',
-  label: 'Test Optional Rule',
+  label: 'Test Optional Rule' as MessageKey,
   type: 'text',
   isOptional: true,
   getRuleData: ({ context }) => ({
     value: context.optionalValue,
     isVisible: true,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context, value) => ({ ...context, optionalValue: value }),
 };
 
 const undefinedValueRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'undefined-value-rule',
-  label: 'Undefined Value Rule',
+  label: 'Undefined Value Rule' as MessageKey,
   type: 'text',
   getRuleData: () => ({
     value: undefined,
     isVisible: true,
-    isAdjustmentAllowed: false,
-  }),
-  updateContext: (context, value) => ({ ...context, testValue: value }),
-};
-
-const is7715RuleTypeRule: RuleDefinition<TestContext, TestMetadata> = {
-  name: 'test-7715-rule',
-  label: 'Test 7715 Rule',
-  type: 'text',
-  getRuleData: ({ context, metadata }) => ({
-    value: context.testValue,
-    isVisible: true,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
-    is7715RuleType: true,
-    tooltip: 'This is a 7715 rule type',
-    error: metadata.validationErrors.testValue,
+    isEditable: false,
   }),
   updateContext: (context, value) => ({ ...context, testValue: value }),
 };
@@ -587,106 +573,6 @@ describe('rules', () => {
 `);
     });
 
-    it('should render enabled field when is7715RuleType is true regardless of isAdjustmentAllowed', () => {
-      const result = renderRule({
-        rule: is7715RuleTypeRule,
-        context: { ...mockContext, isAdjustmentAllowed: false },
-        metadata: mockMetadata,
-      });
-
-      expect(result).toMatchInlineSnapshot(`
-{
-  "key": null,
-  "props": {
-    "children": [
-      {
-        "key": null,
-        "props": {
-          "alignment": "space-between",
-          "children": [
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "children": "Test 7715 Rule",
-                    },
-                    "type": "Text",
-                  },
-                  {
-                    "key": null,
-                    "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "color": "muted",
-                          "name": "question",
-                          "size": "inherit",
-                        },
-                        "type": "Icon",
-                      },
-                      "content": {
-                        "key": null,
-                        "props": {
-                          "children": "This is a 7715 rule type",
-                        },
-                        "type": "Text",
-                      },
-                    },
-                    "type": "Tooltip",
-                  },
-                ],
-                "direction": "horizontal",
-              },
-              "type": "Box",
-            },
-            null,
-          ],
-          "direction": "horizontal",
-        },
-        "type": "Box",
-      },
-      {
-        "key": null,
-        "props": {
-          "children": [
-            {
-              "key": null,
-              "props": {
-                "children": null,
-              },
-              "type": "Box",
-            },
-            {
-              "key": null,
-              "props": {
-                "name": "test-7715-rule",
-                "type": "text",
-                "value": "test-value",
-              },
-              "type": "Input",
-            },
-            {
-              "key": null,
-              "props": {
-                "children": null,
-              },
-              "type": "Box",
-            },
-          ],
-        },
-        "type": "Field",
-      },
-    ],
-    "direction": "vertical",
-  },
-  "type": "Box",
-}
-`);
-    });
-
     it('should render with error message', () => {
       const errorMetadata = {
         validationErrors: { testValue: 'This field has an error' },
@@ -860,11 +746,12 @@ describe('rules', () => {
     it('should throw error for dropdown rule without options', () => {
       const invalidDropdownRule: RuleDefinition<TestContext, TestMetadata> = {
         name: 'invalid-dropdown',
-        label: 'Invalid Dropdown',
+        label: 'Invalid Dropdown' as MessageKey,
         type: 'dropdown',
         getRuleData: ({ context }) => ({
           value: context.dropdownValue,
           isVisible: true,
+          isEditable: true,
 
           // intentionally omitting options to test error handling
         }),

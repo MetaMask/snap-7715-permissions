@@ -40,8 +40,7 @@ export function renderRule<
     iconData,
     isVisible,
     options,
-    isAdjustmentAllowed,
-    is7715RuleType,
+    isEditable,
     allowPastDate,
   } = rule.getRuleData({ context, metadata });
 
@@ -49,9 +48,7 @@ export function renderRule<
     return null;
   }
 
-  // 7715 standard rule types (e.g., expiry) always default to enabled input.
-  // 7715 permission data fields (e.g., amount, period) use isAdjustmentAllowed to determine if the input should be disabled.
-  const isDisabled = is7715RuleType !== true && !isAdjustmentAllowed;
+  const isDisabled = !isEditable;
 
   const addFieldButtonName = isOptional ? `${name}_addFieldButton` : undefined;
   const removeFieldButtonName = isOptional
@@ -169,6 +166,7 @@ export function bindRuleHandlers<
 }): () => void {
   const unbinders = rules.reduce<(() => void)[]>((acc, rule) => {
     const { name, isOptional } = rule;
+    // todo: ideally we would only bind this handler if isEditable is true
 
     const handleInputChange: UserEventHandler<
       UserInputEventType.InputChangeEvent
