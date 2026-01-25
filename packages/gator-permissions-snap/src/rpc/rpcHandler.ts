@@ -12,12 +12,13 @@ import {
 import type { Json } from '@metamask/snaps-sdk';
 import { numberToHex } from '@metamask/utils';
 
-import type { BlockchainTokenMetadataClient } from '../clients/blockchainMetadataClient';
+import type { BlockchainClient } from '../clients/blockchainClient';
 import { nameAndExplorerUrlByChainId } from '../core/chainMetadata';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
   ProfileSyncManager,
+  RevocationMetadata,
   StoredGrantedPermission,
 } from '../profileSync/profileSync';
 import {
@@ -75,17 +76,17 @@ export type RpcHandler = {
  * @param config - The parameters for creating the RPC handler.
  * @param config.permissionHandlerFactory - The factory for creating permission handlers.
  * @param config.profileSyncManager - The profile sync manager.
- * @param config.blockchainMetadataClient - The blockchain metadata client for on-chain checks.
+ * @param config.blockchainClient - The blockchain client for on-chain checks.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler({
   permissionHandlerFactory,
   profileSyncManager,
-  blockchainMetadataClient,
+  blockchainClient,
 }: {
   permissionHandlerFactory: PermissionHandlerFactory;
   profileSyncManager: ProfileSyncManager;
-  blockchainMetadataClient: BlockchainTokenMetadataClient;
+  blockchainClient: BlockchainClient;
 }): RpcHandler {
   /**
    * Handles grant permission requests.
@@ -114,7 +115,6 @@ export function createRpcHandler({
       const storedPermission: StoredGrantedPermission = {
         permissionResponse: permissionResponse.response,
         siteOrigin,
-        isRevoked: false,
       };
       permissionsToStore.push(storedPermission);
     }
@@ -169,7 +169,10 @@ export function createRpcHandler({
 
     if (typeof isRevoked === 'boolean') {
       filteredPermissions = filteredPermissions.filter(
-        (permission) => permission.isRevoked === isRevoked,
+        // if isRevoked is true, include only permissions that have a revocation metadata
+        // if isRevoked is false, include only permissions that do not have a revocation metadata
+        (permission) =>
+          (permission.revocationMetadata === undefined) !== isRevoked,
       );
     }
 
@@ -204,7 +207,7 @@ export function createRpcHandler({
   const submitRevocation = async (params: Json): Promise<Json> => {
     logger.debug('submitRevocation() called with params:', params);
 
-    const { permissionContext } = validateRevocationParams(params);
+    const { permissionContext, txHash } = validateRevocationParams(params);
 
     // First, get the existing permission to validate it exists
     logger.debug(
@@ -254,7 +257,7 @@ export function createRpcHandler({
 
     const delegationHash = hashDelegation(firstDelegation);
     const isDelegationDisabled =
-      await blockchainMetadataClient.checkDelegationDisabledOnChain({
+      await blockchainClient.checkDelegationDisabledOnChain({
         delegationHash,
         chainId: permissionChainId,
         delegationManagerAddress: delegationManager,
@@ -266,9 +269,29 @@ export function createRpcHandler({
       );
     }
 
-    await profileSyncManager.updatePermissionRevocationStatus(
+    // Check if the transaction is confirmed on-chain
+    if (txHash) {
+      const isTransactionSuccessful =
+        await blockchainClient.checkTransactionReceipt({
+          txHash,
+          chainId: permissionChainId,
+        });
+
+      if (!isTransactionSuccessful) {
+        throw new InvalidInputError(
+          `Transaction ${txHash} was not successful. Cannot process revocation.`,
+        );
+      }
+    }
+
+    const revocationMetadata: RevocationMetadata = {
+      txHash,
+      recordedAt: Math.floor(Date.now() / 1000),
+    };
+
+    await profileSyncManager.markPermissionRevoked(
       permissionContext,
-      true,
+      revocationMetadata,
     );
 
     return { success: true };
