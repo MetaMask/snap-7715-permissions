@@ -4,9 +4,7 @@ import {
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
 import type { Delegation } from '@metamask/delegation-core';
-import type {
-  UserStorage,
-} from '@metamask/profile-sync-controller/sdk';
+import type { UserStorage } from '@metamask/profile-sync-controller/sdk';
 
 import {
   createProfileSyncManager,

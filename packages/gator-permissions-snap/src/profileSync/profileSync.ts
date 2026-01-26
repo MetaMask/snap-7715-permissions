@@ -12,7 +12,6 @@ import { hashDelegation, decodeDelegations } from '@metamask/delegation-core';
 import type { Hex } from '@metamask/delegation-core';
 import type {
   UserStorageGenericPathWithFeatureAndKey,
-  JwtBearerAuth,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 import {
