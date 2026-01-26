@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1]
+
 ### Uncategorized
 
 - fix: first granted permission doesn't save ([#261](https://github.com/MetaMask/snap-7715-permissions/pull/261))
@@ -293,7 +295,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.1...HEAD
+[1.1.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.0...@metamask/gator-permissions-snap@1.1.1
 [1.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.0.0...@metamask/gator-permissions-snap@1.1.0
 [1.0.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.9.0...@metamask/gator-permissions-snap@1.0.0
 [0.9.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@0.8.0...@metamask/gator-permissions-snap@0.9.0
