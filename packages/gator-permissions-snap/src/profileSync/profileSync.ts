@@ -142,7 +142,6 @@ export function generateObjectKey(permissionContext: Hex): Hex {
 }
 
 export type ProfileSyncManagerConfig = {
-  auth: JwtBearerAuth;
   userStorage: UserStorage;
   isFeatureEnabled: boolean;
   snapsMetricsService?: SnapsMetricsService;

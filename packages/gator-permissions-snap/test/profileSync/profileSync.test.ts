@@ -5,7 +5,6 @@ import {
 } from '@metamask/delegation-core';
 import type { Delegation } from '@metamask/delegation-core';
 import type {
-  JwtBearerAuth,
   UserStorage,
 } from '@metamask/profile-sync-controller/sdk';
 
@@ -24,10 +23,7 @@ describe('profileSync', () => {
   const sessionAccount = address;
 
   let profileSyncManager: ProfileSyncManager;
-  const jwtBearerAuthMock = {
-    getAccessToken: jest.fn(),
-    getUserProfile: jest.fn(),
-  } as unknown as jest.Mocked<JwtBearerAuth>;
+
   const userStorageMock = {
     getAllFeatureItems: jest.fn(),
     getItem: jest.fn(),
@@ -98,7 +94,6 @@ describe('profileSync', () => {
     beforeEach(() => {
       profileSyncManager = createProfileSyncManager({
         isFeatureEnabled: true,
-        auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
       });
     });
@@ -537,7 +532,6 @@ describe('profileSync', () => {
     beforeEach(() => {
       profileSyncManager = createProfileSyncManager({
         isFeatureEnabled: true,
-        auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
       });
     });
@@ -601,7 +595,6 @@ describe('profileSync', () => {
     beforeEach(() => {
       profileSyncManager = createProfileSyncManager({
         isFeatureEnabled: false,
-        auth: jwtBearerAuthMock,
         userStorage: userStorageMock,
       });
     });
