@@ -703,67 +703,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         });
       });
 
-      it('passes isAdjustmentAllowed flag to onConfirmationCreated when adjustment is not allowed', async () => {
-        const initialContext = {
-          foo: 'bar',
-          expiry: '2024-12-31',
-          isAdjustmentAllowed: false, // Adjustment not allowed
-          accountAddressCaip10: fixedCaip10Address,
-        };
-
-        const mockPermissionRequestWithAdjustmentNotAllowed = {
-          ...mockPermissionRequest,
-          permission: {
-            ...mockPermissionRequest.permission,
-            isAdjustmentAllowed: false,
-          },
-        };
-
-        lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
-
-        let onConfirmationCreatedArgs: any;
-        expect(lifecycleHandlerMocks.onConfirmationCreated).toBeDefined();
-        lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
-          (args) => {
-            onConfirmationCreatedArgs = args;
-          },
-        );
-
-        const orchestrationPromise =
-          permissionRequestLifecycleOrchestrator.orchestrate(
-            'test-origin',
-            mockPermissionRequestWithAdjustmentNotAllowed,
-            lifecycleHandlerMocks,
-          );
-
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        // Verify that isAdjustmentAllowed is passed correctly
-        expect(onConfirmationCreatedArgs).toBeDefined();
-        expect(onConfirmationCreatedArgs.isAdjustmentAllowed).toBe(false);
-        expect(onConfirmationCreatedArgs.updateContext).toBeDefined();
-        expect(onConfirmationCreatedArgs.initialContext).toStrictEqual(
-          initialContext,
-        );
-
-        // Verify that updateContext can be called without throwing (restriction is now in handlers)
-        const updateContextPromise = onConfirmationCreatedArgs.updateContext({
-          updatedContext: { ...initialContext, foo: 'updated' },
-        });
-        expect(await updateContextPromise).toBeUndefined();
-
-        // this is called once when the context is first resolved, and once when we call updateContext
-        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(2);
-
-        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
-          {
-            isConfirmationGranted: true,
-          },
-        );
-
-        await orchestrationPromise;
-      });
-
       it('prevents race condition when grant is clicked before debounced validation completes', async () => {
         // This test simulates the race condition scenario:
         // 1. User types invalid input → validation debounced (500ms delay)

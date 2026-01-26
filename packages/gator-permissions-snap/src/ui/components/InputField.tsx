@@ -10,7 +10,7 @@ export type InputFieldParams = Pick<
   | 'tooltip'
   | 'addFieldButtonName'
   | 'removeFieldButtonName'
-  | 'disabled'
+  | 'isEditable'
   | 'iconData'
   | 'errorMessage'
 > & {
@@ -27,11 +27,11 @@ export const InputField = ({
   tooltip,
   type,
   value,
-  disabled,
+  isEditable = true,
   errorMessage,
   iconData,
 }: InputFieldParams): JSX.Element => {
-  if (disabled) {
+  if (!isEditable) {
     return (
       <TextField
         label={label}
@@ -49,7 +49,7 @@ export const InputField = ({
       label={label}
       tooltip={tooltip}
       errorMessage={errorMessage}
-      disabled={disabled}
+      isEditable={isEditable}
       addFieldButtonName={addFieldButtonName}
       removeFieldButtonName={removeFieldButtonName}
       isFieldEnabled={isFieldEnabled}

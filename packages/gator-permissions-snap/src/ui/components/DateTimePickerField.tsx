@@ -8,8 +8,8 @@ export type DateTimePickerFieldParams = Pick<
   BaseFieldProps,
   | 'label'
   | 'tooltip'
-  | 'disabled'
   | 'errorMessage'
+  | 'isEditable'
   | 'removeFieldButtonName'
   | 'addFieldButtonName'
 > & {
@@ -25,7 +25,7 @@ export const DateTimePickerField = ({
   name,
   tooltip,
   value,
-  disabled,
+  isEditable = true,
   errorMessage,
   allowPastDate,
   addFieldButtonName,
@@ -33,7 +33,7 @@ export const DateTimePickerField = ({
 }: DateTimePickerFieldParams): JSX.Element => {
   const isFieldEnabled = value !== null && value !== undefined;
 
-  if (disabled) {
+  if (!isEditable) {
     // Format the ISO date to a readable format for display
     let displayValue = value ?? '';
     if (value) {
@@ -58,7 +58,7 @@ export const DateTimePickerField = ({
       label={label}
       tooltip={tooltip}
       errorMessage={errorMessage}
-      disabled={disabled}
+      isEditable={isEditable}
       isFieldEnabled={isFieldEnabled}
       variant="form"
       addFieldButtonName={addFieldButtonName}

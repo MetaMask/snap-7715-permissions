@@ -57,8 +57,8 @@ export const createExpiryRule = <
       tooltip: translate('expiryTooltip'),
       error: metadata.validationErrors.expiryError,
       allowPastDate: false,
-      isAdjustmentAllowed: context.isAdjustmentAllowed,
-      is7715RuleType: true,
+      // expiry rule is _always_ editable
+      isEditable: true,
     }),
     updateContext: (context: TContext, value: string | undefined): TContext => {
       let expiry: { timestamp: number } | undefined;

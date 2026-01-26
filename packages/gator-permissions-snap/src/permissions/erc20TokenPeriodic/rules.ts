@@ -34,8 +34,7 @@ export const periodAmountRule: RuleDefinition<
     tooltip: t('amountTooltip'),
     error: metadata.validationErrors.periodAmountError,
     iconData: getIconData(context),
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
-    is7715RuleType: false,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({
     ...context,
@@ -59,8 +58,7 @@ export const periodDurationRule: RuleDefinition<
     tooltip: t('periodDurationTooltip'),
     options: Object.values(TimePeriod),
     error: metadata.validationErrors.periodDurationError,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
-    is7715RuleType: false,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => {
     // Validate that value is a valid TimePeriod
@@ -105,8 +103,7 @@ export const startTimeRule: RuleDefinition<
     tooltip: t('startTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
     allowPastDate: false,
-    isAdjustmentAllowed: context.isAdjustmentAllowed,
-    is7715RuleType: false,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({
     ...context,
