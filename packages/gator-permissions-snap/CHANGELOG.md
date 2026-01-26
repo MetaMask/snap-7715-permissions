@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- fix: first granted permission doesn't save ([#261](https://github.com/MetaMask/snap-7715-permissions/pull/261))
+- fix: editing expiry doesn't work when `isAdjustmentAllowed` is false ([#263](https://github.com/MetaMask/snap-7715-permissions/pull/263))
+
 ## [1.1.0]
 
 ### Changed
