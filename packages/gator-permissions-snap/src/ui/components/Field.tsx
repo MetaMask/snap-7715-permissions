@@ -32,7 +32,7 @@ export type BaseFieldProps = {
   label: string;
   tooltip?: string | undefined;
   errorMessage?: string | undefined;
-  disabled?: boolean | undefined;
+  isEditable?: boolean;
   isFieldEnabled?: boolean;
   addFieldButtonName?: string | undefined;
   removeFieldButtonName?: string | undefined;
@@ -94,13 +94,13 @@ const isDisplayFieldProps = (props: FieldProps): props is ViewFieldProps => {
  * - Generic fields (with children only)
  *
  * Toggle functionality is enabled by providing both `addFieldButtonName` and `removeFieldButtonName`.
- * When toggling is enabled and the field is disabled, only the label section is shown.
+ * When toggling is enabled and the field is not editable, only the label section is shown.
  *
  * @param props - The properties for the Field component.
  * @param props.label - The label text for the field.
  * @param props.tooltip - Optional tooltip text for the label.
  * @param props.errorMessage - Optional error message to display.
- * @param props.disabled - Whether the field is disabled.
+ * @param props.isEditable - Whether the field is editable.
  * @param props.isFieldEnabled - Whether the field is currently enabled (default: true).
  * @param props.addFieldButtonName - Name for the add field button (enables toggle).
  * @param props.removeFieldButtonName - Name for the remove field button (enables toggle).
@@ -115,7 +115,7 @@ export const Field = (props: FieldProps): JSX.Element => {
     label,
     tooltip,
     errorMessage,
-    disabled,
+    isEditable = true,
     isFieldEnabled = true,
     addFieldButtonName,
     removeFieldButtonName,
@@ -131,7 +131,7 @@ export const Field = (props: FieldProps): JSX.Element => {
 
   let toggleFieldButton: SnapElement | null = null;
 
-  if (hasToggleButtons && !disabled) {
+  if (hasToggleButtons && isEditable) {
     const toggleFieldButtonName = isFieldEnabled
       ? removeFieldButtonName
       : addFieldButtonName;
@@ -163,7 +163,7 @@ export const Field = (props: FieldProps): JSX.Element => {
   );
 
   /**
-   * Once the toggle feature is enabled, and the field is disabled,
+   * Once the toggle feature is enabled, and the field is not editable,
    * we only show the label section.
    */
   if (hasToggleButtons && !isFieldEnabled) {
@@ -196,7 +196,7 @@ export const Field = (props: FieldProps): JSX.Element => {
       const { removeButtonName, children } = props;
 
       const removeButtonElement =
-        removeButtonName && !disabled ? (
+        removeButtonName && isEditable ? (
           <Button name={removeButtonName} type="button">
             <Icon name="close" color="primary" size="md" />
           </Button>

@@ -40,18 +40,13 @@ export function renderRule<
     iconData,
     isVisible,
     options,
-    isAdjustmentAllowed,
-    is7715RuleType,
+    isEditable,
     allowPastDate,
   } = rule.getRuleData({ context, metadata });
 
   if (!isVisible) {
     return null;
   }
-
-  // 7715 standard rule types (e.g., expiry) always default to enabled input.
-  // 7715 permission data fields (e.g., amount, period) use isAdjustmentAllowed to determine if the input should be disabled.
-  const isDisabled = is7715RuleType !== true && !isAdjustmentAllowed;
 
   const addFieldButtonName = isOptional ? `${name}_addFieldButton` : undefined;
   const removeFieldButtonName = isOptional
@@ -67,7 +62,7 @@ export function renderRule<
           name={name}
           value={value}
           errorMessage={error}
-          disabled={isDisabled}
+          isEditable={isEditable}
           tooltip={tooltip}
           type={type}
           addFieldButtonName={addFieldButtonName}
@@ -91,7 +86,7 @@ export function renderRule<
           name={name}
           value={value as MessageKey}
           errorMessage={error}
-          disabled={isDisabled}
+          isEditable={isEditable}
           tooltip={tooltip}
           options={options as MessageKey[]}
         />
@@ -104,7 +99,7 @@ export function renderRule<
           name={name}
           value={value}
           errorMessage={error}
-          disabled={isDisabled}
+          isEditable={isEditable}
           tooltip={tooltip}
           allowPastDate={allowPastDate}
           removeFieldButtonName={removeFieldButtonName}
@@ -169,6 +164,9 @@ export function bindRuleHandlers<
 }): () => void {
   const unbinders = rules.reduce<(() => void)[]>((acc, rule) => {
     const { name, isOptional } = rule;
+    // todo: ideally we would only bind this handler if isEditable is true but
+    // that requires resolving the RuleData which is added complexity that we
+    // don't need
 
     const handleInputChange: UserEventHandler<
       UserInputEventType.InputChangeEvent

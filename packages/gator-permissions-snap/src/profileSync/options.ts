@@ -50,11 +50,11 @@ export const createProfileSyncOptions = (
    * Uses snap storage to persist persist storage key
    */
   const keyStorageOptions: StorageOptions = {
-    getStorageKey: async () => {
+    getStorageKey: async (_message: `metamask:${string}`) => {
       const state = await stateManager.getState();
       return state.profileSyncUserStorageKey;
     },
-    setStorageKey: async (val: string) => {
+    setStorageKey: async (_message: `metamask:${string}`, val: string) => {
       const state = await stateManager.getState();
       await stateManager.setState({
         ...state,

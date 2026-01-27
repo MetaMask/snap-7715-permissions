@@ -19,6 +19,7 @@ import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../../src/userEventDispatcher';
+import type { MessageKey } from '../../src/utils/i18n';
 
 const mockAddress = '0x1234567890123456789012345678901234567890' as const;
 const mockAddress2 = '0x1234567890123456789012345678901234567891' as const;
@@ -79,9 +80,9 @@ const mockTokenBalanceAndMetadata: TokenBalanceAndMetadata = {
 const mockMetadata: TestMetadataType = {};
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const setupTest = () => {
-  const title = 'Test permission';
-  const subtitle = 'This site wants a test permission.';
+const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
+  const title = 'permissionRequestTitle' as MessageKey;
+  const subtitle = 'permissionRequestSubtitle' as MessageKey;
 
   const boundEvents = new Map<string, UserEventHandler<UserInputEventType>>();
   const unboundEvents = new Map<string, UserEventHandler<UserInputEventType>>();
@@ -181,7 +182,7 @@ const setupTest = () => {
     ),
     fetchIconDataAsBase64: jest.fn(),
   } as unknown as jest.Mocked<TokenMetadataService>;
-  const rules: RuleDefinition<any, any>[] = [];
+  const rules: RuleDefinition<any, any>[] = options?.rules ?? [];
 
   const permissionHandlerDependencies = {
     title,
@@ -439,12 +440,23 @@ describe('PermissionHandler', () => {
 
     describe('onConfirmationCreated', () => {
       it('registers event handlers for account selection and justification toggle', async () => {
+        const rule: RuleDefinition<TestContextType, TestMetadataType> = {
+          name: 'amountPerSecond',
+          label: 'amountLabel',
+          type: 'number',
+          getRuleData: () => ({
+            value: '0x1',
+            isVisible: true,
+            isEditable: false,
+          }),
+          updateContext: (context) => context,
+        };
         const {
           permissionHandler,
           getLifecycleHandlers,
           getBoundEvent,
           updateContext,
-        } = setupTest();
+        } = setupTest({ rules: [rule] });
 
         await permissionHandler.handlePermissionRequest(mockOrigin);
 
@@ -639,7 +651,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "Test permission",
+                    "children": "Permission request",
                     "size": "lg",
                   },
                   "type": "Heading",
@@ -647,7 +659,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants a test permission.",
+                    "children": "This site wants permissions to spend your tokens.",
                   },
                   "type": "Text",
                 },
@@ -1246,7 +1258,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "Test permission",
+                    "children": "Permission request",
                     "size": "lg",
                   },
                   "type": "Heading",
@@ -1254,7 +1266,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants a test permission.",
+                    "children": "This site wants permissions to spend your tokens.",
                   },
                   "type": "Text",
                 },
@@ -1902,7 +1914,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "Test permission",
+                    "children": "Permission request",
                     "size": "lg",
                   },
                   "type": "Heading",
@@ -1910,7 +1922,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants a test permission.",
+                    "children": "This site wants permissions to spend your tokens.",
                   },
                   "type": "Text",
                 },
@@ -2482,7 +2494,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "Test permission",
+                    "children": "Permission request",
                     "size": "lg",
                   },
                   "type": "Heading",
@@ -2490,7 +2502,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants a test permission.",
+                    "children": "This site wants permissions to spend your tokens.",
                   },
                   "type": "Text",
                 },
@@ -3068,7 +3080,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "Test permission",
+                    "children": "Permission request",
                     "size": "lg",
                   },
                   "type": "Heading",
@@ -3076,7 +3088,7 @@ describe('PermissionHandler', () => {
                 {
                   "key": null,
                   "props": {
-                    "children": "This site wants a test permission.",
+                    "children": "This site wants permissions to spend your tokens.",
                   },
                   "type": "Text",
                 },
@@ -3747,13 +3759,24 @@ describe('PermissionHandler', () => {
         expect(showMoreButtonUnboundEvent).toBeDefined();
       });
 
-      it('does not bind rule handlers when isAdjustmentAllowed is false but allows account selection', async () => {
+      it('binds rule handlers even when isAdjustmentAllowed is false', async () => {
+        const rule: RuleDefinition<TestContextType, TestMetadataType> = {
+          name: 'amountPerSecond',
+          label: 'amountLabel',
+          type: 'number',
+          getRuleData: () => ({
+            value: '0x1',
+            isVisible: true,
+            isEditable: false,
+          }),
+          updateContext: (context) => context,
+        };
         const {
           permissionHandler,
           getLifecycleHandlers,
           getBoundEvent,
           updateContext,
-        } = setupTest();
+        } = setupTest({ rules: [rule] });
 
         await permissionHandler.handlePermissionRequest(mockOrigin);
 
@@ -3766,17 +3789,16 @@ describe('PermissionHandler', () => {
           isAdjustmentAllowed: false, // Adjustment not allowed
         });
 
-        // Try to get a rule input handler - it should not exist when adjustment is not allowed
+        // Try to get a rule input handler - it should still be bound
         const ruleInputHandler = getBoundEvent({
           elementName: 'amountPerSecond', // Example rule input field
           eventType: 'InputChangeEvent',
           interfaceId: mockInterfaceId,
         });
 
-        // The rule handler should not be bound when adjustment is not allowed
-        expect(ruleInputHandler).toBeUndefined();
+        expect(ruleInputHandler).toBeDefined();
 
-        // But account selector should still be bound (it's allowed even when adjustment is not allowed)
+        // Account selector should still be bound (it's allowed even when adjustment is not allowed)
         const accountSelectorHandler = getBoundEvent({
           elementName: 'account-selector',
           eventType: 'InputChangeEvent',

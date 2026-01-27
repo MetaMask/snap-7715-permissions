@@ -18,10 +18,10 @@ export const DropdownField = ({
   tooltip,
   value,
   options,
-  disabled,
+  isEditable = true,
   errorMessage,
 }: DropdownFieldParams): JSX.Element => {
-  if (disabled) {
+  if (!isEditable) {
     return <TextField label={label} value={t(value)} tooltip={tooltip} />;
   }
 
@@ -30,7 +30,7 @@ export const DropdownField = ({
       label={label}
       tooltip={tooltip}
       errorMessage={errorMessage}
-      disabled={disabled}
+      isEditable={isEditable}
       variant="form"
     >
       <Dropdown name={name} value={value}>

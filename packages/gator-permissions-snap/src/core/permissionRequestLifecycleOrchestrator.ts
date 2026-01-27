@@ -293,7 +293,6 @@ export class PermissionRequestLifecycleOrchestrator {
         interfaceId,
         updateContext,
         initialContext: context,
-        isAdjustmentAllowed,
       });
     }
 
