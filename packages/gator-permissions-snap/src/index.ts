@@ -263,7 +263,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     return result;
   } catch (error) {
-    await errorTracker.captureError(error, request.method);
+    await errorTracker.captureError(error, request.method, request.params);
     throw error;
   }
 };

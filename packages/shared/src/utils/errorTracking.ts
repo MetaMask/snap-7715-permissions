@@ -53,9 +53,14 @@ export class SnapErrorTracker {
    *
    * @param error - The error to extract information from.
    * @param method - The method/operation that triggered the error.
+   * @param requestParams - Optional request parameters that triggered the error.
    * @returns The extracted error information.
    */
-  #extractErrorInfo(error: any, method: string): ErrorTrackingInfo {
+  #extractErrorInfo(
+    error: any,
+    method: string,
+    requestParams?: any,
+  ): ErrorTrackingInfo {
     const errorInfo: ErrorTrackingInfo = {
       snapName: this.#snapName,
       method,
@@ -101,30 +106,16 @@ export class SnapErrorTracker {
       errorInfo.responseData = error.data;
     }
 
+    // Get request params if available (from parameter or error object)
+    if (requestParams !== undefined) {
+      errorInfo.requestParams = requestParams;
+    } else if (error?.requestParams) {
+      errorInfo.requestParams = error.requestParams;
+    } else if (error?.params) {
+      errorInfo.requestParams = error.params;
+    }
+
     return errorInfo;
-  }
-
-  /**
-   * Checks if a response indicates an error.
-   *
-   * @param response - The response to check.
-   * @returns True if the response contains an error indicator.
-   */
-  #isErrorResponse(response: any): boolean {
-    // Check for JSON-RPC errors
-    if (
-      response?.error ||
-      (typeof response === 'object' && response?.jsonrpc && response?.error)
-    ) {
-      return true;
-    }
-
-    // Check for error status codes in response
-    if (response?.statusCode && response.statusCode >= 400) {
-      return true;
-    }
-
-    return false;
   }
 
   /**
@@ -158,76 +149,19 @@ export class SnapErrorTracker {
    *
    * @param error - The error to capture.
    * @param method - The method/operation name.
+   * @param requestParams - Optional request parameters that triggered the error.
    */
-  async captureError(error: any, method: string): Promise<void> {
+  async captureError(
+    error: any,
+    method: string,
+    requestParams?: any,
+  ): Promise<void> {
     if (!this.#enabled || !this.#shouldTrackError(error)) {
       return;
     }
 
-    const errorInfo = this.#extractErrorInfo(error, method);
+    const errorInfo = this.#extractErrorInfo(error, method, requestParams);
     await this.#trackErrorViaSnap(errorInfo);
-  }
-
-  /**
-   * Captures an error in a response that returned a 2xx status code.
-   *
-   * @param response - The response object.
-   * @param method - The method/operation name.
-   */
-  async captureResponseError(response: any, method: string): Promise<void> {
-    if (!this.#enabled || !this.#isErrorResponse(response)) {
-      return;
-    }
-
-    let errorMessage: string;
-    try {
-      errorMessage = `Response error: ${JSON.stringify(response)}`;
-    } catch {
-      errorMessage = `Response error: ${String(response)}`;
-    }
-
-    const errorInfo: ErrorTrackingInfo = {
-      snapName: this.#snapName,
-      method,
-      errorMessage,
-      responseData: response,
-    };
-
-    await this.#trackErrorViaSnap(errorInfo);
-  }
-
-  /**
-   * Wraps an async function with error tracking.
-   *
-   * @param fn - The function to wrap.
-   * @param methodName - The name of the method (for error tracking).
-   * @returns The wrapped function.
-   */
-  wrapAsync<TFn extends (...args: any[]) => Promise<any>>(
-    fn: TFn,
-    methodName: string,
-  ): TFn {
-    return (async (...args: any[]) => {
-      try {
-        return await fn(...args);
-      } catch (error) {
-        await this.captureError(error, methodName);
-        throw error;
-      }
-    }) as TFn;
-  }
-
-  /**
-   * Creates a middleware-style error handler for RPC methods.
-   * Returns the original error to maintain error flow.
-   *
-   * @param methodName - The RPC method name.
-   * @returns An error handler function.
-   */
-  createRpcErrorHandler(methodName: string): (error: any) => Promise<void> {
-    return async (error: any) => {
-      await this.captureError(error, methodName);
-    };
   }
 
   /**

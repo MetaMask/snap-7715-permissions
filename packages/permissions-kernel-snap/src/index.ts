@@ -116,7 +116,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     return result;
   } catch (error) {
-    await errorTracker.captureError(error, request.method || 'unknown');
+    await errorTracker.captureError(
+      error,
+      request.method || 'unknown',
+      request.params,
+    );
     throw error;
   } finally {
     // Always release the processing lock we acquired, regardless of success or failure

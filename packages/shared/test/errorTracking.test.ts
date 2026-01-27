@@ -46,6 +46,34 @@ describe('SnapErrorTracker', () => {
     expect(errorMessage).toContain('https://example.com');
   });
 
+  it('should track requestParams when provided', async () => {
+    const requestParams = { userId: '123', action: 'test' };
+    await tracker.captureError(
+      new Error('Test error'),
+      'testMethod',
+      requestParams,
+    );
+    expect(mockSnapRequest).toHaveBeenCalled();
+    const errorMessage = mockSnapRequest.mock.calls[0][0].params.error.message;
+    const errorInfo = JSON.parse(errorMessage);
+    expect(errorInfo.requestParams).toStrictEqual(requestParams);
+  });
+
+  it('should extract requestParams from error object if not provided', async () => {
+    const requestParams = { userId: '456', action: 'test2' };
+    await tracker.captureError(
+      {
+        message: 'Error with params',
+        requestParams,
+      },
+      'testMethod',
+    );
+    expect(mockSnapRequest).toHaveBeenCalled();
+    const errorMessage = mockSnapRequest.mock.calls[0][0].params.error.message;
+    const errorInfo = JSON.parse(errorMessage);
+    expect(errorInfo.requestParams).toStrictEqual(requestParams);
+  });
+
   it('should respect enabled state and custom filtering', async () => {
     // Test disabled state
     tracker.setEnabled(false);
@@ -71,7 +99,6 @@ describe('SnapErrorTracker', () => {
     mockSnapRequest.mockRejectedValue(new Error('Tracking failed'));
     const consoleWarnSpy = jest
       .spyOn(console, 'warn')
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       .mockImplementation(() => {
         /* empty */
       });
@@ -80,54 +107,6 @@ describe('SnapErrorTracker', () => {
     expect(consoleWarnSpy).toHaveBeenCalled();
 
     consoleWarnSpy.mockRestore();
-  });
-
-  it('should track response errors', async () => {
-    // JSON-RPC error
-    await tracker.captureResponseError(
-      { jsonrpc: '2.0', error: { code: -32000, message: 'Server error' } },
-      'testMethod',
-    );
-    expect(mockSnapRequest).toHaveBeenCalled();
-
-    jest.clearAllMocks();
-
-    // Error status code
-    await tracker.captureResponseError(
-      { statusCode: 404, message: 'Not found' },
-      'testMethod',
-    );
-    expect(mockSnapRequest).toHaveBeenCalled();
-
-    jest.clearAllMocks();
-
-    // Success response - should not track
-    await tracker.captureResponseError(
-      { statusCode: 200, data: 'success' },
-      'testMethod',
-    );
-    expect(mockSnapRequest).not.toHaveBeenCalled();
-  });
-
-  it('should wrap async functions and create error handlers', async () => {
-    // Test wrapAsync
-    const mockFn = jest.fn().mockResolvedValue('success');
-    const wrapped = tracker.wrapAsync(mockFn, 'testMethod');
-    const result = await wrapped('arg1');
-    expect(result).toBe('success');
-    expect(mockFn).toHaveBeenCalledWith('arg1');
-
-    // Test error tracking in wrapped function
-    mockFn.mockRejectedValue(new Error('Async error'));
-    await expect(wrapped()).rejects.toThrow('Async error');
-    expect(mockSnapRequest).toHaveBeenCalled();
-
-    jest.clearAllMocks();
-
-    // Test createRpcErrorHandler
-    const handler = tracker.createRpcErrorHandler('rpcMethod');
-    await handler(new Error('RPC error'));
-    expect(mockSnapRequest).toHaveBeenCalled();
   });
 });
 
