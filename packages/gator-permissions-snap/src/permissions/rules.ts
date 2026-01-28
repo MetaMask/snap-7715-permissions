@@ -9,7 +9,7 @@ import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 
 import { TimePeriod } from '../core/types';
 import type {
-  BaseRuleContext,
+  BaseContext,
   RuleDefinition,
   TypedPermissionRequest,
 } from '../core/types';
@@ -20,7 +20,7 @@ import {
   timestampToISO8601,
 } from '../utils/time';
 
-export type ExpiryRuleContext = BaseRuleContext;
+export type ExpiryRuleContext = BaseContext;
 
 export type ExpiryRuleMetadata = {
   validationErrors: {
@@ -57,6 +57,8 @@ export const createExpiryRule = <
       tooltip: translate('expiryTooltip'),
       error: metadata.validationErrors.expiryError,
       allowPastDate: false,
+      // expiry rule is _always_ editable
+      isEditable: true,
     }),
     updateContext: (context: TContext, value: string | undefined): TContext => {
       let expiry: { timestamp: number } | undefined;
@@ -86,7 +88,7 @@ export const createExpiryRule = <
 };
 
 export const applyExpiryRule = <
-  TContext extends BaseRuleContext,
+  TContext extends BaseContext,
   TPermissionRequest extends TypedPermissionRequest<Permission>,
 >(
   context: TContext,

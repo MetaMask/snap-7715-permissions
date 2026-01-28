@@ -95,6 +95,8 @@ export type TrackProfileSyncParams = {
   success: boolean;
   /** Optional error message if operation failed */
   errorMessage?: string;
+  /** Optional performance data for the operation */
+  performanceData?: Record<string, number>;
 };
 
 /**
@@ -254,13 +256,18 @@ export class SnapsMetricsService {
    * @param params - The tracking parameters.
    */
   async trackProfileSync(params: TrackProfileSyncParams): Promise<void> {
+    const { operation, success, errorMessage, performanceData } = params;
+
+    const message = success
+      ? `Profile sync ${operation} successful`
+      : `Profile sync ${operation} failed`;
+
     await this.#trackEvent('Profile Sync', {
-      message: params.success
-        ? `Profile sync ${params.operation} successful`
-        : `Profile sync ${params.operation} failed`,
-      operation: params.operation,
-      success: params.success,
-      ...(params.errorMessage ? { error_message: params.errorMessage } : {}),
+      message,
+      operation,
+      success,
+      ...(performanceData ? { performance_data: performanceData } : {}),
+      ...(errorMessage ? { error_message: errorMessage } : {}),
     });
   }
 

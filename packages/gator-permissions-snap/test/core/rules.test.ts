@@ -11,6 +11,7 @@ import type {
   UserEventDispatcher,
   UserEventHandler,
 } from '../../src/userEventDispatcher';
+import type { MessageKey } from '../../src/utils/i18n';
 
 type TestContext = BaseContext & {
   testValue?: string;
@@ -24,7 +25,7 @@ type TestMetadata = {
 };
 
 const mockContext: TestContext = {
-  expiry: '2024-12-31',
+  expiry: undefined,
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: 'eip155:1:0x1234567890123456789012345678901234567890',
@@ -47,12 +48,12 @@ const mockMetadata: TestMetadata = {
 
 const textRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-text-rule',
-  label: 'Test Text Rule',
+  label: 'Test Text Rule' as MessageKey,
   type: 'text',
   getRuleData: ({ context, metadata }) => ({
     value: context.testValue,
     isVisible: true,
-
+    isEditable: context.isAdjustmentAllowed,
     tooltip: 'This is a test text rule',
     error: metadata.validationErrors.testValue,
   }),
@@ -61,23 +62,24 @@ const textRule: RuleDefinition<TestContext, TestMetadata> = {
 
 const numberRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-number-rule',
-  label: 'Test Number Rule',
+  label: 'Test Number Rule' as MessageKey,
   type: 'number',
   getRuleData: ({ context }) => ({
     value: context.numberValue,
     isVisible: true,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context, value) => ({ ...context, numberValue: value }),
 };
 
 const dropdownRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-dropdown-rule',
-  label: 'Test Dropdown Rule',
+  label: 'Test Dropdown Rule' as MessageKey,
   type: 'dropdown',
   getRuleData: ({ context }) => ({
     value: context.dropdownValue,
     isVisible: true,
-
+    isEditable: context.isAdjustmentAllowed,
     options: ['option1', 'option2', 'option3'],
   }),
   updateContext: (context, value) => ({ ...context, dropdownValue: value }),
@@ -85,24 +87,25 @@ const dropdownRule: RuleDefinition<TestContext, TestMetadata> = {
 
 const optionalRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'test-optional-rule',
-  label: 'Test Optional Rule',
+  label: 'Test Optional Rule' as MessageKey,
   type: 'text',
   isOptional: true,
   getRuleData: ({ context }) => ({
     value: context.optionalValue,
     isVisible: true,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context, value) => ({ ...context, optionalValue: value }),
 };
 
 const undefinedValueRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'undefined-value-rule',
-  label: 'Undefined Value Rule',
+  label: 'Undefined Value Rule' as MessageKey,
   type: 'text',
   getRuleData: () => ({
     value: undefined,
     isVisible: true,
-    isAdjustmentAllowed: true,
+    isEditable: false,
   }),
   updateContext: (context, value) => ({ ...context, testValue: value }),
 };
@@ -120,7 +123,6 @@ describe('rules', () => {
 {
   "key": null,
   "props": {
-    "alignment": "space-between",
     "children": [
       {
         "key": null,
@@ -175,21 +177,35 @@ describe('rules', () => {
         "key": null,
         "props": {
           "children": [
-            null,
             {
               "key": null,
               "props": {
-                "children": "test-value",
+                "children": null,
               },
-              "type": "Text",
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "name": "test-text-rule",
+                "type": "text",
+                "value": "test-value",
+              },
+              "type": "Input",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
             },
           ],
-          "direction": "horizontal",
         },
-        "type": "Box",
+        "type": "Field",
       },
     ],
-    "direction": "horizontal",
+    "direction": "vertical",
   },
   "type": "Box",
 }
@@ -207,7 +223,6 @@ describe('rules', () => {
 {
   "key": null,
   "props": {
-    "alignment": "space-between",
     "children": [
       {
         "key": null,
@@ -241,21 +256,35 @@ describe('rules', () => {
         "key": null,
         "props": {
           "children": [
-            null,
             {
               "key": null,
               "props": {
-                "children": "123",
+                "children": null,
               },
-              "type": "Text",
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "name": "test-number-rule",
+                "type": "number",
+                "value": "123",
+              },
+              "type": "Input",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
             },
           ],
-          "direction": "horizontal",
         },
-        "type": "Box",
+        "type": "Field",
       },
     ],
-    "direction": "horizontal",
+    "direction": "vertical",
   },
   "type": "Box",
 }
@@ -273,7 +302,6 @@ describe('rules', () => {
 {
   "key": null,
   "props": {
-    "alignment": "space-between",
     "children": [
       {
         "key": null,
@@ -306,22 +334,45 @@ describe('rules', () => {
       {
         "key": null,
         "props": {
-          "children": [
-            null,
-            {
-              "key": null,
-              "props": {
-                "children": "option1",
-              },
-              "type": "Text",
+          "children": {
+            "key": null,
+            "props": {
+              "children": [
+                {
+                  "key": "option1",
+                  "props": {
+                    "children": "option1",
+                    "value": "option1",
+                  },
+                  "type": "Option",
+                },
+                {
+                  "key": "option2",
+                  "props": {
+                    "children": "option2",
+                    "value": "option2",
+                  },
+                  "type": "Option",
+                },
+                {
+                  "key": "option3",
+                  "props": {
+                    "children": "option3",
+                    "value": "option3",
+                  },
+                  "type": "Option",
+                },
+              ],
+              "name": "test-dropdown-rule",
+              "value": "option1",
             },
-          ],
-          "direction": "horizontal",
+            "type": "Dropdown",
+          },
         },
-        "type": "Box",
+        "type": "Field",
       },
     ],
-    "direction": "horizontal",
+    "direction": "vertical",
   },
   "type": "Box",
 }
@@ -339,7 +390,6 @@ describe('rules', () => {
 {
   "key": null,
   "props": {
-    "alignment": "space-between",
     "children": [
       {
         "key": null,
@@ -363,7 +413,34 @@ describe('rules', () => {
               },
               "type": "Box",
             },
-            null,
+            {
+              "key": null,
+              "props": {
+                "children": {
+                  "key": null,
+                  "props": {
+                    "children": {
+                      "key": null,
+                      "props": {
+                        "alt": "Remove Test Optional Rule",
+                        "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
+
+  <!-- Toggle circle (on right) -->
+  <circle cx="27" cy="10.5" r="7.5" fill="white"/>
+</svg>
+",
+                      },
+                      "type": "Image",
+                    },
+                    "name": "test-optional-rule_removeFieldButton",
+                  },
+                  "type": "Button",
+                },
+              },
+              "type": "Box",
+            },
           ],
           "direction": "horizontal",
         },
@@ -373,21 +450,35 @@ describe('rules', () => {
         "key": null,
         "props": {
           "children": [
-            null,
             {
               "key": null,
               "props": {
-                "children": "optional-value",
+                "children": null,
               },
-              "type": "Text",
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "name": "test-optional-rule",
+                "type": "text",
+                "value": "optional-value",
+              },
+              "type": "Input",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
             },
           ],
-          "direction": "horizontal",
         },
-        "type": "Box",
+        "type": "Field",
       },
     ],
-    "direction": "horizontal",
+    "direction": "vertical",
   },
   "type": "Box",
 }
@@ -496,7 +587,6 @@ describe('rules', () => {
 {
   "key": null,
   "props": {
-    "alignment": "space-between",
     "children": [
       {
         "key": null,
@@ -551,21 +641,36 @@ describe('rules', () => {
         "key": null,
         "props": {
           "children": [
-            null,
             {
               "key": null,
               "props": {
-                "children": "test-value",
+                "children": null,
               },
-              "type": "Text",
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "name": "test-text-rule",
+                "type": "text",
+                "value": "test-value",
+              },
+              "type": "Input",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": null,
+              },
+              "type": "Box",
             },
           ],
-          "direction": "horizontal",
+          "error": "This field has an error",
         },
-        "type": "Box",
+        "type": "Field",
       },
     ],
-    "direction": "horizontal",
+    "direction": "vertical",
   },
   "type": "Box",
 }
@@ -641,11 +746,12 @@ describe('rules', () => {
     it('should throw error for dropdown rule without options', () => {
       const invalidDropdownRule: RuleDefinition<TestContext, TestMetadata> = {
         name: 'invalid-dropdown',
-        label: 'Invalid Dropdown',
+        label: 'Invalid Dropdown' as MessageKey,
         type: 'dropdown',
         getRuleData: ({ context }) => ({
           value: context.dropdownValue,
           isVisible: true,
+          isEditable: true,
 
           // intentionally omitting options to test error handling
         }),

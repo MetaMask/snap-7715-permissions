@@ -13,6 +13,9 @@ import { InvalidInputError } from '@metamask/snaps-sdk';
 import type { Json } from '@metamask/snaps-sdk';
 import { z } from 'zod';
 
+import type { TransactionReceipt } from '../clients/types';
+import { zTransactionReceipt } from '../clients/types';
+
 export const validateGetGrantedPermissionsParams = (
   params: unknown,
 ): GetGrantedPermissionsParam => {
@@ -43,6 +46,7 @@ export const validatePermissionRequestParam = (
 // Validation schema for revocation parameters
 const zRevocationParams = z.object({
   permissionContext: zHexStr,
+  txHash: zHexStr.optional(),
 });
 
 /**
@@ -53,17 +57,14 @@ const zRevocationParams = z.object({
  */
 export function validateRevocationParams(params: Json): {
   permissionContext: Hex;
+  txHash?: Hex | undefined;
 } {
   try {
     if (!params || typeof params !== 'object') {
       throw new InvalidInputError('Parameters are required');
     }
 
-    const validated = zRevocationParams.parse(params);
-
-    return {
-      permissionContext: validated.permissionContext,
-    };
+    return zRevocationParams.parse(params);
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new InvalidInputError(extractZodError(error.errors));
@@ -71,3 +72,23 @@ export function validateRevocationParams(params: Json): {
     throw error;
   }
 }
+
+/**
+ * Validates the transaction receipt.
+ * @param transactionReceipt - The transaction receipt to validate.
+ * @returns The validated transaction receipt.
+ * @throws InvalidInputError if validation fails.
+ */
+export const validateTransactionReceipt = (
+  transactionReceipt: unknown,
+): TransactionReceipt => {
+  const validatedTransactionReceipt =
+    zTransactionReceipt.safeParse(transactionReceipt);
+  if (!validatedTransactionReceipt.success) {
+    throw new InvalidInputError(
+      extractZodError(validatedTransactionReceipt.error.errors),
+    );
+  }
+
+  return validatedTransactionReceipt.data;
+};

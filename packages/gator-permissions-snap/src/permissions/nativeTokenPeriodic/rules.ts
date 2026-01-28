@@ -34,6 +34,7 @@ export const periodAmountRule: RuleDefinition<
     tooltip: t('amountTooltip'),
     error: metadata.validationErrors.periodAmountError,
     iconData: getIconData(context),
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
@@ -57,6 +58,7 @@ export const periodDurationRule: RuleDefinition<
     tooltip: t('periodDurationTooltip'),
     options: Object.values(TimePeriod),
     error: metadata.validationErrors.periodDurationError,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => {
     // Validate that value is a valid TimePeriod
@@ -101,6 +103,7 @@ export const startTimeRule: RuleDefinition<
     tooltip: t('startTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
     allowPastDate: false,
+    isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,

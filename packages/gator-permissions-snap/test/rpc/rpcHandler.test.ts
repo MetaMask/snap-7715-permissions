@@ -4,6 +4,7 @@ import type {
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
 import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
+import type { Hex } from '@metamask/delegation-core';
 import {
   ChainDisconnectedError,
   InvalidInputError,
@@ -11,10 +12,13 @@ import {
 } from '@metamask/snaps-sdk';
 import type { Json } from '@metamask/snaps-sdk';
 
-import type { BlockchainTokenMetadataClient } from '../../src/clients/blockchainMetadataClient';
+import type { BlockchainClient } from '../../src/clients/blockchainClient';
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
-import type { ProfileSyncManager } from '../../src/profileSync';
+import type {
+  ProfileSyncManager,
+  StoredGrantedPermission,
+} from '../../src/profileSync';
 import { createRpcHandler } from '../../src/rpc/rpcHandler';
 import type { RpcHandler } from '../../src/rpc/rpcHandler';
 
@@ -29,6 +33,8 @@ const TEST_SITE_ORIGIN = 'https://example.com';
 const TEST_CHAIN_ID = '0x1' as const;
 const TEST_EXPIRY = Math.floor(Date.now() / 1000) + 86400; // 24 hours from now
 const TEST_CONTEXT = '0xabcd' as const;
+const TEST_VALID_TX_HASH =
+  '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' as Hex;
 
 const VALID_PERMISSION_REQUEST: PermissionRequest = {
   chainId: TEST_CHAIN_ID,
@@ -86,7 +92,7 @@ describe('RpcHandler', () => {
   let mockHandler: jest.Mocked<PermissionHandlerType>;
   let mockHandlerFactory: jest.Mocked<PermissionHandlerFactory>;
   let mockProfileSyncManager: jest.Mocked<ProfileSyncManager>;
-  let mockBlockchainMetadataClient: jest.Mocked<BlockchainTokenMetadataClient>;
+  let mockBlockchainClient: jest.Mocked<BlockchainClient>;
 
   beforeEach(() => {
     // Reset mocks
@@ -120,18 +126,18 @@ describe('RpcHandler', () => {
       getGrantedPermission: jest.fn(),
       getAllGrantedPermissions: jest.fn(),
       getUserProfile: jest.fn(),
-      updatePermissionRevocationStatus: jest.fn(),
+      markPermissionRevoked: jest.fn(),
     } as unknown as jest.Mocked<ProfileSyncManager>;
 
-    mockBlockchainMetadataClient = {
+    mockBlockchainClient = {
       checkDelegationDisabledOnChain: jest.fn(),
-      getTokenBalanceAndMetadata: jest.fn(),
-    } as unknown as jest.Mocked<BlockchainTokenMetadataClient>;
+      checkTransactionReceipt: jest.fn(),
+    } as unknown as jest.Mocked<BlockchainClient>;
 
     handler = createRpcHandler({
       permissionHandlerFactory: mockHandlerFactory,
       profileSyncManager: mockProfileSyncManager,
-      blockchainMetadataClient: mockBlockchainMetadataClient,
+      blockchainClient: mockBlockchainClient,
     });
   });
 
@@ -589,7 +595,7 @@ describe('RpcHandler', () => {
 
   describe('getGrantedPermissions', () => {
     it('should return all granted permissions successfully', async () => {
-      const mockGrantedPermissions = [
+      const mockGrantedPermissions: StoredGrantedPermission[] = [
         {
           permissionResponse: {
             chainId: TEST_CHAIN_ID,
@@ -612,11 +618,18 @@ describe('RpcHandler', () => {
             delegationManager: TEST_ADDRESS,
           },
           siteOrigin: TEST_SITE_ORIGIN,
-          isRevoked: false,
         },
         {
           permissionResponse: {
             chainId: TEST_CHAIN_ID,
+            rules: [
+              {
+                type: 'expiry',
+                data: {
+                  timestamp: TEST_EXPIRY + 1000,
+                },
+              },
+            ],
             to: '0x0987654321098765432109876543210987654321' as const,
             permission: {
               type: 'different-permission',
@@ -629,7 +642,6 @@ describe('RpcHandler', () => {
               '0x0987654321098765432109876543210987654321' as const,
           },
           siteOrigin: 'https://another-example.com',
-          isRevoked: false,
         },
       ];
 
@@ -671,7 +683,7 @@ describe('RpcHandler', () => {
     });
 
     describe('filtering options', () => {
-      const mockGrantedPermissions = [
+      const mockGrantedPermissions: StoredGrantedPermission[] = [
         {
           permissionResponse: {
             chainId: TEST_CHAIN_ID,
@@ -694,7 +706,6 @@ describe('RpcHandler', () => {
             delegationManager: TEST_ADDRESS,
           },
           siteOrigin: TEST_SITE_ORIGIN,
-          isRevoked: false,
         },
         {
           permissionResponse: {
@@ -719,7 +730,10 @@ describe('RpcHandler', () => {
               '0x0987654321098765432109876543210987654321' as const,
           },
           siteOrigin: 'https://another-example.com',
-          isRevoked: true,
+          revocationMetadata: {
+            txHash: TEST_VALID_TX_HASH,
+            recordedAt: 123456,
+          },
         },
         {
           permissionResponse: {
@@ -744,7 +758,6 @@ describe('RpcHandler', () => {
               '0x1111111111111111111111111111111111111111' as const,
           },
           siteOrigin: TEST_SITE_ORIGIN,
-          isRevoked: false,
         },
       ];
 
@@ -761,7 +774,9 @@ describe('RpcHandler', () => {
           mockProfileSyncManager.getAllGrantedPermissions,
         ).toHaveBeenCalledTimes(1);
         expect(result).toHaveLength(1);
-        expect((result as any[])[0].isRevoked).toBe(true);
+        expect(
+          (result as [StoredGrantedPermission])[0].revocationMetadata,
+        ).toBeDefined();
       });
 
       it('should filter by isRevoked=false', async () => {
@@ -775,7 +790,7 @@ describe('RpcHandler', () => {
         expect(result).toHaveLength(2);
         expect(
           (result as any[]).every(
-            (permission) => permission.isRevoked === false,
+            (permission) => permission.revocationMetadata === undefined,
           ),
         ).toBe(true);
       });
@@ -827,7 +842,7 @@ describe('RpcHandler', () => {
         );
       });
 
-      it('should combine multiple filters', async () => {
+      it('combines multiple filters', async () => {
         const result = await handler.getGrantedPermissions({
           isRevoked: false,
           siteOrigin: TEST_SITE_ORIGIN,
@@ -838,9 +853,11 @@ describe('RpcHandler', () => {
         expect(
           mockProfileSyncManager.getAllGrantedPermissions,
         ).toHaveBeenCalledTimes(1);
+
         expect(result).toHaveLength(1);
-        const permission = (result as any[])[0];
-        expect(permission.isRevoked).toBe(false);
+
+        const permission = (result as [StoredGrantedPermission])[0];
+        expect(permission.revocationMetadata).toBeUndefined();
         expect(permission.siteOrigin).toBe(TEST_SITE_ORIGIN);
         expect(permission.permissionResponse.chainId).toBe(TEST_CHAIN_ID);
         expect(permission.permissionResponse.delegationManager).toBe(
@@ -970,9 +987,10 @@ describe('RpcHandler', () => {
   describe('submitRevocation', () => {
     const validRevocationParams = {
       permissionContext: TEST_CONTEXT,
+      txHash: TEST_VALID_TX_HASH,
     };
 
-    it('should successfully submit revocation with valid parameters', async () => {
+    it('successfully submits revocation with valid parameters', async () => {
       const mockPermission = {
         permissionResponse: {
           chainId: TEST_CHAIN_ID,
@@ -995,15 +1013,15 @@ describe('RpcHandler', () => {
           delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
-        isRevoked: false,
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
+      mockBlockchainClient.checkTransactionReceipt.mockResolvedValueOnce(true);
 
       const result = await handler.submitRevocation(validRevocationParams);
 
@@ -1012,14 +1030,55 @@ describe('RpcHandler', () => {
         validRevocationParams.permissionContext,
       );
       expect(
-        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+        mockBlockchainClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
-      expect(
-        mockProfileSyncManager.updatePermissionRevocationStatus,
-      ).toHaveBeenCalledWith(TEST_CONTEXT, true);
+      expect(mockProfileSyncManager.markPermissionRevoked).toHaveBeenCalledWith(
+        TEST_CONTEXT,
+        { txHash: TEST_VALID_TX_HASH, recordedAt: expect.any(Number) },
+      );
     });
 
-    it('should throw InvalidInputError when permissionContext is invalid', async () => {
+    it('throws an error when transaction hash was unsuccessful', async () => {
+      const mockPermission = {
+        permissionResponse: {
+          chainId: TEST_CHAIN_ID,
+          rules: [
+            {
+              type: 'expiry',
+              data: {
+                timestamp: TEST_EXPIRY,
+              },
+            },
+          ],
+          to: TEST_ADDRESS,
+          permission: {
+            type: 'test-permission',
+            data: { justification: 'Testing permission request' },
+            isAdjustmentAllowed: true,
+          },
+          context: TEST_CONTEXT,
+          dependencies: [],
+          delegationManager: TEST_ADDRESS,
+        },
+        siteOrigin: TEST_SITE_ORIGIN,
+      };
+
+      mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
+        mockPermission,
+      );
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+        true,
+      );
+      mockBlockchainClient.checkTransactionReceipt.mockResolvedValueOnce(false);
+
+      await expect(
+        handler.submitRevocation(validRevocationParams),
+      ).rejects.toThrow(
+        `Transaction ${TEST_VALID_TX_HASH} was not successful. Cannot process revocation.`,
+      );
+    });
+
+    it('throws InvalidInputError when permissionContext is invalid', async () => {
       const invalidParams = {
         ...validRevocationParams,
         permissionContext: 'invalid-context',
@@ -1030,36 +1089,16 @@ describe('RpcHandler', () => {
       );
     });
 
-    it('should throw InvalidInputError when permissionContext is wrong format', async () => {
-      const invalidParams = {
-        ...validRevocationParams,
-        permissionContext: 'not-hex-string', // Invalid format
-      };
+    it.each([null, undefined, 'invalid'])(
+      'throws InvalidInputError when params is %s',
+      async (params) => {
+        await expect(handler.submitRevocation(params as any)).rejects.toThrow(
+          'Parameters are required',
+        );
+      },
+    );
 
-      await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
-        'Failed type validation: permissionContext: Invalid hex value',
-      );
-    });
-
-    it('should throw InvalidInputError when params is null', async () => {
-      await expect(handler.submitRevocation(null)).rejects.toThrow(
-        'Parameters are required',
-      );
-    });
-
-    it('should throw InvalidInputError when params is undefined', async () => {
-      await expect(handler.submitRevocation(undefined as any)).rejects.toThrow(
-        'Parameters are required',
-      );
-    });
-
-    it('should throw InvalidInputError when params is not an object', async () => {
-      await expect(handler.submitRevocation('invalid')).rejects.toThrow(
-        'Parameters are required',
-      );
-    });
-
-    it('should throw InvalidInputError when permissionContext is missing', async () => {
+    it('throws InvalidInputError when permissionContext is missing', async () => {
       const invalidParams = {};
 
       await expect(handler.submitRevocation(invalidParams)).rejects.toThrow(
@@ -1090,32 +1129,34 @@ describe('RpcHandler', () => {
           delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
-        isRevoked: false,
       };
 
       const profileSyncError = new Error('Update failed');
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
-      mockProfileSyncManager.updatePermissionRevocationStatus.mockRejectedValueOnce(
+      mockProfileSyncManager.markPermissionRevoked.mockRejectedValueOnce(
         profileSyncError,
       );
+      mockBlockchainClient.checkTransactionReceipt.mockResolvedValueOnce(true);
 
       await expect(
         handler.submitRevocation(validRevocationParams),
       ).rejects.toThrow('Update failed');
 
-      expect(
-        mockProfileSyncManager.updatePermissionRevocationStatus,
-      ).toHaveBeenCalledWith(TEST_CONTEXT, true);
+      expect(mockProfileSyncManager.markPermissionRevoked).toHaveBeenCalledWith(
+        TEST_CONTEXT,
+        { txHash: TEST_VALID_TX_HASH, recordedAt: expect.any(Number) },
+      );
     });
 
-    it('should handle hex values with uppercase letters', async () => {
+    it('handles hex values with uppercase letters', async () => {
       const upperCaseParams = {
         permissionContext: '0x1234567890ABCDEF1234567890ABCDEF',
+        txHash: TEST_VALID_TX_HASH,
       };
 
       const mockPermission = {
@@ -1140,18 +1181,18 @@ describe('RpcHandler', () => {
           delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
-        isRevoked: false,
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
-      mockProfileSyncManager.updatePermissionRevocationStatus.mockResolvedValueOnce(
+      mockProfileSyncManager.markPermissionRevoked.mockResolvedValueOnce(
         undefined,
       );
+      mockBlockchainClient.checkTransactionReceipt.mockResolvedValueOnce(true);
 
       const result = await handler.submitRevocation(upperCaseParams);
 
@@ -1188,18 +1229,18 @@ describe('RpcHandler', () => {
           delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
-        isRevoked: false,
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         true,
       );
-      mockProfileSyncManager.updatePermissionRevocationStatus.mockResolvedValueOnce(
+      mockProfileSyncManager.markPermissionRevoked.mockResolvedValueOnce(
         undefined,
       );
+      mockBlockchainClient.checkTransactionReceipt.mockResolvedValueOnce(true);
 
       const result = await handler.submitRevocation(testParams);
 
@@ -1209,7 +1250,7 @@ describe('RpcHandler', () => {
       );
     });
 
-    it('should throw InvalidInputError when delegation is not disabled on-chain', async () => {
+    it('throws an error when delegation is not disabled on-chain', async () => {
       const mockPermission = {
         permissionResponse: {
           chainId: TEST_CHAIN_ID,
@@ -1232,29 +1273,29 @@ describe('RpcHandler', () => {
           delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
-        isRevoked: false,
       };
 
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockResolvedValueOnce(
         false,
       );
+      mockBlockchainClient.checkTransactionReceipt.mockResolvedValueOnce(true);
 
       await expect(
         handler.submitRevocation(validRevocationParams),
       ).rejects.toThrow('is not disabled on-chain');
 
       expect(
-        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+        mockBlockchainClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatus,
+        mockProfileSyncManager.markPermissionRevoked,
       ).not.toHaveBeenCalled();
     });
 
-    it('should propagate ResourceUnavailableError when on-chain check fails', async () => {
+    it('rethrows ResourceUnavailableError when on-chain check fails', async () => {
       const mockPermission = {
         permissionResponse: {
           chainId: TEST_CHAIN_ID,
@@ -1277,7 +1318,6 @@ describe('RpcHandler', () => {
           delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
-        isRevoked: false,
       };
 
       const resourceUnavailableError = new ResourceUnavailableError(
@@ -1287,7 +1327,7 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
         resourceUnavailableError,
       );
 
@@ -1296,14 +1336,14 @@ describe('RpcHandler', () => {
       ).rejects.toThrow('Unable to determine delegation disabled status');
 
       expect(
-        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+        mockBlockchainClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatus,
+        mockProfileSyncManager.markPermissionRevoked,
       ).not.toHaveBeenCalled();
     });
 
-    it('should propagate ChainDisconnectedError when on-chain check fails due to wrong chain', async () => {
+    it('rethrows ChainDisconnectedError when on-chain check fails due to wrong chain', async () => {
       const mockPermission = {
         permissionResponse: {
           chainId: TEST_CHAIN_ID,
@@ -1326,7 +1366,6 @@ describe('RpcHandler', () => {
           delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
-        isRevoked: false,
       };
 
       const chainDisconnectedError = new ChainDisconnectedError(
@@ -1336,7 +1375,7 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
         chainDisconnectedError,
       );
 
@@ -1345,14 +1384,14 @@ describe('RpcHandler', () => {
       ).rejects.toThrow('Selected chain does not match the requested chain');
 
       expect(
-        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+        mockBlockchainClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatus,
+        mockProfileSyncManager.markPermissionRevoked,
       ).not.toHaveBeenCalled();
     });
 
-    it('should propagate InvalidInputError from on-chain check', async () => {
+    it('rethrows InvalidInputError from on-chain check', async () => {
       const mockPermission = {
         permissionResponse: {
           chainId: TEST_CHAIN_ID,
@@ -1375,7 +1414,6 @@ describe('RpcHandler', () => {
           delegationManager: TEST_ADDRESS,
         },
         siteOrigin: TEST_SITE_ORIGIN,
-        isRevoked: false,
       };
 
       const invalidInputError = new InvalidInputError(
@@ -1385,7 +1423,7 @@ describe('RpcHandler', () => {
       mockProfileSyncManager.getGrantedPermission.mockResolvedValueOnce(
         mockPermission,
       );
-      mockBlockchainMetadataClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
+      mockBlockchainClient.checkDelegationDisabledOnChain.mockRejectedValueOnce(
         invalidInputError,
       );
 
@@ -1394,10 +1432,10 @@ describe('RpcHandler', () => {
       ).rejects.toThrow('No delegation hash provided');
 
       expect(
-        mockBlockchainMetadataClient.checkDelegationDisabledOnChain,
+        mockBlockchainClient.checkDelegationDisabledOnChain,
       ).toHaveBeenCalled();
       expect(
-        mockProfileSyncManager.updatePermissionRevocationStatus,
+        mockProfileSyncManager.markPermissionRevoked,
       ).not.toHaveBeenCalled();
     });
   });
