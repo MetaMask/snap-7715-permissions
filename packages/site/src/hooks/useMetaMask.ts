@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { gatorSnapOrigin, kernelSnapOrigin } from '../config';
 import type { GetSnapsResponse } from '../types';
@@ -14,22 +14,7 @@ export const useMetaMask = () => {
     useMetaMaskContext();
   const request = useRequest();
 
-  const [isFlask, setIsFlask] = useState(false);
-
   const snapsDetected = provider !== null;
-
-  /**
-   * Detect if the version of MetaMask is Flask.
-   */
-  const detectFlask = async () => {
-    const clientVersion = await request({
-      method: 'web3_clientVersion',
-    });
-
-    const isFlaskDetected = (clientVersion as string[])?.includes('flask');
-
-    setIsFlask(isFlaskDetected);
-  };
 
   /**
    * Get the Snap information from MetaMask.
@@ -52,7 +37,6 @@ export const useMetaMask = () => {
   useEffect(() => {
     const detect = async () => {
       if (provider) {
-        await detectFlask();
         await getSnaps();
       }
     };
@@ -60,5 +44,5 @@ export const useMetaMask = () => {
     detect().catch(console.error);
   }, [provider]);
 
-  return { isFlask, snapsDetected, installedSnaps, getSnaps, provider };
+  return { snapsDetected, installedSnaps, getSnaps, provider };
 };

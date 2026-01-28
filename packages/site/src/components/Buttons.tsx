@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 import styled from 'styled-components';
 
-import FlaskFox from '../assets/flask_fox.svg?react';
+import MetaMaskFox from '../assets/metamask_fox.svg?react';
 import { kernelSnapOrigin } from '../config';
 import { useMetaMask, useRequestSnap } from '../hooks';
 import { shouldDisplayReconnectButton } from '../utils';
@@ -76,10 +76,10 @@ const ConnectedIndicator = styled.div`
   background-color: green;
 `;
 
-export const InstallFlaskButton = () => (
-  <Link href="https://metamask.io/flask/" target="_blank">
-    <FlaskFox />
-    <ButtonText>Install MetaMask Flask</ButtonText>
+export const InstallMetaMaskButton = () => (
+  <Link href="https://metamask.io/download/" target="_blank">
+    <MetaMaskFox />
+    <ButtonText>Install MetaMask</ButtonText>
   </Link>
 );
 
@@ -88,7 +88,7 @@ export const ConnectButton = (
 ) => {
   return (
     <Button {...props}>
-      <FlaskFox />
+      <MetaMaskFox />
       <ButtonText>{props.$isReconnect ? 'Reconnect' : 'Connect'}</ButtonText>
     </Button>
   );
@@ -102,10 +102,10 @@ export const CustomMessageButton = (
 
 export const HeaderButtons = () => {
   const requestSnap = useRequestSnap(kernelSnapOrigin);
-  const { isFlask, installedSnaps } = useMetaMask();
+  const { snapsDetected, installedSnaps } = useMetaMask();
 
-  if (!isFlask && !installedSnaps) {
-    return <InstallFlaskButton />;
+  if (!snapsDetected) {
+    return <InstallMetaMaskButton />;
   }
 
   if (!installedSnaps[kernelSnapOrigin]) {
