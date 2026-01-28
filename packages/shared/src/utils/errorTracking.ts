@@ -28,7 +28,7 @@ export type ErrorTrackingConfig = {
  * Provides a unified way to track and report errors across different snaps.
  */
 export class SnapErrorTracker {
-  #enabled: boolean;
+  readonly #enabled: boolean;
 
   readonly #snapName: string;
 
