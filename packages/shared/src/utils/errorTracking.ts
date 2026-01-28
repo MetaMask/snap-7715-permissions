@@ -183,12 +183,6 @@ export class SnapErrorTracker {
   }
 }
 
-/**
- * Creates and returns a singleton error tracker instance.
- *
- * @param config - Configuration for the error tracker.
- * @returns The error tracker instance.
- */
 let errorTrackerInstance: SnapErrorTracker | null = null;
 
 /**

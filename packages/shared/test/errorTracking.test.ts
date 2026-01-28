@@ -148,6 +148,11 @@ describe('Singleton and default behavior', () => {
     await tracker.captureError({ error: 'Error' }, 'method');
     expect(mockSnapRequest).toHaveBeenCalled();
 
+    jest.clearAllMocks();
+    // Should track even if message is empty string but error property exists
+    await tracker.captureError({ message: '', error: 'something' }, 'method');
+    expect(mockSnapRequest).toHaveBeenCalled();
+
     // Should not track
     jest.clearAllMocks();
     await tracker.captureError({}, 'method');
