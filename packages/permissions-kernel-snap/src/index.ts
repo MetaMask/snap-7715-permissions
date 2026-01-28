@@ -66,19 +66,22 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   const errorTracker = getErrorTracker();
 
-  // Check if another request is already being processed
-  if (activeProcessingLock !== null) {
-    logger.warn(
-      `RPC request rejected (origin="${origin}"): another request is already being processed`,
-    );
-    throw new LimitExceededError('Another request is already being processed.');
-  }
-
   // Acquire the processing lock
   const myLock = Symbol('processing-lock');
-  activeProcessingLock = myLock;
 
   try {
+    // Check if another request is already being processed
+    if (activeProcessingLock !== null) {
+      logger.warn(
+        `RPC request rejected (origin="${origin}"): another request is already being processed`,
+      );
+      throw new LimitExceededError(
+        'Another request is already being processed.',
+      );
+    }
+
+    // Acquire the processing lock
+    activeProcessingLock = myLock;
     logger.info(
       `Custom request (origin="${origin}"): method="${request.method}"`,
     );
