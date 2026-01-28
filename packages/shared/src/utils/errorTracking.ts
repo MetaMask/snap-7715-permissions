@@ -43,7 +43,9 @@ export class SnapErrorTracker {
         // By default, track all errors that are Error instances or have error-like properties
         return (
           error instanceof Error ||
-          (typeof error === 'object' && (error?.message ?? error?.error))
+          (typeof error === 'object' &&
+            error !== null &&
+            (error?.message !== undefined || error?.error !== undefined))
         );
       });
   }
