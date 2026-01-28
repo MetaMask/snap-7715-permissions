@@ -165,24 +165,6 @@ export class SnapErrorTracker {
     const errorInfo = this.#extractErrorInfo(error, method, requestParams);
     await this.#trackErrorViaSnap(errorInfo);
   }
-
-  /**
-   * Sets whether error tracking is enabled.
-   *
-   * @param enabled - Whether to enable error tracking.
-   */
-  setEnabled(enabled: boolean): void {
-    this.#enabled = enabled;
-  }
-
-  /**
-   * Gets the current enabled state.
-   *
-   * @returns Whether error tracking is currently enabled.
-   */
-  isEnabled(): boolean {
-    return this.#enabled;
-  }
 }
 
 let errorTrackerInstance: SnapErrorTracker | null = null;

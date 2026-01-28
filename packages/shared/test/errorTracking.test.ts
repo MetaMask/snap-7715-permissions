@@ -76,13 +76,14 @@ describe('SnapErrorTracker', () => {
 
   it('should respect enabled state and custom filtering', async () => {
     // Test disabled state
-    tracker.setEnabled(false);
-    expect(tracker.isEnabled()).toBe(false);
-    await tracker.captureError(new Error('Test'), 'testMethod');
+    const disabledTracker = new SnapErrorTracker({
+      ...defaultConfig,
+      enabled: false,
+    });
+    await disabledTracker.captureError(new Error('Test'), 'testMethod');
     expect(mockSnapRequest).not.toHaveBeenCalled();
 
     // Test default filtering
-    tracker.setEnabled(true);
     await tracker.captureError({}, 'testMethod'); // No error properties
     expect(mockSnapRequest).not.toHaveBeenCalled();
 
