@@ -14,7 +14,7 @@ import * as chains from 'viem/chains';
 
 import {
   ConnectButton,
-  InstallFlaskButton,
+  InstallMetaMaskButton,
   CustomMessageButton,
   Card,
   Title,
@@ -54,7 +54,6 @@ import {
   ResponseContainer,
   CopyButton,
 } from '../styles';
-import { isLocalSnap } from '../utils';
 
 const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
 
@@ -95,7 +94,7 @@ const Index = () => {
 
   const [selectedChain, setSelectedChain] = useState<Chain>(supportedChains[0]);
 
-  const { isFlask, snapsDetected, installedSnaps, provider } = useMetaMask();
+  const { snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
   const requestPermissionSnap = useRequestSnap(gatorSnapOrigin);
 
@@ -105,9 +104,7 @@ const Index = () => {
     bundlerRpcUrl: BUNDLER_RPC_URL,
   });
 
-  const isMetaMaskReady = isLocalSnap(kernelSnapOrigin)
-    ? isFlask
-    : snapsDetected;
+  const isMetaMaskReady = snapsDetected;
 
   const metaMaskClient = useMemo(() => {
     if (!provider || !isMetaMaskReady) {
@@ -591,8 +588,8 @@ const Index = () => {
             content={{
               title: 'Install',
               description:
-                'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
-              button: <InstallFlaskButton />,
+                'Snaps requires MetaMask to be installed. Install MetaMask to get started.',
+              button: <InstallMetaMaskButton />,
             }}
             fullWidth
           />
