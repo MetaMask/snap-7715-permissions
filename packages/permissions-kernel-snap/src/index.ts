@@ -119,8 +119,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   } catch (error) {
     await errorTracker.captureError({
       error,
-      method: request.method || 'unknown',
-      requestParams: request.params,
+      method: request?.method ?? 'unknown',
+      requestParams: request?.params,
     });
     throw error;
   } finally {
