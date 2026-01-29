@@ -261,11 +261,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     return result;
   } catch (error) {
-    await errorTracker.captureError({
-      error,
-      method: request?.method ?? 'unknown',
-      requestParams: request?.params,
-    });
+    // Fire-and-forget: do not await so the original error is always rethrown.
+    // If captureError throws (e.g. shouldTrackError or #extractErrorInfo), we must not lose the app error.
+    errorTracker
+      .captureError({
+        error,
+        method: request?.method ?? 'unknown',
+        requestParams: request?.params,
+      })
+      .catch(() => {
+        // Swallow tracking failures; caller must always receive the original error.
+      });
     throw error;
   }
 };

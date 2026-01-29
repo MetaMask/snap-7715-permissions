@@ -88,9 +88,19 @@ export class SnapErrorTracker {
       errorInfo.errorStack = error.stack;
     } else if (typeof error === 'string') {
       errorInfo.errorMessage = error;
-    } else if ('message' in error && error.message !== undefined) {
+    } else if (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      error.message !== undefined
+    ) {
       errorInfo.errorMessage = String(error.message);
-    } else if ('error' in error && error.error !== undefined) {
+    } else if (
+      typeof error === 'object' &&
+      error !== null &&
+      'error' in error &&
+      error.error !== undefined
+    ) {
       if (typeof error.error === 'string') {
         errorInfo.errorMessage = error.error;
       } else {

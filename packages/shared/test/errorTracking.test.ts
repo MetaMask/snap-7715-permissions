@@ -138,6 +138,37 @@ describe('SnapErrorTracker', () => {
     expect(mockSnapRequest).not.toHaveBeenCalled();
   });
 
+  it('should not throw when custom shouldTrackError allows primitives', async () => {
+    const permissiveTracker = new SnapErrorTracker({
+      ...defaultConfig,
+      shouldTrackError: (): boolean => true,
+    });
+
+    expect(
+      await permissiveTracker.captureError({
+        error: null,
+        method: 'testMethod',
+      }),
+    ).toBeUndefined();
+    expect(
+      await permissiveTracker.captureError({
+        error: undefined,
+        method: 'testMethod',
+      }),
+    ).toBeUndefined();
+    expect(
+      await permissiveTracker.captureError({ error: 42, method: 'testMethod' }),
+    ).toBeUndefined();
+    expect(
+      await permissiveTracker.captureError({
+        error: true,
+        method: 'testMethod',
+      }),
+    ).toBeUndefined();
+
+    expect(mockSnapRequest).toHaveBeenCalled();
+  });
+
   it('should handle tracking failures gracefully', async () => {
     mockSnapRequest.mockRejectedValue(new Error('Tracking failed'));
     const loggerWarnSpy = jest.spyOn(logger, 'warn').mockImplementation(() => {
