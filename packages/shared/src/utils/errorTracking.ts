@@ -81,15 +81,16 @@ export class SnapErrorTracker {
       errorInfo.url = error.currentUrl;
     }
 
-    // Handle different error formats
+    // Handle different error formats (align with shouldTrackError: use !== undefined so
+    // falsy values like '' or null are preserved for Sentry instead of "Unknown error")
     if (error instanceof Error) {
       errorInfo.errorMessage = error.message;
       errorInfo.errorStack = error.stack;
     } else if (typeof error === 'string') {
       errorInfo.errorMessage = error;
-    } else if (error?.message) {
-      errorInfo.errorMessage = error.message;
-    } else if (error?.error) {
+    } else if ('message' in error && error.message !== undefined) {
+      errorInfo.errorMessage = String(error.message);
+    } else if ('error' in error && error.error !== undefined) {
       if (typeof error.error === 'string') {
         errorInfo.errorMessage = error.error;
       } else {

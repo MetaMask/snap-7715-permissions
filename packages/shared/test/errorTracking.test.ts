@@ -61,6 +61,27 @@ describe('SnapErrorTracker', () => {
     expect(errorInfo.errorMessage).toBe('Something went wrong');
   });
 
+  it('should preserve falsy message values (empty string, null) instead of "Unknown error"', async () => {
+    await tracker.captureError({
+      error: { message: '' },
+      method: 'testMethod',
+    });
+    expect(mockSnapRequest).toHaveBeenCalled();
+    const emptyMsg = mockSnapRequest.mock.calls[0][0].params.error.message;
+    const infoEmpty = JSON.parse(emptyMsg);
+    expect(infoEmpty.errorMessage).toBe('');
+
+    jest.clearAllMocks();
+    await tracker.captureError({
+      error: { message: null },
+      method: 'testMethod',
+    });
+    expect(mockSnapRequest).toHaveBeenCalled();
+    const nullMsg = mockSnapRequest.mock.calls[0][0].params.error.message;
+    const infoNull = JSON.parse(nullMsg);
+    expect(infoNull.errorMessage).toBe('null');
+  });
+
   it('should track requestParams when provided', async () => {
     const requestParams = { userId: '123', action: 'test' };
     await tracker.captureError({
