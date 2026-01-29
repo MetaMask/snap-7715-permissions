@@ -3,6 +3,7 @@ import {
   createErrorTracker,
 } from '../src/utils/errorTracking';
 import type { ErrorTrackingConfig } from '../src/utils/errorTracking';
+import { logger } from '../src/utils/logger';
 
 // Mock the snap provider
 const mockSnapRequest = jest.fn();
@@ -118,8 +119,8 @@ describe('SnapErrorTracker', () => {
 
   it('should handle tracking failures gracefully', async () => {
     mockSnapRequest.mockRejectedValue(new Error('Tracking failed'));
-    const consoleWarnSpy = jest
-      .spyOn(console, 'warn')
+    const loggerWarnSpy = jest
+      .spyOn(logger, 'warn')
       .mockImplementation(() => {
         /* empty */
       });
@@ -128,9 +129,9 @@ describe('SnapErrorTracker', () => {
       error: new Error('Test'),
       method: 'testMethod',
     });
-    expect(consoleWarnSpy).toHaveBeenCalled();
+    expect(loggerWarnSpy).toHaveBeenCalled();
 
-    consoleWarnSpy.mockRestore();
+    loggerWarnSpy.mockRestore();
   });
 });
 

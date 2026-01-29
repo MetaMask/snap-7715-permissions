@@ -1,5 +1,7 @@
 import { getJsonError } from '@metamask/snaps-sdk';
 
+import { logger } from './logger';
+
 /**
  * Error information that will be tracked.
  */
@@ -144,7 +146,7 @@ export class SnapErrorTracker {
       }
     } catch (trackingError) {
       // Silently fail - don't let error tracking itself break the app
-      console.warn(
+      logger.warn(
         '[SnapErrorTracker] Failed to track error via snap:',
         trackingError,
       );
