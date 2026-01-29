@@ -64,7 +64,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  // Acquire the processing lock
+  // Create unique lock token
   const myLock = Symbol('processing-lock');
 
   try {
