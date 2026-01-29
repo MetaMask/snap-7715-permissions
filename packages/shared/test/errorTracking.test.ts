@@ -1,13 +1,12 @@
 import {
   SnapErrorTracker,
   createErrorTracker,
-  getErrorTracker,
 } from '../src/utils/errorTracking';
 import type { ErrorTrackingConfig } from '../src/utils/errorTracking';
 
-// Mock the global snap object
+// Mock the snap provider
 const mockSnapRequest = jest.fn();
-(globalThis as any).snap = {
+const mockSnapProvider = {
   request: mockSnapRequest,
 };
 
@@ -16,6 +15,7 @@ describe('SnapErrorTracker', () => {
   const defaultConfig: ErrorTrackingConfig = {
     enabled: true,
     snapName: 'test-snap',
+    snapProvider: mockSnapProvider,
   };
 
   beforeEach(() => {
@@ -26,21 +26,24 @@ describe('SnapErrorTracker', () => {
 
   it('should track errors with various formats and metadata', async () => {
     // Error instance
-    await tracker.captureError(new Error('Test error'), 'testMethod');
+    await tracker.captureError({
+      error: new Error('Test error'),
+      method: 'testMethod',
+    });
     expect(mockSnapRequest).toHaveBeenCalled();
 
     jest.clearAllMocks();
 
     // Error with metadata
-    await tracker.captureError(
-      {
+    await tracker.captureError({
+      error: {
         message: 'API Error',
         status: 404,
         currentUrl: 'https://example.com',
         response: { data: 'response data' },
       },
-      'testMethod',
-    );
+      method: 'testMethod',
+    });
     const errorMessage = mockSnapRequest.mock.calls[0][0].params.error.message;
     expect(errorMessage).toContain('404');
     expect(errorMessage).toContain('https://example.com');
@@ -48,11 +51,11 @@ describe('SnapErrorTracker', () => {
 
   it('should track requestParams when provided', async () => {
     const requestParams = { userId: '123', action: 'test' };
-    await tracker.captureError(
-      new Error('Test error'),
-      'testMethod',
+    await tracker.captureError({
+      error: new Error('Test error'),
+      method: 'testMethod',
       requestParams,
-    );
+    });
     expect(mockSnapRequest).toHaveBeenCalled();
     const errorMessage = mockSnapRequest.mock.calls[0][0].params.error.message;
     const errorInfo = JSON.parse(errorMessage);
@@ -61,13 +64,13 @@ describe('SnapErrorTracker', () => {
 
   it('should extract requestParams from error object if not provided', async () => {
     const requestParams = { userId: '456', action: 'test2' };
-    await tracker.captureError(
-      {
+    await tracker.captureError({
+      error: {
         message: 'Error with params',
         requestParams,
       },
-      'testMethod',
-    );
+      method: 'testMethod',
+    });
     expect(mockSnapRequest).toHaveBeenCalled();
     const errorMessage = mockSnapRequest.mock.calls[0][0].params.error.message;
     const errorInfo = JSON.parse(errorMessage);
@@ -80,11 +83,14 @@ describe('SnapErrorTracker', () => {
       ...defaultConfig,
       enabled: false,
     });
-    await disabledTracker.captureError(new Error('Test'), 'testMethod');
+    await disabledTracker.captureError({
+      error: new Error('Test'),
+      method: 'testMethod',
+    });
     expect(mockSnapRequest).not.toHaveBeenCalled();
 
     // Test default filtering
-    await tracker.captureError({}, 'testMethod'); // No error properties
+    await tracker.captureError({ error: {}, method: 'testMethod' }); // No error properties
     expect(mockSnapRequest).not.toHaveBeenCalled();
 
     // Test custom filter
@@ -92,7 +98,10 @@ describe('SnapErrorTracker', () => {
       ...defaultConfig,
       shouldTrackError: (): boolean => false,
     });
-    await customTracker.captureError(new Error('Test'), 'testMethod');
+    await customTracker.captureError({
+      error: new Error('Test'),
+      method: 'testMethod',
+    });
     expect(mockSnapRequest).not.toHaveBeenCalled();
   });
 
@@ -104,62 +113,74 @@ describe('SnapErrorTracker', () => {
         /* empty */
       });
 
-    await tracker.captureError(new Error('Test'), 'testMethod');
+    await tracker.captureError({
+      error: new Error('Test'),
+      method: 'testMethod',
+    });
     expect(consoleWarnSpy).toHaveBeenCalled();
 
     consoleWarnSpy.mockRestore();
   });
 });
 
-describe('Singleton and default behavior', () => {
+describe('Error tracker creation and default behavior', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSnapRequest.mockResolvedValue(undefined);
   });
 
-  it('should manage singleton instance', () => {
+  it('should create independent instances', () => {
     const config: ErrorTrackingConfig = {
       enabled: true,
-      snapName: 'singleton-test',
+      snapName: 'test-snap',
+      snapProvider: mockSnapProvider,
     };
 
     const tracker1 = createErrorTracker(config);
     const tracker2 = createErrorTracker(config);
-    const tracker3 = getErrorTracker();
 
-    expect(tracker1).toBe(tracker2);
-    expect(tracker1).toBe(tracker3);
+    expect(tracker1).not.toBe(tracker2);
   });
 
   it('should apply default filtering rules', async () => {
     const tracker = new SnapErrorTracker({
       enabled: true,
       snapName: 'test-snap',
+      snapProvider: mockSnapProvider,
     });
 
     // Should track
-    await tracker.captureError(new Error('Test'), 'method');
+    await tracker.captureError({ error: new Error('Test'), method: 'method' });
     expect(mockSnapRequest).toHaveBeenCalled();
 
     jest.clearAllMocks();
-    await tracker.captureError({ message: 'Error' }, 'method');
+    await tracker.captureError({
+      error: { message: 'Error' },
+      method: 'method',
+    });
     expect(mockSnapRequest).toHaveBeenCalled();
 
     jest.clearAllMocks();
-    await tracker.captureError({ error: 'Error' }, 'method');
+    await tracker.captureError({
+      error: { error: 'Error' },
+      method: 'method',
+    });
     expect(mockSnapRequest).toHaveBeenCalled();
 
     jest.clearAllMocks();
     // Should track even if message is empty string but error property exists
-    await tracker.captureError({ message: '', error: 'something' }, 'method');
+    await tracker.captureError({
+      error: { message: '', error: 'something' },
+      method: 'method',
+    });
     expect(mockSnapRequest).toHaveBeenCalled();
 
     // Should not track
     jest.clearAllMocks();
-    await tracker.captureError({}, 'method');
+    await tracker.captureError({ error: {}, method: 'method' });
     expect(mockSnapRequest).not.toHaveBeenCalled();
 
-    await tracker.captureError(null, 'method');
+    await tracker.captureError({ error: null, method: 'method' });
     expect(mockSnapRequest).not.toHaveBeenCalled();
   });
 });
