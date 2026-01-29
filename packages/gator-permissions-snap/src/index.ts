@@ -2,7 +2,6 @@
 import {
   logger,
   createErrorTracker,
-  getErrorTracker,
 } from '@metamask/7715-permissions-shared/utils';
 import {
   AuthType,
@@ -200,9 +199,10 @@ const rpcHandler = createRpcHandler({
 });
 
 // Initialize error tracker
-createErrorTracker({
+const errorTracker = createErrorTracker({
   enabled: true,
   snapName: 'gator-permissions-snap',
+  snapProvider: snap,
 });
 
 // configure RPC methods bindings
@@ -236,8 +236,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  const errorTracker = getErrorTracker();
-
   try {
     logger.debug(
       `RPC request (origin="${origin}"): method="${request.method}"`,
@@ -263,7 +261,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     return result;
   } catch (error) {
-    await errorTracker.captureError(error, request.method, request.params);
+    await errorTracker.captureError({
+      error,
+      method: request.method || 'unknown',
+      requestParams: request.params,
+    });
     throw error;
   }
 };

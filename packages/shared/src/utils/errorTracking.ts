@@ -20,6 +20,7 @@ export type ErrorTrackingInfo = {
 export type ErrorTrackingConfig = {
   enabled: boolean;
   snapName: string;
+  snapProvider: any;
   shouldTrackError?: (error: any) => boolean;
 };
 
@@ -32,11 +33,14 @@ export class SnapErrorTracker {
 
   readonly #snapName: string;
 
+  readonly #snapProvider: any;
+
   readonly #shouldTrackError: (error: any) => boolean;
 
   constructor(config: ErrorTrackingConfig) {
     this.#enabled = config.enabled;
     this.#snapName = config.snapName;
+    this.#snapProvider = config.snapProvider;
     this.#shouldTrackError =
       config.shouldTrackError ??
       ((error: any): boolean => {
@@ -129,8 +133,8 @@ export class SnapErrorTracker {
   async #trackErrorViaSnap(errorInfo: ErrorTrackingInfo): Promise<void> {
     try {
       // Use snap_trackError if available
-      if (typeof snap !== 'undefined' && snap?.request) {
-        await snap.request({
+      if (this.#snapProvider?.request) {
+        await this.#snapProvider.request({
           method: 'snap_trackError',
           params: {
             error: getJsonError(new Error(JSON.stringify(errorInfo))),
@@ -149,15 +153,20 @@ export class SnapErrorTracker {
   /**
    * Captures and tracks an error.
    *
-   * @param error - The error to capture.
-   * @param method - The method/operation name.
-   * @param requestParams - Optional request parameters that triggered the error.
+   * @param errorData - The error data object containing error, method, and optional requestParams.
+   * @param errorData.error - The error to capture.
+   * @param errorData.method - The method/operation name.
+   * @param errorData.requestParams - Optional request parameters that triggered the error.
    */
-  async captureError(
-    error: any,
-    method: string,
-    requestParams?: any,
-  ): Promise<void> {
+  async captureError({
+    error,
+    method,
+    requestParams,
+  }: {
+    error: any;
+    method: string;
+    requestParams?: any;
+  }): Promise<void> {
     if (!this.#enabled || !this.#shouldTrackError(error)) {
       return;
     }
@@ -167,31 +176,14 @@ export class SnapErrorTracker {
   }
 }
 
-let errorTrackerInstance: SnapErrorTracker | null = null;
-
 /**
- * Creates a singleton error tracker instance.
+ * Creates an error tracker instance.
  *
  * @param config - Configuration for the error tracker.
- * @returns The singleton error tracker instance.
+ * @returns The error tracker instance.
  */
 export function createErrorTracker(
   config: ErrorTrackingConfig,
 ): SnapErrorTracker {
-  errorTrackerInstance ??= new SnapErrorTracker(config);
-  return errorTrackerInstance;
-}
-
-/**
- * Gets the current error tracker instance.
- *
- * @returns The error tracker instance.
- */
-export function getErrorTracker(): SnapErrorTracker {
-  if (!errorTrackerInstance) {
-    throw new Error(
-      'Error tracker not initialized. Call createErrorTracker with config first.',
-    );
-  }
-  return errorTrackerInstance;
+  return new SnapErrorTracker(config);
 }

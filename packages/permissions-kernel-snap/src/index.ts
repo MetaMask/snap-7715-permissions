@@ -1,7 +1,6 @@
 import {
   logger,
   createErrorTracker,
-  getErrorTracker,
 } from '@metamask/7715-permissions-shared/utils';
 import {
   InvalidParamsError,
@@ -26,9 +25,10 @@ const rpcHandler = createRpcHandler({
 });
 
 // Initialize error tracker
-createErrorTracker({
+const errorTracker = createErrorTracker({
   enabled: true,
   snapName: 'permissions-kernel-snap',
+  snapProvider: snap,
 });
 
 // configure RPC methods bindings
@@ -64,8 +64,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  const errorTracker = getErrorTracker();
-
   // Acquire the processing lock
   const myLock = Symbol('processing-lock');
 
@@ -119,11 +117,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     return result;
   } catch (error) {
-    await errorTracker.captureError(
+    await errorTracker.captureError({
       error,
-      request.method || 'unknown',
-      request.params,
-    );
+      method: request.method || 'unknown',
+      requestParams: request.params,
+    });
     throw error;
   } finally {
     // Always release the processing lock we acquired, regardless of success or failure
