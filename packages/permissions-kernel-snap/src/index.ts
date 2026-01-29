@@ -1,4 +1,7 @@
-import { logger } from '@metamask/7715-permissions-shared/utils';
+import {
+  logger,
+  createErrorTracker,
+} from '@metamask/7715-permissions-shared/utils';
 import {
   InvalidParamsError,
   LimitExceededError,
@@ -19,6 +22,13 @@ import { validateJsonRpcRequest } from './utils';
 const rpcHandler = createRpcHandler({
   permissionOfferRegistryManager: createPermissionOfferRegistryManager(snap),
   snapsProvider: snap,
+});
+
+// Initialize error tracker
+const errorTracker = createErrorTracker({
+  enabled: true,
+  snapName: 'permissions-kernel-snap',
+  snapProvider: snap,
 });
 
 // configure RPC methods bindings
@@ -54,19 +64,22 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  // Check if another request is already being processed
-  if (activeProcessingLock !== null) {
-    logger.warn(
-      `RPC request rejected (origin="${origin}"): another request is already being processed`,
-    );
-    throw new LimitExceededError('Another request is already being processed.');
-  }
-
-  // Acquire the processing lock
+  // Create unique lock token
   const myLock = Symbol('processing-lock');
-  activeProcessingLock = myLock;
 
   try {
+    // Check if another request is already being processed
+    if (activeProcessingLock !== null) {
+      logger.warn(
+        `RPC request rejected (origin="${origin}"): another request is already being processed`,
+      );
+      throw new LimitExceededError(
+        'Another request is already being processed.',
+      );
+    }
+
+    // Acquire the processing lock
+    activeProcessingLock = myLock;
     logger.info(
       `Custom request (origin="${origin}"): method="${request.method}"`,
     );
@@ -103,6 +116,19 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     });
 
     return result;
+  } catch (error) {
+    // Fire-and-forget: do not await so the lock is released in finally without
+    // blocking on auxiliary error tracking (lock serializes request processing only).
+    errorTracker
+      .captureError({
+        error,
+        method: request?.method ?? 'unknown',
+        requestParams: request?.params,
+      })
+      .catch(() => {
+        // Swallow tracking failures; lock release must not depend on tracking.
+      });
+    throw error;
   } finally {
     // Always release the processing lock we acquired, regardless of success or failure
     // Only release if we still hold the lock to avoid clobbering a newer lock
