@@ -119,11 +119,9 @@ describe('SnapErrorTracker', () => {
 
   it('should handle tracking failures gracefully', async () => {
     mockSnapRequest.mockRejectedValue(new Error('Tracking failed'));
-    const loggerWarnSpy = jest
-      .spyOn(logger, 'warn')
-      .mockImplementation(() => {
-        /* empty */
-      });
+    const loggerWarnSpy = jest.spyOn(logger, 'warn').mockImplementation(() => {
+      /* empty */
+    });
 
     await tracker.captureError({
       error: new Error('Test'),
