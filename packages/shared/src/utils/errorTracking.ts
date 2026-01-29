@@ -44,9 +44,10 @@ export class SnapErrorTracker {
     this.#shouldTrackError =
       config.shouldTrackError ??
       ((error: any): boolean => {
-        // By default, track all errors that are Error instances or have error-like properties
+        // By default, track Error instances, string errors, or objects with error-like properties
         return (
           error instanceof Error ||
+          typeof error === 'string' ||
           (typeof error === 'object' &&
             error !== null &&
             (error?.message !== undefined || error?.error !== undefined))

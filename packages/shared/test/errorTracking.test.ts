@@ -49,6 +49,17 @@ describe('SnapErrorTracker', () => {
     expect(errorMessage).toContain('https://example.com');
   });
 
+  it('should track string errors with default filter', async () => {
+    await tracker.captureError({
+      error: 'Something went wrong',
+      method: 'testMethod',
+    });
+    expect(mockSnapRequest).toHaveBeenCalled();
+    const errorMessage = mockSnapRequest.mock.calls[0][0].params.error.message;
+    const errorInfo = JSON.parse(errorMessage);
+    expect(errorInfo.errorMessage).toBe('Something went wrong');
+  });
+
   it('should track requestParams when provided', async () => {
     const requestParams = { userId: '123', action: 'test' };
     await tracker.captureError({
