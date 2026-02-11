@@ -2,308 +2,232 @@
   "locale": "zh_CN",
   "messages": {
     "recipientLabel": {
-      "message": "接收方",
-      "description": "Label for the recipient field"
+      "message": "接收方"
     },
     "recipientTooltip": {
-      "message": "请求该许可的网站",
-      "description": "Tooltip for the recipient field"
+      "message": "请求该许可的网站"
     },
     "networkLabel": {
-      "message": "网络",
-      "description": "Label for the network field"
+      "message": "网络"
     },
     "networkTooltip": {
-      "message": "请求许可所在的网络",
-      "description": "Tooltip for the network field"
+      "message": "请求许可所在的网络"
     },
     "tokenLabel": {
-      "message": "代币",
-      "description": "Label for the token field"
+      "message": "代币"
     },
     "tokenTooltip": {
-      "message": "被请求的代币",
-      "description": "Tooltip for the token field"
+      "message": "被请求的代币"
     },
     "reasonLabel": {
-      "message": "原因",
-      "description": "Label for the reason field"
+      "message": "原因"
     },
     "reasonTooltip": {
-      "message": "接收方请求此许可的原因。",
-      "description": "Tooltip for the reason field"
+      "message": "接收方请求此许可的原因。"
     },
     "accountLabel": {
-      "message": "账户",
-      "description": "Label for the account field"
+      "message": "账户"
     },
     "accountTooltip": {
-      "message": "授予许可的账户。",
-      "description": "Tooltip for the account field"
+      "message": "授予许可的账户。"
     },
     "requestFromLabel": {
-      "message": "请求来源",
-      "description": "Label for the request from field"
+      "message": "请求来源"
     },
     "requestFromTooltip": {
-      "message": "请求许可的网站",
-      "description": "Tooltip for the request from field"
+      "message": "请求许可的网站"
     },
     "initialAmountLabel": {
-      "message": "初始金额",
-      "description": "Label for the initial amount field"
+      "message": "初始金额"
     },
     "initialAmountTooltip": {
-      "message": "可开始流式发送的初始代币数量。",
-      "description": "Tooltip for the initial amount field"
+      "message": "可开始流式发送的初始代币数量。"
     },
     "maxAmountLabel": {
-      "message": "最大金额",
-      "description": "Label for the max amount field"
+      "message": "最大金额"
     },
     "maxAmountTooltip": {
-      "message": "可流式发送的最大代币数量。",
-      "description": "Tooltip for the max amount field"
+      "message": "可流式发送的最大代币数量。"
     },
     "startTimeLabel": {
-      "message": "开始时间",
-      "description": "Label for the start time field"
+      "message": "开始时间"
     },
     "startTimeTooltip": {
-      "message": "首个周期开始的时间。",
-      "description": "Tooltip for the start time field for periodic permissions"
+      "message": "首个周期开始的时间。"
     },
     "streamStartTimeTooltip": {
-      "message": "流开始的时间",
-      "description": "Tooltip for the start time field for stream permissions"
+      "message": "流开始的时间"
     },
     "expiryLabel": {
-      "message": "到期时间",
-      "description": "Label for the expiry field"
+      "message": "到期时间"
     },
     "expiryTooltip": {
-      "message": "许可的到期时间",
-      "description": "Tooltip for the expiry field"
+      "message": "许可的到期时间"
     },
     "streamAmountLabel": {
-      "message": "流式金额",
-      "description": "Label for the stream amount field"
+      "message": "流式金额"
     },
     "streamAmountTooltip": {
-      "message": "每个周期可流式发送的代币数量。",
-      "description": "Tooltip for the stream amount field"
+      "message": "每个周期可流式发送的代币数量。"
     },
     "streamPeriodLabel": {
-      "message": "流周期",
-      "description": "Label for the stream period field"
+      "message": "流周期"
     },
     "streamPeriodTooltip": {
-      "message": "流的周期。",
-      "description": "Tooltip for the stream period field"
+      "message": "流的周期。"
     },
     "amountLabel": {
-      "message": "金额",
-      "description": "Label for the amount field"
+      "message": "金额"
     },
     "amountTooltip": {
-      "message": "每个周期授予的代币数量",
-      "description": "Tooltip for the amount field"
+      "message": "每个周期授予的代币数量"
     },
     "periodDurationLabel": {
-      "message": "频率",
-      "description": "Label for the period duration dropdown field"
+      "message": "频率"
     },
     "periodDurationTooltip": {
-      "message": "周期的时长",
-      "description": "Tooltip for the period duration dropdown field"
+      "message": "周期的时长"
     },
     "permissionRequestTitle": {
-      "message": "许可请求",
-      "description": "Title for permission request dialogs"
+      "message": "许可请求"
     },
     "showMoreButton": {
-      "message": "显示",
-      "description": "Text for show more button"
+      "message": "显示"
     },
     "hideButton": {
-      "message": "隐藏",
-      "description": "Text for hide button"
+      "message": "隐藏"
     },
     "streamRateLabel": {
-      "message": "流速",
-      "description": "Label for stream rate field"
+      "message": "流速"
     },
     "streamRateTooltip": {
-      "message": "每秒流式发送的代币数量。",
-      "description": "Tooltip for stream rate field"
+      "message": "每秒流式发送的代币数量。"
     },
     "streamRateValue": {
-      "message": "$1 $2/秒",
-      "description": "Stream rate value format with amount and symbol"
+      "message": "$1 $2/秒"
     },
     "cancelButton": {
-      "message": "取消",
-      "description": "Cancel button text"
+      "message": "取消"
     },
     "grantButton": {
-      "message": "授权",
-      "description": "Grant button text"
+      "message": "授权"
     },
     "hourly": {
-      "message": "每小时",
-      "description": "Hourly time period option"
+      "message": "每小时"
     },
     "daily": {
-      "message": "每日",
-      "description": "Daily time period option"
+      "message": "每日"
     },
     "weekly": {
-      "message": "每周",
-      "description": "Weekly time period option"
+      "message": "每周"
     },
     "biweekly": {
-      "message": "每两周",
-      "description": "Biweekly time period option"
+      "message": "每两周"
     },
     "monthly": {
-      "message": "每月",
-      "description": "Monthly time period option"
+      "message": "每月"
     },
     "yearly": {
-      "message": "每年",
-      "description": "Yearly time period option"
+      "message": "每年"
     },
     "availableLabel": {
-      "message": "可用",
-      "description": "Available label for token balance"
+      "message": "可用"
     },
     "permissionRequestSubtitle": {
-      "message": "此网站请求使用你的代币。",
-      "description": "Subtitle for permission request"
+      "message": "此网站请求使用你的代币。"
     },
     "accountUpgradeWarning": {
-      "message": "此账户将升级为智能账户以完成本次授权。",
-      "description": "Warning message when account needs to be upgraded"
+      "message": "此账户将升级为智能账户以完成本次授权。"
     },
     "removeFieldAlt": {
-      "message": "移除 $1",
-      "description": "Alt text for remove field button"
+      "message": "移除 $1"
     },
     "addFieldAlt": {
-      "message": "添加 $1",
-      "description": "Alt text for add field button"
+      "message": "添加 $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": "$1 必须大于 0",
-      "description": "Validation error when amount must be positive"
+      "message": "$1 必须大于 0"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": "$1 必须大于或等于 0",
-      "description": "Validation error when amount must be non-negative"
+      "message": "$1 必须大于或等于 0"
     },
     "errorInvalidAmount": {
-      "message": "无效的 $1",
-      "description": "Validation error for invalid amount"
+      "message": "无效的 $1"
     },
     "errorInvalidStartTime": {
-      "message": "无效的开始时间",
-      "description": "Validation error for invalid start time"
+      "message": "无效的开始时间"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": "开始时间必须为今天或之后",
-      "description": "Validation error when start time is in the past"
+      "message": "开始时间必须为今天或之后"
     },
     "errorInvalidExpiry": {
-      "message": "无效的到期时间",
-      "description": "Validation error for invalid expiry date"
+      "message": "无效的到期时间"
     },
     "errorExpiryMustBeInFuture": {
-      "message": "到期时间必须在未来",
-      "description": "Validation error when expiry is not in the future"
+      "message": "到期时间必须在未来"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": "开始时间必须早于到期时间",
-      "description": "Validation error when start time is after expiry"
+      "message": "开始时间必须早于到期时间"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": "最大金额必须大于初始金额",
-      "description": "Validation error when max amount is less than initial amount"
+      "message": "最大金额必须大于初始金额"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": "周期时长必须大于 0",
-      "description": "Validation error when period duration is zero or negative"
+      "message": "周期时长必须大于 0"
     },
     "unknownStreamRate": {
-      "message": "未知",
-      "description": "Fallback text when stream rate cannot be calculated"
+      "message": "未知"
     },
     "unknownChain": {
-      "message": "未知链 $1",
-      "description": "Fallback text when chain name is not available"
+      "message": "未知链 $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": "此网站请求撤销您的 ERC-20 代币授权。",
-      "description": "Subtitle for ERC-20 token revocation permission request"
+      "message": "此网站请求撤销您的 ERC-20 代币授权。"
     },
     "introAdvancedPermissionsTitle": {
-      "message": "高级许可让您掌控一切",
-      "description": "Title for the advanced permissions introduction page"
+      "message": "高级许可让您掌控一切"
     },
     "introSecureLimitedAccessTitle": {
-      "message": "安全、受限的访问",
-      "description": "Title for the secure limited access bullet point"
+      "message": "安全、受限的访问"
     },
     "introSecureLimitedAccessDescription": {
-      "message": "限制网站访问并撤销许可，无需支付 Gas 费用。",
-      "description": "Description for the secure limited access bullet point"
+      "message": "限制网站访问并撤销许可，无需支付 Gas 费用。"
     },
     "introFullyCustomizableControlTitle": {
-      "message": "完全可自定义的控制",
-      "description": "Title for the fully customizable control bullet point"
+      "message": "完全可自定义的控制"
     },
     "introFullyCustomizableControlDescription": {
-      "message": "查看、编辑或添加规则，使许可符合您的需求。",
-      "description": "Description for the fully customizable control bullet point"
+      "message": "查看、编辑或添加规则，使许可符合您的需求。"
     },
     "introTransparentConvenientTitle": {
-      "message": "透明且便捷",
-      "description": "Title for the transparent and convenient bullet point"
+      "message": "透明且便捷"
     },
     "introTransparentConvenientDescription": {
-      "message": "在一个地方轻松管理、自动化和编辑许可。",
-      "description": "Description for the transparent and convenient bullet point"
+      "message": "在一个地方轻松管理、自动化和编辑许可。"
     },
     "introSubscriptionTitle": {
-      "message": "此网站想要创建代币订阅",
-      "description": "Title for the subscription permission introduction page"
+      "message": "此网站想要创建代币订阅"
     },
     "introRecurringPaymentsDescription": {
-      "message": "允许此网站定期自动从您的钱包中提取代币——就像区块链上的订阅服务。",
-      "description": "Description for the recurring payments bullet point"
+      "message": "允许此网站定期自动从您的钱包中提取代币——就像区块链上的订阅服务。"
     },
     "introStreamTitle": {
-      "message": "此网站想要创建代币流",
-      "description": "Title for the stream permission introduction page"
+      "message": "此网站想要创建代币流"
     },
     "introContinuousTokenFlowDescription": {
-      "message": "启用从您钱包的渐进式实时代币转账——代币随时间稳定流动，而不是一次性全部转移。",
-      "description": "Description for the continuous token flow bullet point"
+      "message": "启用从您钱包的渐进式实时代币转账——代币随时间稳定流动，而不是一次性全部转移。"
     },
     "introRevocationTitle": {
-      "message": "此网站正在请求代币撤销许可",
-      "description": "Title for the revocation permission introduction page"
+      "message": "此网站正在请求代币撤销许可"
     },
     "introManageTokenApprovalsDescription": {
-      "message": "允许此网站代您撤销现有的代币许可——帮助您清理旧授权并降低风险。",
-      "description": "Description for the manage token approvals bullet point"
+      "message": "允许此网站代您撤销现有的代币许可——帮助您清理旧授权并降低风险。"
     },
     "introPermissionInControlDescription": {
-      "message": "您可以随时在高级许可中编辑或撤销此许可。",
-      "description": "Description for the permission in your control bullet point"
+      "message": "您可以随时在高级许可中编辑或撤销此许可。"
     },
     "introGotItButton": {
-      "message": "知道了",
-      "description": "Text for the got it button on introduction pages"
+      "message": "知道了"
     }
   }
 }
