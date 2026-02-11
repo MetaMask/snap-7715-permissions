@@ -298,7 +298,7 @@
       "description": "Description for the manage token approvals bullet point"
     },
     "introPermissionInControlDescription": {
-      "message": "You can edit or revoke this permission at any time in advanced permissions.",
+      "message": "You can revoke this permission at any time in advanced permissions.",
       "description": "Description for the permission in your control bullet point"
     },
     "introGotItButton": {
