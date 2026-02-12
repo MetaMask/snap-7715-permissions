@@ -17,7 +17,6 @@ import zhCNLocale from '../../locales/zh_CN.json';
 // Type definitions
 export type LocaleMessage = {
   message: string;
-  description?: string;
 };
 
 export type LocaleMessages = {

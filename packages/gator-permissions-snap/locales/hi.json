@@ -2,308 +2,232 @@
   "locale": "hi",
   "messages": {
     "recipientLabel": {
-      "message": "",
-      "description": "Label for the recipient field"
+      "message": ""
     },
     "recipientTooltip": {
-      "message": "",
-      "description": "Tooltip for the recipient field"
+      "message": ""
     },
     "networkLabel": {
-      "message": "",
-      "description": "Label for the network field"
+      "message": ""
     },
     "networkTooltip": {
-      "message": "",
-      "description": "Tooltip for the network field"
+      "message": ""
     },
     "tokenLabel": {
-      "message": "",
-      "description": "Label for the token field"
+      "message": ""
     },
     "tokenTooltip": {
-      "message": "",
-      "description": "Tooltip for the token field"
+      "message": ""
     },
     "reasonLabel": {
-      "message": "",
-      "description": "Label for the reason field"
+      "message": ""
     },
     "reasonTooltip": {
-      "message": "",
-      "description": "Tooltip for the reason field"
+      "message": ""
     },
     "accountLabel": {
-      "message": "",
-      "description": "Label for the account field"
+      "message": ""
     },
     "accountTooltip": {
-      "message": "",
-      "description": "Tooltip for the account field"
+      "message": ""
     },
     "requestFromLabel": {
-      "message": "",
-      "description": "Label for the request from field"
+      "message": ""
     },
     "requestFromTooltip": {
-      "message": "",
-      "description": "Tooltip for the request from field"
+      "message": ""
     },
     "initialAmountLabel": {
-      "message": "",
-      "description": "Label for the initial amount field"
+      "message": ""
     },
     "initialAmountTooltip": {
-      "message": "",
-      "description": "Tooltip for the initial amount field"
+      "message": ""
     },
     "maxAmountLabel": {
-      "message": "",
-      "description": "Label for the max amount field"
+      "message": ""
     },
     "maxAmountTooltip": {
-      "message": "",
-      "description": "Tooltip for the max amount field"
+      "message": ""
     },
     "startTimeLabel": {
-      "message": "",
-      "description": "Label for the start time field"
+      "message": ""
     },
     "startTimeTooltip": {
-      "message": "",
-      "description": "Tooltip for the start time field for periodic permissions"
+      "message": ""
     },
     "streamStartTimeTooltip": {
-      "message": "",
-      "description": "Tooltip for the start time field for stream permissions"
+      "message": ""
     },
     "expiryLabel": {
-      "message": "",
-      "description": "Label for the expiry field"
+      "message": ""
     },
     "expiryTooltip": {
-      "message": "",
-      "description": "Tooltip for the expiry field"
+      "message": ""
     },
     "streamAmountLabel": {
-      "message": "",
-      "description": "Label for the stream amount field"
+      "message": ""
     },
     "streamAmountTooltip": {
-      "message": "",
-      "description": "Tooltip for the stream amount field"
+      "message": ""
     },
     "streamPeriodLabel": {
-      "message": "",
-      "description": "Label for the stream period field"
+      "message": ""
     },
     "streamPeriodTooltip": {
-      "message": "",
-      "description": "Tooltip for the stream period field"
+      "message": ""
     },
     "amountLabel": {
-      "message": "",
-      "description": "Label for the amount field"
+      "message": ""
     },
     "amountTooltip": {
-      "message": "",
-      "description": "Tooltip for the amount field"
+      "message": ""
     },
     "periodDurationLabel": {
-      "message": "",
-      "description": "Label for the period duration dropdown field"
+      "message": ""
     },
     "periodDurationTooltip": {
-      "message": "",
-      "description": "Tooltip for the period duration dropdown field"
+      "message": ""
     },
     "permissionRequestTitle": {
-      "message": "",
-      "description": "Title for permission request dialogs"
+      "message": ""
     },
     "showMoreButton": {
-      "message": "",
-      "description": "Text for show more button"
+      "message": ""
     },
     "hideButton": {
-      "message": "",
-      "description": "Text for hide button"
+      "message": ""
     },
     "streamRateLabel": {
-      "message": "",
-      "description": "Label for stream rate field"
+      "message": ""
     },
     "streamRateTooltip": {
-      "message": "",
-      "description": "Tooltip for stream rate field"
+      "message": ""
     },
     "streamRateValue": {
-      "message": "",
-      "description": "Stream rate value format with amount and symbol"
+      "message": ""
     },
     "cancelButton": {
-      "message": "",
-      "description": "Cancel button text"
+      "message": ""
     },
     "grantButton": {
-      "message": "",
-      "description": "Grant button text"
+      "message": ""
     },
     "hourly": {
-      "message": "",
-      "description": "Hourly time period option"
+      "message": ""
     },
     "daily": {
-      "message": "",
-      "description": "Daily time period option"
+      "message": ""
     },
     "weekly": {
-      "message": "",
-      "description": "Weekly time period option"
+      "message": ""
     },
     "biweekly": {
-      "message": "",
-      "description": "Biweekly time period option"
+      "message": ""
     },
     "monthly": {
-      "message": "",
-      "description": "Monthly time period option"
+      "message": ""
     },
     "yearly": {
-      "message": "",
-      "description": "Yearly time period option"
+      "message": ""
     },
     "availableLabel": {
-      "message": "",
-      "description": "Available label for token balance"
+      "message": ""
     },
     "permissionRequestSubtitle": {
-      "message": "",
-      "description": "Subtitle for permission request"
+      "message": ""
     },
     "accountUpgradeWarning": {
-      "message": "",
-      "description": "Warning message when account needs to be upgraded"
+      "message": ""
     },
     "removeFieldAlt": {
-      "message": "",
-      "description": "Alt text for remove field button"
+      "message": ""
     },
     "addFieldAlt": {
-      "message": "",
-      "description": "Alt text for add field button"
+      "message": ""
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": "",
-      "description": "Validation error when amount must be positive"
+      "message": ""
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": "",
-      "description": "Validation error when amount must be non-negative"
+      "message": ""
     },
     "errorInvalidAmount": {
-      "message": "",
-      "description": "Validation error for invalid amount"
+      "message": ""
     },
     "errorInvalidStartTime": {
-      "message": "",
-      "description": "Validation error for invalid start time"
+      "message": ""
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": "",
-      "description": "Validation error when start time is in the past"
+      "message": ""
     },
     "errorInvalidExpiry": {
-      "message": "",
-      "description": "Validation error for invalid expiry date"
+      "message": ""
     },
     "errorExpiryMustBeInFuture": {
-      "message": "",
-      "description": "Validation error when expiry is not in the future"
+      "message": ""
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": "",
-      "description": "Validation error when start time is after expiry"
+      "message": ""
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": "",
-      "description": "Validation error when max amount is less than initial amount"
+      "message": ""
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": "",
-      "description": "Validation error when period duration is zero or negative"
+      "message": ""
     },
     "unknownStreamRate": {
-      "message": "",
-      "description": "Fallback text when stream rate cannot be calculated"
+      "message": ""
     },
     "unknownChain": {
-      "message": "",
-      "description": "Fallback text when chain name is not available"
+      "message": ""
     },
     "permissionRequestSubtitleRevocation": {
-      "message": "",
-      "description": "Subtitle for ERC-20 token revocation permission request"
+      "message": ""
     },
     "introAdvancedPermissionsTitle": {
-      "message": "",
-      "description": "Title for the advanced permissions introduction page"
+      "message": ""
     },
     "introSecureLimitedAccessTitle": {
-      "message": "",
-      "description": "Title for the secure limited access bullet point"
+      "message": ""
     },
     "introSecureLimitedAccessDescription": {
-      "message": "",
-      "description": "Description for the secure limited access bullet point"
+      "message": ""
     },
     "introFullyCustomizableControlTitle": {
-      "message": "",
-      "description": "Title for the fully customizable control bullet point"
+      "message": ""
     },
     "introFullyCustomizableControlDescription": {
-      "message": "",
-      "description": "Description for the fully customizable control bullet point"
+      "message": ""
     },
     "introTransparentConvenientTitle": {
-      "message": "",
-      "description": "Title for the transparent and convenient bullet point"
+      "message": ""
     },
     "introTransparentConvenientDescription": {
-      "message": "",
-      "description": "Description for the transparent and convenient bullet point"
+      "message": ""
     },
     "introSubscriptionTitle": {
-      "message": "",
-      "description": "Title for the subscription permission introduction page"
+      "message": ""
     },
     "introRecurringPaymentsDescription": {
-      "message": "",
-      "description": "Description for the recurring payments bullet point"
+      "message": ""
     },
     "introStreamTitle": {
-      "message": "",
-      "description": "Title for the stream permission introduction page"
+      "message": ""
     },
     "introContinuousTokenFlowDescription": {
-      "message": "",
-      "description": "Description for the continuous token flow bullet point"
+      "message": ""
     },
     "introRevocationTitle": {
-      "message": "",
-      "description": "Title for the revocation permission introduction page"
+      "message": ""
     },
     "introManageTokenApprovalsDescription": {
-      "message": "",
-      "description": "Description for the manage token approvals bullet point"
+      "message": ""
     },
     "introPermissionInControlDescription": {
-      "message": "",
-      "description": "Description for the permission in your control bullet point"
+      "message": ""
     },
     "introGotItButton": {
-      "message": "",
-      "description": "Text for the got it button on introduction pages"
+      "message": ""
     }
   }
 }
