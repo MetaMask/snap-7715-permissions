@@ -6,10 +6,10 @@ This document provides agents with essential information for working on the snap
 
 This is a monorepo implementing ERC-7715 permissions for MetaMask Snaps. It contains:
 
-- **@metamask/permissions-kernel-snap** - Kernel snap for managing permissions
-- **@metamask/gator-permissions-snap** - DeleGator permissions snap
-- **Shared utilities and types** - Common code across snaps
-- **Development/test site** - Local testing environment
+- **@metamask/permissions-kernel-snap** (`packages/kernel-snap`) - Kernel snap for managing permissions
+- **@metamask/gator-permissions-snap** (`packages/gator-snap`) - DeleGator permissions snap
+- **Shared utilities and types** (`packages/snap-lib`) - Common code across snaps
+- **Development/test site** (`packages/site`) - Local testing environment
 
 ## Technology Stack
 
@@ -104,13 +104,13 @@ Key rules enforced:
 Example:
 ```typescript
 describe('parsePermission', () => {
-  it('should parse valid permission objects', () => {
+  it('parses valid permission objects', () => {
     const input = { name: 'test', args: [] };
     const result = parsePermission(input);
     expect(result).toEqual({ name: 'test', args: [] });
   });
 
-  it('should throw on invalid input', () => {
+  it('throws an error with invalid input', () => {
     expect(() => parsePermission({ name: '', args: [] })).toThrow();
   });
 });
@@ -254,7 +254,7 @@ const name = user.name; // Get the user's name
 ## Performance Guidelines
 
 1. **Minimize state size** - Snap state persists to storage
-2. **Cache appropriately** - Use in-memory cache for RPC responses
+2. **Batch RPC calls** - Group related requests to reduce overhead
 3. **Lazy load dependencies** - Don't import unused modules
 4. **Efficient serialization** - Keep JSON payloads small
 
