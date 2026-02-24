@@ -2,232 +2,232 @@
   "locale": "ko",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "수신"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "권한을 요청하는 사이트"
     },
     "networkLabel": {
-      "message": ""
+      "message": "네트워크"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "권한 요청이 이루어지는 네트워크"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "토큰"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "요청 토큰"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "사유"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "이 권한을 요청한 측에서 제시한 사유입니다."
     },
     "accountLabel": {
-      "message": ""
+      "message": "계정"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "권한이 허용되는 계정."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "요청 출처:"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "권한을 요청하는 사이트"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "초기 수량"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "스트리밍할 수 있는 토큰의 초기 수량."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "최대 수량"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "스트리밍할 수 있는 토큰의 최대 수량."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "시작 시간"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "첫 번째 기간이 시작되는 시점"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "스트리밍 시작 시간"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "만료"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "권한 만료일"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "스트리밍 수량"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "기간별로 스트리밍할 수 있는 토큰 수량."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "스트리밍 기간"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "스트리밍이 이루어지는 기간."
     },
     "amountLabel": {
-      "message": ""
+      "message": "수량"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "각 기간 동안 부여되는 토큰 수량"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "주기"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "각 기간의 길이"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "권한 요청"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "표시"
     },
     "hideButton": {
-      "message": ""
+      "message": "숨기기"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "스트리밍 속도"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "초당 스트리밍하는 토큰 수량."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/초"
     },
     "cancelButton": {
-      "message": ""
+      "message": "취소"
     },
     "grantButton": {
-      "message": ""
+      "message": "허용"
     },
     "hourly": {
-      "message": ""
+      "message": "한 시간"
     },
     "daily": {
-      "message": ""
+      "message": "매일"
     },
     "weekly": {
-      "message": ""
+      "message": "매주"
     },
     "biweekly": {
-      "message": ""
+      "message": "격주"
     },
     "monthly": {
-      "message": ""
+      "message": "매월"
     },
     "yearly": {
-      "message": ""
+      "message": "매년"
     },
     "availableLabel": {
-      "message": ""
+      "message": "사용 가능"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "이 사이트에서 토큰 사용 권한을 요청합니다."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "이 권한을 완료하기 위해 계정이 스마트 계정으로 업그레이드됩니다."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "$1 제거"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "$1 추가"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1(은)는 0보다 커야 합니다"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1(은)는 0 이상이어야 합니다"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "잘못된 $1"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "잘못된 시작 시간"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "시작 시간은 오늘 이후여야 합니다"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "잘못된 만료일"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "만료일은 미래 시점이어야 합니다"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "시작 시간은 만료일 이전이어야 합니다"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "최대 수량은 초기 수량보다 커야 합니다"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "기간 길이는 0보다 커야 합니다"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "알 수 없음"
     },
     "unknownChain": {
-      "message": ""
+      "message": "알 수 없는 체인 $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "이 사이트에서 ERC-20 토큰 승인 취소 권한을 요청합니다."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "고급 권한으로 원하는 대로 관리하세요"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "안전하고 제한된 접근"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "원하는 조건에 맞게 사이트를 제한하고 접근 권한을 취소하세요."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "완전히 사용자 지정 가능한 제어"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "필요에 맞게 권한을 검토, 수정하거나 규칙을 추가하세요."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "투명하고 편리한 관리"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "한 곳에서 모든 권한을 쉽게 관리하세요."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "토큰 구독 요청"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "토큰 구독을 통해 설정한 일정에 따라 사이트가 지갑에서 토큰을 인출할 수 있도록 권한을 허용합니다."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "토큰 스트리밍 요청"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "토큰 스트림을 통해 설정한 기간 동안 사이트가 지갑에서 토큰을 일정 단위로 인출할 수 있도록 권한을 허용합니다."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "토큰 취소 요청"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "토큰 승인 취소를 통해 사이트가 대신 토큰을 취소할 수 있도록 권한을 허용합니다."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "이 권한은 고급 권한 메뉴에서 언제든지 취소할 수 있습니다."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "확인"
     }
   }
 }

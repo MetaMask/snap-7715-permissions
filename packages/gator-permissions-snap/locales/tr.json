@@ -2,232 +2,232 @@
   "locale": "tr",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Alıcı"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "İzni talep eden site"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Ağ"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "İznin talep edildiği ağ"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Token"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "Talep edilen token"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "Sebebi"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "Alıcının bu izni talep etme sebebi."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Hesap"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "İznin verildiği hesap."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Talebi gönderen"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "İzni talep eden site"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Başlangıç Miktarı"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "Akış gerçekleştirilebilecek başlangıç token miktarı."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Maksimum Miktar"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "Akış gerçekleştirilebilecek maksimum token miktarı."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Başlangıç Zamanı"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "İlk dönemin başladığı zaman"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "Akışın başlangıç zamanı"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Son geçerlilik tarihi"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "İznin son geçerlilik tarihi"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Akış Miktarı"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "Dönem başına akış gerçekleştirilebilecek token miktarı."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Akış Dönemi"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "Akışın dönemi."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Miktar"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "Her dönem tahsis edilen token miktarı"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Sıklık"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "Dönem süresi"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "İzin talebi"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Göster"
     },
     "hideButton": {
-      "message": ""
+      "message": "Gizle"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Akış oranı"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "Saniye başına akış gerçekleştirilecek token miktarı."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/sn"
     },
     "cancelButton": {
-      "message": ""
+      "message": "İptal"
     },
     "grantButton": {
-      "message": ""
+      "message": "Tahsis"
     },
     "hourly": {
-      "message": ""
+      "message": "Saatlik"
     },
     "daily": {
-      "message": ""
+      "message": "Günlük"
     },
     "weekly": {
-      "message": ""
+      "message": "Haftalık"
     },
     "biweekly": {
-      "message": ""
+      "message": "İki Haftalık"
     },
     "monthly": {
-      "message": ""
+      "message": "Aylık"
     },
     "yearly": {
-      "message": ""
+      "message": "Yıllık"
     },
     "availableLabel": {
-      "message": ""
+      "message": "kullanılabilir"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Bu site, tokenlarınızı harcamak için izin istiyor."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Bu izni yerine getirmek için bu hesap akıllı hesaba yükseltilecek."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Kaldır: $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Ekle: $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1, 0'dan büyük olmalıdır"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1, 0 veya 0'dan büyük olmalıdır"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "$1 geçersiz"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Başlangıç zamanı geçersiz"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "Başlangıç zamanı bugün veya daha sonraki bir tarih olmalıdır"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Son geçerlilik tarihi geçersiz"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "Son geçerlilik tarihi gelecekte olmalıdır"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "Başlangıç zamanı son geçerlilik tarihinden önce olmalıdır"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "Maksimum miktar başlangıç miktarından büyük olmalıdır"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Dönem süresi 0'dan büyük olmalıdır"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Bilinmeyen"
     },
     "unknownChain": {
-      "message": ""
+      "message": "Bilinmeyen zincir $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Bu site, ERC-20 token onaylarınızı iptal etmek için izin istiyor."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Kontrolü elinizde tutabilmeniz için gelişmiş izinler"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Güvenli, sınırlı erişim"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Kendi tercihlerinize göre siteleri kısıtlayın ve erişim yetkilerini iptal edin."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Tamamen kişiselleştirilebilir kontrol"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "İzinlerin ihtiyaçlarınızı karşılaması için kuralları gözden geçirin, düzenleyin veya yeni kural ekleyin."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Şeffaf ve kullanışlı"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "İzinlerin tamamını tek bir yerden kolayca yönetin."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Token abonelik talebi"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "Token abonelikleri, sitelere, sizin belirlediğiniz plana göre cüzdanınızdan token çekme izni verir."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Token akış talebi"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Token akışları, sitelere, sizin belirlediğiniz bir süre boyunca cüzdanınızdan kademeli olarak token çekme izni verir."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Token iptal talebi"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "Token iptali, sitelerin, token onaylarını sizin adınıza iptal etmesine olanak sağlar."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Bu izni dilediğiniz zaman gelişmiş izinler alanında iptal edebilirsiniz."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "Anladım"
     }
   }
 }

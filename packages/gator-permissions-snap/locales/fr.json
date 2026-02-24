@@ -2,232 +2,232 @@
   "locale": "fr",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Destinataire"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "Le site sollicitant l’autorisation"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Réseau"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "Le réseau sur lequel l’autorisation est demandée"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Jeton"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "Le jeton faisant l’objet de la demande"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "Motif"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "Motif invoqué par le destinataire pour demander cette autorisation."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Compte"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "Le compte depuis lequel l’autorisation est accordée."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Demande provenant de"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "Le site sollicitant l’autorisation"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Montant initial"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "Le montant initial de jetons pouvant être transféré en flux."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Montant maximal"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "Le montant maximum de jetons pouvant être transféré en flux."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Heure de début"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "L’heure à laquelle la première période commence"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "Heure de début du transfert en flux"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Date d’expiration"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "Date d’expiration de l’autorisation"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Montant transféré en flux"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "Le montant de jetons pouvant être transféré en flux par période."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Période de transfert en flux"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "La période de transfert en flux."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Montant"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "Le montant de jetons accordé pendant chaque période"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Fréquence"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "La durée de la période"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "Demande d’autorisation"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Afficher"
     },
     "hideButton": {
-      "message": ""
+      "message": "Masquer"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Débit du flux"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "Le montant de jetons à transférer en flux par seconde."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/s"
     },
     "cancelButton": {
-      "message": ""
+      "message": "Annuler"
     },
     "grantButton": {
-      "message": ""
+      "message": "Accorder"
     },
     "hourly": {
-      "message": ""
+      "message": "Horaire"
     },
     "daily": {
-      "message": ""
+      "message": "Quotidien"
     },
     "weekly": {
-      "message": ""
+      "message": "Hebdomadaire"
     },
     "biweekly": {
-      "message": ""
+      "message": "Bihebdomadaire"
     },
     "monthly": {
-      "message": ""
+      "message": "Mensuel"
     },
     "yearly": {
-      "message": ""
+      "message": "Annuel"
     },
     "availableLabel": {
-      "message": ""
+      "message": "disponible"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Ce site demande l’autorisation de dépenser vos jetons."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Ce compte sera migré vers un compte intelligent pour obtenir cette autorisation."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Supprimer $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Ajouter $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1 doit être supérieur à 0"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1 doit être supérieur ou égal à 0"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "$1 non valide"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Heure de début non valide"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "L’heure de début ne peut pas être antérieure à aujourd’hui"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Date d’expiration non valide"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "La date d’expiration doit être dans le futur"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "L’heure de début doit être antérieure à la date d’expiration"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "Le montant maximal doit être supérieure au montant initial"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "La durée de la période doit être supérieure à 0"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Inconnu"
     },
     "unknownChain": {
-      "message": ""
+      "message": "$1 de chaîne inconnu(e)"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Ce site souhaite obtenir l’autorisation de révoquer vos approbations de jetons ERC-20."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Les autorisations avancées vous permettent de garder le contrôle"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Accès sécurisé et limité"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Restreignez l’accès aux sites et révoquez les autorisations selon vos propres conditions."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Contrôle entièrement personnalisable"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "Examinez, modifiez ou ajoutez des règles pour que les autorisations répondent à vos besoins."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Transparent et pratique"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "Gérez facilement toutes vos autorisations depuis un seul endroit."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Demande d’abonnement à un jeton"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "Les abonnements à des jetons permettent aux sites de prélever des jetons de votre portefeuille selon le calendrier que vous avez défini."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Requête de streaming de jetons"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Les flux de jetons autorisent les sites à retirer des fractions de jetons de votre portefeuille sur une période que vous définissez."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Demande de révocation de jetons"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "La révocation de jetons permet aux sites de révoquer les approbations de jetons en votre nom."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Vous pouvez révoquer cette autorisation à tout moment dans les autorisations avancées."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "D’accord"
     }
   }
 }

@@ -2,232 +2,232 @@
   "locale": "el",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Παραλήπτης"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "Ο ιστότοπος που ζητά την άδεια"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Δίκτυο"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "Το δίκτυο στο οποίο ζητείται η άδεια"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Token"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "Το token που ζητείται"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "Αιτιολογία"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "Η αιτιολογία που έδωσε ο παραλήπτης για το αίτημα αυτής της άδειας."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Λογαριασμός"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "Ο λογαριασμός από τον οποίο χορηγείται η άδεια."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Αίτημα από"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "Ο ιστότοπος που ζητά την άδεια"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Αρχικό ποσό"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "Το αρχικό ποσό των tokens που μπορούν να μεταφερθούν."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Μέγιστο ποσό"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "Το μέγιστο ποσό των tokens που μπορούν να μεταφερθούν."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Ώρα έναρξης"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "Η ώρα κατά την οποία ξεκινά η πρώτη περίοδος"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "Η ώρα έναρξης της μεταφοράς"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Λήξη"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "Η ημερομηνία λήξης της άδειας"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Ποσό προς μεταφορά"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "Το ποσό των tokens που μπορεί να γίνει μεταφορά ανά περίοδο."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Περίοδος μεταφοράς"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "Η περίοδος της μεταφοράς."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Ποσό"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "Το ποσό των tokens που χορηγείται σε κάθε περίοδο"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Συχνότητα"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "Η διάρκεια της περιόδου"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "Αίτημα άδειας"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Εμφάνιση"
     },
     "hideButton": {
-      "message": ""
+      "message": "Απόκρυψη"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Ρυθμός μεταφοράς"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "Το ποσό των tokens που γίνεται μεταφορά ανά δευτερόλεπτο."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/δευτ."
     },
     "cancelButton": {
-      "message": ""
+      "message": "Ακύρωση"
     },
     "grantButton": {
-      "message": ""
+      "message": "Έγκριση"
     },
     "hourly": {
-      "message": ""
+      "message": "Ανά ώρα"
     },
     "daily": {
-      "message": ""
+      "message": "Ανά ημέρα"
     },
     "weekly": {
-      "message": ""
+      "message": "Ανά εβδομάδα"
     },
     "biweekly": {
-      "message": ""
+      "message": "Ανά δύο εβδομάδες"
     },
     "monthly": {
-      "message": ""
+      "message": "Ανά μήνα"
     },
     "yearly": {
-      "message": ""
+      "message": "Ανά έτος"
     },
     "availableLabel": {
-      "message": ""
+      "message": "διαθέσιμο"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Αυτός ο ιστότοπος ζητά άδεια για να ξοδέψει τα tokens σας."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Αυτός ο λογαριασμός θα αναβαθμιστεί σε έξυπνο λογαριασμό για να ολοκληρωθεί αυτό το αίτημα άδειας."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Αφαίρεση $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Προσθήκη $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Το $1 πρέπει να είναι μεγαλύτερο από 0"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "Το $1 πρέπει να είναι μεγαλύτερο ή ίσο με 0"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "Μη έγκυρο $1"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Μη έγκυρη ώρα έναρξης"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "Η ώρα έναρξης πρέπει να είναι σήμερα ή αργότερα"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Μη έγκυρη λήξη"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "Η λήξη πρέπει να είναι στο μέλλον"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "Η ώρα έναρξης πρέπει να είναι πριν από τη λήξη"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "Το μέγιστο ποσό πρέπει να είναι μεγαλύτερο από το αρχικό ποσό"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Η διάρκεια περιόδου πρέπει να είναι μεγαλύτερη από 0"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Άγνωστο"
     },
     "unknownChain": {
-      "message": ""
+      "message": "Άγνωστη αλυσίδα $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Αυτός ο ιστότοπος ζητά άδεια για να ανακαλέσει τις εγκρίσεις ERC‑20 για το token σας."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Με τις προηγμένες άδειες, θα έχετε τον έλεγχο"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Ασφαλής, περιορισμένη πρόσβαση"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Περιορίστε τους ιστότοπους και ανακαλέστε την πρόσβαση με τους δικούς σας όρους."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Πλήρως προσαρμόσιμος έλεγχος"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "Ελέγξτε, επεξεργαστείτε ή προσθέστε κανόνες ώστε οι άδειες να καλύπτουν τις ανάγκες σας."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Απλές και εύχρηστες"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "Διαχειριστείτε εύκολα τις άδειες από ένα μόνο σημείο."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Αίτημα συνδρομής για tokens"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "Με τις συνδρομές σε tokens οι ιστότοποι έχουν την άδεια να αποσύρουν tokens από το πορτοφόλι σας, σύμφωνα με το πρόγραμμα που έχετε ορίσει."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Αίτημα μεταφοράς tokens"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Με τις μεταφορές των tokens δίνετε στους ιστότοπους την άδεια να αποσυρούν τμηματικά tokens από το πορτοφόλι σας, για το χρονικό διάστημα που έχετε ορίσει."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Αίτημα ανάκλησης token"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "Με την ανάκληση των tokens, οι ιστότοποι μπορούν να ανακαλούν εγκρίσεις για εσάς."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Μπορείτε να ανακαλέσετε αυτήν την άδεια οποιαδήποτε στιγμή από τις προηγμένες άδειες."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "Εντάξει"
     }
   }
 }
