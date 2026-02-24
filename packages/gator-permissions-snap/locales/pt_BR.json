@@ -2,232 +2,232 @@
   "locale": "pt_BR",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Destinatário"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "A unidade solicitante de permissão"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Rede"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "A rede na qual a permissão está sendo solicitada"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Token"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "O token que está sendo solicitado"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "Motivo"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "Motivo apresentado pelo destinatário para solicitar esta permissão."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Conta"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "A conta a partir da qual a permissão está sendo concedida."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Solicitação de"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "A unidade solicitante de permissão"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Quantidade inicial"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "A quantidade inicial de tokens que pode ser enviada por streaming."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Quantidade máxima"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "A quantidade máxima de tokens que pode ser enviada por streaming."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Horário de início"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "O momento em que começa o primeiro período"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "O horário de início do streaming"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Vencimento"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "A data de vencimento da permissão"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Quantidade de streaming"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "A quantidade de tokens que podem ser enviados por streaming por período."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Período de streaming"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "O período do streaming."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Quantidade"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "A quantidade de tokens concedidos durante cada período"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Frequência"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "A duração do período"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "Pedido de permissão"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Exibir"
     },
     "hideButton": {
-      "message": ""
+      "message": "Ocultar"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Taxa de streaming"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "A quantidade de tokens a enviar por streaming por segundo."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/segundo"
     },
     "cancelButton": {
-      "message": ""
+      "message": "Cancelar"
     },
     "grantButton": {
-      "message": ""
+      "message": "Conceder"
     },
     "hourly": {
-      "message": ""
+      "message": "Por hora"
     },
     "daily": {
-      "message": ""
+      "message": "Por dia"
     },
     "weekly": {
-      "message": ""
+      "message": "Por semana"
     },
     "biweekly": {
-      "message": ""
+      "message": "Quinzenal"
     },
     "monthly": {
-      "message": ""
+      "message": "Por mês"
     },
     "yearly": {
-      "message": ""
+      "message": "Por ano"
     },
     "availableLabel": {
-      "message": ""
+      "message": "disponível"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Esta unidade solicita permissão para gastar seus tokens."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Esta conta será atualizada para uma conta inteligente para cumprir esta permissão."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Remover $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Adicionar $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1 deve ser maior que 0"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1 deve ser igual ou maior que 0"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "$1 inválido"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Horário de início inválido"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "O horário de início deve ser hoje ou mais tarde"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Validade inválida"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "A data de validade deve ser futura"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "O horário de início deve ser anterior ao vencimento"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "A quantidade máxima deve ser maior que a quantidade inicial"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "A duração do período deve ser maior que 0"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Desconhecido"
     },
     "unknownChain": {
-      "message": ""
+      "message": "Cadeia desconhecida $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Esta unidade solicita permissão para revogar suas aprovações de tokens ERC-20."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Permissões adiantadas mantêm você no controle"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Acesso seguro e limitado"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Restrinja unidades e revogue acessos a seu critério."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Controle totalmente personalizável"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "Revise, edite ou adicione regras para que as permissões atendam às suas necessidades."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Transparente e conveniente"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "Gerencie facilmente as permissões de um único lugar."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Solicitação de assinatura de token"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "As assinaturas de tokens dão às unidades permissão para retirar tokens da sua carteira de acordo com um cronograma definido por você."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Solicitação de streaming de token"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Streamings de tokens permitem que as unidades retirem incrementos de tokens da sua carteira durante um período de tempo definido por você."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Solicitação de revogação de token"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "Revogação de tokens permite que unidades revoguem as aprovações de tokens em seu nome."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Você pode revogar essa permissão quando quiser nas configurações avançadas de permissões."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "Entendi"
     }
   }
 }

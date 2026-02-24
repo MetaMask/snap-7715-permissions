@@ -2,232 +2,232 @@
   "locale": "vi",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Người nhận"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "Trang web yêu cầu quyền"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Mạng"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "Mạng mà quyền đang được yêu cầu"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Token"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "Token đang được yêu cầu"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "Lý do"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "Lý do người nhận đưa ra khi yêu cầu quyền này."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Tài khoản"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "Tài khoản được dùng để cấp quyền."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Yêu cầu từ"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "Trang web yêu cầu quyền"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Số lượng ban đầu"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "Số lượng token ban đầu có thể được truyền tải."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Số lượng tối đa"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "Số lượng token tối đa có thể được truyền tải."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Thời gian bắt đầu"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "Thời điểm mà kỳ đầu tiên bắt đầu"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "Thời điểm bắt đầu truyền tải"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Ngày hết hạn"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "Ngày hết hạn của quyền"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Số lượng truyền tải"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "Số lượng token có thể được truyền tải trong mỗi kỳ."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Chu kỳ truyền tải"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "Chu kỳ truyền tải."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Số lượng"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "Số lượng token được cấp trong mỗi kỳ"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Tần suất"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "Thời gian của mỗi kỳ"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "Yêu cầu quyền"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Hiển thị"
     },
     "hideButton": {
-      "message": ""
+      "message": "Ẩn"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Tốc độ truyền tải"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "Số lượng token được truyền tải mỗi giây."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/giây"
     },
     "cancelButton": {
-      "message": ""
+      "message": "Hủy"
     },
     "grantButton": {
-      "message": ""
+      "message": "Cấp quyền"
     },
     "hourly": {
-      "message": ""
+      "message": "Hằng giờ"
     },
     "daily": {
-      "message": ""
+      "message": "Hằng ngày"
     },
     "weekly": {
-      "message": ""
+      "message": "Hằng tuần"
     },
     "biweekly": {
-      "message": ""
+      "message": "Hai tuần một lần"
     },
     "monthly": {
-      "message": ""
+      "message": "Hằng tháng"
     },
     "yearly": {
-      "message": ""
+      "message": "Hằng năm"
     },
     "availableLabel": {
-      "message": ""
+      "message": "khả dụng"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Trang web này muốn được cấp quyền để sử dụng token của bạn."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Tài khoản này sẽ được nâng cấp lên tài khoản thông minh để hoàn tất việc cấp quyền này."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Xóa $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Thêm $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1 phải lớn hơn 0"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1 phải lớn hơn hoặc bằng 0"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "$1 không hợp lệ"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Thời gian bắt đầu không hợp lệ"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "Thời gian bắt đầu phải từ hôm nay trở đi"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Ngày hết hạn không hợp lệ"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "Ngày hết hạn phải ở trong tương lai"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "Thời gian bắt đầu phải trước ngày hết hạn"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "Số lượng tối đa phải lớn hơn số lượng ban đầu"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Thời lượng chu kỳ phải lớn hơn 0"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Không xác định"
     },
     "unknownChain": {
-      "message": ""
+      "message": "Chuỗi $1 không xác định"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Trang web này muốn được cấp quyền để thu hồi các phê duyệt token ERC-20 của bạn."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Quyền nâng cao giúp bạn luôn kiểm soát mọi thứ"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Truy cập an toàn, có giới hạn"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Hạn chế các trang web và thu hồi quyền truy cập theo điều kiện của bạn."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Kiểm soát hoàn toàn có thể tùy chỉnh"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "Xem lại, chỉnh sửa hoặc thêm quy tắc để quyền phù hợp với nhu cầu của bạn."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Minh bạch và tiện lợi"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "Dễ dàng quản lý tất cả quyền ở một nơi."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Yêu cầu đăng ký token"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "Đăng ký token cho phép các trang web được rút token từ ví của bạn theo lịch trình bạn đã thiết lập."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Yêu cầu truyền tải token"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Truyền tải token cho phép các trang web được rút dần token từ ví của bạn trong khoảng thời gian bạn đã thiết lập."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Yêu cầu thu hồi token"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "Thu hồi token cho phép các trang web thay mặt bạn thu hồi các phê duyệt token."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Bạn có thể thu hồi quyền này bất cứ lúc nào trong mục quyền nâng cao."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "Đã hiểu"
     }
   }
 }

@@ -2,232 +2,232 @@
   "locale": "hi",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "प्राप्तकर्ता"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "अनुमति का अनुरोध करने वाली साइट"
     },
     "networkLabel": {
-      "message": ""
+      "message": "नेटवर्क"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "वह नेटवर्क जिस पर अनुमति का अनुरोध किया जा रहा है"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "टोकन"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "वह टोकन जिसका अनुरोध किया जा रहा है"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "कारण"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "इस अनुमति के लिए प्राप्तकर्ता ने जो वजह बताई है।"
     },
     "accountLabel": {
-      "message": ""
+      "message": "अकाउंट"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "वह अकाउंट जिससे अनुमति दी जा रही है।"
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "से अनुरोध"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "अनुमति का अनुरोध करने वाली साइट"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "शुरुआती अमाउंट"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "टोकनों का शुरुआती अमाउंट जिसे स्ट्रीम किया जा सकता है।"
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "अधिकतम अमाउंट"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "टोकनों का अधिकतम अमाउंट जिसे स्ट्रीम किया जा सकता है।"
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "शुरू होने का समय"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "वह समय जब पहला पीरियड शुरू होता है"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "स्ट्रीम का शुरू होने का समय"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "समाप्ति"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "अनुमति की समाप्ति तिथि"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "स्ट्रीम अमाउंट"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "हर पीरियड में स्ट्रीम किए जा सकने वाले टोकनों का अमाउंट।"
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "स्ट्रीम पीरियड"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "स्ट्रीम का पीरियड।"
     },
     "amountLabel": {
-      "message": ""
+      "message": "अमाउंट"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "हर पीरियड के दौरान दिए गए टोकनों की संख्या"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "आवृत्ति"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "पीरियड की अवधि"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "अनुमति अनुरोध"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "दिखाएं"
     },
     "hideButton": {
-      "message": ""
+      "message": "छुपाएं"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "स्ट्रीम रेट"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "हर सेकंड स्ट्रीम किए जाने वाले टोकनों की संख्या।"
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/सेकंड"
     },
     "cancelButton": {
-      "message": ""
+      "message": "कैंसिल करें"
     },
     "grantButton": {
-      "message": ""
+      "message": "अनुमति दें"
     },
     "hourly": {
-      "message": ""
+      "message": "हर घंटे"
     },
     "daily": {
-      "message": ""
+      "message": "रोज़ाना"
     },
     "weekly": {
-      "message": ""
+      "message": "हर हफ़्ते"
     },
     "biweekly": {
-      "message": ""
+      "message": "हर दो हफ़्ते में"
     },
     "monthly": {
-      "message": ""
+      "message": "हर महीने"
     },
     "yearly": {
-      "message": ""
+      "message": "हर साल"
     },
     "availableLabel": {
-      "message": ""
+      "message": "उपलब्ध"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "यह साइट आपके टोकन खर्च करने की अनुमति चाहती है।"
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "इस अनुमति को पूरा करने के लिए इस अकाउंट को स्मार्ट अकाउंट में अपग्रेड किया जाएगा।"
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "$1 हटाएं"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "$1 जोड़ें"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1 को 0 से ज़्यादा होना चाहिए"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1 को 0 से ज़्यादा या इसके बराबर होना चाहिए"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "$1 ग़लत है"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "शुरू होने का समय ग़लत है"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "शुरू होने का समय आज या बाद का होना चाहिए"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "समाप्ति ग़लत है"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "समाप्ति भविष्य में होनी चाहिए"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "शुरू होने का समय समाप्ति से पहले का होना चाहिए"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "अधिकतम अमाउंट शुरुआती अमाउंट से अधिक होना चाहिए"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "पीरियड की अवधि 0 से ज़्यादा होनी चाहिए"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "अज्ञात"
     },
     "unknownChain": {
-      "message": ""
+      "message": "अज्ञात चेन $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "यह साइट आपके ERC-20 टोकन अप्रूवल को कैंसिल करने की अनुमति चाहती है।"
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "एडवांस में ली गई अनुमति आपको कंट्रोल में रखती हैं"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "सुरक्षित, सीमित एक्सेस"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "अपनी शर्तों पर साइट्स पर रोक लगाएं और एक्सेस कैंसिल करें।"
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "पूरी तरह से कस्टमाइज़ेबल कंट्रोल"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "नियमों को रिव्यू करें, एडिट करें या जोड़ें ताकि अनुमति आपकी ज़रूरतों के हिसाब से हों।"
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "पारदर्शी और सुविधाजनक"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "सभी अनुमतियां एक ही जगह से आसानी से मैनेज करें।"
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "टोकन सब्सक्रिप्शन की अनुमति"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "टोकन सब्सक्रिप्शन से साइटों को आपके सेट किए गए शेड्यूल पर आपके वॉलेट से टोकन निकालने की अनुमति मिल जाती है।"
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "टोकन स्ट्रीमिंग अनुरोध"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "टोकन स्ट्रीमों से साइटों को आपके सेट किए गए समय में आपके वॉलेट से टोकन के इन्क्रीमेंट निकालने की अनुमति मिल जाती है।"
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "टोकन कैंसिल करने का रिक्वेस्ट"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "टोकन कैंसिल करने के ज़रिए साइटें आपकी तरफ़ से टोकन अप्रूवल कैंसिल कर सकती हैं।"
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "आप एडवांस्ड अनुमति में कभी भी यह अनुमति कैंसिल कर सकते हैं।"
     },
     "introGotItButton": {
-      "message": ""
+      "message": "समझ गए"
     }
   }
 }

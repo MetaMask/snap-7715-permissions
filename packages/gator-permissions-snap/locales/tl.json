@@ -2,232 +2,232 @@
   "locale": "tl",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Tatanggap"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "Ang site na humihiling ng pahintulot"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Network"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "Ang network kung saan hinihiling ang pahintulot"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Token"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "Hinihiling ang token"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "Dahilan"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "Dahilan na ibinigay ng tatanggap para sa paghiling sa pahintulot na ito."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Account"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "Ang account kung saan ipinagkaloob ang pahintulot na ito."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Kahilingan mula sa"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "Ang site na humihiling ng pahintulot"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Paunang Halaga"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "Ang paunang halaga ng mga token na maaaring i-stream."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Pinakamataas na Halaga"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "Ang pinakamataas na halaga ng mga token na maaaring i-stream."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Oras ng Pagsisimula"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "Ang oras kung kailan mag-uumpisa ang unang panahon"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "Ang oras ng pagsisimula ng stream"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Mag-e-expire"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "Ang petsa kung kailan mag-e-expire ang pahintulot"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Halaga ng Stream"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "Ang halaga ng mga token na maaaring i-stream kada panahon."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Panahon ng Stream"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "Ang panahon ng stream."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Halaga"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "Ang halaga ng mga token na ipinagkaloob sa bawat panahon"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Dalas"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "Ang tagal ng panahon"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "Kahilingan sa pahintulot"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Ipakita"
     },
     "hideButton": {
-      "message": ""
+      "message": "Itago"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Rate ng stream"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "Ang halaga ng mga token na ii-stream kada segundo."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/segundo"
     },
     "cancelButton": {
-      "message": ""
+      "message": "Kanselahin"
     },
     "grantButton": {
-      "message": ""
+      "message": "Payagan"
     },
     "hourly": {
-      "message": ""
+      "message": "Oras-oras"
     },
     "daily": {
-      "message": ""
+      "message": "Araw-araw"
     },
     "weekly": {
-      "message": ""
+      "message": "Lingguhan"
     },
     "biweekly": {
-      "message": ""
+      "message": "Kada ikalawang linggo"
     },
     "monthly": {
-      "message": ""
+      "message": "Buwanan"
     },
     "yearly": {
-      "message": ""
+      "message": "Taunan"
     },
     "availableLabel": {
-      "message": ""
+      "message": "available"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Kailangan ng site na ito ng mga pahintulot para gastusin ang mga token mo."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Ia-upgrade ang account na ito sa smart account para makumpleto ang pahintulot na ito."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Alisin ang $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Magdagdag ng $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Ang $1 ay dapat na mas malaki sa 0"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "Ang $1 ay dapat na mas malaki o katumbas ng 0"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "Di-wastong $1"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Di-wastong oras ng pagsisimula"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "Ang oras ng pagsisimula ay dapat ngayon o mamaya"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Di-wastong pag-e-expire"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "Dapat sa hinaharap ang pag-e-expire"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "Ang oras ng pagsisimula ay dapat bago mag-expire"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "Ang pinakamataas na halaga ay dapat na mas malaki sa paunang halaga"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Ang tagal ng panahon ay dapat mas malaki sa 0"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Hindi Kilala"
     },
     "unknownChain": {
-      "message": ""
+      "message": "Hindi kilalang chain $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Kailangan ng site na ito ng pahintulot para bawiin ang mga pag-apruba mo sa ERC-20."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Pinananatili ng advanced na mga pahintulot na kontrolado ka"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Ligtas, limitadong access"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Paghigpitan ang mga site at bawiin ang access ayon sa mga tuntunin mo."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Ganap na nako-customize na kontrol"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "Suriin, i-edit, o magdagdag ng mga tuntunin nang sa gayon natutugunan ng mga pahintulot ang pangangailangan mo."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Transparent at maginhawa"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "Madaling pamahalaan ang lahat ng pahintulot sa iisang lugar."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Kahilingan na token subscription"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "Ang mga token subscription ay nagbibigay ng pahintulot sa mga site na kumuha ng mga token mula sa wallet mo sa iskedyul na itinakda mo."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Kahilingan na pag-stream ng token"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Ang mga pag-stream ng token ay nagbibigay ng pahintulot sa mga site na kumuha ng dagdag na mga token mula sa wallet mo sa loob ng isang panahon na itinakda mo."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Kahilingan na pagbawi sa token"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "Pinahihintulutan ng pagbawi sa token ang mga site na bawiin ang pag-apruba sa token sa ngalan mo."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Maaari mong bawiin ang pahintulot na ito anumang oras sa advanced na mga pahintulot."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "Nakuha ko"
     }
   }
 }

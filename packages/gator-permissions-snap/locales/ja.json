@@ -2,232 +2,232 @@
   "locale": "ja",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "受取人"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "アクセス許可を求めているサイトです"
     },
     "networkLabel": {
-      "message": ""
+      "message": "ネットワーク"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "アクセス許可が求められているネットワークです"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "トークン"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "求められているトークンです"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "理由"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "受取人から提供された、この許可が求められている理由です。"
     },
     "accountLabel": {
-      "message": ""
+      "message": "アカウント"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "アクセス許可を与えたアカウントです。"
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "要求元"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "アクセス許可を求めているサイトです"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "初期金額"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "ストリーム可能なトークンの初期の金額です。"
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "最高額"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "ストリーム可能なトークンの最高額です。"
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "開始時刻"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "初回期間の開始時刻です"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "ストリームの開始時刻です"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "有効期限"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "アクセス許可の有効期日です"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "ストリーム金額"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "期間ごとにストリーム可能なトークンの金額です。"
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "ストリーム期間"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "ストリームの期間です。"
     },
     "amountLabel": {
-      "message": ""
+      "message": "金額"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "各期間に与えられるトークンの金額です"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "頻度"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "期間の長さです"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "アクセス許可の要求"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "表示"
     },
     "hideButton": {
-      "message": ""
+      "message": "非表示"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "ストリームレート"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "1秒ごとにストリームするトークンの金額です。"
     },
     "streamRateValue": {
-      "message": ""
+      "message": "毎秒$1 $2"
     },
     "cancelButton": {
-      "message": ""
+      "message": "キャンセル"
     },
     "grantButton": {
-      "message": ""
+      "message": "付与"
     },
     "hourly": {
-      "message": ""
+      "message": "1時間ごと"
     },
     "daily": {
-      "message": ""
+      "message": "毎日"
     },
     "weekly": {
-      "message": ""
+      "message": "毎週"
     },
     "biweekly": {
-      "message": ""
+      "message": "2週間に1度"
     },
     "monthly": {
-      "message": ""
+      "message": "毎月"
     },
     "yearly": {
-      "message": ""
+      "message": "毎年"
     },
     "availableLabel": {
-      "message": ""
+      "message": "利用可能"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "このサイトはトークンの使用許可を求めています。"
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "この許可を完了させるために、このアカウントはスマートアカウントにアップグレードされます。"
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "$1を削除"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "$1を追加"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1は0よりも大きな数値である必要があります"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1は0以上である必要があります"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "無効な$1"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "無効な開始時刻"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "開始時刻は今日以降である必要があります"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "無効な有効期限"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "有効期限は未来に設定する必要があります"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "開始時刻は有効期限より前である必要があります"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "最高額は初期金額よりも大きく設定する必要があります"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "期間の長さは0よりも大きい値に設定する必要があります"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "不明"
     },
     "unknownChain": {
-      "message": ""
+      "message": "不明なチェーン$1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "このサイトはERC-20トークン承認を取り消す許可を求めています。"
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "高度な許可設定で詳細な管理が可能"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "安全で限定的なアクセス"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "サイトを制限し、思い通りにアクセスを取り消せます。"
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "完全にカスタマイズ可能なコントロール"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "ルールを確認、j編集、追加して、ニーズに合わせてアクセス許可を管理できます。"
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "透明かつ便利"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "アクセス許可をすべて1か所で簡単に管理できます。"
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "トークンサブスクリプション要求"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "トークンサブスクリプションは、ユーザーが設定したスケジュールでウォレットからトークンを引き出す許可をサイトに与えます。"
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "トークンストリーミング要求"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "トークンストリームは、ユーザーが設定した期間にわたりウォレットからトークンを一定金額ずつ引き出す許可をサイトに与えます。"
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "トークン取り消し要求"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "トークン取り消しにより、サイトがユーザーに代わりトークンの承認を取り消せるようになります。"
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "この許可は、高度な許可設定でいつでも取り消せます。"
     },
     "introGotItButton": {
-      "message": ""
+      "message": "了解"
     }
   }
 }

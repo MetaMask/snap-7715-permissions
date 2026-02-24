@@ -5,7 +5,7 @@
       "message": "接收方"
     },
     "recipientTooltip": {
-      "message": "请求该许可的网站"
+      "message": "请求许可的网站"
     },
     "networkLabel": {
       "message": "网络"
@@ -41,13 +41,13 @@
       "message": "初始金额"
     },
     "initialAmountTooltip": {
-      "message": "可开始流式发送的初始代币数量。"
+      "message": "可流式传输的初始代币数量。"
     },
     "maxAmountLabel": {
       "message": "最大金额"
     },
     "maxAmountTooltip": {
-      "message": "可流式发送的最大代币数量。"
+      "message": "可流式传输的最大代币数量。"
     },
     "startTimeLabel": {
       "message": "开始时间"
@@ -56,7 +56,7 @@
       "message": "首个周期开始的时间。"
     },
     "streamStartTimeTooltip": {
-      "message": "流开始的时间"
+      "message": "流式传输的开始时间"
     },
     "expiryLabel": {
       "message": "到期时间"
@@ -65,16 +65,16 @@
       "message": "许可的到期时间"
     },
     "streamAmountLabel": {
-      "message": "流式金额"
+      "message": "流式传输金额"
     },
     "streamAmountTooltip": {
-      "message": "每个周期可流式发送的代币数量。"
+      "message": "每个周期可流式传输的代币数量。"
     },
     "streamPeriodLabel": {
-      "message": "流周期"
+      "message": "流式传输周期"
     },
     "streamPeriodTooltip": {
-      "message": "流的周期。"
+      "message": "流式传输周期。"
     },
     "amountLabel": {
       "message": "金额"
@@ -101,7 +101,7 @@
       "message": "流速"
     },
     "streamRateTooltip": {
-      "message": "每秒流式发送的代币数量。"
+      "message": "每秒流式传输的代币数量。"
     },
     "streamRateValue": {
       "message": "$1 $2/秒"
@@ -134,10 +134,10 @@
       "message": "可用"
     },
     "permissionRequestSubtitle": {
-      "message": "此网站请求使用你的代币。"
+      "message": "此网站请求使用您的代币的许可。"
     },
     "accountUpgradeWarning": {
-      "message": "此账户将升级为智能账户以完成本次授权。"
+      "message": "此账户将升级为智能账户以完成本次许可。"
     },
     "removeFieldAlt": {
       "message": "移除 $1"
@@ -188,10 +188,10 @@
       "message": "高级许可让您掌控一切"
     },
     "introSecureLimitedAccessTitle": {
-      "message": "安全、受限的访问"
+      "message": "安全、受限的访问权限"
     },
     "introSecureLimitedAccessDescription": {
-      "message": "限制网站访问并撤销许可，无需支付 Gas 费用。"
+      "message": "以您的方式限制网站并撤销访问权限。"
     },
     "introFullyCustomizableControlTitle": {
       "message": "完全可自定义的控制"
@@ -203,28 +203,28 @@
       "message": "透明且便捷"
     },
     "introTransparentConvenientDescription": {
-      "message": "在一个地方轻松管理、自动化和编辑许可。"
+      "message": "一站式轻松管理许可。"
     },
     "introSubscriptionTitle": {
-      "message": "此网站想要创建代币订阅"
+      "message": "代币订阅请求"
     },
     "introRecurringPaymentsDescription": {
-      "message": "允许此网站定期自动从您的钱包中提取代币——就像区块链上的订阅服务。"
+      "message": "代币订阅许可网站按照您设定的时间表从您的钱包中提取代币。"
     },
     "introStreamTitle": {
-      "message": "此网站想要创建代币流"
+      "message": "代币流式传输请求"
     },
     "introContinuousTokenFlowDescription": {
-      "message": "启用从您钱包的渐进式实时代币转账——代币随时间稳定流动，而不是一次性全部转移。"
+      "message": "代币流式传输许可网站在您设定的时段内从您的钱包中逐步提取代币。"
     },
     "introRevocationTitle": {
-      "message": "此网站正在请求代币撤销许可"
+      "message": "代币撤销请求"
     },
     "introManageTokenApprovalsDescription": {
-      "message": "允许此网站代您撤销现有的代币许可——帮助您清理旧授权并降低风险。"
+      "message": "代币撤销允许网站代您撤销代币授权。"
     },
     "introPermissionInControlDescription": {
-      "message": "您可以随时在高级许可中编辑或撤销此许可。"
+      "message": "您可以随时在高级许可中撤销此许可。"
     },
     "introGotItButton": {
       "message": "知道了"

@@ -56,7 +56,7 @@
       "message": "La hora en que comienza el primer período"
     },
     "streamStartTimeTooltip": {
-      "message": "La hora de inicio de la transmisión"
+      "message": "La hora de inicio del flujo"
     },
     "expiryLabel": {
       "message": "Vencimiento"
@@ -65,16 +65,16 @@
       "message": "La fecha de vencimiento del permiso"
     },
     "streamAmountLabel": {
-      "message": "Monto de transmisión"
+      "message": "Monto de flujo"
     },
     "streamAmountTooltip": {
       "message": "El monto de tokens que se puede transmitir por período."
     },
     "streamPeriodLabel": {
-      "message": "Período de transmisión"
+      "message": "Período de flujo"
     },
     "streamPeriodTooltip": {
-      "message": "El período de la transmisión."
+      "message": "El período del flujo."
     },
     "amountLabel": {
       "message": "Monto"
@@ -98,13 +98,13 @@
       "message": "Ocultar"
     },
     "streamRateLabel": {
-      "message": "Tasa de transmisión"
+      "message": "Tasa de flujo"
     },
     "streamRateTooltip": {
       "message": "El monto de tokens a transmitir por segundo."
     },
     "streamRateValue": {
-      "message": "$1 $2/seg"
+      "message": "$1 $2/s"
     },
     "cancelButton": {
       "message": "Cancelar"
@@ -143,7 +143,7 @@
       "message": "Eliminar $1"
     },
     "addFieldAlt": {
-      "message": "Agregar $1"
+      "message": "Añadir $1"
     },
     "errorAmountMustBeGreaterThanZero": {
       "message": "$1 debe ser mayor que 0"
@@ -152,7 +152,7 @@
       "message": "$1 debe ser mayor o igual a 0"
     },
     "errorInvalidAmount": {
-      "message": "$1 inválido"
+      "message": "$1 no válido"
     },
     "errorInvalidStartTime": {
       "message": "Hora de inicio inválida"
@@ -161,7 +161,7 @@
       "message": "La hora de inicio debe ser hoy o posterior"
     },
     "errorInvalidExpiry": {
-      "message": "Vencimiento inválido"
+      "message": "Vencimiento no válido"
     },
     "errorExpiryMustBeInFuture": {
       "message": "El vencimiento debe estar en el futuro"
@@ -176,7 +176,7 @@
       "message": "La duración del período debe ser mayor que 0"
     },
     "unknownStreamRate": {
-      "message": "Desconocido"
+      "message": "Desconocida"
     },
     "unknownChain": {
       "message": "Cadena desconocida $1"
@@ -185,7 +185,7 @@
       "message": "Este sitio quiere permisos para revocar tus aprobaciones de tokens ERC-20."
     },
     "introAdvancedPermissionsTitle": {
-      "message": "Los permisos avanzados te mantienen en control"
+      "message": "Los permisos avanzados te permiten mantener el control"
     },
     "introSecureLimitedAccessTitle": {
       "message": "Acceso seguro y limitado"
@@ -197,34 +197,34 @@
       "message": "Control totalmente personalizable"
     },
     "introFullyCustomizableControlDescription": {
-      "message": "Revisa, edita o agrega reglas para que los permisos se ajusten a tus necesidades."
+      "message": "Revisa, edita o añade reglas para que los permisos se ajusten a tus necesidades."
     },
     "introTransparentConvenientTitle": {
       "message": "Transparente y conveniente"
     },
     "introTransparentConvenientDescription": {
-      "message": "Administra, automatiza y edita permisos fácilmente desde un solo lugar."
+      "message": "Administra permisos fácilmente desde un solo lugar."
     },
     "introSubscriptionTitle": {
-      "message": "Este sitio quiere crear una suscripción de tokens"
+      "message": "Solicitud de suscripción de tokens"
     },
     "introRecurringPaymentsDescription": {
-      "message": "Permite que este sitio retire tokens automáticamente de tu billetera a intervalos regulares, como un servicio de suscripción para blockchain."
+      "message": "Las suscripciones de tokens otorgan a los sitios permiso para retirar tokens de tu billetera según el cronograma que establezcas."
     },
     "introStreamTitle": {
-      "message": "Este sitio quiere crear un flujo de tokens"
+      "message": "Solicitud de flujo de tokens"
     },
     "introContinuousTokenFlowDescription": {
-      "message": "Habilita transferencias graduales de tokens en tiempo real desde tu billetera: los tokens fluyen constantemente en lugar de moverse todos a la vez."
+      "message": "Los flujos de tokens permiten que los sitios retiren tokens en incrementos de tu billetera durante el período de tiempo que establezcas."
     },
     "introRevocationTitle": {
-      "message": "Este sitio solicita permisos de revocación de tokens"
+      "message": "Solicitud de revocación de tokens"
     },
     "introManageTokenApprovalsDescription": {
-      "message": "Permite que este sitio revoque permisos de tokens existentes en tu nombre, ayudándote a limpiar aprobaciones antiguas y reducir riesgos."
+      "message": "La revocación de tokens permite que los sitios revoquen las aprobaciones de tokens en tu nombre."
     },
     "introPermissionInControlDescription": {
-      "message": "Puedes editar o revocar este permiso en cualquier momento en permisos avanzados."
+      "message": "Puedes revocar este permiso en cualquier momento en permisos avanzados."
     },
     "introGotItButton": {
       "message": "Entendido"

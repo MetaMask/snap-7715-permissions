@@ -2,232 +2,232 @@
   "locale": "ru",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Получатель"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "Сайт, запрашивающий разрешение"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Сеть"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "Сеть, в которой запрашивается разрешение"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Токен"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "Запрашиваемый токен"
     },
     "reasonLabel": {
-      "message": ""
+      "message": "Причина"
     },
     "reasonTooltip": {
-      "message": ""
+      "message": "Причина, указанная получателем для запроса данного разрешения."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Счет"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "Счет, из которого предоставляется разрешение."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Запрос от"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "Сайт, запрашивающий разрешение"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Первоначальная сумма"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "Первоначальная сумма токенов для стриминга."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Maкс. сумма"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "Максимальная сумма токенов для стриминга."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Время начала"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "Время начала первого периода"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "Время начала стрима"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Истечение срока действия"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "Дата истечения срока действия разрешения"
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Сумма для стриминга"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "Сумма токенов для стриминга за один период."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Период стриминга"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "Период стриминга."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Сумма"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "Сумма токенов, предоставленных в течение каждого периода"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Частота"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "Продолжительность периода"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "Запрос разрешений"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Показать"
     },
     "hideButton": {
-      "message": ""
+      "message": "Скрыть"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Скорость стриминга"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "Сумма токенов для стрминга в секунду."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/с"
     },
     "cancelButton": {
-      "message": ""
+      "message": "Отмена"
     },
     "grantButton": {
-      "message": ""
+      "message": "Предоставить"
     },
     "hourly": {
-      "message": ""
+      "message": "В час"
     },
     "daily": {
-      "message": ""
+      "message": "В день"
     },
     "weekly": {
-      "message": ""
+      "message": "В неделю"
     },
     "biweekly": {
-      "message": ""
+      "message": "Каждые две недели"
     },
     "monthly": {
-      "message": ""
+      "message": "В месяц"
     },
     "yearly": {
-      "message": ""
+      "message": "В год"
     },
     "availableLabel": {
-      "message": ""
+      "message": "доступно"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Этот сайт запрашивает разрешение на использование ваших токенов."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Для выполнения этого требования к разрешению счет будет преобразован в смарт-счет."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Удалить $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Добавить $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1 должна быть больше 0"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1 должна быть больше или равно 0"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "Недопустимый $1"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Неверное время начала"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "Начало занятий должно быть сегодня или позже"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Недействительное истечение срока действия"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "Истечение срока действия должно быть в будущем"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "Время начала должно быть до истечения срока действия"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "Максимальная сумма должна быть больше первоначальной суммы"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Продолжительность периода должна быть больше 0"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Неизвестно"
     },
     "unknownChain": {
-      "message": ""
+      "message": "Неизвестный блокчейн $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Этот сайт запрашивает разрешение на отзыв ваших разрешений на использование токенов ERC-20."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Дополнительные разрешения позволяют вам контролировать ситуацию"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Безопасный, ограниченный доступ"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Запрещайте доступ к сайтам и отзывайте права доступа на своих условиях."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Полностью настраиваемое управление"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "Просматривайте, изменяйте или добавляйте правила, чтобы разрешения соответствовали вашим потребностям."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Прозрачно и удобно"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "Управляйте правами доступа с легкостью из одного места."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Запрос на подписку на токены"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "Подписка на токены дает сайтам разрешение списывать токены с вашего кошелька в соответствии с установленным вами расписанием."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Запрос на стриминг токенов"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Потоки токенов позволяют сайтам списывать определенное количество токенов из вашего кошелька в течение заданного вами периода времени."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Запрос на аннулирование токена"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "Отзыв токенов позволяет сайтам отзывать подтверждения токенов от вашего имени."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Вы можете отозвать это разрешение в любое время в расширенных настройках прав доступа."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "Понятно"
     }
   }
 }
