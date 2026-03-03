@@ -210,7 +210,7 @@ describe('DialogInterface', () => {
   describe('close', () => {
     const mockInterfaceId = 'test-interface-123';
 
-    it('should resolve the interface', async () => {
+    it('should resolve the interface and clear state on first attempt', async () => {
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
         if (params.method === 'snap_createInterface') {
           return mockInterfaceId;
@@ -234,13 +234,14 @@ describe('DialogInterface', () => {
           value: {},
         },
       });
+      expect(dialogInterface.interfaceId).toBeUndefined();
     });
 
     it('should be safe to call when no interface exists', async () => {
-      await expect(dialogInterface.close()).resolves.not.toThrow();
+      await expect(dialogInterface.close()).resolves.toBeUndefined();
     });
 
-    it('should silently ignore errors when closing', async () => {
+    it('should not throw when close fails and interface is already gone', async () => {
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
         if (params.method === 'snap_createInterface') {
           return mockInterfaceId;
@@ -251,11 +252,65 @@ describe('DialogInterface', () => {
         if (params.method === 'snap_resolveInterface') {
           throw new Error('Already resolved');
         }
+        if (params.method === 'snap_getInterfaceContext') {
+          throw new Error('Interface not found');
+        }
         return null;
       });
 
       await dialogInterface.show(<Text>Test</Text>);
-      await expect(dialogInterface.close()).resolves.not.toThrow();
+      await expect(dialogInterface.close()).resolves.toBeUndefined();
+      expect(dialogInterface.interfaceId).toBeUndefined();
+    });
+
+    it('should retry and clear state when first close fails but second succeeds', async () => {
+      let resolveCallCount = 0;
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {});
+        }
+        if (params.method === 'snap_resolveInterface') {
+          resolveCallCount += 1;
+          if (resolveCallCount === 1) {
+            throw new Error('Temporary failure');
+          }
+          return null;
+        }
+        if (params.method === 'snap_getInterfaceContext') {
+          return {};
+        }
+        return null;
+      });
+
+      await dialogInterface.show(<Text>Test</Text>);
+      await dialogInterface.close();
+
+      expect(resolveCallCount).toBe(2);
+      expect(dialogInterface.interfaceId).toBeUndefined();
+    });
+
+    it('should not throw when all close attempts fail', async () => {
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {});
+        }
+        if (params.method === 'snap_resolveInterface') {
+          throw new Error('Close failed');
+        }
+        if (params.method === 'snap_getInterfaceContext') {
+          return {};
+        }
+        return null;
+      });
+
+      await dialogInterface.show(<Text>Test</Text>);
+      await expect(dialogInterface.close()).resolves.toBeUndefined();
     });
   });
 

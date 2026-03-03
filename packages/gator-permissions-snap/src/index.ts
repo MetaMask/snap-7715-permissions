@@ -136,7 +136,6 @@ const snapsMetricsService = new SnapsMetricsService(snap);
 
 const profileSyncManager = createProfileSyncManager({
   isFeatureEnabled: isStorePermissionsFeatureEnabled,
-  auth,
   userStorage: new UserStorage(
     {
       auth,
