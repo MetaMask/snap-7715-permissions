@@ -189,8 +189,7 @@ const Index = () => {
 
     const feePerGas = await getFeePerGas();
 
-    const { accountMeta, context, signerMeta } = permissionResponse[0];
-    const { delegationManager } = signerMeta;
+    const { accountMeta, context, delegationManager } = permissionResponse[0];
 
     const publicClient = createPublicClient({
       chain: selectedChain,
