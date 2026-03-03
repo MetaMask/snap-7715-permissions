@@ -129,6 +129,8 @@ export class DialogInterface {
         return;
       }
     }
+
+    cleanup();
   }
 
   /**

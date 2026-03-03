@@ -312,6 +312,31 @@ describe('DialogInterface', () => {
       await dialogInterface.show(<Text>Test</Text>);
       await expect(dialogInterface.close()).resolves.toBeUndefined();
     });
+
+    it('should clear state after exhausting retries when all close attempts fail', async () => {
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {});
+        }
+        if (params.method === 'snap_resolveInterface') {
+          throw new Error('Close failed');
+        }
+        if (params.method === 'snap_getInterfaceContext') {
+          return {};
+        }
+        return null;
+      });
+
+      await dialogInterface.show(<Text>Test</Text>);
+      expect(dialogInterface.interfaceId).toBe(mockInterfaceId);
+
+      await dialogInterface.close();
+
+      expect(dialogInterface.interfaceId).toBeUndefined();
+    });
   });
 
   describe('interfaceId', () => {
