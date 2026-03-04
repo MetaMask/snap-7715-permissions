@@ -23,6 +23,11 @@ import {
   parseCaipAccountId,
 } from '@metamask/utils';
 
+import {
+  RecommendedAction,
+  type FetchTrustSignalResult,
+  type TrustSignalsClient,
+} from '../clients/trustSignalsClient';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
@@ -55,6 +60,8 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #dialogInterfaceFactory: DialogInterfaceFactory;
 
+  readonly #trustSignalsClient: TrustSignalsClient;
+
   constructor({
     accountController,
     confirmationDialogFactory,
@@ -62,6 +69,7 @@ export class PermissionRequestLifecycleOrchestrator {
     snapsMetricsService,
     permissionIntroductionService,
     dialogInterfaceFactory,
+    trustSignalsClient,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
@@ -69,6 +77,7 @@ export class PermissionRequestLifecycleOrchestrator {
     snapsMetricsService: SnapsMetricsService;
     permissionIntroductionService: PermissionIntroductionService;
     dialogInterfaceFactory: DialogInterfaceFactory;
+    trustSignalsClient: TrustSignalsClient;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
@@ -76,6 +85,7 @@ export class PermissionRequestLifecycleOrchestrator {
     this.#snapsMetricsService = snapsMetricsService;
     this.#permissionIntroductionService = permissionIntroductionService;
     this.#dialogInterfaceFactory = dialogInterfaceFactory;
+    this.#trustSignalsClient = trustSignalsClient;
   }
 
   /**
@@ -222,12 +232,18 @@ export class PermissionRequestLifecycleOrchestrator {
       throw error;
     }
 
+    const decisionPromise =
+      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+
     const updateConfirmation = async ({
       newContext,
       isGrantDisabled,
+      trustSignal: trustSignalParam,
     }: {
       newContext: TContext;
       isGrantDisabled: boolean;
+      trustSignal: FetchTrustSignalResult | null;
     }): Promise<void> => {
       context = newContext;
 
@@ -238,6 +254,7 @@ export class PermissionRequestLifecycleOrchestrator {
         metadata,
         origin,
         chainId,
+        trustSignal: trustSignalParam
       });
 
       await confirmationDialog.updateContent({
@@ -246,14 +263,34 @@ export class PermissionRequestLifecycleOrchestrator {
       });
     };
 
-    const decisionPromise =
-      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+    // Only set when the trust signals client resolves; used so updateContext re-renders can pass it through.
+    let trustSignal: FetchTrustSignalResult | null = null;
+
+    // Fetch trust signal in the background; only update when the client resolves (non-blocking)
+    this.#trustSignalsClient
+      .fetchTrustSignal(/*origin*/"https://hyiepliquid.com")
+      .then((trustSignalResult) => {
+        trustSignal = trustSignalResult;
+
+        updateConfirmation({
+          newContext: context,
+          isGrantDisabled: false,
+          trustSignal,
+        });
+      })
+      .catch((error) => {
+        logger.error(
+          'PermissionRequestLifecycleOrchestrator: trust signal fetch failed',
+          { origin, error: error.message },
+        );
+      });
 
     // replace the skeleton content with the actual content rendered with the resolved context
     try {
       await updateConfirmation({
         newContext: context,
         isGrantDisabled: false,
+        trustSignal,
       });
 
       // Track dialog shown after successful rendering
@@ -264,6 +301,8 @@ export class PermissionRequestLifecycleOrchestrator {
         permissionData: permissionRequest.permission.data,
         justification: context.justification,
       });
+
+
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
       throw error;
@@ -282,6 +321,7 @@ export class PermissionRequestLifecycleOrchestrator {
           await updateConfirmation({
             newContext: updatedContext,
             isGrantDisabled: false,
+            trustSignal,
           });
         } catch (error) {
           await confirmationDialog.closeWithError(error as Error);

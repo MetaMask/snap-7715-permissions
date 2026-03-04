@@ -7,6 +7,7 @@ import type { Hex, Caveat, Delegation } from '@metamask/delegation-core';
 import type { CaipAccountId, CaipAssetType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
+import type { FetchTrustSignalResult } from '../clients/trustSignalsClient';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
@@ -138,6 +139,7 @@ export type LifecycleOrchestrationHandlers<
     metadata: TMetadata;
     origin: string;
     chainId: number;
+    trustSignal: FetchTrustSignalResult | null;
   }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;

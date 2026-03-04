@@ -3,17 +3,24 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
   Heading,
+  Icon,
   Section,
   Text,
+  Tooltip,
   Skeleton,
   AccountSelector,
 } from '@metamask/snaps-sdk/jsx';
 import { parseCaipAssetType } from '@metamask/utils';
 
+import {
+  type FetchTrustSignalResult,
+  RecommendedAction,
+} from '../clients/trustSignalsClient';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
 import {
   AddressField,
+  Field,
   ShowMoreText,
   SkeletonField,
   TextField,
@@ -36,6 +43,8 @@ export type PermissionHandlerContentProps = {
   tokenIconData?: IconData | undefined;
   isJustificationCollapsed: boolean;
   origin: string;
+  /** Trust signals result for the origin; when set, a warning icon with tooltip is shown beside the origin. */
+  trustSignal: FetchTrustSignalResult | null;
   delegateAddress: string;
   context: BaseContext;
   tokenBalance: string | null;
@@ -52,6 +61,7 @@ export type PermissionHandlerContentProps = {
  * @param options.permissionTitle - The title of the permission.
  * @param options.permissionSubtitle - The subtitle of the permission.
  * @param options.origin - The origin of the permission request.
+ * @param options.trustSignal - Optional trust signals result; when set, a warning icon with tooltip is shown beside the origin.
  * @param options.delegateAddress - The address that will receive the delegated permission.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
@@ -71,6 +81,7 @@ export const PermissionHandlerContent = ({
   permissionTitle,
   permissionSubtitle,
   origin,
+  trustSignal,
   delegateAddress,
   justification,
   networkName,
@@ -160,11 +171,35 @@ export const PermissionHandlerContent = ({
           </Box>
         </Section>
         <Section>
-          <TextField
-            label={t('requestFromLabel')}
-            value={origin}
-            tooltip={t('requestFromTooltip')}
-          />
+          {trustSignal?.recommendedAction ? (
+            <Field
+              label={t('requestFromLabel')}
+              tooltip={t('requestFromTooltip')}
+              variant="display"
+            >
+              <Box direction="vertical">
+                <Text>{origin}</Text>
+                <Box direction="horizontal" alignment="end">
+                  <Icon
+                    name="danger"
+                    size="md"
+                    color="primary"
+                  />
+                  <Text color="error">
+                    {trustSignal.recommendedAction === RecommendedAction.BLOCK
+                      ? 'Malicious website'
+                      : 'Potentially malicious website'}
+                  </Text>
+                </Box>
+              </Box>
+            </Field>
+          ) : (
+            <TextField
+              label={t('requestFromLabel')}
+              value={origin}
+              tooltip={t('requestFromTooltip')}
+            />
+          )}
           <AddressField
             label={t('recipientLabel')}
             address={delegateAddress}
