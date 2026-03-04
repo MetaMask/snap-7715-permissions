@@ -126,8 +126,8 @@ export const PermissionHandlerContent = ({
 
   if (shouldShowTrustSignal) {
     const trustSignalLabelByRecommendedAction = {
-      [RecommendedAction.BLOCK]: 'Malicious website',
-      [RecommendedAction.WARN]: 'Potentially malicious website',
+      [RecommendedAction.BLOCK]: t('maliciousWebsiteLabel'),
+      [RecommendedAction.WARN]: t('potentiallyMaliciousWebsiteLabel'),
       [RecommendedAction.NONE]: 'Unknown',
     };
     fromField = (
