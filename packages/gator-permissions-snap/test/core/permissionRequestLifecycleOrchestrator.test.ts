@@ -9,6 +9,7 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
+import type { TrustSignalsClient } from '../../src/clients/trustSignalsClient';
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
@@ -129,6 +130,10 @@ const mockPermissionIntroductionService = {
   showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
+const mockTrustSignalsClient = {
+  fetchTrustSignal: jest.fn().mockResolvedValue({ isComplete: false }),
+} as unknown as jest.Mocked<TrustSignalsClient>;
+
 type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
@@ -188,6 +193,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
     mockNonceCaveatService.getNonce.mockResolvedValue(0n);
 
+    mockTrustSignalsClient.fetchTrustSignal.mockResolvedValue({
+      isComplete: false,
+    });
+
     mockDialogInterfaceFactory.createDialogInterface.mockReturnValue({});
 
     permissionRequestLifecycleOrchestrator =
@@ -198,6 +207,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
+        trustSignalsClient: mockTrustSignalsClient,
       });
   });
 
@@ -210,6 +220,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
+        trustSignalsClient: mockTrustSignalsClient,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });
@@ -828,11 +839,26 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenCalledWith({
+        ).toHaveBeenCalledTimes(2);
+
+        expect(
+          lifecycleHandlerMocks.createConfirmationContent,
+        ).toHaveBeenNthCalledWith(1, {
           context: mockContext,
           metadata: mockMetadata,
           origin: 'test-origin',
           chainId: 1,
+          trustSignal: null,
+        });
+
+        expect(
+          lifecycleHandlerMocks.createConfirmationContent,
+        ).toHaveBeenNthCalledWith(2, {
+          context: mockContext,
+          metadata: mockMetadata,
+          origin: 'test-origin',
+          chainId: 1,
+          trustSignal: { isComplete: false },
         });
 
         expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({

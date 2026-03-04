@@ -16,10 +16,14 @@ const RECOMMENDED_ACTIONS: readonly string[] = Object.values(RecommendedAction);
 /**
  * Result of fetching a trust signal for an origin.
  */
-export type FetchTrustSignalResult = {
-  isComplete: boolean;
-  recommendedAction: RecommendedAction | null;
-};
+export type FetchTrustSignalResult =
+  | {
+      isComplete: true;
+      recommendedAction: RecommendedAction;
+    }
+  | {
+      isComplete: false;
+    };
 
 /**
  * Schema for the trust signals scan API response.
@@ -88,7 +92,10 @@ export class TrustSignalsClient {
     const urlToScan = extractOriginSchemeAndHost(origin);
     const scanUrl = `${this.#baseUrl}/scan?url=${encodeURIComponent(urlToScan)}`;
 
-    const parsed = await makeValidatedRequestWithRetry<TrustSignalsResponse, typeof TrustSignalsResponseSchema>(
+    const parsed = await makeValidatedRequestWithRetry<
+      TrustSignalsResponse,
+      typeof TrustSignalsResponseSchema
+    >(
       scanUrl,
       {
         timeoutMs: this.#timeoutMs,

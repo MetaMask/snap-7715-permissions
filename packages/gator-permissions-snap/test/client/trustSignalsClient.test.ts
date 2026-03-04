@@ -15,9 +15,9 @@ describe('extractOriginSchemeAndHost', () => {
   });
 
   it('strips path and query from full URL', () => {
-    expect(
-      extractOriginSchemeAndHost('https://example.com/path/to/page'),
-    ).toBe('https://example.com');
+    expect(extractOriginSchemeAndHost('https://example.com/path/to/page')).toBe(
+      'https://example.com',
+    );
     expect(
       extractOriginSchemeAndHost('https://example.com/path?foo=bar&baz=1'),
     ).toBe('https://example.com');
@@ -89,7 +89,7 @@ describe('TrustSignalsClient', () => {
 
       const result = await client.fetchTrustSignal('https://google.com');
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         isComplete: true,
         recommendedAction: RecommendedAction.NONE,
       });
@@ -127,7 +127,7 @@ describe('TrustSignalsClient', () => {
 
       const result = await client.fetchTrustSignal('https://example.com');
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         isComplete: false,
         recommendedAction: RecommendedAction.NONE,
       });
@@ -147,7 +147,7 @@ describe('TrustSignalsClient', () => {
 
       const result = await client.fetchTrustSignal('https://example.com');
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         isComplete: true,
         recommendedAction: null,
       });
@@ -166,7 +166,7 @@ describe('TrustSignalsClient', () => {
 
       const result = await client.fetchTrustSignal('https://example.com');
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         isComplete: true,
         recommendedAction: null,
       });
@@ -245,7 +245,7 @@ describe('TrustSignalsClient', () => {
 
       await expect(
         client.fetchTrustSignal('https://example.com'),
-      ).rejects.toThrow();
+      ).rejects.toThrow('Invalid response structure');
     });
   });
 });

@@ -6,18 +6,15 @@ import {
   Icon,
   Section,
   Text,
-  Tooltip,
   Skeleton,
   AccountSelector,
 } from '@metamask/snaps-sdk/jsx';
 import { parseCaipAssetType } from '@metamask/utils';
 
-import {
-  type FetchTrustSignalResult,
-  RecommendedAction,
-} from '../clients/trustSignalsClient';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
+import { RecommendedAction } from '../clients/trustSignalsClient';
+import type { FetchTrustSignalResult } from '../clients/trustSignalsClient';
 import {
   AddressField,
   Field,
@@ -121,6 +118,49 @@ export const PermissionHandlerContent = ({
     }
   }
 
+  let fromField: SnapElement;
+
+  const shouldShowTrustSignal =
+    trustSignal?.isComplete &&
+    trustSignal.recommendedAction !== RecommendedAction.NONE;
+
+  if (shouldShowTrustSignal) {
+    const trustSignalLabelByRecommendedAction = {
+      [RecommendedAction.BLOCK]: 'Malicious website',
+      [RecommendedAction.WARN]: 'Potentially malicious website',
+      [RecommendedAction.NONE]: 'Unknown',
+    };
+    fromField = (
+      <Field
+        label={t('requestFromLabel')}
+        tooltip={t('requestFromTooltip')}
+        variant="display"
+      >
+        <Box direction="vertical">
+          <Text>{origin}</Text>
+          <Box direction="horizontal" alignment="end">
+            <Icon name="danger" size="md" color="primary" />
+            <Text color="error">
+              {
+                trustSignalLabelByRecommendedAction[
+                  trustSignal.recommendedAction
+                ]
+              }
+            </Text>
+          </Box>
+        </Box>
+      </Field>
+    );
+  } else {
+    fromField = (
+      <TextField
+        label={t('requestFromLabel')}
+        value={origin}
+        tooltip={t('requestFromTooltip')}
+      />
+    );
+  }
+
   return (
     <Box>
       <Box direction="vertical">
@@ -171,35 +211,7 @@ export const PermissionHandlerContent = ({
           </Box>
         </Section>
         <Section>
-          {trustSignal?.recommendedAction ? (
-            <Field
-              label={t('requestFromLabel')}
-              tooltip={t('requestFromTooltip')}
-              variant="display"
-            >
-              <Box direction="vertical">
-                <Text>{origin}</Text>
-                <Box direction="horizontal" alignment="end">
-                  <Icon
-                    name="danger"
-                    size="md"
-                    color="primary"
-                  />
-                  <Text color="error">
-                    {trustSignal.recommendedAction === RecommendedAction.BLOCK
-                      ? 'Malicious website'
-                      : 'Potentially malicious website'}
-                  </Text>
-                </Box>
-              </Box>
-            </Field>
-          ) : (
-            <TextField
-              label={t('requestFromLabel')}
-              value={origin}
-              tooltip={t('requestFromTooltip')}
-            />
-          )}
+          {fromField}
           <AddressField
             label={t('recipientLabel')}
             address={delegateAddress}

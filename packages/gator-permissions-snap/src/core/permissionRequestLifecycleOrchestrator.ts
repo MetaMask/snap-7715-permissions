@@ -23,11 +23,6 @@ import {
   parseCaipAccountId,
 } from '@metamask/utils';
 
-import {
-  RecommendedAction,
-  type FetchTrustSignalResult,
-  type TrustSignalsClient,
-} from '../clients/trustSignalsClient';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
@@ -40,6 +35,10 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
+import type {
+  FetchTrustSignalResult,
+  TrustSignalsClient,
+} from '../clients/trustSignalsClient';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
@@ -235,7 +234,6 @@ export class PermissionRequestLifecycleOrchestrator {
     const decisionPromise =
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
-
     const updateConfirmation = async ({
       newContext,
       isGrantDisabled,
@@ -254,7 +252,7 @@ export class PermissionRequestLifecycleOrchestrator {
         metadata,
         origin,
         chainId,
-        trustSignal: trustSignalParam
+        trustSignal: trustSignalParam,
       });
 
       await confirmationDialog.updateContent({
@@ -268,20 +266,19 @@ export class PermissionRequestLifecycleOrchestrator {
 
     // Fetch trust signal in the background; only update when the client resolves (non-blocking)
     this.#trustSignalsClient
-      .fetchTrustSignal(/*origin*/"https://hyiepliquid.com")
-      .then((trustSignalResult) => {
+      .fetchTrustSignal(origin)
+      .then(async (trustSignalResult) => {
         trustSignal = trustSignalResult;
-
-        updateConfirmation({
+        return updateConfirmation({
           newContext: context,
           isGrantDisabled: false,
-          trustSignal,
+          trustSignal: trustSignalResult,
         });
       })
       .catch((error) => {
-        logger.error(
-          'PermissionRequestLifecycleOrchestrator: trust signal fetch failed',
-          { origin, error: error.message },
+        logger.debug(
+          'PermissionRequestLifecycleOrchestrator: trust signal fetch or UI update failed',
+          { origin, error: error instanceof Error ? error.message : error },
         );
       });
 
@@ -301,8 +298,6 @@ export class PermissionRequestLifecycleOrchestrator {
         permissionData: permissionRequest.permission.data,
         justification: context.justification,
       });
-
-
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
       throw error;
