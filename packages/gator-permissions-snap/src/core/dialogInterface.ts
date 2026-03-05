@@ -65,22 +65,72 @@ export class DialogInterface {
   }
 
   /**
+   * Tries to close the dialog interface.
+   * @param interfaceId - The ID of the interface to attempt to close.
+   * @returns boolean indicating whether the attempt was successful.
+   */
+  async #tryToClose(interfaceId: string): Promise<boolean> {
+    try {
+      await this.#snap.request({
+        method: 'snap_resolveInterface',
+        params: { id: interfaceId, value: {} },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Checks whether the specified interface exists.
+   * @param interfaceId - The ID of the interface to check.
+   * @returns boolean indicating whether the interface exists.
+   */
+  async #doesInterfaceExist(interfaceId: string): Promise<boolean> {
+    try {
+      await this.#snap.request({
+        method: 'snap_getInterfaceContext',
+        params: { id: interfaceId },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Programmatically close the dialog.
    * Safe to call multiple times.
+   * Best effort: attempts up to three close requests; always clears local state and resolves.
+   * Callers in confirmation.tsx do not catch errors, so this method does not throw.
    */
   async close(): Promise<void> {
-    if (this.#interfaceId) {
-      try {
-        await this.#snap.request({
-          method: 'snap_resolveInterface',
-          params: { id: this.#interfaceId, value: {} },
-        });
-      } catch {
-        // Silently ignore - dialog may already be closed
-      }
+    const MAX_ATTEMPTS = 3;
+
+    const cleanup = (): void => {
       this.#interfaceId = undefined;
       this.#isDialogShown = false;
+    };
+
+    if (!this.#interfaceId) {
+      return;
     }
+
+    const id = this.#interfaceId;
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      if (await this.#tryToClose(id)) {
+        cleanup();
+        return;
+      }
+
+      if (!(await this.#doesInterfaceExist(id))) {
+        cleanup();
+        return;
+      }
+    }
+
+    cleanup();
   }
 
   /**
