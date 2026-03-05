@@ -27,6 +27,7 @@ import { BlockchainClient } from './clients/blockchainClient';
 import { BlockchainTokenMetadataClient } from './clients/blockchainMetadataClient';
 import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
+import { TrustSignalsClient } from './clients/trustSignalsClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
@@ -68,6 +69,16 @@ if (!tokensApiBaseUrl) {
 const priceApiBaseUrl = process.env.PRICE_API_BASE_URL;
 if (!priceApiBaseUrl) {
   throw new InternalError('PRICE_API_BASE_URL is not set');
+}
+
+const dappScanningBaseUrl = process.env.DAPP_SCANNING_BASE_URL;
+if (!dappScanningBaseUrl) {
+  throw new InternalError('DAPP_SCANNING_BASE_URL is not set');
+}
+
+const securityAlertsBaseUrl = process.env.SECURITY_ALERTS_BASE_URL;
+if (!securityAlertsBaseUrl) {
+  throw new InternalError('SECURITY_ALERTS_BASE_URL is not set');
 }
 
 const confirmationTimeoutMsString = process.env.CONFIRMATION_TIMEOUT_MS;
@@ -157,6 +168,13 @@ const priceApiClient = new PriceApiClient({
 
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
+const trustSignalsClient = new TrustSignalsClient({
+  baseUrl: dappScanningBaseUrl,
+  securityAlertsBaseUrl,
+  timeoutMs: 10000,
+  maxResponseSizeBytes: 1024 * 1024,
+});
+
 const timeoutFactory = createTimeoutFactory({
   timeoutMs: confirmationTimeoutMs,
 });
@@ -182,6 +200,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   snapsMetricsService,
   permissionIntroductionService,
   dialogInterfaceFactory,
+  trustSignalsClient,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({

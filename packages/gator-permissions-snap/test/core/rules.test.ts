@@ -556,6 +556,7 @@ describe('rules', () => {
             {
               "key": null,
               "props": {
+                "alignment": "end",
                 "children": "test-value",
               },
               "type": "Text",
@@ -726,6 +727,7 @@ describe('rules', () => {
             {
               "key": null,
               "props": {
+                "alignment": "end",
                 "children": "",
               },
               "type": "Text",

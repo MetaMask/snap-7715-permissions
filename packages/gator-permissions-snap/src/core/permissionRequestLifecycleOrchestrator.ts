@@ -35,6 +35,11 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
+import type {
+  FetchAddressScanResult,
+  ScanDappUrlResult,
+  TrustSignalsClient,
+} from '../clients/trustSignalsClient';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
@@ -55,6 +60,8 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #dialogInterfaceFactory: DialogInterfaceFactory;
 
+  readonly #trustSignalsClient: TrustSignalsClient;
+
   constructor({
     accountController,
     confirmationDialogFactory,
@@ -62,6 +69,7 @@ export class PermissionRequestLifecycleOrchestrator {
     snapsMetricsService,
     permissionIntroductionService,
     dialogInterfaceFactory,
+    trustSignalsClient,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
@@ -69,6 +77,7 @@ export class PermissionRequestLifecycleOrchestrator {
     snapsMetricsService: SnapsMetricsService;
     permissionIntroductionService: PermissionIntroductionService;
     dialogInterfaceFactory: DialogInterfaceFactory;
+    trustSignalsClient: TrustSignalsClient;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
@@ -76,6 +85,7 @@ export class PermissionRequestLifecycleOrchestrator {
     this.#snapsMetricsService = snapsMetricsService;
     this.#permissionIntroductionService = permissionIntroductionService;
     this.#dialogInterfaceFactory = dialogInterfaceFactory;
+    this.#trustSignalsClient = trustSignalsClient;
   }
 
   /**
@@ -222,37 +232,90 @@ export class PermissionRequestLifecycleOrchestrator {
       throw error;
     }
 
+    const decisionPromise =
+      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+    let lastUpdateConfirmationPromise: Promise<void> = Promise.resolve();
+
+    let scanDappUrlResult: ScanDappUrlResult | null = null;
+    let scanAddressResult: FetchAddressScanResult | null = null;
+
     const updateConfirmation = async ({
       newContext,
       isGrantDisabled,
     }: {
-      newContext: TContext;
+      newContext?: TContext;
       isGrantDisabled: boolean;
     }): Promise<void> => {
-      context = newContext;
+      const runUpdate = async (): Promise<void> => {
+        if (newContext) {
+          context = newContext;
+        }
 
-      const metadata = await lifecycleHandlers.deriveMetadata({ context });
+        const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
-      const ui = await lifecycleHandlers.createConfirmationContent({
-        context,
-        metadata,
-        origin,
-        chainId,
-      });
+        const ui = await lifecycleHandlers.createConfirmationContent({
+          context,
+          metadata,
+          origin,
+          chainId,
+          scanDappUrlResult,
+          scanAddressResult,
+        });
 
-      await confirmationDialog.updateContent({
-        ui,
-        isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
-      });
+        await confirmationDialog.updateContent({
+          ui,
+          isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
+        });
+      };
+
+      lastUpdateConfirmationPromise =
+        lastUpdateConfirmationPromise.finally(runUpdate);
+
+      await lastUpdateConfirmationPromise;
     };
 
-    const decisionPromise =
-      confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+    // Scan dapp URL in the background; only update when the client resolves (non-blocking)
+    this.#trustSignalsClient
+      .scanDappUrl(origin)
+      .then(async (result) => {
+        scanDappUrlResult = result;
+        return updateConfirmation({
+          isGrantDisabled: false,
+        });
+      })
+      .catch((error) => {
+        logger.debug(
+          'PermissionRequestLifecycleOrchestrator: dapp URL scan or UI update failed',
+          { origin, error: error instanceof Error ? error.message : error },
+        );
+      });
+
+    // Address scan in the background; only update when the client resolves (non-blocking)
+    const delegateAddress = validatedPermissionRequest.to;
+    if (delegateAddress) {
+      this.#trustSignalsClient
+        .fetchAddressScan(validatedPermissionRequest.chainId, delegateAddress)
+        .then(async (result) => {
+          scanAddressResult = result;
+          return updateConfirmation({
+            isGrantDisabled: false,
+          });
+        })
+        .catch((error) => {
+          logger.debug(
+            'PermissionRequestLifecycleOrchestrator: address scan or UI update failed',
+            {
+              address: delegateAddress,
+              error: error instanceof Error ? error.message : error,
+            },
+          );
+        });
+    }
 
     // replace the skeleton content with the actual content rendered with the resolved context
     try {
       await updateConfirmation({
-        newContext: context,
         isGrantDisabled: false,
       });
 

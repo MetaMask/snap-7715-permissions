@@ -1623,6 +1623,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
+                              "alignment": "end",
                               "children": "1",
                             },
                             "type": "Text",
@@ -1699,6 +1700,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
+                              "alignment": "end",
                               "children": "10",
                             },
                             "type": "Text",
@@ -1782,6 +1784,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
+                              "alignment": "end",
                               "children": "10/26/1985, 8:00:00 AM",
                             },
                             "type": "Text",
@@ -1969,6 +1972,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
+                              "alignment": "end",
                               "children": "302400",
                             },
                             "type": "Text",
@@ -2045,6 +2049,7 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
+                              "alignment": "end",
                               "children": "Weekly",
                             },
                             "type": "Text",

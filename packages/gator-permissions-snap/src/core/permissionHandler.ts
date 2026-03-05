@@ -17,6 +17,10 @@ import {
   parseCaipAssetType,
 } from '@metamask/utils';
 
+import type {
+  FetchAddressScanResult,
+  ScanDappUrlResult,
+} from '../clients/trustSignalsClient';
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
@@ -211,11 +215,15 @@ export class PermissionHandler<
       metadata,
       origin,
       chainId,
+      scanDappUrlResult,
+      scanAddressResult,
     }: {
       context: TContext;
       metadata: TMetadata;
       origin: string;
       chainId: number;
+      scanDappUrlResult: ScanDappUrlResult | null;
+      scanAddressResult: FetchAddressScanResult | null;
     }): Promise<JSX.Element> => {
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
@@ -239,6 +247,8 @@ export class PermissionHandler<
 
       return PermissionHandlerContent({
         origin,
+        scanDappUrlResult,
+        scanAddressResult,
         delegateAddress,
         justification,
         networkName,

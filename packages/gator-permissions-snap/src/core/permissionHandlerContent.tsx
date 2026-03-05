@@ -13,6 +13,14 @@ import { parseCaipAssetType } from '@metamask/utils';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
 import {
+  AddressScanResultType,
+  RecommendedAction,
+} from '../clients/trustSignalsClient';
+import type {
+  FetchAddressScanResult,
+  ScanDappUrlResult,
+} from '../clients/trustSignalsClient';
+import {
   AddressField,
   ShowMoreText,
   SkeletonField,
@@ -36,6 +44,10 @@ export type PermissionHandlerContentProps = {
   tokenIconData?: IconData | undefined;
   isJustificationCollapsed: boolean;
   origin: string;
+  /** Dapp URL scan result; when set with a warning/block, a warning icon with tooltip is shown beside the origin. */
+  scanDappUrlResult: ScanDappUrlResult | null;
+  /** Address scan result from the security alerts API. */
+  scanAddressResult: FetchAddressScanResult | null;
   delegateAddress: string;
   context: BaseContext;
   tokenBalance: string | null;
@@ -52,6 +64,8 @@ export type PermissionHandlerContentProps = {
  * @param options.permissionTitle - The title of the permission.
  * @param options.permissionSubtitle - The subtitle of the permission.
  * @param options.origin - The origin of the permission request.
+ * @param options.scanDappUrlResult - Optional dapp URL scan result; when set, a warning icon with tooltip is shown beside the origin.
+ * @param options.scanAddressResult - Optional address scan result from the security alerts API.
  * @param options.delegateAddress - The address that will receive the delegated permission.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
@@ -71,6 +85,8 @@ export const PermissionHandlerContent = ({
   permissionTitle,
   permissionSubtitle,
   origin,
+  scanDappUrlResult,
+  scanAddressResult,
   delegateAddress,
   justification,
   networkName,
@@ -109,6 +125,54 @@ export const PermissionHandlerContent = ({
       tokenAddress = assetReference;
     }
   }
+
+  const urlWarningByRecommendedAction = {
+    [RecommendedAction.BLOCK]: t('maliciousWebsiteLabel'),
+    [RecommendedAction.WARN]: t('potentiallyMaliciousWebsiteLabel'),
+  };
+
+  const recommendedAction = scanDappUrlResult?.isComplete
+    ? scanDappUrlResult.recommendedAction
+    : undefined;
+
+  const dappUrlWarningLabel =
+    recommendedAction === RecommendedAction.BLOCK ||
+    recommendedAction === RecommendedAction.WARN
+      ? urlWarningByRecommendedAction[recommendedAction]
+      : undefined;
+
+  const fromField = (
+    <TextField
+      label={t('requestFromLabel')}
+      value={origin}
+      tooltip={t('requestFromTooltip')}
+      warningLabel={dappUrlWarningLabel}
+    />
+  );
+
+  const addressWarningByResultType = {
+    [AddressScanResultType.Warning]: t('potentiallyMaliciousAddressLabel'),
+    [AddressScanResultType.Malicious]: t('maliciousAddressLabel'),
+  };
+
+  const resultType = scanAddressResult?.resultType;
+  // scanAddressResult.label is empty string when no label is specified
+  const label =
+    scanAddressResult?.label === '' ? null : scanAddressResult?.label;
+  const addressWarningLabel =
+    resultType === AddressScanResultType.Warning ||
+    resultType === AddressScanResultType.Malicious
+      ? (label ?? addressWarningByResultType[resultType])
+      : undefined;
+
+  const addressField = (
+    <AddressField
+      label={t('recipientLabel')}
+      address={delegateAddress}
+      tooltip={t('recipientTooltip')}
+      warningLabel={addressWarningLabel}
+    />
+  );
 
   return (
     <Box>
@@ -160,16 +224,8 @@ export const PermissionHandlerContent = ({
           </Box>
         </Section>
         <Section>
-          <TextField
-            label={t('requestFromLabel')}
-            value={origin}
-            tooltip={t('requestFromTooltip')}
-          />
-          <AddressField
-            label={t('recipientLabel')}
-            address={delegateAddress}
-            tooltip={t('recipientTooltip')}
-          />
+          {fromField}
+          {addressField}
           <TextField
             label={t('networkLabel')}
             value={networkName}

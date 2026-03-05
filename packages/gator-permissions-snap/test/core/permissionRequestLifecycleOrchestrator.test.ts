@@ -9,6 +9,12 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
+import type {
+  FetchAddressScanResult,
+  ScanDappUrlResult,
+  TrustSignalsClient,
+} from '../../src/clients/trustSignalsClient';
+import { AddressScanResultType } from '../../src/clients/trustSignalsClient';
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
@@ -129,6 +135,16 @@ const mockPermissionIntroductionService = {
   showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
+const mockScanAddressResult: FetchAddressScanResult = {
+  resultType: AddressScanResultType.Benign,
+  label: '',
+};
+
+const mockTrustSignalsClient = {
+  scanDappUrl: jest.fn().mockResolvedValue({ isComplete: false }),
+  fetchAddressScan: jest.fn().mockResolvedValue(mockScanAddressResult),
+} as unknown as jest.Mocked<TrustSignalsClient>;
+
 type TestLifecycleHandlersMocks = {
   parseAndValidatePermission: jest.Mock;
   buildContext: jest.Mock;
@@ -188,6 +204,14 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
     mockNonceCaveatService.getNonce.mockResolvedValue(0n);
 
+    mockTrustSignalsClient.scanDappUrl.mockResolvedValue({
+      isComplete: false,
+    });
+
+    mockTrustSignalsClient.fetchAddressScan.mockResolvedValue(
+      mockScanAddressResult,
+    );
+
     mockDialogInterfaceFactory.createDialogInterface.mockReturnValue({});
 
     permissionRequestLifecycleOrchestrator =
@@ -198,6 +222,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
+        trustSignalsClient: mockTrustSignalsClient,
       });
   });
 
@@ -210,6 +235,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
+        trustSignalsClient: mockTrustSignalsClient,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });
@@ -703,6 +729,121 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         });
       });
 
+      it('serializes consecutive updateConfirmation calls so they run in order and do not overwrite each other', async () => {
+        // updateConfirmation is called with only newContext and isGrantDisabled; scan results are read from closure variables.
+        mockTrustSignalsClient.scanDappUrl.mockImplementationOnce(
+          async (): Promise<ScanDappUrlResult> =>
+            new Promise<ScanDappUrlResult>(() => {}),
+        );
+
+        const contextWithMarker = (
+          marker: string,
+        ): BaseContext & { foo?: string } => ({
+          ...mockContext,
+          foo: marker,
+          justification: '',
+          expiry: { timestamp: 1733088000 },
+          isAdjustmentAllowed: true,
+          accountAddressCaip10: 'caip:10:address',
+          tokenAddressCaip19: 'caip:19/asset:address',
+          tokenMetadata: {
+            decimals: 18,
+            symbol: 'TEST',
+            iconDataBase64: null,
+          },
+        });
+
+        const delay = async (ms: number): Promise<void> =>
+          new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+        lifecycleHandlerMocks.createConfirmationContent.mockImplementation(
+          async ({
+            context,
+          }: {
+            context: BaseContext & { foo?: string };
+          }): Promise<SnapElement> => {
+            await delay(10);
+            return {
+              ...mockUiContent,
+              contextMarker: context.foo,
+            } as SnapElement;
+          },
+        );
+
+        let resolveUserDecision: (decision: boolean) => void = (_) => {
+          throw new Error('resolveUserDecision not set');
+        };
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
+          async () => {
+            const isConfirmationGranted = await new Promise<boolean>(
+              (resolve) => {
+                resolveUserDecision = resolve;
+              },
+            );
+            return { isConfirmationGranted };
+          },
+        );
+
+        const onConfirmationCreatedPromise = new Promise<{
+          updateContext: (args: {
+            updatedContext: BaseContext & { foo?: string };
+          }) => Promise<void>;
+        }>((resolve) => {
+          lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+            (params) => {
+              resolve(params);
+            },
+          );
+        });
+
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequest,
+            lifecycleHandlerMocks,
+          );
+
+        const { updateContext } = await onConfirmationCreatedPromise;
+
+        const contextFirst = contextWithMarker('first');
+        const contextSecond = contextWithMarker('second');
+        const contextThird = contextWithMarker('third');
+
+        const initialUpdateContentCalls =
+          mockConfirmationDialog.updateContent.mock.calls.length;
+
+        const promise1 = updateContext({ updatedContext: contextFirst });
+        const promise2 = updateContext({ updatedContext: contextSecond });
+        const promise3 = updateContext({ updatedContext: contextThird });
+
+        await Promise.all([promise1, promise2, promise3]);
+
+        const updateContentCalls =
+          mockConfirmationDialog.updateContent.mock.calls;
+        expect(updateContentCalls.length).toBeGreaterThanOrEqual(
+          initialUpdateContentCalls + 3,
+        );
+
+        // The three updateContext calls may not be at fixed indices (scan callbacks can add earlier updateContent calls), so assert on the last three
+        const lastThreeCalls = updateContentCalls.slice(-3);
+        const firstUpdateUi = lastThreeCalls[0]?.[0]?.ui as SnapElement & {
+          contextMarker?: string;
+        };
+        const secondUpdateUi = lastThreeCalls[1]?.[0]?.ui as SnapElement & {
+          contextMarker?: string;
+        };
+        const thirdUpdateUi = lastThreeCalls[2]?.[0]?.ui as SnapElement & {
+          contextMarker?: string;
+        };
+
+        expect(firstUpdateUi.contextMarker).toBe('first');
+        expect(secondUpdateUi.contextMarker).toBe('second');
+        expect(thirdUpdateUi.contextMarker).toBe('third');
+
+        resolveUserDecision(true);
+        await orchestrationPromise;
+      });
+
       it('prevents race condition when grant is clicked before debounced validation completes', async () => {
         // This test simulates the race condition scenario:
         // 1. User types invalid input → validation debounced (500ms delay)
@@ -775,6 +916,20 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
        */
 
       beforeEach(async () => {
+        // Delay scan resolution so the initial createConfirmationContent runs with null scan results
+        mockTrustSignalsClient.scanDappUrl.mockImplementation(
+          async () =>
+            new Promise<ScanDappUrlResult>((resolve) =>
+              setTimeout(() => resolve({ isComplete: false }), 50),
+            ),
+        );
+        mockTrustSignalsClient.fetchAddressScan.mockImplementation(
+          async () =>
+            new Promise<FetchAddressScanResult>((resolve) =>
+              setTimeout(() => resolve(mockScanAddressResult), 50),
+            ),
+        );
+
         await permissionRequestLifecycleOrchestrator.orchestrate(
           'test-origin',
           mockPermissionRequest,
@@ -816,8 +971,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
       /*
        * 3. Builds context, derives metadata and updates the UI content for confirmation.
+       * The orchestrator reads scan results from closure variables when calling createConfirmationContent (not passed into updateConfirmation).
        */
       it('builds context, derives metadata and updates the UI content for confirmation', async () => {
+        // Allow time for delayed scan mocks to resolve so we get all 3 createConfirmationContent calls
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+
         expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith(
           mockPermissionRequest,
         );
@@ -826,14 +985,38 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           context: mockContext,
         });
 
+        // createConfirmationContent receives scan results from orchestrator closure (initial render, then when each scan resolves)
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenCalledWith({
+        ).toHaveBeenCalledTimes(3);
+
+        expect(
+          lifecycleHandlerMocks.createConfirmationContent,
+        ).toHaveBeenNthCalledWith(1, {
           context: mockContext,
           metadata: mockMetadata,
           origin: 'test-origin',
           chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
         });
+
+        // Final call has both scan results from closure (after both background scans resolve)
+        expect(
+          lifecycleHandlerMocks.createConfirmationContent,
+        ).toHaveBeenNthCalledWith(3, {
+          context: mockContext,
+          metadata: mockMetadata,
+          origin: 'test-origin',
+          chainId: 1,
+          scanDappUrlResult: { isComplete: false },
+          scanAddressResult: mockScanAddressResult,
+        });
+
+        expect(mockTrustSignalsClient.fetchAddressScan).toHaveBeenCalledWith(
+          mockPermissionRequest.chainId,
+          mockPermissionRequest.to,
+        );
 
         expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
           ui: mockUiContent,

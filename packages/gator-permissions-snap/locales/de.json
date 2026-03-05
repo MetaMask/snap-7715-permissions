@@ -228,6 +228,18 @@
     },
     "introGotItButton": {
       "message": "Verstanden"
+    },
+    "maliciousWebsiteLabel": {
+      "message": ""
+    },
+    "potentiallyMaliciousWebsiteLabel": {
+      "message": ""
+    },
+    "maliciousAddressLabel": {
+      "message": ""
+    },
+    "potentiallyMaliciousAddressLabel": {
+      "message": ""
     }
   }
 }

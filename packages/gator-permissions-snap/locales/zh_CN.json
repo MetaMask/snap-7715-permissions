@@ -228,6 +228,18 @@
     },
     "introGotItButton": {
       "message": "知道了"
+    },
+    "maliciousWebsiteLabel": {
+      "message": ""
+    },
+    "potentiallyMaliciousWebsiteLabel": {
+      "message": ""
+    },
+    "maliciousAddressLabel": {
+      "message": ""
+    },
+    "potentiallyMaliciousAddressLabel": {
+      "message": ""
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Text, Tooltip } from '@metamask/snaps-sdk/jsx';
+import { Box, Icon, Text, Tooltip } from '@metamask/snaps-sdk/jsx';
 
 import type { ViewFieldProps } from './Field';
 import { Field } from './Field';
@@ -9,24 +9,36 @@ export type AddressFieldParams = Pick<
   'label' | 'tooltip' | 'iconData'
 > & {
   address: string;
+  /** When set, shows a danger icon and this label below the address. */
+  warningLabel?: string | undefined;
 };
 
 /**
  * A reusable component that displays an address field with a shortened address
  * and a tooltip showing the full address on hover.
+ * When warningLabel is set, shows the address with a warning icon and label below.
+ *
  * @param props - The component props.
  * @param props.label - The label for the field.
  * @param props.address - The full address to display.
  * @param props.tooltip - The tooltip text for the field label.
  * @param props.iconData - Optional icon data.
- * @returns A JSX element containing an address field with tooltip.
+ * @param props.warningLabel - When set, shows a danger icon and this label below the address.
+ * @returns A JSX element containing an address field with optional warning.
  */
 export const AddressField = ({
   label,
   address,
   tooltip,
   iconData,
+  warningLabel,
 }: AddressFieldParams): JSX.Element => {
+  const addressContent = (
+    <Tooltip content={address}>
+      <Text>{shortenAddress(address)}</Text>
+    </Tooltip>
+  );
+
   return (
     <Field
       label={label}
@@ -34,9 +46,21 @@ export const AddressField = ({
       iconData={iconData}
       variant="display"
     >
-      <Tooltip content={address}>
-        <Text>{shortenAddress(address)}</Text>
-      </Tooltip>
+      {warningLabel ? (
+        <Box direction="vertical" alignment="end">
+          <Box direction="horizontal" alignment="end">
+            {addressContent}
+          </Box>
+          <Box direction="horizontal" alignment="end">
+            <Icon name="danger" size="md" color="primary" />
+            <Text alignment="end" color="error">
+              {warningLabel}
+            </Text>
+          </Box>
+        </Box>
+      ) : (
+        addressContent
+      )}
     </Field>
   );
 };
