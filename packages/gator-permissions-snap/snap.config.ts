@@ -13,7 +13,7 @@ const {
   STORE_PERMISSIONS_ENABLED,
   ACCOUNT_API_BASE_URL,
   TOKENS_API_BASE_URL,
-  TRUST_SIGNALS_BASE_URL,
+  DAPP_SCANNING_BASE_URL,
   KERNEL_SNAP_ID,
 } = process.env;
 
@@ -70,9 +70,9 @@ if (!TOKENS_API_BASE_URL) {
   );
 }
 
-if (!TRUST_SIGNALS_BASE_URL) {
+if (!DAPP_SCANNING_BASE_URL) {
   throw new InternalError(
-    'TRUST_SIGNALS_BASE_URL must be set as an environment variable.',
+    'DAPP_SCANNING_BASE_URL must be set as an environment variable.',
   );
 }
 
@@ -92,7 +92,7 @@ const config: SnapConfig = {
     STORE_PERMISSIONS_ENABLED,
     ACCOUNT_API_BASE_URL,
     TOKENS_API_BASE_URL,
-    TRUST_SIGNALS_BASE_URL,
+    DAPP_SCANNING_BASE_URL,
     KERNEL_SNAP_ID,
   },
 };

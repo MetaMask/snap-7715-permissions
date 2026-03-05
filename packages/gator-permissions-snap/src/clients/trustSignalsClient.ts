@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { makeValidatedRequestWithRetry } from '../utils/httpClient';
 
 /**
- * Recommended action from the trust signals scan API.
+ * Recommended action from the dapp scanning API.
  */
 export enum RecommendedAction {
   BLOCK = 'BLOCK',
@@ -26,18 +26,19 @@ export type FetchTrustSignalResult =
     };
 
 /**
- * Schema for the trust signals scan API response.
+ * Schema for the dapp scanning API response.
  * Only validates the fields we use; recommendedAction may be missing or invalid.
  */
-const TrustSignalsResponseSchema = z.object({
+const DappScanningResponseSchema = z.object({
   status: z.string(),
   recommendedAction: z.string().optional(),
 });
 
-type TrustSignalsResponse = z.infer<typeof TrustSignalsResponseSchema>;
+type DappScanningResponse = z.infer<typeof DappScanningResponseSchema>;
 
 /**
  * Configuration options for TrustSignalsClient.
+ * baseUrl is the dapp scanning API base URL when using that service.
  */
 export type TrustSignalsClientConfig = {
   baseUrl: string;
@@ -57,7 +58,7 @@ export function extractOriginSchemeAndHost(origin: string): string {
 }
 
 /**
- * Client for the trust signals scan API.
+ * Client for fetching trust signals. Presently uses the dapp scanning API.
  */
 export class TrustSignalsClient {
   readonly #fetch: typeof globalThis.fetch;
@@ -81,8 +82,8 @@ export class TrustSignalsClient {
   }
 
   /**
-   * Fetches the trust signal for the given origin.
-   * Only the scheme and host of the origin are sent to the API (no path or query).
+   * Fetches the trust signal for the given origin via the dapp scanning API.
+   * Only the scheme and host of the origin are sent (no path or query).
    *
    * @param origin - The origin to scan (e.g. "https://example.com" or "https://example.com/path?q=1").
    * @returns The scan result: isComplete is true only when status is "COMPLETE";
@@ -93,8 +94,8 @@ export class TrustSignalsClient {
     const scanUrl = `${this.#baseUrl}/scan?url=${encodeURIComponent(urlToScan)}`;
 
     const parsed = await makeValidatedRequestWithRetry<
-      TrustSignalsResponse,
-      typeof TrustSignalsResponseSchema
+      DappScanningResponse,
+      typeof DappScanningResponseSchema
     >(
       scanUrl,
       {
@@ -102,7 +103,7 @@ export class TrustSignalsClient {
         maxResponseSizeBytes: this.#maxResponseSizeBytes,
         fetch: this.#fetch,
       },
-      TrustSignalsResponseSchema,
+      DappScanningResponseSchema,
       { retries: 0 },
     );
 

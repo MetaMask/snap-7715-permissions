@@ -71,9 +71,9 @@ if (!priceApiBaseUrl) {
   throw new InternalError('PRICE_API_BASE_URL is not set');
 }
 
-const trustSignalsBaseUrl = process.env.TRUST_SIGNALS_BASE_URL;
-if (!trustSignalsBaseUrl) {
-  throw new InternalError('TRUST_SIGNALS_BASE_URL is not set');
+const dappScanningBaseUrl = process.env.DAPP_SCANNING_BASE_URL;
+if (!dappScanningBaseUrl) {
+  throw new InternalError('DAPP_SCANNING_BASE_URL is not set');
 }
 
 const confirmationTimeoutMsString = process.env.CONFIRMATION_TIMEOUT_MS;
@@ -164,7 +164,7 @@ const priceApiClient = new PriceApiClient({
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
 const trustSignalsClient = new TrustSignalsClient({
-  baseUrl: trustSignalsBaseUrl,
+  baseUrl: dappScanningBaseUrl,
   timeoutMs: 10000,
   maxResponseSizeBytes: 1024 * 1024,
 });
