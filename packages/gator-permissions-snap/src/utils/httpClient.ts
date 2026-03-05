@@ -21,6 +21,35 @@ export type HttpClientConfig = {
 };
 
 /**
+ * Runs a request function with retry logic on ResourceUnavailableError.
+ * @param requestFn - Function that performs the request (called once per attempt).
+ * @param retryOptions - Retry options.
+ * @returns A promise that resolves to the request result.
+ */
+async function withRetry<TReturn>(
+  requestFn: () => Promise<TReturn>,
+  retryOptions?: RetryOptions,
+): Promise<TReturn> {
+  const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await requestFn();
+    } catch (error) {
+      if (error instanceof ResourceUnavailableError && attempt < retries) {
+        await sleep(delayMs);
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw new InternalError(
+    `Failed to fetch resource after ${retries + 1} attempts`,
+  );
+}
+
+/**
  * Makes an HTTP request with timeout and response size limits, and validates the response with Zod, with retry logic.
  * @param url - The URL to fetch.
  * @param config - Configuration for timeout, response size limits, and fetch function.
@@ -42,22 +71,9 @@ export async function makeValidatedRequestWithRetry<
   responseSchema: TSchema,
   retryOptions?: RetryOptions,
 ): Promise<TResponse> {
-  const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
-
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      return await makeValidatedRequest(url, config, responseSchema);
-    } catch (error) {
-      if (error instanceof ResourceUnavailableError && attempt < retries) {
-        await sleep(delayMs);
-        continue;
-      }
-      throw error;
-    }
-  }
-
-  throw new InternalError(
-    `Failed to fetch resource after ${retries + 1} attempts`,
+  return withRetry(
+    async () => makeValidatedRequest(url, config, responseSchema),
+    retryOptions,
   );
 }
 
@@ -85,30 +101,19 @@ export async function makeValidatedPostRequestWithRetry<
   responseSchema: TSchema,
   retryOptions?: RetryOptions,
 ): Promise<TResponse> {
-  const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
-
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      return await makeValidatedPostRequest(url, config, body, responseSchema);
-    } catch (error) {
-      if (error instanceof ResourceUnavailableError && attempt < retries) {
-        await sleep(delayMs);
-        continue;
-      }
-      throw error;
-    }
-  }
-
-  throw new InternalError(
-    `Failed to fetch resource after ${retries + 1} attempts`,
+  return withRetry(
+    async () => makeValidatedRequest(url, config, responseSchema, body),
+    retryOptions,
   );
 }
 
 /**
  * Makes an HTTP request with timeout and response size limits, and validates the response with Zod.
+ * If body is provided, the request uses POST with a JSON body; otherwise GET is used.
  * @param url - The URL to fetch.
  * @param config - Configuration for timeout, response size limits, and fetch function.
  * @param responseSchema - Zod schema to validate the response against.
+ * @param body - Optional JSON-serializable body; when provided, method is POST.
  * @returns A promise that resolves to the validated response data.
  * @throws {ResourceUnavailableError} If the request times out, exceeds size limits, or server is unavailable.
  * @throws {ResourceNotFoundError} If the resource is not found (404).
@@ -123,6 +128,7 @@ async function makeValidatedRequest<
   url: string,
   config: HttpClientConfig,
   responseSchema: TSchema,
+  body?: Record<string, unknown>,
 ): Promise<TResponse> {
   const {
     timeoutMs,
@@ -134,71 +140,28 @@ async function makeValidatedRequest<
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   let response: globalThis.Response;
 
-  try {
-    response = await fetchFn(url, {
-      signal: controller.signal,
-      headers: {
-        ...config.headers,
-        Accept: 'application/json',
-        'User-Agent': 'MetaMask-Snap/1.0',
-      },
-    });
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new ResourceUnavailableError(
-        `Request timed out after ${timeoutMs}ms`,
-      );
-    }
+  const headers: Record<string, string> = {
+    ...config.headers,
+    Accept: 'application/json',
+    'User-Agent': 'MetaMask-Snap/1.0',
+  };
 
-    throw new InternalError(
-      `Failed to fetch resource: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    );
-  } finally {
-    clearTimeout(timeoutId);
+  const fetchConfig: RequestInit = {
+    signal: controller.signal,
+    headers,
+  };
+
+  const isPost = body !== undefined;
+
+  if (isPost) {
+    fetchConfig.body = JSON.stringify(body);
+    fetchConfig.method = 'POST';
+    headers['Content-Type'] = 'application/json';
   }
-
-  return processJsonResponse(response, maxResponseSizeBytes, responseSchema);
-}
-
-/**
- * Makes an HTTP POST request with JSON body, timeout and response size limits, and validates the response with Zod.
- * @param url - The URL to POST to.
- * @param config - Configuration for timeout, response size limits, and fetch function.
- * @param body - JSON-serializable body object.
- * @param responseSchema - Zod schema to validate the response against.
- * @returns A promise that resolves to the validated response data.
- */
-async function makeValidatedPostRequest<
-  TResponse,
-  TSchema extends z.ZodType<TResponse, any, any>,
->(
-  url: string,
-  config: HttpClientConfig,
-  body: Record<string, unknown>,
-  responseSchema: TSchema,
-): Promise<TResponse> {
-  const {
-    timeoutMs,
-    maxResponseSizeBytes,
-    fetch: fetchFn = globalThis.fetch,
-  } = config;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  let response: globalThis.Response;
+  // GET is fetch's default method
 
   try {
-    response = await fetchFn(url, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: {
-        ...config.headers,
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'MetaMask-Snap/1.0',
-      },
-      body: JSON.stringify(body),
-    });
+    response = await fetchFn(url, fetchConfig);
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
       throw new ResourceUnavailableError(

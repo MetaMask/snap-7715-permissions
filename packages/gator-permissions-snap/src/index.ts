@@ -51,6 +51,9 @@ import { createStateManager } from './stateManagement';
 import { UserEventDispatcher } from './userEventDispatcher';
 import { setupI18n } from './utils/i18n';
 
+const HTTP_TIMEOUT_MS = 10000;
+const HTTP_MAX_RESPONSE_SIZE_BYTES = 1024 * 1024; // 1MB
+
 const isStorePermissionsFeatureEnabled =
   process.env.STORE_PERMISSIONS_ENABLED === 'true';
 
@@ -91,8 +94,8 @@ const confirmationTimeoutMs = parseInt(confirmationTimeoutMsString, 10);
 // set up dependencies
 
 const accountApiClient = new AccountApiClient({
-  timeoutMs: 10000, // 10 seconds timeout
-  maxResponseSizeBytes: 1024 * 1024, // 1MB max response size
+  timeoutMs: HTTP_TIMEOUT_MS,
+  maxResponseSizeBytes: HTTP_MAX_RESPONSE_SIZE_BYTES,
   accountBaseUrl: accountApiBaseUrl,
   tokensBaseUrl: tokensApiBaseUrl,
 });
@@ -162,8 +165,8 @@ const profileSyncManager = createProfileSyncManager({
 
 const priceApiClient = new PriceApiClient({
   baseUrl: priceApiBaseUrl,
-  timeoutMs: 10000, // 10 seconds timeout
-  maxResponseSizeBytes: 1024 * 1024, // 1MB max response size
+  timeoutMs: HTTP_TIMEOUT_MS,
+  maxResponseSizeBytes: HTTP_MAX_RESPONSE_SIZE_BYTES,
 });
 
 const tokenPricesService = new TokenPricesService(priceApiClient, snap);
@@ -171,8 +174,8 @@ const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 const trustSignalsClient = new TrustSignalsClient({
   baseUrl: dappScanningBaseUrl,
   securityAlertsBaseUrl,
-  timeoutMs: 10000,
-  maxResponseSizeBytes: 1024 * 1024,
+  timeoutMs: HTTP_TIMEOUT_MS,
+  maxResponseSizeBytes: HTTP_MAX_RESPONSE_SIZE_BYTES,
 });
 
 const timeoutFactory = createTimeoutFactory({
