@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
+import { AddressScanResultType } from '../../src/clients/trustSignalsClient';
 import type { TokenBalanceAndMetadata } from '../../src/clients/types';
 import type { AccountController } from '../../src/core/accountController';
 import { PermissionHandler } from '../../src/core/permissionHandler';
@@ -439,6 +440,30 @@ describe('PermissionHandler', () => {
 
         expect(result).toBeDefined();
         expect(result.type).toBe('Box');
+      });
+
+      it('uses translated fallback for address warning when scanAddressResult.label is empty', async () => {
+        const { permissionHandler, getLifecycleHandlers } = setupTest();
+
+        await permissionHandler.handlePermissionRequest(mockOrigin);
+
+        const lifecycleHandlers = getLifecycleHandlers();
+
+        const result = await lifecycleHandlers.createConfirmationContent({
+          context: mockContext,
+          metadata: mockMetadata,
+          origin: mockOrigin,
+          chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: {
+            resultType: AddressScanResultType.Malicious,
+            label: '',
+          },
+        });
+
+        // When label is empty, permissionHandlerContent should use t('maliciousAddressLabel')
+        const serialized = JSON.stringify(result);
+        expect(serialized).toContain('Malicious address');
       });
     });
 

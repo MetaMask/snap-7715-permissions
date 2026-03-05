@@ -156,10 +156,13 @@ export const PermissionHandlerContent = ({
   };
 
   const resultType = scanAddressResult?.resultType;
+  // scanAddressResult.label is empty string when no label is specified
+  const label =
+    scanAddressResult?.label === '' ? null : scanAddressResult?.label;
   const addressWarningLabel =
     resultType === AddressScanResultType.Warning ||
     resultType === AddressScanResultType.Malicious
-      ? (scanAddressResult?.label ?? addressWarningByResultType[resultType])
+      ? (label ?? addressWarningByResultType[resultType])
       : undefined;
 
   const addressField = (
