@@ -234,6 +234,8 @@ export class PermissionRequestLifecycleOrchestrator {
     const decisionPromise =
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
+    let lastUpdateConfirmationPromise: Promise<void> = Promise.resolve();
+
     const updateConfirmation = async ({
       newContext,
       isGrantDisabled,
@@ -243,22 +245,29 @@ export class PermissionRequestLifecycleOrchestrator {
       isGrantDisabled: boolean;
       trustSignal: FetchTrustSignalResult | null;
     }): Promise<void> => {
-      context = newContext;
+      const runUpdate = async (): Promise<void> => {
+        context = newContext;
 
-      const metadata = await lifecycleHandlers.deriveMetadata({ context });
+        const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
-      const ui = await lifecycleHandlers.createConfirmationContent({
-        context,
-        metadata,
-        origin,
-        chainId,
-        trustSignal: trustSignalParam,
-      });
+        const ui = await lifecycleHandlers.createConfirmationContent({
+          context,
+          metadata,
+          origin,
+          chainId,
+          trustSignal: trustSignalParam,
+        });
 
-      await confirmationDialog.updateContent({
-        ui,
-        isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
-      });
+        await confirmationDialog.updateContent({
+          ui,
+          isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
+        });
+      };
+
+      lastUpdateConfirmationPromise = lastUpdateConfirmationPromise.then(() =>
+        runUpdate(),
+      );
+      await lastUpdateConfirmationPromise;
     };
 
     // Only set when the trust signals client resolves; used so updateContext re-renders can pass it through.

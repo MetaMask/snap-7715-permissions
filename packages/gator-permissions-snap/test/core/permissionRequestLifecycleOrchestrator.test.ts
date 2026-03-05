@@ -9,7 +9,10 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
-import type { TrustSignalsClient } from '../../src/clients/trustSignalsClient';
+import type {
+  FetchTrustSignalResult,
+  TrustSignalsClient,
+} from '../../src/clients/trustSignalsClient';
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
@@ -712,6 +715,120 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           context: modifiedContext,
           originalRequest: mockPermissionRequest,
         });
+      });
+
+      it('serializes consecutive updateConfirmation calls so they run in order and do not overwrite each other', async () => {
+        mockTrustSignalsClient.fetchTrustSignal.mockImplementationOnce(
+          () => new Promise<FetchTrustSignalResult>(() => {}),
+        );
+
+        const contextWithMarker = (marker: string) => ({
+          ...mockContext,
+          foo: marker,
+          justification: '',
+          expiry: '2024-12-31',
+          isAdjustmentAllowed: true,
+          accountAddressCaip10: fixedCaip10Address,
+          tokenAddressCaip19: 'eip155:1:0x1234',
+          tokenMetadata: {
+            decimals: 18,
+            symbol: 'TEST',
+            iconDataBase64: null,
+          },
+        });
+
+        const delay = (ms: number) =>
+          new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+        lifecycleHandlerMocks.createConfirmationContent.mockImplementation(
+          async ({
+            context,
+          }: {
+            context: BaseContext & { foo?: string };
+          }) => {
+            await delay(10);
+            return {
+              ...mockUiContent,
+              contextMarker: context.foo,
+            } as SnapElement;
+          },
+        );
+
+        let resolveUserDecision: (decision: boolean) => void = (_) => {
+          throw new Error('resolveUserDecision not set');
+        };
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
+          async () => {
+            const isConfirmationGranted = await new Promise<boolean>(
+              (resolve) => {
+                resolveUserDecision = resolve;
+              },
+            );
+            return { isConfirmationGranted };
+          },
+        );
+
+        const onConfirmationCreatedPromise = new Promise<{
+          updateContext: (args: {
+            updatedContext: BaseContext & { foo?: string };
+          }) => Promise<void>;
+        }>((resolve) => {
+          lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+            (params) => {
+              resolve(params);
+            },
+          );
+        });
+
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequest,
+            lifecycleHandlerMocks,
+          );
+
+        const { updateContext } = await onConfirmationCreatedPromise;
+
+        const contextFirst = contextWithMarker('first') as unknown as BaseContext & {
+          foo: string;
+        };
+        const contextSecond = contextWithMarker('second') as unknown as BaseContext & {
+          foo: string;
+        };
+        const contextThird = contextWithMarker('third') as unknown as BaseContext & {
+          foo: string;
+        };
+
+        const initialUpdateContentCalls =
+          mockConfirmationDialog.updateContent.mock.calls.length;
+
+        const promise1 = updateContext({ updatedContext: contextFirst });
+        const promise2 = updateContext({ updatedContext: contextSecond });
+        const promise3 = updateContext({ updatedContext: contextThird });
+
+        await Promise.all([promise1, promise2, promise3]);
+
+        const updateContentCalls =
+          mockConfirmationDialog.updateContent.mock.calls;
+        expect(updateContentCalls.length).toBeGreaterThanOrEqual(
+          initialUpdateContentCalls + 3,
+        );
+
+        const firstUpdateUi = updateContentCalls[initialUpdateContentCalls]?.[0]
+          ?.ui as SnapElement & { contextMarker?: string };
+        const secondUpdateUi = updateContentCalls[
+          initialUpdateContentCalls + 1
+        ]?.[0]?.ui as SnapElement & { contextMarker?: string };
+        const thirdUpdateUi = updateContentCalls[
+          initialUpdateContentCalls + 2
+        ]?.[0]?.ui as SnapElement & { contextMarker?: string };
+
+        expect(firstUpdateUi.contextMarker).toBe('first');
+        expect(secondUpdateUi.contextMarker).toBe('second');
+        expect(thirdUpdateUi.contextMarker).toBe('third');
+
+        resolveUserDecision(true);
+        await orchestrationPromise;
       });
 
       it('prevents race condition when grant is clicked before debounced validation completes', async () => {
