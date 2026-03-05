@@ -107,12 +107,16 @@ export class TrustSignalsClient {
     );
 
     const isComplete = parsed.status === 'COMPLETE';
-    const recommendedAction =
-      typeof parsed.recommendedAction === 'string' &&
-      RECOMMENDED_ACTIONS.includes(parsed.recommendedAction)
-        ? (parsed.recommendedAction as RecommendedAction)
-        : null;
+    
+    if (!isComplete) {
+      return { isComplete: false };
+    }
 
-    return { isComplete, recommendedAction };
+    const recommendedAction =
+      RECOMMENDED_ACTIONS.includes(parsed.recommendedAction ?? '')
+        ? (parsed.recommendedAction as RecommendedAction)
+        : RecommendedAction.NONE;
+
+    return { isComplete: true, recommendedAction };
   }
 }

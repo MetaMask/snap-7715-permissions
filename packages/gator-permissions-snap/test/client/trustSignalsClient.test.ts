@@ -109,8 +109,10 @@ describe('TrustSignalsClient', () => {
 
         const result = await client.fetchTrustSignal('https://example.com');
 
-        expect(result.recommendedAction).toBe(RecommendedAction[action]);
         expect(result.isComplete).toBe(true);
+        if (result.isComplete) {
+          expect(result.recommendedAction).toBe(RecommendedAction[action]);
+        }
       }
     });
 
@@ -129,11 +131,10 @@ describe('TrustSignalsClient', () => {
 
       expect(result).toStrictEqual({
         isComplete: false,
-        recommendedAction: RecommendedAction.NONE,
       });
     });
 
-    it('returns recommendedAction null when field is missing', async () => {
+    it('returns recommendedAction NONE when field is missing', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -149,11 +150,11 @@ describe('TrustSignalsClient', () => {
 
       expect(result).toStrictEqual({
         isComplete: true,
-        recommendedAction: null,
+        recommendedAction: RecommendedAction.NONE,
       });
     });
 
-    it('returns recommendedAction null when value is not BLOCK | WARN | NONE', async () => {
+    it('returns recommendedAction NONE when value is not BLOCK | WARN | NONE', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -168,11 +169,11 @@ describe('TrustSignalsClient', () => {
 
       expect(result).toStrictEqual({
         isComplete: true,
-        recommendedAction: null,
+        recommendedAction: RecommendedAction.NONE,
       });
     });
 
-    it('returns recommendedAction null when value is lowercase', async () => {
+    it('returns recommendedAction NONE when value is lowercase', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -185,7 +186,10 @@ describe('TrustSignalsClient', () => {
 
       const result = await client.fetchTrustSignal('https://example.com');
 
-      expect(result.recommendedAction).toBeNull();
+      expect(result).toStrictEqual({
+        isComplete: true,
+        recommendedAction: RecommendedAction.NONE,
+      });
     });
 
     it('strips trailing slashes from baseUrl', async () => {
