@@ -244,11 +244,13 @@ export class PermissionRequestLifecycleOrchestrator {
       newContext,
       isGrantDisabled,
     }: {
-      newContext: TContext;
+      newContext?: TContext;
       isGrantDisabled: boolean;
     }): Promise<void> => {
       const runUpdate = async (): Promise<void> => {
-        context = newContext;
+        if (newContext) {
+          context = newContext;
+        }
 
         const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
@@ -268,7 +270,8 @@ export class PermissionRequestLifecycleOrchestrator {
       };
 
       lastUpdateConfirmationPromise =
-        lastUpdateConfirmationPromise.then(runUpdate);
+        lastUpdateConfirmationPromise.finally(runUpdate);
+
       await lastUpdateConfirmationPromise;
     };
 
@@ -278,7 +281,6 @@ export class PermissionRequestLifecycleOrchestrator {
       .then(async (result) => {
         scanDappUrlResult = result;
         return updateConfirmation({
-          newContext: context,
           isGrantDisabled: false,
         });
       })
@@ -297,7 +299,6 @@ export class PermissionRequestLifecycleOrchestrator {
         .then(async (result) => {
           scanAddressResult = result;
           return updateConfirmation({
-            newContext: context,
             isGrantDisabled: false,
           });
         })
@@ -315,7 +316,6 @@ export class PermissionRequestLifecycleOrchestrator {
     // replace the skeleton content with the actual content rendered with the resolved context
     try {
       await updateConfirmation({
-        newContext: context,
         isGrantDisabled: false,
       });
 

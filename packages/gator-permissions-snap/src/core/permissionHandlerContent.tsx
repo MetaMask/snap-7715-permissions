@@ -3,7 +3,6 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
   Heading,
-  Icon,
   Section,
   Text,
   Skeleton,
@@ -23,7 +22,6 @@ import type {
 } from '../clients/trustSignalsClient';
 import {
   AddressField,
-  Field,
   ShowMoreText,
   SkeletonField,
   TextField,
@@ -128,84 +126,50 @@ export const PermissionHandlerContent = ({
     }
   }
 
-  let fromField: SnapElement;
+  const urlWarningByRecommendedAction = {
+    [RecommendedAction.BLOCK]: t('maliciousWebsiteLabel'),
+    [RecommendedAction.WARN]: t('potentiallyMaliciousWebsiteLabel'),
+  };
 
-  const shouldShowDappUrlWarning =
-    scanDappUrlResult?.isComplete &&
-    scanDappUrlResult.recommendedAction !== RecommendedAction.NONE;
+  const recommendedAction = scanDappUrlResult?.isComplete
+    ? scanDappUrlResult.recommendedAction
+    : undefined;
 
-  if (shouldShowDappUrlWarning) {
-    const scanDappUrlLabelByRecommendedAction = {
-      [RecommendedAction.BLOCK]: t('maliciousWebsiteLabel'),
-      [RecommendedAction.WARN]: t('potentiallyMaliciousWebsiteLabel'),
-      [RecommendedAction.NONE]: 'Unknown',
-    };
-    fromField = (
-      <Field
-        label={t('requestFromLabel')}
-        tooltip={t('requestFromTooltip')}
-        variant="display"
-      >
-        <Box direction="vertical">
-          <Text>{origin}</Text>
-          <Box direction="horizontal" alignment="end">
-            <Icon name="danger" size="md" color="primary" />
-            <Text color="error">
-              {
-                scanDappUrlLabelByRecommendedAction[
-                  scanDappUrlResult.recommendedAction
-                ]
-              }
-            </Text>
-          </Box>
-        </Box>
-      </Field>
-    );
-  } else {
-    fromField = (
-      <TextField
-        label={t('requestFromLabel')}
-        value={origin}
-        tooltip={t('requestFromTooltip')}
-      />
-    );
-  }
+  const dappUrlWarningLabel =
+    recommendedAction === RecommendedAction.BLOCK ||
+    recommendedAction === RecommendedAction.WARN
+      ? urlWarningByRecommendedAction[recommendedAction]
+      : undefined;
 
-  let addressField: SnapElement;
-  const shouldShowAddressWarning =
-    scanAddressResult?.resultType === AddressScanResultType.Warning ||
-    scanAddressResult?.resultType === AddressScanResultType.Malicious;
+  const fromField = (
+    <TextField
+      label={t('requestFromLabel')}
+      value={origin}
+      tooltip={t('requestFromTooltip')}
+      warningLabel={dappUrlWarningLabel}
+    />
+  );
 
-  if (shouldShowAddressWarning && scanAddressResult) {
-    const addressWarningLabel =
-      scanAddressResult.label ||
-      (scanAddressResult.resultType === AddressScanResultType.Malicious
-        ? t('maliciousAddressLabel')
-        : t('potentiallyMaliciousAddressLabel'));
-    addressField = (
-      <Field
-        label={t('recipientLabel')}
-        tooltip={t('recipientTooltip')}
-        variant="display"
-      >
-        <Box direction="vertical">
-          <Text>{delegateAddress}</Text>
-          <Box direction="horizontal" alignment="end">
-            <Icon name="danger" size="md" color="primary" />
-            <Text color="error">{addressWarningLabel}</Text>
-          </Box>
-        </Box>
-      </Field>
-    );
-  } else {
-    addressField = (
-      <AddressField
-        label={t('recipientLabel')}
-        address={delegateAddress}
-        tooltip={t('recipientTooltip')}
-      />
-    );
-  }
+  const addressWarningByResultType = {
+    [AddressScanResultType.Warning]: t('potentiallyMaliciousAddressLabel'),
+    [AddressScanResultType.Malicious]: t('maliciousAddressLabel'),
+  };
+
+  const resultType = scanAddressResult?.resultType;
+  const addressWarningLabel =
+    resultType === AddressScanResultType.Warning ||
+    resultType === AddressScanResultType.Malicious
+      ? (scanAddressResult?.label ?? addressWarningByResultType[resultType])
+      : undefined;
+
+  const addressField = (
+    <AddressField
+      label={t('recipientLabel')}
+      address={delegateAddress}
+      tooltip={t('recipientTooltip')}
+      warningLabel={addressWarningLabel}
+    />
+  );
 
   return (
     <Box>

@@ -926,6 +926,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "https://example.com",
                               },
                               "type": "Text",
@@ -1085,6 +1086,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "Ethereum Mainnet",
                               },
                               "type": "Text",
@@ -1549,6 +1551,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "https://example.com",
                               },
                               "type": "Text",
@@ -1708,6 +1711,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "Ethereum Mainnet",
                               },
                               "type": "Text",
@@ -2201,6 +2205,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "https://example.com",
                               },
                               "type": "Text",
@@ -2360,6 +2365,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "Ethereum Mainnet",
                               },
                               "type": "Text",
@@ -2789,6 +2795,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "https://example.com",
                               },
                               "type": "Text",
@@ -2948,6 +2955,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "Ethereum Mainnet",
                               },
                               "type": "Text",
@@ -3379,6 +3387,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "https://example.com",
                               },
                               "type": "Text",
@@ -3538,6 +3547,7 @@ describe('PermissionHandler', () => {
                             {
                               "key": null,
                               "props": {
+                                "alignment": "end",
                                 "children": "Ethereum Mainnet",
                               },
                               "type": "Text",

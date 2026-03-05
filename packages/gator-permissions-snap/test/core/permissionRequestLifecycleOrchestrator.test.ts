@@ -730,6 +730,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       it('serializes consecutive updateConfirmation calls so they run in order and do not overwrite each other', async () => {
+        // updateConfirmation is called with only newContext and isGrantDisabled; scan results are read from closure variables.
         mockTrustSignalsClient.scanDappUrl.mockImplementationOnce(
           async (): Promise<ScanDappUrlResult> =>
             new Promise<ScanDappUrlResult>(() => {}),
@@ -823,14 +824,17 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           initialUpdateContentCalls + 3,
         );
 
-        const firstUpdateUi = updateContentCalls[initialUpdateContentCalls]?.[0]
-          ?.ui as SnapElement & { contextMarker?: string };
-        const secondUpdateUi = updateContentCalls[
-          initialUpdateContentCalls + 1
-        ]?.[0]?.ui as SnapElement & { contextMarker?: string };
-        const thirdUpdateUi = updateContentCalls[
-          initialUpdateContentCalls + 2
-        ]?.[0]?.ui as SnapElement & { contextMarker?: string };
+        // The three updateContext calls may not be at fixed indices (scan callbacks can add earlier updateContent calls), so assert on the last three
+        const lastThreeCalls = updateContentCalls.slice(-3);
+        const firstUpdateUi = lastThreeCalls[0]?.[0]?.ui as SnapElement & {
+          contextMarker?: string;
+        };
+        const secondUpdateUi = lastThreeCalls[1]?.[0]?.ui as SnapElement & {
+          contextMarker?: string;
+        };
+        const thirdUpdateUi = lastThreeCalls[2]?.[0]?.ui as SnapElement & {
+          contextMarker?: string;
+        };
 
         expect(firstUpdateUi.contextMarker).toBe('first');
         expect(secondUpdateUi.contextMarker).toBe('second');
@@ -912,6 +916,20 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
        */
 
       beforeEach(async () => {
+        // Delay scan resolution so the initial createConfirmationContent runs with null scan results
+        mockTrustSignalsClient.scanDappUrl.mockImplementation(
+          async () =>
+            new Promise<ScanDappUrlResult>((resolve) =>
+              setTimeout(() => resolve({ isComplete: false }), 50),
+            ),
+        );
+        mockTrustSignalsClient.fetchAddressScan.mockImplementation(
+          async () =>
+            new Promise<FetchAddressScanResult>((resolve) =>
+              setTimeout(() => resolve(mockScanAddressResult), 50),
+            ),
+        );
+
         await permissionRequestLifecycleOrchestrator.orchestrate(
           'test-origin',
           mockPermissionRequest,
@@ -953,8 +971,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
       /*
        * 3. Builds context, derives metadata and updates the UI content for confirmation.
+       * The orchestrator reads scan results from closure variables when calling createConfirmationContent (not passed into updateConfirmation).
        */
       it('builds context, derives metadata and updates the UI content for confirmation', async () => {
+        // Allow time for delayed scan mocks to resolve so we get all 3 createConfirmationContent calls
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+
         expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith(
           mockPermissionRequest,
         );
@@ -963,7 +985,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           context: mockContext,
         });
 
-        // Initial render, then when scanDappUrl resolves, then when fetchAddressScan resolves (order of 2nd/3rd may vary)
+        // createConfirmationContent receives scan results from orchestrator closure (initial render, then when each scan resolves)
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
         ).toHaveBeenCalledTimes(3);
@@ -979,7 +1001,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           scanAddressResult: null,
         });
 
-        // Final call has both scan results (after both background scans resolve)
+        // Final call has both scan results from closure (after both background scans resolve)
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
         ).toHaveBeenNthCalledWith(3, {
