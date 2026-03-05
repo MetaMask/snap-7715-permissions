@@ -234,6 +234,12 @@
     },
     "potentiallyMaliciousWebsiteLabel": {
       "message": ""
+    },
+    "maliciousAddressLabel": {
+      "message": ""
+    },
+    "potentiallyMaliciousAddressLabel": {
+      "message": ""
     }
   }
 }

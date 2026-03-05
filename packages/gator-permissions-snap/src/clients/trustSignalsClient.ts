@@ -17,9 +17,9 @@ export enum RecommendedAction {
 const RECOMMENDED_ACTIONS: readonly string[] = Object.values(RecommendedAction);
 
 /**
- * Result of fetching a trust signal for an origin.
+ * Result of scanning a dapp URL via the dapp scanning API.
  */
-export type FetchTrustSignalResult =
+export type ScanDappUrlResult =
   | {
       isComplete: true;
       recommendedAction: RecommendedAction;
@@ -99,14 +99,15 @@ export enum AddressScanResultType {
   ErrorResult = 'ErrorResult',
 }
 
-const ADDRESS_SCAN_RESULT_TYPES: readonly string[] =
-  Object.values(AddressScanResultType);
+const ADDRESS_SCAN_RESULT_TYPES: readonly string[] = Object.values(
+  AddressScanResultType,
+);
 
 /**
  * Result of fetching an address scan from the security alerts API.
  */
 export type FetchAddressScanResult = {
-  result_type: AddressScanResultType;
+  resultType: AddressScanResultType;
   label: string;
 };
 
@@ -171,14 +172,14 @@ export class TrustSignalsClient {
   }
 
   /**
-   * Fetches the trust signal for the given origin via the dapp scanning API.
+   * Scans a dapp URL via the dapp scanning API.
    * Only the scheme and host of the origin are sent (no path or query).
    *
    * @param origin - The origin to scan (e.g. "https://example.com" or "https://example.com/path?q=1").
    * @returns The scan result: isComplete is true only when status is "COMPLETE";
    * recommendedAction is set only when the API returns a valid value (BLOCK, WARN, NONE).
    */
-  async fetchTrustSignal(origin: string): Promise<FetchTrustSignalResult> {
+  async scanDappUrl(origin: string): Promise<ScanDappUrlResult> {
     const urlToScan = extractOriginSchemeAndHost(origin);
     const scanUrl = `${this.#baseUrl}/scan?url=${encodeURIComponent(urlToScan)}`;
 
@@ -197,15 +198,16 @@ export class TrustSignalsClient {
     );
 
     const isComplete = parsed.status === 'COMPLETE';
-    
+
     if (!isComplete) {
       return { isComplete: false };
     }
 
-    const recommendedAction =
-      RECOMMENDED_ACTIONS.includes(parsed.recommendedAction ?? '')
-        ? (parsed.recommendedAction as RecommendedAction)
-        : RecommendedAction.NONE;
+    const recommendedAction = RECOMMENDED_ACTIONS.includes(
+      parsed.recommendedAction ?? '',
+    )
+      ? (parsed.recommendedAction as RecommendedAction)
+      : RecommendedAction.NONE;
 
     return { isComplete: true, recommendedAction };
   }
@@ -216,7 +218,7 @@ export class TrustSignalsClient {
    *
    * @param chainId - Hex chain ID (e.g. "0x1") or "solana".
    * @param address - The address to scan.
-   * @returns The scan result with result_type and label.
+   * @returns The scan result with resultType and label.
    */
   async fetchAddressScan(
     chainId: string,
@@ -225,7 +227,7 @@ export class TrustSignalsClient {
     const chain = DEFAULT_CHAIN_ID_TO_NAME[chainId];
     if (chain === undefined) {
       return {
-        result_type: AddressScanResultType.ErrorResult,
+        resultType: AddressScanResultType.ErrorResult,
         label: '',
       };
     }
@@ -246,12 +248,12 @@ export class TrustSignalsClient {
       { retries: 0 },
     );
 
-    const result_type = ADDRESS_SCAN_RESULT_TYPES.includes(parsed.result_type)
+    const resultType = ADDRESS_SCAN_RESULT_TYPES.includes(parsed.result_type)
       ? (parsed.result_type as AddressScanResultType)
       : AddressScanResultType.ErrorResult;
 
     return {
-      result_type,
+      resultType,
       label: parsed.label,
     };
   }

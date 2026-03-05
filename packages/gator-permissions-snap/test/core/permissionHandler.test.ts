@@ -411,6 +411,8 @@ describe('PermissionHandler', () => {
           metadata: mockMetadata,
           origin: mockOrigin,
           chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
         });
 
         expect(dependencies.createConfirmationContent).toHaveBeenCalledWith({
@@ -431,6 +433,8 @@ describe('PermissionHandler', () => {
           metadata: mockMetadata,
           origin: mockOrigin,
           chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
         });
 
         expect(result).toBeDefined();
@@ -634,6 +638,8 @@ describe('PermissionHandler', () => {
             metadata: mockMetadata,
             origin: mockOrigin,
             chainId: 1,
+            scanDappUrlResult: null,
+            scanAddressResult: null,
           });
         expect(confirmationContent).toMatchInlineSnapshot(`
 {
@@ -1240,6 +1246,8 @@ describe('PermissionHandler', () => {
             metadata: mockMetadata,
             origin: mockOrigin,
             chainId: 1,
+            scanDappUrlResult: null,
+            scanAddressResult: null,
           });
 
         expect(confirmationContent).toMatchInlineSnapshot(`
@@ -1895,6 +1903,8 @@ describe('PermissionHandler', () => {
             metadata: mockMetadata,
             origin: mockOrigin,
             chainId: 1,
+            scanDappUrlResult: null,
+            scanAddressResult: null,
           });
 
         // skeletons in place of both the token balance and fiat balance
@@ -2475,6 +2485,8 @@ describe('PermissionHandler', () => {
             metadata: mockMetadata,
             origin: mockOrigin,
             chainId: 1,
+            scanDappUrlResult: null,
+            scanAddressResult: null,
           });
 
         // concrete token balance, skeleton for fiat balance
@@ -3061,6 +3073,8 @@ describe('PermissionHandler', () => {
             metadata: mockMetadata,
             origin: mockOrigin,
             chainId: 1,
+            scanDappUrlResult: null,
+            scanAddressResult: null,
           });
 
         // concrete token balance, concrete fiat balance

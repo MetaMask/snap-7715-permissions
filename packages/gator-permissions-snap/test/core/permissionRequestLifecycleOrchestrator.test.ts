@@ -10,9 +10,11 @@ import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
 import type {
-  FetchTrustSignalResult,
+  FetchAddressScanResult,
+  ScanDappUrlResult,
   TrustSignalsClient,
 } from '../../src/clients/trustSignalsClient';
+import { AddressScanResultType } from '../../src/clients/trustSignalsClient';
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
@@ -133,9 +135,14 @@ const mockPermissionIntroductionService = {
   showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
+const mockScanAddressResult: FetchAddressScanResult = {
+  resultType: AddressScanResultType.Benign,
+  label: '',
+};
+
 const mockTrustSignalsClient = {
-  fetchTrustSignal: jest.fn().mockResolvedValue({ isComplete: false }),
-  fetchAddressScan: jest.fn(),
+  scanDappUrl: jest.fn().mockResolvedValue({ isComplete: false }),
+  fetchAddressScan: jest.fn().mockResolvedValue(mockScanAddressResult),
 } as unknown as jest.Mocked<TrustSignalsClient>;
 
 type TestLifecycleHandlersMocks = {
@@ -197,9 +204,13 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
     mockNonceCaveatService.getNonce.mockResolvedValue(0n);
 
-    mockTrustSignalsClient.fetchTrustSignal.mockResolvedValue({
+    mockTrustSignalsClient.scanDappUrl.mockResolvedValue({
       isComplete: false,
     });
+
+    mockTrustSignalsClient.fetchAddressScan.mockResolvedValue(
+      mockScanAddressResult,
+    );
 
     mockDialogInterfaceFactory.createDialogInterface.mockReturnValue({});
 
@@ -719,18 +730,21 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       it('serializes consecutive updateConfirmation calls so they run in order and do not overwrite each other', async () => {
-        mockTrustSignalsClient.fetchTrustSignal.mockImplementationOnce(
-          () => new Promise<FetchTrustSignalResult>(() => {}),
+        mockTrustSignalsClient.scanDappUrl.mockImplementationOnce(
+          async (): Promise<ScanDappUrlResult> =>
+            new Promise<ScanDappUrlResult>(() => {}),
         );
 
-        const contextWithMarker = (marker: string) => ({
+        const contextWithMarker = (
+          marker: string,
+        ): BaseContext & { foo?: string } => ({
           ...mockContext,
           foo: marker,
           justification: '',
-          expiry: '2024-12-31',
+          expiry: { timestamp: 1733088000 },
           isAdjustmentAllowed: true,
-          accountAddressCaip10: fixedCaip10Address,
-          tokenAddressCaip19: 'eip155:1:0x1234',
+          accountAddressCaip10: 'caip:10:address',
+          tokenAddressCaip19: 'caip:19/asset:address',
           tokenMetadata: {
             decimals: 18,
             symbol: 'TEST',
@@ -738,7 +752,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           },
         });
 
-        const delay = (ms: number) =>
+        const delay = async (ms: number): Promise<void> =>
           new Promise<void>((resolve) => setTimeout(resolve, ms));
 
         lifecycleHandlerMocks.createConfirmationContent.mockImplementation(
@@ -746,7 +760,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
             context,
           }: {
             context: BaseContext & { foo?: string };
-          }) => {
+          }): Promise<SnapElement> => {
             await delay(10);
             return {
               ...mockUiContent,
@@ -790,15 +804,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         const { updateContext } = await onConfirmationCreatedPromise;
 
-        const contextFirst = contextWithMarker('first') as unknown as BaseContext & {
-          foo: string;
-        };
-        const contextSecond = contextWithMarker('second') as unknown as BaseContext & {
-          foo: string;
-        };
-        const contextThird = contextWithMarker('third') as unknown as BaseContext & {
-          foo: string;
-        };
+        const contextFirst = contextWithMarker('first');
+        const contextSecond = contextWithMarker('second');
+        const contextThird = contextWithMarker('third');
 
         const initialUpdateContentCalls =
           mockConfirmationDialog.updateContent.mock.calls.length;
@@ -955,9 +963,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           context: mockContext,
         });
 
+        // Initial render, then when scanDappUrl resolves, then when fetchAddressScan resolves (order of 2nd/3rd may vary)
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenCalledTimes(2);
+        ).toHaveBeenCalledTimes(3);
 
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
@@ -966,18 +975,26 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           metadata: mockMetadata,
           origin: 'test-origin',
           chainId: 1,
-          trustSignal: null,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
         });
 
+        // Final call has both scan results (after both background scans resolve)
         expect(
           lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenNthCalledWith(2, {
+        ).toHaveBeenNthCalledWith(3, {
           context: mockContext,
           metadata: mockMetadata,
           origin: 'test-origin',
           chainId: 1,
-          trustSignal: { isComplete: false },
+          scanDappUrlResult: { isComplete: false },
+          scanAddressResult: mockScanAddressResult,
         });
+
+        expect(mockTrustSignalsClient.fetchAddressScan).toHaveBeenCalledWith(
+          mockPermissionRequest.chainId,
+          mockPermissionRequest.to,
+        );
 
         expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
           ui: mockUiContent,

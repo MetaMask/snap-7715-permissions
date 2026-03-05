@@ -89,12 +89,7 @@ export async function makeValidatedPostRequestWithRetry<
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      return await makeValidatedPostRequest(
-        url,
-        config,
-        body,
-        responseSchema,
-      );
+      return await makeValidatedPostRequest(url, config, body, responseSchema);
     } catch (error) {
       if (error instanceof ResourceUnavailableError && attempt < retries) {
         await sleep(delayMs);
@@ -162,11 +157,7 @@ async function makeValidatedRequest<
     clearTimeout(timeoutId);
   }
 
-  return processJsonResponse(
-    response,
-    maxResponseSizeBytes,
-    responseSchema,
-  );
+  return processJsonResponse(response, maxResponseSizeBytes, responseSchema);
 }
 
 /**
@@ -222,15 +213,16 @@ async function makeValidatedPostRequest<
     clearTimeout(timeoutId);
   }
 
-  return processJsonResponse(
-    response,
-    maxResponseSizeBytes,
-    responseSchema,
-  );
+  return processJsonResponse(response, maxResponseSizeBytes, responseSchema);
 }
 
 /**
  * Checks response status, size, parses JSON and validates with schema.
+ *
+ * @param response - The fetch Response to process.
+ * @param maxResponseSizeBytes - Maximum allowed response body size in bytes.
+ * @param responseSchema - Zod schema to validate the parsed JSON against.
+ * @returns The validated response data.
  */
 async function processJsonResponse<
   TResponse,

@@ -13,8 +13,14 @@ import { parseCaipAssetType } from '@metamask/utils';
 
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
-import { RecommendedAction } from '../clients/trustSignalsClient';
-import type { FetchTrustSignalResult } from '../clients/trustSignalsClient';
+import {
+  AddressScanResultType,
+  RecommendedAction,
+} from '../clients/trustSignalsClient';
+import type {
+  FetchAddressScanResult,
+  ScanDappUrlResult,
+} from '../clients/trustSignalsClient';
 import {
   AddressField,
   Field,
@@ -40,8 +46,10 @@ export type PermissionHandlerContentProps = {
   tokenIconData?: IconData | undefined;
   isJustificationCollapsed: boolean;
   origin: string;
-  /** Trust signals result for the origin; when set, a warning icon with tooltip is shown beside the origin. */
-  trustSignal: FetchTrustSignalResult | null;
+  /** Dapp URL scan result; when set with a warning/block, a warning icon with tooltip is shown beside the origin. */
+  scanDappUrlResult: ScanDappUrlResult | null;
+  /** Address scan result from the security alerts API. */
+  scanAddressResult: FetchAddressScanResult | null;
   delegateAddress: string;
   context: BaseContext;
   tokenBalance: string | null;
@@ -58,7 +66,8 @@ export type PermissionHandlerContentProps = {
  * @param options.permissionTitle - The title of the permission.
  * @param options.permissionSubtitle - The subtitle of the permission.
  * @param options.origin - The origin of the permission request.
- * @param options.trustSignal - Optional trust signals result; when set, a warning icon with tooltip is shown beside the origin.
+ * @param options.scanDappUrlResult - Optional dapp URL scan result; when set, a warning icon with tooltip is shown beside the origin.
+ * @param options.scanAddressResult - Optional address scan result from the security alerts API.
  * @param options.delegateAddress - The address that will receive the delegated permission.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
@@ -78,7 +87,8 @@ export const PermissionHandlerContent = ({
   permissionTitle,
   permissionSubtitle,
   origin,
-  trustSignal,
+  scanDappUrlResult,
+  scanAddressResult,
   delegateAddress,
   justification,
   networkName,
@@ -120,12 +130,12 @@ export const PermissionHandlerContent = ({
 
   let fromField: SnapElement;
 
-  const shouldShowTrustSignal =
-    trustSignal?.isComplete &&
-    trustSignal.recommendedAction !== RecommendedAction.NONE;
+  const shouldShowDappUrlWarning =
+    scanDappUrlResult?.isComplete &&
+    scanDappUrlResult.recommendedAction !== RecommendedAction.NONE;
 
-  if (shouldShowTrustSignal) {
-    const trustSignalLabelByRecommendedAction = {
+  if (shouldShowDappUrlWarning) {
+    const scanDappUrlLabelByRecommendedAction = {
       [RecommendedAction.BLOCK]: t('maliciousWebsiteLabel'),
       [RecommendedAction.WARN]: t('potentiallyMaliciousWebsiteLabel'),
       [RecommendedAction.NONE]: 'Unknown',
@@ -142,8 +152,8 @@ export const PermissionHandlerContent = ({
             <Icon name="danger" size="md" color="primary" />
             <Text color="error">
               {
-                trustSignalLabelByRecommendedAction[
-                  trustSignal.recommendedAction
+                scanDappUrlLabelByRecommendedAction[
+                  scanDappUrlResult.recommendedAction
                 ]
               }
             </Text>
@@ -157,6 +167,42 @@ export const PermissionHandlerContent = ({
         label={t('requestFromLabel')}
         value={origin}
         tooltip={t('requestFromTooltip')}
+      />
+    );
+  }
+
+  let addressField: SnapElement;
+  const shouldShowAddressWarning =
+    scanAddressResult?.resultType === AddressScanResultType.Warning ||
+    scanAddressResult?.resultType === AddressScanResultType.Malicious;
+
+  if (shouldShowAddressWarning && scanAddressResult) {
+    const addressWarningLabel =
+      scanAddressResult.label ||
+      (scanAddressResult.resultType === AddressScanResultType.Malicious
+        ? t('maliciousAddressLabel')
+        : t('potentiallyMaliciousAddressLabel'));
+    addressField = (
+      <Field
+        label={t('recipientLabel')}
+        tooltip={t('recipientTooltip')}
+        variant="display"
+      >
+        <Box direction="vertical">
+          <Text>{delegateAddress}</Text>
+          <Box direction="horizontal" alignment="end">
+            <Icon name="danger" size="md" color="primary" />
+            <Text color="error">{addressWarningLabel}</Text>
+          </Box>
+        </Box>
+      </Field>
+    );
+  } else {
+    addressField = (
+      <AddressField
+        label={t('recipientLabel')}
+        address={delegateAddress}
+        tooltip={t('recipientTooltip')}
       />
     );
   }
@@ -212,11 +258,7 @@ export const PermissionHandlerContent = ({
         </Section>
         <Section>
           {fromField}
-          <AddressField
-            label={t('recipientLabel')}
-            address={delegateAddress}
-            tooltip={t('recipientTooltip')}
-          />
+          {addressField}
           <TextField
             label={t('networkLabel')}
             value={networkName}

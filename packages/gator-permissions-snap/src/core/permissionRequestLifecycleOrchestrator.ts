@@ -36,7 +36,8 @@ import type {
   PermissionRequestResult,
 } from './types';
 import type {
-  FetchTrustSignalResult,
+  FetchAddressScanResult,
+  ScanDappUrlResult,
   TrustSignalsClient,
 } from '../clients/trustSignalsClient';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
@@ -236,14 +237,15 @@ export class PermissionRequestLifecycleOrchestrator {
 
     let lastUpdateConfirmationPromise: Promise<void> = Promise.resolve();
 
+    let scanDappUrlResult: ScanDappUrlResult | null = null;
+    let scanAddressResult: FetchAddressScanResult | null = null;
+
     const updateConfirmation = async ({
       newContext,
       isGrantDisabled,
-      trustSignal: trustSignalParam,
     }: {
       newContext: TContext;
       isGrantDisabled: boolean;
-      trustSignal: FetchTrustSignalResult | null;
     }): Promise<void> => {
       const runUpdate = async (): Promise<void> => {
         context = newContext;
@@ -255,7 +257,8 @@ export class PermissionRequestLifecycleOrchestrator {
           metadata,
           origin,
           chainId,
-          trustSignal: trustSignalParam,
+          scanDappUrlResult,
+          scanAddressResult,
         });
 
         await confirmationDialog.updateContent({
@@ -264,39 +267,56 @@ export class PermissionRequestLifecycleOrchestrator {
         });
       };
 
-      lastUpdateConfirmationPromise = lastUpdateConfirmationPromise.then(() =>
-        runUpdate(),
-      );
+      lastUpdateConfirmationPromise =
+        lastUpdateConfirmationPromise.then(runUpdate);
       await lastUpdateConfirmationPromise;
     };
 
-    // Only set when the trust signals client resolves; used so updateContext re-renders can pass it through.
-    let trustSignal: FetchTrustSignalResult | null = null;
-
-    // Fetch trust signal in the background; only update when the client resolves (non-blocking)
+    // Scan dapp URL in the background; only update when the client resolves (non-blocking)
     this.#trustSignalsClient
-      .fetchTrustSignal(origin)
-      .then(async (trustSignalResult) => {
-        trustSignal = trustSignalResult;
+      .scanDappUrl(origin)
+      .then(async (result) => {
+        scanDappUrlResult = result;
         return updateConfirmation({
           newContext: context,
           isGrantDisabled: false,
-          trustSignal: trustSignalResult,
         });
       })
       .catch((error) => {
         logger.debug(
-          'PermissionRequestLifecycleOrchestrator: trust signal fetch or UI update failed',
+          'PermissionRequestLifecycleOrchestrator: dapp URL scan or UI update failed',
           { origin, error: error instanceof Error ? error.message : error },
         );
       });
+
+    // Address scan in the background; only update when the client resolves (non-blocking)
+    const delegateAddress = validatedPermissionRequest.to;
+    if (delegateAddress) {
+      this.#trustSignalsClient
+        .fetchAddressScan(validatedPermissionRequest.chainId, delegateAddress)
+        .then(async (result) => {
+          scanAddressResult = result;
+          return updateConfirmation({
+            newContext: context,
+            isGrantDisabled: false,
+          });
+        })
+        .catch((error) => {
+          logger.debug(
+            'PermissionRequestLifecycleOrchestrator: address scan or UI update failed',
+            {
+              address: delegateAddress,
+              error: error instanceof Error ? error.message : error,
+            },
+          );
+        });
+    }
 
     // replace the skeleton content with the actual content rendered with the resolved context
     try {
       await updateConfirmation({
         newContext: context,
         isGrantDisabled: false,
-        trustSignal,
       });
 
       // Track dialog shown after successful rendering
@@ -325,7 +345,6 @@ export class PermissionRequestLifecycleOrchestrator {
           await updateConfirmation({
             newContext: updatedContext,
             isGrantDisabled: false,
-            trustSignal,
           });
         } catch (error) {
           await confirmationDialog.closeWithError(error as Error);
