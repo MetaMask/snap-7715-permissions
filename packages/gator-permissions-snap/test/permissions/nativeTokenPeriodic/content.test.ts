@@ -284,7 +284,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Start Time",
+                                  "children": "Start Time (UTC)",
                                 },
                                 "type": "Text",
                               },
@@ -330,7 +330,7 @@ describe('nativeTokenPeriodic:content', () => {
                           "disablePast": true,
                           "name": "native-token-periodic-start-date",
                           "type": "datetime",
-                          "value": "1985-10-26T08:00:00.000Z",
+                          "value": "1985-10-26T08:00:00.000+00:00",
                         },
                         "type": "DateTimePicker",
                       },
@@ -358,7 +358,7 @@ describe('nativeTokenPeriodic:content', () => {
                               {
                                 "key": null,
                                 "props": {
-                                  "children": "Expiry",
+                                  "children": "Expiry (UTC)",
                                 },
                                 "type": "Text",
                               },
@@ -398,7 +398,7 @@ describe('nativeTokenPeriodic:content', () => {
                                 "children": {
                                   "key": null,
                                   "props": {
-                                    "alt": "Remove Expiry",
+                                    "alt": "Remove Expiry (UTC)",
                                     "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -431,7 +431,7 @@ describe('nativeTokenPeriodic:content', () => {
                           "disablePast": true,
                           "name": "native-token-periodic-expiry",
                           "type": "datetime",
-                          "value": "2024-05-01T00:00:00.000Z",
+                          "value": "2024-05-01T00:00:00.000+00:00",
                         },
                         "type": "DateTimePicker",
                       },

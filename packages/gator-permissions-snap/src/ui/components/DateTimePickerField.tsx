@@ -3,6 +3,7 @@ import { DateTimePicker } from '@metamask/snaps-sdk/jsx';
 import type { BaseFieldProps } from './Field';
 import { Field } from './Field';
 import { TextField } from './TextField';
+import { forceToLocalZone } from '../../utils/time';
 
 export type DateTimePickerFieldParams = Pick<
   BaseFieldProps,
@@ -38,7 +39,7 @@ export const DateTimePickerField = ({
     let displayValue = value ?? '';
     if (value) {
       try {
-        const date = new Date(value);
+        const date = new Date(forceToLocalZone(value));
         if (!isNaN(date.getTime())) {
           displayValue = date.toLocaleString();
         }
@@ -66,7 +67,7 @@ export const DateTimePickerField = ({
     >
       <DateTimePicker
         name={name}
-        value={value}
+        value={forceToLocalZone(value)}
         type="datetime"
         disablePast={disablePast}
       />
