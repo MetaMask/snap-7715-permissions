@@ -1,6 +1,7 @@
 import {
   TrustSignalsClient,
   RecommendedAction,
+  AddressScanResultType,
   extractOriginSchemeAndHost,
 } from '../../src/clients/trustSignalsClient';
 
@@ -41,6 +42,7 @@ describe('TrustSignalsClient', () => {
     mockFetch = jest.fn();
     client = new TrustSignalsClient({
       baseUrl: 'https://trust.example.com',
+      securityAlertsBaseUrl: 'https://security-alerts.example.com',
       fetch: mockFetch,
       timeoutMs: 5000,
       maxResponseSizeBytes: 1024 * 1024,
@@ -195,6 +197,7 @@ describe('TrustSignalsClient', () => {
     it('strips trailing slashes from baseUrl', async () => {
       const clientWithTrailingSlash = new TrustSignalsClient({
         baseUrl: 'https://trust.example.com/',
+        securityAlertsBaseUrl: 'https://security-alerts.example.com',
         fetch: mockFetch,
         timeoutMs: 5000,
         maxResponseSizeBytes: 1024 * 1024,
@@ -250,6 +253,111 @@ describe('TrustSignalsClient', () => {
       await expect(
         client.fetchTrustSignal('https://example.com'),
       ).rejects.toThrow('Invalid response structure');
+    });
+  });
+
+  describe('fetchAddressScan', () => {
+    it('returns ErrorResult with empty label when chain is not in DEFAULT_CHAIN_ID_TO_NAME', async () => {
+      const result = await client.fetchAddressScan('0x999999', '0xabc');
+
+      expect(result).toStrictEqual({
+        result_type: AddressScanResultType.ErrorResult,
+        label: '',
+      });
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it('POSTs to security alerts URL with chain and address for known chain', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          result_type: 'Benign',
+          label: '',
+        }),
+        headers: { get: jest.fn().mockReturnValue(null) },
+      } as any);
+
+      await client.fetchAddressScan('0x1', '0x742d35Cc6634C0532925a3b844Bc454e4438f44e');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://security-alerts.example.com/address/evm/scan',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          }),
+          body: JSON.stringify({
+            chain: 'ethereum',
+            address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+          }),
+        }),
+      );
+    });
+
+    it('returns Benign, Warning, Malicious from API response', async () => {
+      for (const resultType of [
+        AddressScanResultType.Benign,
+        AddressScanResultType.Warning,
+        AddressScanResultType.Malicious,
+      ] as const) {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            result_type: resultType,
+            label: resultType === AddressScanResultType.Warning ? 'Suspicious' : '',
+          }),
+          headers: { get: jest.fn().mockReturnValue(null) },
+        } as any);
+
+        const result = await client.fetchAddressScan('0x1', '0xabc');
+
+        expect(result.result_type).toBe(resultType);
+        expect(result.label).toBe(
+          resultType === AddressScanResultType.Warning ? 'Suspicious' : '',
+        );
+      }
+    });
+
+    it('returns ErrorResult when API returns unknown result_type', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          result_type: 'UnknownType',
+          label: 'something',
+        }),
+        headers: { get: jest.fn().mockReturnValue(null) },
+      } as any);
+
+      const result = await client.fetchAddressScan('0x1', '0xabc');
+
+      expect(result).toStrictEqual({
+        result_type: AddressScanResultType.ErrorResult,
+        label: 'something',
+      });
+    });
+
+    it('strips trailing slash from securityAlertsBaseUrl', async () => {
+      const clientWithTrailingSlash = new TrustSignalsClient({
+        baseUrl: 'https://trust.example.com',
+        securityAlertsBaseUrl: 'https://security-alerts.example.com/',
+        fetch: mockFetch,
+        timeoutMs: 5000,
+        maxResponseSizeBytes: 1024 * 1024,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ result_type: 'Benign', label: '' }),
+        headers: { get: jest.fn().mockReturnValue(null) },
+      } as any);
+
+      await clientWithTrailingSlash.fetchAddressScan('0x89', '0xdef');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://security-alerts.example.com/address/evm/scan',
+        expect.any(Object),
+      );
     });
   });
 });

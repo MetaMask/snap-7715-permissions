@@ -62,6 +62,54 @@ export async function makeValidatedRequestWithRetry<
 }
 
 /**
+ * Makes an HTTP POST request with JSON body, timeout and response size limits, and validates the response with Zod, with retry logic.
+ * @param url - The URL to POST to.
+ * @param config - Configuration for timeout, response size limits, and fetch function.
+ * @param body - JSON-serializable body object.
+ * @param responseSchema - Zod schema to validate the response against.
+ * @param retryOptions - Retry options.
+ * @returns A promise that resolves to the validated response data.
+ * @throws {ResourceUnavailableError} If the request times out, exceeds size limits, or server is unavailable.
+ * @throws {ResourceNotFoundError} If the resource is not found (404).
+ * @throws {InvalidInputError} If the request is invalid (4xx errors).
+ * @throws {ParseError} If the response cannot be parsed as JSON.
+ * @throws {ResourceUnavailableError} If the response structure is invalid according to the schema.
+ */
+export async function makeValidatedPostRequestWithRetry<
+  TResponse,
+  TSchema extends z.ZodType<TResponse, any, any>,
+>(
+  url: string,
+  config: HttpClientConfig,
+  body: Record<string, unknown>,
+  responseSchema: TSchema,
+  retryOptions?: RetryOptions,
+): Promise<TResponse> {
+  const { retries = 1, delayMs = 1000 } = retryOptions ?? {};
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await makeValidatedPostRequest(
+        url,
+        config,
+        body,
+        responseSchema,
+      );
+    } catch (error) {
+      if (error instanceof ResourceUnavailableError && attempt < retries) {
+        await sleep(delayMs);
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw new InternalError(
+    `Failed to fetch resource after ${retries + 1} attempts`,
+  );
+}
+
+/**
  * Makes an HTTP request with timeout and response size limits, and validates the response with Zod.
  * @param url - The URL to fetch.
  * @param config - Configuration for timeout, response size limits, and fetch function.
@@ -114,7 +162,84 @@ async function makeValidatedRequest<
     clearTimeout(timeoutId);
   }
 
-  // Check HTTP status code
+  return processJsonResponse(
+    response,
+    maxResponseSizeBytes,
+    responseSchema,
+  );
+}
+
+/**
+ * Makes an HTTP POST request with JSON body, timeout and response size limits, and validates the response with Zod.
+ * @param url - The URL to POST to.
+ * @param config - Configuration for timeout, response size limits, and fetch function.
+ * @param body - JSON-serializable body object.
+ * @param responseSchema - Zod schema to validate the response against.
+ * @returns A promise that resolves to the validated response data.
+ */
+async function makeValidatedPostRequest<
+  TResponse,
+  TSchema extends z.ZodType<TResponse, any, any>,
+>(
+  url: string,
+  config: HttpClientConfig,
+  body: Record<string, unknown>,
+  responseSchema: TSchema,
+): Promise<TResponse> {
+  const {
+    timeoutMs,
+    maxResponseSizeBytes,
+    fetch: fetchFn = globalThis.fetch,
+  } = config;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  let response: globalThis.Response;
+
+  try {
+    response = await fetchFn(url, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        ...config.headers,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'MetaMask-Snap/1.0',
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ResourceUnavailableError(
+        `Request timed out after ${timeoutMs}ms`,
+      );
+    }
+
+    throw new InternalError(
+      `Failed to fetch resource: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  return processJsonResponse(
+    response,
+    maxResponseSizeBytes,
+    responseSchema,
+  );
+}
+
+/**
+ * Checks response status, size, parses JSON and validates with schema.
+ */
+async function processJsonResponse<
+  TResponse,
+  TSchema extends z.ZodType<TResponse, any, any>,
+>(
+  response: globalThis.Response,
+  maxResponseSizeBytes: number,
+  responseSchema: TSchema,
+): Promise<TResponse> {
   if (!response.ok) {
     if (response.status === 404) {
       throw new ResourceNotFoundError(`Resource not found: ${response.status}`);
@@ -125,7 +250,6 @@ async function makeValidatedRequest<
     }
   }
 
-  // Check response size before processing
   const contentLength = response.headers?.get('content-length');
   if (contentLength && parseInt(contentLength, 10) > maxResponseSizeBytes) {
     throw new LimitExceededError(
@@ -133,7 +257,6 @@ async function makeValidatedRequest<
     );
   }
 
-  // Parse and validate the response with zod
   let responseData: unknown;
   try {
     responseData = await response.json();
@@ -141,7 +264,6 @@ async function makeValidatedRequest<
     throw new ParseError('Failed to parse JSON response');
   }
 
-  // Validate response structure and content with zod
   try {
     return responseSchema.parse(responseData);
   } catch {

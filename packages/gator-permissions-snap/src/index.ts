@@ -76,6 +76,11 @@ if (!dappScanningBaseUrl) {
   throw new InternalError('DAPP_SCANNING_BASE_URL is not set');
 }
 
+const securityAlertsBaseUrl = process.env.SECURITY_ALERTS_BASE_URL;
+if (!securityAlertsBaseUrl) {
+  throw new InternalError('SECURITY_ALERTS_BASE_URL is not set');
+}
+
 const confirmationTimeoutMsString = process.env.CONFIRMATION_TIMEOUT_MS;
 if (!confirmationTimeoutMsString) {
   throw new InternalError('CONFIRMATION_TIMEOUT_MS is not set');
@@ -165,6 +170,7 @@ const tokenPricesService = new TokenPricesService(priceApiClient, snap);
 
 const trustSignalsClient = new TrustSignalsClient({
   baseUrl: dappScanningBaseUrl,
+  securityAlertsBaseUrl,
   timeoutMs: 10000,
   maxResponseSizeBytes: 1024 * 1024,
 });

@@ -135,6 +135,7 @@ const mockPermissionIntroductionService = {
 
 const mockTrustSignalsClient = {
   fetchTrustSignal: jest.fn().mockResolvedValue({ isComplete: false }),
+  fetchAddressScan: jest.fn(),
 } as unknown as jest.Mocked<TrustSignalsClient>;
 
 type TestLifecycleHandlersMocks = {
