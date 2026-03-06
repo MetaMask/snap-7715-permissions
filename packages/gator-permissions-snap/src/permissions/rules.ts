@@ -13,6 +13,7 @@ import type {
   RuleDefinition,
   TypedPermissionRequest,
 } from '../core/types';
+import { t } from '../utils/i18n';
 import type { TranslateFunction } from '../utils/i18n';
 import {
   iso8601ToTimestamp,
@@ -84,6 +85,7 @@ export const createExpiryRule = <
         expiry,
       };
     },
+    contentWhenDisabled: t('expiryContentWhenDisabled'),
   };
 };
 

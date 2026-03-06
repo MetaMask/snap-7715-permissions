@@ -13,6 +13,7 @@ export type InputFieldParams = Pick<
   | 'isEditable'
   | 'iconData'
   | 'errorMessage'
+  | 'contentWhenDisabled'
 > & {
   name: string;
   value: string | undefined;
@@ -30,6 +31,7 @@ export const InputField = ({
   isEditable = true,
   errorMessage,
   iconData,
+  contentWhenDisabled,
 }: InputFieldParams): JSX.Element => {
   if (!isEditable) {
     return (
@@ -54,6 +56,7 @@ export const InputField = ({
       removeFieldButtonName={removeFieldButtonName}
       isFieldEnabled={isFieldEnabled}
       iconData={iconData}
+      contentWhenDisabled={contentWhenDisabled}
       variant="form"
     >
       <Input name={name} type={type} value={value} />

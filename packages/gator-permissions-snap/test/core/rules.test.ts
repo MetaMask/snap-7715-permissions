@@ -98,6 +98,16 @@ const optionalRule: RuleDefinition<TestContext, TestMetadata> = {
   updateContext: (context, value) => ({ ...context, optionalValue: value }),
 };
 
+const optionalRuleWithContentWhenDisabled: RuleDefinition<
+  TestContext,
+  TestMetadata
+> = {
+  ...optionalRule,
+  name: 'test-optional-rule-with-content',
+  label: 'Test Optional Rule With Content' as MessageKey,
+  contentWhenDisabled: 'Shown when this field is disabled.',
+};
+
 const undefinedValueRule: RuleDefinition<TestContext, TestMetadata> = {
   name: 'undefined-value-rule',
   label: 'Undefined Value Rule' as MessageKey,
@@ -377,6 +387,28 @@ describe('rules', () => {
   "type": "Box",
 }
 `);
+    });
+
+    it('should render contentWhenDisabled when optional rule is toggled off', () => {
+      const { optionalValue: _omit, ...rest } = mockContext;
+      const contextWithOptionalDisabled = { ...rest } as TestContext;
+
+      const result = renderRule({
+        rule: optionalRuleWithContentWhenDisabled,
+        context: contextWithOptionalDisabled,
+        metadata: mockMetadata,
+      });
+
+      const children = result?.props?.children;
+      expect(Array.isArray(children)).toBe(true);
+      expect(children).toHaveLength(2);
+      const contentWhenDisabledElement = Array.isArray(children)
+        ? (children[1] as { type: string; props: { children: string } })
+        : undefined;
+      expect(contentWhenDisabledElement?.type).toBe('Text');
+      expect(contentWhenDisabledElement?.props?.children).toBe(
+        'Shown when this field is disabled.',
+      );
     });
 
     it('should render an optional rule with remove button', () => {

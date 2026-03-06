@@ -36,6 +36,7 @@ export type BaseFieldProps = {
   isFieldEnabled?: boolean;
   addFieldButtonName?: string | undefined;
   removeFieldButtonName?: string | undefined;
+  contentWhenDisabled?: string | undefined;
 };
 
 export type ViewFieldProps = BaseFieldProps & {
@@ -104,6 +105,7 @@ const isDisplayFieldProps = (props: FieldProps): props is ViewFieldProps => {
  * @param props.isFieldEnabled - Whether the field is currently enabled (default: true).
  * @param props.addFieldButtonName - Name for the add field button (enables toggle).
  * @param props.removeFieldButtonName - Name for the remove field button (enables toggle).
+ * @param props.contentWhenDisabled - Optional content to show when the field is toggled off.
  * @param props.iconData - Optional icon data for display or input fields.
  * @param props.removeButtonName - Optional name for the remove button (input fields).
  * @param props.children - The content to render inside the field.
@@ -119,6 +121,7 @@ export const Field = (props: FieldProps): JSX.Element => {
     isFieldEnabled = true,
     addFieldButtonName,
     removeFieldButtonName,
+    contentWhenDisabled,
   } = props;
 
   const tooltipElement = tooltip ? <TooltipIcon tooltip={tooltip} /> : null;
@@ -167,7 +170,14 @@ export const Field = (props: FieldProps): JSX.Element => {
    * we only show the label section.
    */
   if (hasToggleButtons && !isFieldEnabled) {
-    return <Box direction="vertical">{labelSection}</Box>;
+    return (
+      <Box direction="vertical">
+        {labelSection}
+        {contentWhenDisabled ? (
+          <Text color="alternative">{contentWhenDisabled}</Text>
+        ) : null}
+      </Box>
+    );
   }
 
   if (isInputFieldProps(props) || isDisplayFieldProps(props)) {

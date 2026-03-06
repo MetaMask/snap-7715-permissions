@@ -12,6 +12,7 @@ export type DateTimePickerFieldParams = Pick<
   | 'isEditable'
   | 'removeFieldButtonName'
   | 'addFieldButtonName'
+  | 'contentWhenDisabled'
 > & {
   name: string;
   /** ISO 8601 formatted date string with timezone */
@@ -30,6 +31,7 @@ export const DateTimePickerField = ({
   allowPastDate,
   addFieldButtonName,
   removeFieldButtonName,
+  contentWhenDisabled,
 }: DateTimePickerFieldParams): JSX.Element => {
   const isFieldEnabled = value !== null && value !== undefined;
 
@@ -60,6 +62,7 @@ export const DateTimePickerField = ({
       errorMessage={errorMessage}
       isEditable={isEditable}
       isFieldEnabled={isFieldEnabled}
+      contentWhenDisabled={contentWhenDisabled}
       variant="form"
       addFieldButtonName={addFieldButtonName}
       removeFieldButtonName={removeFieldButtonName}

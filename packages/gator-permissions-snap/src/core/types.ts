@@ -218,6 +218,7 @@ export type RuleDefinition<
   getRuleData: (config: { context: TContext; metadata: TMetadata }) => RuleData;
   // todo: it would be nice if we could make the value type more specific
   updateContext: (context: TContext, value: any) => TContext;
+  contentWhenDisabled?: string;
 };
 
 /**
