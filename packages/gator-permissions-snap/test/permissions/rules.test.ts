@@ -42,8 +42,9 @@ describe('createExpiryRule', () => {
     expect(rule.name).toBe('expiry');
     expect(rule.label).toBe('expiryLabel');
     expect(rule.type).toBe('datetime');
-    expect(rule.contentWhenDisabled).toBe(
-      'Never expires - we recommend that you set an expiry.',
+    expect(rule.contentWhenDisabled).toBeDefined();
+    expect(rule.contentWhenDisabled?.()).toBe(
+      'translation of: expiryContentWhenDisabled',
     );
   });
 

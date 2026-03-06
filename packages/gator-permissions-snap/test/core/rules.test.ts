@@ -105,7 +105,7 @@ const optionalRuleWithContentWhenDisabled: RuleDefinition<
   ...optionalRule,
   name: 'test-optional-rule-with-content',
   label: 'Test Optional Rule With Content' as MessageKey,
-  contentWhenDisabled: 'Shown when this field is disabled.',
+  contentWhenDisabled: () => 'Shown when this field is disabled.',
 };
 
 const undefinedValueRule: RuleDefinition<TestContext, TestMetadata> = {

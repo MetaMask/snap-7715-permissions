@@ -36,7 +36,7 @@ export type BaseFieldProps = {
   isFieldEnabled?: boolean;
   addFieldButtonName?: string | undefined;
   removeFieldButtonName?: string | undefined;
-  contentWhenDisabled?: string | undefined;
+  contentWhenDisabled?: (() => string) | undefined;
 };
 
 export type ViewFieldProps = BaseFieldProps & {
@@ -174,7 +174,7 @@ export const Field = (props: FieldProps): JSX.Element => {
       <Box direction="vertical">
         {labelSection}
         {contentWhenDisabled ? (
-          <Text color="alternative">{contentWhenDisabled}</Text>
+          <Text color="alternative">{contentWhenDisabled()}</Text>
         ) : null}
       </Box>
     );
