@@ -162,23 +162,26 @@ export const timestampToISO8601 = (timestamp: number): string => {
     );
   }
 
-  return forceToUTC(date.toISOString());
+  return date.toISOString();
 };
 
 /**
  * Converts an ISO 8601 date string to a Unix timestamp (in seconds).
+ * This function ignores any timezone information in the input string and treats
+ * the time as UTC. For example, "2024-01-01T10:00:00.000+02:00" is treated as
+ * "2024-01-01T10:00:00.000Z", not as the UTC equivalent.
  * This is used to convert DateTimePicker values back to timestamps.
  *
- * @param iso - The ISO 8601 formatted date string.
+ * @param iso - The ISO 8601 formatted date string (timezone info will be ignored).
  * @returns The Unix timestamp in seconds.
  */
-export const iso8601ToTimestamp = (iso: string): number => {
+export const iso8601ToTimestampIgnoreTimezone = (iso: string): number => {
   const normalizedIso = forceToUTC(iso);
   const date = new Date(normalizedIso);
 
   if (isNaN(date.getTime())) {
     throw new InvalidInputError(
-      `iso8601ToTimestamp: Invalid ISO 8601 string: ${iso}`,
+      `iso8601ToTimestampIgnoreTimezone: Invalid ISO 8601 string: ${iso}`,
     );
   }
 

@@ -1,6 +1,9 @@
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
-import { timestampToISO8601, iso8601ToTimestamp } from '../../utils/time';
+import {
+  timestampToISO8601,
+  iso8601ToTimestampIgnoreTimezone,
+} from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import { createExpiryRule } from '../rules';
 import type {
@@ -81,7 +84,7 @@ export const startTimeRule: Erc20TokenStreamRuleDefinition = {
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
-      startTime: iso8601ToTimestamp(value),
+      startTime: iso8601ToTimestampIgnoreTimezone(value),
     },
   }),
 };

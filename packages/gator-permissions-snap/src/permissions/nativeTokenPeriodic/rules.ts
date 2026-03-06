@@ -7,7 +7,7 @@ import {
   getClosestTimePeriod,
   TIME_PERIOD_TO_SECONDS,
   timestampToISO8601,
-  iso8601ToTimestamp,
+  iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import type {
@@ -109,7 +109,7 @@ export const startTimeRule: RuleDefinition<
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
-      startTime: iso8601ToTimestamp(value),
+      startTime: iso8601ToTimestampIgnoreTimezone(value),
     },
   }),
 };

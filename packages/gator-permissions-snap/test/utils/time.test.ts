@@ -5,7 +5,7 @@ import {
   getClosestTimePeriod,
   TIME_PERIOD_TO_SECONDS,
   timestampToISO8601,
-  iso8601ToTimestamp,
+  iso8601ToTimestampIgnoreTimezone,
   forceToUTC,
   forceToLocalZone,
 } from '../../src/utils/time';
@@ -36,16 +36,16 @@ describe('Time Utility Functions', () => {
     });
   });
 
-  describe('iso8601ToTimestamp', () => {
+  describe('iso8601ToTimestampIgnoreTimezone', () => {
     it('should convert an ISO 8601 string to Unix timestamp', () => {
       const iso = '2024-01-01T00:00:00.000Z';
-      const result = iso8601ToTimestamp(iso);
+      const result = iso8601ToTimestampIgnoreTimezone(iso);
       expect(result).toBe(1704067200);
     });
 
     it('should handle ISO strings with time components', () => {
       const iso = '2024-01-01T10:50:30.000Z';
-      const result = iso8601ToTimestamp(iso);
+      const result = iso8601ToTimestampIgnoreTimezone(iso);
       expect(result).toBe(1704106230);
     });
 
@@ -55,25 +55,25 @@ describe('Time Utility Functions', () => {
       // But forceToUTC strips the offset and treats the time as UTC
       // So 2024-01-01T02:00:00.000+02:00 becomes 2024-01-01T02:00:00.000Z
       const iso = '2024-01-01T02:00:00.000+02:00';
-      const result = iso8601ToTimestamp(iso);
+      const result = iso8601ToTimestampIgnoreTimezone(iso);
       expect(result).toBe(1704074400); // 2024-01-01T02:00:00.000Z
     });
 
     it('should throw an error for invalid ISO strings', () => {
-      expect(() => iso8601ToTimestamp('invalid-date')).toThrow(
-        'iso8601ToTimestamp: Invalid ISO 8601 string',
+      expect(() => iso8601ToTimestampIgnoreTimezone('invalid-date')).toThrow(
+        'iso8601ToTimestampIgnoreTimezone: Invalid ISO 8601 string',
       );
-      expect(() => iso8601ToTimestamp('')).toThrow(
-        'iso8601ToTimestamp: Invalid ISO 8601 string',
+      expect(() => iso8601ToTimestampIgnoreTimezone('')).toThrow(
+        'iso8601ToTimestampIgnoreTimezone: Invalid ISO 8601 string',
       );
     });
   });
 
-  describe('timestampToISO8601 and iso8601ToTimestamp round-trip', () => {
+  describe('timestampToISO8601 and iso8601ToTimestampIgnoreTimezone round-trip', () => {
     it('should round-trip correctly', () => {
       const originalTimestamp = 1704106230;
       const iso = timestampToISO8601(originalTimestamp);
-      const result = iso8601ToTimestamp(iso);
+      const result = iso8601ToTimestampIgnoreTimezone(iso);
       expect(result).toBe(originalTimestamp);
     });
 
@@ -87,7 +87,7 @@ describe('Time Utility Functions', () => {
 
       for (const timestamp of testTimestamps) {
         const iso = timestampToISO8601(timestamp);
-        const result = iso8601ToTimestamp(iso);
+        const result = iso8601ToTimestampIgnoreTimezone(iso);
         expect(result).toBe(timestamp);
       }
     });
