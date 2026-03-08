@@ -174,7 +174,7 @@ export const Field = (props: FieldProps): JSX.Element => {
       <Box direction="vertical">
         {labelSection}
         {contentWhenDisabled ? (
-          <Text color="alternative">{contentWhenDisabled()}</Text>
+          <Text color="warning">{contentWhenDisabled()}</Text>
         ) : null}
       </Box>
     );
