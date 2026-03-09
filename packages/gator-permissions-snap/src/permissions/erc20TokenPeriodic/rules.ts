@@ -102,7 +102,7 @@ export const startTimeRule: RuleDefinition<
     isVisible: true,
     tooltip: t('startTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
-    allowPastDate: false,
+    allowPastDate: true, // start time can be in the past for periodic permissions
     isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({

@@ -77,7 +77,7 @@ export const startTimeRule: Erc20TokenStreamRuleDefinition = {
     isVisible: true,
     tooltip: t('streamStartTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
-    allowPastDate: false,
+    allowPastDate: true, // start time can be in the past
     isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenStreamContext, value: string) => ({
