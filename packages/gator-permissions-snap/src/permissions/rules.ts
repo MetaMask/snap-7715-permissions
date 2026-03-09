@@ -81,9 +81,9 @@ export function deriveExposureForStreamingPermission(
     totalExposure = maxAmount ?? exposureAtExpiry ?? null;
   }
 
-  return totalExposure !== null
-    ? formatUnits({ value: totalExposure, decimals })
-    : null;
+  return totalExposure === null
+    ? null
+    : formatUnits({ value: totalExposure, decimals });
 }
 
 export type ExpiryRuleContext = BaseContext;
