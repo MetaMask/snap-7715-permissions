@@ -42,8 +42,8 @@ export async function createConfirmationContent({
 
   const totalExposureNotice =
     totalExposure === null
-      ? `This permission grants an unlimited amount of ${context.tokenMetadata.symbol}.`
-      : `This permission grants a total of ${totalExposure} ${context.tokenMetadata.symbol}.`;
+      ? t('totalExposureUnlimited', [context.tokenMetadata.symbol])
+      : t('totalExposure', [totalExposure, context.tokenMetadata.symbol]);
 
   return (
     <Box>
