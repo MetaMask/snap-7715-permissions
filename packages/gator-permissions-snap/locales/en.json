@@ -64,6 +64,9 @@
     "expiryTooltip": {
       "message": "The expiry date of the permission"
     },
+    "expiryContentWhenDisabled": {
+      "message": "Never expires - we recommend that you set an expiry."
+    },
     "streamAmountLabel": {
       "message": "Stream Amount"
     },

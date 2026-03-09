@@ -2188,60 +2188,61 @@ describe('nativeTokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "children": {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Initial Amount",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Initial Amount",
+                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Text",
-                              },
-                              {
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The initial amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
                                 "key": null,
                                 "props": {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The initial amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Add Initial Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+                                      "alt": "Add Initial Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
 
@@ -2249,21 +2250,23 @@ describe('nativeTokenStream:content', () => {
   <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
 </svg>
 ",
+                                    },
+                                    "type": "Image",
                                   },
-                                  "type": "Image",
+                                  "name": "native-token-stream-initial-amount_addFieldButton",
                                 },
-                                "name": "native-token-stream-initial-amount_addFieldButton",
+                                "type": "Button",
                               },
-                              "type": "Button",
                             },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
                     },
-                    "type": "Box",
-                  },
+                    null,
+                  ],
                   "direction": "vertical",
                 },
                 "type": "Box",
@@ -2271,60 +2274,61 @@ describe('nativeTokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "children": {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Max Amount",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Max Amount",
+                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Text",
-                              },
-                              {
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The maximum amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
                                 "key": null,
                                 "props": {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The maximum amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Add Max Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+                                      "alt": "Add Max Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
 
@@ -2332,21 +2336,23 @@ describe('nativeTokenStream:content', () => {
   <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
 </svg>
 ",
+                                    },
+                                    "type": "Image",
                                   },
-                                  "type": "Image",
+                                  "name": "native-token-stream-max-amount_addFieldButton",
                                 },
-                                "name": "native-token-stream-max-amount_addFieldButton",
+                                "type": "Button",
                               },
-                              "type": "Button",
                             },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
                     },
-                    "type": "Box",
-                  },
+                    null,
+                  ],
                   "direction": "vertical",
                 },
                 "type": "Box",

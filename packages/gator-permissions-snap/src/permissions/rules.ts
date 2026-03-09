@@ -84,6 +84,7 @@ export const createExpiryRule = <
         expiry,
       };
     },
+    contentWhenDisabled: () => translate('expiryContentWhenDisabled'),
   };
 };
 
