@@ -54,6 +54,14 @@ describe('erc20TokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
+            {
+              "key": null,
+              "props": {
+                "children": "This permission grants a total of undefined USDC.",
+                "color": "warning",
+              },
+              "type": "Text",
+            },
             [
               {
                 "key": null,
@@ -842,6 +850,14 @@ describe('erc20TokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
+            {
+              "key": null,
+              "props": {
+                "children": "This permission grants a total of undefined USDC.",
+                "color": "warning",
+              },
+              "type": "Text",
+            },
             [
               {
                 "key": null,

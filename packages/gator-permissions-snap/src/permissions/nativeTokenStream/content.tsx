@@ -38,11 +38,17 @@ export async function createConfirmationContent({
   context: NativeTokenStreamContext;
   metadata: NativeTokenStreamMetadata;
 }): Promise<SnapElement> {
-  const { amountPerSecond } = metadata;
+  const { amountPerSecond, totalExposure } = metadata;
+
+  const totalExposureNotice =
+    totalExposure === null
+      ? `This permission grants an unlimited amount of ${context.tokenMetadata.symbol}.`
+      : `This permission grants a total of ${totalExposure} ${context.tokenMetadata.symbol}.`;
 
   return (
     <Box>
       <Section>
+        <Text color="warning">{totalExposureNotice}</Text>
         {renderRules({
           rules: [initialAmountRule, maxAmountRule],
           context,
@@ -80,7 +86,10 @@ export async function createConfirmationContent({
             <Input
               name="stream-rate"
               type="text"
-              value={t('streamRateValue', [amountPerSecond, 'ETH'])}
+              value={t('streamRateValue', [
+                amountPerSecond,
+                context.tokenMetadata.symbol,
+              ])}
               disabled={true}
             />
           </Field>

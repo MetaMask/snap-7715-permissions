@@ -76,6 +76,12 @@
     "streamPeriodTooltip": {
       "message": "The period of the stream."
     },
+    "totalExposureUnlimited": {
+      "message": "This permission grants an unlimited amount of $1."
+    },
+    "totalExposure": {
+      "message": "This permission grants a total of $1 $2."
+    },
     "amountLabel": {
       "message": "Amount"
     },

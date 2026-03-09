@@ -286,6 +286,7 @@ describe('erc20TokenStream:context', () => {
 
       expect(metadata).toStrictEqual({
         amountPerSecond: '0.5',
+        totalExposure: '10',
         validationErrors: {},
       });
     });

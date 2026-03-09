@@ -51,6 +51,14 @@ describe('nativeTokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
+            {
+              "key": null,
+              "props": {
+                "children": "This permission grants a total of undefined ETH.",
+                "color": "warning",
+              },
+              "type": "Text",
+            },
             [
               {
                 "key": null,
@@ -806,6 +814,14 @@ describe('nativeTokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
+            {
+              "key": null,
+              "props": {
+                "children": "This permission grants a total of undefined ETH.",
+                "color": "warning",
+              },
+              "type": "Text",
+            },
             [
               {
                 "key": null,
@@ -1560,6 +1576,14 @@ describe('nativeTokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
+            {
+              "key": null,
+              "props": {
+                "children": "This permission grants a total of undefined ETH.",
+                "color": "warning",
+              },
+              "type": "Text",
+            },
             [
               {
                 "key": null,
@@ -2184,6 +2208,14 @@ describe('nativeTokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
+            {
+              "key": null,
+              "props": {
+                "children": "This permission grants a total of undefined ETH.",
+                "color": "warning",
+              },
+              "type": "Text",
+            },
             [
               {
                 "key": null,
@@ -2873,6 +2905,14 @@ describe('nativeTokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
+            {
+              "key": null,
+              "props": {
+                "children": "This permission grants a total of undefined ETH.",
+                "color": "warning",
+              },
+              "type": "Text",
+            },
             [
               {
                 "key": null,

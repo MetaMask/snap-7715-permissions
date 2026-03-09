@@ -38,11 +38,17 @@ export async function createConfirmationContent({
   context: Erc20TokenStreamContext;
   metadata: Erc20TokenStreamMetadata;
 }): Promise<SnapElement> {
-  const { amountPerSecond } = metadata;
+  const { amountPerSecond, totalExposure } = metadata;
+
+  const totalExposureNotice =
+    totalExposure === null
+      ? t('totalExposureUnlimited', [context.tokenMetadata.symbol])
+      : t('totalExposure', [totalExposure, context.tokenMetadata.symbol]);
 
   return (
     <Box>
       <Section>
+        <Text color="warning">{totalExposureNotice}</Text>
         {renderRules({
           rules: [initialAmountRule, maxAmountRule],
           context,
