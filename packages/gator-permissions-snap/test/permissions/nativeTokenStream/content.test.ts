@@ -3648,7 +3648,6 @@ describe('nativeTokenStream:content', () => {
 `);
     });
 
-    
     it('should render content with unlimited total exposure', async () => {
       const content = await createConfirmationContent({
         context: mockContext,

@@ -2415,7 +2415,6 @@ describe('erc20TokenStream:content', () => {
 `);
     });
 
-    
     it('should handle disabled fields when adjustment is not allowed', async () => {
       const contentWithoutAdjustment = await createConfirmationContent({
         context: {
@@ -3783,7 +3782,6 @@ describe('erc20TokenStream:content', () => {
 }
 `);
     });
-
 
     it('should render content with unlimited total exposure', async () => {
       const content = await createConfirmationContent({
