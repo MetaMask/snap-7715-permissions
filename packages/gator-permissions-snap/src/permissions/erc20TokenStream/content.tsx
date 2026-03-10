@@ -1,10 +1,5 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Divider,
-  Section,
-  Text,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Divider, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import {
   initialAmountRule,

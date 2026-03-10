@@ -69,9 +69,14 @@ export function deriveExposureForStreamingPermission(
     const amountPerSecondBigInt =
       amountPerPeriod / TIME_PERIOD_TO_SECONDS[timePeriod];
 
-    exposureAtExpiry =
-      (initialAmount ?? 0n) +
-      BigInt(expiryTimestamp - startTime) * amountPerSecondBigInt;
+    const elapsed = expiryTimestamp - startTime;
+
+    if (elapsed > 0) {
+      exposureAtExpiry =
+        (initialAmount ?? 0n) + BigInt(elapsed) * amountPerSecondBigInt;
+    } else {
+      exposureAtExpiry = initialAmount ?? 0n;
+    }
   }
 
   let totalExposure: bigint | null = null;

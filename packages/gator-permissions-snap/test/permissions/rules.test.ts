@@ -342,6 +342,37 @@ describe('deriveExposureForStreamingPermission', () => {
     expect(result).toBe('86400');
   });
 
+  it('returns initialAmount when startTime is greater than expiryTimestamp (initialAmount set)', () => {
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const initialAmount = 5n * oneTokenWei;
+    const amountPerDay = 86400n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 1000,
+      expiryTimestamp: 100,
+      maxAmount: null,
+      decimals,
+    });
+    expect(result).toBe('5');
+  });
+
+  it('returns zero when startTime is greater than expiryTimestamp (initialAmount null)', () => {
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const amountPerDay = 86400n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: null,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 1000,
+      expiryTimestamp: 100,
+      maxAmount: null,
+      decimals,
+    });
+    expect(result).toBe('0');
+  });
+
   it('formats total exposure with given decimals', () => {
     const value = 12345n * 10n ** BigInt(decimals);
     const result = deriveExposureForStreamingPermission({
