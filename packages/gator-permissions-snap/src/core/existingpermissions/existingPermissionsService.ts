@@ -54,54 +54,14 @@ export class ExistingPermissionsService {
       (permission) => permission.revocationMetadata === undefined,
     );
 
-    console.log('yyyyy permissions after revocation filter', {
-      matching,
-      permissionRequest,
-      allPermissions,
-    });
-
     matching = matching.filter(
       (permission) => permission.siteOrigin === siteOrigin,
     );
-
-    console.log('yyyyy permissions after site origin filter', {
-      matching,
-      permissionRequest,
-      allPermissions,
-    });
 
     matching = matching.filter(
       (permission) =>
         permission.permissionResponse.chainId === permissionRequest.chainId,
     );
-
-    console.log('yyyyy permissions after chain ID filter', {
-      matching,
-      permissionRequest,
-      allPermissions,
-    });
-
-    // if (permissionRequest.to) {
-    //   matching = matching.filter(
-    //     (permission) =>
-    //       permission.permissionResponse.to === permissionRequest.to,
-    //   );
-    // }
-
-    // const matching = allPermissions.find(
-    //   (permission) =>
-    //     permission.revocationMetadata === undefined &&
-    //     permission.siteOrigin === siteOrigin &&
-    //     permission.permissionResponse.chainId === permissionRequest.chainId &&
-    //     (!permissionRequest.to ||
-    //       permission.permissionResponse.to === permissionRequest.to),
-    // );
-
-    console.log('yyyyy found matching permission', {
-      matching,
-      permissionRequest,
-      allPermissions,
-    });
 
     return matching;
   }

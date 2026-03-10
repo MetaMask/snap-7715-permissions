@@ -7,7 +7,6 @@ import {
   Heading,
   Text,
   AccountSelector,
-  Divider,
 } from '@metamask/snaps-sdk/jsx';
 import { toCaipAccountId } from '@metamask/utils';
 

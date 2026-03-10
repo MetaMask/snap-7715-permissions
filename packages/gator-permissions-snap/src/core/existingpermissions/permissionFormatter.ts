@@ -7,6 +7,22 @@ import { shortenAddress } from '../../utils/string';
 import { nameAndExplorerUrlByChainId } from '../chainMetadata';
 
 /**
+ * Safely converts a value to string, handling various types.
+ *
+ * @param value - The value to convert.
+ * @returns The string representation of the value.
+ */
+function safeToString(value: unknown): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number' || typeof value === 'bigint') {
+    return String(value);
+  }
+  return String(value);
+}
+
+/**
  * Represents formatted permission details as an object.
  */
 export type PermissionDetail = {
@@ -50,12 +66,12 @@ export function formatPermissionDetails(
     if ('interval' in permissionData && 'maxAmount' in permissionData) {
       const { maxAmount, interval } = permissionData;
 
-      if (maxAmount !== undefined) {
-        details[t('maxAmountLabel')] = String(maxAmount);
+      if (maxAmount !== undefined && maxAmount !== null) {
+        details[t('maxAmountLabel')] = safeToString(maxAmount);
       }
 
-      if (interval !== undefined) {
-        details[t('intervalLabel')] = String(interval);
+      if (interval !== undefined && interval !== null) {
+        details[t('intervalLabel')] = safeToString(interval);
       }
     }
 
@@ -63,11 +79,11 @@ export function formatPermissionDetails(
     if ('maxAmount' in permissionData && 'startTime' in permissionData) {
       const { maxAmount, startTime } = permissionData;
 
-      if (maxAmount !== undefined) {
-        details[t('maxAmountLabel')] = String(maxAmount);
+      if (maxAmount !== undefined && maxAmount !== null) {
+        details[t('maxAmountLabel')] = safeToString(maxAmount);
       }
 
-      if (startTime !== undefined) {
+      if (startTime !== undefined && startTime !== null) {
         details[t('startTimeLabel')] = formatTimestamp(Number(startTime));
       }
     }
