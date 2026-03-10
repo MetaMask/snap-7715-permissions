@@ -36,7 +36,7 @@ export async function createConfirmationContent({
 
   const totalExposureValue =
     totalExposure === null
-      ? t('totalExposureUnlimited', [context.tokenMetadata.symbol])
+      ? t('totalExposureUnlimited')
       : `${totalExposure} ${context.tokenMetadata.symbol}`;
 
   const streamRateValue = t('streamRateValue', [
