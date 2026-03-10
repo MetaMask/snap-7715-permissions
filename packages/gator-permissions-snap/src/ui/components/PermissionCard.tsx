@@ -24,12 +24,12 @@ export const PermissionCard = ({
 }: PermissionCardProps): JSX.Element => {
   return (
     <Box key={`permission-${index}`} direction="vertical">
+      {index > 0 && <Divider />}
       {Object.entries(detail).map(([label, value]) => (
         <Text key={`${index}-${label}`}>
           {label}: {value}
         </Text>
       ))}
-      {index < 0 && <Divider />}
     </Box>
   );
 };

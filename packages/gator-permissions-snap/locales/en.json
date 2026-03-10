@@ -245,13 +245,10 @@
       "message": "Potentially malicious address"
     },
     "existingPermissionsTitle": {
-      "message": "Existing permission"
+      "message": "Existing permissions"
     },
     "existingPermissionsDescription": {
-      "message": "You already have a permission of this type from this site. Here is what you have previously granted:"
-    },
-    "existingPermissionsSectionTitle": {
-      "message": "Current permission details"
+      "message": "You already have permissions from this site. Here is what you have previously granted:"
     },
     "existingPermissionsConfirmButton": {
       "message": "Proceed"

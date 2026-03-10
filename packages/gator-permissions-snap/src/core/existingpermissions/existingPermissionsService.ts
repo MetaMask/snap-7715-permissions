@@ -130,8 +130,7 @@ export class ExistingPermissionsService {
    * Shows the existing permissions dialog and waits for user acknowledgement.
    * @param options - The options object.
    * @param options.dialogInterface - The dialog interface to use for displaying content.
-   * @param options.existingPermission - The existing permission to display.
-   * @param options.existingPermissions
+   * @param options.existingPermissions - The existing permissions to display.
    * @returns Object with wasCancelled flag indicating if user dismissed the dialog.
    */
   async showExistingPermissions({

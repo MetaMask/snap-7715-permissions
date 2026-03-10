@@ -6,7 +6,10 @@ import {
   Footer,
   Heading,
   Text,
+  AccountSelector,
+  Divider,
 } from '@metamask/snaps-sdk/jsx';
+import { toCaipAccountId } from '@metamask/utils';
 
 import { formatPermissionDetails } from './permissionFormatter';
 import type { ExistingPermissionDisplayConfig } from './types';
@@ -17,6 +20,7 @@ import { t } from '../../utils/i18n';
 export const EXISTING_PERMISSIONS_CONFIRM_BUTTON =
   'existing-permissions-confirm';
 
+export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 /**
  * Builds the existing permissions display content.
  * Shows a comparison between an existing permission and what the user is about to grant.
@@ -31,6 +35,16 @@ export function buildExistingPermissionsContent(
 
   const permissionDetails = existingPermissions.map(formatPermissionDetails);
 
+  // Get chainId and account address from the first permission
+  const chainId = existingPermissions[0]?.chainId;
+  const accountAddress = existingPermissions[0]?.from;
+
+  // Convert to CAIP-10 format using the eip155 chain namespace
+  const accountAddressCaip10 =
+    chainId && accountAddress
+      ? toCaipAccountId('eip155', chainId, accountAddress)
+      : undefined;
+
   return (
     <Container>
       <Box direction="vertical">
@@ -41,8 +55,22 @@ export function buildExistingPermissionsContent(
 
         <Section>
           <Box direction="vertical">
-            <Heading size="md">{t('existingPermissionsSectionTitle')}</Heading>
+            <Box direction="horizontal" alignment="space-between">
+              <Box direction="horizontal">
+                <Text>{t('accountLabel')}</Text>
+              </Box>
+            </Box>
+            <AccountSelector
+              name={ACCOUNT_SELECTOR_NAME}
+              chainIds={chainId ? [`eip155:${chainId}`] : []}
+              switchGlobalAccount={false}
+              value={accountAddressCaip10}
+            />
+          </Box>
+        </Section>
 
+        <Section>
+          <Box direction="vertical">
             {permissionDetails.map((detail, index) => (
               <PermissionCard
                 key={`permission-${index}`}
