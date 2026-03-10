@@ -6,11 +6,12 @@ import {
   Footer,
   Heading,
   Text,
-  AccountSelector,
+  Address,
+  Divider,
 } from '@metamask/snaps-sdk/jsx';
-import { toCaipAccountId } from '@metamask/utils';
+import { CaipAccountId } from '@metamask/utils';
 
-import { formatPermissionDetails } from './permissionFormatter';
+import { groupPermissionsByFromAddress } from './permissionFormatter';
 import type { ExistingPermissionDisplayConfig } from './types';
 import { PermissionCard } from '../../ui/components/PermissionCard';
 import { t } from '../../utils/i18n';
@@ -19,7 +20,9 @@ import { t } from '../../utils/i18n';
 export const EXISTING_PERMISSIONS_CONFIRM_BUTTON =
   'existing-permissions-confirm';
 
-export const ACCOUNT_SELECTOR_NAME = 'account-selector';
+// Maximum number of permissions to display per account
+const MAX_PERMISSIONS_PER_ACCOUNT = 5;
+
 /**
  * Builds the existing permissions display content.
  * Shows a comparison between an existing permission and what the user is about to grant.
@@ -32,17 +35,7 @@ export function buildExistingPermissionsContent(
 ): JSX.Element {
   const { existingPermissions, title, description, buttonLabel } = config;
 
-  const permissionDetails = existingPermissions.map(formatPermissionDetails);
-
-  // Get chainId and account address from the first permission
-  const chainId = existingPermissions[0]?.chainId;
-  const accountAddress = existingPermissions[0]?.from;
-
-  // Convert to CAIP-10 format using the eip155 chain namespace
-  const accountAddressCaip10 =
-    chainId && accountAddress
-      ? toCaipAccountId('eip155', chainId, accountAddress)
-      : undefined;
+  const grouped = groupPermissionsByFromAddress(existingPermissions);
 
   return (
     <Container>
@@ -52,33 +45,49 @@ export function buildExistingPermissionsContent(
           <Text>{t(description)}</Text>
         </Box>
 
-        <Section>
-          <Box direction="vertical">
-            <Box direction="horizontal" alignment="space-between">
-              <Box direction="horizontal">
-                <Text>{t('accountLabel')}</Text>
-              </Box>
-            </Box>
-            <AccountSelector
-              name={ACCOUNT_SELECTOR_NAME}
-              chainIds={chainId ? [`eip155:${chainId}`] : []}
-              switchGlobalAccount={false}
-              value={accountAddressCaip10}
-            />
-          </Box>
-        </Section>
+        {Object.entries(grouped).map(([accountAddress, permissions]) => {
+          const displayedPermissions = permissions.slice(
+            0,
+            MAX_PERMISSIONS_PER_ACCOUNT,
+          );
+          const hasMorePermissions =
+            permissions.length > MAX_PERMISSIONS_PER_ACCOUNT;
+          const moreCount = permissions.length - MAX_PERMISSIONS_PER_ACCOUNT;
 
-        <Section>
-          <Box direction="vertical">
-            {permissionDetails.map((detail, index) => (
-              <PermissionCard
-                key={`permission-${index}`}
-                detail={detail}
-                index={index}
-              />
-            ))}
-          </Box>
-        </Section>
+          return (
+            <Section key={`account-${accountAddress}`}>
+              <Box direction="vertical">
+                <Box direction="horizontal" alignment="space-between">
+                  <Text fontWeight="bold">{t('accountLabel')}</Text>
+                  <Address
+                    address={accountAddress as CaipAccountId}
+                    displayName={true}
+                  />
+                </Box>
+                <Divider />
+                {displayedPermissions.map((detail, index) => (
+                  <PermissionCard
+                    key={`permission-${index}`}
+                    detail={detail}
+                    index={index}
+                  />
+                ))}
+                {hasMorePermissions && (
+                  <Box direction="vertical">
+                    <Divider />
+                    <Text>
+                      {t('morePermissionsCount', [
+                        String(moreCount),
+                        moreCount > 1 ? 's' : '',
+                      ])}
+                      <Text fontWeight="bold">{t('dappConnectionsLink')}</Text>
+                    </Text>
+                  </Box>
+                )}
+              </Box>
+            </Section>
+          );
+        })}
       </Box>
       <Footer>
         <Button name={EXISTING_PERMISSIONS_CONFIRM_BUTTON}>

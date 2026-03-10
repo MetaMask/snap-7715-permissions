@@ -264,6 +264,12 @@
     },
     "intervalLabel": {
       "message": "Interval"
+    },
+    "morePermissionsCount": {
+      "message": "This account has $1 more permission$2. View and manage all permissions in the "
+    },
+    "dappConnectionsLink": {
+      "message": "Dapp Connections"
     }
   }
 }

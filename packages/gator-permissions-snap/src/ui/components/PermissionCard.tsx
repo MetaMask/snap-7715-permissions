@@ -26,9 +26,14 @@ export const PermissionCard = ({
     <Box key={`permission-${index}`} direction="vertical">
       {index > 0 && <Divider />}
       {Object.entries(detail).map(([label, value]) => (
-        <Text key={`${index}-${label}`}>
-          {label}: {value}
-        </Text>
+        <Box
+          direction="horizontal"
+          alignment="space-between"
+          key={`${index}-${label}`}
+        >
+          <Text>{label}:</Text>
+          <Text> {value}</Text>
+        </Box>
       ))}
     </Box>
   );

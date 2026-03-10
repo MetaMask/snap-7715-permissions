@@ -1,6 +1,6 @@
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
-import { hexToNumber } from '@metamask/utils';
+import { CaipAccountId, hexToNumber, toCaipAccountId } from '@metamask/utils';
 
 import { t } from '../../utils/i18n';
 import { shortenAddress } from '../../utils/string';
@@ -105,4 +105,36 @@ function formatTimestamp(timestamp: number): string {
   } catch {
     return String(timestamp);
   }
+}
+
+/**
+ * Converts existingPermissions array to an object keyed by CAIP-10 from address.
+ *
+ * @param permissions - The permission responses to convert.
+ * @returns Object with CAIP-10 addresses as keys and arrays of permission details as values.
+ */
+export function groupPermissionsByFromAddress(
+  permissions: PermissionResponse[],
+): Record<CaipAccountId, PermissionDetail[]> {
+  const result: Record<CaipAccountId, PermissionDetail[]> = {};
+
+  for (const permission of permissions) {
+    const { from, chainId } = permission;
+
+    // Skip permissions without required fields
+    if (!from || !chainId) {
+      continue;
+    }
+
+    // Convert to CAIP-10 format
+    const caip10Address = toCaipAccountId('eip155', chainId, from);
+
+    // Initialize array if key doesn't exist
+    result[caip10Address] ??= [];
+
+    // Add formatted permission details
+    result[caip10Address].push(formatPermissionDetails(permission));
+  }
+
+  return result;
 }
