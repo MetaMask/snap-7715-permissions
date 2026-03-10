@@ -31,6 +31,7 @@ import { TrustSignalsClient } from './clients/trustSignalsClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
+import { ExistingPermissionsService } from './core/existingpermissions';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
@@ -188,6 +189,11 @@ const permissionIntroductionService = new PermissionIntroductionService({
   userEventDispatcher,
 });
 
+const existingPermissionsService = new ExistingPermissionsService({
+  profileSyncManager,
+  userEventDispatcher,
+});
+
 const dialogInterfaceFactory = new DialogInterfaceFactory({
   snap,
 });
@@ -198,6 +204,7 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   nonceCaveatService,
   snapsMetricsService,
   permissionIntroductionService,
+  existingPermissionsService,
   dialogInterfaceFactory,
   trustSignalsClient,
 });

@@ -27,6 +27,7 @@ import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
+import type { ExistingPermissionsService } from './existingpermissions';
 import type { PermissionIntroductionService } from './permissionIntroduction';
 import type {
   BaseContext,
@@ -58,6 +59,8 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #permissionIntroductionService: PermissionIntroductionService;
 
+  readonly #existingPermissionsService: ExistingPermissionsService;
+
   readonly #dialogInterfaceFactory: DialogInterfaceFactory;
 
   readonly #trustSignalsClient: TrustSignalsClient;
@@ -68,6 +71,7 @@ export class PermissionRequestLifecycleOrchestrator {
     nonceCaveatService,
     snapsMetricsService,
     permissionIntroductionService,
+    existingPermissionsService,
     dialogInterfaceFactory,
     trustSignalsClient,
   }: {
@@ -76,6 +80,7 @@ export class PermissionRequestLifecycleOrchestrator {
     nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
     permissionIntroductionService: PermissionIntroductionService;
+    existingPermissionsService: ExistingPermissionsService;
     dialogInterfaceFactory: DialogInterfaceFactory;
     trustSignalsClient: TrustSignalsClient;
   }) {
@@ -84,6 +89,7 @@ export class PermissionRequestLifecycleOrchestrator {
     this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
     this.#permissionIntroductionService = permissionIntroductionService;
+    this.#existingPermissionsService = existingPermissionsService;
     this.#dialogInterfaceFactory = dialogInterfaceFactory;
     this.#trustSignalsClient = trustSignalsClient;
   }
@@ -181,6 +187,36 @@ export class PermissionRequestLifecycleOrchestrator {
       await this.#permissionIntroductionService.markIntroductionAsSeen(
         permissionType,
       );
+    }
+
+    // Check if user already has an existing permission of this type from this site
+    const existingPermissions =
+      await this.#existingPermissionsService.getExistingPermissions(
+        permissionRequest,
+        origin,
+      );
+
+    if (existingPermissions && existingPermissions.length > 0) {
+      const { wasCancelled } =
+        await this.#existingPermissionsService.showExistingPermissions({
+          dialogInterface,
+          existingPermissions,
+        });
+
+      // If user cancelled the existing permissions dialog, reject the permission request
+      if (wasCancelled) {
+        await this.#snapsMetricsService.trackPermissionRejected({
+          origin,
+          permissionType,
+          chainId: permissionRequest.chainId,
+          permissionData: permissionRequest.permission.data,
+        });
+
+        return {
+          approved: false,
+          reason: 'Permission request denied',
+        };
+      }
     }
 
     // only necessary when not pre-installed, to ensure that the account

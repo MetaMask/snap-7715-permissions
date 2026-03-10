@@ -243,6 +243,30 @@
     },
     "potentiallyMaliciousAddressLabel": {
       "message": "Potentially malicious address"
+    },
+    "existingPermissionsTitle": {
+      "message": "Existing permission"
+    },
+    "existingPermissionsDescription": {
+      "message": "You already have a permission of this type from this site. Here is what you have previously granted:"
+    },
+    "existingPermissionsSectionTitle": {
+      "message": "Current permission details"
+    },
+    "existingPermissionsConfirmButton": {
+      "message": "Proceed"
+    },
+    "permissionTypeLabel": {
+      "message": "Permission type"
+    },
+    "chainLabel": {
+      "message": "Network"
+    },
+    "delegateAddressLabel": {
+      "message": "Recipient"
+    },
+    "intervalLabel": {
+      "message": "Interval"
     }
   }
 }
