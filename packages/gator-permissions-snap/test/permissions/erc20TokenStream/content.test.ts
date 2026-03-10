@@ -722,49 +722,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Stream rate",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens to stream per second.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -773,35 +777,49 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "0.5 USDC/sec",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Image",
+                              "type": "Box",
                             },
                           },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "disabled": true,
-                            "name": "stream-rate",
-                            "type": "text",
-                            "value": "0.5 USDC/sec",
-                          },
-                          "type": "Input",
+                          "type": "Section",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -811,49 +829,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Total exposure",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Total exposure",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The total amount of tokens that can be streamed with this permission.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The total amount of tokens that can be streamed with this permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -861,40 +883,50 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "USDC",
-                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
                                   },
-                                  "type": "Image",
-                                },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "100 USDC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
                               "type": "Box",
                             },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "100 USDC",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Section",
                         },
-                        "type": "Box",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Section",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -1608,49 +1640,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Stream rate",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens to stream per second.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1659,35 +1695,49 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "0.5 USDC/sec",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Image",
+                              "type": "Box",
                             },
                           },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "disabled": true,
-                            "name": "stream-rate",
-                            "type": "text",
-                            "value": "0.5 USDC/sec",
-                          },
-                          "type": "Input",
+                          "type": "Section",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -1697,49 +1747,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Total exposure",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Total exposure",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The total amount of tokens that can be streamed with this permission.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The total amount of tokens that can be streamed with this permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -1747,40 +1801,50 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "USDC",
-                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
                                   },
-                                  "type": "Image",
-                                },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "100 USDC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
                               "type": "Box",
                             },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "100 USDC",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Section",
                         },
-                        "type": "Box",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Section",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -2480,49 +2544,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Stream rate",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens to stream per second.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -2531,35 +2599,49 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "0.5 USDC/sec",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Image",
+                              "type": "Box",
                             },
                           },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "disabled": true,
-                            "name": "stream-rate",
-                            "type": "text",
-                            "value": "0.5 USDC/sec",
-                          },
-                          "type": "Input",
+                          "type": "Section",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -2569,49 +2651,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Total exposure",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Total exposure",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The total amount of tokens that can be streamed with this permission.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The total amount of tokens that can be streamed with this permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -2619,40 +2705,50 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "USDC",
-                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
                                   },
-                                  "type": "Image",
-                                },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "100 USDC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
                               "type": "Box",
                             },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "100 USDC",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Section",
                         },
-                        "type": "Box",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Section",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -3223,49 +3319,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Stream rate",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens to stream per second.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -3274,35 +3374,49 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "0.5 USDC/sec",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Image",
+                              "type": "Box",
                             },
                           },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "disabled": true,
-                            "name": "stream-rate",
-                            "type": "text",
-                            "value": "0.5 USDC/sec",
-                          },
-                          "type": "Input",
+                          "type": "Section",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -3312,49 +3426,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Total exposure",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Total exposure",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The total amount of tokens that can be streamed with this permission.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The total amount of tokens that can be streamed with this permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -3362,40 +3480,50 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "USDC",
-                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
                                   },
-                                  "type": "Image",
-                                },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "100 USDC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
                               "type": "Box",
                             },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "100 USDC",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Section",
                         },
-                        "type": "Box",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Section",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -4024,49 +4152,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Stream rate",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens to stream per second.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -4075,35 +4207,49 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "0.5 USDC/sec",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Image",
+                              "type": "Box",
                             },
                           },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "disabled": true,
-                            "name": "stream-rate",
-                            "type": "text",
-                            "value": "0.5 USDC/sec",
-                          },
-                          "type": "Input",
+                          "type": "Section",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -4113,49 +4259,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Total exposure",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Total exposure",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The total amount of tokens that can be streamed with this permission.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The total amount of tokens that can be streamed with this permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -4163,40 +4313,50 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "USDC",
-                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
                                   },
-                                  "type": "Image",
-                                },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "100 USDC",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
                               "type": "Box",
                             },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "100 USDC",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Section",
                         },
-                        "type": "Box",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Section",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -4899,49 +5059,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Stream rate",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Stream rate",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The amount of tokens to stream per second.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The amount of tokens to stream per second.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -4950,35 +5114,49 @@ describe('erc20TokenStream:content', () => {
                     "key": null,
                     "props": {
                       "children": [
+                        null,
                         {
                           "key": null,
                           "props": {
                             "children": {
                               "key": null,
                               "props": {
-                                "alt": "USDC",
-                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
+                                  },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "0.5 USDC/sec",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
-                              "type": "Image",
+                              "type": "Box",
                             },
                           },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "disabled": true,
-                            "name": "stream-rate",
-                            "type": "text",
-                            "value": "0.5 USDC/sec",
-                          },
-                          "type": "Input",
+                          "type": "Section",
                         },
                       ],
+                      "direction": "horizontal",
                     },
-                    "type": "Field",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
@@ -4988,49 +5166,53 @@ describe('erc20TokenStream:content', () => {
             {
               "key": null,
               "props": {
+                "alignment": "start",
                 "children": [
                   {
                     "key": null,
                     "props": {
                       "alignment": "space-between",
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Total exposure",
-                              },
-                              "type": "Text",
-                            },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "color": "muted",
-                                    "name": "question",
-                                    "size": "inherit",
-                                  },
-                                  "type": "Icon",
+                      "children": [
+                        {
+                          "key": null,
+                          "props": {
+                            "children": [
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": "Total exposure",
                                 },
-                                "content": {
-                                  "key": null,
-                                  "props": {
-                                    "children": "The total amount of tokens that can be streamed with this permission.",
-                                  },
-                                  "type": "Text",
-                                },
+                                "type": "Text",
                               },
-                              "type": "Tooltip",
-                            },
-                          ],
-                          "direction": "horizontal",
+                              {
+                                "key": null,
+                                "props": {
+                                  "children": {
+                                    "key": null,
+                                    "props": {
+                                      "color": "muted",
+                                      "name": "question",
+                                      "size": "inherit",
+                                    },
+                                    "type": "Icon",
+                                  },
+                                  "content": {
+                                    "key": null,
+                                    "props": {
+                                      "children": "The total amount of tokens that can be streamed with this permission.",
+                                    },
+                                    "type": "Text",
+                                  },
+                                },
+                                "type": "Tooltip",
+                              },
+                            ],
+                            "direction": "horizontal",
+                          },
+                          "type": "Box",
                         },
-                        "type": "Box",
-                      },
+                        null,
+                      ],
                       "direction": "horizontal",
                     },
                     "type": "Box",
@@ -5038,40 +5220,50 @@ describe('erc20TokenStream:content', () => {
                   {
                     "key": null,
                     "props": {
-                      "children": {
-                        "key": null,
-                        "props": {
-                          "children": [
-                            {
+                      "children": [
+                        null,
+                        {
+                          "key": null,
+                          "props": {
+                            "children": {
                               "key": null,
                               "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "USDC",
-                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                "children": [
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": {
+                                        "key": null,
+                                        "props": {
+                                          "alt": "USDC",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                        },
+                                        "type": "Image",
+                                      },
+                                    },
+                                    "type": "Box",
                                   },
-                                  "type": "Image",
-                                },
+                                  {
+                                    "key": null,
+                                    "props": {
+                                      "children": "Unlimited",
+                                    },
+                                    "type": "Text",
+                                  },
+                                ],
+                                "direction": "horizontal",
                               },
                               "type": "Box",
                             },
-                            {
-                              "key": null,
-                              "props": {
-                                "children": "Unlimited",
-                              },
-                              "type": "Text",
-                            },
-                          ],
-                          "direction": "horizontal",
+                          },
+                          "type": "Section",
                         },
-                        "type": "Box",
-                      },
+                      ],
+                      "direction": "horizontal",
                     },
-                    "type": "Section",
+                    "type": "Box",
                   },
                 ],
                 "direction": "vertical",
