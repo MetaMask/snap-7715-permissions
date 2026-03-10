@@ -369,11 +369,11 @@ describe('nativeTokenPeriodic:context', () => {
         });
 
         expect(metadata.validationErrors).toStrictEqual({
-          expiryError: 'Expiry must be in the future',
+          expiryError: 'Expiration date must be in the future',
         });
       });
 
-      it('should return a validation error for invalid expiry -1', async () => {
+      it('should return a validation error for Invalid expiration date -1', async () => {
         const contextWithInvalidExpiry = {
           ...context,
           expiry: {
@@ -390,12 +390,12 @@ describe('nativeTokenPeriodic:context', () => {
         });
 
         expect(metadata.validationErrors).toStrictEqual({
-          expiryError: 'Invalid expiry',
+          expiryError: 'Invalid expiration date',
         });
       });
 
       it.each([[12345678], [0x1234], [999999999]])(
-        'should return a validation error for invalid expiry %s',
+        'should return a validation error for Invalid expiration date %s',
         async (expiry) => {
           const contextWithInvalidExpiry = {
             ...context,
@@ -413,7 +413,7 @@ describe('nativeTokenPeriodic:context', () => {
           });
 
           expect(metadata.validationErrors).toStrictEqual({
-            expiryError: 'Expiry must be in the future',
+            expiryError: 'Expiration date must be in the future',
           });
         },
       );

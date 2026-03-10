@@ -58,7 +58,7 @@ describe('erc20TokenRevocation:content', () => {
                             {
                               "key": null,
                               "props": {
-                                "children": "Expiry (UTC)",
+                                "children": "Expiration date (UTC)",
                               },
                               "type": "Text",
                             },
@@ -77,7 +77,7 @@ describe('erc20TokenRevocation:content', () => {
                                 "content": {
                                   "key": null,
                                   "props": {
-                                    "children": "The expiry date of the permission",
+                                    "children": "The expiration date of the permission",
                                   },
                                   "type": "Text",
                                 },
@@ -98,7 +98,7 @@ describe('erc20TokenRevocation:content', () => {
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "alt": "Remove Expiry (UTC)",
+                                  "alt": "Remove Expiration date (UTC)",
                                   "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>

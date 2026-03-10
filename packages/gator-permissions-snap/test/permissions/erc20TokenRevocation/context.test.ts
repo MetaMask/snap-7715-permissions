@@ -151,7 +151,7 @@ describe('erc20TokenRevocation:context', () => {
 
       const metadata = await deriveMetadata({ context });
       expect(metadata.validationErrors).toStrictEqual({
-        expiryError: 'Expiry must be in the future',
+        expiryError: 'Expiration date must be in the future',
       });
     });
   });

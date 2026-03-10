@@ -55,14 +55,6 @@ describe('erc20TokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
-            {
-              "key": null,
-              "props": {
-                "children": "This permission grants a total of 100 USDC.",
-                "color": "warning",
-              },
-              "type": "Text",
-            },
             [
               {
                 "key": null,
@@ -80,7 +72,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Initial Amount",
+                                    "children": "Initial amount",
                                   },
                                   "type": "Text",
                                 },
@@ -120,7 +112,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Initial Amount",
+                                      "alt": "Remove Initial amount",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -205,7 +197,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Max Amount",
+                                    "children": "Max amount",
                                   },
                                   "type": "Text",
                                 },
@@ -245,7 +237,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Max Amount",
+                                      "alt": "Remove Max amount",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -337,7 +329,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time (UTC)",
+                                    "children": "Start time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -411,7 +403,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry (UTC)",
+                                    "children": "Expiration date (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -430,7 +422,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission",
+                                        "children": "The expiration date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -451,7 +443,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry (UTC)",
+                                      "alt": "Remove Expiration date (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -522,7 +514,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Amount",
+                                    "children": "Stream amount",
                                   },
                                   "type": "Text",
                                 },
@@ -620,7 +612,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Period",
+                                    "children": "Stream period",
                                   },
                                   "type": "Text",
                                 },
@@ -816,6 +808,99 @@ describe('erc20TokenStream:content', () => {
               },
               "type": "Box",
             },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Total exposure",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The total amount of tokens that can be streamed with this permission.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alt": "USDC",
+                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                  },
+                                  "type": "Image",
+                                },
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "100 USDC",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    },
+                    "type": "Section",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Section",
@@ -837,7 +922,7 @@ describe('erc20TokenStream:content', () => {
             maxAmountError: 'Invalid max amount',
             amountPerPeriodError: 'Invalid amount per period',
             startTimeError: 'Invalid start time',
-            expiryError: 'Invalid expiry',
+            expiryError: 'Invalid expiration date',
           },
         },
       });
@@ -851,14 +936,6 @@ describe('erc20TokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
-            {
-              "key": null,
-              "props": {
-                "children": "This permission grants a total of 100 USDC.",
-                "color": "warning",
-              },
-              "type": "Text",
-            },
             [
               {
                 "key": null,
@@ -876,7 +953,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Initial Amount",
+                                    "children": "Initial amount",
                                   },
                                   "type": "Text",
                                 },
@@ -916,7 +993,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Initial Amount",
+                                      "alt": "Remove Initial amount",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1002,7 +1079,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Max Amount",
+                                    "children": "Max amount",
                                   },
                                   "type": "Text",
                                 },
@@ -1042,7 +1119,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Max Amount",
+                                      "alt": "Remove Max amount",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1135,7 +1212,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time (UTC)",
+                                    "children": "Start time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -1210,7 +1287,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry (UTC)",
+                                    "children": "Expiration date (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -1229,7 +1306,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission",
+                                        "children": "The expiration date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -1250,7 +1327,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry (UTC)",
+                                      "alt": "Remove Expiration date (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1287,7 +1364,7 @@ describe('erc20TokenStream:content', () => {
                           },
                           "type": "DateTimePicker",
                         },
-                        "error": "Invalid expiry",
+                        "error": "Invalid expiration date",
                       },
                       "type": "Field",
                     },
@@ -1322,7 +1399,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Amount",
+                                    "children": "Stream amount",
                                   },
                                   "type": "Text",
                                 },
@@ -1421,7 +1498,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Period",
+                                    "children": "Stream period",
                                   },
                                   "type": "Text",
                                 },
@@ -1617,6 +1694,99 @@ describe('erc20TokenStream:content', () => {
               },
               "type": "Box",
             },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Total exposure",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The total amount of tokens that can be streamed with this permission.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alt": "USDC",
+                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                  },
+                                  "type": "Image",
+                                },
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "100 USDC",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    },
+                    "type": "Section",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Section",
@@ -1643,14 +1813,6 @@ describe('erc20TokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
-            {
-              "key": null,
-              "props": {
-                "children": "This permission grants a total of 100 USDC.",
-                "color": "warning",
-              },
-              "type": "Text",
-            },
             [
               {
                 "key": null,
@@ -1668,7 +1830,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Initial Amount",
+                                    "children": "Initial amount",
                                   },
                                   "type": "Text",
                                 },
@@ -1708,7 +1870,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Initial Amount",
+                                      "alt": "Remove Initial amount",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1793,7 +1955,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Max Amount",
+                                    "children": "Max amount",
                                   },
                                   "type": "Text",
                                 },
@@ -1833,7 +1995,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Max Amount",
+                                      "alt": "Remove Max amount",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1925,7 +2087,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -1968,10 +2130,10 @@ describe('erc20TokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "erc20-token-stream-start-time",
                             "type": "datetime",
-                            "value": "1985-10-26T08:00:00.000Z",
+                            "value": "1985-10-26T08:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -1999,7 +2161,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiration date (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -2018,7 +2180,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission",
+                                        "children": "The expiration date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -2039,7 +2201,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiration date (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -2072,7 +2234,7 @@ describe('erc20TokenStream:content', () => {
                             "disablePast": true,
                             "name": "erc20-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -2110,7 +2272,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Amount",
+                                    "children": "Stream amount",
                                   },
                                   "type": "Text",
                                 },
@@ -2208,7 +2370,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Period",
+                                    "children": "Stream period",
                                   },
                                   "type": "Text",
                                 },
@@ -2404,6 +2566,99 @@ describe('erc20TokenStream:content', () => {
               },
               "type": "Box",
             },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Total exposure",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The total amount of tokens that can be streamed with this permission.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alt": "USDC",
+                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                  },
+                                  "type": "Image",
+                                },
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "100 USDC",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    },
+                    "type": "Section",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Section",
@@ -2433,14 +2688,6 @@ describe('erc20TokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
-            {
-              "key": null,
-              "props": {
-                "children": "This permission grants a total of 100 USDC.",
-                "color": "warning",
-              },
-              "type": "Text",
-            },
             [
               {
                 "key": null,
@@ -2459,7 +2706,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Initial Amount",
+                                    "children": "Initial amount",
                                   },
                                   "type": "Text",
                                 },
@@ -2545,7 +2792,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Max Amount",
+                                    "children": "Max amount",
                                   },
                                   "type": "Text",
                                 },
@@ -2638,7 +2885,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -2714,7 +2961,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiration date (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -2733,7 +2980,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission",
+                                        "children": "The expiration date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -2754,7 +3001,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiration date (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -2787,7 +3034,7 @@ describe('erc20TokenStream:content', () => {
                             "disablePast": true,
                             "name": "erc20-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -2826,7 +3073,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Amount",
+                                    "children": "Stream amount",
                                   },
                                   "type": "Text",
                                 },
@@ -2912,7 +3159,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Period",
+                                    "children": "Stream period",
                                   },
                                   "type": "Text",
                                 },
@@ -3062,6 +3309,99 @@ describe('erc20TokenStream:content', () => {
               },
               "type": "Box",
             },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Total exposure",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The total amount of tokens that can be streamed with this permission.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alt": "USDC",
+                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                  },
+                                  "type": "Image",
+                                },
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "100 USDC",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    },
+                    "type": "Section",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Section",
@@ -3095,72 +3435,65 @@ describe('erc20TokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
-            {
-              "key": null,
-              "props": {
-                "children": "This permission grants a total of 100 USDC.",
-                "color": "warning",
-              },
-              "type": "Text",
-            },
             [
               {
                 "key": null,
                 "props": {
-                  "children": {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Initial Amount",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Initial amount",
+                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Text",
-                              },
-                              {
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The initial amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
                                 "key": null,
                                 "props": {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The initial amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Add Initial Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+                                      "alt": "Add Initial amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
 
@@ -3168,21 +3501,23 @@ describe('erc20TokenStream:content', () => {
   <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
 </svg>
 ",
+                                    },
+                                    "type": "Image",
                                   },
-                                  "type": "Image",
+                                  "name": "erc20-token-stream-initial-amount_addFieldButton",
                                 },
-                                "name": "erc20-token-stream-initial-amount_addFieldButton",
+                                "type": "Button",
                               },
-                              "type": "Button",
                             },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
                     },
-                    "type": "Box",
-                  },
+                    null,
+                  ],
                   "direction": "vertical",
                 },
                 "type": "Box",
@@ -3190,60 +3525,61 @@ describe('erc20TokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "children": {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Max Amount",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Max amount",
+                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Text",
-                              },
-                              {
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The maximum amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
                                 "key": null,
                                 "props": {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The maximum amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Add Max Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+                                      "alt": "Add Max amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
 
@@ -3251,21 +3587,23 @@ describe('erc20TokenStream:content', () => {
   <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
 </svg>
 ",
+                                    },
+                                    "type": "Image",
                                   },
-                                  "type": "Image",
+                                  "name": "erc20-token-stream-max-amount_addFieldButton",
                                 },
-                                "name": "erc20-token-stream-max-amount_addFieldButton",
+                                "type": "Button",
                               },
-                              "type": "Button",
                             },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
                     },
-                    "type": "Box",
-                  },
+                    null,
+                  ],
                   "direction": "vertical",
                 },
                 "type": "Box",
@@ -3293,7 +3631,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -3336,10 +3674,10 @@ describe('erc20TokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "erc20-token-stream-start-time",
                             "type": "datetime",
-                            "value": "1985-10-26T08:00:00.000Z",
+                            "value": "1985-10-26T08:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -3367,7 +3705,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiration date (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -3386,7 +3724,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission",
+                                        "children": "The expiration date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -3407,7 +3745,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiration date (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -3440,7 +3778,7 @@ describe('erc20TokenStream:content', () => {
                             "disablePast": true,
                             "name": "erc20-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -3478,7 +3816,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Amount",
+                                    "children": "Stream amount",
                                   },
                                   "type": "Text",
                                 },
@@ -3576,7 +3914,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Period",
+                                    "children": "Stream period",
                                   },
                                   "type": "Text",
                                 },
@@ -3772,6 +4110,99 @@ describe('erc20TokenStream:content', () => {
               },
               "type": "Box",
             },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Total exposure",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The total amount of tokens that can be streamed with this permission.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alt": "USDC",
+                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                  },
+                                  "type": "Image",
+                                },
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "100 USDC",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    },
+                    "type": "Section",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
           ],
         },
         "type": "Section",
@@ -3801,14 +4232,6 @@ describe('erc20TokenStream:content', () => {
         "key": null,
         "props": {
           "children": [
-            {
-              "key": null,
-              "props": {
-                "children": "This permission grants an unlimited amount of USDC.",
-                "color": "warning",
-              },
-              "type": "Text",
-            },
             [
               {
                 "key": null,
@@ -3826,7 +4249,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Initial Amount",
+                                    "children": "Initial amount",
                                   },
                                   "type": "Text",
                                 },
@@ -3866,7 +4289,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Initial Amount",
+                                      "alt": "Remove Initial amount",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -3951,7 +4374,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Max Amount",
+                                    "children": "Max amount",
                                   },
                                   "type": "Text",
                                 },
@@ -3991,7 +4414,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Max Amount",
+                                      "alt": "Remove Max amount",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -4083,7 +4506,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -4126,10 +4549,10 @@ describe('erc20TokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "erc20-token-stream-start-time",
                             "type": "datetime",
-                            "value": "1985-10-26T08:00:00.000Z",
+                            "value": "1985-10-26T08:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -4157,7 +4580,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiration date (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -4176,7 +4599,7 @@ describe('erc20TokenStream:content', () => {
                                     "content": {
                                       "key": null,
                                       "props": {
-                                        "children": "The expiry date of the permission",
+                                        "children": "The expiration date of the permission",
                                       },
                                       "type": "Text",
                                     },
@@ -4197,7 +4620,7 @@ describe('erc20TokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiration date (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -4230,7 +4653,7 @@ describe('erc20TokenStream:content', () => {
                             "disablePast": true,
                             "name": "erc20-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -4268,7 +4691,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Amount",
+                                    "children": "Stream amount",
                                   },
                                   "type": "Text",
                                 },
@@ -4366,7 +4789,7 @@ describe('erc20TokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Stream Period",
+                                    "children": "Stream period",
                                   },
                                   "type": "Text",
                                 },
@@ -4556,6 +4979,99 @@ describe('erc20TokenStream:content', () => {
                       ],
                     },
                     "type": "Field",
+                  },
+                ],
+                "direction": "vertical",
+              },
+              "type": "Box",
+            },
+            {
+              "key": null,
+              "props": {
+                "children": [
+                  {
+                    "key": null,
+                    "props": {
+                      "alignment": "space-between",
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Total exposure",
+                              },
+                              "type": "Text",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "color": "muted",
+                                    "name": "question",
+                                    "size": "inherit",
+                                  },
+                                  "type": "Icon",
+                                },
+                                "content": {
+                                  "key": null,
+                                  "props": {
+                                    "children": "The total amount of tokens that can be streamed with this permission.",
+                                  },
+                                  "type": "Text",
+                                },
+                              },
+                              "type": "Tooltip",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                      "direction": "horizontal",
+                    },
+                    "type": "Box",
+                  },
+                  {
+                    "key": null,
+                    "props": {
+                      "children": {
+                        "key": null,
+                        "props": {
+                          "children": [
+                            {
+                              "key": null,
+                              "props": {
+                                "children": {
+                                  "key": null,
+                                  "props": {
+                                    "alt": "USDC",
+                                    "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                  },
+                                  "type": "Image",
+                                },
+                              },
+                              "type": "Box",
+                            },
+                            {
+                              "key": null,
+                              "props": {
+                                "children": "Unlimited",
+                              },
+                              "type": "Text",
+                            },
+                          ],
+                          "direction": "horizontal",
+                        },
+                        "type": "Box",
+                      },
+                    },
+                    "type": "Section",
                   },
                 ],
                 "direction": "vertical",
