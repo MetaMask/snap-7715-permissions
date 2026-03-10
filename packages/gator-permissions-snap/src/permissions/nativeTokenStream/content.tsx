@@ -1,10 +1,5 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Divider,
-  Section,
-  Text,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Divider, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import {
   initialAmountRule,
@@ -19,7 +14,8 @@ import type {
   NativeTokenStreamMetadata,
 } from './types';
 import { renderRules } from '../../core/rules';
-import { TokenIcon, TooltipIcon } from '../../ui/components';
+import { Field } from '../../ui/components';
+import { TokenIcon } from '../../ui/components';
 import { t } from '../../utils/i18n';
 
 /**
@@ -42,6 +38,11 @@ export async function createConfirmationContent({
     totalExposure === null
       ? t('totalExposureUnlimited', [context.tokenMetadata.symbol])
       : `${totalExposure} ${context.tokenMetadata.symbol}`;
+
+  const streamRateValue = t('streamRateValue', [
+    amountPerSecond,
+    context.tokenMetadata.symbol,
+  ]);
 
   return (
     <Box>
@@ -66,13 +67,12 @@ export async function createConfirmationContent({
           metadata,
         })}
 
-        <Box direction="vertical">
-          <Box direction="horizontal" alignment="space-between">
-            <Box direction="horizontal">
-              <Text>{t('streamRateLabel')}</Text>
-              <TooltipIcon tooltip={t('streamRateTooltip')} />
-            </Box>
-          </Box>
+        <Field
+          label={t('streamRateLabel')}
+          tooltip={t('streamRateTooltip')}
+          variant="display"
+          direction="vertical"
+        >
           <Section>
             <Box direction="horizontal">
               <Box>
@@ -81,25 +81,17 @@ export async function createConfirmationContent({
                   altText={context.tokenMetadata.symbol}
                 />
               </Box>
-              <Text>
-                {t('streamRateValue', [
-                  amountPerSecond,
-                  context.tokenMetadata.symbol,
-                ])}
-              </Text>
+              <Text>{streamRateValue}</Text>
             </Box>
           </Section>
-        </Box>
+        </Field>
 
-        <Box direction="vertical">
-          <Box direction="horizontal" alignment="space-between">
-            <Box direction="horizontal">
-              <Text>{t('totalExposureLabel')}</Text>
-              <TooltipIcon
-                tooltip={t('totalExposureTooltip')}
-              />
-            </Box>
-          </Box>
+        <Field
+          label={t('totalExposureLabel')}
+          tooltip={t('totalExposureTooltip')}
+          variant="display"
+          direction="vertical"
+        >
           <Section>
             <Box direction="horizontal">
               <Box>
@@ -111,7 +103,7 @@ export async function createConfirmationContent({
               <Text>{totalExposureValue}</Text>
             </Box>
           </Section>
-        </Box>
+        </Field>
       </Section>
     </Box>
   );

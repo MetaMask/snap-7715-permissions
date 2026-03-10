@@ -98,9 +98,7 @@ export async function createConfirmationContent({
           <Box direction="horizontal" alignment="space-between">
             <Box direction="horizontal">
               <Text>{t('totalExposureLabel')}</Text>
-              <TooltipIcon
-                tooltip={t('totalExposureTooltip')}
-              />
+              <TooltipIcon tooltip={t('totalExposureTooltip')} />
             </Box>
           </Box>
           <Section>
