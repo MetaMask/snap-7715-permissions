@@ -40,15 +40,14 @@ export async function createConfirmationContent({
 }): Promise<SnapElement> {
   const { amountPerSecond, totalExposure } = metadata;
 
-  const totalExposureNotice =
+  const totalExposureValue =
     totalExposure === null
       ? t('totalExposureUnlimited', [context.tokenMetadata.symbol])
-      : t('totalExposure', [totalExposure, context.tokenMetadata.symbol]);
+      : `${totalExposure} ${context.tokenMetadata.symbol}`;
 
   return (
     <Box>
       <Section>
-        <Text color="warning">{totalExposureNotice}</Text>
         {renderRules({
           rules: [initialAmountRule, maxAmountRule],
           context,
@@ -93,6 +92,28 @@ export async function createConfirmationContent({
               disabled={true}
             />
           </Field>
+        </Box>
+
+        <Box direction="vertical">
+          <Box direction="horizontal" alignment="space-between">
+            <Box direction="horizontal">
+              <Text>{t('totalExposureLabel')}</Text>
+              <TooltipIcon
+                tooltip={t('totalExposureTooltip')}
+              />
+            </Box>
+          </Box>
+          <Section>
+            <Box direction="horizontal">
+              <Box>
+                <TokenIcon
+                  imageDataBase64={context.tokenMetadata.iconDataBase64}
+                  altText={context.tokenMetadata.symbol}
+                />
+              </Box>
+              <Text>{totalExposureValue}</Text>
+            </Box>
+          </Section>
         </Box>
       </Section>
     </Box>

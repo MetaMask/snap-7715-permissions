@@ -2,8 +2,6 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
   Divider,
-  Field,
-  Input,
   Section,
   Text,
 } from '@metamask/snaps-sdk/jsx';
@@ -40,15 +38,14 @@ export async function createConfirmationContent({
 }): Promise<SnapElement> {
   const { amountPerSecond, totalExposure } = metadata;
 
-  const totalExposureNotice =
+  const totalExposureValue =
     totalExposure === null
       ? t('totalExposureUnlimited', [context.tokenMetadata.symbol])
-      : t('totalExposure', [totalExposure, context.tokenMetadata.symbol]);
+      : `${totalExposure} ${context.tokenMetadata.symbol}`;
 
   return (
     <Box>
       <Section>
-        <Text color="warning">{totalExposureNotice}</Text>
         {renderRules({
           rules: [initialAmountRule, maxAmountRule],
           context,
@@ -76,23 +73,44 @@ export async function createConfirmationContent({
               <TooltipIcon tooltip={t('streamRateTooltip')} />
             </Box>
           </Box>
-          <Field>
-            <Box>
-              <TokenIcon
-                imageDataBase64={context.tokenMetadata.iconDataBase64}
-                altText={context.tokenMetadata.symbol}
+          <Section>
+            <Box direction="horizontal">
+              <Box>
+                <TokenIcon
+                  imageDataBase64={context.tokenMetadata.iconDataBase64}
+                  altText={context.tokenMetadata.symbol}
+                />
+              </Box>
+              <Text>
+                {t('streamRateValue', [
+                  amountPerSecond,
+                  context.tokenMetadata.symbol,
+                ])}
+              </Text>
+            </Box>
+          </Section>
+        </Box>
+
+        <Box direction="vertical">
+          <Box direction="horizontal" alignment="space-between">
+            <Box direction="horizontal">
+              <Text>{t('totalExposureLabel')}</Text>
+              <TooltipIcon
+                tooltip={t('totalExposureTooltip')}
               />
             </Box>
-            <Input
-              name="stream-rate"
-              type="text"
-              value={t('streamRateValue', [
-                amountPerSecond,
-                context.tokenMetadata.symbol,
-              ])}
-              disabled={true}
-            />
-          </Field>
+          </Box>
+          <Section>
+            <Box direction="horizontal">
+              <Box>
+                <TokenIcon
+                  imageDataBase64={context.tokenMetadata.iconDataBase64}
+                  altText={context.tokenMetadata.symbol}
+                />
+              </Box>
+              <Text>{totalExposureValue}</Text>
+            </Box>
+          </Section>
         </Box>
       </Section>
     </Box>
