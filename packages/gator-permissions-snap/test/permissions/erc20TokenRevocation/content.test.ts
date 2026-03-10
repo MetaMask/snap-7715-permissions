@@ -58,7 +58,7 @@ describe('erc20TokenRevocation:content', () => {
                             {
                               "key": null,
                               "props": {
-                                "children": "Expiry",
+                                "children": "Expiry (UTC)",
                               },
                               "type": "Text",
                             },
@@ -98,7 +98,7 @@ describe('erc20TokenRevocation:content', () => {
                               "children": {
                                 "key": null,
                                 "props": {
-                                  "alt": "Remove Expiry",
+                                  "alt": "Remove Expiry (UTC)",
                                   "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -131,7 +131,7 @@ describe('erc20TokenRevocation:content', () => {
                         "disablePast": true,
                         "name": "erc20-token-revocation-expiry",
                         "type": "datetime",
-                        "value": "2024-05-01T00:00:00.000Z",
+                        "value": "2024-05-01T00:00:00.000+00:00",
                       },
                       "type": "DateTimePicker",
                     },

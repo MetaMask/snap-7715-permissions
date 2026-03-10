@@ -50,7 +50,7 @@
       "message": "The maximum amount of tokens that can be streamed."
     },
     "startTimeLabel": {
-      "message": "Start Time"
+      "message": "Start Time (UTC)"
     },
     "startTimeTooltip": {
       "message": "The time at which the first period begins"
@@ -59,7 +59,7 @@
       "message": "The start time of the stream"
     },
     "expiryLabel": {
-      "message": "Expiry"
+      "message": "Expiry (UTC)"
     },
     "expiryTooltip": {
       "message": "The expiry date of the permission"

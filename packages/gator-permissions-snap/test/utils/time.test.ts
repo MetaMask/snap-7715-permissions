@@ -5,7 +5,9 @@ import {
   getClosestTimePeriod,
   TIME_PERIOD_TO_SECONDS,
   timestampToISO8601,
-  iso8601ToTimestamp,
+  iso8601ToTimestampIgnoreTimezone,
+  forceToUTC,
+  forceToLocalZone,
 } from '../../src/utils/time';
 
 describe('Time Utility Functions', () => {
@@ -34,41 +36,44 @@ describe('Time Utility Functions', () => {
     });
   });
 
-  describe('iso8601ToTimestamp', () => {
+  describe('iso8601ToTimestampIgnoreTimezone', () => {
     it('should convert an ISO 8601 string to Unix timestamp', () => {
       const iso = '2024-01-01T00:00:00.000Z';
-      const result = iso8601ToTimestamp(iso);
+      const result = iso8601ToTimestampIgnoreTimezone(iso);
       expect(result).toBe(1704067200);
     });
 
     it('should handle ISO strings with time components', () => {
       const iso = '2024-01-01T10:50:30.000Z';
-      const result = iso8601ToTimestamp(iso);
+      const result = iso8601ToTimestampIgnoreTimezone(iso);
       expect(result).toBe(1704106230);
     });
 
     it('should handle ISO strings with timezone offset', () => {
-      // +02:00 offset means 2 hours behind UTC
+      // +02:00 offset means 2 hours ahead of UTC
+      // 2024-01-01T02:00:00.000+02:00 is equivalent to 2024-01-01T00:00:00.000Z
+      // But forceToUTC strips the offset and treats the time as UTC
+      // So 2024-01-01T02:00:00.000+02:00 becomes 2024-01-01T02:00:00.000Z
       const iso = '2024-01-01T02:00:00.000+02:00';
-      const result = iso8601ToTimestamp(iso);
-      expect(result).toBe(1704067200); // Same as 2024-01-01T00:00:00.000Z
+      const result = iso8601ToTimestampIgnoreTimezone(iso);
+      expect(result).toBe(1704074400); // 2024-01-01T02:00:00.000Z
     });
 
     it('should throw an error for invalid ISO strings', () => {
-      expect(() => iso8601ToTimestamp('invalid-date')).toThrow(
-        'iso8601ToTimestamp: Invalid ISO 8601 string',
+      expect(() => iso8601ToTimestampIgnoreTimezone('invalid-date')).toThrow(
+        'iso8601ToTimestampIgnoreTimezone: Invalid ISO 8601 string',
       );
-      expect(() => iso8601ToTimestamp('')).toThrow(
-        'iso8601ToTimestamp: Invalid ISO 8601 string',
+      expect(() => iso8601ToTimestampIgnoreTimezone('')).toThrow(
+        'iso8601ToTimestampIgnoreTimezone: Invalid ISO 8601 string',
       );
     });
   });
 
-  describe('timestampToISO8601 and iso8601ToTimestamp round-trip', () => {
+  describe('timestampToISO8601 and iso8601ToTimestampIgnoreTimezone round-trip', () => {
     it('should round-trip correctly', () => {
       const originalTimestamp = 1704106230;
       const iso = timestampToISO8601(originalTimestamp);
-      const result = iso8601ToTimestamp(iso);
+      const result = iso8601ToTimestampIgnoreTimezone(iso);
       expect(result).toBe(originalTimestamp);
     });
 
@@ -82,7 +87,7 @@ describe('Time Utility Functions', () => {
 
       for (const timestamp of testTimestamps) {
         const iso = timestampToISO8601(timestamp);
-        const result = iso8601ToTimestamp(iso);
+        const result = iso8601ToTimestampIgnoreTimezone(iso);
         expect(result).toBe(timestamp);
       }
     });
@@ -210,6 +215,97 @@ describe('Time Utility Functions', () => {
       const tenYears = 60 * 60 * 24 * 365 * 10;
       expect(() => getClosestTimePeriod(tenYears)).not.toThrow();
       expect(getClosestTimePeriod(tenYears)).toBe(TimePeriod.YEARLY);
+    });
+  });
+
+  describe('forceToUTC', () => {
+    it('should convert ISO string with Z to UTC', () => {
+      const iso = '2024-01-01T10:30:00.000Z';
+      const result = forceToUTC(iso);
+      expect(result).toBe('2024-01-01T10:30:00.000Z');
+    });
+
+    it('should remove positive timezone offset and add Z', () => {
+      const iso = '2024-01-01T10:30:00.000+02:00';
+      const result = forceToUTC(iso);
+      expect(result).toBe('2024-01-01T10:30:00.000Z');
+    });
+
+    it('should remove negative timezone offset and add Z', () => {
+      const iso = '2024-01-01T10:30:00.000-05:00';
+      const result = forceToUTC(iso);
+      expect(result).toBe('2024-01-01T10:30:00.000Z');
+    });
+
+    it('should handle various timezone offsets', () => {
+      expect(forceToUTC('2024-01-01T00:00:00.000+12:00')).toBe(
+        '2024-01-01T00:00:00.000Z',
+      );
+      expect(forceToUTC('2024-01-01T00:00:00.000-12:00')).toBe(
+        '2024-01-01T00:00:00.000Z',
+      );
+      expect(forceToUTC('2024-01-01T00:00:00.000+00:00')).toBe(
+        '2024-01-01T00:00:00.000Z',
+      );
+    });
+
+    it('should handle ISO strings without milliseconds', () => {
+      const iso = '2024-01-01T10:30:00+02:00';
+      const result = forceToUTC(iso);
+      expect(result).toBe('2024-01-01T10:30:00Z');
+    });
+  });
+
+  describe('forceToLocalZone', () => {
+    it('should return empty string for undefined or empty input', () => {
+      expect(forceToLocalZone(undefined)).toBe('');
+      expect(forceToLocalZone('')).toBe('');
+    });
+
+    it('should replace Z with local timezone offset', () => {
+      const iso = '2024-01-01T10:30:00.000Z';
+      const result = forceToLocalZone(iso);
+      // Result should end with a timezone offset, not Z
+      expect(result).toMatch(/([+-]\d{2}:\d{2})$/u);
+      expect(result).toContain('2024-01-01T10:30:00.000');
+    });
+
+    it('should replace timezone offset with local timezone offset', () => {
+      const iso = '2024-01-01T10:30:00.000+05:00';
+      const result = forceToLocalZone(iso);
+      // Result should end with a timezone offset
+      expect(result).toMatch(/([+-]\d{2}:\d{2})$/u);
+      expect(result).toContain('2024-01-01T10:30:00.000');
+    });
+
+    it('should preserve the time part when converting timezone', () => {
+      const iso = '2024-06-15T14:45:30.000Z';
+      const result = forceToLocalZone(iso);
+      expect(result).toContain('2024-06-15T14:45:30.000');
+    });
+
+    it('should handle ISO strings without milliseconds', () => {
+      const iso = '2024-01-01T10:30:00Z';
+      const result = forceToLocalZone(iso);
+      expect(result).toMatch(/([+-]\d{2}:\d{2})$/u);
+      expect(result).toContain('2024-01-01T10:30:00');
+    });
+
+    it('should handle negative timezone offsets', () => {
+      const iso = '2024-01-01T10:30:00.000-08:00';
+      const result = forceToLocalZone(iso);
+      expect(result).toMatch(/([+-]\d{2}:\d{2})$/u);
+      expect(result).toContain('2024-01-01T10:30:00.000');
+    });
+
+    it('should format timezone offset with proper padding', () => {
+      const iso = '2024-01-01T10:30:00.000Z';
+      const result = forceToLocalZone(iso);
+      // Check that the timezone offset is properly formatted (HH:MM)
+      const match = result.match(/([+-])(\d{2}):(\d{2})$/u);
+      expect(match).not.toBeNull();
+      expect(match?.[2]).toHaveLength(2); // Hours should be 2 digits
+      expect(match?.[3]).toHaveLength(2); // Minutes should be 2 digits
     });
   });
 });

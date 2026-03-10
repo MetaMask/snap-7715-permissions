@@ -1,6 +1,9 @@
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
-import { timestampToISO8601, iso8601ToTimestamp } from '../../utils/time';
+import {
+  timestampToISO8601,
+  iso8601ToTimestampIgnoreTimezone,
+} from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import { createExpiryRule } from '../rules';
 import type {
@@ -75,14 +78,14 @@ export const startTimeRule: NativeTokenStreamRuleDefinition = {
     isVisible: true,
     tooltip: t('streamStartTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
-    allowPastDate: false,
+    allowPastDate: true, // start time can be in the past
     isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: NativeTokenStreamContext, value: string) => ({
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
-      startTime: iso8601ToTimestamp(value),
+      startTime: iso8601ToTimestampIgnoreTimezone(value),
     },
   }),
 };

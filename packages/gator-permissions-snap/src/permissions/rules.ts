@@ -15,7 +15,7 @@ import type {
 } from '../core/types';
 import type { TranslateFunction } from '../utils/i18n';
 import {
-  iso8601ToTimestamp,
+  iso8601ToTimestampIgnoreTimezone,
   TIME_PERIOD_TO_SECONDS,
   timestampToISO8601,
 } from '../utils/time';
@@ -72,7 +72,7 @@ export const createExpiryRule = <
           value === ''
             ? Math.floor(Date.now() / 1000) +
               Number(TIME_PERIOD_TO_SECONDS[TimePeriod.MONTHLY])
-            : iso8601ToTimestamp(value);
+            : iso8601ToTimestampIgnoreTimezone(value);
 
         expiry = {
           timestamp,

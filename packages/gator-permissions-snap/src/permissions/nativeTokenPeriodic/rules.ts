@@ -7,7 +7,7 @@ import {
   getClosestTimePeriod,
   TIME_PERIOD_TO_SECONDS,
   timestampToISO8601,
-  iso8601ToTimestamp,
+  iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import type {
@@ -102,14 +102,14 @@ export const startTimeRule: RuleDefinition<
     isVisible: true,
     tooltip: t('startTimeTooltip'),
     error: metadata.validationErrors.startTimeError,
-    allowPastDate: false,
+    allowPastDate: true, // start time can be in the past
     isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: NativeTokenPeriodicContext, value: string) => ({
     ...context,
     permissionDetails: {
       ...context.permissionDetails,
-      startTime: iso8601ToTimestamp(value),
+      startTime: iso8601ToTimestampIgnoreTimezone(value),
     },
   }),
 };
