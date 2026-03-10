@@ -327,7 +327,7 @@ describe('nativeTokenPeriodic:content', () => {
                       "children": {
                         "key": null,
                         "props": {
-                          "disablePast": true,
+                          "disablePast": false,
                           "name": "native-token-periodic-start-date",
                           "type": "datetime",
                           "value": "1985-10-26T08:00:00.000+00:00",

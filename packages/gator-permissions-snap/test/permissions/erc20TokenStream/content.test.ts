@@ -371,7 +371,7 @@ describe('erc20TokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "erc20-token-stream-start-time",
                             "type": "datetime",
                             "value": "1985-10-26T08:00:00.000+00:00",
@@ -1161,7 +1161,7 @@ describe('erc20TokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "erc20-token-stream-start-time",
                             "type": "datetime",
                             "value": "1985-10-26T08:00:00.000+00:00",

@@ -350,7 +350,7 @@ describe('nativeTokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "native-token-stream-start-time",
                             "type": "datetime",
                             "value": "1985-10-26T08:00:00.000+00:00",
@@ -1106,7 +1106,7 @@ describe('nativeTokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "native-token-stream-start-time",
                             "type": "datetime",
                             "value": "1985-10-26T08:00:00.000+00:00",
@@ -2412,7 +2412,7 @@ describe('nativeTokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "native-token-stream-start-time",
                             "type": "datetime",
                             "value": "1985-10-26T08:00:00.000+00:00",
@@ -3167,7 +3167,7 @@ describe('nativeTokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "native-token-stream-start-time",
                             "type": "datetime",
                             "value": "1985-10-26T08:00:00.000+00:00",
