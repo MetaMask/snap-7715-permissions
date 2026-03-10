@@ -113,6 +113,40 @@ export const zPeriodDuration = zTimestamp
   });
 
 /**
+ * Forces any ISO 8601 string to be treated as UTC, ignoring the original timezone.
+ * e.g. "2026-04-17T18:14:00.000+12:00" → "2026-04-17T18:14:00.000Z"
+ * @param iso - The input ISO 8601 string, which may include a timezone offset.
+ * @returns The input ISO string with the timezone removed and replaced with 'Z' to indicate UTC.
+ */
+export const forceToUTC = (iso: string): string => {
+  const normalized = iso.replace(/([+-]\d{2}:\d{2}|Z)$/u, '');
+  return `${normalized}Z`;
+};
+
+/**
+ * Forces any ISO 8601 string to be treated as the local timezone, ignoring the original timezone.
+ * e.g. "2026-04-17T06:14:00.000Z" → "2026-04-17T06:14:00.000+12:00" (in NZ)
+ * e.g. "2026-04-17T06:14:00.000+05:00" → "2026-04-17T06:14:00.000+12:00" (in NZ)
+ * @param iso - The input ISO 8601 string, which may include a timezone offset.
+ * @returns The input ISO string with the timezone removed and replaced with the local timezone offset.
+ */
+export const forceToLocalZone = (iso: string | undefined): string => {
+  if (!iso) {
+    return '';
+  }
+  const normalized = iso.replace(/([+-]\d{2}:\d{2}|Z)$/u, '');
+  const date = new Date(normalized);
+  const offsetMinutes = -date.getTimezoneOffset();
+  const sign = offsetMinutes >= 0 ? '+' : '-';
+  const hours = String(Math.floor(Math.abs(offsetMinutes) / 60)).padStart(
+    2,
+    '0',
+  );
+  const minutes = String(Math.abs(offsetMinutes) % 60).padStart(2, '0');
+  return `${normalized}${sign}${hours}:${minutes}`;
+};
+
+/**
  * Converts a Unix timestamp (in seconds) to an ISO 8601 date string with timezone.
  * This format is required by the snaps-sdk DateTimePicker component.
  *
@@ -133,17 +167,21 @@ export const timestampToISO8601 = (timestamp: number): string => {
 
 /**
  * Converts an ISO 8601 date string to a Unix timestamp (in seconds).
+ * This function ignores any timezone information in the input string and treats
+ * the time as UTC. For example, "2024-01-01T10:00:00.000+02:00" is treated as
+ * "2024-01-01T10:00:00.000Z", not as the UTC equivalent.
  * This is used to convert DateTimePicker values back to timestamps.
  *
- * @param iso - The ISO 8601 formatted date string.
+ * @param iso - The ISO 8601 formatted date string (timezone info will be ignored).
  * @returns The Unix timestamp in seconds.
  */
-export const iso8601ToTimestamp = (iso: string): number => {
-  const date = new Date(iso);
+export const iso8601ToTimestampIgnoreTimezone = (iso: string): number => {
+  const normalizedIso = forceToUTC(iso);
+  const date = new Date(normalizedIso);
 
   if (isNaN(date.getTime())) {
     throw new InvalidInputError(
-      `iso8601ToTimestamp: Invalid ISO 8601 string: ${iso}`,
+      `iso8601ToTimestampIgnoreTimezone: Invalid ISO 8601 string: ${iso}`,
     );
   }
 

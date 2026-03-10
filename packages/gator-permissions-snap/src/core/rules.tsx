@@ -32,7 +32,7 @@ export function renderRule<
   context: TContext;
   metadata: TMetadata;
 }): SnapElement | null {
-  const { label, type, name, isOptional } = rule;
+  const { label, type, name, isOptional, contentWhenDisabled } = rule;
   const {
     value,
     error,
@@ -68,6 +68,7 @@ export function renderRule<
           addFieldButtonName={addFieldButtonName}
           removeFieldButtonName={removeFieldButtonName}
           iconData={iconData}
+          contentWhenDisabled={contentWhenDisabled}
         />
       );
     }
@@ -104,6 +105,7 @@ export function renderRule<
           allowPastDate={allowPastDate}
           removeFieldButtonName={removeFieldButtonName}
           addFieldButtonName={addFieldButtonName}
+          contentWhenDisabled={contentWhenDisabled}
         />
       );
     }

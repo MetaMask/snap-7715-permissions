@@ -316,7 +316,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start Time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -359,10 +359,10 @@ describe('nativeTokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "native-token-stream-start-time",
                             "type": "datetime",
-                            "value": "1985-10-26T08:00:00.000Z",
+                            "value": "1985-10-26T08:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -390,7 +390,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiry (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -430,7 +430,7 @@ describe('nativeTokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiry (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -463,7 +463,7 @@ describe('nativeTokenStream:content', () => {
                             "disablePast": true,
                             "name": "native-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -1080,7 +1080,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start Time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -1123,10 +1123,10 @@ describe('nativeTokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "native-token-stream-start-time",
                             "type": "datetime",
-                            "value": "1985-10-26T08:00:00.000Z",
+                            "value": "1985-10-26T08:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -1154,7 +1154,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiry (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -1194,7 +1194,7 @@ describe('nativeTokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiry (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1227,7 +1227,7 @@ describe('nativeTokenStream:content', () => {
                             "disablePast": true,
                             "name": "native-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -1764,7 +1764,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start Time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -1840,7 +1840,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiry (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -1880,7 +1880,7 @@ describe('nativeTokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiry (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -1913,7 +1913,7 @@ describe('nativeTokenStream:content', () => {
                             "disablePast": true,
                             "name": "native-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -2221,60 +2221,61 @@ describe('nativeTokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "children": {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Initial Amount",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Initial Amount",
+                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Text",
-                              },
-                              {
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The initial amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
                                 "key": null,
                                 "props": {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The initial amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Add Initial Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+                                      "alt": "Add Initial Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
 
@@ -2282,21 +2283,23 @@ describe('nativeTokenStream:content', () => {
   <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
 </svg>
 ",
+                                    },
+                                    "type": "Image",
                                   },
-                                  "type": "Image",
+                                  "name": "native-token-stream-initial-amount_addFieldButton",
                                 },
-                                "name": "native-token-stream-initial-amount_addFieldButton",
+                                "type": "Button",
                               },
-                              "type": "Button",
                             },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
                     },
-                    "type": "Box",
-                  },
+                    null,
+                  ],
                   "direction": "vertical",
                 },
                 "type": "Box",
@@ -2304,60 +2307,61 @@ describe('nativeTokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "children": {
-                    "key": null,
-                    "props": {
-                      "alignment": "space-between",
-                      "children": [
-                        {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Max Amount",
+                  "children": [
+                    {
+                      "key": null,
+                      "props": {
+                        "alignment": "space-between",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": [
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": "Max Amount",
+                                  },
+                                  "type": "Text",
                                 },
-                                "type": "Text",
-                              },
-                              {
+                                {
+                                  "key": null,
+                                  "props": {
+                                    "children": {
+                                      "key": null,
+                                      "props": {
+                                        "color": "muted",
+                                        "name": "question",
+                                        "size": "inherit",
+                                      },
+                                      "type": "Icon",
+                                    },
+                                    "content": {
+                                      "key": null,
+                                      "props": {
+                                        "children": "The maximum amount of tokens that can be streamed.",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  },
+                                  "type": "Tooltip",
+                                },
+                              ],
+                              "direction": "horizontal",
+                            },
+                            "type": "Box",
+                          },
+                          {
+                            "key": null,
+                            "props": {
+                              "children": {
                                 "key": null,
                                 "props": {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "color": "muted",
-                                      "name": "question",
-                                      "size": "inherit",
-                                    },
-                                    "type": "Icon",
-                                  },
-                                  "content": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "The maximum amount of tokens that can be streamed.",
-                                    },
-                                    "type": "Text",
-                                  },
-                                },
-                                "type": "Tooltip",
-                              },
-                            ],
-                            "direction": "horizontal",
-                          },
-                          "type": "Box",
-                        },
-                        {
-                          "key": null,
-                          "props": {
-                            "children": {
-                              "key": null,
-                              "props": {
-                                "children": {
-                                  "key": null,
-                                  "props": {
-                                    "alt": "Add Max Amount",
-                                    "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
+                                      "alt": "Add Max Amount",
+                                      "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#A0A4B0"/>
 
@@ -2365,21 +2369,23 @@ describe('nativeTokenStream:content', () => {
   <circle cx="10.5" cy="10.5" r="7.5" fill="white"/>
 </svg>
 ",
+                                    },
+                                    "type": "Image",
                                   },
-                                  "type": "Image",
+                                  "name": "native-token-stream-max-amount_addFieldButton",
                                 },
-                                "name": "native-token-stream-max-amount_addFieldButton",
+                                "type": "Button",
                               },
-                              "type": "Button",
                             },
+                            "type": "Box",
                           },
-                          "type": "Box",
-                        },
-                      ],
-                      "direction": "horizontal",
+                        ],
+                        "direction": "horizontal",
+                      },
+                      "type": "Box",
                     },
-                    "type": "Box",
-                  },
+                    null,
+                  ],
                   "direction": "vertical",
                 },
                 "type": "Box",
@@ -2407,7 +2413,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start Time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -2450,10 +2456,10 @@ describe('nativeTokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "native-token-stream-start-time",
                             "type": "datetime",
-                            "value": "1985-10-26T08:00:00.000Z",
+                            "value": "1985-10-26T08:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -2481,7 +2487,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiry (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -2521,7 +2527,7 @@ describe('nativeTokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiry (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -2554,7 +2560,7 @@ describe('nativeTokenStream:content', () => {
                             "disablePast": true,
                             "name": "native-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -3170,7 +3176,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Start Time",
+                                    "children": "Start Time (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -3213,10 +3219,10 @@ describe('nativeTokenStream:content', () => {
                         "children": {
                           "key": null,
                           "props": {
-                            "disablePast": true,
+                            "disablePast": false,
                             "name": "native-token-stream-start-time",
                             "type": "datetime",
-                            "value": "1985-10-26T08:00:00.000Z",
+                            "value": "1985-10-26T08:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
@@ -3244,7 +3250,7 @@ describe('nativeTokenStream:content', () => {
                                 {
                                   "key": null,
                                   "props": {
-                                    "children": "Expiry",
+                                    "children": "Expiry (UTC)",
                                   },
                                   "type": "Text",
                                 },
@@ -3284,7 +3290,7 @@ describe('nativeTokenStream:content', () => {
                                   "children": {
                                     "key": null,
                                     "props": {
-                                      "alt": "Remove Expiry",
+                                      "alt": "Remove Expiry (UTC)",
                                       "src": "<svg width="37.5" height="21" viewBox="0 0 37.5 21" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect x="0" y="0" width="37.5" height="21" rx="10.5" fill="#3F57FF"/>
@@ -3317,7 +3323,7 @@ describe('nativeTokenStream:content', () => {
                             "disablePast": true,
                             "name": "native-token-stream-expiry",
                             "type": "datetime",
-                            "value": "2024-05-01T00:00:00.000Z",
+                            "value": "2024-05-01T00:00:00.000+00:00",
                           },
                           "type": "DateTimePicker",
                         },
