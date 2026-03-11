@@ -162,8 +162,12 @@ export function groupPermissionsByFromAddress(
       continue;
     }
 
-    // Convert to CAIP-10 format
-    const caip10Address = toCaipAccountId('eip155', chainId, from);
+    // Convert to CAIP-10 format (eip155 expects decimal chain id, not hex)
+    const caip10Address = toCaipAccountId(
+      'eip155',
+      hexToNumber(chainId).toString(),
+      from,
+    );
 
     // Initialize array if key doesn't exist
     result[caip10Address] ??= [];

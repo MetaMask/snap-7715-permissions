@@ -43,7 +43,7 @@ export class ExistingPermissionsService {
   /**
    * Finds existing permissions matching the given request and origin.
    * Uses a filtering pattern similar to getGrantedPermissions in rpcHandler.
-   * Filters by isRevoked, siteOrigin, chainId, and delegationManager.
+   * Filters by isRevoked, siteOrigin and chainId.
    *
    * @param permissionRequest - The permission request to match.
    * @param siteOrigin - The origin of the requesting dApp.
