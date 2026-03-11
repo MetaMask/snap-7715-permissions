@@ -24,6 +24,7 @@ import type { PermissionIntroductionService } from '../../src/core/permissionInt
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
+import { ExistingPermissionsService } from 'src/core/existingpermissions/existingPermissionsService';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 const randomAddress = (): Hex => {
@@ -135,6 +136,11 @@ const mockPermissionIntroductionService = {
   showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
+const mockExistingPermissionsService = {
+  getExistingPermissions: jest.fn().mockResolvedValue([]),
+  showExistingPermissions: jest.fn().mockResolvedValue({ wasCancelled: false }),
+} as unknown as jest.Mocked<ExistingPermissionsService>;
+
 const mockScanAddressResult: FetchAddressScanResult = {
   resultType: AddressScanResultType.Benign,
   label: '',
@@ -221,6 +227,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
+        existingPermissionsService: mockExistingPermissionsService,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
         trustSignalsClient: mockTrustSignalsClient,
       });
@@ -234,6 +241,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
+        existingPermissionsService: mockExistingPermissionsService,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
         trustSignalsClient: mockTrustSignalsClient,
       });
@@ -354,7 +362,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         );
         expect(result.approved).toBe(false);
         expect(!result.approved && result.reason).toBe(
-          'Permission request denied',
+          'Permission request denied at confirmation screen',
         );
       });
 

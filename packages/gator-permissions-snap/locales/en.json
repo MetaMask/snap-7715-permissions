@@ -252,6 +252,36 @@
     },
     "potentiallyMaliciousAddressLabel": {
       "message": "Potentially malicious address"
+    },
+    "existingPermissionsTitle": {
+      "message": "Existing permissions"
+    },
+    "existingPermissionsDescription": {
+      "message": "You already have permissions from this site. Do you want to proceed?"
+    },
+    "existingPermissionsConfirmButton": {
+      "message": "Proceed"
+    },
+    "chainLabel": {
+      "message": "Network"
+    },
+    "morePermissionsCountSingle": {
+      "message": "This account has 1 more permission. View and manage all permissions in the "
+    },
+    "morePermissionsCountPlural": {
+      "message": "This account has $1 more permissions. View and manage all permissions in the "
+    },
+    "unlimited": {
+      "message": "Unlimited"
+    },
+    "allTokens": {
+      "message": "All tokens"
+    },
+    "dappConnectionsLink": {
+      "message": "Dapp Connections"
+    },
+    "revokeTokenApprovalsLabel": {
+      "message": "Revoke token approvals"
     }
   }
 }
