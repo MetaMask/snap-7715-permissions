@@ -77,10 +77,9 @@ export function buildExistingPermissionsContent(
                   <Box direction="vertical">
                     <Divider />
                     <Text>
-                      {t('morePermissionsCount', [
-                        String(moreCount),
-                        moreCount > 1 ? 's' : '',
-                      ])}
+                      {moreCount === 1
+                        ? t('morePermissionsCountSingle')
+                        : t('morePermissionsCountPlural', [String(moreCount)])}
                       <Bold>{t('dappConnectionsLink')}</Bold>
                     </Text>
                   </Box>
