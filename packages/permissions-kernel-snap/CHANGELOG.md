@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- feat: integrate error tracking service with RPC handlers ([#242](https://github.com/MetaMask/snap-7715-permissions/pull/242))
+- chore: update dependencies ([#247](https://github.com/MetaMask/snap-7715-permissions/pull/247))
+
 ## [1.0.0]
 
 ### Added

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- Feat: existing permissions page ([#280](https://github.com/MetaMask/snap-7715-permissions/pull/280))
+- Add "total exposure" notice to stream permissions ([#279](https://github.com/MetaMask/snap-7715-permissions/pull/279))
+- feat: update time handling to ensure UTC consistency and local timezone conversion ([#277](https://github.com/MetaMask/snap-7715-permissions/pull/277))
+- feat: Expiry rule now has a notice if not included in the permission ([#278](https://github.com/MetaMask/snap-7715-permissions/pull/278))
+- Retry attempts to close the dialog ([#274](https://github.com/MetaMask/snap-7715-permissions/pull/274))
+- feat: add trust signals to permission picker ([#275](https://github.com/MetaMask/snap-7715-permissions/pull/275))
+- remove description from translations ([#271](https://github.com/MetaMask/snap-7715-permissions/pull/271))
+- fix: update intro permission control message for clarity ([#269](https://github.com/MetaMask/snap-7715-permissions/pull/269))
+- feat: integrate error tracking service with RPC handlers ([#242](https://github.com/MetaMask/snap-7715-permissions/pull/242))
+- bump some versions and fix resolutions ([#259](https://github.com/MetaMask/snap-7715-permissions/pull/259))
+
 ## [1.1.1]
 
 ### Fixed
