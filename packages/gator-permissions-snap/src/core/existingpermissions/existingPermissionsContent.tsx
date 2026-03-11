@@ -8,6 +8,7 @@ import {
   Text,
   Address,
   Divider,
+  Bold,
 } from '@metamask/snaps-sdk/jsx';
 import { CaipAccountId } from '@metamask/utils';
 
@@ -80,7 +81,7 @@ export function buildExistingPermissionsContent(
                         String(moreCount),
                         moreCount > 1 ? 's' : '',
                       ])}
-                      <Text fontWeight="bold">{t('dappConnectionsLink')}</Text>
+                      <Bold>{t('dappConnectionsLink')}</Bold>
                     </Text>
                   </Box>
                 )}

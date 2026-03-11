@@ -4,6 +4,7 @@ import { CaipAccountId, hexToNumber, toCaipAccountId } from '@metamask/utils';
 
 import { t } from '../../utils/i18n';
 import { shortenAddress } from '../../utils/string';
+import { timestampToISO8601 } from '../../utils/time';
 import { nameAndExplorerUrlByChainId } from '../chainMetadata';
 
 /**
@@ -84,27 +85,12 @@ export function formatPermissionDetails(
       }
 
       if (startTime !== undefined && startTime !== null) {
-        details[t('startTimeLabel')] = formatTimestamp(Number(startTime));
+        details[t('startTimeLabel')] = timestampToISO8601(Number(startTime));
       }
     }
   }
 
   return details;
-}
-
-/**
- * Formats a Unix timestamp for display.
- *
- * @param timestamp - The Unix timestamp to format.
- * @returns Formatted date string.
- */
-function formatTimestamp(timestamp: number): string {
-  try {
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString();
-  } catch {
-    return String(timestamp);
-  }
 }
 
 /**
