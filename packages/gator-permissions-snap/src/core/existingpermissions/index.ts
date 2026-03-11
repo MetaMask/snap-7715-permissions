@@ -1,6 +1,7 @@
 export { ExistingPermissionsService } from './existingPermissionsService';
 export {
   buildExistingPermissionsContent,
+  buildExistingPermissionsSkeletonContent,
   EXISTING_PERMISSIONS_CONFIRM_BUTTON,
 } from './existingPermissionsContent';
 export {

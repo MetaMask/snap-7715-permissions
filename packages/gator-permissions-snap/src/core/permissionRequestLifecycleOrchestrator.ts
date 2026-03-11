@@ -153,6 +153,10 @@ export class PermissionRequestLifecycleOrchestrator {
       permissionData: permissionRequest.permission.data,
     });
 
+    // Validate the permission request early, before showing any UI
+    const validatedPermissionRequest =
+      lifecycleHandlers.parseAndValidatePermission(permissionRequest);
+
     // Create shared dialog interface for both intro and confirmation
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
@@ -226,9 +230,6 @@ export class PermissionRequestLifecycleOrchestrator {
     // only necessary when not pre-installed, to ensure that the account
     // permissions are requested before the confirmation dialog is shown.
     await this.#accountController.getAccountAddresses();
-
-    const validatedPermissionRequest =
-      lifecycleHandlers.parseAndValidatePermission(permissionRequest);
 
     let context: TContext;
 

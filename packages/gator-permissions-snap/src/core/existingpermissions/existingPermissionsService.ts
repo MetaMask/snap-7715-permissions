@@ -3,6 +3,7 @@ import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import {
   buildExistingPermissionsContent,
+  buildExistingPermissionsSkeletonContent,
   EXISTING_PERMISSIONS_CONFIRM_BUTTON,
 } from './existingPermissionsContent';
 import { formatPermissionWithTokenMetadata } from './permissionFormatter';
@@ -41,26 +42,26 @@ export class ExistingPermissionsService {
   }
 
   /**
-   * Finds existing permissions matching the given request and origin.
-   * Uses a filtering pattern similar to getGrantedPermissions in rpcHandler.
-   * Filters by isRevoked, siteOrigin and chainId.
+   * Finds existing permissions matching the given origin.
+   * Returns all permissions granted to the origin across all chains (not limited to the requested chainId).
+   * Filters by isRevoked and siteOrigin only.
    *
-   * @param permissionRequest - The permission request to match.
+   * @param _permissionRequest - The permission request (kept for API compatibility, not used for filtering).
    * @param siteOrigin - The origin of the requesting dApp.
-   * @returns An array of matching stored permissions, or an empty array if not found.
+   * @returns An array of matching stored permissions across all chains, or an empty array if not found.
    */
   async #findMatchingExistingPermission(
-    permissionRequest: PermissionRequest,
+    _permissionRequest: PermissionRequest,
     siteOrigin: string,
   ): Promise<StoredGrantedPermission[]> {
     const allPermissions =
       await this.#profileSyncManager.getAllGrantedPermissions();
 
+    // Return all non-revoked permissions for the origin across all chains
     const matching = allPermissions.filter(
       (permission) =>
         permission.revocationMetadata === undefined &&
-        permission.siteOrigin === siteOrigin &&
-        permission.permissionResponse.chainId === permissionRequest.chainId,
+        permission.siteOrigin === siteOrigin,
     );
 
     return matching;
@@ -105,19 +106,21 @@ export class ExistingPermissionsService {
         return { wasCancelled: false };
       }
 
-      // Format permissions with token metadata
-      const formattedPermissions = await Promise.all(
-        existingPermissions.map(async (stored) =>
-          formatPermissionWithTokenMetadata(
-            stored.permissionResponse,
-            this.#tokenMetadataService,
-          ),
-        ),
+      // Validate permissions before displaying them
+      // A permission is valid if it has both 'from' and 'chainId' fields
+      const validPermissions = existingPermissions.filter(
+        (stored) =>
+          stored.permissionResponse.from && stored.permissionResponse.chainId,
       );
 
-      // Build configuration for the existing permissions display
+      // If all permissions are invalid, treat as no existing permissions
+      if (validPermissions.length === 0) {
+        return { wasCancelled: false };
+      }
+
+      // Build configuration for the skeleton display (shown immediately)
       const config: ExistingPermissionDisplayConfig = {
-        existingPermissions: formattedPermissions,
+        existingPermissions: [],
         title: 'existingPermissionsTitle',
         description: 'existingPermissionsDescription',
         buttonLabel: 'existingPermissionsConfirmButton',
@@ -132,14 +135,43 @@ export class ExistingPermissionsService {
       };
 
       const wasConfirmed = await new Promise<boolean>((resolve) => {
-        const content = buildExistingPermissionsContent(config);
+        // Show skeleton immediately
+        const skeletonContent = buildExistingPermissionsSkeletonContent(config);
 
         dialogInterface
-          .show(content, () => {
+          .show(skeletonContent, () => {
             unbindAll();
             resolve(false); // User cancelled via X button
           })
-          .then((interfaceId) => {
+          .then(async (interfaceId) => {
+            try {
+              // Format permissions with token metadata (this may take time)
+              const formattedPermissions = await Promise.all(
+                validPermissions.map(async (stored) =>
+                  formatPermissionWithTokenMetadata(
+                    stored.permissionResponse,
+                    this.#tokenMetadataService,
+                  ),
+                ),
+              );
+
+              // Build configuration for the actual permissions display
+              const actualConfig: ExistingPermissionDisplayConfig = {
+                existingPermissions: formattedPermissions,
+                title: 'existingPermissionsTitle',
+                description: 'existingPermissionsDescription',
+                buttonLabel: 'existingPermissionsConfirmButton',
+              };
+
+              // Update dialog with actual content
+              const actualContent =
+                buildExistingPermissionsContent(actualConfig);
+              await dialogInterface.show(actualContent);
+            } catch {
+              // If formatting fails, dialog still shows with skeleton
+              // This is acceptable - user can still interact with the dialog
+            }
+
             // Handler for acknowledge button
             const { unbind: unbindConfirm } = this.#userEventDispatcher.on({
               elementName: EXISTING_PERMISSIONS_CONFIRM_BUTTON,

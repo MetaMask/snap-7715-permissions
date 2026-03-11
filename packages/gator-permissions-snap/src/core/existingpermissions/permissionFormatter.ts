@@ -119,7 +119,9 @@ function extractPermissionDetails(
 
       if (startTime !== undefined && startTime !== null) {
         const date = new Date(Number(startTime) * 1000);
-        details[t('startTimeLabel')] = date.toLocaleString();
+        details[t('startTimeLabel')] = date.toLocaleString(undefined, {
+          timeZone: 'UTC',
+        });
       }
 
       if (justification !== undefined && justification !== null) {
