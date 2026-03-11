@@ -40,13 +40,13 @@ export type PermissionDetail = {
  * @param symbol - The token symbol.
  * @returns The formatted amount with symbol, or 'Unlimited' if maxAmount is null/undefined.
  */
-export function formatMaxAmountWithMetadata(
+function formatMaxAmountWithMetadata(
   maxAmount: Hex | undefined | null,
   decimals: number,
   symbol: string,
 ): string {
   if (maxAmount === undefined || maxAmount === null) {
-    return 'Unlimited';
+    return t('unlimited');
   }
 
   const formattedAmount = formatUnitsFromHex({
@@ -86,7 +86,7 @@ function extractPermissionDetails(
   if (permissionData && typeof permissionData === 'object') {
     // For revocation-type permissions
     if (permissionType === 'erc20-token-revocation') {
-      details[t('revokeTokenApprovalsLabel')] = 'All tokens';
+      details[t('revokeTokenApprovalsLabel')] = t('allTokens');
 
       // Add justification if available
       if ('justification' in permissionData) {
@@ -208,7 +208,7 @@ export async function formatPermissionWithTokenMetadata(
     const { maxAmount, tokenAddress } = permissionData;
 
     try {
-      const chainId = Number(permission.chainId);
+      const chainId = hexToNumber(permission.chainId);
       const options: Parameters<
         typeof tokenMetadataService.getTokenBalanceAndMetadata
       >[0] = {

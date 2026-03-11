@@ -271,6 +271,12 @@
     "morePermissionsCountPlural": {
       "message": "This account has $1 more permissions. View and manage all permissions in the "
     },
+    "unlimited": {
+      "message": "Unlimited"
+    },
+    "allTokens": {
+      "message": "All tokens"
+    },
     "dappConnectionsLink": {
       "message": "Dapp Connections"
     },
