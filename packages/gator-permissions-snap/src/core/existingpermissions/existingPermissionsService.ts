@@ -1,4 +1,3 @@
-import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 
 import {
@@ -46,12 +45,10 @@ export class ExistingPermissionsService {
    * Returns all permissions granted to the origin across all chains (not limited to the requested chainId).
    * Filters by isRevoked and siteOrigin only.
    *
-   * @param _permissionRequest - The permission request (kept for API compatibility, not used for filtering).
    * @param siteOrigin - The origin of the requesting dApp.
    * @returns An array of matching stored permissions across all chains, or an empty array if not found.
    */
   async #findMatchingExistingPermission(
-    _permissionRequest: PermissionRequest,
     siteOrigin: string,
   ): Promise<StoredGrantedPermission[]> {
     const allPermissions =
@@ -68,20 +65,15 @@ export class ExistingPermissionsService {
   }
 
   /**
-   * Gets existing permissions matching the given request.
-   * @param permissionRequest - The permission request to check.
+   * Gets existing permissions matching the given origin.
    * @param siteOrigin - The origin of the requesting dApp.
    * @returns An array of matching stored permissions, or an empty array if not found.
    */
   async getExistingPermissions(
-    permissionRequest: PermissionRequest,
     siteOrigin: string,
   ): Promise<StoredGrantedPermission[]> {
     try {
-      return await this.#findMatchingExistingPermission(
-        permissionRequest,
-        siteOrigin,
-      );
+      return await this.#findMatchingExistingPermission(siteOrigin);
     } catch {
       return [];
     }

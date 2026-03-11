@@ -116,15 +116,8 @@ describe('ExistingPermissionsService', () => {
         otherOriginPermission,
       ]);
 
-      const request: PermissionRequest = {
-        chainId: '0x1',
-        to: randomAddress(),
-        permission: { type: 'test', data: {}, isAdjustmentAllowed: true },
-        rules: [],
-      };
-
       // Action
-      const result = await service.getExistingPermissions(request, origin);
+      const result = await service.getExistingPermissions(origin);
 
       // Assert: returns permissions from all chains, not just requested chain
       expect(result).toHaveLength(3);
@@ -155,15 +148,8 @@ describe('ExistingPermissionsService', () => {
         revokedPermission,
       ]);
 
-      const request: PermissionRequest = {
-        chainId: '0x1',
-        to: randomAddress(),
-        permission: { type: 'test', data: {}, isAdjustmentAllowed: true },
-        rules: [],
-      };
-
       // Action
-      const result = await service.getExistingPermissions(request, origin);
+      const result = await service.getExistingPermissions(origin);
 
       // Assert: only active permissions returned
       expect(result).toHaveLength(1);
