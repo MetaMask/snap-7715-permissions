@@ -1,5 +1,4 @@
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
-import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 import { bytesToHex } from '@metamask/utils';
@@ -153,27 +152,19 @@ describe('ExistingPermissionsService', () => {
 
       // Assert: only active permissions returned
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(activePermission);
+      expect(result[0]).toStrictEqual(activePermission);
     });
 
     it('should return empty array when no matching permissions exist', async () => {
       mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([]);
 
-      const request: PermissionRequest = {
-        chainId: '0x1',
-        to: randomAddress(),
-        permission: { type: 'test', data: {}, isAdjustmentAllowed: true },
-        rules: [],
-      };
-
       // Action
       const result = await service.getExistingPermissions(
-        request,
         'https://example.com',
       );
 
       // Assert
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
 
     it('should handle errors gracefully and return empty array', async () => {
@@ -181,21 +172,13 @@ describe('ExistingPermissionsService', () => {
         new Error('Storage error'),
       );
 
-      const request: PermissionRequest = {
-        chainId: '0x1',
-        to: randomAddress(),
-        permission: { type: 'test', data: {}, isAdjustmentAllowed: true },
-        rules: [],
-      };
-
       // Action
       const result = await service.getExistingPermissions(
-        request,
         'https://example.com',
       );
 
       // Assert: returns empty array instead of throwing
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
   });
 
@@ -208,7 +191,7 @@ describe('ExistingPermissionsService', () => {
       });
 
       // Assert
-      expect(result).toEqual({ wasCancelled: false });
+      expect(result).toStrictEqual({ wasCancelled: false });
       expect(mockDialogInterface.show).not.toHaveBeenCalled();
     });
 
@@ -220,7 +203,7 @@ describe('ExistingPermissionsService', () => {
       });
 
       // Assert
-      expect(result).toEqual({ wasCancelled: false });
+      expect(result).toStrictEqual({ wasCancelled: false });
       expect(mockDialogInterface.show).not.toHaveBeenCalled();
     });
 
@@ -238,7 +221,7 @@ describe('ExistingPermissionsService', () => {
       });
 
       // Assert: returns early without showing dialog
-      expect(result).toEqual({ wasCancelled: false });
+      expect(result).toStrictEqual({ wasCancelled: false });
       expect(mockDialogInterface.show).not.toHaveBeenCalled();
     });
 
@@ -353,7 +336,7 @@ describe('ExistingPermissionsService', () => {
 
       // Assert: should complete without throwing
       const result = await resultPromise;
-      expect(result).toEqual(expect.objectContaining({}));
+      expect(result).toStrictEqual(expect.objectContaining({}));
     });
   });
 });

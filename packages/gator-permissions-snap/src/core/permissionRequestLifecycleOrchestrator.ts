@@ -164,9 +164,7 @@ export class PermissionRequestLifecycleOrchestrator {
     // Start loading existing permissions in the background before showing introduction
     // This way if the introduction is shown, the existing permissions will already be loaded
     const existingPermissionsPromise =
-      this.#existingPermissionsService.getExistingPermissions(
-        origin,
-      );
+      this.#existingPermissionsService.getExistingPermissions(origin);
 
     // Check if we need to show introduction
     if (
