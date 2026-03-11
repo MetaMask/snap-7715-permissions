@@ -2788,7 +2788,7 @@ describe('erc20TokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -2843,23 +2843,45 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "children": [
+                          null,
                           {
                             "key": null,
                             "props": {
-                              "alt": "USDC",
-                              "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "alt": "USDC",
+                                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                          },
+                                          "type": "Image",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "1",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Image",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "alignment": "end",
-                              "children": "1",
-                            },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -2867,14 +2889,14 @@ describe('erc20TokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -2929,23 +2951,45 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "children": [
+                          null,
                           {
                             "key": null,
                             "props": {
-                              "alt": "USDC",
-                              "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "alt": "USDC",
+                                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                          },
+                                          "type": "Image",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "10",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Image",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "alignment": "end",
-                              "children": "10",
-                            },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -2953,7 +2997,7 @@ describe('erc20TokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -2967,7 +3011,7 @@ describe('erc20TokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -3026,10 +3070,38 @@ describe('erc20TokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
-                              "children": "10/26/1985, 8:00:00 AM",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "children": " ",
+                                          },
+                                          "type": "Text",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "10/26/1985, 8:00:00 AM",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -3037,7 +3109,7 @@ describe('erc20TokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -3155,7 +3227,7 @@ describe('erc20TokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -3210,23 +3282,45 @@ describe('erc20TokenStream:content', () => {
                       "key": null,
                       "props": {
                         "children": [
+                          null,
                           {
                             "key": null,
                             "props": {
-                              "alt": "USDC",
-                              "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "alt": "USDC",
+                                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
   </svg>",
+                                          },
+                                          "type": "Image",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "302400",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Image",
-                          },
-                          {
-                            "key": null,
-                            "props": {
-                              "alignment": "end",
-                              "children": "302400",
-                            },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -3234,14 +3328,14 @@ describe('erc20TokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -3300,10 +3394,38 @@ describe('erc20TokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
-                              "children": "Weekly",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "children": " ",
+                                          },
+                                          "type": "Text",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "Weekly",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -3311,7 +3433,7 @@ describe('erc20TokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },

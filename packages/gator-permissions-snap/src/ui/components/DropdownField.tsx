@@ -22,7 +22,14 @@ export const DropdownField = ({
   errorMessage,
 }: DropdownFieldParams): JSX.Element => {
   if (!isEditable) {
-    return <TextField label={label} value={t(value)} tooltip={tooltip} />;
+    return (
+      <TextField
+        label={label}
+        value={t(value)}
+        tooltip={tooltip}
+        direction="vertical"
+      />
+    );
   }
 
   return (

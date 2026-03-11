@@ -14,8 +14,7 @@ import type {
   NativeTokenStreamMetadata,
 } from './types';
 import { renderRules } from '../../core/rules';
-import { Field } from '../../ui/components';
-import { TokenIcon } from '../../ui/components';
+import { Field, TokenIcon } from '../../ui/components';
 import { t } from '../../utils/i18n';
 
 /**

@@ -1809,7 +1809,7 @@ describe('nativeTokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -1868,10 +1868,38 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
-                              "children": "1",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "children": " ",
+                                          },
+                                          "type": "Text",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "1",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -1879,14 +1907,14 @@ describe('nativeTokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -1945,10 +1973,38 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
-                              "children": "10",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "children": " ",
+                                          },
+                                          "type": "Text",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "10",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -1956,7 +2012,7 @@ describe('nativeTokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -1970,7 +2026,7 @@ describe('nativeTokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -2029,10 +2085,38 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
-                              "children": "10/26/1985, 8:00:00 AM",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "children": " ",
+                                          },
+                                          "type": "Text",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "10/26/1985, 8:00:00 AM",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -2040,7 +2124,7 @@ describe('nativeTokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -2158,7 +2242,7 @@ describe('nativeTokenStream:content', () => {
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -2217,10 +2301,38 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
-                              "children": "302400",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "children": " ",
+                                          },
+                                          "type": "Text",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "302400",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -2228,14 +2340,14 @@ describe('nativeTokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
               {
                 "key": null,
                 "props": {
-                  "alignment": "space-between",
+                  "alignment": "start",
                   "children": [
                     {
                       "key": null,
@@ -2294,10 +2406,38 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "alignment": "end",
-                              "children": "Weekly",
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "children": [
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "children": {
+                                          "key": null,
+                                          "props": {
+                                            "children": " ",
+                                          },
+                                          "type": "Text",
+                                        },
+                                      },
+                                      "type": "Box",
+                                    },
+                                    {
+                                      "key": null,
+                                      "props": {
+                                        "alignment": "end",
+                                        "children": "Weekly",
+                                      },
+                                      "type": "Text",
+                                    },
+                                  ],
+                                  "direction": "horizontal",
+                                },
+                                "type": "Box",
+                              },
                             },
-                            "type": "Text",
+                            "type": "Section",
                           },
                         ],
                         "direction": "horizontal",
@@ -2305,7 +2445,7 @@ describe('nativeTokenStream:content', () => {
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
