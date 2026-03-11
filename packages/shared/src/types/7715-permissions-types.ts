@@ -98,7 +98,7 @@ export const zSanitizedJustification = z
         z
           .string()
           .min(1, 'Justification cannot be empty')
-          .max(120, 'Justification cannot exceed 120 characters')
+          .max(300, 'Justification cannot exceed 300 characters')
           .refine(
             (val) => {
               // Check for markup/script patterns (covers HTML, XML, JSON, CSS)

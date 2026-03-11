@@ -25,15 +25,15 @@ describe('zSanitizedJustification', () => {
       expect(result2).toBe(DEFAULT_JUSTIFICATION_MESSAGE);
     });
 
-    it('rejects strings longer than 120 characters', () => {
-      const longString = 'a'.repeat(121);
+    it('rejects strings longer than 300 characters', () => {
+      const longString = 'a'.repeat(301);
       expect(() => zSanitizedJustification.parse(longString)).toThrow(
-        'Justification cannot exceed 120 characters',
+        'Justification cannot exceed 300 characters',
       );
     });
 
-    it('accepts strings exactly 120 characters', () => {
-      const exactString = 'a'.repeat(120);
+    it('accepts strings exactly 300 characters', () => {
+      const exactString = 'a'.repeat(300);
       expect(() => zSanitizedJustification.parse(exactString)).not.toThrow();
     });
   });

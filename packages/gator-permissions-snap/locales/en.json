@@ -20,10 +20,10 @@
       "message": "The token being requested"
     },
     "reasonLabel": {
-      "message": "Reason"
+      "message": "Justification"
     },
     "reasonTooltip": {
-      "message": "Reason given by the recipient for requesting this permission."
+      "message": "Justification given by the recipient for requesting this permission."
     },
     "accountLabel": {
       "message": "Account"
