@@ -253,17 +253,8 @@
     "existingPermissionsConfirmButton": {
       "message": "Proceed"
     },
-    "permissionTypeLabel": {
-      "message": "Permission type"
-    },
     "chainLabel": {
       "message": "Network"
-    },
-    "delegateAddressLabel": {
-      "message": "Recipient"
-    },
-    "intervalLabel": {
-      "message": "Interval"
     },
     "morePermissionsCountSingle": {
       "message": "This account has 1 more permission. View and manage all permissions in the "

@@ -11,22 +11,6 @@ import { formatUnitsFromHex } from '../../utils/value';
 import { nameAndExplorerUrlByChainId } from '../chainMetadata';
 
 /**
- * Safely converts a value to string, handling various types.
- *
- * @param value - The value to convert.
- * @returns The string representation of the value.
- */
-function safeToString(value: unknown): string {
-  if (typeof value === 'string') {
-    return value;
-  }
-  if (typeof value === 'number' || typeof value === 'bigint') {
-    return String(value);
-  }
-  return String(value);
-}
-
-/**
  * Represents formatted permission details as an object.
  */
 export type PermissionDetail = {
@@ -92,7 +76,8 @@ function extractPermissionDetails(
       if ('justification' in permissionData) {
         const { justification } = permissionData;
         if (justification !== undefined && justification !== null) {
-          details[t('reasonLabel')] = safeToString(justification);
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
+          details[t('reasonLabel')] = String(justification);
         }
       }
     }
@@ -101,7 +86,8 @@ function extractPermissionDetails(
       const { maxAmount, interval, justification } = permissionData;
 
       if (maxAmount !== undefined && maxAmount !== null) {
-        details[t('maxAmountLabel')] = safeToString(maxAmount);
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
+        details[t('maxAmountLabel')] = String(maxAmount);
       }
 
       if (interval !== undefined && interval !== null) {
@@ -118,7 +104,8 @@ function extractPermissionDetails(
       }
 
       if (justification !== undefined && justification !== null) {
-        details[t('reasonLabel')] = safeToString(justification);
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
+        details[t('reasonLabel')] = String(justification);
       }
     }
     // For stream-type permissions
@@ -126,7 +113,8 @@ function extractPermissionDetails(
       const { maxAmount, startTime, justification } = permissionData;
 
       if (maxAmount !== undefined && maxAmount !== null) {
-        details[t('maxAmountLabel')] = safeToString(maxAmount);
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
+        details[t('maxAmountLabel')] = String(maxAmount);
       }
 
       if (startTime !== undefined && startTime !== null) {
@@ -135,7 +123,8 @@ function extractPermissionDetails(
       }
 
       if (justification !== undefined && justification !== null) {
-        details[t('reasonLabel')] = safeToString(justification);
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
+        details[t('reasonLabel')] = String(justification);
       }
     }
   }
