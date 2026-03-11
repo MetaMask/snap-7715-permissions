@@ -3,6 +3,7 @@ import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { CaipAccountId, hexToNumber, toCaipAccountId } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
+import type { FormattedPermissionForDisplay } from './types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
 import { getClosestTimePeriod } from '../../utils/time';
@@ -59,13 +60,13 @@ export function formatMaxAmountWithMetadata(
 
 /**
  * Extracts permission details into a display-friendly format.
- * Converts PermissionResponse into a key-value object for UI rendering.
+ * Converts a permission (response or display-formatted) into a key-value object for UI rendering.
  *
- * @param permission - The permission response to extract details from.
+ * @param permission - The permission to extract details from (raw or formatted for display).
  * @returns Object of permission details for display.
  */
 function extractPermissionDetails(
-  permission: PermissionResponse,
+  permission: FormattedPermissionForDisplay,
 ): PermissionDetail {
   const details: PermissionDetail = {};
 
@@ -81,7 +82,7 @@ function extractPermissionDetails(
   }
 
   // Extract permission details based on permission type
-  const permissionData = permission.permission.data as Record<string, unknown>;
+  const permissionData = permission.permission.data;
   if (permissionData && typeof permissionData === 'object') {
     // For revocation-type permissions
     if (permissionType === 'erc20-token-revocation') {
@@ -146,11 +147,11 @@ function extractPermissionDetails(
  * Converts existingPermissions array to an object keyed by CAIP-10 from address.
  * Groups already-formatted permissions by account address.
  *
- * @param permissions - The already-formatted permission responses to group.
+ * @param permissions - The display-formatted permissions to group.
  * @returns Object with CAIP-10 addresses as keys and arrays of permission details as values.
  */
 export function groupPermissionsByFromAddress(
-  permissions: PermissionResponse[],
+  permissions: FormattedPermissionForDisplay[],
 ): Record<CaipAccountId, PermissionDetail[]> {
   const result: Record<CaipAccountId, PermissionDetail[]> = {};
 
@@ -182,16 +183,17 @@ export function groupPermissionsByFromAddress(
 /**
  * Formats a permission with token metadata for display.
  * Fetches token metadata (including for native tokens when assetAddress is undefined)
- * and formats maxAmount with decimals and symbol.
+ * and replaces maxAmount (Hex) with a human-readable string (e.g. "1.5 ETH").
+ * The result is for UI display only; do not use it where raw Hex is expected.
  *
  * @param permission - The permission response to format.
  * @param tokenMetadataService - Service for fetching token metadata.
- * @returns The formatted permission with token metadata applied to maxAmount if applicable.
+ * @returns The permission with display-formatted maxAmount; typed as FormattedPermissionForDisplay to prevent misuse.
  */
 export async function formatPermissionWithTokenMetadata(
   permission: PermissionResponse,
   tokenMetadataService: TokenMetadataService,
-): Promise<PermissionResponse> {
+): Promise<FormattedPermissionForDisplay> {
   const permissionData = permission.permission.data as Record<string, unknown>;
 
   if (!permissionData || typeof permissionData !== 'object') {
