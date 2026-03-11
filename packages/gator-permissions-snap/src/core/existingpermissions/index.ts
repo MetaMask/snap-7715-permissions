@@ -4,7 +4,8 @@ export {
   EXISTING_PERMISSIONS_CONFIRM_BUTTON,
 } from './existingPermissionsContent';
 export {
-  formatPermissionDetails,
+  formatMaxAmountWithMetadata,
+  formatPermissionWithTokenMetadata,
   groupPermissionsByFromAddress,
 } from './permissionFormatter';
 export type { ExistingPermissionDisplayConfig } from './types';

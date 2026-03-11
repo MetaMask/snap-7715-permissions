@@ -248,7 +248,7 @@
       "message": "Existing permissions"
     },
     "existingPermissionsDescription": {
-      "message": "You already have permissions from this site. Here is what you have previously granted:"
+      "message": "You already have permissions from this site. Do you want to proceed?"
     },
     "existingPermissionsConfirmButton": {
       "message": "Proceed"
@@ -270,6 +270,9 @@
     },
     "dappConnectionsLink": {
       "message": "Dapp Connections"
+    },
+    "revokeTokenApprovalsLabel": {
+      "message": "Revoke token approvals"
     }
   }
 }

@@ -22,7 +22,7 @@ export const EXISTING_PERMISSIONS_CONFIRM_BUTTON =
   'existing-permissions-confirm';
 
 // Maximum number of permissions to display per account
-const MAX_PERMISSIONS_PER_ACCOUNT = 5;
+const MAX_PERMISSIONS_PER_ACCOUNT = 3;
 
 /**
  * Builds the existing permissions display content.

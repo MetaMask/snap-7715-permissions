@@ -5,11 +5,13 @@ import {
   buildExistingPermissionsContent,
   EXISTING_PERMISSIONS_CONFIRM_BUTTON,
 } from './existingPermissionsContent';
+import { formatPermissionWithTokenMetadata } from './permissionFormatter';
 import type { ExistingPermissionDisplayConfig } from './types';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../../profileSync/profileSync';
+import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
 import type { DialogInterface } from '../dialogInterface';
 
@@ -22,15 +24,20 @@ export class ExistingPermissionsService {
 
   readonly #userEventDispatcher: UserEventDispatcher;
 
+  readonly #tokenMetadataService: TokenMetadataService;
+
   constructor({
     profileSyncManager,
     userEventDispatcher,
+    tokenMetadataService,
   }: {
     profileSyncManager: ProfileSyncManager;
     userEventDispatcher: UserEventDispatcher;
+    tokenMetadataService: TokenMetadataService;
   }) {
     this.#profileSyncManager = profileSyncManager;
     this.#userEventDispatcher = userEventDispatcher;
+    this.#tokenMetadataService = tokenMetadataService;
   }
 
   /**
@@ -49,17 +56,10 @@ export class ExistingPermissionsService {
     const allPermissions =
       await this.#profileSyncManager.getAllGrantedPermissions();
 
-    // Combine filters into single pass for efficiency
-    let matching = allPermissions.filter(
-      (permission) => permission.revocationMetadata === undefined,
-    );
-
-    matching = matching.filter(
-      (permission) => permission.siteOrigin === siteOrigin,
-    );
-
-    matching = matching.filter(
+    const matching = allPermissions.filter(
       (permission) =>
+        permission.revocationMetadata === undefined &&
+        permission.siteOrigin === siteOrigin &&
         permission.permissionResponse.chainId === permissionRequest.chainId,
     );
 
@@ -105,11 +105,19 @@ export class ExistingPermissionsService {
         return { wasCancelled: false };
       }
 
+      // Format permissions with token metadata
+      const formattedPermissions = await Promise.all(
+        existingPermissions.map(async (stored) =>
+          formatPermissionWithTokenMetadata(
+            stored.permissionResponse,
+            this.#tokenMetadataService,
+          ),
+        ),
+      );
+
       // Build configuration for the existing permissions display
       const config: ExistingPermissionDisplayConfig = {
-        existingPermissions: existingPermissions.map(
-          (permission) => permission.permissionResponse,
-        ),
+        existingPermissions: formattedPermissions,
         title: 'existingPermissionsTitle',
         description: 'existingPermissionsDescription',
         buttonLabel: 'existingPermissionsConfirmButton',
