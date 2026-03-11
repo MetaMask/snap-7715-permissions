@@ -362,7 +362,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         );
         expect(result.approved).toBe(false);
         expect(!result.approved && result.reason).toBe(
-          'Permission request denied',
+          'Permission request denied at confirmation screen',
         );
       });
 

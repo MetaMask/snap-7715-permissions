@@ -5,7 +5,7 @@ import type { Hex } from '@metamask/utils';
 
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
-import { timestampToISO8601, getClosestTimePeriod } from '../../utils/time';
+import { getClosestTimePeriod } from '../../utils/time';
 import { formatUnitsFromHex } from '../../utils/value';
 import { nameAndExplorerUrlByChainId } from '../chainMetadata';
 
@@ -129,7 +129,8 @@ function extractPermissionDetails(
       }
 
       if (startTime !== undefined && startTime !== null) {
-        details[t('startTimeLabel')] = timestampToISO8601(Number(startTime));
+        const date = new Date(Number(startTime) * 1000);
+        details[t('startTimeLabel')] = date.toLocaleString();
       }
 
       if (justification !== undefined && justification !== null) {
