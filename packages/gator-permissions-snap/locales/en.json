@@ -38,19 +38,19 @@
       "message": "The site requesting the permission"
     },
     "initialAmountLabel": {
-      "message": "Initial Amount"
+      "message": "Initial amount"
     },
     "initialAmountTooltip": {
       "message": "The initial amount of tokens that can be streamed."
     },
     "maxAmountLabel": {
-      "message": "Max Amount"
+      "message": "Max amount"
     },
     "maxAmountTooltip": {
       "message": "The maximum amount of tokens that can be streamed."
     },
     "startTimeLabel": {
-      "message": "Start Time (UTC)"
+      "message": "Start time (UTC)"
     },
     "startTimeTooltip": {
       "message": "The time at which the first period begins"
@@ -59,25 +59,34 @@
       "message": "The start time of the stream"
     },
     "expiryLabel": {
-      "message": "Expiry (UTC)"
+      "message": "Expiration date (UTC)"
     },
     "expiryTooltip": {
-      "message": "The expiry date of the permission"
+      "message": "The expiration date of the permission"
     },
     "expiryContentWhenDisabled": {
-      "message": "Never expires - we recommend that you set an expiry."
+      "message": "This permission is ongoing. We recommend setting an expiration date."
     },
     "streamAmountLabel": {
-      "message": "Stream Amount"
+      "message": "Stream amount"
     },
     "streamAmountTooltip": {
       "message": "The amount of tokens that can be streamed per period."
     },
     "streamPeriodLabel": {
-      "message": "Stream Period"
+      "message": "Stream period"
     },
     "streamPeriodTooltip": {
       "message": "The period of the stream."
+    },
+    "totalExposureUnlimited": {
+      "message": "Unlimited"
+    },
+    "totalExposureLabel": {
+      "message": "Total exposure"
+    },
+    "totalExposureTooltip": {
+      "message": "The total amount of tokens that can be streamed with this permission."
     },
     "amountLabel": {
       "message": "Amount"
@@ -164,13 +173,13 @@
       "message": "Start time must be today or later"
     },
     "errorInvalidExpiry": {
-      "message": "Invalid expiry"
+      "message": "Invalid expiration date"
     },
     "errorExpiryMustBeInFuture": {
-      "message": "Expiry must be in the future"
+      "message": "Expiration date must be in the future"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": "Start time must be before expiry"
+      "message": "Start time must be before expiration date"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
       "message": "Max amount must be greater than initial amount"

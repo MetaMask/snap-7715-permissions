@@ -1,7 +1,12 @@
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import { TimePeriod } from '../../src/core/types';
 import type { BaseContext } from '../../src/core/types';
-import { applyExpiryRule, createExpiryRule } from '../../src/permissions/rules';
+import {
+  applyExpiryRule,
+  createExpiryRule,
+  deriveExposureForStreamingPermission,
+} from '../../src/permissions/rules';
 import { timestampToISO8601 } from '../../src/utils/time';
 
 describe('createExpiryRule', () => {
@@ -204,5 +209,181 @@ describe('applyExpiryRule', () => {
 
     expect(updated.rules).toHaveLength(1);
     expect(updated.rules[0]).toStrictEqual(originalRequest.rules[0]);
+  });
+});
+
+describe('deriveExposureForStreamingPermission', () => {
+  const decimals = 18;
+
+  it('returns null when maxAmount is null and exposureAtExpiry cannot be computed (no expiry)', () => {
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: 0n,
+      amountPerPeriod: 1000n * 10n ** BigInt(decimals),
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: undefined,
+      maxAmount: null,
+      decimals,
+    });
+    expect(result).toBeNull();
+  });
+
+  it('returns null when maxAmount is null and exposureAtExpiry cannot be computed (no amount per period)', () => {
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: 0n,
+      amountPerPeriod: null,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: 86400,
+      maxAmount: null,
+      decimals,
+    });
+    expect(result).toBeNull();
+  });
+
+  it('returns formatted maxAmount when only maxAmount is set', () => {
+    const maxAmount = 10n * 10n ** BigInt(decimals);
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: null,
+      amountPerPeriod: null,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: undefined,
+      maxAmount,
+      decimals,
+    });
+    expect(result).toBe('10');
+  });
+
+  it('returns formatted exposureAtExpiry when expiry and amountPerPeriod set and maxAmount null', () => {
+    // 1 day = 86400 seconds; amountPerPeriod = 86400 * 10^18 (1 token/sec in wei) -> amountPerSecond = 10^18
+    // exposure at expiry = 0 + 86400 * 10^18 = 86400e18 -> "86400"
+    const oneDaySeconds = 86400;
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const amountPerDay = 86400n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: 0n,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: oneDaySeconds,
+      maxAmount: null,
+      decimals,
+    });
+    expect(result).toBe('86400');
+  });
+
+  it('returns min of maxAmount and exposureAtExpiry when both set (maxAmount smaller)', () => {
+    const oneDaySeconds = 86400;
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const amountPerDay = 86400n * oneTokenWei;
+    const maxAmount = 5n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: 0n,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: oneDaySeconds,
+      maxAmount,
+      decimals,
+    });
+    expect(result).toBe('5');
+  });
+
+  it('returns min of maxAmount and exposureAtExpiry when both set (exposureAtExpiry smaller)', () => {
+    const halfDaySeconds = 43200;
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const amountPerDay = 86400n * oneTokenWei;
+    const maxAmount = 100000n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: 0n,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: halfDaySeconds,
+      maxAmount,
+      decimals,
+    });
+    // exposure at half day = 43200 tokens, min(100000, 43200) = 43200
+    expect(result).toBe('43200');
+  });
+
+  it('includes initialAmount in exposure-at-expiry calculation', () => {
+    const oneDaySeconds = 86400;
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const initialAmount = 3n * oneTokenWei;
+    const amountPerDay = 86400n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: oneDaySeconds,
+      maxAmount: null,
+      decimals,
+    });
+    // initial 3 + 86400 over 1 day = 86403
+    expect(result).toBe('86403');
+  });
+
+  it('uses zero for initialAmount when null in exposure-at-expiry', () => {
+    const oneDaySeconds = 86400;
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const amountPerDay = 86400n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: null,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: oneDaySeconds,
+      maxAmount: null,
+      decimals,
+    });
+    expect(result).toBe('86400');
+  });
+
+  it('returns initialAmount when startTime is greater than expiryTimestamp (initialAmount set)', () => {
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const initialAmount = 5n * oneTokenWei;
+    const amountPerDay = 86400n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 1000,
+      expiryTimestamp: 100,
+      maxAmount: null,
+      decimals,
+    });
+    expect(result).toBe('5');
+  });
+
+  it('returns zero when startTime is greater than expiryTimestamp (initialAmount null)', () => {
+    const oneTokenWei = 10n ** BigInt(decimals);
+    const amountPerDay = 86400n * oneTokenWei;
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: null,
+      amountPerPeriod: amountPerDay,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 1000,
+      expiryTimestamp: 100,
+      maxAmount: null,
+      decimals,
+    });
+    expect(result).toBe('0');
+  });
+
+  it('formats total exposure with given decimals', () => {
+    const value = 12345n * 10n ** BigInt(decimals);
+    const result = deriveExposureForStreamingPermission({
+      initialAmount: null,
+      amountPerPeriod: null,
+      timePeriod: TimePeriod.DAILY,
+      startTime: 0,
+      expiryTimestamp: undefined,
+      maxAmount: value,
+      decimals,
+    });
+    expect(result).toBe('12345');
   });
 });

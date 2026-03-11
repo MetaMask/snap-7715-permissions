@@ -1,12 +1,5 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import {
-  Box,
-  Divider,
-  Field,
-  Input,
-  Section,
-  Text,
-} from '@metamask/snaps-sdk/jsx';
+import { Box, Divider, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import {
   initialAmountRule,
@@ -21,7 +14,7 @@ import type {
   NativeTokenStreamMetadata,
 } from './types';
 import { renderRules } from '../../core/rules';
-import { TokenIcon, TooltipIcon } from '../../ui/components';
+import { Field, TokenIcon } from '../../ui/components';
 import { t } from '../../utils/i18n';
 
 /**
@@ -38,7 +31,17 @@ export async function createConfirmationContent({
   context: NativeTokenStreamContext;
   metadata: NativeTokenStreamMetadata;
 }): Promise<SnapElement> {
-  const { amountPerSecond } = metadata;
+  const { amountPerSecond, totalExposure } = metadata;
+
+  const totalExposureValue =
+    totalExposure === null
+      ? t('totalExposureUnlimited')
+      : `${totalExposure} ${context.tokenMetadata.symbol}`;
+
+  const streamRateValue = t('streamRateValue', [
+    amountPerSecond,
+    context.tokenMetadata.symbol,
+  ]);
 
   return (
     <Box>
@@ -63,28 +66,43 @@ export async function createConfirmationContent({
           metadata,
         })}
 
-        <Box direction="vertical">
-          <Box direction="horizontal" alignment="space-between">
+        <Field
+          label={t('streamRateLabel')}
+          tooltip={t('streamRateTooltip')}
+          variant="display"
+          direction="vertical"
+        >
+          <Section>
             <Box direction="horizontal">
-              <Text>{t('streamRateLabel')}</Text>
-              <TooltipIcon tooltip={t('streamRateTooltip')} />
+              <Box>
+                <TokenIcon
+                  imageDataBase64={context.tokenMetadata.iconDataBase64}
+                  altText={context.tokenMetadata.symbol}
+                />
+              </Box>
+              <Text>{streamRateValue}</Text>
             </Box>
-          </Box>
-          <Field>
-            <Box>
-              <TokenIcon
-                imageDataBase64={context.tokenMetadata.iconDataBase64}
-                altText={context.tokenMetadata.symbol}
-              />
+          </Section>
+        </Field>
+
+        <Field
+          label={t('totalExposureLabel')}
+          tooltip={t('totalExposureTooltip')}
+          variant="display"
+          direction="vertical"
+        >
+          <Section>
+            <Box direction="horizontal">
+              <Box>
+                <TokenIcon
+                  imageDataBase64={context.tokenMetadata.iconDataBase64}
+                  altText={context.tokenMetadata.symbol}
+                />
+              </Box>
+              <Text>{totalExposureValue}</Text>
             </Box>
-            <Input
-              name="stream-rate"
-              type="text"
-              value={t('streamRateValue', [amountPerSecond, 'ETH'])}
-              disabled={true}
-            />
-          </Field>
-        </Box>
+          </Section>
+        </Field>
       </Section>
     </Box>
   );

@@ -18,6 +18,7 @@ import type {
 
 export type Erc20TokenStreamMetadata = BaseMetadata & {
   amountPerSecond: string;
+  totalExposure: string | null;
   validationErrors: {
     initialAmountError?: string;
     maxAmountError?: string;

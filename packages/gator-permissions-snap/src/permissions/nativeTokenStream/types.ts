@@ -17,6 +17,7 @@ import type {
 
 export type NativeTokenStreamMetadata = BaseMetadata & {
   amountPerSecond: string;
+  totalExposure: string | null;
   validationErrors: {
     initialAmountError?: string;
     maxAmountError?: string;

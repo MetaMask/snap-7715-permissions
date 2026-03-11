@@ -1,4 +1,4 @@
-import { Input } from '@metamask/snaps-sdk/jsx';
+import { Text, Input } from '@metamask/snaps-sdk/jsx';
 
 import type { InputFieldProps } from './Field';
 import { Field } from './Field';
@@ -33,18 +33,23 @@ export const InputField = ({
   iconData,
   contentWhenDisabled,
 }: InputFieldParams): JSX.Element => {
+  const isFieldEnabled = value !== null && value !== undefined;
+
   if (!isEditable) {
+    if (!isFieldEnabled) {
+      // we can't just return null here, so we return an empty Text element
+      return <Text> </Text>;
+    }
     return (
       <TextField
         label={label}
         value={value ?? ''}
         tooltip={tooltip}
         iconData={iconData}
+        direction="vertical"
       />
     );
   }
-
-  const isFieldEnabled = value !== null && value !== undefined;
 
   return (
     <Field

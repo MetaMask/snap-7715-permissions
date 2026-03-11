@@ -529,7 +529,7 @@ describe('rules', () => {
 {
   "key": null,
   "props": {
-    "alignment": "space-between",
+    "alignment": "start",
     "children": [
       {
         "key": null,
@@ -588,10 +588,38 @@ describe('rules', () => {
             {
               "key": null,
               "props": {
-                "alignment": "end",
-                "children": "test-value",
+                "children": {
+                  "key": null,
+                  "props": {
+                    "children": [
+                      {
+                        "key": null,
+                        "props": {
+                          "children": {
+                            "key": null,
+                            "props": {
+                              "children": " ",
+                            },
+                            "type": "Text",
+                          },
+                        },
+                        "type": "Box",
+                      },
+                      {
+                        "key": null,
+                        "props": {
+                          "alignment": "end",
+                          "children": "test-value",
+                        },
+                        "type": "Text",
+                      },
+                    ],
+                    "direction": "horizontal",
+                  },
+                  "type": "Box",
+                },
               },
-              "type": "Text",
+              "type": "Section",
             },
           ],
           "direction": "horizontal",
@@ -599,7 +627,7 @@ describe('rules', () => {
         "type": "Box",
       },
     ],
-    "direction": "horizontal",
+    "direction": "vertical",
   },
   "type": "Box",
 }
@@ -721,58 +749,9 @@ describe('rules', () => {
 {
   "key": null,
   "props": {
-    "alignment": "space-between",
-    "children": [
-      {
-        "key": null,
-        "props": {
-          "alignment": "space-between",
-          "children": [
-            {
-              "key": null,
-              "props": {
-                "children": [
-                  {
-                    "key": null,
-                    "props": {
-                      "children": "Undefined Value Rule",
-                    },
-                    "type": "Text",
-                  },
-                  null,
-                ],
-                "direction": "horizontal",
-              },
-              "type": "Box",
-            },
-            null,
-          ],
-          "direction": "horizontal",
-        },
-        "type": "Box",
-      },
-      {
-        "key": null,
-        "props": {
-          "children": [
-            null,
-            {
-              "key": null,
-              "props": {
-                "alignment": "end",
-                "children": "",
-              },
-              "type": "Text",
-            },
-          ],
-          "direction": "horizontal",
-        },
-        "type": "Box",
-      },
-    ],
-    "direction": "horizontal",
+    "children": " ",
   },
-  "type": "Box",
+  "type": "Text",
 }
 `);
     });

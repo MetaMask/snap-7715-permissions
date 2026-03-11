@@ -291,7 +291,7 @@ describe('validatePermissionRequestParam', () => {
       { timestamp: 0.1 },
       { data: 1234 },
     ])(
-      'should throw InvalidInputError for invalid expiry rule data %s',
+      'should throw InvalidInputError for Invalid expiration date rule data %s',
       (ruleData) => {
         expect(() => {
           validatePermissionRequestParam({

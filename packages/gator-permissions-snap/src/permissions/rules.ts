@@ -19,6 +19,77 @@ import {
   TIME_PERIOD_TO_SECONDS,
   timestampToISO8601,
 } from '../utils/time';
+import { formatUnits } from '../utils/value';
+
+/**
+ * Parameters required to derive total exposure for a stream-style permission.
+ * Total exposure is the minimum of max amount and (when expiry and rate exist)
+ * initial amount + (expiry - start) * amountPerSecond.
+ */
+export type ExposureParams = {
+  /** Initial amount (bigint), or null for zero. */
+  initialAmount: bigint | null;
+  /** Amount per time period (bigint), or null if no stream rate. */
+  amountPerPeriod: bigint | null;
+  /** Time period for amountPerPeriod. */
+  timePeriod: TimePeriod;
+  /** Permission start time (Unix seconds). */
+  startTime: number;
+  /** Expiry timestamp (Unix seconds), or undefined if no expiry. */
+  expiryTimestamp: number | undefined;
+  /** Max amount cap (bigint), or null if uncapped. */
+  maxAmount: bigint | null;
+  /** Token decimals for formatting. */
+  decimals: number;
+};
+
+/**
+ * Derives total exposure and returns it as a formatted string.
+ * Total exposure is the smaller of maxAmount and exposure-at-expiry (when both
+ * are defined); otherwise the one that is defined, or null.
+ *
+ * @param params - Minimum parameters to compute total exposure.
+ * @returns Formatted total exposure string, or null if not determinable.
+ */
+export function deriveExposureForStreamingPermission(
+  params: ExposureParams,
+): string | null {
+  const {
+    initialAmount,
+    amountPerPeriod,
+    timePeriod,
+    startTime,
+    expiryTimestamp,
+    maxAmount,
+    decimals,
+  } = params;
+
+  let exposureAtExpiry: bigint | null = null;
+  if (expiryTimestamp !== undefined && amountPerPeriod !== null) {
+    const amountPerSecondBigInt =
+      amountPerPeriod / TIME_PERIOD_TO_SECONDS[timePeriod];
+
+    const elapsed = expiryTimestamp - startTime;
+
+    if (elapsed > 0) {
+      exposureAtExpiry =
+        (initialAmount ?? 0n) + BigInt(elapsed) * amountPerSecondBigInt;
+    } else {
+      exposureAtExpiry = initialAmount ?? 0n;
+    }
+  }
+
+  let totalExposure: bigint | null = null;
+  if (maxAmount !== null && exposureAtExpiry !== null) {
+    totalExposure = maxAmount < exposureAtExpiry ? maxAmount : exposureAtExpiry;
+  } else {
+    totalExposure = maxAmount ?? exposureAtExpiry ?? null;
+  }
+
+  return totalExposure === null
+    ? null
+    : formatUnits({ value: totalExposure, decimals });
+}
 
 export type ExpiryRuleContext = BaseContext;
 

@@ -48,6 +48,8 @@ export type ViewFieldProps = BaseFieldProps & {
         iconAltText: string;
       }
     | undefined;
+  /** Layout direction: label and value side-by-side (horizontal) or stacked (vertical). */
+  direction?: 'horizontal' | 'vertical' | undefined;
 };
 
 export type InputFieldProps = BaseFieldProps & {
@@ -190,14 +192,20 @@ export const Field = (props: FieldProps): JSX.Element => {
     ) : null;
 
     if (isDisplayFieldProps(props)) {
-      const { children } = props;
+      const { children, direction = 'horizontal' } = props;
+      const contentBox = (
+        <Box direction="horizontal">
+          {iconElement}
+          {children}
+        </Box>
+      );
       return (
-        <Box direction="horizontal" alignment="space-between">
+        <Box
+          direction={direction}
+          alignment={direction === 'vertical' ? 'start' : 'space-between'}
+        >
           {labelSection}
-          <Box direction="horizontal">
-            {iconElement}
-            {children}
-          </Box>
+          {contentBox}
         </Box>
       );
     }

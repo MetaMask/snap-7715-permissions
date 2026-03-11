@@ -1,4 +1,4 @@
-import { DateTimePicker } from '@metamask/snaps-sdk/jsx';
+import { DateTimePicker, Text } from '@metamask/snaps-sdk/jsx';
 
 import type { BaseFieldProps } from './Field';
 import { Field } from './Field';
@@ -37,6 +37,10 @@ export const DateTimePickerField = ({
   const isFieldEnabled = value !== null && value !== undefined;
 
   if (!isEditable) {
+    if (!isFieldEnabled) {
+      // we can't just return null here, so we return an empty Text element
+      return <Text> </Text>;
+    }
     // Format the ISO date to a readable format for display.
     // We convert to local timezone for display purposes so users see the time
     // they're familiar with, even though the internal timestamp representation is in UTC.
@@ -52,7 +56,14 @@ export const DateTimePickerField = ({
       }
     }
 
-    return <TextField label={label} value={displayValue} tooltip={tooltip} />;
+    return (
+      <TextField
+        label={label}
+        value={displayValue}
+        tooltip={tooltip}
+        direction="vertical"
+      />
+    );
   }
 
   // Convert allowPastDate to disablePast for the Snaps SDK component

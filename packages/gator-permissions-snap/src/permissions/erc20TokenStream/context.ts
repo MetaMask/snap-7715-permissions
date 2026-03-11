@@ -28,7 +28,10 @@ import {
   calculateAmountPerSecond,
   validateStartTimeVsExpiry,
 } from '../contextValidation';
-import { applyExpiryRule } from '../rules';
+import {
+  applyExpiryRule,
+  deriveExposureForStreamingPermission,
+} from '../rules';
 
 const DEFAULT_MAX_AMOUNT =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -323,8 +326,19 @@ export async function deriveMetadata({
     validationErrors.maxAmountError = maxVsInitialError;
   }
 
+  const totalExposureFormatted = deriveExposureForStreamingPermission({
+    initialAmount: initialAmountResult.amount,
+    amountPerPeriod: amountPerPeriodResult.amount,
+    timePeriod: permissionDetails.timePeriod,
+    startTime: permissionDetails.startTime,
+    expiryTimestamp: expiry?.timestamp,
+    maxAmount: maxAmountResult.amount,
+    decimals,
+  });
+
   return {
     amountPerSecond,
     validationErrors,
+    totalExposure: totalExposureFormatted,
   };
 }
