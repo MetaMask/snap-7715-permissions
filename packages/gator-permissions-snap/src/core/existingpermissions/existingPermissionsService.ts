@@ -41,18 +41,18 @@ export class ExistingPermissionsService {
   }
 
   /**
-   * Finds an existing permission matching the given request and origin.
+   * Finds existing permissions matching the given request and origin.
    * Uses a filtering pattern similar to getGrantedPermissions in rpcHandler.
    * Filters by isRevoked, siteOrigin, chainId, and delegationManager.
    *
    * @param permissionRequest - The permission request to match.
    * @param siteOrigin - The origin of the requesting dApp.
-   * @returns The matching stored permission, or undefined if not found.
+   * @returns An array of matching stored permissions, or an empty array if not found.
    */
   async #findMatchingExistingPermission(
     permissionRequest: PermissionRequest,
     siteOrigin: string,
-  ): Promise<StoredGrantedPermission[] | undefined> {
+  ): Promise<StoredGrantedPermission[]> {
     const allPermissions =
       await this.#profileSyncManager.getAllGrantedPermissions();
 
@@ -67,22 +67,22 @@ export class ExistingPermissionsService {
   }
 
   /**
-   * Gets the existing permission matching the given request, or undefined if not found.
+   * Gets existing permissions matching the given request.
    * @param permissionRequest - The permission request to check.
    * @param siteOrigin - The origin of the requesting dApp.
-   * @returns The matching stored permission, or undefined if not found.
+   * @returns An array of matching stored permissions, or an empty array if not found.
    */
   async getExistingPermissions(
     permissionRequest: PermissionRequest,
     siteOrigin: string,
-  ): Promise<StoredGrantedPermission[] | undefined> {
+  ): Promise<StoredGrantedPermission[]> {
     try {
       return await this.#findMatchingExistingPermission(
         permissionRequest,
         siteOrigin,
       );
     } catch {
-      return undefined;
+      return [];
     }
   }
 

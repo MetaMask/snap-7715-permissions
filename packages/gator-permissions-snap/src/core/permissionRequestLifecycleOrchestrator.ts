@@ -157,6 +157,14 @@ export class PermissionRequestLifecycleOrchestrator {
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
 
+    // Start loading existing permissions in the background before showing introduction
+    // This way if the introduction is shown, the existing permissions will already be loaded
+    const existingPermissionsPromise =
+      this.#existingPermissionsService.getExistingPermissions(
+        permissionRequest,
+        origin,
+      );
+
     // Check if we need to show introduction
     if (
       await this.#permissionIntroductionService.shouldShowIntroduction(
@@ -180,7 +188,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
         return {
           approved: false,
-          reason: 'Permission request denied',
+          reason: 'Permission request denied at introduction screen',
         };
       }
 
@@ -189,14 +197,10 @@ export class PermissionRequestLifecycleOrchestrator {
       );
     }
 
-    // Check if user already has an existing permission of this type from this site
-    const existingPermissions =
-      await this.#existingPermissionsService.getExistingPermissions(
-        permissionRequest,
-        origin,
-      );
+    // Await the existing permissions that were started loading earlier
+    const existingPermissions = await existingPermissionsPromise;
 
-    if (existingPermissions && existingPermissions.length > 0) {
+    if (existingPermissions?.length > 0) {
       const { wasCancelled } =
         await this.#existingPermissionsService.showExistingPermissions({
           dialogInterface,
@@ -214,7 +218,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
         return {
           approved: false,
-          reason: 'Permission request denied',
+          reason: 'Permission request denied at existing permissions screen',
         };
       }
     }
@@ -459,7 +463,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
       return {
         approved: false,
-        reason: 'Permission request denied',
+        reason: 'Permission request denied at confirmation screen',
       };
     } catch (error) {
       // Any unexpected error during the flow should immediately close the dialog
