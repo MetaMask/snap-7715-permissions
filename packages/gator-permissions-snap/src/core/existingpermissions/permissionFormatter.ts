@@ -1,6 +1,6 @@
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
-import { CaipAccountId, hexToNumber, toCaipAccountId } from '@metamask/utils';
+import { hexToNumber } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
 import type { FormattedPermissionForDisplay } from './types';
@@ -143,8 +143,8 @@ function extractPermissionDetails(
  */
 export function groupPermissionsByFromAddress(
   permissions: FormattedPermissionForDisplay[],
-): Record<CaipAccountId, PermissionDetail[]> {
-  const result: Record<CaipAccountId, PermissionDetail[]> = {};
+): Record<Hex, PermissionDetail[]> {
+  const result: Record<Hex, PermissionDetail[]> = {};
 
   for (const permission of permissions) {
     const { from, chainId } = permission;
@@ -154,18 +154,11 @@ export function groupPermissionsByFromAddress(
       continue;
     }
 
-    // Convert to CAIP-10 format (eip155 expects decimal chain id, not hex)
-    const caip10Address = toCaipAccountId(
-      'eip155',
-      hexToNumber(chainId).toString(),
-      from,
-    );
-
     // Initialize array if key doesn't exist
-    result[caip10Address] ??= [];
+    result[from] ??= [];
 
     // Extract and add permission details
-    result[caip10Address].push(extractPermissionDetails(permission));
+    result[from].push(extractPermissionDetails(permission));
   }
 
   return result;

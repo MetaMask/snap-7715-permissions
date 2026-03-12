@@ -82,7 +82,7 @@ describe('ExistingPermissionsService', () => {
 
     // Setup mock DialogInterface
     mockDialogInterface = {
-      show: jest.fn().mockResolvedValue('interface-id'),
+      show: jest.fn(async (_ui: any, _onClose?: () => void) => 'interface-id'),
       interfaceId: 'interface-id',
     } as unknown as jest.Mocked<DialogInterface>;
 

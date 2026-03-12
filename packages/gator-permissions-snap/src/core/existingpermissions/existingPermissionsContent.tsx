@@ -12,7 +12,7 @@ import {
   Skeleton,
 } from '@metamask/snaps-sdk/jsx';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { CaipAccountId } from '@metamask/utils';
+import { Hex } from '@metamask/utils';
 
 import { groupPermissionsByFromAddress } from './permissionFormatter';
 import type { ExistingPermissionDisplayConfig } from './types';
@@ -118,10 +118,7 @@ export function buildExistingPermissionsContent(
               <Box direction="vertical">
                 <Box direction="horizontal" alignment="space-between">
                   <Text fontWeight="bold">{t('accountLabel')}</Text>
-                  <Address
-                    address={accountAddress as CaipAccountId}
-                    displayName={true}
-                  />
+                  <Address address={accountAddress as Hex} displayName={true} />
                 </Box>
                 <Divider />
                 {displayedPermissions.map((detail, index) => (
