@@ -74,7 +74,7 @@ export function buildExistingPermissionsSkeletonContent(
         ))}
       </Box>
       <Footer>
-        <Button name={EXISTING_PERMISSIONS_CONFIRM_BUTTON}>
+        <Button name={EXISTING_PERMISSIONS_CONFIRM_BUTTON} disabled={true}>
           {t(buttonLabel)}
         </Button>
       </Footer>
