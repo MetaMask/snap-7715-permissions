@@ -18,23 +18,23 @@ export type PermissionDetail = {
 };
 
 /**
- * Formats a maxAmount value using token metadata (decimals and symbol).
- * @param maxAmount - The amount in hex format.
+ * Formats a token amount value using token metadata (decimals and symbol).
+ * @param amount - The amount in hex format.
  * @param decimals - The token decimals.
  * @param symbol - The token symbol.
- * @returns The formatted amount with symbol, or 'Unlimited' if maxAmount is null/undefined.
+ * @returns The formatted amount with symbol, or 'Unlimited' if amount is null/undefined.
  */
-function formatMaxAmountWithMetadata(
-  maxAmount: Hex | undefined | null,
+function formatTokenAmountWithMetadata(
+  amount: Hex | undefined | null,
   decimals: number,
   symbol: string,
 ): string {
-  if (maxAmount === undefined || maxAmount === null) {
+  if (amount === undefined || amount === null) {
     return t('unlimited');
   }
 
   const formattedAmount = formatUnitsFromHex({
-    value: maxAmount,
+    value: amount,
     allowNull: false,
     decimals,
   });
@@ -45,8 +45,9 @@ function formatMaxAmountWithMetadata(
 /**
  * Extracts permission details into a display-friendly format.
  * Converts a permission (response or display-formatted) into a key-value object for UI rendering.
+ * Note: Token amounts (periodAmount, maxAmount) should be pre-formatted with metadata by formatPermissionWithTokenMetadata.
  *
- * @param permission - The permission to extract details from (raw or formatted for display).
+ * @param permission - The permission to extract details from (should be pre-formatted with token metadata).
  * @returns Object of permission details for display.
  */
 function extractPermissionDetails(
@@ -67,6 +68,7 @@ function extractPermissionDetails(
 
   // Extract permission details based on permission type
   const permissionData = permission.permission.data;
+
   if (permissionData && typeof permissionData === 'object') {
     // For revocation-type permissions
     if (permissionType === 'erc20-token-revocation') {
@@ -81,17 +83,21 @@ function extractPermissionDetails(
         }
       }
     }
-    // For subscription-type permissions
-    else if ('interval' in permissionData && 'maxAmount' in permissionData) {
-      const { maxAmount, interval, justification } = permissionData;
+    // For periodic-type permissions
+    else if (
+      'periodDuration' in permissionData &&
+      'periodAmount' in permissionData
+    ) {
+      const { periodAmount, periodDuration, justification } = permissionData;
 
-      if (maxAmount !== undefined && maxAmount !== null) {
+      if (periodAmount !== undefined && periodAmount !== null) {
+        // periodAmount is already formatted with token metadata by formatPermissionWithTokenMetadata
         // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-        details[t('maxAmountLabel')] = String(maxAmount);
+        details[t('amountLabel')] = String(periodAmount);
       }
 
-      if (interval !== undefined && interval !== null) {
-        const timePeriod = getClosestTimePeriod(Number(interval));
+      if (periodDuration !== undefined && periodDuration !== null) {
+        const timePeriod = getClosestTimePeriod(Number(periodDuration));
         details[t('periodDurationLabel')] = t(
           timePeriod.toLowerCase() as
             | 'hourly'
@@ -113,6 +119,7 @@ function extractPermissionDetails(
       const { maxAmount, startTime, justification } = permissionData;
 
       if (maxAmount !== undefined && maxAmount !== null) {
+        // maxAmount is already formatted with token metadata by formatPermissionWithTokenMetadata
         // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
         details[t('maxAmountLabel')] = String(maxAmount);
       }
@@ -167,12 +174,12 @@ export function groupPermissionsByFromAddress(
 /**
  * Formats a permission with token metadata for display.
  * Fetches token metadata (including for native tokens when assetAddress is undefined)
- * and replaces maxAmount (Hex) with a human-readable string (e.g. "1.5 ETH").
+ * and replaces token amount fields (periodAmount, maxAmount in Hex) with human-readable strings (e.g. "1.5 ETH").
  * The result is for UI display only; do not use it where raw Hex is expected.
  *
  * @param permission - The permission response to format.
  * @param tokenMetadataService - Service for fetching token metadata.
- * @returns The permission with display-formatted maxAmount; typed as FormattedPermissionForDisplay to prevent misuse.
+ * @returns The permission with display-formatted token amounts; typed as FormattedPermissionForDisplay to prevent misuse.
  */
 export async function formatPermissionWithTokenMetadata(
   permission: PermissionResponse,
@@ -184,52 +191,63 @@ export async function formatPermissionWithTokenMetadata(
     return permission;
   }
 
-  // Check if this permission has a maxAmount field
-  if (
-    'maxAmount' in permissionData &&
-    ('interval' in permissionData || 'startTime' in permissionData)
-  ) {
-    const { maxAmount, tokenAddress } = permissionData;
+  // Check if this permission has token amount fields that need formatting
+  const hasTokenAmountFields =
+    'maxAmount' in permissionData || 'periodAmount' in permissionData;
 
-    try {
-      const chainId = hexToNumber(permission.chainId);
-      const options: Parameters<
-        typeof tokenMetadataService.getTokenBalanceAndMetadata
-      >[0] = {
+  if (!hasTokenAmountFields) {
+    return permission;
+  }
+
+  // Extract token address for metadata lookup
+  const tokenAddress = permissionData.tokenAddress as string | undefined;
+
+  try {
+    const chainId = hexToNumber(permission.chainId);
+    const options: Parameters<typeof tokenMetadataService.getTokenMetadata>[0] =
+      {
         chainId,
         account: permission.from as `0x${string}`,
       };
 
-      if (tokenAddress && typeof tokenAddress === 'string') {
-        options.assetAddress = tokenAddress as `0x${string}`;
-      }
+    if (tokenAddress && typeof tokenAddress === 'string') {
+      options.assetAddress = tokenAddress as `0x${string}`;
+    }
 
-      const { decimals, symbol } =
-        await tokenMetadataService.getTokenBalanceAndMetadata(options);
+    const { decimals, symbol } =
+      await tokenMetadataService.getTokenMetadata(options);
 
-      // Format the maxAmount with decimals and symbol
-      const formattedMaxAmount = formatMaxAmountWithMetadata(
-        maxAmount as Hex | null | undefined,
+    // Format all token amount fields with token metadata
+    const formattedData = { ...permissionData };
+
+    // Format maxAmount if present (stream-type permissions)
+    if ('maxAmount' in permissionData) {
+      formattedData.maxAmount = formatTokenAmountWithMetadata(
+        permissionData.maxAmount as Hex | null | undefined,
         decimals,
         symbol,
       );
-
-      // Return permission with formatted maxAmount
-      return {
-        ...permission,
-        permission: {
-          ...permission.permission,
-          data: {
-            ...permissionData,
-            maxAmount: formattedMaxAmount,
-          },
-        },
-      };
-    } catch {
-      // If token metadata fetch fails, return original permission
-      return permission;
     }
-  }
 
-  return permission;
+    // Format periodAmount if present (periodic-type permissions)
+    if ('periodAmount' in permissionData) {
+      formattedData.periodAmount = formatTokenAmountWithMetadata(
+        permissionData.periodAmount as Hex | null | undefined,
+        decimals,
+        symbol,
+      );
+    }
+
+    // Return permission with formatted token amounts
+    return {
+      ...permission,
+      permission: {
+        ...permission.permission,
+        data: formattedData,
+      },
+    };
+  } catch {
+    // If token metadata fetch fails, return original permission
+    return permission;
+  }
 }
