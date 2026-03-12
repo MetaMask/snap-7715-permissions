@@ -438,14 +438,15 @@ describe('zSanitizedJustification', () => {
 
     it('handles boundary conditions', () => {
       // Test with maximum allowed length
-      const maxLength = 'a'.repeat(120);
+      const maxLength = 'a'.repeat(300);
       expect(() => zSanitizedJustification.parse(maxLength)).not.toThrow();
 
       // Test with minimum allowed length
       expect(() => zSanitizedJustification.parse('a')).not.toThrow();
 
-      // Test with exactly 120 characters containing spaces
-      const maxLengthWithSpaces = 'a '.repeat(60).trim();
+      // Test with exactly 300 characters containing spaces
+      const maxLengthWithSpaces = `${'a '.repeat(149)}aa`;
+      expect(maxLengthWithSpaces).toHaveLength(300);
       expect(() =>
         zSanitizedJustification.parse(maxLengthWithSpaces),
       ).not.toThrow();
