@@ -25,15 +25,15 @@ describe('zSanitizedJustification', () => {
       expect(result2).toBe(DEFAULT_JUSTIFICATION_MESSAGE);
     });
 
-    it('rejects strings longer than 120 characters', () => {
-      const longString = 'a'.repeat(121);
+    it('rejects strings longer than 300 characters', () => {
+      const longString = 'a'.repeat(301);
       expect(() => zSanitizedJustification.parse(longString)).toThrow(
-        'Justification cannot exceed 120 characters',
+        'Justification cannot exceed 300 characters',
       );
     });
 
-    it('accepts strings exactly 120 characters', () => {
-      const exactString = 'a'.repeat(120);
+    it('accepts strings exactly 300 characters', () => {
+      const exactString = 'a'.repeat(300);
       expect(() => zSanitizedJustification.parse(exactString)).not.toThrow();
     });
   });
@@ -438,14 +438,15 @@ describe('zSanitizedJustification', () => {
 
     it('handles boundary conditions', () => {
       // Test with maximum allowed length
-      const maxLength = 'a'.repeat(120);
+      const maxLength = 'a'.repeat(300);
       expect(() => zSanitizedJustification.parse(maxLength)).not.toThrow();
 
       // Test with minimum allowed length
       expect(() => zSanitizedJustification.parse('a')).not.toThrow();
 
-      // Test with exactly 120 characters containing spaces
-      const maxLengthWithSpaces = 'a '.repeat(60).trim();
+      // Test with exactly 300 characters containing spaces
+      const maxLengthWithSpaces = `${'a '.repeat(149)}aa`;
+      expect(maxLengthWithSpaces).toHaveLength(300);
       expect(() =>
         zSanitizedJustification.parse(maxLengthWithSpaces),
       ).not.toThrow();

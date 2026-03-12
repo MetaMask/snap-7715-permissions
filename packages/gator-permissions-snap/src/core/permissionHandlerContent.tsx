@@ -209,18 +209,16 @@ export const PermissionHandlerContent = ({
           </Box>
         </Section>
         <Section>
-          <Box direction="horizontal" alignment="space-between">
+          <Box direction="vertical" alignment="space-between">
             <Box direction="horizontal">
               <Text>{t('reasonLabel')}</Text>
               <TooltipIcon tooltip={t('reasonTooltip')} />
             </Box>
-            <Box direction="horizontal">
-              <ShowMoreText
-                text={justification}
-                buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
-                isCollapsed={isJustificationCollapsed}
-              />
-            </Box>
+            <ShowMoreText
+              text={justification}
+              buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
+              isCollapsed={isJustificationCollapsed}
+            />
           </Box>
         </Section>
         <Section>
