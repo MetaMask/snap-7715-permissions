@@ -19,10 +19,10 @@
     "tokenTooltip": {
       "message": "El token solicitado"
     },
-    "reasonLabel": {
+    "justificationLabel": {
       "message": "Motivo"
     },
-    "reasonTooltip": {
+    "justificationTooltip": {
       "message": "El motivo dado por el destinatario para solicitar este permiso."
     },
     "accountLabel": {

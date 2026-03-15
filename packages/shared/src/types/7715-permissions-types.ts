@@ -64,7 +64,7 @@ const DEFAULT_JUSTIFICATION_MESSAGE =
 /**
  * Sanitized justification schema that:
  * - Makes justification optional (null/undefined/empty becomes default message)
- * - Limits length to 120 characters
+ * - Limits length to 300 characters
  * - Trims excessive whitespace and normalizes control characters
  * - Prevents JSON, XML, dangerous control characters, and quotes
  * - Ensures the string is safe for display
@@ -98,7 +98,7 @@ export const zSanitizedJustification = z
         z
           .string()
           .min(1, 'Justification cannot be empty')
-          .max(120, 'Justification cannot exceed 120 characters')
+          .max(300, 'Justification cannot exceed 300 characters')
           .refine(
             (val) => {
               // Check for markup/script patterns (covers HTML, XML, JSON, CSS)
