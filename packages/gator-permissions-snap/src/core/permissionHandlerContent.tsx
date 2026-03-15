@@ -211,8 +211,8 @@ export const PermissionHandlerContent = ({
         <Section>
           <Box direction="vertical" alignment="space-between">
             <Box direction="horizontal">
-              <Text>{t('reasonLabel')}</Text>
-              <TooltipIcon tooltip={t('reasonTooltip')} />
+              <Text>{t('justificationLabel')}</Text>
+              <TooltipIcon tooltip={t('justificationTooltip')} />
             </Box>
             <ShowMoreText
               text={justification}
@@ -273,8 +273,8 @@ export const SkeletonPermissionHandlerContent = ({
         </Section>
         <Section>
           <SkeletonField
-            label={t('reasonLabel')}
-            tooltip={t('reasonTooltip')}
+            label={t('justificationLabel')}
+            tooltip={t('justificationTooltip')}
           />
         </Section>
         <Section>

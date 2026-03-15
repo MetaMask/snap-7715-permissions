@@ -77,7 +77,7 @@ function extractPermissionDetails(
         const { justification } = permissionData;
         if (justification !== undefined && justification !== null) {
           // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-          details[t('reasonLabel')] = String(justification);
+          details[t('justificationLabel')] = String(justification);
         }
       }
     }
@@ -105,7 +105,7 @@ function extractPermissionDetails(
 
       if (justification !== undefined && justification !== null) {
         // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-        details[t('reasonLabel')] = String(justification);
+        details[t('justificationLabel')] = String(justification);
       }
     }
     // For stream-type permissions
@@ -124,7 +124,7 @@ function extractPermissionDetails(
 
       if (justification !== undefined && justification !== null) {
         // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-        details[t('reasonLabel')] = String(justification);
+        details[t('justificationLabel')] = String(justification);
       }
     }
   }

@@ -19,10 +19,10 @@
     "tokenTooltip": {
       "message": ""
     },
-    "reasonLabel": {
+    "justificationLabel": {
       "message": ""
     },
-    "reasonTooltip": {
+    "justificationTooltip": {
       "message": ""
     },
     "accountLabel": {
