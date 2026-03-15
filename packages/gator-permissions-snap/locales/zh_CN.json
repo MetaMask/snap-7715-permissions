@@ -19,10 +19,10 @@
     "tokenTooltip": {
       "message": "被请求的代币"
     },
-    "reasonLabel": {
+    "justificationLabel": {
       "message": "原因"
     },
-    "reasonTooltip": {
+    "justificationTooltip": {
       "message": "接收方请求此许可的原因。"
     },
     "accountLabel": {

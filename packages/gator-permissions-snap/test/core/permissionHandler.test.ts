@@ -807,7 +807,7 @@ describe('PermissionHandler', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Reason",
+                              "children": "Justification",
                             },
                             "type": "Text",
                           },
@@ -826,7 +826,7 @@ describe('PermissionHandler', () => {
                               "content": {
                                 "key": null,
                                 "props": {
-                                  "children": "Reason given by the recipient for requesting this permission.",
+                                  "children": "Justification given by the recipient for requesting this permission.",
                                 },
                                 "type": "Text",
                               },
@@ -841,44 +841,22 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Test justificatio...",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "end",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Show",
-                                      "name": "show-more-justification",
-                                    },
-                                    "type": "Button",
-                                  },
-                                  "direction": "horizontal",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Test justification text that is longer than twenty characters",
+                            },
+                            "type": "Text",
                           },
-                          "type": "Box",
-                        },
-                        "direction": "horizontal",
+                          null,
+                        ],
+                        "direction": "vertical",
                       },
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -1432,7 +1410,7 @@ describe('PermissionHandler', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Reason",
+                              "children": "Justification",
                             },
                             "type": "Text",
                           },
@@ -1451,7 +1429,7 @@ describe('PermissionHandler', () => {
                               "content": {
                                 "key": null,
                                 "props": {
-                                  "children": "Reason given by the recipient for requesting this permission.",
+                                  "children": "Justification given by the recipient for requesting this permission.",
                                 },
                                 "type": "Text",
                               },
@@ -1466,44 +1444,22 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Test justificatio...",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "end",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Show",
-                                      "name": "show-more-justification",
-                                    },
-                                    "type": "Button",
-                                  },
-                                  "direction": "horizontal",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Test justification text that is longer than twenty characters",
+                            },
+                            "type": "Text",
                           },
-                          "type": "Box",
-                        },
-                        "direction": "horizontal",
+                          null,
+                        ],
+                        "direction": "vertical",
                       },
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -2086,7 +2042,7 @@ describe('PermissionHandler', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Reason",
+                              "children": "Justification",
                             },
                             "type": "Text",
                           },
@@ -2105,7 +2061,7 @@ describe('PermissionHandler', () => {
                               "content": {
                                 "key": null,
                                 "props": {
-                                  "children": "Reason given by the recipient for requesting this permission.",
+                                  "children": "Justification given by the recipient for requesting this permission.",
                                 },
                                 "type": "Text",
                               },
@@ -2120,44 +2076,22 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Test justificatio...",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "end",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Show",
-                                      "name": "show-more-justification",
-                                    },
-                                    "type": "Button",
-                                  },
-                                  "direction": "horizontal",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Test justification text that is longer than twenty characters",
+                            },
+                            "type": "Text",
                           },
-                          "type": "Box",
-                        },
-                        "direction": "horizontal",
+                          null,
+                        ],
+                        "direction": "vertical",
                       },
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -2676,7 +2610,7 @@ describe('PermissionHandler', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Reason",
+                              "children": "Justification",
                             },
                             "type": "Text",
                           },
@@ -2695,7 +2629,7 @@ describe('PermissionHandler', () => {
                               "content": {
                                 "key": null,
                                 "props": {
-                                  "children": "Reason given by the recipient for requesting this permission.",
+                                  "children": "Justification given by the recipient for requesting this permission.",
                                 },
                                 "type": "Text",
                               },
@@ -2710,44 +2644,22 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Test justificatio...",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "end",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Show",
-                                      "name": "show-more-justification",
-                                    },
-                                    "type": "Button",
-                                  },
-                                  "direction": "horizontal",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Test justification text that is longer than twenty characters",
+                            },
+                            "type": "Text",
                           },
-                          "type": "Box",
-                        },
-                        "direction": "horizontal",
+                          null,
+                        ],
+                        "direction": "vertical",
                       },
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },
@@ -3268,7 +3180,7 @@ describe('PermissionHandler', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": "Reason",
+                              "children": "Justification",
                             },
                             "type": "Text",
                           },
@@ -3287,7 +3199,7 @@ describe('PermissionHandler', () => {
                               "content": {
                                 "key": null,
                                 "props": {
-                                  "children": "Reason given by the recipient for requesting this permission.",
+                                  "children": "Justification given by the recipient for requesting this permission.",
                                 },
                                 "type": "Text",
                               },
@@ -3302,44 +3214,22 @@ describe('PermissionHandler', () => {
                     {
                       "key": null,
                       "props": {
-                        "children": {
-                          "key": null,
-                          "props": {
-                            "children": [
-                              {
-                                "key": null,
-                                "props": {
-                                  "children": "Test justificatio...",
-                                },
-                                "type": "Text",
-                              },
-                              {
-                                "key": null,
-                                "props": {
-                                  "alignment": "end",
-                                  "children": {
-                                    "key": null,
-                                    "props": {
-                                      "children": "Show",
-                                      "name": "show-more-justification",
-                                    },
-                                    "type": "Button",
-                                  },
-                                  "direction": "horizontal",
-                                },
-                                "type": "Box",
-                              },
-                            ],
-                            "direction": "horizontal",
+                        "children": [
+                          {
+                            "key": null,
+                            "props": {
+                              "children": "Test justification text that is longer than twenty characters",
+                            },
+                            "type": "Text",
                           },
-                          "type": "Box",
-                        },
-                        "direction": "horizontal",
+                          null,
+                        ],
+                        "direction": "vertical",
                       },
                       "type": "Box",
                     },
                   ],
-                  "direction": "horizontal",
+                  "direction": "vertical",
                 },
                 "type": "Box",
               },

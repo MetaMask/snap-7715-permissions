@@ -19,11 +19,11 @@
     "tokenTooltip": {
       "message": "The token being requested"
     },
-    "reasonLabel": {
-      "message": "Reason"
+    "justificationLabel": {
+      "message": "Justification"
     },
-    "reasonTooltip": {
-      "message": "Reason given by the recipient for requesting this permission."
+    "justificationTooltip": {
+      "message": "Justification given by the recipient for requesting this permission."
     },
     "accountLabel": {
       "message": "Account"
