@@ -586,5 +586,64 @@ describe('TokenMetadataService', () => {
         });
       });
     });
+
+    describe('concurrent request handling', () => {
+      beforeEach(() => {
+        mockAccountApiClient.isChainIdSupported.mockReturnValue(true);
+        // Simulate a slow fetch to ensure we can test concurrency
+        mockAccountApiClient.getTokenBalanceAndMetadata.mockImplementation(
+          async () =>
+            new Promise((resolve) => {
+              setTimeout(() => resolve(mockTokenBalanceAndMetadata), 10);
+            }),
+        );
+      });
+
+      it('should deduplicate concurrent requests for the same metadata', async () => {
+        // Fire two concurrent requests for the same metadata
+        const [result1, result2] = await Promise.all([
+          tokenMetadataService.getTokenMetadata(baseOptions),
+          tokenMetadataService.getTokenMetadata(baseOptions),
+        ]);
+
+        // Both should get the same result
+        expect(result1).toStrictEqual({
+          symbol: 'ETH',
+          decimals: 18,
+        });
+        expect(result2).toStrictEqual({
+          symbol: 'ETH',
+          decimals: 18,
+        });
+
+        // But the client should only be called once
+        expect(
+          mockAccountApiClient.getTokenBalanceAndMetadata,
+        ).toHaveBeenCalledTimes(1);
+      });
+
+      it('should cache metadata after concurrent requests resolve', async () => {
+        // Fire two concurrent requests
+        await Promise.all([
+          tokenMetadataService.getTokenMetadata(baseOptions),
+          tokenMetadataService.getTokenMetadata(baseOptions),
+        ]);
+
+        // Reset the mock
+        mockAccountApiClient.getTokenBalanceAndMetadata.mockClear();
+
+        // Third call should use cache
+        const result = await tokenMetadataService.getTokenMetadata(baseOptions);
+
+        expect(result).toStrictEqual({
+          symbol: 'ETH',
+          decimals: 18,
+        });
+        // Should not call the client again
+        expect(
+          mockAccountApiClient.getTokenBalanceAndMetadata,
+        ).not.toHaveBeenCalled();
+      });
+    });
   });
 });

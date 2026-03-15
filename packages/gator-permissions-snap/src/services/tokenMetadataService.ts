@@ -33,6 +33,8 @@ export class TokenMetadataService {
 
   readonly #metadataCache: Map<CacheKey, TokenMetadata>;
 
+  readonly #metadataPromiseCache: Map<CacheKey, Promise<TokenMetadata>>;
+
   /**
    * Initializes a new TokenMetadataService instance.
    * @param config - The configuration object.
@@ -53,6 +55,7 @@ export class TokenMetadataService {
     this.#tokenMetadataClient = tokenMetadataClient;
     this.#fetcher = fetcher;
     this.#metadataCache = new Map();
+    this.#metadataPromiseCache = new Map();
   }
 
   /**
@@ -129,6 +132,7 @@ export class TokenMetadataService {
   /**
    * Retrieves cached token metadata or fetches it if not cached.
    * Metadata (symbol, decimals) is static per token and safe to cache.
+   * Concurrent requests for the same metadata share a single in-flight fetch.
    * @param options - The options for fetching the token metadata.
    * @returns A promise resolving to the token metadata.
    */
@@ -140,6 +144,7 @@ export class TokenMetadataService {
     const { chainId, assetAddress } = options;
     const cacheKey = this.#createCacheKey(chainId, assetAddress);
 
+    // Check if we already have a cached result
     const cached = this.#metadataCache.get(cacheKey);
     if (cached) {
       logger.debug(
@@ -148,13 +153,33 @@ export class TokenMetadataService {
       return cached;
     }
 
-    const balanceAndMetadata =
-      await this.#fetchTokenBalanceAndMetadata(options);
+    // Check if we're already fetching this metadata (for concurrent requests)
+    let promise = this.#metadataPromiseCache.get(cacheKey);
+    if (promise) {
+      logger.debug(
+        'TokenMetadataService:getTokenMetadata() - returning in-flight fetch',
+      );
+      return promise;
+    }
 
-    return {
-      symbol: balanceAndMetadata.symbol,
-      decimals: balanceAndMetadata.decimals,
-    };
+    // Start the fetch and cache the promise
+    promise = this.#fetchTokenBalanceAndMetadata(options).then(
+      (balanceAndMetadata) => {
+        return {
+          symbol: balanceAndMetadata.symbol,
+          decimals: balanceAndMetadata.decimals,
+        };
+      },
+    );
+
+    this.#metadataPromiseCache.set(cacheKey, promise);
+
+    // Once resolved, move it to the result cache and clean up promise cache
+    return promise.then((result) => {
+      this.#metadataCache.set(cacheKey, result);
+      this.#metadataPromiseCache.delete(cacheKey);
+      return result;
+    });
   }
 
   /**
