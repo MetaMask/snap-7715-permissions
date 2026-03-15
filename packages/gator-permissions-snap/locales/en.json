@@ -257,10 +257,10 @@
       "message": "Existing permissions"
     },
     "existingPermissionsDescription": {
-      "message": "You already have permissions from this site. Do you want to proceed?"
+      "message": "You've already granted permissions for this site. Do you want to continue?"
     },
     "existingPermissionsConfirmButton": {
-      "message": "Proceed"
+      "message": "Continue"
     },
     "chainLabel": {
       "message": "Network"
