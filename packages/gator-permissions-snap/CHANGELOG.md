@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0]
+
+### Changed
+
+- `justification` field may now be longer (up to 300 chars), and will be more prominently displayed in the UI ([#282](https://github.com/MetaMask/snap-7715-permissions/pull/282))
+
+### Fixed
+
+- Improve display of existing permissions before granting a new permission ([#284](https://github.com/MetaMask/snap-7715-permissions/pull/284), [#283](https://github.com/MetaMask/snap-7715-permissions/pull/283))
+  - Show all permissions from all chains granted to the requesting origin
+  - Group existing permissions by granting account
+  - Improved validation and asyncronous loading with caching, and skeleton UI
+
 ## [1.2.0]
 
 ### Added
@@ -314,7 +327,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.2.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.0...HEAD
+[1.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.2.0...@metamask/gator-permissions-snap@1.3.0
 [1.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.1...@metamask/gator-permissions-snap@1.2.0
 [1.1.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.0...@metamask/gator-permissions-snap@1.1.1
 [1.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.0.0...@metamask/gator-permissions-snap@1.1.0
