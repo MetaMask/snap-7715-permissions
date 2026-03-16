@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- fix: existing permissions issues ([#284](https://github.com/MetaMask/snap-7715-permissions/pull/284))
+- feat: enhance existing permissions handling ([#283](https://github.com/MetaMask/snap-7715-permissions/pull/283))
+- Improve clarity of justification field in Permission Picker ([#282](https://github.com/MetaMask/snap-7715-permissions/pull/282))
+
 ## [1.2.0]
 
 ### Added
