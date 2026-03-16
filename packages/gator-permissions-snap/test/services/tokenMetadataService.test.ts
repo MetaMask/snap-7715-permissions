@@ -505,26 +505,6 @@ describe('TokenMetadataService', () => {
           mockAccountApiClient.getTokenBalanceAndMetadata,
         ).toHaveBeenCalledTimes(2);
       });
-
-      it('should cache metadata alongside balance in getTokenBalanceAndMetadata', async () => {
-        // First call getTokenBalanceAndMetadata which caches metadata
-        await tokenMetadataService.getTokenBalanceAndMetadata(baseOptions);
-        expect(
-          mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).toHaveBeenCalledTimes(1);
-
-        // Second call getTokenMetadata which should use cache
-        const metadata =
-          await tokenMetadataService.getTokenMetadata(baseOptions);
-
-        expect(
-          mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).toHaveBeenCalledTimes(1); // No additional call
-        expect(metadata).toStrictEqual({
-          symbol: 'ETH',
-          decimals: 18,
-        });
-      });
     });
 
     describe('error handling', () => {

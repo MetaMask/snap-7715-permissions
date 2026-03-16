@@ -31,8 +31,6 @@ export class TokenMetadataService {
 
   readonly #fetcher: typeof fetch;
 
-  readonly #metadataCache: Map<CacheKey, TokenMetadata>;
-
   readonly #metadataPromiseCache: Map<CacheKey, Promise<TokenMetadata>>;
 
   /**
@@ -54,7 +52,6 @@ export class TokenMetadataService {
     this.#accountApiClient = accountApiClient;
     this.#tokenMetadataClient = tokenMetadataClient;
     this.#fetcher = fetcher;
-    this.#metadataCache = new Map();
     this.#metadataPromiseCache = new Map();
   }
 
@@ -91,7 +88,6 @@ export class TokenMetadataService {
    * Fetches token data from available clients with fallback support.
    * Tries multiple clients in order of preference. If a client fails,
    * automatically falls back to the next available client.
-   * Also caches the metadata portion for future use.
    * @param options - The options for fetching the token data.
    * @returns A promise resolving to the token balance and metadata.
    */
@@ -108,13 +104,6 @@ export class TokenMetadataService {
           chainId,
           account,
           assetAddress,
-        });
-
-        // Cache the metadata portion for future use
-        const cacheKey = this.#createCacheKey(chainId, assetAddress);
-        this.#metadataCache.set(cacheKey, {
-          symbol: balanceAndMetadata.symbol,
-          decimals: balanceAndMetadata.decimals,
         });
 
         return balanceAndMetadata;
@@ -144,42 +133,34 @@ export class TokenMetadataService {
     const { chainId, assetAddress } = options;
     const cacheKey = this.#createCacheKey(chainId, assetAddress);
 
-    // Check if we already have a cached result
-    const cached = this.#metadataCache.get(cacheKey);
-    if (cached) {
-      logger.debug(
-        'TokenMetadataService:getTokenMetadata() - returning cached metadata',
-      );
-      return cached;
-    }
-
     // Check if we're already fetching this metadata (for concurrent requests)
     let promise = this.#metadataPromiseCache.get(cacheKey);
     if (promise) {
       logger.debug(
-        'TokenMetadataService:getTokenMetadata() - returning in-flight fetch',
+        'TokenMetadataService:getTokenMetadata() - returning cached/in-flight metadata',
       );
       return promise;
     }
 
     // Start the fetch and cache the promise
-    promise = this.#fetchTokenBalanceAndMetadata(options).then(
-      (balanceAndMetadata) => {
+    promise = this.#fetchTokenBalanceAndMetadata(options)
+      .then((balanceAndMetadata) => {
         return {
           symbol: balanceAndMetadata.symbol,
           decimals: balanceAndMetadata.decimals,
         };
-      },
-    );
+      })
+      .catch((error) => {
+        logger.error(
+          'TokenMetadataService:getTokenMetadata() - failed to fetch metadata',
+          error,
+        );
+        this.#metadataPromiseCache.delete(cacheKey);
+        throw error;
+      });
 
     this.#metadataPromiseCache.set(cacheKey, promise);
-
-    // Once resolved, move it to the result cache and clean up promise cache
-    return promise.then((result) => {
-      this.#metadataCache.set(cacheKey, result);
-      this.#metadataPromiseCache.delete(cacheKey);
-      return result;
-    });
+    return promise;
   }
 
   /**

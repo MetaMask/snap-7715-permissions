@@ -3,13 +3,17 @@ import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 import { bytesToHex } from '@metamask/utils';
 
+import type { TokenBalanceAndMetadata } from '../../../src/clients/types';
 import type { DialogInterface } from '../../../src/core/dialogInterface';
 import { ExistingPermissionsService } from '../../../src/core/existingpermissions/existingPermissionsService';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../../../src/profileSync/profileSync';
-import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
+import type {
+  TokenMetadata,
+  TokenMetadataService,
+} from '../../../src/services/tokenMetadataService';
 import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
 
 // Helper to generate random addresses
@@ -29,8 +33,8 @@ const createMockStoredPermission = (
   isRevoked: boolean = false,
 ): StoredGrantedPermission => ({
   permissionResponse: {
-    chainId,
-    from,
+    chainId: chainId as Hex,
+    from: from as Hex,
     to: randomAddress(),
     context: '0x',
     dependencies: [],
@@ -71,13 +75,18 @@ describe('ExistingPermissionsService', () => {
       }),
     } as unknown as jest.Mocked<UserEventDispatcher>;
 
-    // Setup mock TokenMetadataService
+    // Setup mock TokenMetadataService - formatPermissionWithTokenMetadata uses getTokenMetadata
+    const tokenMetadata: TokenMetadata = { decimals: 18, symbol: 'ETH' };
     mockTokenMetadataService = {
-      getTokenBalanceAndMetadata: jest.fn().mockResolvedValue({
-        decimals: 18,
-        symbol: 'ETH',
-        balance: '1.5',
-      }),
+      getTokenMetadata: jest
+        .fn<() => Promise<TokenMetadata>>()
+        .mockResolvedValue(tokenMetadata),
+      getTokenBalanceAndMetadata: jest
+        .fn<() => Promise<TokenBalanceAndMetadata>>()
+        .mockResolvedValue({
+          ...tokenMetadata,
+          balance: 0n,
+        }),
     } as unknown as jest.Mocked<TokenMetadataService>;
 
     // Setup mock DialogInterface
@@ -253,7 +262,40 @@ describe('ExistingPermissionsService', () => {
       expect(secondCall).toBeDefined();
 
       // Clean up: trigger dialog close to resolve the promise
-      const onCloseCallback = firstCall[1];
+      const onCloseCallback = firstCall?.[1];
+      onCloseCallback?.();
+
+      await resultPromise;
+    });
+
+    it('should call getTokenMetadata when permission has token amount fields', async () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {
+          maxAmount: '0xde0b6b3a7640000' as Hex, // 1 ETH in hex
+          startTime: Math.floor(Date.now() / 1000),
+        },
+        isAdjustmentAllowed: true,
+      };
+
+      mockDialogInterface.show.mockResolvedValue('interface-id');
+
+      const resultPromise = service.showExistingPermissions({
+        dialogInterface: mockDialogInterface,
+        existingPermissions: [permission],
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      expect(mockTokenMetadataService.getTokenMetadata).toHaveBeenCalledWith(
+        expect.objectContaining({
+          chainId: 1,
+          account: permission.permissionResponse.from,
+        }),
+      );
+
+      const onCloseCallback = mockDialogInterface.show.mock.calls[0]?.[1];
       onCloseCallback?.();
 
       await resultPromise;
@@ -279,7 +321,7 @@ describe('ExistingPermissionsService', () => {
       expect(mockDialogInterface.show).toHaveBeenCalled();
 
       // Trigger dialog close
-      const onCloseCallback = mockDialogInterface.show.mock.calls[0][1];
+      const onCloseCallback = mockDialogInterface.show.mock.calls[0]?.[1];
       onCloseCallback?.();
 
       await resultPromise;
@@ -307,7 +349,7 @@ describe('ExistingPermissionsService', () => {
       );
 
       // Clean up
-      const onCloseCallback = mockDialogInterface.show.mock.calls[0][1];
+      const onCloseCallback = mockDialogInterface.show.mock.calls[0]?.[1];
       onCloseCallback?.();
 
       await resultPromise;
@@ -315,13 +357,21 @@ describe('ExistingPermissionsService', () => {
 
     it('should handle errors gracefully without crashing', async () => {
       const permission = createMockStoredPermission();
-      mockTokenMetadataService.getTokenBalanceAndMetadata.mockRejectedValue(
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {
+          maxAmount: '0xde0b6b3a7640000' as Hex,
+          startTime: Math.floor(Date.now() / 1000),
+        },
+        isAdjustmentAllowed: true,
+      };
+      mockTokenMetadataService.getTokenMetadata.mockRejectedValue(
         new Error('Token metadata fetch failed'),
       );
 
       mockDialogInterface.show.mockResolvedValue('interface-id');
 
-      // Action - should not throw
+      // Action - should not throw when getTokenMetadata fails (dialog stays with skeleton)
       const resultPromise = service.showExistingPermissions({
         dialogInterface: mockDialogInterface,
         existingPermissions: [permission],
@@ -331,7 +381,7 @@ describe('ExistingPermissionsService', () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       // Trigger dialog close
-      const onCloseCallback = mockDialogInterface.show.mock.calls[0][1];
+      const onCloseCallback = mockDialogInterface.show.mock.calls[0]?.[1];
       onCloseCallback?.();
 
       // Assert: should complete without throwing
