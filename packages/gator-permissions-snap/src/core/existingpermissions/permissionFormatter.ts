@@ -4,6 +4,7 @@ import { hexToNumber } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
 import type { FormattedPermissionForDisplay } from './types';
+import { DEFAULT_MAX_AMOUNT } from '../../permissions/erc20TokenStream/context';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
 import { getClosestTimePeriod } from '../../utils/time';
@@ -225,11 +226,18 @@ export async function formatPermissionWithTokenMetadata(
 
     // Format maxAmount if present (stream-type permissions)
     if ('maxAmount' in permissionData) {
-      formattedData.maxAmount = formatTokenAmountWithMetadata(
-        permissionData.maxAmount as Hex | null | undefined,
-        decimals,
-        symbol,
-      );
+      if (
+        (permissionData.maxAmount as string).toLowerCase() ===
+        DEFAULT_MAX_AMOUNT
+      ) {
+        formattedData.maxAmount = t('unlimited');
+      } else {
+        formattedData.maxAmount = formatTokenAmountWithMetadata(
+          permissionData.maxAmount as Hex | null | undefined,
+          decimals,
+          symbol,
+        );
+      }
     }
 
     // Format periodAmount if present (periodic-type permissions)
