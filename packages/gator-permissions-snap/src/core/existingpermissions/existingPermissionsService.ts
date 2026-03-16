@@ -58,7 +58,7 @@ export class ExistingPermissionsService {
     const matching = allPermissions.filter(
       (permission) =>
         permission.revocationMetadata === undefined &&
-        permission.siteOrigin === siteOrigin,
+        permission.siteOrigin.toLowerCase() === siteOrigin.toLowerCase(),
     );
 
     return matching;
