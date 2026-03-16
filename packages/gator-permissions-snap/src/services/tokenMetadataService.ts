@@ -19,7 +19,11 @@ export type TokenMetadata = {
   decimals: number;
 };
 
-type CacheKey = `${number}-${string}`;
+/**
+ * Cache key format: `${chainId}-${assetAddress || 'native'}`
+ * Example: "1-0xusdc..." or "1-native"
+ */
+type CacheKey = `${number}-${Hex | 'native'}`;
 
 /**
  * Service responsible for fetching token balance and metadata.
@@ -81,7 +85,7 @@ export class TokenMetadataService {
    * @returns The cache key.
    */
   #createCacheKey(chainId: number, assetAddress: Hex | undefined): CacheKey {
-    return `${chainId}-${assetAddress ?? 'native'}` as CacheKey;
+    return `${chainId}-${assetAddress ?? 'native'}`;
   }
 
   /**
