@@ -9,11 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.0]
 
-### Uncategorized
+### Changed
 
-- fix: existing permissions issues ([#284](https://github.com/MetaMask/snap-7715-permissions/pull/284))
-- feat: enhance existing permissions handling ([#283](https://github.com/MetaMask/snap-7715-permissions/pull/283))
-- Improve clarity of justification field in Permission Picker ([#282](https://github.com/MetaMask/snap-7715-permissions/pull/282))
+- `justification` field may now be longer (up to 300 chars), and will be more prominently displayed in the UI ([#282](https://github.com/MetaMask/snap-7715-permissions/pull/282))
+
+### Fixed
+
+- Improve display of existing permissions before granting a new permission ([#284](https://github.com/MetaMask/snap-7715-permissions/pull/284), [#283](https://github.com/MetaMask/snap-7715-permissions/pull/283))
+  - Show all permissions from all chains granted to the requesting origin
+  - Group existing permissions by granting account
+  - Improved validation and asyncronous loading with caching, and skeleton UI
 
 ## [1.2.0]
 
