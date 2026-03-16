@@ -4,6 +4,7 @@ import { hexToNumber } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
 import type { FormattedPermissionForDisplay } from './types';
+import { DEFAULT_MAX_AMOUNT } from '../../permissions/erc20TokenStream/context';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
 import { getClosestTimePeriod } from '../../utils/time';
@@ -85,8 +86,8 @@ function extractPermissionDetails(
     }
     // For periodic-type permissions
     else if (
-      'periodDuration' in permissionData &&
-      'periodAmount' in permissionData
+      permissionType === 'erc20-token-periodic' ||
+      permissionType === 'native-token-periodic'
     ) {
       const { periodAmount, periodDuration, justification } = permissionData;
 
@@ -115,7 +116,10 @@ function extractPermissionDetails(
       }
     }
     // For stream-type permissions
-    else if ('maxAmount' in permissionData && 'startTime' in permissionData) {
+    else if (
+      permissionType === 'erc20-token-stream' ||
+      permissionType === 'native-token-stream'
+    ) {
       const { maxAmount, startTime, justification } = permissionData;
 
       if (maxAmount !== undefined && maxAmount !== null) {
@@ -222,11 +226,21 @@ export async function formatPermissionWithTokenMetadata(
 
     // Format maxAmount if present (stream-type permissions)
     if ('maxAmount' in permissionData) {
-      formattedData.maxAmount = formatTokenAmountWithMetadata(
-        permissionData.maxAmount as Hex | null | undefined,
-        decimals,
-        symbol,
-      );
+      const { maxAmount } = permissionData;
+      if (
+        maxAmount !== undefined &&
+        maxAmount !== null &&
+        typeof maxAmount === 'string' &&
+        maxAmount.toLowerCase() === DEFAULT_MAX_AMOUNT
+      ) {
+        formattedData.maxAmount = t('unlimited');
+      } else {
+        formattedData.maxAmount = formatTokenAmountWithMetadata(
+          permissionData.maxAmount as Hex | null | undefined,
+          decimals,
+          symbol,
+        );
+      }
     }
 
     // Format periodAmount if present (periodic-type permissions)
