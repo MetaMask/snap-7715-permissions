@@ -85,8 +85,8 @@ function extractPermissionDetails(
     }
     // For periodic-type permissions
     else if (
-      'periodDuration' in permissionData &&
-      'periodAmount' in permissionData
+      permissionType === 'erc20-token-periodic' ||
+      permissionType === 'native-token-periodic'
     ) {
       const { periodAmount, periodDuration, justification } = permissionData;
 
@@ -115,7 +115,10 @@ function extractPermissionDetails(
       }
     }
     // For stream-type permissions
-    else if ('maxAmount' in permissionData && 'startTime' in permissionData) {
+    else if (
+      permissionType === 'erc20-token-stream' ||
+      permissionType === 'native-token-stream'
+    ) {
       const { maxAmount, startTime, justification } = permissionData;
 
       if (maxAmount !== undefined && maxAmount !== null) {
