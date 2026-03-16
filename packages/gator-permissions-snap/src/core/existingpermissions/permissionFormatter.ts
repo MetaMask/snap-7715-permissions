@@ -226,9 +226,12 @@ export async function formatPermissionWithTokenMetadata(
 
     // Format maxAmount if present (stream-type permissions)
     if ('maxAmount' in permissionData) {
+      const { maxAmount } = permissionData;
       if (
-        (permissionData.maxAmount as string).toLowerCase() ===
-        DEFAULT_MAX_AMOUNT
+        maxAmount !== undefined &&
+        maxAmount !== null &&
+        typeof maxAmount === 'string' &&
+        maxAmount.toLowerCase() === DEFAULT_MAX_AMOUNT
       ) {
         formattedData.maxAmount = t('unlimited');
       } else {
