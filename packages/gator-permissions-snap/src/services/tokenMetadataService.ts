@@ -14,6 +14,17 @@ export type GetTokenBalanceAndMetadataOptions = {
   assetAddress?: Hex;
 };
 
+export type TokenMetadata = {
+  symbol: string;
+  decimals: number;
+};
+
+/**
+ * Cache key format: `${chainId}-${assetAddress || 'native'}`
+ * Example: "1-0xusdc..." or "1-native"
+ */
+type CacheKey = `${number}-${Hex | 'native'}`;
+
 /**
  * Service responsible for fetching token balance and metadata.
  */
@@ -23,6 +34,8 @@ export class TokenMetadataService {
   readonly #tokenMetadataClient: TokenMetadataClient;
 
   readonly #fetcher: typeof fetch;
+
+  readonly #metadataPromiseCache: Map<CacheKey, Promise<TokenMetadata>>;
 
   /**
    * Initializes a new TokenMetadataService instance.
@@ -43,6 +56,7 @@ export class TokenMetadataService {
     this.#accountApiClient = accountApiClient;
     this.#tokenMetadataClient = tokenMetadataClient;
     this.#fetcher = fetcher;
+    this.#metadataPromiseCache = new Map();
   }
 
   /**
@@ -65,19 +79,26 @@ export class TokenMetadataService {
   }
 
   /**
-   * Retrieves the token balance and metadata for the specified account.
+   * Creates a cache key for storing token metadata.
+   * @param chainId - The chain ID.
+   * @param assetAddress - The asset address (or empty string for native token).
+   * @returns The cache key.
+   */
+  #createCacheKey(chainId: number, assetAddress: Hex | undefined): CacheKey {
+    return `${chainId}-${assetAddress ?? 'native'}`;
+  }
+
+  /**
+   * Fetches token data from available clients with fallback support.
    * Tries multiple clients in order of preference. If a client fails,
    * automatically falls back to the next available client.
-   * @param options - The options for fetching the token balance and metadata.
+   * @param options - The options for fetching the token data.
    * @returns A promise resolving to the token balance and metadata.
    */
-  public async getTokenBalanceAndMetadata(
+  async #fetchTokenBalanceAndMetadata(
     options: GetTokenBalanceAndMetadataOptions,
   ): Promise<TokenBalanceAndMetadata> {
-    logger.debug('TokenMetadataService:getTokenBalanceAndMetadata()');
-
     const { chainId, account, assetAddress } = options;
-
     const clients = this.#getTokenMetadataClientForChainId({ chainId });
     let lastError: unknown = new InternalError('No client found');
 
@@ -89,20 +110,84 @@ export class TokenMetadataService {
           assetAddress,
         });
 
-        logger.debug(
-          'TokenMetadataService:getTokenBalanceAndMetadata() - balance and metadata resolved',
-        );
-
         return balanceAndMetadata;
       } catch (error) {
         lastError = error;
         logger.info(
-          `TokenMetadataService:getTokenBalanceAndMetadata() - client failed for chain ${chainId}`,
+          `TokenMetadataService - client failed for chain ${chainId}`,
         );
       }
     }
 
     throw lastError;
+  }
+
+  /**
+   * Retrieves cached token metadata or fetches it if not cached.
+   * Metadata (symbol, decimals) is static per token and safe to cache.
+   * Concurrent requests for the same metadata share a single in-flight fetch.
+   * @param options - The options for fetching the token metadata.
+   * @returns A promise resolving to the token metadata.
+   */
+  public async getTokenMetadata(
+    options: GetTokenBalanceAndMetadataOptions,
+  ): Promise<TokenMetadata> {
+    logger.debug('TokenMetadataService:getTokenMetadata()');
+
+    const { chainId, assetAddress } = options;
+    const cacheKey = this.#createCacheKey(chainId, assetAddress);
+
+    // Check if we're already fetching this metadata (for concurrent requests)
+    let promise = this.#metadataPromiseCache.get(cacheKey);
+    if (promise) {
+      logger.debug(
+        'TokenMetadataService:getTokenMetadata() - returning cached/in-flight metadata',
+      );
+      return promise;
+    }
+
+    // Start the fetch and cache the promise
+    promise = this.#fetchTokenBalanceAndMetadata(options)
+      .then((balanceAndMetadata) => {
+        return {
+          symbol: balanceAndMetadata.symbol,
+          decimals: balanceAndMetadata.decimals,
+        };
+      })
+      .catch((error) => {
+        logger.error(
+          'TokenMetadataService:getTokenMetadata() - failed to fetch metadata',
+          error,
+        );
+        this.#metadataPromiseCache.delete(cacheKey);
+        throw error;
+      });
+
+    this.#metadataPromiseCache.set(cacheKey, promise);
+    return promise;
+  }
+
+  /**
+   * Retrieves the token balance and metadata for the specified account.
+   * Tries multiple clients in order of preference. If a client fails,
+   * automatically falls back to the next available client.
+   * Balance is always fetched fresh, but metadata is cached for reuse.
+   * @param options - The options for fetching the token balance and metadata.
+   * @returns A promise resolving to the token balance and metadata.
+   */
+  public async getTokenBalanceAndMetadata(
+    options: GetTokenBalanceAndMetadataOptions,
+  ): Promise<TokenBalanceAndMetadata> {
+    logger.debug('TokenMetadataService:getTokenBalanceAndMetadata()');
+
+    const balanceAndMetadata =
+      await this.#fetchTokenBalanceAndMetadata(options);
+
+    logger.debug(
+      'TokenMetadataService:getTokenBalanceAndMetadata() - balance and metadata resolved',
+    );
+
+    return balanceAndMetadata;
   }
 
   /**
