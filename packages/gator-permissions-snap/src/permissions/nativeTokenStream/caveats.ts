@@ -18,8 +18,8 @@ import type { DelegationContracts } from '../../core/chainMetadata';
  *
  * Caveats and enforcers
  * ---------------------
- * NativeTokenStreamingEnforcer: enforces the streaming terms (initial/max amount, rate, start
- * time) so that only allowed native-token transfers within the stream limits are permitted.
+ * NativeTokenStreamingEnforcer: enforces the streaming terms (initial/max amount, amount per second,
+ * start time) so that only allowed native-token transfers within the stream limits are permitted.
  * ExactCalldataEnforcer with calldata '0x': requires transaction calldata to be empty, so the
  * delegation can only send native value (simple transfer). No contract invocation is allowed.
  */
@@ -41,7 +41,7 @@ export async function createPermissionCaveats({
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
 
-  // NativeTokenStreamingEnforcer: enforce initial/max amount, rate (amountPerSecond), and start time.
+  // NativeTokenStreamingEnforcer: enforce initial/max amount, amount per second, and start time.
   const nativeTokenStreamingCaveat: Caveat = {
     enforcer: contracts.nativeTokenStreamingEnforcer,
     terms: createNativeTokenStreamingTerms({

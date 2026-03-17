@@ -17,7 +17,7 @@ import type { DelegationContracts } from '../../core/chainMetadata';
  *
  * Caveats and enforcers
  * ---------------------
- * ERC20PeriodTransferEnforcer: enforces the periodic terms (token, period amount, period duration,
+ * ERC20PeriodTransferEnforcer: enforces the periodic terms (token address, period amount, period duration,
  * start date) so that only allowed ERC-20 transfers within the periodic limits are permitted.
  * ValueLteEnforcer: caps native value at zero so the delegation cannot send ETH/native token
  * (only the specified ERC-20 token is transferred periodically).
