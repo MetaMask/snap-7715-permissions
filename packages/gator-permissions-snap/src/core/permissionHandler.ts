@@ -48,7 +48,7 @@ import type {
   FetchAddressScanResult,
   ScanDappUrlResult,
 } from '../clients/trustSignalsClient';
-import type { ExistingPermissionsStatus } from '../services/existingPermissionsService';
+import { ExistingPermissionsState } from '../services/existingPermissionsService';
 import { createCancellableOperation } from '../utils/cancellableOperation';
 import type { MessageKey } from '../utils/i18n';
 import { formatUnits } from '../utils/value';
@@ -226,7 +226,7 @@ export class PermissionHandler<
       chainId: number;
       scanDappUrlResult: ScanDappUrlResult | null;
       scanAddressResult: FetchAddressScanResult | null;
-      existingPermissionsStatus: ExistingPermissionsStatus;
+      existingPermissionsStatus: ExistingPermissionsState;
     }): Promise<JSX.Element> => {
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 

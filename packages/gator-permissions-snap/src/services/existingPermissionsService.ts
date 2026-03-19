@@ -28,7 +28,11 @@ function extractPermissionCategory(
  * Status of existing permissions for a site with respect to the currently requested permission.
  * Used to drive a single network call and one UI decision (banner type or none).
  */
-export type ExistingPermissionsStatus = 'none' | 'existing_only' | 'similar';
+export enum ExistingPermissionsState {
+  None = 'None',
+  DissimilarPermissions = 'DissimilarPermissions',
+  SimilarPermissions = 'SimilarPermissions',
+}
 
 /**
  * Service for displaying existing permissions when a dApp requests new ones.
@@ -99,15 +103,15 @@ export class ExistingPermissionsService {
    *
    * @param siteOrigin - The origin of the requesting dApp.
    * @param requestedPermission - The permission being requested (for similarity check).
-   * @returns 'none' if no existing permissions; 'similar' if any match the requested type; 'existing_only' otherwise.
+   * @returns None if no existing permissions; SimilarPermissions if any match the requested type; DissimilarPermissions otherwise.
    */
   async getExistingPermissionsStatus(
     siteOrigin: string,
     requestedPermission: Permission,
-  ): Promise<ExistingPermissionsStatus> {
+  ): Promise<ExistingPermissionsState> {
     const existingPermissions = await this.getExistingPermissions(siteOrigin);
     if (existingPermissions.length === 0) {
-      return 'none';
+      return ExistingPermissionsState.None;
     }
     const requestedCategory = extractPermissionCategory(
       extractDescriptorName(requestedPermission.type),
@@ -118,6 +122,8 @@ export class ExistingPermissionsService {
           extractDescriptorName(stored.permissionResponse.permission.type),
         ) === requestedCategory,
     );
-    return hasSimilar ? 'similar' : 'existing_only';
+    return hasSimilar
+      ? ExistingPermissionsState.SimilarPermissions
+      : ExistingPermissionsState.DissimilarPermissions;
   }
 }

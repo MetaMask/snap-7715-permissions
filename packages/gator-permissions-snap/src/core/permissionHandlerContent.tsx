@@ -22,7 +22,7 @@ import type {
   FetchAddressScanResult,
   ScanDappUrlResult,
 } from '../clients/trustSignalsClient';
-import type { ExistingPermissionsStatus } from '../services/existingPermissionsService';
+import { ExistingPermissionsState } from '../services/existingPermissionsService';
 import {
   AddressField,
   ShowMoreText,
@@ -58,7 +58,7 @@ export type PermissionHandlerContentProps = {
   chainId: number;
   explorerUrl: string | undefined;
   isAccountUpgraded: boolean;
-  existingPermissionsStatus: ExistingPermissionsStatus;
+  existingPermissionsStatus: ExistingPermissionsState;
 };
 
 /**
@@ -216,7 +216,8 @@ export const PermissionHandlerContent = ({
             )}
           </Box>
         </Section>
-        {existingPermissionsStatus === 'similar' && (
+        {existingPermissionsStatus ===
+          ExistingPermissionsState.SimilarPermissions && (
           <Banner title={t('existingPermissionsTitle')} severity="warning">
             <Text>
               {t('existingPermissionsSimilarDescription')}{' '}
@@ -224,7 +225,8 @@ export const PermissionHandlerContent = ({
             </Text>
           </Banner>
         )}
-        {existingPermissionsStatus === 'existing_only' && (
+        {existingPermissionsStatus ===
+          ExistingPermissionsState.DissimilarPermissions && (
           <Banner title={t('existingPermissionsTitle')} severity="info">
             <Text>
               {t('existingPermissionsDescription')}{' '}

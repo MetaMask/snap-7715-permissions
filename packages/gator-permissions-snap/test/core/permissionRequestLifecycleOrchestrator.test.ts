@@ -23,8 +23,11 @@ import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFacto
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
+import {
+  ExistingPermissionsService,
+  ExistingPermissionsState,
+} from '../../src/services/existingPermissionsService';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
-import { ExistingPermissionsService } from 'src/services/existingPermissionsService';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 const randomAddress = (): Hex => {
@@ -138,7 +141,9 @@ const mockPermissionIntroductionService = {
 
 const mockExistingPermissionsService = {
   getExistingPermissions: jest.fn().mockResolvedValue([]),
-  getExistingPermissionsStatus: jest.fn().mockResolvedValue('none' as const),
+  getExistingPermissionsStatus: jest
+    .fn()
+    .mockResolvedValue(ExistingPermissionsState.None),
   hasExistingPermissions: jest.fn().mockResolvedValue(false),
   similarPermissionsExist: jest.fn().mockResolvedValue(false),
 } as unknown as jest.Mocked<ExistingPermissionsService>;
