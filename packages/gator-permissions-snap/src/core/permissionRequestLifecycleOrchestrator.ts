@@ -41,6 +41,7 @@ import type {
   TrustSignalsClient,
 } from '../clients/trustSignalsClient';
 import type { ExistingPermissionsService } from '../services/existingPermissionsService';
+import { ExistingPermissionsState } from '../services/existingPermissionsService';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
@@ -163,11 +164,15 @@ export class PermissionRequestLifecycleOrchestrator {
 
     // Start loading existing-permissions status in the background so it can run in parallel
     // with the introduction flow; result is only needed when building confirmation content.
-    const existingPermissionsStatusPromise =
-      this.#existingPermissionsService.getExistingPermissionsStatus(
+    // Chain .catch() so the promise never rejects: if the user cancels at intro we return
+    // without awaiting it, and any processing error (e.g. malformed stored permission type)
+    // should not cause an unhandled rejection or crash the dialog.
+    const existingPermissionsStatusPromise = this.#existingPermissionsService
+      .getExistingPermissionsStatus(
         origin,
         validatedPermissionRequest.permission,
-      );
+      )
+      .catch(() => ExistingPermissionsState.None);
 
     // Check if we need to show introduction
     if (

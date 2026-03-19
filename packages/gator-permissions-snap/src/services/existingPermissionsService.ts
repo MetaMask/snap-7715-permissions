@@ -75,36 +75,8 @@ export class ExistingPermissionsService {
     }
   }
 
-  async hasExistingPermissions(siteOrigin: string): Promise<boolean> {
-    const existingPermissions = await this.getExistingPermissions(siteOrigin);
-    return existingPermissions.length > 0;
-  }
-
-  async similarPermissionsExist(
-    siteOrigin: string,
-    requestedPermission: Permission,
-  ): Promise<boolean> {
-    const existingPermissions = await this.getExistingPermissions(siteOrigin);
-    const requestedCategory = extractPermissionCategory(
-      extractDescriptorName(requestedPermission.type),
-    );
-    // Only treat as similar when both have a recognized category (stream/periodic) and they match.
-    // Unrecognized types (e.g. revocation) return null; null === null would falsely mark them as similar.
-    if (requestedCategory === null) {
-      return false;
-    }
-    return existingPermissions.some((stored) => {
-      const storedCategory = extractPermissionCategory(
-        extractDescriptorName(stored.permissionResponse.permission.type),
-      );
-      return storedCategory !== null && storedCategory === requestedCategory;
-    });
-  }
-
   /**
    * Fetches existing permissions once and returns a single status for the permission flow.
-   * Use this instead of calling hasExistingPermissions and similarPermissionsExist
-   * separately to avoid duplicate network roundtrips to the storage API.
    *
    * @param siteOrigin - The origin of the requesting dApp.
    * @param requestedPermission - The permission being requested (for similarity check).
@@ -114,25 +86,31 @@ export class ExistingPermissionsService {
     siteOrigin: string,
     requestedPermission: Permission,
   ): Promise<ExistingPermissionsState> {
-    const existingPermissions = await this.getExistingPermissions(siteOrigin);
-    if (existingPermissions.length === 0) {
+    try {
+      const existingPermissions = await this.getExistingPermissions(siteOrigin);
+      if (existingPermissions.length === 0) {
+        return ExistingPermissionsState.None;
+      }
+      const requestedCategory = extractPermissionCategory(
+        extractDescriptorName(requestedPermission.type),
+      );
+      // Only treat as similar when both have a recognized category (stream/periodic) and they match.
+      // Unrecognized types (e.g. revocation) return null; null === null would falsely mark them as similar.
+      const hasSimilar =
+        requestedCategory !== null &&
+        existingPermissions.some((stored) => {
+          const storedCategory = extractPermissionCategory(
+            extractDescriptorName(stored.permissionResponse.permission.type),
+          );
+          return (
+            storedCategory !== null && storedCategory === requestedCategory
+          );
+        });
+      return hasSimilar
+        ? ExistingPermissionsState.SimilarPermissions
+        : ExistingPermissionsState.DissimilarPermissions;
+    } catch {
       return ExistingPermissionsState.None;
     }
-    const requestedCategory = extractPermissionCategory(
-      extractDescriptorName(requestedPermission.type),
-    );
-    // Only treat as similar when both have a recognized category (stream/periodic) and they match.
-    // Unrecognized types (e.g. revocation) return null; null === null would falsely mark them as similar.
-    const hasSimilar =
-      requestedCategory !== null &&
-      existingPermissions.some((stored) => {
-        const storedCategory = extractPermissionCategory(
-          extractDescriptorName(stored.permissionResponse.permission.type),
-        );
-        return storedCategory !== null && storedCategory === requestedCategory;
-      });
-    return hasSimilar
-      ? ExistingPermissionsState.SimilarPermissions
-      : ExistingPermissionsState.DissimilarPermissions;
   }
 }

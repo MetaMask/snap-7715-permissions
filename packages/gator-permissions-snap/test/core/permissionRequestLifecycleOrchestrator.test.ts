@@ -144,8 +144,6 @@ const mockExistingPermissionsService = {
   getExistingPermissionsStatus: jest
     .fn()
     .mockResolvedValue(ExistingPermissionsState.None),
-  hasExistingPermissions: jest.fn().mockResolvedValue(false),
-  similarPermissionsExist: jest.fn().mockResolvedValue(false),
 } as unknown as jest.Mocked<ExistingPermissionsService>;
 
 const mockScanAddressResult: FetchAddressScanResult = {
@@ -226,6 +224,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     );
 
     mockDialogInterfaceFactory.createDialogInterface.mockReturnValue({});
+
+    mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
+    mockExistingPermissionsService.getExistingPermissionsStatus.mockResolvedValue(
+      ExistingPermissionsState.None,
+    );
 
     permissionRequestLifecycleOrchestrator =
       new PermissionRequestLifecycleOrchestrator({
@@ -1014,6 +1017,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           chainId: 1,
           scanDappUrlResult: null,
           scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
         });
 
         // Final call has both scan results from closure (after both background scans resolve)
@@ -1026,6 +1030,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           chainId: 1,
           scanDappUrlResult: { isComplete: false },
           scanAddressResult: mockScanAddressResult,
+          existingPermissionsStatus: ExistingPermissionsState.None,
         });
 
         expect(mockTrustSignalsClient.fetchAddressScan).toHaveBeenCalledWith(
