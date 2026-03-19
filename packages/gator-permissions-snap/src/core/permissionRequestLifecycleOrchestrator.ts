@@ -161,9 +161,10 @@ export class PermissionRequestLifecycleOrchestrator {
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
 
-    // Single network call to determine existing-permissions status for banner UI
-    const existingPermissionsStatus =
-      await this.#existingPermissionsService.getExistingPermissionsStatus(
+    // Start loading existing-permissions status in the background so it can run in parallel
+    // with the introduction flow; result is only needed when building confirmation content.
+    const existingPermissionsStatusPromise =
+      this.#existingPermissionsService.getExistingPermissionsStatus(
         origin,
         validatedPermissionRequest.permission,
       );
@@ -267,6 +268,9 @@ export class PermissionRequestLifecycleOrchestrator {
         }
 
         const metadata = await lifecycleHandlers.deriveMetadata({ context });
+
+        const existingPermissionsStatus =
+          await existingPermissionsStatusPromise;
 
         const ui = await lifecycleHandlers.createConfirmationContent({
           context,
