@@ -5,11 +5,11 @@ import { bytesToHex } from '@metamask/utils';
 
 import type { TokenBalanceAndMetadata } from '../../../src/clients/types';
 import type { DialogInterface } from '../../../src/core/dialogInterface';
-import { ExistingPermissionsService } from '../../../src/core/existingpermissions/existingPermissionsService';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../../../src/profileSync/profileSync';
+import { ExistingPermissionsService } from '../../../src/services/existingPermissionsService';
 import type {
   TokenMetadata,
   TokenMetadataService,

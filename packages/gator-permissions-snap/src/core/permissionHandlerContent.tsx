@@ -7,6 +7,8 @@ import {
   Text,
   Skeleton,
   AccountSelector,
+  Banner,
+  Link,
 } from '@metamask/snaps-sdk/jsx';
 import { parseCaipAssetType } from '@metamask/utils';
 
@@ -55,6 +57,8 @@ export type PermissionHandlerContentProps = {
   chainId: number;
   explorerUrl: string | undefined;
   isAccountUpgraded: boolean;
+  hasExistingPermissions: boolean;
+  similarPermissionsExist: boolean;
 };
 
 /**
@@ -78,6 +82,8 @@ export type PermissionHandlerContentProps = {
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
+ * @param options.hasExistingPermissions - Whether permissions already exist.
+ * @param options.similarPermissionsExist - Whether similar permissions already exist.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -99,6 +105,8 @@ export const PermissionHandlerContent = ({
   chainId,
   explorerUrl,
   isAccountUpgraded,
+  hasExistingPermissions,
+  similarPermissionsExist,
 }: PermissionHandlerContentProps): SnapElement => {
   const tokenBalanceComponent = TokenBalanceField({
     tokenBalance,
@@ -174,6 +182,8 @@ export const PermissionHandlerContent = ({
     />
   );
 
+  const gatorPermissionsPageUrl = `https://link.metamask.io/gator-permissions?type=token-transfer&site=${origin}`;
+
   return (
     <Box>
       <Box direction="vertical">
@@ -208,6 +218,22 @@ export const PermissionHandlerContent = ({
             )}
           </Box>
         </Section>
+        {hasExistingPermissions && similarPermissionsExist && (
+          <Banner title={t('existingPermissionsTitle')} severity="warning">
+            <Text>
+              {t('existingPermissionsSimilarDescription')}{' '}
+              <Link href={gatorPermissionsPageUrl}>{t('here')}</Link>
+            </Text>
+          </Banner>
+        )}
+        {hasExistingPermissions && !similarPermissionsExist && (
+          <Banner title={t('existingPermissionsTitle')} severity="info">
+            <Text>
+              {t('existingPermissionsDescription')}{' '}
+              <Link href={gatorPermissionsPageUrl}>{t('here')}</Link>
+            </Text>
+          </Banner>
+        )}
         <Section>
           <Box direction="vertical" alignment="space-between">
             <Box direction="horizontal">

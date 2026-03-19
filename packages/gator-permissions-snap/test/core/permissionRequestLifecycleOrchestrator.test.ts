@@ -24,7 +24,7 @@ import type { PermissionIntroductionService } from '../../src/core/permissionInt
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
-import { ExistingPermissionsService } from 'src/core/existingpermissions/existingPermissionsService';
+import { ExistingPermissionsService } from 'src/services/existingPermissionsService';
 import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 const randomAddress = (): Hex => {

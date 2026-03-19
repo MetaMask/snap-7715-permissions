@@ -31,7 +31,6 @@ import { TrustSignalsClient } from './clients/trustSignalsClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
-import { ExistingPermissionsService } from './core/existingpermissions';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
@@ -44,6 +43,7 @@ import {
 import { isMethodAllowedForOrigin } from './rpc/permissions';
 import { createRpcHandler } from './rpc/rpcHandler';
 import { RpcMethod } from './rpc/rpcMethod';
+import { ExistingPermissionsService } from './services/existingPermissionsService';
 import { NonceCaveatService } from './services/nonceCaveatService';
 import { SnapsMetricsService } from './services/snapsMetricsService';
 import { TokenMetadataService } from './services/tokenMetadataService';

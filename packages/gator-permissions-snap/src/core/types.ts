@@ -144,6 +144,8 @@ export type LifecycleOrchestrationHandlers<
     chainId: number;
     scanDappUrlResult: ScanDappUrlResult | null;
     scanAddressResult: FetchAddressScanResult | null;
+    hasExistingPermissions: boolean;
+    similarPermissionsExist: boolean;
   }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;

@@ -217,6 +217,8 @@ export class PermissionHandler<
       chainId,
       scanDappUrlResult,
       scanAddressResult,
+      hasExistingPermissions,
+      similarPermissionsExist,
     }: {
       context: TContext;
       metadata: TMetadata;
@@ -224,6 +226,8 @@ export class PermissionHandler<
       chainId: number;
       scanDappUrlResult: ScanDappUrlResult | null;
       scanAddressResult: FetchAddressScanResult | null;
+      hasExistingPermissions: boolean;
+      similarPermissionsExist: boolean;
     }): Promise<JSX.Element> => {
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
@@ -264,6 +268,8 @@ export class PermissionHandler<
         chainId,
         explorerUrl,
         isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
+        hasExistingPermissions,
+        similarPermissionsExist,
       });
     };
 
