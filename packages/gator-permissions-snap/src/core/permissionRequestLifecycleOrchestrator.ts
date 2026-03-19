@@ -161,12 +161,9 @@ export class PermissionRequestLifecycleOrchestrator {
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
 
-    // Start loading existing permissions in the background before showing introduction
-    // This way if the introduction is shown, the existing permissions will already be loaded
-    const hasExistingPermissions =
-      await this.#existingPermissionsService.hasExistingPermissions(origin);
-    const similarPermissionsExist =
-      await this.#existingPermissionsService.similarPermissionsExist(
+    // Single network call to determine existing-permissions status for banner UI
+    const existingPermissionsStatus =
+      await this.#existingPermissionsService.getExistingPermissionsStatus(
         origin,
         validatedPermissionRequest.permission,
       );
@@ -278,8 +275,7 @@ export class PermissionRequestLifecycleOrchestrator {
           chainId,
           scanDappUrlResult,
           scanAddressResult,
-          hasExistingPermissions,
-          similarPermissionsExist,
+          existingPermissionsStatus,
         });
 
         await confirmationDialog.updateContent({

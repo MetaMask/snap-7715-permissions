@@ -17,10 +17,6 @@ import {
   parseCaipAssetType,
 } from '@metamask/utils';
 
-import type {
-  FetchAddressScanResult,
-  ScanDappUrlResult,
-} from '../clients/trustSignalsClient';
 import { getIconData } from '../permissions/iconUtil';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
@@ -48,6 +44,11 @@ import type {
   PermissionHandlerParams,
 } from './types';
 import { logger } from '../../../shared/src/utils/logger';
+import type {
+  FetchAddressScanResult,
+  ScanDappUrlResult,
+} from '../clients/trustSignalsClient';
+import type { ExistingPermissionsStatus } from '../services/existingPermissionsService';
 import { createCancellableOperation } from '../utils/cancellableOperation';
 import type { MessageKey } from '../utils/i18n';
 import { formatUnits } from '../utils/value';
@@ -217,8 +218,7 @@ export class PermissionHandler<
       chainId,
       scanDappUrlResult,
       scanAddressResult,
-      hasExistingPermissions,
-      similarPermissionsExist,
+      existingPermissionsStatus,
     }: {
       context: TContext;
       metadata: TMetadata;
@@ -226,8 +226,7 @@ export class PermissionHandler<
       chainId: number;
       scanDappUrlResult: ScanDappUrlResult | null;
       scanAddressResult: FetchAddressScanResult | null;
-      hasExistingPermissions: boolean;
-      similarPermissionsExist: boolean;
+      existingPermissionsStatus: ExistingPermissionsStatus;
     }): Promise<JSX.Element> => {
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
@@ -268,8 +267,7 @@ export class PermissionHandler<
         chainId,
         explorerUrl,
         isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
-        hasExistingPermissions,
-        similarPermissionsExist,
+        existingPermissionsStatus,
       });
     };
 

@@ -22,6 +22,7 @@ import type {
   FetchAddressScanResult,
   ScanDappUrlResult,
 } from '../clients/trustSignalsClient';
+import type { ExistingPermissionsStatus } from '../services/existingPermissionsService';
 import {
   AddressField,
   ShowMoreText,
@@ -57,8 +58,7 @@ export type PermissionHandlerContentProps = {
   chainId: number;
   explorerUrl: string | undefined;
   isAccountUpgraded: boolean;
-  hasExistingPermissions: boolean;
-  similarPermissionsExist: boolean;
+  existingPermissionsStatus: ExistingPermissionsStatus;
 };
 
 /**
@@ -82,8 +82,7 @@ export type PermissionHandlerContentProps = {
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
- * @param options.hasExistingPermissions - Whether permissions already exist.
- * @param options.similarPermissionsExist - Whether similar permissions already exist.
+ * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -105,8 +104,7 @@ export const PermissionHandlerContent = ({
   chainId,
   explorerUrl,
   isAccountUpgraded,
-  hasExistingPermissions,
-  similarPermissionsExist,
+  existingPermissionsStatus,
 }: PermissionHandlerContentProps): SnapElement => {
   const tokenBalanceComponent = TokenBalanceField({
     tokenBalance,
@@ -182,7 +180,7 @@ export const PermissionHandlerContent = ({
     />
   );
 
-  const gatorPermissionsPageUrl = `https://link.metamask.io/gator-permissions?type=token-transfer&site=${origin}`;
+  const gatorPermissionsPageUrl = `https://link.metamask.io/gator-permissions?type=token-transfer&site=${encodeURIComponent(origin)}`;
 
   return (
     <Box>
@@ -218,7 +216,7 @@ export const PermissionHandlerContent = ({
             )}
           </Box>
         </Section>
-        {hasExistingPermissions && similarPermissionsExist && (
+        {existingPermissionsStatus === 'similar' && (
           <Banner title={t('existingPermissionsTitle')} severity="warning">
             <Text>
               {t('existingPermissionsSimilarDescription')}{' '}
@@ -226,7 +224,7 @@ export const PermissionHandlerContent = ({
             </Text>
           </Banner>
         )}
-        {hasExistingPermissions && !similarPermissionsExist && (
+        {existingPermissionsStatus === 'existing_only' && (
           <Banner title={t('existingPermissionsTitle')} severity="info">
             <Text>
               {t('existingPermissionsDescription')}{' '}

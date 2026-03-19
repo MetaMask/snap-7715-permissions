@@ -137,8 +137,9 @@ const mockPermissionIntroductionService = {
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
 const mockExistingPermissionsService = {
-  hasExistingPermissions: jest.fn().mockResolvedValue(false),
   getExistingPermissions: jest.fn().mockResolvedValue([]),
+  getExistingPermissionsStatus: jest.fn().mockResolvedValue('none' as const),
+  hasExistingPermissions: jest.fn().mockResolvedValue(false),
   similarPermissionsExist: jest.fn().mockResolvedValue(false),
 } as unknown as jest.Mocked<ExistingPermissionsService>;
 

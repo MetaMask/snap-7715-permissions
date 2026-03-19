@@ -11,6 +11,7 @@ import type {
   FetchAddressScanResult,
   ScanDappUrlResult,
 } from '../clients/trustSignalsClient';
+import type { ExistingPermissionsStatus } from '../services/existingPermissionsService';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { AccountController } from './accountController';
@@ -144,8 +145,7 @@ export type LifecycleOrchestrationHandlers<
     chainId: number;
     scanDappUrlResult: ScanDappUrlResult | null;
     scanAddressResult: FetchAddressScanResult | null;
-    hasExistingPermissions: boolean;
-    similarPermissionsExist: boolean;
+    existingPermissionsStatus: ExistingPermissionsStatus;
   }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;
