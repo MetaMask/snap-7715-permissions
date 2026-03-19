@@ -220,8 +220,10 @@ export const PermissionHandlerContent = ({
           ExistingPermissionsState.SimilarPermissions && (
           <Banner title={t('existingPermissionsTitle')} severity="warning">
             <Text>
-              {t('existingPermissionsSimilarDescription')}{' '}
-              <Link href={gatorPermissionsPageUrl}>{t('here')}</Link>
+              {t('existingPermissionsSimilarMessage')}
+              <Link href={gatorPermissionsPageUrl}>
+                {t('existingPermissionsLink')}
+              </Link>
             </Text>
           </Banner>
         )}
@@ -229,8 +231,10 @@ export const PermissionHandlerContent = ({
           ExistingPermissionsState.DissimilarPermissions && (
           <Banner title={t('existingPermissionsTitle')} severity="info">
             <Text>
-              {t('existingPermissionsDescription')}{' '}
-              <Link href={gatorPermissionsPageUrl}>{t('here')}</Link>
+              {t('existingPermissionsExistingMessage')}
+              <Link href={gatorPermissionsPageUrl}>
+                {t('existingPermissionsLink')}
+              </Link>
             </Text>
           </Banner>
         )}

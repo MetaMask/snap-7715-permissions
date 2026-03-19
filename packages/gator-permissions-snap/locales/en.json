@@ -256,13 +256,13 @@
     "existingPermissionsTitle": {
       "message": "Existing permissions"
     },
-    "existingPermissionsDescription": {
-      "message": "You have granted permissions to this site in the past. Review them"
+    "existingPermissionsExistingMessage": {
+      "message": "You have granted permissions to this site in the past. Review them "
     },
-    "existingPermissionsSimilarDescription": {
-      "message": "You have granted similar permissions to this site in the past. Review them"
+    "existingPermissionsSimilarMessage": {
+      "message": "You have granted similar permissions to this site in the past. Review them "
     },
-    "here": {
+    "existingPermissionsLink": {
       "message": "here"
     },
     "chainLabel": {
