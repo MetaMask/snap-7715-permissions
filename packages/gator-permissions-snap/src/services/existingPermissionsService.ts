@@ -88,12 +88,17 @@ export class ExistingPermissionsService {
     const requestedCategory = extractPermissionCategory(
       extractDescriptorName(requestedPermission.type),
     );
-    return existingPermissions.some(
-      (stored) =>
-        extractPermissionCategory(
-          extractDescriptorName(stored.permissionResponse.permission.type),
-        ) === requestedCategory,
-    );
+    // Only treat as similar when both have a recognized category (stream/periodic) and they match.
+    // Unrecognized types (e.g. revocation) return null; null === null would falsely mark them as similar.
+    if (requestedCategory === null) {
+      return false;
+    }
+    return existingPermissions.some((stored) => {
+      const storedCategory = extractPermissionCategory(
+        extractDescriptorName(stored.permissionResponse.permission.type),
+      );
+      return storedCategory !== null && storedCategory === requestedCategory;
+    });
   }
 
   /**
@@ -116,12 +121,16 @@ export class ExistingPermissionsService {
     const requestedCategory = extractPermissionCategory(
       extractDescriptorName(requestedPermission.type),
     );
-    const hasSimilar = existingPermissions.some(
-      (stored) =>
-        extractPermissionCategory(
+    // Only treat as similar when both have a recognized category (stream/periodic) and they match.
+    // Unrecognized types (e.g. revocation) return null; null === null would falsely mark them as similar.
+    const hasSimilar =
+      requestedCategory !== null &&
+      existingPermissions.some((stored) => {
+        const storedCategory = extractPermissionCategory(
           extractDescriptorName(stored.permissionResponse.permission.type),
-        ) === requestedCategory,
-    );
+        );
+        return storedCategory !== null && storedCategory === requestedCategory;
+      });
     return hasSimilar
       ? ExistingPermissionsState.SimilarPermissions
       : ExistingPermissionsState.DissimilarPermissions;
