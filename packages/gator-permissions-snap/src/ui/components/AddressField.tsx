@@ -52,7 +52,7 @@ export const AddressField = ({
             {addressContent}
           </Box>
           <Box direction="horizontal" alignment="end">
-            <Icon name="danger" size="md" color="primary" />
+            <Icon name="danger" size="md" color="error" />
             <Text alignment="end" color="error">
               {warningLabel}
             </Text>
