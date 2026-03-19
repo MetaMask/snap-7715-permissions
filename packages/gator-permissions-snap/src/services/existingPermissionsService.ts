@@ -1,9 +1,28 @@
 import { Permission } from '@metamask/7715-permissions-shared/types';
+import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../profileSync/profileSync';
+
+/**
+ * Extracts the category (stream or periodic) from a permission type.
+ * E.g., 'native-token-stream' → 'stream', 'erc20-token-periodic' → 'periodic'
+ * @param permissionTypeName - The permission type name to extract category from.
+ * @returns The category ('stream' or 'periodic') or null if unrecognized.
+ */
+function extractPermissionCategory(
+  permissionTypeName: string,
+): 'stream' | 'periodic' | null {
+  if (permissionTypeName.includes('stream')) {
+    return 'stream';
+  }
+  if (permissionTypeName.includes('periodic')) {
+    return 'periodic';
+  }
+  return null;
+}
 
 /**
  * Status of existing permissions for a site with respect to the currently requested permission.
@@ -39,10 +58,11 @@ export class ExistingPermissionsService {
         await this.#profileSyncManager.getAllGrantedPermissions();
 
       // Return all non-revoked permissions for the origin across all chains
+      const normalizedOrigin = siteOrigin.toLowerCase();
       const matching = allPermissions.filter(
         (permission) =>
           permission.revocationMetadata === undefined &&
-          permission.siteOrigin.toLowerCase() === siteOrigin.toLowerCase(),
+          permission.siteOrigin.toLowerCase() === normalizedOrigin,
       );
 
       return matching;
@@ -61,9 +81,14 @@ export class ExistingPermissionsService {
     requestedPermission: Permission,
   ): Promise<boolean> {
     const existingPermissions = await this.getExistingPermissions(siteOrigin);
+    const requestedCategory = extractPermissionCategory(
+      extractDescriptorName(requestedPermission.type),
+    );
     return existingPermissions.some(
       (stored) =>
-        stored.permissionResponse.permission.type === requestedPermission.type,
+        extractPermissionCategory(
+          extractDescriptorName(stored.permissionResponse.permission.type),
+        ) === requestedCategory,
     );
   }
 
@@ -84,9 +109,14 @@ export class ExistingPermissionsService {
     if (existingPermissions.length === 0) {
       return 'none';
     }
+    const requestedCategory = extractPermissionCategory(
+      extractDescriptorName(requestedPermission.type),
+    );
     const hasSimilar = existingPermissions.some(
       (stored) =>
-        stored.permissionResponse.permission.type === requestedPermission.type,
+        extractPermissionCategory(
+          extractDescriptorName(stored.permissionResponse.permission.type),
+        ) === requestedCategory,
     );
     return hasSimilar ? 'similar' : 'existing_only';
   }

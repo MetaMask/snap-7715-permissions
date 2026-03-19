@@ -792,8 +792,8 @@ describe('PermissionHandler', () => {
             },
             "type": "Section",
           },
-          undefined,
-          undefined,
+          false,
+          false,
           {
             "key": null,
             "props": {
@@ -1397,8 +1397,8 @@ describe('PermissionHandler', () => {
             },
             "type": "Section",
           },
-          undefined,
-          undefined,
+          false,
+          false,
           {
             "key": null,
             "props": {
@@ -2031,8 +2031,8 @@ describe('PermissionHandler', () => {
             },
             "type": "Section",
           },
-          undefined,
-          undefined,
+          false,
+          false,
           {
             "key": null,
             "props": {
@@ -2601,8 +2601,8 @@ describe('PermissionHandler', () => {
             },
             "type": "Section",
           },
-          undefined,
-          undefined,
+          false,
+          false,
           {
             "key": null,
             "props": {
@@ -3173,8 +3173,8 @@ describe('PermissionHandler', () => {
             },
             "type": "Section",
           },
-          undefined,
-          undefined,
+          false,
+          false,
           {
             "key": null,
             "props": {
