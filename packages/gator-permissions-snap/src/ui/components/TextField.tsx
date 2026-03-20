@@ -41,7 +41,7 @@ export const TextField = ({
     <Box direction="vertical">
       <Text alignment="end">{value}</Text>
       <Box direction="horizontal" alignment="end">
-        <Icon name="danger" size="md" color="primary" />
+        <Icon name="danger" size="md" color="error" />
         <Text color="error">{warningLabel}</Text>
       </Box>
     </Box>
