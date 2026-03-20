@@ -43,6 +43,7 @@ import type {
 } from '../clients/trustSignalsClient';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsService';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -161,10 +162,17 @@ export class PermissionRequestLifecycleOrchestrator {
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
 
-    // Start loading existing permissions in the background before showing introduction
-    // This way if the introduction is shown, the existing permissions will already be loaded
-    const existingPermissionsPromise =
-      this.#existingPermissionsService.getExistingPermissions(origin);
+    // Start loading existing-permissions status in the background so it can run in parallel
+    // with the introduction flow; result is only needed when building confirmation content.
+    // Chain .catch() so the promise never rejects: if the user cancels at intro we return
+    // without awaiting it, and any processing error (e.g. malformed stored permission type)
+    // should not cause an unhandled rejection or crash the dialog.
+    const existingPermissionsStatusPromise = this.#existingPermissionsService
+      .getExistingPermissionsStatus(
+        origin,
+        validatedPermissionRequest.permission,
+      )
+      .catch(() => ExistingPermissionsState.None);
 
     // Check if we need to show introduction
     if (
@@ -196,32 +204,6 @@ export class PermissionRequestLifecycleOrchestrator {
       await this.#permissionIntroductionService.markIntroductionAsSeen(
         permissionType,
       );
-    }
-
-    // Await the existing permissions that were started loading earlier
-    const existingPermissions = await existingPermissionsPromise;
-
-    if (existingPermissions?.length > 0) {
-      const { wasCancelled } =
-        await this.#existingPermissionsService.showExistingPermissions({
-          dialogInterface,
-          existingPermissions,
-        });
-
-      // If user cancelled the existing permissions dialog, reject the permission request
-      if (wasCancelled) {
-        await this.#snapsMetricsService.trackPermissionRejected({
-          origin,
-          permissionType,
-          chainId: permissionRequest.chainId,
-          permissionData: permissionRequest.permission.data,
-        });
-
-        return {
-          approved: false,
-          reason: 'Permission request denied at existing permissions screen',
-        };
-      }
     }
 
     // only necessary when not pre-installed, to ensure that the account
@@ -292,14 +274,24 @@ export class PermissionRequestLifecycleOrchestrator {
 
         const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
-        const ui = await lifecycleHandlers.createConfirmationContent({
-          context,
-          metadata,
-          origin,
-          chainId,
-          scanDappUrlResult,
-          scanAddressResult,
-        });
+        const existingPermissionsStatus =
+          await existingPermissionsStatusPromise;
+
+        const ui = context.showExistingPermissions
+          ? await this.#existingPermissionsService.createExistingPermissionsContent(
+              await this.#existingPermissionsService.getExistingPermissions(
+                origin,
+              ),
+            )
+          : await lifecycleHandlers.createConfirmationContent({
+              context,
+              metadata,
+              origin,
+              chainId,
+              scanDappUrlResult,
+              scanAddressResult,
+              existingPermissionsStatus,
+            });
 
         await confirmationDialog.updateContent({
           ui,

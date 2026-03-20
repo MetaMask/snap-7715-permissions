@@ -234,7 +234,7 @@ describe('ExistingPermissionsService', () => {
       expect(mockDialogInterface.show).not.toHaveBeenCalled();
     });
 
-    it('should show skeleton immediately then update with real content', async () => {
+    it('should show content after formatting permissions', async () => {
       const permission = createMockStoredPermission();
 
       // Mock dialog.show to capture the callback and resolve immediately
@@ -251,18 +251,15 @@ describe('ExistingPermissionsService', () => {
       // Allow async operations to complete
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      // Assert: skeleton should be shown, then updated with real content
-      expect(mockDialogInterface.show).toHaveBeenCalledTimes(2);
+      // Assert: content should be shown once
+      expect(mockDialogInterface.show).toHaveBeenCalledTimes(1);
 
-      // Get both calls
-      const firstCall = mockDialogInterface.show.mock.calls[0];
-      const secondCall = mockDialogInterface.show.mock.calls[1];
-
-      expect(firstCall).toBeDefined();
-      expect(secondCall).toBeDefined();
+      // Get the call
+      const call = mockDialogInterface.show.mock.calls[0];
+      expect(call).toBeDefined();
 
       // Clean up: trigger dialog close to resolve the promise
-      const onCloseCallback = firstCall?.[1];
+      const onCloseCallback = call?.[1];
       onCloseCallback?.();
 
       await resultPromise;

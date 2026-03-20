@@ -30,9 +30,11 @@ import type {
   AccountUpgradeStatus,
 } from './accountController';
 import { getChainMetadata } from './chainMetadata';
+import { EXISTING_PERMISSIONS_CONFIRM_BUTTON } from './existingpermissions';
 import {
   ACCOUNT_SELECTOR_NAME,
   PermissionHandlerContent,
+  SHOW_EXISTING_PERMISSIONS_BUTTON_NAME,
   SkeletonPermissionHandlerContent,
 } from './permissionHandlerContent';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
@@ -51,6 +53,7 @@ import { logger } from '../../../shared/src/utils/logger';
 import { createCancellableOperation } from '../utils/cancellableOperation';
 import type { MessageKey } from '../utils/i18n';
 import { formatUnits } from '../utils/value';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsService';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 
@@ -217,6 +220,7 @@ export class PermissionHandler<
       chainId,
       scanDappUrlResult,
       scanAddressResult,
+      existingPermissionsStatus,
     }: {
       context: TContext;
       metadata: TMetadata;
@@ -224,6 +228,7 @@ export class PermissionHandler<
       chainId: number;
       scanDappUrlResult: ScanDappUrlResult | null;
       scanAddressResult: FetchAddressScanResult | null;
+      existingPermissionsStatus: ExistingPermissionsState;
     }): Promise<JSX.Element> => {
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
@@ -264,6 +269,7 @@ export class PermissionHandler<
         chainId,
         explorerUrl,
         isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
+        existingPermissionsStatus,
       });
     };
 
@@ -418,6 +424,34 @@ export class PermissionHandler<
         },
       });
 
+      const { unbind: unbindShowExistingPermissionsButtonClick } =
+        this.#userEventDispatcher.on({
+          elementName: SHOW_EXISTING_PERMISSIONS_BUTTON_NAME,
+          eventType: UserInputEventType.ButtonClickEvent,
+          interfaceId,
+          handler: async () => {
+            currentContext = {
+              ...currentContext,
+              showExistingPermissions: true,
+            };
+            await rerender();
+          },
+        });
+
+      const { unbind: unbindExistingPermissionsConfirmButtonClick } =
+        this.#userEventDispatcher.on({
+          elementName: EXISTING_PERMISSIONS_CONFIRM_BUTTON,
+          eventType: UserInputEventType.ButtonClickEvent,
+          interfaceId,
+          handler: async () => {
+            currentContext = {
+              ...currentContext,
+              showExistingPermissions: false,
+            };
+            await rerender();
+          },
+        });
+
       const unbindRuleHandlers = bindRuleHandlers({
         rules: this.#rules,
         userEventDispatcher: this.#userEventDispatcher,
@@ -433,6 +467,8 @@ export class PermissionHandler<
         unbindRuleHandlers();
         unbindShowMoreButtonClick();
         unbindAccountSelected();
+        unbindShowExistingPermissionsButtonClick();
+        unbindExistingPermissionsConfirmButtonClick();
       };
     };
 

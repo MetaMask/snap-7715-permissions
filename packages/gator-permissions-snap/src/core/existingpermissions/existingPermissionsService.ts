@@ -1,19 +1,43 @@
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { Permission } from '@metamask/7715-permissions-shared/types';
 
-import {
-  buildExistingPermissionsContent,
-  buildExistingPermissionsSkeletonContent,
-  EXISTING_PERMISSIONS_CONFIRM_BUTTON,
-} from './existingPermissionsContent';
+import { buildExistingPermissionsContent } from './existingPermissionsContent';
 import { formatPermissionWithTokenMetadata } from './permissionFormatter';
 import type { ExistingPermissionDisplayConfig } from './types';
+import { extractDescriptorName } from '../../../../shared/src/utils/common';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../../profileSync/profileSync';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
-import type { DialogInterface } from '../dialogInterface';
+
+/**
+ * Extracts the category (stream or periodic) from a permission type.
+ * E.g., 'native-token-stream' → 'stream', 'erc20-token-periodic' → 'periodic'
+ * @param permissionTypeName - The permission type name to extract category from.
+ * @returns The category ('stream' or 'periodic') or null if unrecognized.
+ */
+function extractPermissionCategory(
+  permissionTypeName: string,
+): 'stream' | 'periodic' | null {
+  if (permissionTypeName.includes('stream')) {
+    return 'stream';
+  }
+  if (permissionTypeName.includes('periodic')) {
+    return 'periodic';
+  }
+  return null;
+}
+
+/**
+ * Status of existing permissions for a site with respect to the currently requested permission.
+ * Used to drive a single network call and one UI decision (banner type or none).
+ */
+export enum ExistingPermissionsState {
+  None = 'None',
+  DissimilarPermissions = 'DissimilarPermissions',
+  SimilarPermissions = 'SimilarPermissions',
+}
 
 /**
  * Service for displaying existing permissions when a dApp requests new ones.
@@ -22,13 +46,10 @@ import type { DialogInterface } from '../dialogInterface';
 export class ExistingPermissionsService {
   readonly #profileSyncManager: ProfileSyncManager;
 
-  readonly #userEventDispatcher: UserEventDispatcher;
-
   readonly #tokenMetadataService: TokenMetadataService;
 
   constructor({
     profileSyncManager,
-    userEventDispatcher,
     tokenMetadataService,
   }: {
     profileSyncManager: ProfileSyncManager;
@@ -36,32 +57,7 @@ export class ExistingPermissionsService {
     tokenMetadataService: TokenMetadataService;
   }) {
     this.#profileSyncManager = profileSyncManager;
-    this.#userEventDispatcher = userEventDispatcher;
     this.#tokenMetadataService = tokenMetadataService;
-  }
-
-  /**
-   * Finds existing permissions matching the given origin.
-   * Returns all permissions granted to the origin across all chains (not limited to the requested chainId).
-   * Filters by isRevoked and siteOrigin only.
-   *
-   * @param siteOrigin - The origin of the requesting dApp.
-   * @returns An array of matching stored permissions across all chains, or an empty array if not found.
-   */
-  async #findMatchingExistingPermission(
-    siteOrigin: string,
-  ): Promise<StoredGrantedPermission[]> {
-    const allPermissions =
-      await this.#profileSyncManager.getAllGrantedPermissions();
-
-    // Return all non-revoked permissions for the origin across all chains
-    const matching = allPermissions.filter(
-      (permission) =>
-        permission.revocationMetadata === undefined &&
-        permission.siteOrigin.toLowerCase() === siteOrigin.toLowerCase(),
-    );
-
-    return matching;
   }
 
   /**
@@ -73,121 +69,75 @@ export class ExistingPermissionsService {
     siteOrigin: string,
   ): Promise<StoredGrantedPermission[]> {
     try {
-      return await this.#findMatchingExistingPermission(siteOrigin);
+      const allPermissions =
+        await this.#profileSyncManager.getAllGrantedPermissions();
+
+      // Return all non-revoked permissions for the origin across all chains
+      const matching = allPermissions.filter(
+        (permission) =>
+          permission.revocationMetadata === undefined &&
+          permission.siteOrigin.toLowerCase() === siteOrigin.toLowerCase() &&
+          permission.permissionResponse.from &&
+          permission.permissionResponse.chainId,
+      );
+
+      return matching;
     } catch {
       return [];
     }
   }
 
-  /**
-   * Shows the existing permissions dialog and waits for user acknowledgement.
-   * @param options - The options object.
-   * @param options.dialogInterface - The dialog interface to use for displaying content.
-   * @param options.existingPermissions - The existing permissions to display.
-   * @returns Object with wasCancelled flag indicating if user dismissed the dialog.
-   */
-  async showExistingPermissions({
-    dialogInterface,
-    existingPermissions,
-  }: {
-    dialogInterface: DialogInterface;
-    existingPermissions: StoredGrantedPermission[] | undefined;
-  }): Promise<{ wasCancelled: boolean }> {
+  async createExistingPermissionsContent(
+    existingPermissions: StoredGrantedPermission[],
+  ): Promise<JSX.Element> {
+    const formattedPermissions = await Promise.all(
+      existingPermissions.map(async (stored) =>
+        formatPermissionWithTokenMetadata(
+          stored.permissionResponse,
+          this.#tokenMetadataService,
+        ),
+      ),
+    );
+
+    const config: ExistingPermissionDisplayConfig = {
+      existingPermissions: formattedPermissions,
+      title: 'existingPermissionsTitle',
+      description: 'existingPermissionsDescription',
+      buttonLabel: 'existingPermissionsConfirmButton',
+    };
+
+    return Promise.resolve(buildExistingPermissionsContent(config));
+  }
+
+  async getExistingPermissionsStatus(
+    siteOrigin: string,
+    requestedPermission: Permission,
+  ): Promise<ExistingPermissionsState> {
     try {
-      if (!existingPermissions || existingPermissions.length === 0) {
-        return { wasCancelled: false };
+      const existingPermissions = await this.getExistingPermissions(siteOrigin);
+      if (existingPermissions.length === 0) {
+        return ExistingPermissionsState.None;
       }
-
-      // Validate permissions before displaying them
-      // A permission is valid if it has both 'from' and 'chainId' fields
-      const validPermissions = existingPermissions.filter(
-        (stored) =>
-          stored.permissionResponse.from && stored.permissionResponse.chainId,
+      const requestedCategory = extractPermissionCategory(
+        extractDescriptorName(requestedPermission.type),
       );
-
-      // If all permissions are invalid, treat as no existing permissions
-      if (validPermissions.length === 0) {
-        return { wasCancelled: false };
-      }
-
-      // Build configuration for the skeleton display (shown immediately)
-      const config: ExistingPermissionDisplayConfig = {
-        existingPermissions: [],
-        title: 'existingPermissionsTitle',
-        description: 'existingPermissionsDescription',
-        buttonLabel: 'existingPermissionsConfirmButton',
-      };
-
-      // Track unbind functions to clean up handlers
-      const unbindFunctions: (() => void)[] = [];
-
-      // Helper to cleanup all event handlers
-      const unbindAll = (): void => {
-        unbindFunctions.forEach((fn) => fn());
-      };
-
-      const wasConfirmed = await new Promise<boolean>((resolve) => {
-        // Show skeleton immediately
-        const skeletonContent = buildExistingPermissionsSkeletonContent(config);
-
-        dialogInterface
-          .show(skeletonContent, () => {
-            unbindAll();
-            resolve(false); // User cancelled via X button
-          })
-          .then(async (interfaceId) => {
-            try {
-              // Format permissions with token metadata (this may take time)
-              const formattedPermissions = await Promise.all(
-                validPermissions.map(async (stored) =>
-                  formatPermissionWithTokenMetadata(
-                    stored.permissionResponse,
-                    this.#tokenMetadataService,
-                  ),
-                ),
-              );
-
-              // Build configuration for the actual permissions display
-              const actualConfig: ExistingPermissionDisplayConfig = {
-                existingPermissions: formattedPermissions,
-                title: 'existingPermissionsTitle',
-                description: 'existingPermissionsDescription',
-                buttonLabel: 'existingPermissionsConfirmButton',
-              };
-
-              // Update dialog with actual content
-              const actualContent =
-                buildExistingPermissionsContent(actualConfig);
-              await dialogInterface.show(actualContent);
-            } catch {
-              // If formatting fails, dialog still shows with skeleton
-              // This is acceptable - user can still interact with the dialog
-            }
-
-            // Handler for acknowledge button
-            const { unbind: unbindConfirm } = this.#userEventDispatcher.on({
-              elementName: EXISTING_PERMISSIONS_CONFIRM_BUTTON,
-              eventType: UserInputEventType.ButtonClickEvent,
-              interfaceId,
-              handler: async () => {
-                unbindAll();
-                resolve(true); // User acknowledged
-              },
-            });
-            unbindFunctions.push(unbindConfirm);
-
-            return undefined;
-          })
-          .catch(() => {
-            unbindAll();
-            resolve(false); // Error = treat as cancelled
-          });
-      });
-
-      return { wasCancelled: !wasConfirmed };
+      // Only treat as similar when both have a recognized category (stream/periodic) and they match.
+      // Unrecognized types (e.g. revocation) return null; null === null would falsely mark them as similar.
+      const hasSimilar =
+        requestedCategory !== null &&
+        existingPermissions.some((stored) => {
+          const storedCategory = extractPermissionCategory(
+            extractDescriptorName(stored.permissionResponse.permission.type),
+          );
+          return (
+            storedCategory !== null && storedCategory === requestedCategory
+          );
+        });
+      return hasSimilar
+        ? ExistingPermissionsState.SimilarPermissions
+        : ExistingPermissionsState.DissimilarPermissions;
     } catch {
-      // If anything goes wrong, just return false to continue with the flow
-      return { wasCancelled: false };
+      return ExistingPermissionsState.None;
     }
   }
 }

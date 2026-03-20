@@ -7,6 +7,8 @@ import {
   Text,
   Skeleton,
   AccountSelector,
+  Banner,
+  Button,
 } from '@metamask/snaps-sdk/jsx';
 import { parseCaipAssetType } from '@metamask/utils';
 
@@ -31,8 +33,11 @@ import {
 } from '../ui/components';
 import type { MessageKey } from '../utils/i18n';
 import { t } from '../utils/i18n';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsService';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
+export const SHOW_EXISTING_PERMISSIONS_BUTTON_NAME =
+  'show-existing-permissions-button';
 
 export type PermissionHandlerContentProps = {
   children: SnapElement;
@@ -55,6 +60,7 @@ export type PermissionHandlerContentProps = {
   chainId: number;
   explorerUrl: string | undefined;
   isAccountUpgraded: boolean;
+  existingPermissionsStatus: ExistingPermissionsState;
 };
 
 /**
@@ -78,6 +84,7 @@ export type PermissionHandlerContentProps = {
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
+ * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -99,6 +106,7 @@ export const PermissionHandlerContent = ({
   chainId,
   explorerUrl,
   isAccountUpgraded,
+  existingPermissionsStatus,
 }: PermissionHandlerContentProps): SnapElement => {
   const tokenBalanceComponent = TokenBalanceField({
     tokenBalance,
@@ -208,6 +216,24 @@ export const PermissionHandlerContent = ({
             )}
           </Box>
         </Section>
+        {existingPermissionsStatus ===
+          ExistingPermissionsState.SimilarPermissions && (
+          <Banner title={t('existingPermissionsTitle')} severity="warning">
+            <Text>{t('existingPermissionsSimilarMessage')}</Text>
+            <Button name={SHOW_EXISTING_PERMISSIONS_BUTTON_NAME}>
+              {t('existingPermissionsLink')}
+            </Button>
+          </Banner>
+        )}
+        {existingPermissionsStatus ===
+          ExistingPermissionsState.DissimilarPermissions && (
+          <Banner title={t('existingPermissionsTitle')} severity="info">
+            <Text>{t('existingPermissionsExistingMessage')}</Text>
+            <Button name={SHOW_EXISTING_PERMISSIONS_BUTTON_NAME}>
+              {t('existingPermissionsLink')}
+            </Button>
+          </Banner>
+        )}
         <Section>
           <Box direction="vertical" alignment="space-between">
             <Box direction="horizontal">

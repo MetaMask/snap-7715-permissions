@@ -20,6 +20,7 @@ import type { PermissionRequestLifecycleOrchestrator } from './permissionRequest
 import type { TimeoutFactory } from './timeoutFactory';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { MessageKey } from '../utils/i18n';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsService';
 
 /**
  * Represents the result of a permission request.
@@ -57,6 +58,7 @@ export type BaseContext = {
     symbol: string;
     iconDataBase64: string | null;
   };
+  showExistingPermissions: boolean | null;
 };
 
 export type BaseMetadata = {
@@ -144,6 +146,7 @@ export type LifecycleOrchestrationHandlers<
     chainId: number;
     scanDappUrlResult: ScanDappUrlResult | null;
     scanAddressResult: FetchAddressScanResult | null;
+    existingPermissionsStatus: ExistingPermissionsState;
   }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;

@@ -1,4 +1,4 @@
-import { Box, Divider, Text } from '@metamask/snaps-sdk/jsx';
+import { Box, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import type { PermissionDetail } from '../../core/existingpermissions/permissionFormatter';
 
@@ -23,8 +23,7 @@ export const PermissionCard = ({
   index,
 }: PermissionCardProps): JSX.Element => {
   return (
-    <Box key={`permission-${index}`} direction="vertical">
-      {index > 0 && <Divider />}
+    <Section key={`permission-${index}`} direction="vertical">
       {Object.entries(detail).map(([label, value]) => (
         <Box
           direction="horizontal"
@@ -35,6 +34,6 @@ export const PermissionCard = ({
           <Text> {value}</Text>
         </Box>
       ))}
-    </Box>
+    </Section>
   );
 };

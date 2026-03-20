@@ -262,6 +262,15 @@
     "existingPermissionsConfirmButton": {
       "message": "Continue"
     },
+    "existingPermissionsExistingMessage": {
+      "message": "You have granted permissions to this site in the past."
+    },
+    "existingPermissionsSimilarMessage": {
+      "message": "You have granted similar permissions to this site in the past."
+    },
+    "existingPermissionsLink": {
+      "message": "Review them"
+    },
     "chainLabel": {
       "message": "Network"
     },
