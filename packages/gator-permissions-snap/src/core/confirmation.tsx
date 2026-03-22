@@ -21,6 +21,8 @@ export class ConfirmationDialog {
 
   readonly #timeoutFactory: TimeoutFactory;
 
+  static isGrantDisabled = true;
+
   #ui: SnapElement;
 
   #timeout: Timeout | undefined;
@@ -191,12 +193,13 @@ export class ConfirmationDialog {
    */
   async updateContent({
     ui,
+    isGrantDisabled,
   }: {
     ui: SnapElement;
     isGrantDisabled: boolean;
   }): Promise<void> {
     this.#ui = ui;
-
+    ConfirmationDialog.isGrantDisabled = isGrantDisabled;
     await this.#dialogInterface.show(this.#buildConfirmation());
   }
 

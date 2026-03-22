@@ -1224,7 +1224,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": false,
+                "disabled": true,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -1864,7 +1864,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": false,
+                "disabled": true,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -2533,7 +2533,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": false,
+                "disabled": true,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -3138,7 +3138,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": false,
+                "disabled": true,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -3745,7 +3745,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": false,
+                "disabled": true,
                 "name": "grant-button",
                 "variant": "primary",
               },

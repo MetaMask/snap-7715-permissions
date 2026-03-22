@@ -280,7 +280,7 @@ export const PermissionHandlerContent = ({
         <Button
           name={ConfirmationDialog.grantButton}
           variant="primary"
-          disabled={false}
+          disabled={ConfirmationDialog.isGrantDisabled}
         >
           {t('grantButton')}
         </Button>
