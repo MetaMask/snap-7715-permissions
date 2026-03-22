@@ -1,4 +1,13 @@
-import { Box, Section, Heading, Text, Address } from '@metamask/snaps-sdk/jsx';
+import {
+  Box,
+  Section,
+  Heading,
+  Text,
+  Address,
+  Container,
+  Button,
+  Footer,
+} from '@metamask/snaps-sdk/jsx';
 import { Hex } from '@metamask/utils';
 
 import { groupPermissionsByFromAddress } from './permissionFormatter';
@@ -20,34 +29,41 @@ export const EXISTING_PERMISSIONS_CONFIRM_BUTTON =
 export function buildExistingPermissionsContent(
   config: ExistingPermissionDisplayConfig,
 ): JSX.Element {
-  const { existingPermissions, title, description } = config;
+  const { existingPermissions, title, description, buttonLabel } = config;
 
   const grouped = groupPermissionsByFromAddress(existingPermissions);
 
   return (
-    <Box direction="vertical">
-      <Box center={true}>
-        <Heading size="lg">{t(title)}</Heading>
-        <Text>{t(description)}</Text>
-      </Box>
+    <Container>
+      <Box direction="vertical">
+        <Box center={true}>
+          <Heading size="lg">{t(title)}</Heading>
+          <Text>{t(description)}</Text>
+        </Box>
 
-      {Object.entries(grouped).map(([accountAddress, permissions]) => {
-        return (
-          <Box key={`account-${accountAddress}`} direction="vertical">
-            <Section direction="horizontal" alignment="space-between">
-              <Text fontWeight="bold">{t('accountLabel')}</Text>
-              <Address address={accountAddress as Hex} displayName={true} />
-            </Section>
-            {permissions.map((detail, index) => (
-              <PermissionCard
-                key={`permission-${index}`}
-                detail={detail}
-                index={index}
-              />
-            ))}
-          </Box>
-        );
-      })}
-    </Box>
+        {Object.entries(grouped).map(([accountAddress, permissions]) => {
+          return (
+            <Box key={`account-${accountAddress}`} direction="vertical">
+              <Section direction="horizontal" alignment="space-between">
+                <Text fontWeight="bold">{t('accountLabel')}</Text>
+                <Address address={accountAddress as Hex} displayName={true} />
+              </Section>
+              {permissions.map((detail, index) => (
+                <PermissionCard
+                  key={`permission-${index}`}
+                  detail={detail}
+                  index={index}
+                />
+              ))}
+            </Box>
+          );
+        })}
+      </Box>
+      <Footer>
+        <Button name={EXISTING_PERMISSIONS_CONFIRM_BUTTON}>
+          {t(buttonLabel)}
+        </Button>
+      </Footer>
+    </Container>
   );
 }

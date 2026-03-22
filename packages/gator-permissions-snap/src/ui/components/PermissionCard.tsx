@@ -24,16 +24,23 @@ export const PermissionCard = ({
 }: PermissionCardProps): JSX.Element => {
   return (
     <Section key={`permission-${index}`} direction="vertical">
-      {Object.entries(detail).map(([label, value]) => (
-        <Box
-          direction="horizontal"
-          alignment="space-between"
-          key={`${index}-${label}`}
-        >
-          <Text>{label}:</Text>
-          <Text> {value}</Text>
-        </Box>
-      ))}
+      {Object.entries(detail).map(([key, item]) =>
+        key === 'justification' ? (
+          <Box direction="vertical" alignment="start" key={`${index}-${key}`}>
+            <Text>{item.label}:</Text>
+            <Text> {item.value}</Text>
+          </Box>
+        ) : (
+          <Box
+            direction="horizontal"
+            alignment="space-between"
+            key={`${index}-${key}`}
+          >
+            <Text>{item.label}:</Text>
+            <Text> {item.value}</Text>
+          </Box>
+        ),
+      )}
     </Section>
   );
 };

@@ -3,7 +3,6 @@ import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { hexToNumber } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
-import type { FormattedPermissionForDisplay } from './types';
 import { DEFAULT_MAX_AMOUNT } from '../../permissions/erc20TokenStream/context';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
@@ -15,7 +14,10 @@ import { nameAndExplorerUrlByChainId } from '../chainMetadata';
  * Represents formatted permission details as an object.
  */
 export type PermissionDetail = {
-  [key: string]: string;
+  [key: string]: {
+    label: string;
+    value: string;
+  };
 };
 
 /**
@@ -45,14 +47,14 @@ function formatTokenAmountWithMetadata(
 
 /**
  * Extracts permission details into a display-friendly format.
- * Converts a permission (response or display-formatted) into a key-value object for UI rendering.
+ * Converts a permission (response or display-formatted) into a structured object with translated labels and formatted values.
  * Note: Token amounts (periodAmount, maxAmount) should be pre-formatted with metadata by formatPermissionWithTokenMetadata.
  *
  * @param permission - The permission to extract details from (should be pre-formatted with token metadata).
- * @returns Object of permission details for display.
+ * @returns Object of permission details with label, value, and key for each field.
  */
 function extractPermissionDetails(
-  permission: FormattedPermissionForDisplay,
+  permission: PermissionResponse,
 ): PermissionDetail {
   const details: PermissionDetail = {};
 
@@ -61,11 +63,12 @@ function extractPermissionDetails(
   // Extract chain information
   const chainMetadata =
     nameAndExplorerUrlByChainId[hexToNumber(permission.chainId)];
-  if (chainMetadata) {
-    details[t('chainLabel')] = chainMetadata.name;
-  } else {
-    details[t('chainLabel')] = permission.chainId;
-  }
+  const chainLabel = t('chainLabel');
+  const chainValue = chainMetadata ? chainMetadata.name : permission.chainId;
+  details.chainId = {
+    label: chainLabel,
+    value: chainValue,
+  };
 
   // Extract permission details based on permission type
   const permissionData = permission.permission.data;
@@ -73,14 +76,22 @@ function extractPermissionDetails(
   if (permissionData && typeof permissionData === 'object') {
     // For revocation-type permissions
     if (permissionType === 'erc20-token-revocation') {
-      details[t('revokeTokenApprovalsLabel')] = t('allTokens');
+      const revokeLabel = t('revokeTokenApprovalsLabel');
+      const revokeValue = t('allTokens');
+      details.tokenApprovals = {
+        label: revokeLabel,
+        value: revokeValue,
+      };
 
       // Add justification if available
       if ('justification' in permissionData) {
         const { justification } = permissionData;
         if (justification !== undefined && justification !== null) {
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-          details[t('justificationLabel')] = String(justification);
+          const justificationLabel = t('justificationLabel');
+          details.justification = {
+            label: justificationLabel,
+            value: String(justification),
+          };
         }
       }
     }
@@ -92,14 +103,18 @@ function extractPermissionDetails(
       const { periodAmount, periodDuration, justification } = permissionData;
 
       if (periodAmount !== undefined && periodAmount !== null) {
+        const amountLabel = t('amountLabel');
         // periodAmount is already formatted with token metadata by formatPermissionWithTokenMetadata
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-        details[t('amountLabel')] = String(periodAmount);
+        details.periodAmount = {
+          label: amountLabel,
+          value: String(periodAmount),
+        };
       }
 
       if (periodDuration !== undefined && periodDuration !== null) {
         const timePeriod = getClosestTimePeriod(Number(periodDuration));
-        details[t('periodDurationLabel')] = t(
+        const durationLabel = t('periodDurationLabel');
+        const durationValue = t(
           timePeriod.toLowerCase() as
             | 'hourly'
             | 'daily'
@@ -108,11 +123,18 @@ function extractPermissionDetails(
             | 'monthly'
             | 'yearly',
         );
+        details.periodDuration = {
+          label: durationLabel,
+          value: durationValue,
+        };
       }
 
       if (justification !== undefined && justification !== null) {
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-        details[t('justificationLabel')] = String(justification);
+        const justificationLabel = t('justificationLabel');
+        details.justification = {
+          label: justificationLabel,
+          value: String(justification),
+        };
       }
     }
     // For stream-type permissions
@@ -123,21 +145,32 @@ function extractPermissionDetails(
       const { maxAmount, startTime, justification } = permissionData;
 
       if (maxAmount !== undefined && maxAmount !== null) {
+        const maxAmountLabel = t('maxAmountLabel');
         // maxAmount is already formatted with token metadata by formatPermissionWithTokenMetadata
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-        details[t('maxAmountLabel')] = String(maxAmount);
+        details.maxAmount = {
+          label: maxAmountLabel,
+          value: String(maxAmount),
+        };
       }
 
       if (startTime !== undefined && startTime !== null) {
+        const startTimeLabel = t('startTimeLabel');
         const date = new Date(Number(startTime) * 1000);
-        details[t('startTimeLabel')] = date.toLocaleString(undefined, {
+        const startTimeValue = date.toLocaleString(undefined, {
           timeZone: 'UTC',
         });
+        details.startTime = {
+          label: startTimeLabel,
+          value: startTimeValue,
+        };
       }
 
       if (justification !== undefined && justification !== null) {
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string -- display value from permission data
-        details[t('justificationLabel')] = String(justification);
+        const justificationLabel = t('justificationLabel');
+        details.justification = {
+          label: justificationLabel,
+          value: String(justification),
+        };
       }
     }
   }
@@ -153,7 +186,7 @@ function extractPermissionDetails(
  * @returns Object with CAIP-10 addresses as keys and arrays of permission details as values.
  */
 export function groupPermissionsByFromAddress(
-  permissions: FormattedPermissionForDisplay[],
+  permissions: PermissionResponse[],
 ): Record<Hex, PermissionDetail[]> {
   const result: Record<Hex, PermissionDetail[]> = {};
 
@@ -183,12 +216,12 @@ export function groupPermissionsByFromAddress(
  *
  * @param permission - The permission response to format.
  * @param tokenMetadataService - Service for fetching token metadata.
- * @returns The permission with display-formatted token amounts; typed as FormattedPermissionForDisplay to prevent misuse.
+ * @returns The permission with display-formatted token amounts; typed as PermissionResponse to prevent misuse.
  */
 export async function formatPermissionWithTokenMetadata(
   permission: PermissionResponse,
   tokenMetadataService: TokenMetadataService,
-): Promise<FormattedPermissionForDisplay> {
+): Promise<PermissionResponse> {
   const permissionData = permission.permission.data as Record<string, unknown>;
 
   if (!permissionData || typeof permissionData !== 'object') {

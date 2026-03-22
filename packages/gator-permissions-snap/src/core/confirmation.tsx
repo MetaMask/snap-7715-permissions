@@ -1,21 +1,19 @@
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { Button, Container, Footer } from '@metamask/snaps-sdk/jsx';
 
 import type { DialogInterface } from './dialogInterface';
 import type { UserEventDispatcher } from '../userEventDispatcher';
 import type { Timeout, TimeoutFactory } from './timeoutFactory';
 import type { ConfirmationProps } from './types';
-import { t } from '../utils/i18n';
 
 /**
  * Dialog for handling user confirmation of permission grants.
  * Manages the UI state, timeout behavior, and user interactions.
  */
 export class ConfirmationDialog {
-  static readonly #cancelButton = 'cancel-button';
+  static readonly cancelButton = 'cancel-button';
 
-  static readonly #grantButton = 'grant-button';
+  static readonly grantButton = 'grant-button';
 
   readonly #dialogInterface: DialogInterface;
 
@@ -24,8 +22,6 @@ export class ConfirmationDialog {
   readonly #timeoutFactory: TimeoutFactory;
 
   #ui: SnapElement;
-
-  #isGrantDisabled = true;
 
   #timeout: Timeout | undefined;
 
@@ -119,7 +115,7 @@ export class ConfirmationDialog {
       });
 
       const { unbind: unbindGrantButtonClick } = this.#userEventDispatcher.on({
-        elementName: ConfirmationDialog.#grantButton,
+        elementName: ConfirmationDialog.grantButton,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
@@ -141,7 +137,7 @@ export class ConfirmationDialog {
       });
 
       const { unbind: unbindCancelButtonClick } = this.#userEventDispatcher.on({
-        elementName: ConfirmationDialog.#cancelButton,
+        elementName: ConfirmationDialog.cancelButton,
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
@@ -184,23 +180,7 @@ export class ConfirmationDialog {
   }
 
   #buildConfirmation(): JSX.Element {
-    return (
-      <Container>
-        {this.#ui}
-        <Footer>
-          <Button name={ConfirmationDialog.#cancelButton} variant="destructive">
-            {t('cancelButton')}
-          </Button>
-          <Button
-            name={ConfirmationDialog.#grantButton}
-            variant="primary"
-            disabled={this.#isGrantDisabled}
-          >
-            {t('grantButton')}
-          </Button>
-        </Footer>
-      </Container>
-    );
+    return this.#ui;
   }
 
   /**
@@ -211,13 +191,11 @@ export class ConfirmationDialog {
    */
   async updateContent({
     ui,
-    isGrantDisabled,
   }: {
     ui: SnapElement;
     isGrantDisabled: boolean;
   }): Promise<void> {
     this.#ui = ui;
-    this.#isGrantDisabled = isGrantDisabled;
 
     await this.#dialogInterface.show(this.#buildConfirmation());
   }
