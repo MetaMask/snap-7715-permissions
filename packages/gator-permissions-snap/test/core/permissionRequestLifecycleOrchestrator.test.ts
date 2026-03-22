@@ -20,12 +20,15 @@ import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFactory';
+import {
+  ExistingPermissionsService,
+  ExistingPermissionsState,
+} from '../../src/core/existingpermissions/existingPermissionsService';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
+import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
-import { ExistingPermissionsService } from 'src/core/existingpermissions/existingPermissionsService';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
 
 const randomAddress = (): Hex => {
   const randomBytes = new Uint8Array(20);
@@ -137,9 +140,19 @@ const mockPermissionIntroductionService = {
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
 const mockExistingPermissionsService = {
-  getExistingPermissions: jest.fn().mockResolvedValue([]),
-  showExistingPermissions: jest.fn().mockResolvedValue({ wasCancelled: false }),
+  getExistingPermissions: jest.fn(),
+  getExistingPermissionsStatus: jest.fn(),
+  createExistingPermissionsContent: jest.fn(),
 } as unknown as jest.Mocked<ExistingPermissionsService>;
+
+// Set default mock implementations for existing permissions service
+mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
+mockExistingPermissionsService.getExistingPermissionsStatus.mockResolvedValue(
+  ExistingPermissionsState.None,
+);
+mockExistingPermissionsService.createExistingPermissionsContent.mockResolvedValue(
+  mockUiContent,
+);
 
 const mockScanAddressResult: FetchAddressScanResult = {
   resultType: AddressScanResultType.Benign,
@@ -170,6 +183,15 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Reset existing permissions service mocks after clearing
+    mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
+    mockExistingPermissionsService.getExistingPermissionsStatus.mockResolvedValue(
+      ExistingPermissionsState.None,
+    );
+    mockExistingPermissionsService.createExistingPermissionsContent.mockResolvedValue(
+      mockUiContent,
+    );
 
     lifecycleHandlerMocks = {
       parseAndValidatePermission: jest.fn().mockImplementation((req) => req),
@@ -1007,6 +1029,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           chainId: 1,
           scanDappUrlResult: null,
           scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
         });
 
         // Final call has both scan results from closure (after both background scans resolve)
@@ -1019,6 +1042,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           chainId: 1,
           scanDappUrlResult: { isComplete: false },
           scanAddressResult: mockScanAddressResult,
+          existingPermissionsStatus: ExistingPermissionsState.None,
         });
 
         expect(mockTrustSignalsClient.fetchAddressScan).toHaveBeenCalledWith(
