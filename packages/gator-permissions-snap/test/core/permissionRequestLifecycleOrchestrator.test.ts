@@ -367,7 +367,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
           ui: mockUiContent,
-          isGrantDisabled: false,
         });
       });
 
@@ -760,7 +759,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       it('serializes consecutive updateConfirmation calls so they run in order and do not overwrite each other', async () => {
-        // updateConfirmation is called with only newContext and isGrantDisabled; scan results are read from closure variables.
+        // updateConfirmation is called with optional newContext; scan results are read from closure variables.
         mockTrustSignalsClient.scanDappUrl.mockImplementationOnce(
           async (): Promise<ScanDappUrlResult> =>
             new Promise<ScanDappUrlResult>(() => {}),
@@ -1030,6 +1029,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           scanDappUrlResult: null,
           scanAddressResult: null,
           existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
         });
 
         // Final call has both scan results from closure (after both background scans resolve)
@@ -1043,6 +1043,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           scanDappUrlResult: { isComplete: false },
           scanAddressResult: mockScanAddressResult,
           existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
         });
 
         expect(mockTrustSignalsClient.fetchAddressScan).toHaveBeenCalledWith(
@@ -1052,7 +1053,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
           ui: mockUiContent,
-          isGrantDisabled: false,
         });
       });
 

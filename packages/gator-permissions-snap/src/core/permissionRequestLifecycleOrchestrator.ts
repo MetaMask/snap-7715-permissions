@@ -43,7 +43,7 @@ import type {
 } from '../clients/trustSignalsClient';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
-import { ExistingPermissionsState } from './existingpermissions/existingPermissionsService';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -172,7 +172,16 @@ export class PermissionRequestLifecycleOrchestrator {
         origin,
         validatedPermissionRequest.permission,
       )
-      .catch(() => ExistingPermissionsState.None);
+      .catch((error: unknown) => {
+        logger.error(
+          'PermissionRequestLifecycleOrchestrator: getExistingPermissionsStatus rejected',
+          {
+            origin,
+            error: error instanceof Error ? error.message : error,
+          },
+        );
+        return ExistingPermissionsState.None;
+      });
 
     // Check if we need to show introduction
     if (
@@ -277,6 +286,8 @@ export class PermissionRequestLifecycleOrchestrator {
         const existingPermissionsStatus =
           await existingPermissionsStatusPromise;
 
+        const grantDisabled = isGrantDisabled || hasValidationErrors(metadata);
+
         const ui = context.showExistingPermissions
           ? await this.#existingPermissionsService.createExistingPermissionsContent(
               await this.#existingPermissionsService.getExistingPermissions(
@@ -291,12 +302,10 @@ export class PermissionRequestLifecycleOrchestrator {
               scanDappUrlResult,
               scanAddressResult,
               existingPermissionsStatus,
+              isGrantDisabled: grantDisabled,
             });
 
-        await confirmationDialog.updateContent({
-          ui,
-          isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
-        });
+        await confirmationDialog.updateContent({ ui });
       };
 
       lastUpdateConfirmationPromise =

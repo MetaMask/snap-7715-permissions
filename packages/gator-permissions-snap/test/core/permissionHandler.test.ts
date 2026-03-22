@@ -5,6 +5,7 @@ import { UserInputEventType } from '@metamask/snaps-sdk';
 import { AddressScanResultType } from '../../src/clients/trustSignalsClient';
 import type { TokenBalanceAndMetadata } from '../../src/clients/types';
 import type { AccountController } from '../../src/core/accountController';
+import { ExistingPermissionsState } from '../../src/core/existingpermissions/existingPermissionsState';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type {
@@ -414,6 +415,8 @@ describe('PermissionHandler', () => {
           chainId: 1,
           scanDappUrlResult: null,
           scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
         });
 
         expect(dependencies.createConfirmationContent).toHaveBeenCalledWith({
@@ -436,6 +439,8 @@ describe('PermissionHandler', () => {
           chainId: 1,
           scanDappUrlResult: null,
           scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
         });
 
         expect(result).toBeDefined();
@@ -459,6 +464,8 @@ describe('PermissionHandler', () => {
             resultType: AddressScanResultType.Malicious,
             label: '',
           },
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
         });
 
         // When label is empty, permissionHandlerContent should use t('maliciousAddressLabel')
@@ -495,7 +502,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         const accountSelectorBoundEvent = getBoundEvent({
@@ -530,7 +536,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         expect(
@@ -558,7 +563,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -607,7 +611,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -654,7 +657,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         const confirmationContent =
@@ -665,6 +667,8 @@ describe('PermissionHandler', () => {
             chainId: 1,
             scanDappUrlResult: null,
             scanAddressResult: null,
+            existingPermissionsStatus: ExistingPermissionsState.None,
+            isGrantDisabled: false,
           });
         expect(confirmationContent).toMatchInlineSnapshot(`
 {
@@ -1224,7 +1228,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": true,
+                "disabled": false,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -1258,7 +1262,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -1290,6 +1293,8 @@ describe('PermissionHandler', () => {
             chainId: 1,
             scanDappUrlResult: null,
             scanAddressResult: null,
+            existingPermissionsStatus: ExistingPermissionsState.None,
+            isGrantDisabled: false,
           });
 
         expect(confirmationContent).toMatchInlineSnapshot(`
@@ -1864,7 +1869,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": true,
+                "disabled": false,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -1923,7 +1928,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -1964,6 +1968,8 @@ describe('PermissionHandler', () => {
             chainId: 1,
             scanDappUrlResult: null,
             scanAddressResult: null,
+            existingPermissionsStatus: ExistingPermissionsState.None,
+            isGrantDisabled: false,
           });
 
         // skeletons in place of both the token balance and fiat balance
@@ -2533,7 +2539,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": true,
+                "disabled": false,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -2563,6 +2569,8 @@ describe('PermissionHandler', () => {
             chainId: 1,
             scanDappUrlResult: null,
             scanAddressResult: null,
+            existingPermissionsStatus: ExistingPermissionsState.None,
+            isGrantDisabled: false,
           });
 
         // concrete token balance, skeleton for fiat balance
@@ -3138,7 +3146,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": true,
+                "disabled": false,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -3168,6 +3176,8 @@ describe('PermissionHandler', () => {
             chainId: 1,
             scanDappUrlResult: null,
             scanAddressResult: null,
+            existingPermissionsStatus: ExistingPermissionsState.None,
+            isGrantDisabled: false,
           });
 
         // concrete token balance, concrete fiat balance
@@ -3745,7 +3755,7 @@ describe('PermissionHandler', () => {
               "key": null,
               "props": {
                 "children": "Grant",
-                "disabled": true,
+                "disabled": false,
                 "name": "grant-button",
                 "variant": "primary",
               },
@@ -3793,7 +3803,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         const accountSelectorChangeHandler = getBoundEvent({
@@ -3847,7 +3856,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: true,
         });
 
         const accountSelectorBoundEvent = getBoundEvent({
@@ -3910,7 +3918,6 @@ describe('PermissionHandler', () => {
           interfaceId: mockInterfaceId,
           initialContext: mockContext,
           updateContext,
-          isAdjustmentAllowed: false, // Adjustment not allowed
         });
 
         // Try to get a rule input handler - it should still be bound

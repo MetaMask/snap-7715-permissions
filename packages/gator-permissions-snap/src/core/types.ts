@@ -20,7 +20,7 @@ import type { PermissionRequestLifecycleOrchestrator } from './permissionRequest
 import type { TimeoutFactory } from './timeoutFactory';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { MessageKey } from '../utils/i18n';
-import { ExistingPermissionsState } from './existingpermissions/existingPermissionsService';
+import type { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 
 /**
  * Represents the result of a permission request.
@@ -151,6 +151,8 @@ export type LifecycleOrchestrationHandlers<
     scanDappUrlResult: ScanDappUrlResult | null;
     scanAddressResult: FetchAddressScanResult | null;
     existingPermissionsStatus: ExistingPermissionsState;
+    /** Whether the grant control should render disabled (validation + caller intent). */
+    isGrantDisabled: boolean;
   }) => Promise<SnapElement>;
   applyContext: (args: {
     context: TContext;
@@ -170,7 +172,6 @@ export type LifecycleOrchestrationHandlers<
    * @param confirmationCreatedArgs.interfaceId - The interface ID for the confirmation dialog
    * @param confirmationCreatedArgs.initialContext - The initial context for the confirmation dialog
    * @param confirmationCreatedArgs.updateContext - Function to update the context of the confirmation dialog
-   * @param confirmationCreatedArgs.isAdjustmentAllowed - Whether adjustments to the confirmation dialog are allowed
    */
   onConfirmationCreated?: (confirmationCreatedArgs: {
     interfaceId: string;

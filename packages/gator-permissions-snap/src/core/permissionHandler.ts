@@ -53,7 +53,7 @@ import { logger } from '../../../shared/src/utils/logger';
 import { createCancellableOperation } from '../utils/cancellableOperation';
 import type { MessageKey } from '../utils/i18n';
 import { formatUnits } from '../utils/value';
-import { ExistingPermissionsState } from './existingpermissions/existingPermissionsService';
+import type { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 
 export const JUSTIFICATION_SHOW_MORE_BUTTON_NAME = 'show-more-justification';
 
@@ -221,6 +221,7 @@ export class PermissionHandler<
       scanDappUrlResult,
       scanAddressResult,
       existingPermissionsStatus,
+      isGrantDisabled,
     }: {
       context: TContext;
       metadata: TMetadata;
@@ -229,6 +230,7 @@ export class PermissionHandler<
       scanDappUrlResult: ScanDappUrlResult | null;
       scanAddressResult: FetchAddressScanResult | null;
       existingPermissionsStatus: ExistingPermissionsState;
+      isGrantDisabled: boolean;
     }): Promise<JSX.Element> => {
       const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
@@ -270,6 +272,7 @@ export class PermissionHandler<
         explorerUrl,
         isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
         existingPermissionsStatus,
+        isGrantDisabled,
       });
     };
 

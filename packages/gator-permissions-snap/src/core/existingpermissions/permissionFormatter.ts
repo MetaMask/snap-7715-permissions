@@ -182,10 +182,11 @@ function extractPermissionDetails(
 }
 
 /**
- * Converts existingPermissions array to an object keyed by CAIP-10 from address.
- * Groups already-formatted permissions by account address.
+ * Converts permissions to an object keyed by CAIP-10 `from` address.
+ * Callers should pass responses that have been through {@link formatPermissionWithTokenMetadata}
+ * when token amounts should appear human-readable in the UI.
  *
- * @param permissions - The display-formatted permissions to group.
+ * @param permissions - Permission responses to group (entries without `from`/`chainId` are skipped).
  * @returns Object with CAIP-10 addresses as keys and arrays of permission details as values.
  */
 export function groupPermissionsByFromAddress(
@@ -219,7 +220,8 @@ export function groupPermissionsByFromAddress(
  *
  * @param permission - The permission response to format.
  * @param tokenMetadataService - Service for fetching token metadata.
- * @returns The permission with display-formatted token amounts; typed as PermissionResponse to prevent misuse.
+ * @returns The same permission shape with display-formatted token amounts in `data`; still typed as
+ *   `PermissionResponse`, so treat `data` as UI-only after this call (not raw hex for on-chain math).
  */
 export async function formatPermissionWithTokenMetadata(
   permission: PermissionResponse,

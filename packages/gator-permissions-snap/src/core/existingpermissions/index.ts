@@ -1,3 +1,4 @@
+export { ExistingPermissionsState } from './existingPermissionsState';
 export { ExistingPermissionsService } from './existingPermissionsService';
 export {
   buildExistingPermissionsContent,

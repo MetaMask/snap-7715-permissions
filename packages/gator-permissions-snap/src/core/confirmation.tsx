@@ -21,8 +21,6 @@ export class ConfirmationDialog {
 
   readonly #timeoutFactory: TimeoutFactory;
 
-  static isGrantDisabled = true;
-
   #ui: SnapElement;
 
   #timeout: Timeout | undefined;
@@ -187,19 +185,13 @@ export class ConfirmationDialog {
 
   /**
    * Updates the confirmation dialog content.
+   * Grant enable/disable is encoded in the `ui` tree (for example `PermissionHandlerContent` props).
+   *
    * @param options - The update options.
    * @param options.ui - The new UI content.
-   * @param options.isGrantDisabled - Whether the grant button should be disabled.
    */
-  async updateContent({
-    ui,
-    isGrantDisabled,
-  }: {
-    ui: SnapElement;
-    isGrantDisabled: boolean;
-  }): Promise<void> {
+  async updateContent({ ui }: { ui: SnapElement }): Promise<void> {
     this.#ui = ui;
-    ConfirmationDialog.isGrantDisabled = isGrantDisabled;
     await this.#dialogInterface.show(this.#buildConfirmation());
   }
 

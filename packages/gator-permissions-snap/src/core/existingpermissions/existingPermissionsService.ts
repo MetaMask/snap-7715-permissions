@@ -5,6 +5,7 @@ import {
 } from '@metamask/7715-permissions-shared/utils';
 
 import { buildExistingPermissionsContent } from './existingPermissionsContent';
+import { ExistingPermissionsState } from './existingPermissionsState';
 import { formatPermissionWithTokenMetadata } from './permissionFormatter';
 import type { ExistingPermissionDisplayConfig } from './types';
 import type {
@@ -12,6 +13,8 @@ import type {
   StoredGrantedPermission,
 } from '../../profileSync/profileSync';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
+
+export { ExistingPermissionsState } from './existingPermissionsState';
 
 /**
  * Extracts the category (stream or periodic) from a permission type name.
@@ -33,17 +36,8 @@ function extractPermissionCategory(
 }
 
 /**
- * Status of existing permissions for a site with respect to the currently requested permission.
- * Used to drive a single network call and one UI decision (banner type or none).
- */
-export enum ExistingPermissionsState {
-  None = 'None',
-  DissimilarPermissions = 'DissimilarPermissions',
-  SimilarPermissions = 'SimilarPermissions',
-}
-
-/**
- * Loads stored permissions for a site and builds the existing-permissions review UI (banner + full list).
+ * Loads stored permissions for a site, classifies them against the current request for banner UI,
+ * and builds the full existing-permissions review screen.
  */
 export class ExistingPermissionsService {
   readonly #profileSyncManager: ProfileSyncManager;
@@ -63,8 +57,10 @@ export class ExistingPermissionsService {
 
   /**
    * Gets existing permissions matching the given origin.
+   * Entries without `permissionResponse.from` or `permissionResponse.chainId` are omitted.
+   *
    * @param siteOrigin - The origin of the requesting dApp.
-   * @returns An array of matching stored permissions, or an empty array if not found.
+   * @returns Non-revoked stored grants for the origin, or an empty array on failure or if none match.
    */
   async getExistingPermissions(
     siteOrigin: string,
@@ -95,6 +91,12 @@ export class ExistingPermissionsService {
     }
   }
 
+  /**
+   * Builds the full-screen list of stored permissions (formatted for display) and a confirm control.
+   *
+   * @param existingPermissions - Stored grants to render; typically from {@link getExistingPermissions}.
+   * @returns JSX for the existing-permissions review container.
+   */
   async createExistingPermissionsContent(
     existingPermissions: StoredGrantedPermission[],
   ): Promise<JSX.Element> {
@@ -117,6 +119,13 @@ export class ExistingPermissionsService {
     return buildExistingPermissionsContent(config);
   }
 
+  /**
+   * Compares stored grants for the site to the requested permission (stream vs periodic category).
+   *
+   * @param siteOrigin - The requesting dApp origin.
+   * @param requestedPermission - The permission the user is about to grant.
+   * @returns Banner-driving status, or {@link ExistingPermissionsState.None} if none stored or on error.
+   */
   async getExistingPermissionsStatus(
     siteOrigin: string,
     requestedPermission: Permission,

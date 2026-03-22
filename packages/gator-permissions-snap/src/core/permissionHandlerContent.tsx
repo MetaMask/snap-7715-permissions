@@ -36,7 +36,7 @@ import {
 } from '../ui/components';
 import type { MessageKey } from '../utils/i18n';
 import { t } from '../utils/i18n';
-import { ExistingPermissionsState } from './existingpermissions/existingPermissionsService';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 export const SHOW_EXISTING_PERMISSIONS_BUTTON_NAME =
@@ -64,6 +64,8 @@ export type PermissionHandlerContentProps = {
   explorerUrl: string | undefined;
   isAccountUpgraded: boolean;
   existingPermissionsStatus: ExistingPermissionsState;
+  /** When true, the primary grant button is not clickable. */
+  isGrantDisabled: boolean;
 };
 
 /**
@@ -88,6 +90,7 @@ export type PermissionHandlerContentProps = {
  * @param options.explorerUrl - The URL of the block explorer for the token.
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
  * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
+ * @param options.isGrantDisabled - Whether the grant button should render disabled.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -110,6 +113,7 @@ export const PermissionHandlerContent = ({
   explorerUrl,
   isAccountUpgraded,
   existingPermissionsStatus,
+  isGrantDisabled,
 }: PermissionHandlerContentProps): SnapElement => {
   const tokenBalanceComponent = TokenBalanceField({
     tokenBalance,
@@ -280,7 +284,7 @@ export const PermissionHandlerContent = ({
         <Button
           name={ConfirmationDialog.grantButton}
           variant="primary"
-          disabled={ConfirmationDialog.isGrantDisabled}
+          disabled={isGrantDisabled}
         >
           {t('grantButton')}
         </Button>

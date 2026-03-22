@@ -20,8 +20,7 @@ export const EXISTING_PERMISSIONS_CONFIRM_BUTTON =
   'existing-permissions-confirm';
 
 /**
- * Builds the existing permissions display content.
- * Shows a comparison between an existing permission and what the user is about to grant.
+ * Builds the existing permissions display content: a grouped list of stored grants for review.
  *
  * @param config - The configuration for the existing permissions display.
  * @returns The existing permissions UI as a JSX.Element.

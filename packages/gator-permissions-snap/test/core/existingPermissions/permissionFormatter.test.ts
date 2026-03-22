@@ -96,10 +96,13 @@ describe('formatPermissionWithTokenMetadata', () => {
 
   beforeEach(() => {
     jest.spyOn(logger, 'debug').mockImplementation(() => undefined);
+    const getTokenMetadata = jest
+      .fn()
+      .mockResolvedValue({ decimals: 18, symbol: 'ETH' });
     mockTokenMetadataService = {
-      getTokenMetadata: jest
-        .fn()
-        .mockResolvedValue({ decimals: 18, symbol: 'ETH' }),
+      getTokenMetadata: getTokenMetadata as jest.MockedFunction<
+        TokenMetadataService['getTokenMetadata']
+      >,
     };
   });
 
