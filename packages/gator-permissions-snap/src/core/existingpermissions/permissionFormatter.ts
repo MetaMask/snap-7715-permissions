@@ -1,5 +1,8 @@
 import type { PermissionResponse } from '@metamask/7715-permissions-shared/types';
-import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
+import {
+  extractDescriptorName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
 import { hexToNumber } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
@@ -293,8 +296,14 @@ export async function formatPermissionWithTokenMetadata(
         data: formattedData,
       },
     };
-  } catch {
-    // If token metadata fetch fails, return original permission
+  } catch (error) {
+    logger.debug(
+      'formatPermissionWithTokenMetadata: token metadata fetch failed, using raw permission data',
+      {
+        chainId: permission.chainId,
+        error: error instanceof Error ? error.message : error,
+      },
+    );
     return permission;
   }
 }

@@ -50,7 +50,7 @@ export function buildExistingPermissionsContent(
               </Section>
               {permissions.map((detail, index) => (
                 <PermissionCard
-                  key={`permission-${index}`}
+                  key={`${accountAddress}-${index}`}
                   detail={detail}
                   index={index}
                 />

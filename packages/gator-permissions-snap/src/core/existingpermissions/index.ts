@@ -7,7 +7,4 @@ export {
   formatPermissionWithTokenMetadata,
   groupPermissionsByFromAddress,
 } from './permissionFormatter';
-export type {
-  ExistingPermissionDisplayConfig,
-  FormattedPermissionForDisplay,
-} from './types';
+export type { ExistingPermissionDisplayConfig } from './types';

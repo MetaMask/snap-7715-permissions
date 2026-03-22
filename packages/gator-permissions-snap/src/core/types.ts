@@ -58,7 +58,11 @@ export type BaseContext = {
     symbol: string;
     iconDataBase64: string | null;
   };
-  showExistingPermissions: boolean | null;
+  /**
+   * When true, the confirmation UI shows stored permissions for this site instead of the grant form.
+   * Omitted or falsey means the normal confirmation content. Set by the permission handler when the user opens the existing-permissions view.
+   */
+  showExistingPermissions?: boolean | null;
 };
 
 export type BaseMetadata = {

@@ -1,5 +1,13 @@
-import { describe, it, beforeEach, expect, jest } from '@jest/globals';
+import {
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  expect,
+  jest,
+} from '@jest/globals';
 import type { Permission } from '@metamask/7715-permissions-shared/types';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/utils';
 import { bytesToHex } from '@metamask/utils';
 
@@ -16,7 +24,6 @@ import type {
   TokenMetadata,
   TokenMetadataService,
 } from '../../../src/services/tokenMetadataService';
-import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
 
 // Helper to generate random addresses
 const randomAddress = (): Hex => {
@@ -57,24 +64,16 @@ const createMockStoredPermission = (
 describe('ExistingPermissionsService', () => {
   let service: ExistingPermissionsService;
   let mockProfileSyncManager: jest.Mocked<ProfileSyncManager>;
-  let mockUserEventDispatcher: jest.Mocked<UserEventDispatcher>;
   let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 
     // Setup mock ProfileSyncManager
     mockProfileSyncManager = {
       getAllGrantedPermissions: jest.fn(),
     } as unknown as jest.Mocked<ProfileSyncManager>;
-
-    // Setup mock UserEventDispatcher
-    mockUserEventDispatcher = {
-      on: jest.fn().mockReturnValue({
-        unbind: jest.fn(),
-        dispatcher: {} as any,
-      }),
-    } as unknown as jest.Mocked<UserEventDispatcher>;
 
     // Setup mock TokenMetadataService - formatPermissionWithTokenMetadata uses getTokenMetadata
     const tokenMetadata: TokenMetadata = { decimals: 18, symbol: 'ETH' };
@@ -93,9 +92,12 @@ describe('ExistingPermissionsService', () => {
     // Create service with mocks
     service = new ExistingPermissionsService({
       profileSyncManager: mockProfileSyncManager,
-      userEventDispatcher: mockUserEventDispatcher,
       tokenMetadataService: mockTokenMetadataService,
     });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('getExistingPermissions()', () => {
@@ -183,6 +185,13 @@ describe('ExistingPermissionsService', () => {
 
       // Assert: returns empty array instead of throwing
       expect(result).toStrictEqual([]);
+      expect(logger.error).toHaveBeenCalledWith(
+        'ExistingPermissionsService.getExistingPermissions() failed',
+        expect.objectContaining({
+          siteOrigin: 'https://example.com',
+          error: 'Storage error',
+        }),
+      );
     });
   });
 
@@ -256,6 +265,32 @@ describe('ExistingPermissionsService', () => {
       expect(status).toBe(ExistingPermissionsState.DissimilarPermissions);
     });
 
+    it('should not treat types that merely contain "stream" as stream category', async () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'custom-streaming-permission',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([
+        permission,
+      ]);
+
+      const requestedPermission: Permission = {
+        type: 'native-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const status = await service.getExistingPermissionsStatus(
+        'https://example.com',
+        requestedPermission,
+      );
+
+      expect(status).toBe(ExistingPermissionsState.DissimilarPermissions);
+    });
+
     it('should return None on error', async () => {
       mockProfileSyncManager.getAllGrantedPermissions.mockRejectedValue(
         new Error('Storage error'),
@@ -285,7 +320,28 @@ describe('ExistingPermissionsService', () => {
       ]);
 
       expect(content).toBeDefined();
-      expect(mockTokenMetadataService.getTokenMetadata).toBeDefined();
+      expect(mockTokenMetadataService.getTokenMetadata).not.toHaveBeenCalled();
+    });
+
+    it('should call getTokenMetadata when permission has token amount fields', async () => {
+      const from = randomAddress();
+      const permission = createMockStoredPermission('0x1', from);
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {
+          maxAmount: '0xde0b6b3a7640000',
+          tokenAddress: randomAddress(),
+          justification: 'test',
+        },
+        isAdjustmentAllowed: true,
+      };
+
+      const content = await service.createExistingPermissionsContent([
+        permission,
+      ]);
+
+      expect(content).toBeDefined();
+      expect(mockTokenMetadataService.getTokenMetadata).toHaveBeenCalled();
     });
 
     it('should handle empty permission array', async () => {

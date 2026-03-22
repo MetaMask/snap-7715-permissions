@@ -1,30 +1,33 @@
-import { Permission } from '@metamask/7715-permissions-shared/types';
+import type { Permission } from '@metamask/7715-permissions-shared/types';
+import {
+  extractDescriptorName,
+  logger,
+} from '@metamask/7715-permissions-shared/utils';
 
 import { buildExistingPermissionsContent } from './existingPermissionsContent';
 import { formatPermissionWithTokenMetadata } from './permissionFormatter';
 import type { ExistingPermissionDisplayConfig } from './types';
-import { extractDescriptorName } from '../../../../shared/src/utils/common';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
 } from '../../profileSync/profileSync';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { UserEventDispatcher } from '../../userEventDispatcher';
 
 /**
- * Extracts the category (stream or periodic) from a permission type.
- * E.g., 'native-token-stream' → 'stream', 'erc20-token-periodic' → 'periodic'
+ * Extracts the category (stream or periodic) from a permission type name.
+ * Uses suffix checks so unrelated names that merely contain "stream" as a substring are not misclassified.
+ *
  * @param permissionTypeName - The permission type name to extract category from.
  * @returns The category ('stream' or 'periodic') or null if unrecognized.
  */
 function extractPermissionCategory(
   permissionTypeName: string,
 ): 'stream' | 'periodic' | null {
-  if (permissionTypeName.includes('stream')) {
-    return 'stream';
-  }
-  if (permissionTypeName.includes('periodic')) {
+  if (permissionTypeName.endsWith('-periodic')) {
     return 'periodic';
+  }
+  if (permissionTypeName.endsWith('-stream')) {
+    return 'stream';
   }
   return null;
 }
@@ -40,8 +43,7 @@ export enum ExistingPermissionsState {
 }
 
 /**
- * Service for displaying existing permissions when a dApp requests new ones.
- * Provides UI for showing the comparison between existing and requested permissions.
+ * Loads stored permissions for a site and builds the existing-permissions review UI (banner + full list).
  */
 export class ExistingPermissionsService {
   readonly #profileSyncManager: ProfileSyncManager;
@@ -53,7 +55,6 @@ export class ExistingPermissionsService {
     tokenMetadataService,
   }: {
     profileSyncManager: ProfileSyncManager;
-    userEventDispatcher: UserEventDispatcher;
     tokenMetadataService: TokenMetadataService;
   }) {
     this.#profileSyncManager = profileSyncManager;
@@ -82,7 +83,14 @@ export class ExistingPermissionsService {
       );
 
       return matching;
-    } catch {
+    } catch (error) {
+      logger.error(
+        'ExistingPermissionsService.getExistingPermissions() failed',
+        {
+          siteOrigin,
+          error: error instanceof Error ? error.message : error,
+        },
+      );
       return [];
     }
   }
@@ -106,7 +114,7 @@ export class ExistingPermissionsService {
       buttonLabel: 'existingPermissionsConfirmButton',
     };
 
-    return Promise.resolve(buildExistingPermissionsContent(config));
+    return buildExistingPermissionsContent(config);
   }
 
   async getExistingPermissionsStatus(
@@ -136,7 +144,14 @@ export class ExistingPermissionsService {
       return hasSimilar
         ? ExistingPermissionsState.SimilarPermissions
         : ExistingPermissionsState.DissimilarPermissions;
-    } catch {
+    } catch (error) {
+      logger.error(
+        'ExistingPermissionsService.getExistingPermissionsStatus() failed',
+        {
+          siteOrigin,
+          error: error instanceof Error ? error.message : error,
+        },
+      );
       return ExistingPermissionsState.None;
     }
   }
