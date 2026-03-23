@@ -65,7 +65,7 @@ export class ExistingPermissionsService {
    * Entries without `permissionResponse.from` or `permissionResponse.chainId` are omitted.
    *
    * @param siteOrigin - The origin of the requesting dApp.
-   * @returns Non-revoked stored grants for the origin, or an empty array on failure or if none match.
+   * @returns Non-revoked stored granted permissions for the origin, or an empty array on failure or if none match.
    */
   async getExistingPermissions(
     siteOrigin: string,
