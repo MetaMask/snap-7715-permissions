@@ -257,10 +257,22 @@
       "message": "Existing permissions"
     },
     "existingPermissionsDescription": {
-      "message": "You've already granted permissions for this site. Do you want to continue?"
+      "message": "Permissions you’ve already granted to this site"
     },
     "existingPermissionsConfirmButton": {
-      "message": "Continue"
+      "message": "Back to request"
+    },
+    "existingPermissionsExistingMessage": {
+      "message": "You have granted permissions to this site in the past."
+    },
+    "existingPermissionsSimilarMessage": {
+      "message": "You have granted similar permissions to this site in the past."
+    },
+    "existingPermissionsLink": {
+      "message": "Review them"
+    },
+    "existingPermissionsLoadError": {
+      "message": "We couldn’t load the list. You can go back and try again."
     },
     "chainLabel": {
       "message": "Network"

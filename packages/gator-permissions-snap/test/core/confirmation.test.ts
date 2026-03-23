@@ -324,7 +324,6 @@ describe('ConfirmationDialog', () => {
 
       await confirmationDialog.updateContent({
         ui: updatedUi,
-        isGrantDisabled: false,
       });
 
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({

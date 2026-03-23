@@ -1,17 +1,15 @@
 import {
   Box,
-  Button,
-  Container,
   Section,
-  Footer,
   Heading,
   Text,
   Address,
-  Divider,
-  Bold,
+  Container,
+  Button,
+  Footer,
   Skeleton,
+  SnapElement,
 } from '@metamask/snaps-sdk/jsx';
-import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Hex } from '@metamask/utils';
 
 import { groupPermissionsByFromAddress } from './permissionFormatter';
@@ -23,15 +21,12 @@ import { t } from '../../utils/i18n';
 export const EXISTING_PERMISSIONS_CONFIRM_BUTTON =
   'existing-permissions-confirm';
 
-// Maximum number of permissions to display per account
-const MAX_PERMISSIONS_PER_ACCOUNT = 3;
-
 /**
- * Builds a skeleton loading state for the existing permissions dialog.
- * Shows placeholder UI while permissions are being fetched and formatted.
+ * Builds a skeleton loading UI for the existing permissions page.
+ * Displays placeholder content while permissions are being loaded and formatted.
  *
- * @param config - The configuration for the existing permissions display (used for title/description).
- * @returns The skeleton loading UI as a JSX.Element.
+ * @param config - Title, description, and button label keys (same as the full list view).
+ * @returns The skeleton UI as a JSX.Element.
  */
 export function buildExistingPermissionsSkeletonContent(
   config: ExistingPermissionDisplayConfig,
@@ -54,14 +49,12 @@ export function buildExistingPermissionsSkeletonContent(
                 <Text fontWeight="bold">{t('accountLabel')}</Text>
                 <Skeleton />
               </Box>
-              <Divider />
               {/* Show 2 skeleton permission cards */}
               {[0, 1].map((permIndex) => (
                 <Box
                   key={`skeleton-permission-${permIndex}`}
                   direction="vertical"
                 >
-                  {permIndex > 0 && <Divider />}
                   <Box direction="vertical">
                     <Skeleton />
                     <Skeleton />
@@ -83,8 +76,40 @@ export function buildExistingPermissionsSkeletonContent(
 }
 
 /**
- * Builds the existing permissions display content.
- * Shows a comparison between an existing permission and what the user is about to grant.
+ * Fallback when loading or formatting the existing-permissions list fails.
+ * Keeps the confirm action enabled so the user can return to the main request.
+ *
+ * @param config - Title, description, and button label keys.
+ * @returns Fallback UI as a SnapElement.
+ */
+export function buildExistingPermissionsFallbackContent(
+  config: Pick<
+    ExistingPermissionDisplayConfig,
+    'title' | 'description' | 'buttonLabel'
+  >,
+): SnapElement {
+  const { title, description, buttonLabel } = config;
+
+  return (
+    <Container>
+      <Box direction="vertical">
+        <Box center={true}>
+          <Heading size="lg">{t(title)}</Heading>
+          <Text>{t(description)}</Text>
+          <Text>{t('existingPermissionsLoadError')}</Text>
+        </Box>
+      </Box>
+      <Footer>
+        <Button name={EXISTING_PERMISSIONS_CONFIRM_BUTTON}>
+          {t(buttonLabel)}
+        </Button>
+      </Footer>
+    </Container>
+  );
+}
+
+/**
+ * Builds the existing permissions display content: a grouped list of stored granted permissions for review.
  *
  * @param config - The configuration for the existing permissions display.
  * @returns The existing permissions UI as a JSX.Element.
@@ -105,42 +130,20 @@ export function buildExistingPermissionsContent(
         </Box>
 
         {Object.entries(grouped).map(([accountAddress, permissions]) => {
-          const displayedPermissions = permissions.slice(
-            0,
-            MAX_PERMISSIONS_PER_ACCOUNT,
-          );
-          const hasMorePermissions =
-            permissions.length > MAX_PERMISSIONS_PER_ACCOUNT;
-          const moreCount = permissions.length - MAX_PERMISSIONS_PER_ACCOUNT;
-
           return (
-            <Section key={`account-${accountAddress}`}>
-              <Box direction="vertical">
-                <Box direction="horizontal" alignment="space-between">
-                  <Text fontWeight="bold">{t('accountLabel')}</Text>
-                  <Address address={accountAddress as Hex} displayName={true} />
-                </Box>
-                <Divider />
-                {displayedPermissions.map((detail, index) => (
-                  <PermissionCard
-                    key={`permission-${index}`}
-                    detail={detail}
-                    index={index}
-                  />
-                ))}
-                {hasMorePermissions && (
-                  <Box direction="vertical">
-                    <Divider />
-                    <Text>
-                      {moreCount === 1
-                        ? t('morePermissionsCountSingle')
-                        : t('morePermissionsCountPlural', [String(moreCount)])}
-                      <Bold>{t('dappConnectionsLink')}</Bold>
-                    </Text>
-                  </Box>
-                )}
-              </Box>
-            </Section>
+            <Box key={`account-${accountAddress}`} direction="vertical">
+              <Section direction="horizontal" alignment="space-between">
+                <Text fontWeight="bold">{t('accountLabel')}</Text>
+                <Address address={accountAddress as Hex} displayName={true} />
+              </Section>
+              {permissions.map((detail, index) => (
+                <PermissionCard
+                  key={`${accountAddress}-${index}`}
+                  detail={detail}
+                  index={index}
+                />
+              ))}
+            </Box>
           );
         })}
       </Box>

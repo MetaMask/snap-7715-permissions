@@ -1,11 +1,22 @@
-import { describe, it, beforeEach, expect, jest } from '@jest/globals';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import {
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  expect,
+  jest,
+} from '@jest/globals';
+import type { Permission } from '@metamask/7715-permissions-shared/types';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/utils';
 import { bytesToHex } from '@metamask/utils';
 
 import type { TokenBalanceAndMetadata } from '../../../src/clients/types';
 import type { DialogInterface } from '../../../src/core/dialogInterface';
-import { ExistingPermissionsService } from '../../../src/core/existingpermissions/existingPermissionsService';
+import {
+  ExistingPermissionsService,
+  ExistingPermissionsState,
+} from '../../../src/core/existingpermissions/existingPermissionsService';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,
@@ -14,7 +25,6 @@ import type {
   TokenMetadata,
   TokenMetadataService,
 } from '../../../src/services/tokenMetadataService';
-import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
 
 // Helper to generate random addresses
 const randomAddress = (): Hex => {
@@ -55,25 +65,16 @@ const createMockStoredPermission = (
 describe('ExistingPermissionsService', () => {
   let service: ExistingPermissionsService;
   let mockProfileSyncManager: jest.Mocked<ProfileSyncManager>;
-  let mockUserEventDispatcher: jest.Mocked<UserEventDispatcher>;
   let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
-  let mockDialogInterface: jest.Mocked<DialogInterface>;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 
     // Setup mock ProfileSyncManager
     mockProfileSyncManager = {
       getAllGrantedPermissions: jest.fn(),
     } as unknown as jest.Mocked<ProfileSyncManager>;
-
-    // Setup mock UserEventDispatcher
-    mockUserEventDispatcher = {
-      on: jest.fn().mockReturnValue({
-        unbind: jest.fn(),
-        dispatcher: {} as any,
-      }),
-    } as unknown as jest.Mocked<UserEventDispatcher>;
 
     // Setup mock TokenMetadataService - formatPermissionWithTokenMetadata uses getTokenMetadata
     const tokenMetadata: TokenMetadata = { decimals: 18, symbol: 'ETH' };
@@ -89,18 +90,15 @@ describe('ExistingPermissionsService', () => {
         }),
     } as unknown as jest.Mocked<TokenMetadataService>;
 
-    // Setup mock DialogInterface
-    mockDialogInterface = {
-      show: jest.fn(async (_ui: any, _onClose?: () => void) => 'interface-id'),
-      interfaceId: 'interface-id',
-    } as unknown as jest.Mocked<DialogInterface>;
-
     // Create service with mocks
     service = new ExistingPermissionsService({
       profileSyncManager: mockProfileSyncManager,
-      userEventDispatcher: mockUserEventDispatcher,
       tokenMetadataService: mockTokenMetadataService,
     });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('getExistingPermissions()', () => {
@@ -188,205 +186,300 @@ describe('ExistingPermissionsService', () => {
 
       // Assert: returns empty array instead of throwing
       expect(result).toStrictEqual([]);
+      expect(logger.error).toHaveBeenCalledWith(
+        'ExistingPermissionsService.getExistingPermissions() failed',
+        expect.objectContaining({
+          siteOrigin: 'https://example.com',
+          error: 'Storage error',
+        }),
+      );
+    });
+  });
+
+  describe('getExistingPermissionsStatus()', () => {
+    it('should return None when no existing permissions exist', async () => {
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([]);
+
+      const requestedPermission: Permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const status = await service.getExistingPermissionsStatus(
+        'https://example.com',
+        requestedPermission,
+      );
+
+      expect(status).toBe(ExistingPermissionsState.None);
+    });
+
+    it('should return SimilarPermissions when matching categories exist', async () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([
+        permission,
+      ]);
+
+      const requestedPermission: Permission = {
+        type: 'native-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const status = await service.getExistingPermissionsStatus(
+        'https://example.com',
+        requestedPermission,
+      );
+
+      expect(status).toBe(ExistingPermissionsState.SimilarPermissions);
+    });
+
+    it('should return DissimilarPermissions when categories do not match', async () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([
+        permission,
+      ]);
+
+      const requestedPermission: Permission = {
+        type: 'native-token-periodic',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const status = await service.getExistingPermissionsStatus(
+        'https://example.com',
+        requestedPermission,
+      );
+
+      expect(status).toBe(ExistingPermissionsState.DissimilarPermissions);
+    });
+
+    it('should not treat types that merely contain "stream" as stream category', async () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'custom-streaming-permission',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([
+        permission,
+      ]);
+
+      const requestedPermission: Permission = {
+        type: 'native-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const status = await service.getExistingPermissionsStatus(
+        'https://example.com',
+        requestedPermission,
+      );
+
+      expect(status).toBe(ExistingPermissionsState.DissimilarPermissions);
+    });
+
+    it('should return None on error', async () => {
+      mockProfileSyncManager.getAllGrantedPermissions.mockRejectedValue(
+        new Error('Storage error'),
+      );
+
+      const requestedPermission: Permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const status = await service.getExistingPermissionsStatus(
+        'https://example.com',
+        requestedPermission,
+      );
+
+      expect(status).toBe(ExistingPermissionsState.None);
+    });
+
+    it('should call profile sync only once', async () => {
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([]);
+
+      const requestedPermission: Permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      await service.getExistingPermissionsStatus(
+        'https://example.com',
+        requestedPermission,
+      );
+
+      expect(
+        mockProfileSyncManager.getAllGrantedPermissions,
+      ).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getExistingPermissionsStatusFromList()', () => {
+    it('returns None when list is empty', () => {
+      const requestedPermission: Permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList([], requestedPermission),
+      ).toBe(ExistingPermissionsState.None);
+    });
+
+    it('returns SimilarPermissions when matching categories exist', () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const requestedPermission: Permission = {
+        type: 'native-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList(
+          [permission],
+          requestedPermission,
+        ),
+      ).toBe(ExistingPermissionsState.SimilarPermissions);
+    });
+
+    it('returns DissimilarPermissions when categories do not match', () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const requestedPermission: Permission = {
+        type: 'native-token-periodic',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList(
+          [permission],
+          requestedPermission,
+        ),
+      ).toBe(ExistingPermissionsState.DissimilarPermissions);
+    });
+
+    it('does not treat types that merely contain "stream" as stream category', () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'custom-streaming-permission',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const requestedPermission: Permission = {
+        type: 'native-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList(
+          [permission],
+          requestedPermission,
+        ),
+      ).toBe(ExistingPermissionsState.DissimilarPermissions);
     });
   });
 
   describe('showExistingPermissions()', () => {
-    it('should return early if no existing permissions', async () => {
-      // Action
-      const result = await service.showExistingPermissions({
-        dialogInterface: mockDialogInterface,
-        existingPermissions: undefined,
-      });
+    it('shows skeleton then list without calling profile sync', async () => {
+      const show = jest.fn().mockResolvedValue(undefined);
+      const dialogInterface = { show } as unknown as DialogInterface;
 
-      // Assert
-      expect(result).toStrictEqual({ wasCancelled: false });
-      expect(mockDialogInterface.show).not.toHaveBeenCalled();
+      await service.showExistingPermissions(dialogInterface, [
+        createMockStoredPermission(),
+      ]);
+
+      expect(show).toHaveBeenCalledTimes(2);
+      expect(
+        mockProfileSyncManager.getAllGrantedPermissions,
+      ).not.toHaveBeenCalled();
     });
 
-    it('should return early if empty permission array', async () => {
-      // Action
-      const result = await service.showExistingPermissions({
-        dialogInterface: mockDialogInterface,
-        existingPermissions: [],
-      });
+    it('shows fallback UI when formatting fails', async () => {
+      const show = jest.fn().mockResolvedValue(undefined);
+      const dialogInterface = { show } as unknown as DialogInterface;
+      const spy = jest
+        .spyOn(service, 'createExistingPermissionsContent')
+        .mockRejectedValueOnce(new Error('format failed'));
 
-      // Assert
-      expect(result).toStrictEqual({ wasCancelled: false });
-      expect(mockDialogInterface.show).not.toHaveBeenCalled();
+      await service.showExistingPermissions(dialogInterface, [
+        createMockStoredPermission(),
+      ]);
+
+      expect(show).toHaveBeenCalledTimes(2);
+      expect(logger.error).toHaveBeenCalled();
+      spy.mockRestore();
     });
+  });
 
-    it('should return early if all permissions are invalid', async () => {
-      const invalidPermission1 = createMockStoredPermission();
-      invalidPermission1.permissionResponse.from = undefined as any;
-
-      const invalidPermission2 = createMockStoredPermission();
-      invalidPermission2.permissionResponse.chainId = undefined as any;
-
-      // Action
-      const result = await service.showExistingPermissions({
-        dialogInterface: mockDialogInterface,
-        existingPermissions: [invalidPermission1, invalidPermission2],
-      });
-
-      // Assert: returns early without showing dialog
-      expect(result).toStrictEqual({ wasCancelled: false });
-      expect(mockDialogInterface.show).not.toHaveBeenCalled();
-    });
-
-    it('should show skeleton immediately then update with real content', async () => {
+  describe('createExistingPermissionsContent()', () => {
+    it('should format permissions and build content', async () => {
       const permission = createMockStoredPermission();
 
-      // Mock dialog.show to capture the callback and resolve immediately
-      mockDialogInterface.show.mockImplementation(async (_ui, _onClose) => {
-        return 'interface-id';
-      });
+      const content = await service.createExistingPermissionsContent([
+        permission,
+      ]);
 
-      // Action
-      const resultPromise = service.showExistingPermissions({
-        dialogInterface: mockDialogInterface,
-        existingPermissions: [permission],
-      });
-
-      // Allow async operations to complete
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      // Assert: skeleton should be shown, then updated with real content
-      expect(mockDialogInterface.show).toHaveBeenCalledTimes(2);
-
-      // Get both calls
-      const firstCall = mockDialogInterface.show.mock.calls[0];
-      const secondCall = mockDialogInterface.show.mock.calls[1];
-
-      expect(firstCall).toBeDefined();
-      expect(secondCall).toBeDefined();
-
-      // Clean up: trigger dialog close to resolve the promise
-      const onCloseCallback = firstCall?.[1];
-      onCloseCallback?.();
-
-      await resultPromise;
+      expect(content).toBeDefined();
+      expect(mockTokenMetadataService.getTokenMetadata).not.toHaveBeenCalled();
     });
 
     it('should call getTokenMetadata when permission has token amount fields', async () => {
-      const permission = createMockStoredPermission();
+      const from = randomAddress();
+      const permission = createMockStoredPermission('0x1', from);
       permission.permissionResponse.permission = {
         type: 'erc20-token-stream',
         data: {
-          maxAmount: '0xde0b6b3a7640000' as Hex, // 1 ETH in hex
-          startTime: Math.floor(Date.now() / 1000),
+          maxAmount: '0xde0b6b3a7640000',
+          tokenAddress: randomAddress(),
+          justification: 'test',
         },
         isAdjustmentAllowed: true,
       };
 
-      mockDialogInterface.show.mockResolvedValue('interface-id');
+      const content = await service.createExistingPermissionsContent([
+        permission,
+      ]);
 
-      const resultPromise = service.showExistingPermissions({
-        dialogInterface: mockDialogInterface,
-        existingPermissions: [permission],
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      expect(mockTokenMetadataService.getTokenMetadata).toHaveBeenCalledWith(
-        expect.objectContaining({
-          chainId: 1,
-          account: permission.permissionResponse.from,
-        }),
-      );
-
-      const onCloseCallback = mockDialogInterface.show.mock.calls[0]?.[1];
-      onCloseCallback?.();
-
-      await resultPromise;
+      expect(content).toBeDefined();
+      expect(mockTokenMetadataService.getTokenMetadata).toHaveBeenCalled();
     });
 
-    it('should filter out invalid permissions from display', async () => {
-      const validPermission = createMockStoredPermission();
-      const invalidPermissionNoFrom = { ...createMockStoredPermission() };
-      invalidPermissionNoFrom.permissionResponse.from = undefined as any;
+    it('should handle empty permission array', async () => {
+      const content = await service.createExistingPermissionsContent([]);
 
-      mockDialogInterface.show.mockResolvedValue('interface-id');
-
-      // Action
-      const resultPromise = service.showExistingPermissions({
-        dialogInterface: mockDialogInterface,
-        existingPermissions: [validPermission, invalidPermissionNoFrom],
-      });
-
-      // Allow async operations
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      // Assert: dialog was shown (skeleton + real content attempt)
-      expect(mockDialogInterface.show).toHaveBeenCalled();
-
-      // Trigger dialog close
-      const onCloseCallback = mockDialogInterface.show.mock.calls[0]?.[1];
-      onCloseCallback?.();
-
-      await resultPromise;
-    });
-
-    it('should register button handler for user confirmation', async () => {
-      const permission = createMockStoredPermission();
-
-      mockDialogInterface.show.mockResolvedValue('interface-id');
-
-      // Action
-      const resultPromise = service.showExistingPermissions({
-        dialogInterface: mockDialogInterface,
-        existingPermissions: [permission],
-      });
-
-      // Allow async operations
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      // Assert: button handler was registered
-      expect(mockUserEventDispatcher.on).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: UserInputEventType.ButtonClickEvent,
-        }),
-      );
-
-      // Clean up
-      const onCloseCallback = mockDialogInterface.show.mock.calls[0]?.[1];
-      onCloseCallback?.();
-
-      await resultPromise;
-    });
-
-    it('should handle errors gracefully without crashing', async () => {
-      const permission = createMockStoredPermission();
-      permission.permissionResponse.permission = {
-        type: 'erc20-token-stream',
-        data: {
-          maxAmount: '0xde0b6b3a7640000' as Hex,
-          startTime: Math.floor(Date.now() / 1000),
-        },
-        isAdjustmentAllowed: true,
-      };
-      mockTokenMetadataService.getTokenMetadata.mockRejectedValue(
-        new Error('Token metadata fetch failed'),
-      );
-
-      mockDialogInterface.show.mockResolvedValue('interface-id');
-
-      // Action - should not throw when getTokenMetadata fails (dialog stays with skeleton)
-      const resultPromise = service.showExistingPermissions({
-        dialogInterface: mockDialogInterface,
-        existingPermissions: [permission],
-      });
-
-      // Allow async operations
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      // Trigger dialog close
-      const onCloseCallback = mockDialogInterface.show.mock.calls[0]?.[1];
-      onCloseCallback?.();
-
-      // Assert: should complete without throwing
-      const result = await resultPromise;
-      expect(result).toStrictEqual(expect.objectContaining({}));
+      expect(content).toBeDefined();
     });
   });
 });

@@ -7,9 +7,14 @@ import {
   Text,
   Skeleton,
   AccountSelector,
+  Banner,
+  Button,
+  Container,
+  Footer,
 } from '@metamask/snaps-sdk/jsx';
 import { parseCaipAssetType } from '@metamask/utils';
 
+import { ConfirmationDialog } from './confirmation';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
 import {
@@ -31,8 +36,11 @@ import {
 } from '../ui/components';
 import type { MessageKey } from '../utils/i18n';
 import { t } from '../utils/i18n';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
+export const SHOW_EXISTING_PERMISSIONS_BUTTON_NAME =
+  'show-existing-permissions-button';
 
 export type PermissionHandlerContentProps = {
   children: SnapElement;
@@ -55,6 +63,9 @@ export type PermissionHandlerContentProps = {
   chainId: number;
   explorerUrl: string | undefined;
   isAccountUpgraded: boolean;
+  existingPermissionsStatus: ExistingPermissionsState;
+  /** When true, the primary grant button is not clickable. */
+  isGrantDisabled: boolean;
 };
 
 /**
@@ -78,6 +89,8 @@ export type PermissionHandlerContentProps = {
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
+ * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
+ * @param options.isGrantDisabled - Whether the grant button should render disabled.
  * @returns The confirmation content.
  */
 export const PermissionHandlerContent = ({
@@ -99,6 +112,8 @@ export const PermissionHandlerContent = ({
   chainId,
   explorerUrl,
   isAccountUpgraded,
+  existingPermissionsStatus,
+  isGrantDisabled,
 }: PermissionHandlerContentProps): SnapElement => {
   const tokenBalanceComponent = TokenBalanceField({
     tokenBalance,
@@ -175,74 +190,106 @@ export const PermissionHandlerContent = ({
   );
 
   return (
-    <Box>
-      <Box direction="vertical">
-        <Box center={true}>
-          <Heading size="lg">{t(permissionTitle)}</Heading>
-          <Text>{t(permissionSubtitle)}</Text>
-        </Box>
-        <Section>
-          <Box direction="vertical">
-            <Box direction="horizontal" alignment="space-between">
-              <Box direction="horizontal">
-                <Text>{t('accountLabel')}</Text>
-                <TooltipIcon tooltip={t('accountTooltip')} />
-              </Box>
-            </Box>
-            <AccountSelector
-              name={ACCOUNT_SELECTOR_NAME}
-              chainIds={[`eip155:${chainId}`]}
-              switchGlobalAccount={false}
-              value={context.accountAddressCaip10}
-            />
-            {!isAccountUpgraded && (
-              <Text size="sm" color="warning">
-                {t('accountUpgradeWarning')}
-              </Text>
-            )}
-            {hasAsset && (
-              <Box direction="horizontal" alignment="end">
-                {fiatBalanceComponent}
-                {tokenBalanceComponent}
-              </Box>
-            )}
+    <Container>
+      <Box>
+        <Box direction="vertical">
+          <Box center={true}>
+            <Heading size="lg">{t(permissionTitle)}</Heading>
+            <Text>{t(permissionSubtitle)}</Text>
           </Box>
-        </Section>
-        <Section>
-          <Box direction="vertical" alignment="space-between">
-            <Box direction="horizontal">
-              <Text>{t('justificationLabel')}</Text>
-              <TooltipIcon tooltip={t('justificationTooltip')} />
+          <Section>
+            <Box direction="vertical">
+              <Box direction="horizontal" alignment="space-between">
+                <Box direction="horizontal">
+                  <Text>{t('accountLabel')}</Text>
+                  <TooltipIcon tooltip={t('accountTooltip')} />
+                </Box>
+              </Box>
+              <AccountSelector
+                name={ACCOUNT_SELECTOR_NAME}
+                chainIds={[`eip155:${chainId}`]}
+                switchGlobalAccount={false}
+                value={context.accountAddressCaip10}
+              />
+              {!isAccountUpgraded && (
+                <Text size="sm" color="warning">
+                  {t('accountUpgradeWarning')}
+                </Text>
+              )}
+              {hasAsset && (
+                <Box direction="horizontal" alignment="end">
+                  {fiatBalanceComponent}
+                  {tokenBalanceComponent}
+                </Box>
+              )}
             </Box>
-            <ShowMoreText
-              text={justification}
-              buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
-              isCollapsed={isJustificationCollapsed}
-            />
-          </Box>
-        </Section>
-        <Section>
-          {fromField}
-          {addressField}
-          <TextField
-            label={t('networkLabel')}
-            value={networkName}
-            tooltip={t('networkTooltip')}
-          />
-          {hasAsset && (
-            <TokenField
-              label={t('tokenLabel')}
-              tokenSymbol={tokenSymbol}
-              tokenAddress={tokenAddress}
-              explorerUrl={tokenExplorerUrl}
-              tooltip={t('tokenTooltip')}
-              iconData={tokenIconData}
-            />
+          </Section>
+          {existingPermissionsStatus ===
+            ExistingPermissionsState.SimilarPermissions && (
+            <Banner title={t('existingPermissionsTitle')} severity="warning">
+              <Text>{t('existingPermissionsSimilarMessage')}</Text>
+              <Button name={SHOW_EXISTING_PERMISSIONS_BUTTON_NAME}>
+                {t('existingPermissionsLink')}
+              </Button>
+            </Banner>
           )}
-        </Section>
-        {children}
+          {existingPermissionsStatus ===
+            ExistingPermissionsState.DissimilarPermissions && (
+            <Banner title={t('existingPermissionsTitle')} severity="info">
+              <Text>{t('existingPermissionsExistingMessage')}</Text>
+              <Button name={SHOW_EXISTING_PERMISSIONS_BUTTON_NAME}>
+                {t('existingPermissionsLink')}
+              </Button>
+            </Banner>
+          )}
+          <Section>
+            <Box direction="vertical" alignment="space-between">
+              <Box direction="horizontal">
+                <Text>{t('justificationLabel')}</Text>
+                <TooltipIcon tooltip={t('justificationTooltip')} />
+              </Box>
+              <ShowMoreText
+                text={justification}
+                buttonName={JUSTIFICATION_SHOW_MORE_BUTTON_NAME}
+                isCollapsed={isJustificationCollapsed}
+              />
+            </Box>
+          </Section>
+          <Section>
+            {fromField}
+            {addressField}
+            <TextField
+              label={t('networkLabel')}
+              value={networkName}
+              tooltip={t('networkTooltip')}
+            />
+            {hasAsset && (
+              <TokenField
+                label={t('tokenLabel')}
+                tokenSymbol={tokenSymbol}
+                tokenAddress={tokenAddress}
+                explorerUrl={tokenExplorerUrl}
+                tooltip={t('tokenTooltip')}
+                iconData={tokenIconData}
+              />
+            )}
+          </Section>
+          {children}
+        </Box>
       </Box>
-    </Box>
+      <Footer>
+        <Button name={ConfirmationDialog.cancelButton} variant="destructive">
+          {t('cancelButton')}
+        </Button>
+        <Button
+          name={ConfirmationDialog.grantButton}
+          variant="primary"
+          disabled={isGrantDisabled}
+        >
+          {t('grantButton')}
+        </Button>
+      </Footer>
+    </Container>
   );
 };
 
@@ -254,49 +301,66 @@ export const SkeletonPermissionHandlerContent = ({
   permissionSubtitle: MessageKey;
 }): JSX.Element => {
   return (
-    <Box>
-      <Box direction="vertical">
-        <Box center={true}>
-          <Heading size="lg">{t(permissionTitle)}</Heading>
-          <Text>{t(permissionSubtitle)}</Text>
-        </Box>
-        <Section>
-          <Box direction="vertical">
-            <Box direction="horizontal" alignment="space-between">
-              <Box direction="horizontal">
-                <Text>{t('accountLabel')}</Text>
-                <TooltipIcon tooltip={t('accountTooltip')} />
-              </Box>
-            </Box>
-            <Skeleton />
+    <Container>
+      <Box>
+        <Box direction="vertical">
+          <Box center={true}>
+            <Heading size="lg">{t(permissionTitle)}</Heading>
+            <Text>{t(permissionSubtitle)}</Text>
           </Box>
-        </Section>
-        <Section>
-          <SkeletonField
-            label={t('justificationLabel')}
-            tooltip={t('justificationTooltip')}
-          />
-        </Section>
-        <Section>
-          <SkeletonField
-            label={t('requestFromLabel')}
-            tooltip={t('requestFromTooltip')}
-          />
-          <SkeletonField
-            label={t('recipientLabel')}
-            tooltip={t('recipientTooltip')}
-          />
-          <SkeletonField
-            label={t('networkLabel')}
-            tooltip={t('networkTooltip')}
-          />
-          <SkeletonField label={t('tokenLabel')} tooltip={t('tokenTooltip')} />
-        </Section>
-        <Section>
-          <Skeleton />
-          <Skeleton />
-        </Section>
+          <Section>
+            <Box direction="vertical">
+              <Box direction="horizontal" alignment="space-between">
+                <Box direction="horizontal">
+                  <Text>{t('accountLabel')}</Text>
+                  <TooltipIcon tooltip={t('accountTooltip')} />
+                </Box>
+              </Box>
+              <Skeleton />
+            </Box>
+          </Section>
+          <Section>
+            <SkeletonField
+              label={t('justificationLabel')}
+              tooltip={t('justificationTooltip')}
+            />
+          </Section>
+          <Section>
+            <SkeletonField
+              label={t('requestFromLabel')}
+              tooltip={t('requestFromTooltip')}
+            />
+            <SkeletonField
+              label={t('recipientLabel')}
+              tooltip={t('recipientTooltip')}
+            />
+            <SkeletonField
+              label={t('networkLabel')}
+              tooltip={t('networkTooltip')}
+            />
+            <SkeletonField
+              label={t('tokenLabel')}
+              tooltip={t('tokenTooltip')}
+            />
+          </Section>
+          <Section>
+            <Skeleton />
+            <Skeleton />
+          </Section>
+        </Box>
       </Box>
-    </Box>
+      <Footer>
+        <Button name={ConfirmationDialog.cancelButton} variant="destructive">
+          {t('cancelButton')}
+        </Button>
+        <Button
+          name={ConfirmationDialog.grantButton}
+          variant="primary"
+          disabled={true}
+        >
+          {t('grantButton')}
+        </Button>
+      </Footer>
+    </Container>
   );
 };

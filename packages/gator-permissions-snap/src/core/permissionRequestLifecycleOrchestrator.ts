@@ -43,6 +43,7 @@ import type {
 } from '../clients/trustSignalsClient';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -161,10 +162,31 @@ export class PermissionRequestLifecycleOrchestrator {
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
 
-    // Start loading existing permissions in the background before showing introduction
-    // This way if the introduction is shown, the existing permissions will already be loaded
-    const existingPermissionsPromise =
+    // One profile-sync read per permission request: same snapshot drives the banner and the
+    // "review existing" list. getExistingPermissions() already resolves to [] on failure (never rejects).
+    const existingPermissionsForOriginPromise =
       this.#existingPermissionsService.getExistingPermissions(origin);
+
+    // Derive banner state from that snapshot in parallel with the introduction flow.
+    // Chain .catch() so the promise never rejects: if the user cancels at intro we return
+    // without awaiting it, and any processing error should not cause an unhandled rejection.
+    const existingPermissionsStatusPromise = existingPermissionsForOriginPromise
+      .then((list) =>
+        this.#existingPermissionsService.getExistingPermissionsStatusFromList(
+          list,
+          validatedPermissionRequest.permission,
+        ),
+      )
+      .catch((error: unknown) => {
+        logger.error(
+          'PermissionRequestLifecycleOrchestrator: existing permissions status from snapshot failed',
+          {
+            origin,
+            error: error instanceof Error ? error.message : error,
+          },
+        );
+        return ExistingPermissionsState.None;
+      });
 
     // Check if we need to show introduction
     if (
@@ -196,32 +218,6 @@ export class PermissionRequestLifecycleOrchestrator {
       await this.#permissionIntroductionService.markIntroductionAsSeen(
         permissionType,
       );
-    }
-
-    // Await the existing permissions that were started loading earlier
-    const existingPermissions = await existingPermissionsPromise;
-
-    if (existingPermissions?.length > 0) {
-      const { wasCancelled } =
-        await this.#existingPermissionsService.showExistingPermissions({
-          dialogInterface,
-          existingPermissions,
-        });
-
-      // If user cancelled the existing permissions dialog, reject the permission request
-      if (wasCancelled) {
-        await this.#snapsMetricsService.trackPermissionRejected({
-          origin,
-          permissionType,
-          chainId: permissionRequest.chainId,
-          permissionData: permissionRequest.permission.data,
-        });
-
-        return {
-          approved: false,
-          reason: 'Permission request denied at existing permissions screen',
-        };
-      }
     }
 
     // only necessary when not pre-installed, to ensure that the account
@@ -278,6 +274,9 @@ export class PermissionRequestLifecycleOrchestrator {
     let scanDappUrlResult: ScanDappUrlResult | null = null;
     let scanAddressResult: FetchAddressScanResult | null = null;
 
+    /** Avoid re-running skeleton + format when trust-signal refreshes fire while the subview is open. */
+    let existingPermissionsSubviewActive = false;
+
     const updateConfirmation = async ({
       newContext,
       isGrantDisabled,
@@ -292,19 +291,37 @@ export class PermissionRequestLifecycleOrchestrator {
 
         const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
-        const ui = await lifecycleHandlers.createConfirmationContent({
-          context,
-          metadata,
-          origin,
-          chainId,
-          scanDappUrlResult,
-          scanAddressResult,
-        });
+        const existingPermissionsStatus =
+          await existingPermissionsStatusPromise;
 
-        await confirmationDialog.updateContent({
-          ui,
-          isGrantDisabled: isGrantDisabled || hasValidationErrors(metadata),
-        });
+        const grantDisabled = isGrantDisabled || hasValidationErrors(metadata);
+
+        if (context.showExistingPermissions) {
+          if (!existingPermissionsSubviewActive) {
+            // Set synchronously before awaits so eslint require-atomic-updates is satisfied;
+            // runUpdate calls are serialized via lastUpdateConfirmationPromise.
+            existingPermissionsSubviewActive = true;
+            const snapshot = await existingPermissionsForOriginPromise;
+            await this.#existingPermissionsService.showExistingPermissions(
+              dialogInterface,
+              snapshot,
+            );
+          }
+        } else {
+          existingPermissionsSubviewActive = false;
+          const ui = await lifecycleHandlers.createConfirmationContent({
+            context,
+            metadata,
+            origin,
+            chainId,
+            scanDappUrlResult,
+            scanAddressResult,
+            existingPermissionsStatus,
+            isGrantDisabled: grantDisabled,
+          });
+
+          await confirmationDialog.updateContent({ ui });
+        }
       };
 
       lastUpdateConfirmationPromise =

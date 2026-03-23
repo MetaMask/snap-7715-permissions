@@ -191,7 +191,6 @@ const permissionIntroductionService = new PermissionIntroductionService({
 
 const existingPermissionsService = new ExistingPermissionsService({
   profileSyncManager,
-  userEventDispatcher,
   tokenMetadataService,
 });
 

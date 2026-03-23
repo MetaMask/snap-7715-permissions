@@ -1,4 +1,4 @@
-import { Box, Divider, Text } from '@metamask/snaps-sdk/jsx';
+import { Box, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import type { PermissionDetail } from '../../core/existingpermissions/permissionFormatter';
 
@@ -23,18 +23,24 @@ export const PermissionCard = ({
   index,
 }: PermissionCardProps): JSX.Element => {
   return (
-    <Box key={`permission-${index}`} direction="vertical">
-      {index > 0 && <Divider />}
-      {Object.entries(detail).map(([label, value]) => (
-        <Box
-          direction="horizontal"
-          alignment="space-between"
-          key={`${index}-${label}`}
-        >
-          <Text>{label}:</Text>
-          <Text> {value}</Text>
-        </Box>
-      ))}
-    </Box>
+    <Section direction="vertical">
+      {Object.entries(detail).map(([key, item]) =>
+        key === 'justification' ? (
+          <Box direction="vertical" alignment="start" key={`${index}-${key}`}>
+            <Text>{item.label}:</Text>
+            <Text> {item.value}</Text>
+          </Box>
+        ) : (
+          <Box
+            direction="horizontal"
+            alignment="space-between"
+            key={`${index}-${key}`}
+          >
+            <Text>{item.label}:</Text>
+            <Text> {item.value}</Text>
+          </Box>
+        ),
+      )}
+    </Section>
   );
 };

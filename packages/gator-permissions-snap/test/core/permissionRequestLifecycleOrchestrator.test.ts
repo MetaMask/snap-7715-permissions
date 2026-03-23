@@ -20,12 +20,17 @@ import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFactory';
+import {
+  ExistingPermissionsService,
+  ExistingPermissionsState,
+} from '../../src/core/existingpermissions/existingPermissionsService';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
+import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
+import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
-import { ExistingPermissionsService } from 'src/core/existingpermissions/existingPermissionsService';
-import type { NonceCaveatService } from 'src/services/nonceCaveatService';
+import type { TokenMetadataService } from '../../src/services/tokenMetadataService';
 
 const randomAddress = (): Hex => {
   const randomBytes = new Uint8Array(20);
@@ -136,10 +141,31 @@ const mockPermissionIntroductionService = {
   showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
+const existingPermissionsStatusHelper = new ExistingPermissionsService({
+  profileSyncManager: {
+    getAllGrantedPermissions: jest.fn(),
+  } as unknown as ProfileSyncManager,
+  tokenMetadataService: {} as unknown as TokenMetadataService,
+});
+
 const mockExistingPermissionsService = {
-  getExistingPermissions: jest.fn().mockResolvedValue([]),
-  showExistingPermissions: jest.fn().mockResolvedValue({ wasCancelled: false }),
+  getExistingPermissions: jest.fn(),
+  getExistingPermissionsStatusFromList: jest.fn(),
+  showExistingPermissions: jest.fn(),
 } as unknown as jest.Mocked<ExistingPermissionsService>;
+
+// Set default mock implementations for existing permissions service
+mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
+mockExistingPermissionsService.getExistingPermissionsStatusFromList.mockImplementation(
+  (list, perm) =>
+    existingPermissionsStatusHelper.getExistingPermissionsStatusFromList(
+      list,
+      perm,
+    ),
+);
+mockExistingPermissionsService.showExistingPermissions.mockResolvedValue(
+  undefined,
+);
 
 const mockScanAddressResult: FetchAddressScanResult = {
   resultType: AddressScanResultType.Benign,
@@ -170,6 +196,19 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Reset existing permissions service mocks after clearing
+    mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
+    mockExistingPermissionsService.getExistingPermissionsStatusFromList.mockImplementation(
+      (list, perm) =>
+        existingPermissionsStatusHelper.getExistingPermissionsStatusFromList(
+          list,
+          perm,
+        ),
+    );
+    mockExistingPermissionsService.showExistingPermissions.mockResolvedValue(
+      undefined,
+    );
 
     lifecycleHandlerMocks = {
       parseAndValidatePermission: jest.fn().mockImplementation((req) => req),
@@ -277,6 +316,21 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         });
       });
 
+      it('loads existing permissions from profile sync only once per request', async () => {
+        await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(
+          mockExistingPermissionsService.getExistingPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          mockExistingPermissionsService.getExistingPermissions,
+        ).toHaveBeenCalledWith('test-origin');
+      });
+
       it('creates a skeleton confirmation before the context is resolved', async () => {
         // this never resolves, because we are testing the behavior _before_ the context is returned.
         const contextPromise = new Promise<BaseContext>((_resolve) => {
@@ -345,7 +399,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
           ui: mockUiContent,
-          isGrantDisabled: false,
         });
       });
 
@@ -738,7 +791,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       it('serializes consecutive updateConfirmation calls so they run in order and do not overwrite each other', async () => {
-        // updateConfirmation is called with only newContext and isGrantDisabled; scan results are read from closure variables.
+        // updateConfirmation is called with optional newContext; scan results are read from closure variables.
         mockTrustSignalsClient.scanDappUrl.mockImplementationOnce(
           async (): Promise<ScanDappUrlResult> =>
             new Promise<ScanDappUrlResult>(() => {}),
@@ -1007,6 +1060,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           chainId: 1,
           scanDappUrlResult: null,
           scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
         });
 
         // Final call has both scan results from closure (after both background scans resolve)
@@ -1019,6 +1074,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           chainId: 1,
           scanDappUrlResult: { isComplete: false },
           scanAddressResult: mockScanAddressResult,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
         });
 
         expect(mockTrustSignalsClient.fetchAddressScan).toHaveBeenCalledWith(
@@ -1028,7 +1085,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
           ui: mockUiContent,
-          isGrantDisabled: false,
         });
       });
 
