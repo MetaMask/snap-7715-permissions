@@ -170,7 +170,7 @@ export class ExistingPermissionsService {
   }
 
   /**
-   * Compares stored grants for the site to the requested permission (stream vs periodic category).
+   * Compares stored granted permissions for the site to the requested permission (stream vs periodic category).
    * Fetches from profile sync. Prefer {@link getExistingPermissions} + {@link getExistingPermissionsStatusFromList}
    * when you already have a snapshot for this origin.
    *
