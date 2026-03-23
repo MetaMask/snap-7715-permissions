@@ -109,7 +109,7 @@ export function buildExistingPermissionsFallbackContent(
 }
 
 /**
- * Builds the existing permissions display content: a grouped list of stored grants for review.
+ * Builds the existing permissions display content: a grouped list of stored granted permissions for review.
  *
  * @param config - The configuration for the existing permissions display.
  * @returns The existing permissions UI as a JSX.Element.
