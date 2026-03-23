@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1]
+
+### Changed
+
+- Use a banner with a list to display existing permissions. ([#288](https://github.com/MetaMask/snap-7715-permissions/pull/288))
+
+### Fixed
+
+- fix: change warning icon color to error red for malicious addresses ([#287](https://github.com/MetaMask/snap-7715-permissions/pull/287))
+
 ## [1.3.0]
 
 ### Changed
@@ -327,7 +337,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.1...HEAD
+[1.3.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.0...@metamask/gator-permissions-snap@1.3.1
 [1.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.2.0...@metamask/gator-permissions-snap@1.3.0
 [1.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.1...@metamask/gator-permissions-snap@1.2.0
 [1.1.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.0...@metamask/gator-permissions-snap@1.1.1
