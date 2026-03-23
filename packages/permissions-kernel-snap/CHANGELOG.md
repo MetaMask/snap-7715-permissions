@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- Feat: Existing permissions banner with list ([#288](https://github.com/MetaMask/snap-7715-permissions/pull/288))
+- fix: update warning icon color to error red for malicious addresses ([#287](https://github.com/MetaMask/snap-7715-permissions/pull/287))
+- chore: Add explainer comment to each permission type `caveats.ts` ([#270](https://github.com/MetaMask/snap-7715-permissions/pull/270))
+- Release/18.0.0 ([#285](https://github.com/MetaMask/snap-7715-permissions/pull/285))
+- fix: existing permissions issues ([#284](https://github.com/MetaMask/snap-7715-permissions/pull/284))
+- feat: enhance existing permissions handling ([#283](https://github.com/MetaMask/snap-7715-permissions/pull/283))
+- Improve clarity of justification field in Permission Picker ([#282](https://github.com/MetaMask/snap-7715-permissions/pull/282))
+
 ## [1.1.0]
 
 ### Added
