@@ -74,11 +74,15 @@ export class ExistingPermissionsService {
       const allPermissions =
         await this.#profileSyncManager.getAllGrantedPermissions();
 
-      // Return all non-revoked permissions for the origin across all chains
+      // Normalize origin once instead of on each iteration
+      const normalizedOrigin = siteOrigin.toLowerCase();
+
+      // Return all non-revoked permissions for the origin across all chains.
+      // A permission is considered valid if it has both 'from' (account) and 'chainId'.
       const matching = allPermissions.filter(
         (permission) =>
           permission.revocationMetadata === undefined &&
-          permission.siteOrigin.toLowerCase() === siteOrigin.toLowerCase() &&
+          permission.siteOrigin.toLowerCase() === normalizedOrigin &&
           permission.permissionResponse.from &&
           permission.permissionResponse.chainId,
       );
