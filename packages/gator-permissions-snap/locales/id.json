@@ -2,244 +2,298 @@
   "locale": "id",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Penerima"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "Situs yang meminta izin"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Jaringan"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "Jaringan tempat izin diminta"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Token"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "Token yang diminta"
     },
     "justificationLabel": {
-      "message": ""
+      "message": "Justification"
     },
     "justificationTooltip": {
-      "message": ""
+      "message": "Justification given by the recipient for requesting this permission."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Akun"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "Akun yang digunakan untuk memberikan izin."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Permintaan dari"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "Situs yang meminta izin"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Initial amount"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "Jumlah awal token yang dapat dialirkan."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Max amount"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "Jumlah maksimum token yang dapat dialirkan."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Start time (UTC)"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "Waktu dimulainya periode pertama"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "Waktu mulai pengaliran"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Expiration date (UTC)"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "The expiration date of the permission"
+    },
+    "expiryContentWhenDisabled": {
+      "message": "This permission is ongoing. We recommend setting an expiration date."
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Stream amount"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "Jumlah token yang dapat dialirkan per periode."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Stream period"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "Periode pengaliran."
+    },
+    "totalExposureUnlimited": {
+      "message": "Unlimited"
+    },
+    "totalExposureLabel": {
+      "message": "Total exposure"
+    },
+    "totalExposureTooltip": {
+      "message": "The total amount of tokens that can be streamed with this permission."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Jumlah"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "Jumlah token yang diberikan selama masing-masing periode"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Frekuensi"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "Durasi periode"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "Permintaan izin"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Tampilkan"
     },
     "hideButton": {
-      "message": ""
+      "message": "Sembunyikan"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Nilai aliran"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "Jumlah token yang akan dialirkan per detik."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/detik"
     },
     "cancelButton": {
-      "message": ""
+      "message": "Batal"
     },
     "grantButton": {
-      "message": ""
+      "message": "Berikan"
     },
     "hourly": {
-      "message": ""
+      "message": "Per jam"
     },
     "daily": {
-      "message": ""
+      "message": "Per hari"
     },
     "weekly": {
-      "message": ""
+      "message": "Per minggu"
     },
     "biweekly": {
-      "message": ""
+      "message": "Dua kali seminggu"
     },
     "monthly": {
-      "message": ""
+      "message": "Per bulan"
     },
     "yearly": {
-      "message": ""
+      "message": "Per tahun"
     },
     "availableLabel": {
-      "message": ""
+      "message": "tersedia"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Situs ini memerlukan izin untuk menggunakan token Anda."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Akun ini akan ditingkatkan menjadi akun pintar untuk menyelesaikan izin ini."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Hapus $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Tambahkan $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1 harus lebih besar dari 0"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1 harus lebih besar dari atau sama dengan 0"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "$1 tidak valid"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Waktu mulai tidak valid"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "Waktu mulai harus hari ini atau setelahnya"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Invalid expiration date"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "Expiration date must be in the future"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "Start time must be before expiration date"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "Jumlah maks harus lebih besar dari jumlah awal"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Durasi periode harus lebih besar dari 0"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Tidak dikenal"
     },
     "unknownChain": {
-      "message": ""
+      "message": "Chain tidak dikenal $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Situs ini memerlukan izin untuk membatalkan persetujuan token ERC-20 Anda."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Izin lanjutan memberi Anda kontrol penuh"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Akses aman dan terbatas"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Batasi situs dan batalkan akses sesuai ketentuan Anda."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Kontrol yang dapat disesuaikan sepenuhnya"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "Tinjau, edit, atau tambahkan aturan agar izin sesuai dengan kebutuhan Anda."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Transparan dan mudah"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "Kelola izin dengan mudah dari satu tempat."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Permintaan langganan token"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "Langganan token memberi situs izin untuk mengambil token dari dompet Anda sesuai jadwal yang ditetapkan."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Permintaan pengaliran token"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Pengaliran token memberikan izin kepada situs web untuk menarik token secara bertahap dari dompet Anda selama periode waktu yang ditetapkan."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Permintaan pembatalan token"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "Pembatalan token memungkinkan situs untuk membatalkan persetujuan token atas nama Anda."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Anda dapat membatalkan izin ini setiap saat di izin lanjutan."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "Mengerti"
     },
     "maliciousWebsiteLabel": {
-      "message": ""
+      "message": "Malicious website"
     },
     "potentiallyMaliciousWebsiteLabel": {
-      "message": ""
+      "message": "Potentially malicious website"
     },
     "maliciousAddressLabel": {
-      "message": ""
+      "message": "Malicious address"
     },
     "potentiallyMaliciousAddressLabel": {
-      "message": ""
+      "message": "Potentially malicious address"
+    },
+    "existingPermissionsTitle": {
+      "message": "Existing permissions"
+    },
+    "existingPermissionsDescription": {
+      "message": "Permissions you’ve already granted to this site"
+    },
+    "existingPermissionsConfirmButton": {
+      "message": "Back to request"
+    },
+    "existingPermissionsExistingMessage": {
+      "message": "You have granted permissions to this site in the past."
+    },
+    "existingPermissionsSimilarMessage": {
+      "message": "You have granted similar permissions to this site in the past."
+    },
+    "existingPermissionsLink": {
+      "message": "Review them"
+    },
+    "existingPermissionsLoadError": {
+      "message": "We couldn’t load the list. You can go back and try again."
+    },
+    "chainLabel": {
+      "message": "Jaringan"
+    },
+    "morePermissionsCountSingle": {
+      "message": "This account has 1 more permission. View and manage all permissions in the "
+    },
+    "morePermissionsCountPlural": {
+      "message": "This account has $1 more permissions. View and manage all permissions in the "
+    },
+    "unlimited": {
+      "message": "Unlimited"
+    },
+    "allTokens": {
+      "message": "All tokens"
+    },
+    "dappConnectionsLink": {
+      "message": "Dapp Connections"
+    },
+    "revokeTokenApprovalsLabel": {
+      "message": "Revoke token approvals"
     }
   }
 }
