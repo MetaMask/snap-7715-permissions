@@ -288,24 +288,26 @@ export class PermissionRequestLifecycleOrchestrator {
 
         const grantDisabled = isGrantDisabled || hasValidationErrors(metadata);
 
-        const ui = context.showExistingPermissions
-          ? await this.#existingPermissionsService.createExistingPermissionsContent(
-              await this.#existingPermissionsService.getExistingPermissions(
-                origin,
-              ),
-            )
-          : await lifecycleHandlers.createConfirmationContent({
-              context,
-              metadata,
-              origin,
-              chainId,
-              scanDappUrlResult,
-              scanAddressResult,
-              existingPermissionsStatus,
-              isGrantDisabled: grantDisabled,
-            });
+        if (context.showExistingPermissions) {
+          // Show skeleton first, then update with real content
+          await this.#existingPermissionsService.showExistingPermissions(
+            dialogInterface,
+            origin,
+          );
+        } else {
+          const ui = await lifecycleHandlers.createConfirmationContent({
+            context,
+            metadata,
+            origin,
+            chainId,
+            scanDappUrlResult,
+            scanAddressResult,
+            existingPermissionsStatus,
+            isGrantDisabled: grantDisabled,
+          });
 
-        await confirmationDialog.updateContent({ ui });
+          await confirmationDialog.updateContent({ ui });
+        }
       };
 
       lastUpdateConfirmationPromise =

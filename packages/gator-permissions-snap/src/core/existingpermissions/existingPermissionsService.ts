@@ -4,7 +4,10 @@ import {
   logger,
 } from '@metamask/7715-permissions-shared/utils';
 
-import { buildExistingPermissionsContent } from './existingPermissionsContent';
+import {
+  buildExistingPermissionsContent,
+  buildExistingPermissionsSkeletonContent,
+} from './existingPermissionsContent';
 import { ExistingPermissionsState } from './existingPermissionsState';
 import { formatPermissionWithTokenMetadata } from './permissionFormatter';
 import type { ExistingPermissionDisplayConfig } from './types';
@@ -13,6 +16,7 @@ import type {
   StoredGrantedPermission,
 } from '../../profileSync/profileSync';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import type { DialogInterface } from '../dialogInterface';
 
 export { ExistingPermissionsState } from './existingPermissionsState';
 
@@ -162,6 +166,48 @@ export class ExistingPermissionsService {
         },
       );
       return ExistingPermissionsState.None;
+    }
+  }
+
+  /**
+   * Shows existing permissions in a dialog with skeleton loading state.
+   * First displays a skeleton placeholder, then updates with actual formatted content.
+   *
+   * @param dialogInterface - The dialog interface to show content in.
+   * @param siteOrigin - The origin of the requesting dApp.
+   */
+  async showExistingPermissions(
+    dialogInterface: DialogInterface,
+    siteOrigin: string,
+  ): Promise<void> {
+    try {
+      // Show skeleton immediately with configuration for UI labels
+      const skeletonConfig: ExistingPermissionDisplayConfig = {
+        existingPermissions: [],
+        title: 'existingPermissionsTitle',
+        description: 'existingPermissionsDescription',
+        buttonLabel: 'existingPermissionsConfirmButton',
+      };
+      await dialogInterface.show(
+        buildExistingPermissionsSkeletonContent(skeletonConfig),
+      );
+
+      // Load and format permissions in the background
+      const existingPermissions = await this.getExistingPermissions(siteOrigin);
+      const formattedContent =
+        await this.createExistingPermissionsContent(existingPermissions);
+
+      // Update dialog with actual content
+      await dialogInterface.show(formattedContent);
+    } catch (error) {
+      logger.error(
+        'ExistingPermissionsService.showExistingPermissions() failed',
+        {
+          siteOrigin,
+          error: error instanceof Error ? error.message : error,
+        },
+      );
+      // Dialog continues gracefully even if formatting fails
     }
   }
 }
