@@ -271,6 +271,9 @@
     "existingPermissionsLink": {
       "message": "Review them"
     },
+    "existingPermissionsLoadError": {
+      "message": "We couldn’t load the list. You can go back and try again."
+    },
     "chainLabel": {
       "message": "Network"
     },

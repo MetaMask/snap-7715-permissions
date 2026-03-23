@@ -27,8 +27,10 @@ import {
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type { BaseContext } from '../../src/core/types';
+import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
 import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
+import type { TokenMetadataService } from '../../src/services/tokenMetadataService';
 
 const randomAddress = (): Hex => {
   const randomBytes = new Uint8Array(20);
@@ -139,19 +141,30 @@ const mockPermissionIntroductionService = {
   showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
+const existingPermissionsStatusHelper = new ExistingPermissionsService({
+  profileSyncManager: {
+    getAllGrantedPermissions: jest.fn(),
+  } as unknown as ProfileSyncManager,
+  tokenMetadataService: {} as unknown as TokenMetadataService,
+});
+
 const mockExistingPermissionsService = {
   getExistingPermissions: jest.fn(),
-  getExistingPermissionsStatus: jest.fn(),
-  createExistingPermissionsContent: jest.fn(),
+  getExistingPermissionsStatusFromList: jest.fn(),
+  showExistingPermissions: jest.fn(),
 } as unknown as jest.Mocked<ExistingPermissionsService>;
 
 // Set default mock implementations for existing permissions service
 mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
-mockExistingPermissionsService.getExistingPermissionsStatus.mockResolvedValue(
-  ExistingPermissionsState.None,
+mockExistingPermissionsService.getExistingPermissionsStatusFromList.mockImplementation(
+  (list, perm) =>
+    existingPermissionsStatusHelper.getExistingPermissionsStatusFromList(
+      list,
+      perm,
+    ),
 );
-mockExistingPermissionsService.createExistingPermissionsContent.mockResolvedValue(
-  mockUiContent,
+mockExistingPermissionsService.showExistingPermissions.mockResolvedValue(
+  undefined,
 );
 
 const mockScanAddressResult: FetchAddressScanResult = {
@@ -186,11 +199,15 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
     // Reset existing permissions service mocks after clearing
     mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
-    mockExistingPermissionsService.getExistingPermissionsStatus.mockResolvedValue(
-      ExistingPermissionsState.None,
+    mockExistingPermissionsService.getExistingPermissionsStatusFromList.mockImplementation(
+      (list, perm) =>
+        existingPermissionsStatusHelper.getExistingPermissionsStatusFromList(
+          list,
+          perm,
+        ),
     );
-    mockExistingPermissionsService.createExistingPermissionsContent.mockResolvedValue(
-      mockUiContent,
+    mockExistingPermissionsService.showExistingPermissions.mockResolvedValue(
+      undefined,
     );
 
     lifecycleHandlerMocks = {
@@ -297,6 +314,21 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           to: requestingAccountAddress,
           delegationManager,
         });
+      });
+
+      it('loads existing permissions from profile sync only once per request', async () => {
+        await permissionRequestLifecycleOrchestrator.orchestrate(
+          'test-origin',
+          mockPermissionRequest,
+          lifecycleHandlerMocks,
+        );
+
+        expect(
+          mockExistingPermissionsService.getExistingPermissions,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          mockExistingPermissionsService.getExistingPermissions,
+        ).toHaveBeenCalledWith('test-origin');
       });
 
       it('creates a skeleton confirmation before the context is resolved', async () => {

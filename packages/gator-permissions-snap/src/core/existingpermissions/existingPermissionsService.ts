@@ -6,6 +6,7 @@ import {
 
 import {
   buildExistingPermissionsContent,
+  buildExistingPermissionsFallbackContent,
   buildExistingPermissionsSkeletonContent,
 } from './existingPermissionsContent';
 import { ExistingPermissionsState } from './existingPermissionsState';
@@ -124,18 +125,18 @@ export class ExistingPermissionsService {
   }
 
   /**
-   * Compares stored grants for the site to the requested permission (stream vs periodic category).
+   * Derives banner state from an in-memory snapshot of stored grants (no profile sync I/O).
+   * Use with {@link getExistingPermissions} once per permission request lifecycle.
    *
-   * @param siteOrigin - The requesting dApp origin.
+   * @param existingPermissions - Stored grants for the requesting origin (already filtered).
    * @param requestedPermission - The permission the user is about to grant.
    * @returns Banner-driving status, or {@link ExistingPermissionsState.None} if none stored or on error.
    */
-  async getExistingPermissionsStatus(
-    siteOrigin: string,
+  getExistingPermissionsStatusFromList(
+    existingPermissions: StoredGrantedPermission[],
     requestedPermission: Permission,
-  ): Promise<ExistingPermissionsState> {
+  ): ExistingPermissionsState {
     try {
-      const existingPermissions = await this.getExistingPermissions(siteOrigin);
       if (existingPermissions.length === 0) {
         return ExistingPermissionsState.None;
       }
@@ -159,9 +160,8 @@ export class ExistingPermissionsService {
         : ExistingPermissionsState.DissimilarPermissions;
     } catch (error) {
       logger.error(
-        'ExistingPermissionsService.getExistingPermissionsStatus() failed',
+        'ExistingPermissionsService.getExistingPermissionsStatusFromList() failed',
         {
-          siteOrigin,
           error: error instanceof Error ? error.message : error,
         },
       );
@@ -170,44 +170,62 @@ export class ExistingPermissionsService {
   }
 
   /**
+   * Compares stored grants for the site to the requested permission (stream vs periodic category).
+   * Fetches from profile sync. Prefer {@link getExistingPermissions} + {@link getExistingPermissionsStatusFromList}
+   * when you already have a snapshot for this origin.
+   *
+   * @param siteOrigin - The requesting dApp origin.
+   * @param requestedPermission - The permission the user is about to grant.
+   * @returns Banner-driving status, or {@link ExistingPermissionsState.None} if none stored or on error.
+   */
+  async getExistingPermissionsStatus(
+    siteOrigin: string,
+    requestedPermission: Permission,
+  ): Promise<ExistingPermissionsState> {
+    const existingPermissions = await this.getExistingPermissions(siteOrigin);
+    return this.getExistingPermissionsStatusFromList(
+      existingPermissions,
+      requestedPermission,
+    );
+  }
+
+  /**
    * Shows existing permissions in a dialog with skeleton loading state.
-   * First displays a skeleton placeholder, then updates with actual formatted content.
+   * Uses a snapshot from {@link getExistingPermissions} so profile sync is not queried again.
    *
    * @param dialogInterface - The dialog interface to show content in.
-   * @param siteOrigin - The origin of the requesting dApp.
+   * @param existingPermissions - Stored grants for this origin (same snapshot as status computation).
    */
   async showExistingPermissions(
     dialogInterface: DialogInterface,
-    siteOrigin: string,
+    existingPermissions: StoredGrantedPermission[],
   ): Promise<void> {
+    const skeletonConfig: ExistingPermissionDisplayConfig = {
+      existingPermissions: [],
+      title: 'existingPermissionsTitle',
+      description: 'existingPermissionsDescription',
+      buttonLabel: 'existingPermissionsConfirmButton',
+    };
+
     try {
-      // Show skeleton immediately with configuration for UI labels
-      const skeletonConfig: ExistingPermissionDisplayConfig = {
-        existingPermissions: [],
-        title: 'existingPermissionsTitle',
-        description: 'existingPermissionsDescription',
-        buttonLabel: 'existingPermissionsConfirmButton',
-      };
       await dialogInterface.show(
         buildExistingPermissionsSkeletonContent(skeletonConfig),
       );
 
-      // Load and format permissions in the background
-      const existingPermissions = await this.getExistingPermissions(siteOrigin);
       const formattedContent =
         await this.createExistingPermissionsContent(existingPermissions);
 
-      // Update dialog with actual content
       await dialogInterface.show(formattedContent);
     } catch (error) {
       logger.error(
         'ExistingPermissionsService.showExistingPermissions() failed',
         {
-          siteOrigin,
           error: error instanceof Error ? error.message : error,
         },
       );
-      // Dialog continues gracefully even if formatting fails
+      await dialogInterface.show(
+        buildExistingPermissionsFallbackContent(skeletonConfig),
+      );
     }
   }
 }

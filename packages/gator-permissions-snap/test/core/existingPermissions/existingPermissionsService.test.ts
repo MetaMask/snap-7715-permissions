@@ -12,6 +12,7 @@ import type { Hex } from '@metamask/utils';
 import { bytesToHex } from '@metamask/utils';
 
 import type { TokenBalanceAndMetadata } from '../../../src/clients/types';
+import type { DialogInterface } from '../../../src/core/dialogInterface';
 import {
   ExistingPermissionsService,
   ExistingPermissionsState,
@@ -308,6 +309,137 @@ describe('ExistingPermissionsService', () => {
       );
 
       expect(status).toBe(ExistingPermissionsState.None);
+    });
+
+    it('should call profile sync only once', async () => {
+      mockProfileSyncManager.getAllGrantedPermissions.mockResolvedValue([]);
+
+      const requestedPermission: Permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      await service.getExistingPermissionsStatus(
+        'https://example.com',
+        requestedPermission,
+      );
+
+      expect(
+        mockProfileSyncManager.getAllGrantedPermissions,
+      ).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getExistingPermissionsStatusFromList()', () => {
+    it('returns None when list is empty', () => {
+      const requestedPermission: Permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList([], requestedPermission),
+      ).toBe(ExistingPermissionsState.None);
+    });
+
+    it('returns SimilarPermissions when matching categories exist', () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const requestedPermission: Permission = {
+        type: 'native-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList(
+          [permission],
+          requestedPermission,
+        ),
+      ).toBe(ExistingPermissionsState.SimilarPermissions);
+    });
+
+    it('returns DissimilarPermissions when categories do not match', () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const requestedPermission: Permission = {
+        type: 'native-token-periodic',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList(
+          [permission],
+          requestedPermission,
+        ),
+      ).toBe(ExistingPermissionsState.DissimilarPermissions);
+    });
+
+    it('does not treat types that merely contain "stream" as stream category', () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'custom-streaming-permission',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const requestedPermission: Permission = {
+        type: 'native-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList(
+          [permission],
+          requestedPermission,
+        ),
+      ).toBe(ExistingPermissionsState.DissimilarPermissions);
+    });
+  });
+
+  describe('showExistingPermissions()', () => {
+    it('shows skeleton then list without calling profile sync', async () => {
+      const show = jest.fn().mockResolvedValue(undefined);
+      const dialogInterface = { show } as unknown as DialogInterface;
+
+      await service.showExistingPermissions(dialogInterface, [
+        createMockStoredPermission(),
+      ]);
+
+      expect(show).toHaveBeenCalledTimes(2);
+      expect(
+        mockProfileSyncManager.getAllGrantedPermissions,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('shows fallback UI when formatting fails', async () => {
+      const show = jest.fn().mockResolvedValue(undefined);
+      const dialogInterface = { show } as unknown as DialogInterface;
+      const spy = jest
+        .spyOn(service, 'createExistingPermissionsContent')
+        .mockRejectedValueOnce(new Error('format failed'));
+
+      await service.showExistingPermissions(dialogInterface, [
+        createMockStoredPermission(),
+      ]);
+
+      expect(show).toHaveBeenCalledTimes(2);
+      expect(logger.error).toHaveBeenCalled();
+      spy.mockRestore();
     });
   });
 

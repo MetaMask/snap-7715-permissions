@@ -162,19 +162,24 @@ export class PermissionRequestLifecycleOrchestrator {
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
 
-    // Start loading existing-permissions status in the background so it can run in parallel
-    // with the introduction flow; result is only needed when building confirmation content.
+    // One profile-sync read per permission request: same snapshot drives the banner and the
+    // "review existing" list. getExistingPermissions() already resolves to [] on failure (never rejects).
+    const existingPermissionsForOriginPromise =
+      this.#existingPermissionsService.getExistingPermissions(origin);
+
+    // Derive banner state from that snapshot in parallel with the introduction flow.
     // Chain .catch() so the promise never rejects: if the user cancels at intro we return
-    // without awaiting it, and any processing error (e.g. malformed stored permission type)
-    // should not cause an unhandled rejection or crash the dialog.
-    const existingPermissionsStatusPromise = this.#existingPermissionsService
-      .getExistingPermissionsStatus(
-        origin,
-        validatedPermissionRequest.permission,
+    // without awaiting it, and any processing error should not cause an unhandled rejection.
+    const existingPermissionsStatusPromise = existingPermissionsForOriginPromise
+      .then((list) =>
+        this.#existingPermissionsService.getExistingPermissionsStatusFromList(
+          list,
+          validatedPermissionRequest.permission,
+        ),
       )
       .catch((error: unknown) => {
         logger.error(
-          'PermissionRequestLifecycleOrchestrator: getExistingPermissionsStatus rejected',
+          'PermissionRequestLifecycleOrchestrator: existing permissions status from snapshot failed',
           {
             origin,
             error: error instanceof Error ? error.message : error,
@@ -269,6 +274,9 @@ export class PermissionRequestLifecycleOrchestrator {
     let scanDappUrlResult: ScanDappUrlResult | null = null;
     let scanAddressResult: FetchAddressScanResult | null = null;
 
+    /** Avoid re-running skeleton + format when trust-signal refreshes fire while the subview is open. */
+    let existingPermissionsSubviewActive = false;
+
     const updateConfirmation = async ({
       newContext,
       isGrantDisabled,
@@ -289,12 +297,18 @@ export class PermissionRequestLifecycleOrchestrator {
         const grantDisabled = isGrantDisabled || hasValidationErrors(metadata);
 
         if (context.showExistingPermissions) {
-          // Show skeleton first, then update with real content
-          await this.#existingPermissionsService.showExistingPermissions(
-            dialogInterface,
-            origin,
-          );
+          if (!existingPermissionsSubviewActive) {
+            // Set synchronously before awaits so eslint require-atomic-updates is satisfied;
+            // runUpdate calls are serialized via lastUpdateConfirmationPromise.
+            existingPermissionsSubviewActive = true;
+            const snapshot = await existingPermissionsForOriginPromise;
+            await this.#existingPermissionsService.showExistingPermissions(
+              dialogInterface,
+              snapshot,
+            );
+          }
         } else {
+          existingPermissionsSubviewActive = false;
           const ui = await lifecycleHandlers.createConfirmationContent({
             context,
             metadata,

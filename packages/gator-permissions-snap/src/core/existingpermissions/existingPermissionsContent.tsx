@@ -25,6 +25,7 @@ export const EXISTING_PERMISSIONS_CONFIRM_BUTTON =
  * Builds a skeleton loading UI for the existing permissions page.
  * Displays placeholder content while permissions are being loaded and formatted.
  *
+ * @param config - Title, description, and button label keys (same as the full list view).
  * @returns The skeleton UI as a JSX.Element.
  */
 export function buildExistingPermissionsSkeletonContent(
@@ -67,6 +68,39 @@ export function buildExistingPermissionsSkeletonContent(
       </Box>
       <Footer>
         <Button name={EXISTING_PERMISSIONS_CONFIRM_BUTTON} disabled={true}>
+          {t(buttonLabel)}
+        </Button>
+      </Footer>
+    </Container>
+  );
+}
+
+/**
+ * Fallback when loading or formatting the existing-permissions list fails.
+ * Keeps the confirm action enabled so the user can return to the main request.
+ *
+ * @param config - Title, description, and button label keys.
+ * @returns Fallback UI as a SnapElement.
+ */
+export function buildExistingPermissionsFallbackContent(
+  config: Pick<
+    ExistingPermissionDisplayConfig,
+    'title' | 'description' | 'buttonLabel'
+  >,
+): SnapElement {
+  const { title, description, buttonLabel } = config;
+
+  return (
+    <Container>
+      <Box direction="vertical">
+        <Box center={true}>
+          <Heading size="lg">{t(title)}</Heading>
+          <Text>{t(description)}</Text>
+          <Text>{t('existingPermissionsLoadError')}</Text>
+        </Box>
+      </Box>
+      <Footer>
+        <Button name={EXISTING_PERMISSIONS_CONFIRM_BUTTON}>
           {t(buttonLabel)}
         </Button>
       </Footer>
