@@ -25,6 +25,7 @@ import {
   NativeTokenPeriodicForm,
   ERC20TokenPeriodicForm,
   ERC20TokenRevocationForm,
+  NativeTokenSwapForm,
 } from '../components/permissions';
 import type {
   PermissionRequest,
@@ -33,6 +34,7 @@ import type {
   NativeTokenPeriodicPermissionRequest,
   ERC20TokenPeriodicPermissionRequest,
   ERC20TokenRevocationPermissionRequest,
+  NativeTokenSwapPermissionRequest,
 } from '../components/permissions/types';
 import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import {
@@ -248,9 +250,9 @@ const Index = () => {
         chainId,
         to: delegateAccount.address,
         expiry,
-        isAdjustmentAllowed,
         permission: {
           type,
+          isAdjustmentAllowed,
           // permission types that are _not_ native token stream are using Hex for token amount types
           data: permissionData as any,
         },
@@ -353,7 +355,8 @@ const Index = () => {
         | ERC20TokenStreamPermissionRequest
         | NativeTokenPeriodicPermissionRequest
         | NativeTokenStreamPermissionRequest
-        | ERC20TokenRevocationPermissionRequest,
+        | ERC20TokenRevocationPermissionRequest
+        | NativeTokenSwapPermissionRequest,
     ) => {
       setPermissionRequest(request);
     },
@@ -503,6 +506,7 @@ const Index = () => {
                   <option value="erc20-token-revocation">
                     ERC20 Token Revocation
                   </option>
+                  <option value="native-token-swap">Native Token Swap</option>
                 </select>
               </div>
 
@@ -524,6 +528,10 @@ const Index = () => {
 
               {permissionType === 'erc20-token-revocation' && (
                 <ERC20TokenRevocationForm onChange={onFormChange} />
+              )}
+
+              {permissionType === 'native-token-swap' && (
+                <NativeTokenSwapForm onChange={onFormChange} />
               )}
             </StyledForm>
             <CustomMessageButton

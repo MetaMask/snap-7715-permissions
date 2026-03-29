@@ -139,6 +139,30 @@ function extractPermissionDetails(
           value: String(justification),
         };
       }
+    } else if (permissionType === 'native-token-swap') {
+      const { maxNativeSwapAmount, justification } = permissionData;
+      const whitelistedOnly = permissionData.whitelistedTokensOnly === true;
+
+      if (maxNativeSwapAmount !== undefined && maxNativeSwapAmount !== null) {
+        details.maxNativeSwapAmount = {
+          label: t('nativeTokenSwapMaxAmountDetailLabel'),
+          value: String(maxNativeSwapAmount),
+        };
+      }
+
+      details.tokenSwapPolicy = {
+        label: t('nativeTokenSwapTokenPolicyDetailLabel'),
+        value: whitelistedOnly
+          ? t('tokenSwapModeWhitelistedOnly')
+          : t('tokenSwapModeAnyToken'),
+      };
+
+      if (justification !== undefined && justification !== null) {
+        details.justification = {
+          label: t('justificationLabel'),
+          value: String(justification),
+        };
+      }
     }
     // For stream-type permissions
     else if (
@@ -235,7 +259,9 @@ export async function formatPermissionWithTokenMetadata(
 
   // Check if this permission has token amount fields that need formatting
   const hasTokenAmountFields =
-    'maxAmount' in permissionData || 'periodAmount' in permissionData;
+    'maxAmount' in permissionData ||
+    'periodAmount' in permissionData ||
+    'maxNativeSwapAmount' in permissionData;
 
   if (!hasTokenAmountFields) {
     return permission;
@@ -285,6 +311,14 @@ export async function formatPermissionWithTokenMetadata(
     if ('periodAmount' in permissionData) {
       formattedData.periodAmount = formatTokenAmountWithMetadata(
         permissionData.periodAmount as Hex | null | undefined,
+        decimals,
+        symbol,
+      );
+    }
+
+    if ('maxNativeSwapAmount' in permissionData) {
+      formattedData.maxNativeSwapAmount = formatTokenAmountWithMetadata(
+        permissionData.maxNativeSwapAmount as Hex | null | undefined,
         decimals,
         symbol,
       );

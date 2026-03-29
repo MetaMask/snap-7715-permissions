@@ -39,9 +39,16 @@ export type ERC20TokenRevocationPermissionRequest = BasePermissionRequest & {
   type: 'erc20-token-revocation';
 };
 
+export type NativeTokenSwapPermissionRequest = BasePermissionRequest & {
+  type: 'native-token-swap';
+  maxNativeSwapAmount: Hex;
+  whitelistedTokensOnly: boolean;
+};
+
 export type PermissionRequest =
   | NativeTokenStreamPermissionRequest
   | NativeTokenPeriodicPermissionRequest
   | ERC20TokenPeriodicPermissionRequest
   | ERC20TokenRevocationPermissionRequest
-  | ERC20TokenStreamPermissionRequest;
+  | ERC20TokenStreamPermissionRequest
+  | NativeTokenSwapPermissionRequest;

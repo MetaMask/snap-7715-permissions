@@ -91,6 +91,19 @@ const revocationPage1Content: PermissionIntroductionPageConfig = {
   ],
 };
 
+const nativeTokenSwapPage1Content: PermissionIntroductionPageConfig = {
+  headerImageSvg: permissionRequestImage,
+  title: 'introNativeTokenSwapTitle',
+  bulletPoints: [
+    {
+      description: 'introNativeTokenSwapDescription',
+    },
+    {
+      description: 'introPermissionInControlDescription',
+    },
+  ],
+};
+
 /**
  * Map of permission types to their introduction configurations.
  * Note: Keys must match the permission type descriptor names (kebab-case).
@@ -117,6 +130,10 @@ export const permissionIntroductionConfigs: Record<
   },
   'native-token-stream': {
     page1: streamPage1Content,
+    page2: fixedPage2Content,
+  },
+  'native-token-swap': {
+    page1: nativeTokenSwapPage1Content,
     page2: fixedPage2Content,
   },
 };

@@ -9,6 +9,7 @@ import { zHexStr } from './common';
 export const SUPPORTED_RULE_TYPES = {
   'native-token-stream': ['expiry'],
   'native-token-periodic': ['expiry'],
+  'native-token-swap': ['expiry'],
   'erc20-token-stream': ['expiry'],
   'erc20-token-periodic': ['expiry'],
   'erc20-token-revocation': ['expiry'],

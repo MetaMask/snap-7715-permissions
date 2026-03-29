@@ -294,6 +294,45 @@
     },
     "revokeTokenApprovalsLabel": {
       "message": "Revoke token approvals"
+    },
+    "permissionRequestSubtitleNativeTokenSwap": {
+      "message": "This site wants permission to swap your native token up to a limit you set."
+    },
+    "maxNativeSwapAmountLabel": {
+      "message": "Max allowance"
+    },
+    "maxNativeSwapAmountTooltip": {
+      "message": "Maximum native token allowance that can be spent when swapping on your behalf."
+    },
+    "tokenSwapRestrictionLabel": {
+      "message": "Swappable into"
+    },
+    "tokenSwapRestrictionTooltip": {
+      "message": "Choose whether swaps are limited to whitelisted tokens or may use any token."
+    },
+    "tokenSwapModeWhitelistedOnly": {
+      "message": "Whitelisted tokens only"
+    },
+    "tokenSwapModeAnyToken": {
+      "message": "Any token"
+    },
+    "whitelistedTokensListLinkIntro": {
+      "message": "View the whitelisted token list:"
+    },
+    "whitelistedTokensListLinkLabel": {
+      "message": "Open token list"
+    },
+    "introNativeTokenSwapTitle": {
+      "message": "Native token swap request"
+    },
+    "introNativeTokenSwapDescription": {
+      "message": "Native token swap permissions let a site use your native token for swaps up to a cap. You can require swaps into whitelisted tokens only."
+    },
+    "nativeTokenSwapMaxAmountDetailLabel": {
+      "message": "Max allowance"
+    },
+    "nativeTokenSwapTokenPolicyDetailLabel": {
+      "message": "Token policy"
     }
   }
 }

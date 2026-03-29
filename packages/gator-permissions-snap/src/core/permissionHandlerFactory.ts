@@ -8,6 +8,7 @@ import { erc20TokenRevocationPermissionDefinition } from '../permissions/erc20To
 import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
 import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
 import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
+import { nativeTokenSwapPermissionDefinition } from '../permissions/nativeTokenSwap';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
@@ -103,6 +104,9 @@ export class PermissionHandlerFactory {
         handler = createPermissionHandler(
           nativeTokenPeriodicPermissionDefinition,
         );
+        break;
+      case 'native-token-swap':
+        handler = createPermissionHandler(nativeTokenSwapPermissionDefinition);
         break;
       case 'erc20-token-periodic':
         handler = createPermissionHandler(

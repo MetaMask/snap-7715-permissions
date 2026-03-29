@@ -87,6 +87,29 @@ describe('PermissionHandlerFactory', () => {
       expect(handler).toBeInstanceOf(PermissionHandler);
     });
 
+    it('should create a PermissionHandler when given native-token-swap permission type', () => {
+      const swapRequest: PermissionRequest = {
+        chainId: '0x1',
+        to: TEST_ADDRESS,
+        permission: {
+          type: 'native-token-swap',
+          isAdjustmentAllowed: true,
+          data: {
+            justification: 'test',
+            maxNativeSwapAmount: '0x1',
+            whitelistedTokensOnly: true,
+          },
+        },
+        rules: [],
+      };
+
+      const handler =
+        permissionHandlerFactory.createPermissionHandler(swapRequest);
+
+      expect(handler).toBeDefined();
+      expect(handler).toBeInstanceOf(PermissionHandler);
+    });
+
     it('should throw an error when given an unsupported permission type', () => {
       expect(() =>
         permissionHandlerFactory.createPermissionHandler(
