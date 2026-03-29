@@ -924,9 +924,10 @@ describe('RpcHandler', () => {
     it('should return all supported permission types with chainIds and ruleTypes', async () => {
       const result = await handler.getSupportedPermissions();
 
-      // Should return an object with all 5 permission types
+      // Should return an object with all supported permission types
       expect(result).toHaveProperty('native-token-stream');
       expect(result).toHaveProperty('native-token-periodic');
+      expect(result).toHaveProperty('native-token-swap');
       expect(result).toHaveProperty('erc20-token-stream');
       expect(result).toHaveProperty('erc20-token-periodic');
       expect(result).toHaveProperty('erc20-token-revocation');
@@ -961,6 +962,7 @@ describe('RpcHandler', () => {
       expect(typedResult['erc20-token-revocation']?.ruleTypes).toContain(
         'expiry',
       );
+      expect(typedResult['native-token-swap']?.ruleTypes).toContain('expiry');
     });
 
     it('should return the same chainIds for all permission types', async () => {
@@ -979,6 +981,9 @@ describe('RpcHandler', () => {
         nativeStreamChainIds,
       );
       expect(result['erc20-token-revocation']?.chainIds).toStrictEqual(
+        nativeStreamChainIds,
+      );
+      expect(result['native-token-swap']?.chainIds).toStrictEqual(
         nativeStreamChainIds,
       );
     });
