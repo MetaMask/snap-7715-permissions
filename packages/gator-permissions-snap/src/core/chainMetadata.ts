@@ -18,6 +18,9 @@ export type DelegationContracts = {
   exactCalldataEnforcer: Hex;
   nonceEnforcer: Hex;
   allowedCalldataEnforcer: Hex;
+  argsEqualityEnforcer: Hex;
+  nativeTokenTransferAmountEnforcer: Hex;
+  redeemerEnforcer: Hex;
 };
 
 const contracts: DelegationContracts = {
@@ -34,6 +37,9 @@ const contracts: DelegationContracts = {
   exactCalldataEnforcer: '0x99F2e9bF15ce5eC84685604836F71aB835DBBdED',
   nonceEnforcer: '0xDE4f2FAC4B3D87A1d9953Ca5FC09FCa7F366254f',
   allowedCalldataEnforcer: '0xc2b0d624c1c4319760C96503BA27C347F3260f55',
+  argsEqualityEnforcer: '0x44B8C6ae3C304213c3e298495e12497Ed3E56E41',
+  nativeTokenTransferAmountEnforcer: '0xF71af580b9c3078fbc2BBF16FbB8EEd82b330320',
+  redeemerEnforcer: '0xE144b0b2618071B4E56f746313528a669c7E65c5',
 };
 
 // derived from https://chainid.network/chains.json
