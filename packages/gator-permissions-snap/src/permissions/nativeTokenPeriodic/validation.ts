@@ -2,12 +2,26 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import { getConfiguredChainIds } from '../../core/chainMetadata';
+import type { GetSupportedChainsOptions } from '../getSupportedChainsOptions';
 import { validateHexInteger, validateStartTime } from '../validation';
 import type {
   NativeTokenPeriodicPermission,
   NativeTokenPeriodicPermissionRequest,
 } from './types';
 import { zNativeTokenPeriodicPermission } from './types';
+
+/**
+ * Returns chain IDs on which native-token-periodic is supported.
+ *
+ * @param _options - Reserved for future use.
+ * @returns Sorted configured chain IDs.
+ */
+export function getSupportedChains(
+  _options?: GetSupportedChainsOptions,
+): number[] {
+  return getConfiguredChainIds();
+}
 
 /**
  * Validates a permission object data specific to the permission type.

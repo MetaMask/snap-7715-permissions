@@ -44,6 +44,7 @@ import type {
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
+import { getSupportedChainsForPermissionType } from '../permissions/permissionDefinitionsRegistry';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -96,22 +97,24 @@ export class PermissionRequestLifecycleOrchestrator {
   }
 
   /**
-   * Asserts that the specified chain ID is supported.
-   * @param chainId - The chain ID to validate.
-   * @throws If the chain ID is not supported.
+   * Asserts that the chain ID is supported for the given permission type.
+   *
+   * @param permissionType - Extracted permission type name.
+   * @param chainId - EIP-155 chain ID.
    */
-  #assertIsSupportedChainId(chainId: number): void {
-    try {
-      getChainMetadata({ chainId });
-    } catch (error) {
+  #assertChainSupportedForPermissionType(
+    permissionType: string,
+    chainId: number,
+  ): void {
+    const supported = getSupportedChainsForPermissionType(permissionType);
+    if (!supported.includes(chainId)) {
       logger.error(
-        'PermissionRequestLifecycleOrchestrator:assertIsSupportedChainId() - unsupported chainId',
-        {
-          chainId,
-          error,
-        },
+        'PermissionRequestLifecycleOrchestrator: chain not supported for permission type',
+        { chainId, permissionType },
       );
-      throw new InvalidParamsError(`Unsupported ChainId: ${chainId}`);
+      throw new InvalidParamsError(
+        `Unsupported chain ${numberToHex(chainId)} for permission type ${permissionType}`,
+      );
     }
   }
 
@@ -144,7 +147,7 @@ export class PermissionRequestLifecycleOrchestrator {
       permissionRequest.permission.type,
     );
 
-    this.#assertIsSupportedChainId(chainId);
+    this.#assertChainSupportedForPermissionType(permissionType, chainId);
 
     // Track permission request started
     await this.#snapsMetricsService.trackPermissionRequestStarted({

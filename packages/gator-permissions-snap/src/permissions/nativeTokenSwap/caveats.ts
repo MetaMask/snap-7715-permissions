@@ -1,15 +1,22 @@
-import { createArgsEqualityCheckTerms, createLimitedCallsTerms, createNativeTokenTransferAmountTerms, createRedeemerTerms, type Caveat } from '@metamask/delegation-core';
+import {
+  createArgsEqualityCheckTerms,
+  createLimitedCallsTerms,
+  createNativeTokenTransferAmountTerms,
+  createRedeemerTerms,
+} from '@metamask/delegation-core';
+import type { Caveat } from '@metamask/delegation-core';
+import { InternalError } from '@metamask/snaps-sdk';
 
 import type { PopulatedNativeTokenSwapPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
 
-const SWAP_ADAPTER_ADDRESS = '0x0000000000000000000000000000000000000000';
-
 // abiEncode("Token-Whitelist-Enforced");
-const WHITELIST_ENFORCED = "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000018546f6b656e2d57686974656c6973742d456e666f726365640000000000000000";
+const WHITELIST_ENFORCED =
+  '0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000018546f6b656e2d57686974656c6973742d456e666f726365640000000000000000';
 
 // abiEncode("Token-Whitelist-Not-Enforced");
-const WHITELIST_NOT_ENFORCED = "0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001c546f6b656e2d57686974656c6973742d4e6f742d456e666f7263656400000000";
+const WHITELIST_NOT_ENFORCED =
+  '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001c546f6b656e2d57686974656c6973742d4e6f742d456e666f7263656400000000';
 
 /**
  * Native token swap permission
@@ -22,24 +29,33 @@ const WHITELIST_NOT_ENFORCED = "0x0000000000000000000000000000000000000000000000
  * ArgsEqualityEnforcer: args specifying whether only whitelisted tokens are allowed.
  * NativeTokenTransferAmountEnforcer: defines the max amount of native token that can be swapped.
  * RedeemerEnforcer: only the swap adapter contract can redeem the permission.
-*/
+ */
 
 /**
- * Returns no caveats for native token swap.
- * @returns Empty caveat list.
+ * Builds caveats for a native-token-swap delegation.
+ *
+ * @param args - Caveat inputs.
+ * @param args.permission - Populated swap permission.
+ * @param args.contracts - Chain contracts; must include `nativeTokenSwapAdapter` when supported.
+ * @returns Caveats attached to the delegation.
  */
-export async function createPermissionCaveats({permission, contracts}: {
+export async function createPermissionCaveats({
+  permission,
+  contracts,
+}: {
   permission: PopulatedNativeTokenSwapPermission;
   contracts: DelegationContracts;
 }): Promise<Caveat[]> {
   const { maxNativeSwapAmount, whitelistedTokensOnly } = permission.data;
 
-  const expectedArgs = whitelistedTokensOnly ? WHITELIST_ENFORCED: WHITELIST_NOT_ENFORCED;
+  const expectedArgs = whitelistedTokensOnly
+    ? WHITELIST_ENFORCED
+    : WHITELIST_NOT_ENFORCED;
 
   const argsEqualityCaveat: Caveat = {
     enforcer: contracts.argsEqualityEnforcer,
     terms: createArgsEqualityCheckTerms({
-      args: expectedArgs
+      args: expectedArgs,
     }),
     args: expectedArgs,
   };
@@ -52,10 +68,18 @@ export async function createPermissionCaveats({permission, contracts}: {
     args: '0x',
   };
 
+  const swapAdapterAddress = contracts.nativeTokenSwapAdapter;
+
+  if (swapAdapterAddress === undefined) {
+    throw new InternalError(
+      'Native token swap adapter is not configured for this chain',
+    );
+  }
+
   const redeemerCaveat: Caveat = {
     enforcer: contracts.redeemerEnforcer,
     terms: createRedeemerTerms({
-      redeemers: [SWAP_ADAPTER_ADDRESS],
+      redeemers: [swapAdapterAddress],
     }),
     args: '0x',
   };
@@ -68,5 +92,10 @@ export async function createPermissionCaveats({permission, contracts}: {
     args: '0x',
   };
 
-  return [argsEqualityCaveat, nativeTokenTransferAmountCaveat, redeemerCaveat, limitedCallsCaveat];
+  return [
+    argsEqualityCaveat,
+    nativeTokenTransferAmountCaveat,
+    redeemerCaveat,
+    limitedCallsCaveat,
+  ];
 }

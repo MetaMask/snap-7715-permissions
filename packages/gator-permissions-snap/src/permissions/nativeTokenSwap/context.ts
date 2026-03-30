@@ -9,11 +9,8 @@ import {
 import type { Hex } from '@metamask/utils';
 
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import { parseUnits, formatUnitsFromHex } from '../../utils/value';
-import {
-  validateAndParseAmount,
-  validateExpiry,
-} from '../contextValidation';
+import { formatUnitsFromHex } from '../../utils/value';
+import { validateAndParseAmount, validateExpiry } from '../contextValidation';
 import { applyExpiryRule } from '../rules';
 import type {
   NativeTokenSwapContext,
@@ -29,6 +26,8 @@ const ASSET_REFERENCE = '60';
 
 /**
  * Applies UI context back onto the permission request.
+ *
+ * @param args - Merge inputs.
  * @param args.context - Context from the confirmation UI.
  * @param args.originalRequest - Original request.
  * @returns Updated permission request.
@@ -78,6 +77,8 @@ export async function applyContext({
 
 /**
  * Populates defaults on the permission before caveat creation.
+ *
+ * @param args - Populate inputs.
  * @param args.permission - Permission to populate.
  * @returns Populated permission.
  */
@@ -93,6 +94,8 @@ export async function populatePermission({
 
 /**
  * Builds dialog context from a validated permission request.
+ *
+ * @param args - Context build inputs.
  * @param args.permissionRequest - Validated request.
  * @param args.tokenMetadataService - Token metadata (native asset).
  * @returns Context for confirmation UI.
@@ -179,6 +182,8 @@ export async function buildContext({
 
 /**
  * Derives validation metadata for the confirmation UI.
+ *
+ * @param args - Metadata inputs.
  * @param args.context - Current context.
  * @returns Metadata including field errors.
  */

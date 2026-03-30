@@ -1,8 +1,12 @@
 import { describe, expect, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
+import { getNativeTokenSwapSupportedChainIds } from '../../../src/core/chainMetadata';
 import type { NativeTokenSwapPermissionRequest } from '../../../src/permissions/nativeTokenSwap/types';
-import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenSwap/validation';
+import {
+  getSupportedChains,
+  parseAndValidatePermission,
+} from '../../../src/permissions/nativeTokenSwap/validation';
 import { parseUnits } from '../../../src/utils/value';
 
 const validPermissionRequest: NativeTokenSwapPermissionRequest = {
@@ -30,6 +34,14 @@ const validPermissionRequest: NativeTokenSwapPermissionRequest = {
 };
 
 describe('nativeTokenSwap:validation', () => {
+  describe('getSupportedChains()', () => {
+    it('returns sorted chain IDs with a deployed swap adapter', () => {
+      expect(getSupportedChains()).toStrictEqual(
+        getNativeTokenSwapSupportedChainIds(),
+      );
+    });
+  });
+
   describe('parseAndValidatePermission()', () => {
     it('should validate a valid permission request', () => {
       expect(() =>

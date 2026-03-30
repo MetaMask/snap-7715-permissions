@@ -2,8 +2,22 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import { getConfiguredChainIds } from '../../core/chainMetadata';
+import type { GetSupportedChainsOptions } from '../getSupportedChainsOptions';
 import type { Erc20TokenRevocationPermissionRequest } from './types';
 import { zErc20TokenRevocationPermission } from './types';
+
+/**
+ * Returns chain IDs on which erc20-token-revocation is supported.
+ *
+ * @param _options - Reserved for future use.
+ * @returns Sorted configured chain IDs.
+ */
+export function getSupportedChains(
+  _options?: GetSupportedChainsOptions,
+): number[] {
+  return getConfiguredChainIds();
+}
 
 /**
  * Parses and validates a permission request for ERC20 token approval revocation.

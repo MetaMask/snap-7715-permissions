@@ -69,8 +69,4 @@ export const expiryRule = createExpiryRule<
   NativeTokenSwapMetadata
 >({ elementName: EXPIRY_ELEMENT, translate: t });
 
-export const allRules = [
-  maxSwapAmountRule,
-  tokenRestrictionRule,
-  expiryRule,
-];
+export const allRules = [maxSwapAmountRule, tokenRestrictionRule, expiryRule];

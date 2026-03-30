@@ -14,7 +14,7 @@ import type {
   NativeTokenPeriodicPermissionRequest,
   PopulatedNativeTokenPeriodicPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
+import { getSupportedChains, parseAndValidatePermission } from './validation';
 import type { PermissionDefinition } from '../../core/types';
 
 export const nativeTokenPeriodicPermissionDefinition: PermissionDefinition<
@@ -27,6 +27,7 @@ export const nativeTokenPeriodicPermissionDefinition: PermissionDefinition<
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
+  getSupportedChains,
   dependencies: {
     parseAndValidatePermission,
     buildContext,

@@ -38,7 +38,9 @@ export const zNativeTokenSwapPermission = zPermission.extend({
   ),
 });
 
-export type NativeTokenSwapPermission = z.infer<typeof zNativeTokenSwapPermission>;
+export type NativeTokenSwapPermission = z.infer<
+  typeof zNativeTokenSwapPermission
+>;
 
 export type NativeTokenSwapPermissionRequest =
   TypedPermissionRequest<NativeTokenSwapPermission>;

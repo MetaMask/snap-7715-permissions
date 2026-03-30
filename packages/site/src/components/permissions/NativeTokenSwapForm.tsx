@@ -10,10 +10,11 @@ type NativeTokenSwapFormProps = {
 
 /**
  * Demo form for requesting a native-token-swap permission (test site).
+ * @param options0 - Form props.
+ * @param options0.onChange - Callback to invoke when form values change.
+ * @returns A React component that renders the native-token-swap form.
  */
-export const NativeTokenSwapForm = ({
-  onChange,
-}: NativeTokenSwapFormProps) => {
+export const NativeTokenSwapForm = ({ onChange }: NativeTokenSwapFormProps) => {
   const [maxNativeSwapAmount, setMaxNativeSwapAmount] = useState(
     BigInt(bigIntToHex(parseUnits('0.1', 18))),
   );

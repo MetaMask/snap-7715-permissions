@@ -13,8 +13,8 @@ import type { Json } from '@metamask/snaps-sdk';
 import { numberToHex } from '@metamask/utils';
 
 import type { BlockchainClient } from '../clients/blockchainClient';
-import { nameAndExplorerUrlByChainId } from '../core/chainMetadata';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
+import { getSupportedChainsForPermissionType } from '../permissions/permissionDefinitionsRegistry';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
   ProfileSyncManager,
@@ -306,10 +306,6 @@ export function createRpcHandler({
   const getSupportedPermissions = async (): Promise<Json> => {
     logger.debug('getSupportedPermissions()');
 
-    const chainIds = Object.keys(nameAndExplorerUrlByChainId).map((id) =>
-      numberToHex(Number(id)),
-    );
-
     const supportedPermissions: GetSupportedPermissionsResult = {};
 
     for (const offer of DEFAULT_GATOR_PERMISSION_TO_OFFER) {
@@ -318,6 +314,9 @@ export function createRpcHandler({
         SUPPORTED_RULE_TYPES[
           permissionType as keyof typeof SUPPORTED_RULE_TYPES
         ];
+
+      const chainIds =
+        getSupportedChainsForPermissionType(permissionType).map(numberToHex);
 
       supportedPermissions[permissionType] = {
         chainIds,

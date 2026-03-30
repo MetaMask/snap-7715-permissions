@@ -14,7 +14,7 @@ import type {
   NativeTokenSwapPermissionRequest,
   PopulatedNativeTokenSwapPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
+import { getSupportedChains, parseAndValidatePermission } from './validation';
 import type { PermissionDefinition } from '../../core/types';
 
 export const nativeTokenSwapPermissionDefinition: PermissionDefinition<
@@ -27,6 +27,7 @@ export const nativeTokenSwapPermissionDefinition: PermissionDefinition<
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitleNativeTokenSwap',
+  getSupportedChains,
   dependencies: {
     parseAndValidatePermission,
     buildContext,
