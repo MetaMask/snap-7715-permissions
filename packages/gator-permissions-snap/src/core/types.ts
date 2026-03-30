@@ -18,6 +18,7 @@ import type { DelegationContracts } from './chainMetadata';
 import type { DialogInterface } from './dialogInterface';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type { TimeoutFactory } from './timeoutFactory';
+import type { GetSupportedChainsOptions } from '../permissions/getSupportedChainsOptions';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { MessageKey } from '../utils/i18n';
 import type { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
@@ -277,7 +278,26 @@ export type PermissionDefinition<
     TPermission,
     TPopulatedPermission
   >;
+  /**
+   * Chain IDs (EIP-155) on which this permission may be granted or advertised.
+   */
+  getSupportedChains: (options?: GetSupportedChainsOptions) => number[];
 };
+
+/**
+ * Erased permission definition for the permission registry. Concrete permission
+ * modules use stricter `TContext` / `TMetadata`; those definitions are not assignable
+ * to default {@link PermissionDefinition} under `exactOptionalPropertyTypes` because
+ * `rules` and `dependencies` vary contravariantly with context and metadata.
+ */
+
+export type RegistryPermissionDefinition = PermissionDefinition<
+  any,
+  any,
+  any,
+  any,
+  any
+>;
 
 /**
  * Parameters required to construct a PermissionHandler instance.

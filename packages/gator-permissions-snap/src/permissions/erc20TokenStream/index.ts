@@ -14,7 +14,7 @@ import type {
   Erc20TokenStreamPermissionRequest,
   PopulatedErc20TokenStreamPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
+import { getSupportedChains, parseAndValidatePermission } from './validation';
 import type { PermissionDefinition } from '../../core/types';
 
 export const erc20TokenStreamPermissionDefinition: PermissionDefinition<
@@ -27,6 +27,7 @@ export const erc20TokenStreamPermissionDefinition: PermissionDefinition<
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
+  getSupportedChains,
   dependencies: {
     parseAndValidatePermission,
     buildContext,

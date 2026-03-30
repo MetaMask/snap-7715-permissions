@@ -5,6 +5,7 @@ import {
   createTimestampTerms,
   createNonceTerms,
 } from '@metamask/delegation-core';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
@@ -70,7 +71,7 @@ const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
   to: requestingAccountAddress,
   permission: {
-    type: 'test-permission',
+    type: 'native-token-stream',
     data: {},
     isAdjustmentAllowed: true,
   },
@@ -289,6 +290,43 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
   });
 
   describe('orchestrate', () => {
+    describe('chain support', () => {
+      it('rejects a chain ID not listed for the permission type', async () => {
+        const request: PermissionRequest = {
+          ...mockPermissionRequest,
+          chainId: '0xdeadbeef',
+        };
+
+        await expect(
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            request,
+            lifecycleHandlerMocks,
+          ),
+        ).rejects.toThrow(InvalidParamsError);
+      });
+
+      it('rejects native-token-swap on a chain without a swap adapter', async () => {
+        const request: PermissionRequest = {
+          ...mockPermissionRequest,
+          chainId: '0xaa36a7', // Ethereum Sepolia — no adapter in metadata
+          permission: {
+            type: 'native-token-swap',
+            data: { justification: 'x' },
+            isAdjustmentAllowed: true,
+          },
+        };
+
+        await expect(
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            request,
+            lifecycleHandlerMocks,
+          ),
+        ).rejects.toThrow(InvalidParamsError);
+      });
+    });
+
     describe('functional tests', () => {
       it('successfully orchestrates a permission request', async () => {
         const result = await permissionRequestLifecycleOrchestrator.orchestrate(
@@ -520,19 +558,19 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         expect(delegationsArray[0]?.salt).not.toBe(0n);
       });
 
-      it('does not reject permission request for unknown chain', async () => {
+      it('rejects permission request for chain not supported for permission type', async () => {
         const chainRequestWithUnknownChain = {
           ...mockPermissionRequest,
-          chainId: '0x9999999' as Hex, // non-existent chain
+          chainId: '0x9999999' as Hex, // not in getConfiguredChainIds()
         };
 
-        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          chainRequestWithUnknownChain,
-          lifecycleHandlerMocks,
-        );
-
-        expect(result).toBeDefined();
+        await expect(
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            chainRequestWithUnknownChain,
+            lifecycleHandlerMocks,
+          ),
+        ).rejects.toThrow(InvalidParamsError);
       });
 
       it('does not throw an error when expiry rule is not present', async () => {

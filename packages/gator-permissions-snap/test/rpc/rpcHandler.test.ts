@@ -578,6 +578,10 @@ describe('RpcHandler', () => {
           type: 'native-token-periodic',
         },
         {
+          proposedName: 'Native Token Swap',
+          type: 'native-token-swap',
+        },
+        {
           proposedName: 'ERC20 Token Stream',
           type: 'erc20-token-stream',
         },
@@ -924,9 +928,10 @@ describe('RpcHandler', () => {
     it('should return all supported permission types with chainIds and ruleTypes', async () => {
       const result = await handler.getSupportedPermissions();
 
-      // Should return an object with all 5 permission types
+      // Should return an object with all supported permission types
       expect(result).toHaveProperty('native-token-stream');
       expect(result).toHaveProperty('native-token-periodic');
+      expect(result).toHaveProperty('native-token-swap');
       expect(result).toHaveProperty('erc20-token-stream');
       expect(result).toHaveProperty('erc20-token-periodic');
       expect(result).toHaveProperty('erc20-token-revocation');
@@ -961,9 +966,10 @@ describe('RpcHandler', () => {
       expect(typedResult['erc20-token-revocation']?.ruleTypes).toContain(
         'expiry',
       );
+      expect(typedResult['native-token-swap']?.ruleTypes).toContain('expiry');
     });
 
-    it('should return the same chainIds for all permission types', async () => {
+    it('should return the same chainIds for non-swap permission types and a subset for native-token-swap', async () => {
       const result = (await handler.getSupportedPermissions()) as {
         [key: string]: { chainIds: string[]; ruleTypes: string[] };
       };
@@ -981,6 +987,14 @@ describe('RpcHandler', () => {
       expect(result['erc20-token-revocation']?.chainIds).toStrictEqual(
         nativeStreamChainIds,
       );
+
+      const swapChainIds = result['native-token-swap']?.chainIds;
+      expect(swapChainIds?.length).toBeLessThan(
+        nativeStreamChainIds?.length ?? 0,
+      );
+      for (const id of swapChainIds ?? []) {
+        expect(nativeStreamChainIds).toContain(id);
+      }
     });
   });
 

@@ -8,25 +8,25 @@ import {
 } from './context';
 import { allRules } from './rules';
 import type {
-  Erc20TokenPeriodicContext,
-  Erc20TokenPeriodicMetadata,
-  Erc20TokenPeriodicPermission,
-  Erc20TokenPeriodicPermissionRequest,
-  PopulatedErc20TokenPeriodicPermission,
+  NativeTokenSwapContext,
+  NativeTokenSwapMetadata,
+  NativeTokenSwapPermission,
+  NativeTokenSwapPermissionRequest,
+  PopulatedNativeTokenSwapPermission,
 } from './types';
 import { getSupportedChains, parseAndValidatePermission } from './validation';
 import type { PermissionDefinition } from '../../core/types';
 
-export const erc20TokenPeriodicPermissionDefinition: PermissionDefinition<
-  Erc20TokenPeriodicPermissionRequest,
-  Erc20TokenPeriodicContext,
-  Erc20TokenPeriodicMetadata,
-  Erc20TokenPeriodicPermission,
-  PopulatedErc20TokenPeriodicPermission
+export const nativeTokenSwapPermissionDefinition: PermissionDefinition<
+  NativeTokenSwapPermissionRequest,
+  NativeTokenSwapContext,
+  NativeTokenSwapMetadata,
+  NativeTokenSwapPermission,
+  PopulatedNativeTokenSwapPermission
 > = {
   rules: allRules,
   title: 'permissionRequestTitle',
-  subtitle: 'permissionRequestSubtitle',
+  subtitle: 'permissionRequestSubtitleNativeTokenSwap',
   getSupportedChains,
   dependencies: {
     parseAndValidatePermission,

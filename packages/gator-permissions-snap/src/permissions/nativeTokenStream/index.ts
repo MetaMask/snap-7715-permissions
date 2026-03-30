@@ -14,7 +14,7 @@ import type {
   NativeTokenStreamPermissionRequest,
   PopulatedNativeTokenStreamPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
+import { getSupportedChains, parseAndValidatePermission } from './validation';
 import type { PermissionDefinition } from '../../core/types';
 
 export const nativeTokenStreamPermissionDefinition: PermissionDefinition<
@@ -27,6 +27,7 @@ export const nativeTokenStreamPermissionDefinition: PermissionDefinition<
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
+  getSupportedChains,
   dependencies: {
     parseAndValidatePermission,
     buildContext,
