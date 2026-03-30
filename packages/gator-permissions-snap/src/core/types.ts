@@ -277,6 +277,10 @@ export type PermissionDefinition<
     TPermission,
     TPopulatedPermission
   >;
+  /**
+   * Chain IDs (EIP-155) on which this permission may be granted.
+   */
+  getSupportedChains: () => number[];
 };
 
 /**

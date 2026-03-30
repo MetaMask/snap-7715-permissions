@@ -1,14 +1,9 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
-import { InvalidInputError } from '@metamask/snaps-sdk';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
+import { hexToNumber } from '@metamask/utils';
 
 import type { AccountController } from './accountController';
-import { erc20TokenPeriodicPermissionDefinition } from '../permissions/erc20TokenPeriodic';
-import { erc20TokenRevocationPermissionDefinition } from '../permissions/erc20TokenRevocation';
-import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
-import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
-import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
-import { nativeTokenSwapPermissionDefinition } from '../permissions/nativeTokenSwap';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
@@ -20,7 +15,7 @@ import type {
   PermissionDefinition,
   PermissionHandlerType,
 } from './types';
-
+import { getPermissionDefinition } from '../permissions/permissionDefinitionsRegistry';
 /**
  * Factory for creating permission-specific orchestrators.
  * Each permission type has its own orchestrator that handles the specific logic for that permission.
@@ -92,39 +87,25 @@ export class PermissionHandlerFactory {
         tokenMetadataService: this.#tokenMetadataService,
       });
     };
-    let handler: PermissionHandlerType;
 
-    switch (type) {
-      case 'native-token-stream':
-        handler = createPermissionHandler(
-          nativeTokenStreamPermissionDefinition,
-        );
-        break;
-      case 'native-token-periodic':
-        handler = createPermissionHandler(
-          nativeTokenPeriodicPermissionDefinition,
-        );
-        break;
-      case 'native-token-swap':
-        handler = createPermissionHandler(nativeTokenSwapPermissionDefinition);
-        break;
-      case 'erc20-token-periodic':
-        handler = createPermissionHandler(
-          erc20TokenPeriodicPermissionDefinition,
-        );
-        break;
-      case 'erc20-token-revocation':
-        handler = createPermissionHandler(
-          erc20TokenRevocationPermissionDefinition,
-        );
-        break;
-      case 'erc20-token-stream':
-        handler = createPermissionHandler(erc20TokenStreamPermissionDefinition);
-        break;
-      default:
-        throw new InvalidInputError(`Unsupported permission type: ${type}`);
+    const permissionDefinition = getPermissionDefinition(type);
+
+    if (!permissionDefinition) {
+      throw new InvalidParamsError(
+        `Permission definition not found for permission type: ${type}`,
+      );
     }
 
-    return handler;
+    if (
+      !permissionDefinition
+        .getSupportedChains()
+        .includes(hexToNumber(permissionRequest.chainId))
+    ) {
+      throw new InvalidParamsError(
+        `Unsupported chain ${permissionRequest.chainId} for permission type ${type}`,
+      );
+    }
+
+    return createPermissionHandler(permissionDefinition);
   }
 }

@@ -2,12 +2,22 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import { getConfiguredChainIds } from '../../core/chainMetadata';
 import { validateHexInteger, validateStartTime } from '../validation';
 import type {
   Erc20TokenStreamPermission,
   Erc20TokenStreamPermissionRequest,
 } from './types';
 import { zErc20TokenStreamPermission } from './types';
+
+/**
+ * Returns chain IDs on which erc20-token-stream is supported.
+ *
+ * @returns Sorted configured chain IDs.
+ */
+export function getSupportedChains(): number[] {
+  return getConfiguredChainIds();
+}
 
 /**
  * Validates a permission object data specific to the permission type.

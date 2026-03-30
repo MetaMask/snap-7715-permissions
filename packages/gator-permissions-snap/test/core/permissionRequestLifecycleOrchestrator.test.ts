@@ -70,7 +70,7 @@ const mockPermissionRequest: PermissionRequest = {
   chainId: '0x1',
   to: requestingAccountAddress,
   permission: {
-    type: 'test-permission',
+    type: 'native-token-stream',
     data: {},
     isAdjustmentAllowed: true,
   },
@@ -518,21 +518,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(delegationsArray).toStrictEqual([expectedDelegation]);
         expect(delegationsArray[0]?.salt).not.toBe(0n);
-      });
-
-      it('does not reject permission request for unknown chain', async () => {
-        const chainRequestWithUnknownChain = {
-          ...mockPermissionRequest,
-          chainId: '0x9999999' as Hex, // non-existent chain
-        };
-
-        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          chainRequestWithUnknownChain,
-          lifecycleHandlerMocks,
-        );
-
-        expect(result).toBeDefined();
       });
 
       it('does not throw an error when expiry rule is not present', async () => {

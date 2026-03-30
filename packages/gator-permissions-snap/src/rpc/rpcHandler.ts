@@ -13,8 +13,11 @@ import type { Json } from '@metamask/snaps-sdk';
 import { numberToHex } from '@metamask/utils';
 
 import type { BlockchainClient } from '../clients/blockchainClient';
-import { nameAndExplorerUrlByChainId } from '../core/chainMetadata';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
+import {
+  getPermissionDefinition,
+  SupportedGatorPermissionType,
+} from '../permissions/permissionDefinitionsRegistry';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
   ProfileSyncManager,
@@ -306,18 +309,24 @@ export function createRpcHandler({
   const getSupportedPermissions = async (): Promise<Json> => {
     logger.debug('getSupportedPermissions()');
 
-    const chainIds = Object.keys(nameAndExplorerUrlByChainId).map((id) =>
-      numberToHex(Number(id)),
-    );
-
     const supportedPermissions: GetSupportedPermissionsResult = {};
 
     for (const offer of DEFAULT_GATOR_PERMISSION_TO_OFFER) {
-      const permissionType = extractDescriptorName(offer.type);
-      const ruleTypes =
-        SUPPORTED_RULE_TYPES[
-          permissionType as keyof typeof SUPPORTED_RULE_TYPES
-        ];
+      const permissionType = extractDescriptorName(
+        offer.type,
+      ) as SupportedGatorPermissionType;
+      const ruleTypes = SUPPORTED_RULE_TYPES[permissionType];
+
+      const permissionDefinition = getPermissionDefinition(permissionType);
+      if (!permissionDefinition) {
+        throw new InvalidInputError(
+          `Permission definition not found for permission type: ${permissionType}`,
+        );
+      }
+
+      const chainIds = permissionDefinition
+        .getSupportedChains()
+        .map(numberToHex);
 
       supportedPermissions[permissionType] = {
         chainIds,

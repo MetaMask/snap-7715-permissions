@@ -14,7 +14,7 @@ import type {
   Erc20TokenRevocationPermissionRequest,
   PopulatedErc20TokenRevocationPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
+import { getSupportedChains, parseAndValidatePermission } from './validation';
 import type { PermissionDefinition } from '../../core/types';
 
 export const erc20TokenRevocationPermissionDefinition: PermissionDefinition<
@@ -27,6 +27,7 @@ export const erc20TokenRevocationPermissionDefinition: PermissionDefinition<
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitleRevocation',
+  getSupportedChains,
   dependencies: {
     parseAndValidatePermission,
     buildContext,

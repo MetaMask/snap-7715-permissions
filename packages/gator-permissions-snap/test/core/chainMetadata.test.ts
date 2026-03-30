@@ -3,6 +3,7 @@ import { isHexString } from '@metamask/utils';
 import type { DelegationContracts } from '../../src/core/chainMetadata';
 import {
   getChainMetadata,
+  getConfiguredChainIds,
   nameAndExplorerUrlByChainId,
 } from '../../src/core/chainMetadata';
 
@@ -44,7 +45,7 @@ describe('chainMetadata', () => {
         (chainId) => {
           const metadata = getChainMetadata({ chainId });
 
-          expect(metadata).toStrictEqual(metadataSchema);
+          expect(metadata).toMatchObject(metadataSchema);
 
           // Name should not be the default "Unknown chain" format
           expect(metadata.name).not.toMatch(/^Unknown chain 0x/u);
@@ -58,7 +59,7 @@ describe('chainMetadata', () => {
         (chainId) => {
           const metadata = getChainMetadata({ chainId });
 
-          expect(metadata).toStrictEqual({
+          expect(metadata).toMatchObject({
             ...metadataSchema,
             explorerUrl: undefined,
           });
@@ -73,7 +74,7 @@ describe('chainMetadata', () => {
       it('returns metadata with default name for unknown chain', () => {
         const metadata = getChainMetadata({ chainId: 0x9999 });
 
-        expect(metadata).toStrictEqual({
+        expect(metadata).toMatchObject({
           ...metadataSchema,
           explorerUrl: undefined,
         });
@@ -83,6 +84,31 @@ describe('chainMetadata', () => {
 
         // Explorer URL should be undefined
         expect(metadata.explorerUrl).toBeUndefined();
+      });
+    });
+
+    describe('native token swap adapter', () => {
+      it('includes tokenSwapAdapter on Ethereum mainnet', () => {
+        const metadata = getChainMetadata({ chainId: 0x1 });
+        expect(metadata.contracts.tokenSwapAdapter).toBe(
+          '0xe41eb5a3f6e35f1a8c77113f372892d09820c3fd',
+        );
+      });
+
+      it('omits tokenSwapAdapter when not deployed on chain', () => {
+        const metadata = getChainMetadata({ chainId: 0xaa36a7 }); // Sepolia
+        expect(metadata.contracts.tokenSwapAdapter).toBeUndefined();
+      });
+    });
+
+    describe('getConfiguredChainIds', () => {
+      it('returns sorted chain ids from nameAndExplorerUrlByChainId', () => {
+        const ids = getConfiguredChainIds();
+        expect(ids).toStrictEqual(
+          Object.keys(nameAndExplorerUrlByChainId)
+            .map((k) => Number(k))
+            .sort((a, b) => a - b),
+        );
       });
     });
 

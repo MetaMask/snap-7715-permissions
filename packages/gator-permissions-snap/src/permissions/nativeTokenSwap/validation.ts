@@ -2,6 +2,7 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import { getTokenSwapSupportedChainIds } from '../../core/chainMetadata';
 import { validateHexInteger } from '../validation';
 import type {
   NativeTokenSwapPermission,
@@ -10,8 +11,19 @@ import type {
 import { zNativeTokenSwapPermission } from './types';
 
 /**
+ * Returns chain IDs on which native-token-swap is supported (adapter deployed).
+ *
+ * @returns Sorted chain IDs.
+ */
+export function getSupportedChains(): number[] {
+  return getTokenSwapSupportedChainIds();
+}
+
+/**
  * Validates permission-specific data for native token swap.
+ *
  * @param permission - The parsed native token swap permission.
+ * @returns True when valid.
  */
 function validatePermissionData(permission: NativeTokenSwapPermission): true {
   validateHexInteger({

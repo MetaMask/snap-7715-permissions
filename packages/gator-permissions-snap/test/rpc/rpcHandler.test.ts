@@ -578,6 +578,10 @@ describe('RpcHandler', () => {
           type: 'native-token-periodic',
         },
         {
+          proposedName: 'Native Token Swap',
+          type: 'native-token-swap',
+        },
+        {
           proposedName: 'ERC20 Token Stream',
           type: 'erc20-token-stream',
         },
@@ -965,7 +969,7 @@ describe('RpcHandler', () => {
       expect(typedResult['native-token-swap']?.ruleTypes).toContain('expiry');
     });
 
-    it('should return the same chainIds for all permission types', async () => {
+    it('should return the same chainIds for non-swap permission types and a subset for native-token-swap', async () => {
       const result = (await handler.getSupportedPermissions()) as {
         [key: string]: { chainIds: string[]; ruleTypes: string[] };
       };
@@ -983,9 +987,14 @@ describe('RpcHandler', () => {
       expect(result['erc20-token-revocation']?.chainIds).toStrictEqual(
         nativeStreamChainIds,
       );
-      expect(result['native-token-swap']?.chainIds).toStrictEqual(
-        nativeStreamChainIds,
+
+      const swapChainIds = result['native-token-swap']?.chainIds;
+      expect(swapChainIds?.length).toBeLessThan(
+        nativeStreamChainIds?.length ?? 0,
       );
+      for (const id of swapChainIds ?? []) {
+        expect(nativeStreamChainIds).toContain(id);
+      }
     });
   });
 

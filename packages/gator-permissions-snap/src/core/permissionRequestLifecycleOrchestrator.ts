@@ -14,7 +14,7 @@ import {
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
-import { InvalidInputError, InvalidParamsError } from '@metamask/snaps-sdk';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   bytesToHex,
@@ -96,26 +96,6 @@ export class PermissionRequestLifecycleOrchestrator {
   }
 
   /**
-   * Asserts that the specified chain ID is supported.
-   * @param chainId - The chain ID to validate.
-   * @throws If the chain ID is not supported.
-   */
-  #assertIsSupportedChainId(chainId: number): void {
-    try {
-      getChainMetadata({ chainId });
-    } catch (error) {
-      logger.error(
-        'PermissionRequestLifecycleOrchestrator:assertIsSupportedChainId() - unsupported chainId',
-        {
-          chainId,
-          error,
-        },
-      );
-      throw new InvalidParamsError(`Unsupported ChainId: ${chainId}`);
-    }
-  }
-
-  /**
    * Orchestrates the permission request lifecycle.
    * @param origin - The origin of the permission request.
    * @param permissionRequest - The permission request to orchestrate.
@@ -143,8 +123,6 @@ export class PermissionRequestLifecycleOrchestrator {
     const permissionType = extractDescriptorName(
       permissionRequest.permission.type,
     );
-
-    this.#assertIsSupportedChainId(chainId);
 
     // Track permission request started
     await this.#snapsMetricsService.trackPermissionRequestStarted({
