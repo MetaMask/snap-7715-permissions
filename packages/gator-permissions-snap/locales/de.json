@@ -11,7 +11,7 @@
       "message": "Netzwerk"
     },
     "networkTooltip": {
-      "message": "Das Netzwerk, auf dem die Genehmigung angefordert wird"
+      "message": "Das Netzwerk, für das die Berechtigung angefordert wird"
     },
     "tokenLabel": {
       "message": "Token"
@@ -20,10 +20,10 @@
       "message": "Der angeforderte Token"
     },
     "justificationLabel": {
-      "message": "Grund"
+      "message": "Justification"
     },
     "justificationTooltip": {
-      "message": "Der vom Empfänger angegebene Grund für die Anforderung dieser Genehmigung."
+      "message": "Justification given by the recipient for requesting this permission."
     },
     "accountLabel": {
       "message": "Konto"
@@ -38,19 +38,19 @@
       "message": "Die Website, die die Genehmigung anfordert"
     },
     "initialAmountLabel": {
-      "message": "Anfangsbetrag"
+      "message": "Initial amount"
     },
     "initialAmountTooltip": {
-      "message": "Der anfängliche Betrag an Token, der gestreamt werden kann."
+      "message": "Der anfängliche Betrag an Tokens, der gestreamt werden kann."
     },
     "maxAmountLabel": {
-      "message": "Maximalbetrag"
+      "message": "Max amount"
     },
     "maxAmountTooltip": {
-      "message": "Der maximale Betrag an Token, der gestreamt werden kann."
+      "message": "Der maximale Betrag an Tokens, der gestreamt werden kann."
     },
     "startTimeLabel": {
-      "message": "Startzeit"
+      "message": "Start time (UTC)"
     },
     "startTimeTooltip": {
       "message": "Der Zeitpunkt, zu dem die erste Periode beginnt"
@@ -59,28 +59,40 @@
       "message": "Die Startzeit des Streams"
     },
     "expiryLabel": {
-      "message": "Ablauf"
+      "message": "Expiration date (UTC)"
     },
     "expiryTooltip": {
-      "message": "Das Ablaufdatum der Genehmigung"
+      "message": "The expiration date of the permission"
+    },
+    "expiryContentWhenDisabled": {
+      "message": "This permission is ongoing. We recommend setting an expiration date."
     },
     "streamAmountLabel": {
-      "message": "Stream-Betrag"
+      "message": "Stream amount"
     },
     "streamAmountTooltip": {
-      "message": "Der Betrag an Token, der pro Periode gestreamt werden kann."
+      "message": "Der Betrag an Tokens, der pro Periode gestreamt werden kann."
     },
     "streamPeriodLabel": {
-      "message": "Stream-Periode"
+      "message": "Stream period"
     },
     "streamPeriodTooltip": {
       "message": "Die Periode des Streams."
+    },
+    "totalExposureUnlimited": {
+      "message": "Unlimited"
+    },
+    "totalExposureLabel": {
+      "message": "Total exposure"
+    },
+    "totalExposureTooltip": {
+      "message": "The total amount of tokens that can be streamed with this permission."
     },
     "amountLabel": {
       "message": "Betrag"
     },
     "amountTooltip": {
-      "message": "Der Betrag an Token, der während jeder Periode gewährt wird"
+      "message": "Der Betrag an Tokens, der während jeder Periode gewährt wird"
     },
     "periodDurationLabel": {
       "message": "Häufigkeit"
@@ -101,7 +113,7 @@
       "message": "Stream-Betrag"
     },
     "streamRateTooltip": {
-      "message": "Der Betrag an Token, der pro Sekunde gestreamt wird."
+      "message": "Der Betrag an Tokens, der pro Sekunde gestreamt wird."
     },
     "streamRateValue": {
       "message": "$1 $2/Sek."
@@ -131,13 +143,13 @@
       "message": "Jährlich"
     },
     "availableLabel": {
-      "message": "verfügbares Guthaben"
+      "message": "verfügbar"
     },
     "permissionRequestSubtitle": {
-      "message": "Diese Website möchte Genehmigungen, um Ihren Token auszugeben."
+      "message": "Diese Website möchte Genehmigungen, um Ihre Tokens auszugeben."
     },
     "accountUpgradeWarning": {
-      "message": "Dieses Konto wird auf ein smart account aktualisiert, um diese Genehmigung abzuschließen."
+      "message": "Dieses Konto wird zu einem Smart-Konto hochgestuft, um diese Berechtigung einzurichten."
     },
     "removeFieldAlt": {
       "message": "$1 entfernen"
@@ -161,13 +173,13 @@
       "message": "Startzeit muss heute oder später sein"
     },
     "errorInvalidExpiry": {
-      "message": "Ungültiges Ablaufdatum"
+      "message": "Invalid expiration date"
     },
     "errorExpiryMustBeInFuture": {
-      "message": "Ablaufdatum muss in der Zukunft liegen"
+      "message": "Expiration date must be in the future"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": "Startzeit muss vor dem Ablaufdatum liegen"
+      "message": "Start time must be before expiration date"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
       "message": "Maximalbetrag muss größer als der Anfangsbetrag sein"
@@ -182,7 +194,7 @@
       "message": "Unbekannte Chain $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": "Diese Website möchte Genehmigungen, um Ihre ERC-20 Token Approvals zu widerrufen."
+      "message": "Diese Website möchte Genehmigungen erhalten, Ihre ERC-20-Token-Genehmigungen zu widerrufen."
     },
     "introAdvancedPermissionsTitle": {
       "message": "Erweiterte Genehmigungen geben Ihnen die Kontrolle"
@@ -197,49 +209,91 @@
       "message": "Vollständig anpassbare Kontrolle"
     },
     "introFullyCustomizableControlDescription": {
-      "message": "Überprüfen, bearbeiten oder fügen Sie Regeln hinzu, damit Genehmigungen Ihren Anforderungen entsprechen."
+      "message": "Überprüfen oder bearbeiten Sie Regeln oder fügen Sie neue hinzu, damit die Genehmigungen Ihren Anforderungen entsprechen."
     },
     "introTransparentConvenientTitle": {
       "message": "Transparent und bequem"
     },
     "introTransparentConvenientDescription": {
-      "message": "Verwalten, automatisieren und bearbeiten Sie Genehmigungen einfach von einem Ort aus."
+      "message": "Verwalten Sie Berechtigungen ganz einfach von einem Ort aus."
     },
     "introSubscriptionTitle": {
-      "message": "Diese Website möchte ein Token-Abonnement erstellen"
+      "message": "Token-Abonnementanforderung"
     },
     "introRecurringPaymentsDescription": {
-      "message": "Erlauben Sie dieser Website, Token automatisch in regelmäßigen Abständen aus Ihrer Wallet abzuheben – wie ein Abonnementdienst für die Blockchain."
+      "message": "Token-Abonnements erteilen Websites die Berechtigung, Tokens gemäß dem von Ihnen festgelegten Zeitplan aus Ihrer Wallet abzurufen."
     },
     "introStreamTitle": {
-      "message": "Diese Website möchte einen Token-Stream erstellen"
+      "message": "Token-Streaming-Anfrage"
     },
     "introContinuousTokenFlowDescription": {
-      "message": "Ermöglichen Sie schrittweise Echtzeit-Token-Transfers aus Ihrer Wallet – Token fließen stetig über die Zeit, anstatt alles auf einmal zu bewegen."
+      "message": "Token-Streams geben Websites die Berechtigung, über einen von Ihnen festgelegten Zeitraum hinweg schrittweise Tokens aus Ihrer Wallet zu entnehmen."
     },
     "introRevocationTitle": {
-      "message": "Diese Website bittet um Token-Widerrufsgenehmigungen"
+      "message": "Token-Widerrufsantrag"
     },
     "introManageTokenApprovalsDescription": {
-      "message": "Erlauben Sie dieser Website, bestehende Token Approvals in Ihrem Namen zu widerrufen – hilft Ihnen, alte Genehmigungen aufzuräumen und Risiken zu reduzieren."
+      "message": "Durch die Token-Widerrufung können Websites Token-Genehmigungen in Ihrem Namen widerrufen."
     },
     "introPermissionInControlDescription": {
-      "message": "Sie können diese Genehmigung jederzeit in den erweiterten Genehmigungen bearbeiten oder widerrufen."
+      "message": "Sie können diese Berechtigung jederzeit in den erweiterten Genehmigungen widerrufen."
     },
     "introGotItButton": {
       "message": "Verstanden"
     },
     "maliciousWebsiteLabel": {
-      "message": ""
+      "message": "Malicious website"
     },
     "potentiallyMaliciousWebsiteLabel": {
-      "message": ""
+      "message": "Potentially malicious website"
     },
     "maliciousAddressLabel": {
-      "message": ""
+      "message": "Malicious address"
     },
     "potentiallyMaliciousAddressLabel": {
-      "message": ""
+      "message": "Potentially malicious address"
+    },
+    "existingPermissionsTitle": {
+      "message": "Existing permissions"
+    },
+    "existingPermissionsDescription": {
+      "message": "Permissions you’ve already granted to this site"
+    },
+    "existingPermissionsConfirmButton": {
+      "message": "Back to request"
+    },
+    "existingPermissionsExistingMessage": {
+      "message": "You have granted permissions to this site in the past."
+    },
+    "existingPermissionsSimilarMessage": {
+      "message": "You have granted similar permissions to this site in the past."
+    },
+    "existingPermissionsLink": {
+      "message": "Review them"
+    },
+    "existingPermissionsLoadError": {
+      "message": "We couldn’t load the list. You can go back and try again."
+    },
+    "chainLabel": {
+      "message": "Netzwerk"
+    },
+    "morePermissionsCountSingle": {
+      "message": "This account has 1 more permission. View and manage all permissions in the "
+    },
+    "morePermissionsCountPlural": {
+      "message": "This account has $1 more permissions. View and manage all permissions in the "
+    },
+    "unlimited": {
+      "message": "Unlimited"
+    },
+    "allTokens": {
+      "message": "All tokens"
+    },
+    "dappConnectionsLink": {
+      "message": "Dapp Connections"
+    },
+    "revokeTokenApprovalsLabel": {
+      "message": "Revoke token approvals"
     }
   }
 }
