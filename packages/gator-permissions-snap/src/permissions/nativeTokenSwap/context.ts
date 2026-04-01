@@ -47,16 +47,16 @@ export async function applyContext({
   const { rules } = applyExpiryRule(context, originalRequest);
 
   const { amount, error } = validateAndParseAmount(
-    permissionDetails.maxSwapAmount,
+    permissionDetails.allowance,
     decimals,
-    'max allowance',
+    'allowance',
   );
   if (error || amount === null) {
-    throw new InvalidInputError(error ?? 'Invalid max allowance');
+    throw new InvalidInputError(error ?? 'Invalid allowance');
   }
 
   const permissionData = {
-    maxNativeSwapAmount: bigIntToHex(amount),
+    allowance: bigIntToHex(amount),
     whitelistedTokensOnly: permissionDetails.whitelistedTokensOnly,
     justification: originalRequest.permission.data.justification,
   };
@@ -143,8 +143,8 @@ export async function buildContext({
       }
     : undefined;
 
-  const maxSwapAmount = formatUnitsFromHex({
-    value: data.maxNativeSwapAmount,
+  const allowanceFormatted = formatUnitsFromHex({
+    value: data.allowance,
     allowNull: false,
     decimals,
   });
@@ -174,7 +174,7 @@ export async function buildContext({
       iconDataBase64,
     },
     permissionDetails: {
-      maxSwapAmount,
+      allowance: allowanceFormatted,
       whitelistedTokensOnly: data.whitelistedTokensOnly,
     },
   };
@@ -200,13 +200,13 @@ export async function deriveMetadata({
 
   const validationErrors: NativeTokenSwapMetadata['validationErrors'] = {};
 
-  const maxAmountResult = validateAndParseAmount(
-    permissionDetails.maxSwapAmount,
+  const allowanceResult = validateAndParseAmount(
+    permissionDetails.allowance,
     decimals,
-    'max allowance',
+    'allowance',
   );
-  if (maxAmountResult.error) {
-    validationErrors.maxNativeSwapAmountError = maxAmountResult.error;
+  if (allowanceResult.error) {
+    validationErrors.allowanceError = allowanceResult.error;
   }
 
   if (expiry) {

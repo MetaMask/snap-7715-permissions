@@ -15,7 +15,7 @@ describe('nativeTokenSwap:caveats', () => {
         type: 'native-token-swap',
         data: {
           justification: 'Swap cap',
-          maxNativeSwapAmount: bigIntToHex(maxWei),
+          allowance: bigIntToHex(maxWei),
           whitelistedTokensOnly: false,
         },
         isAdjustmentAllowed: true,

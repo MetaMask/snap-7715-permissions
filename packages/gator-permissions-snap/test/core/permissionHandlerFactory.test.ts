@@ -96,7 +96,7 @@ describe('PermissionHandlerFactory', () => {
           isAdjustmentAllowed: true,
           data: {
             justification: 'test',
-            maxNativeSwapAmount: '0x1',
+            allowance: '0x1',
             whitelistedTokensOnly: true,
           },
         },

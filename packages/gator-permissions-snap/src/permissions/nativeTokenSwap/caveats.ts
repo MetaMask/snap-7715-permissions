@@ -5,11 +5,10 @@ import {
 } from '@metamask/delegation-core';
 import type { Caveat, Hex } from '@metamask/delegation-core';
 import { InternalError } from '@metamask/snaps-sdk';
+import { bigIntToHex, hexToBigInt, numberToHex } from '@metamask/utils';
 
 import type { PopulatedNativeTokenSwapPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
-import { bigIntToHex } from '@metamask/utils';
-import { numberToHex } from '@metamask/utils';
 
 // abiEncode("Token-Whitelist-Enforced");
 const WHITELIST_ENFORCED =
@@ -19,19 +18,20 @@ const WHITELIST_ENFORCED =
 const WHITELIST_NOT_ENFORCED =
   '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001c546f6b656e2d57686974656c6973742d4e6f742d456e666f7263656400000000';
 
-export const PERIOD_DURATION = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
+export const PERIOD_DURATION =
+  0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
 
 /**
  * Native token swap permission
  * ------------------------------
- * This permission allows a delegate to swap the grantor's native token for a specified token up to a cap.
- * The caveats below enforce the swap limit and token policy.
+ * This permission allows a delegate to swap the grantor's native token for a specified token within an allowance.
+ * The caveats below enforce the allowance and token policy.
  *
  * Caveats and enforcers
  * ---------------------
  * ArgsEqualityEnforcer: args specifying whether only whitelisted tokens are allowed.
  * NativeTokenPeriodTransferEnforcer: encodes a period duration of UINT256_MAX, to enforce a single period with
- * allowance of maxNativeSwapAmount.
+ * the configured native token allowance.
  * RedeemerEnforcer: only the swap adapter contract can redeem the permission.
  */
 
@@ -47,9 +47,11 @@ export const PERIOD_DURATION = 0xfffffffffffffffffffffffffffffffffffffffffffffff
  * @returns The terms as a 96-byte hex string (32 bytes for each parameter).
  * @throws Error if any of the numeric parameters are invalid.
  */
-function createNativeTokenPeriodTransferTerms(
-  terms: { periodAmount: bigint; periodDuration: bigint; startDate: number },
-): Hex {
+function createNativeTokenPeriodTransferTerms(terms: {
+  periodAmount: bigint;
+  periodDuration: bigint;
+  startDate: number;
+}): Hex {
   const { periodAmount, periodDuration, startDate } = terms;
 
   if (periodAmount <= 0n) {
@@ -86,7 +88,7 @@ export async function createPermissionCaveats({
   permission: PopulatedNativeTokenSwapPermission;
   contracts: DelegationContracts;
 }): Promise<Caveat[]> {
-  const { maxNativeSwapAmount, whitelistedTokensOnly } = permission.data;
+  const { allowance, whitelistedTokensOnly } = permission.data;
 
   const expectedArgs = whitelistedTokensOnly
     ? WHITELIST_ENFORCED
@@ -103,9 +105,9 @@ export async function createPermissionCaveats({
   const nativeTokenPeriodTransferCaveat: Caveat = {
     enforcer: contracts.nativeTokenPeriodTransferEnforcer,
     terms: createNativeTokenPeriodTransferTerms({
-      periodAmount: BigInt(maxNativeSwapAmount),
+      periodAmount: hexToBigInt(allowance),
       periodDuration: PERIOD_DURATION,
-      startDate: Date.now() / 1000,
+      startDate: Math.floor(Date.now() / 1000),
     }),
     args: '0x',
   };

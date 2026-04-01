@@ -4,7 +4,7 @@ import { t } from '../../utils/i18n';
 import { createExpiryRule } from '../rules';
 import type { NativeTokenSwapContext, NativeTokenSwapMetadata } from './types';
 
-export const MAX_SWAP_AMOUNT_ELEMENT = 'native-token-swap-max-amount';
+export const ALLOWANCE_ELEMENT = 'native-token-swap-allowance';
 export const TOKEN_RESTRICTION_ELEMENT = 'native-token-swap-token-restriction';
 export const EXPIRY_ELEMENT = 'native-token-swap-expiry';
 
@@ -13,16 +13,16 @@ type NativeTokenSwapRuleDefinition = RuleDefinition<
   NativeTokenSwapMetadata
 >;
 
-export const maxSwapAmountRule: NativeTokenSwapRuleDefinition = {
-  name: MAX_SWAP_AMOUNT_ELEMENT,
-  label: 'maxNativeSwapAmountLabel',
+export const allowanceRule: NativeTokenSwapRuleDefinition = {
+  name: ALLOWANCE_ELEMENT,
+  label: 'allowanceLabel',
   type: 'number',
   isOptional: false,
   getRuleData: ({ context, metadata }) => ({
-    value: context.permissionDetails.maxSwapAmount,
+    value: context.permissionDetails.allowance,
     isVisible: true,
-    tooltip: t('maxNativeSwapAmountTooltip'),
-    error: metadata.validationErrors.maxNativeSwapAmountError,
+    tooltip: t('allowanceTooltip'),
+    error: metadata.validationErrors.allowanceError,
     isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (
@@ -32,7 +32,7 @@ export const maxSwapAmountRule: NativeTokenSwapRuleDefinition = {
     ...swapContext,
     permissionDetails: {
       ...swapContext.permissionDetails,
-      maxSwapAmount: value ?? '',
+      allowance: value ?? '',
     },
   }),
 };
@@ -69,4 +69,4 @@ export const expiryRule = createExpiryRule<
   NativeTokenSwapMetadata
 >({ elementName: EXPIRY_ELEMENT, translate: t });
 
-export const allRules = [maxSwapAmountRule, tokenRestrictionRule, expiryRule];
+export const allRules = [allowanceRule, tokenRestrictionRule, expiryRule];

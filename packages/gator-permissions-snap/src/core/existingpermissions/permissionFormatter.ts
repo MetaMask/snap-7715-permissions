@@ -140,13 +140,13 @@ function extractPermissionDetails(
         };
       }
     } else if (permissionType === 'native-token-swap') {
-      const { maxNativeSwapAmount, justification } = permissionData;
+      const { allowance, justification } = permissionData;
       const whitelistedOnly = permissionData.whitelistedTokensOnly === true;
 
-      if (maxNativeSwapAmount !== undefined && maxNativeSwapAmount !== null) {
-        details.maxNativeSwapAmount = {
-          label: t('nativeTokenSwapMaxAmountDetailLabel'),
-          value: String(maxNativeSwapAmount),
+      if (allowance !== undefined && allowance !== null) {
+        details.allowance = {
+          label: t('nativeTokenSwapAllowanceDetailLabel'),
+          value: String(allowance),
         };
       }
 
@@ -261,7 +261,7 @@ export async function formatPermissionWithTokenMetadata(
   const hasTokenAmountFields =
     'maxAmount' in permissionData ||
     'periodAmount' in permissionData ||
-    'maxNativeSwapAmount' in permissionData;
+    'allowance' in permissionData;
 
   if (!hasTokenAmountFields) {
     return permission;
@@ -316,9 +316,9 @@ export async function formatPermissionWithTokenMetadata(
       );
     }
 
-    if ('maxNativeSwapAmount' in permissionData) {
-      formattedData.maxNativeSwapAmount = formatTokenAmountWithMetadata(
-        permissionData.maxNativeSwapAmount as Hex | null | undefined,
+    if ('allowance' in permissionData) {
+      formattedData.allowance = formatTokenAmountWithMetadata(
+        permissionData.allowance as Hex | null | undefined,
         decimals,
         symbol,
       );

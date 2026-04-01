@@ -24,9 +24,7 @@ const validPermissionRequest: NativeTokenSwapPermissionRequest = {
     type: 'native-token-swap',
     data: {
       justification: 'test',
-      maxNativeSwapAmount: bigIntToHex(
-        parseUnits({ formatted: '1', decimals: 18 }),
-      ),
+      allowance: bigIntToHex(parseUnits({ formatted: '1', decimals: 18 })),
       whitelistedTokensOnly: true,
     },
     isAdjustmentAllowed: true,
@@ -79,20 +77,20 @@ describe('nativeTokenSwap:validation', () => {
       );
     });
 
-    it('should reject zero maxNativeSwapAmount', () => {
+    it('should reject zero allowance', () => {
       const zeroAmount = {
         ...validPermissionRequest,
         permission: {
           ...validPermissionRequest.permission,
           data: {
             ...validPermissionRequest.permission.data,
-            maxNativeSwapAmount: '0x0',
+            allowance: '0x0',
           },
         },
       };
 
       expect(() => parseAndValidatePermission(zeroAmount as any)).toThrow(
-        'Invalid maxNativeSwapAmount: must be greater than 0',
+        'Invalid allowance: must be greater than 0',
       );
     });
   });

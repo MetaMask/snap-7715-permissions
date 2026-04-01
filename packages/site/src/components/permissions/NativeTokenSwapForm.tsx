@@ -15,7 +15,7 @@ type NativeTokenSwapFormProps = {
  * @returns A React component that renders the native-token-swap form.
  */
 export const NativeTokenSwapForm = ({ onChange }: NativeTokenSwapFormProps) => {
-  const [maxNativeSwapAmount, setMaxNativeSwapAmount] = useState(
+  const [allowance, setAllowance] = useState(
     BigInt(bigIntToHex(parseUnits('0.1', 18))),
   );
   const [whitelistedTokensOnly, setWhitelistedTokensOnly] = useState(true);
@@ -27,11 +27,11 @@ export const NativeTokenSwapForm = ({ onChange }: NativeTokenSwapFormProps) => {
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
 
-  const handleMaxNativeSwapAmountChange = useCallback(
+  const handleAllowanceChange = useCallback(
     ({
       target: { value: inputValue },
     }: React.ChangeEvent<HTMLInputElement>) => {
-      setMaxNativeSwapAmount(BigInt(inputValue));
+      setAllowance(BigInt(inputValue));
     },
     [],
   );
@@ -73,7 +73,7 @@ export const NativeTokenSwapForm = ({ onChange }: NativeTokenSwapFormProps) => {
   useEffect(() => {
     onChange({
       type: 'native-token-swap',
-      maxNativeSwapAmount: bigIntToHex(maxNativeSwapAmount),
+      allowance: bigIntToHex(allowance),
       whitelistedTokensOnly,
       expiry,
       justification,
@@ -82,7 +82,7 @@ export const NativeTokenSwapForm = ({ onChange }: NativeTokenSwapFormProps) => {
     });
   }, [
     onChange,
-    maxNativeSwapAmount,
+    allowance,
     whitelistedTokensOnly,
     expiry,
     justification,
@@ -92,13 +92,13 @@ export const NativeTokenSwapForm = ({ onChange }: NativeTokenSwapFormProps) => {
   return (
     <>
       <div>
-        <label htmlFor="maxNativeSwapAmount">Max allowance:</label>
+        <label htmlFor="allowance">Allowance:</label>
         <input
           type="text"
-          id="maxNativeSwapAmount"
-          name="maxNativeSwapAmount"
-          value={maxNativeSwapAmount.toString()}
-          onChange={handleMaxNativeSwapAmountChange}
+          id="allowance"
+          name="allowance"
+          value={allowance.toString()}
+          onChange={handleAllowanceChange}
         />
       </div>
       <div style={{ display: 'flex', alignItems: 'center' }}>

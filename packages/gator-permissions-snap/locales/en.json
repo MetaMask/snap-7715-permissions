@@ -296,13 +296,13 @@
       "message": "Revoke token approvals"
     },
     "permissionRequestSubtitleNativeTokenSwap": {
-      "message": "This site wants permission to swap your native token up to a limit you set."
+      "message": "This site wants permission to swap your native token within an allowance you set."
     },
-    "maxNativeSwapAmountLabel": {
-      "message": "Max allowance"
+    "allowanceLabel": {
+      "message": "Allowance"
     },
-    "maxNativeSwapAmountTooltip": {
-      "message": "Maximum native token allowance that can be spent when swapping on your behalf."
+    "allowanceTooltip": {
+      "message": "Native token allowance that can be spent when swapping on your behalf."
     },
     "tokenSwapRestrictionLabel": {
       "message": "Swappable into"
@@ -326,10 +326,10 @@
       "message": "Native token swap request"
     },
     "introNativeTokenSwapDescription": {
-      "message": "Native token swap permissions let a site use your native token for swaps up to a cap. You can require swaps into whitelisted tokens only."
+      "message": "Native token swap permissions let a site use your native token for swaps within an allowance you set. You can require swaps into whitelisted tokens only."
     },
-    "nativeTokenSwapMaxAmountDetailLabel": {
-      "message": "Max allowance"
+    "nativeTokenSwapAllowanceDetailLabel": {
+      "message": "Allowance"
     },
     "nativeTokenSwapTokenPolicyDetailLabel": {
       "message": "Token policy"

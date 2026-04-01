@@ -1,7 +1,7 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Link, Section } from '@metamask/snaps-sdk/jsx';
 
-import { maxSwapAmountRule, tokenRestrictionRule, expiryRule } from './rules';
+import { allowanceRule, tokenRestrictionRule, expiryRule } from './rules';
 import type { NativeTokenSwapContext, NativeTokenSwapMetadata } from './types';
 import { renderRules } from '../../core/rules';
 import { t } from '../../utils/i18n';
@@ -13,7 +13,7 @@ const WHITELIST_LINK_PLACEHOLDER_HREF =
  * Builds confirmation UI for a native token swap permission.
  *
  * @param args - Dialog content inputs.
- * @param args.context - Permission context including swap cap and token policy.
+ * @param args.context - Permission context including allowance and token policy.
  * @param args.metadata - Validation metadata.
  * @returns Snap dialog content.
  */
@@ -28,7 +28,7 @@ export async function createConfirmationContent({
     <Box>
       <Section>
         {renderRules({
-          rules: [maxSwapAmountRule, tokenRestrictionRule],
+          rules: [allowanceRule, tokenRestrictionRule],
           context,
           metadata,
         })}

@@ -27,8 +27,8 @@ export function getSupportedChains(): number[] {
  */
 function validatePermissionData(permission: NativeTokenSwapPermission): true {
   validateHexInteger({
-    name: 'maxNativeSwapAmount',
-    value: permission.data.maxNativeSwapAmount,
+    name: 'allowance',
+    value: permission.data.allowance,
     required: true,
     allowZero: false,
   });

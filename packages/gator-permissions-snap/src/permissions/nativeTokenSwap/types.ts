@@ -14,15 +14,15 @@ import type {
 
 export type NativeTokenSwapMetadata = BaseMetadata & {
   validationErrors: {
-    maxNativeSwapAmountError?: string;
+    allowanceError?: string;
     expiryError?: string;
   };
 };
 
 export type NativeTokenSwapContext = BaseContext & {
   permissionDetails: {
-    /** Human-readable max allowance for the swap cap (native token units). */
-    maxSwapAmount: string;
+    /** Human-readable native token allowance (swap limit). */
+    allowance: string;
     whitelistedTokensOnly: boolean;
   };
 };
@@ -32,7 +32,7 @@ export const zNativeTokenSwapPermission = zPermission.extend({
   data: z.intersection(
     zMetaMaskPermissionData,
     z.object({
-      maxNativeSwapAmount: zHexStr,
+      allowance: zHexStr,
       whitelistedTokensOnly: z.boolean(),
     }),
   ),
