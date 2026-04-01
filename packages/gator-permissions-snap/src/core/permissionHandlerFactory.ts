@@ -16,6 +16,7 @@ import type {
   PermissionHandlerType,
 } from './types';
 import { getPermissionDefinition } from '../permissions/permissionDefinitionsRegistry';
+
 /**
  * Factory for creating permission-specific orchestrators.
  * Each permission type has its own orchestrator that handles the specific logic for that permission.
