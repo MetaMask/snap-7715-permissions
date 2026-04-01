@@ -316,12 +316,6 @@
     "tokenSwapModeAnyToken": {
       "message": "Any token"
     },
-    "whitelistedTokensListLinkIntro": {
-      "message": "View the whitelisted token list:"
-    },
-    "whitelistedTokensListLinkLabel": {
-      "message": "Open token list"
-    },
     "introNativeTokenSwapTitle": {
       "message": "Native token swap request"
     },

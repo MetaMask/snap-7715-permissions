@@ -1,13 +1,9 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { Box, Link, Section } from '@metamask/snaps-sdk/jsx';
+import { Box, Section } from '@metamask/snaps-sdk/jsx';
 
 import { allowanceRule, tokenRestrictionRule, expiryRule } from './rules';
 import type { NativeTokenSwapContext, NativeTokenSwapMetadata } from './types';
 import { renderRules } from '../../core/rules';
-import { t } from '../../utils/i18n';
-
-const WHITELIST_LINK_PLACEHOLDER_HREF =
-  'https://example.com/whitelisted-tokens';
 
 /**
  * Builds confirmation UI for a native token swap permission.
@@ -32,11 +28,6 @@ export async function createConfirmationContent({
           context,
           metadata,
         })}
-        <Box direction="vertical">
-          <Link href={WHITELIST_LINK_PLACEHOLDER_HREF}>
-            {t('whitelistedTokensListLinkLabel')}
-          </Link>
-        </Box>
         {renderRules({
           rules: [expiryRule],
           context,
