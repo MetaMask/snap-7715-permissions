@@ -5,7 +5,7 @@ import {
 } from '@metamask/delegation-core';
 import type { Caveat, Hex } from '@metamask/delegation-core';
 import { InternalError } from '@metamask/snaps-sdk';
-import { bigIntToHex, hexToBigInt, numberToHex } from '@metamask/utils';
+import { hexToBigInt } from '@metamask/utils';
 
 import type { PopulatedNativeTokenSwapPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
@@ -34,6 +34,29 @@ export const PERIOD_DURATION =
  * the configured native token allowance.
  * RedeemerEnforcer: only the swap adapter contract can redeem the permission.
  */
+
+/**
+ * Converts a numeric value to a hexadecimal string with zero-padding, without 0x prefix.
+ *
+ * @param options - The options for the conversion.
+ * @param options.value - The numeric value to convert to hex (bigint or number).
+ * @param options.size - The size in bytes for the resulting hex string (each byte = 2 hex characters).
+ * @returns A hexadecimal string prefixed with zeros to match the specified size.
+ * @example
+ * ```typescript
+ * toHexString({ value: 255, size: 2 }) // Returns "00ff"
+ * toHexString({ value: 16n, size: 1 }) // Returns "10"
+ * ```
+ */
+export const toHexString = ({
+  value,
+  size,
+}: {
+  value: bigint | number;
+  size: number;
+}): string => {
+  return value.toString(16).padStart(size * 2, '0');
+};
 
 /**
  * Creates terms for a NativeTokenPeriodTransfer caveat that validates that native token (ETH) transfers
@@ -66,9 +89,9 @@ function createNativeTokenPeriodTransferTerms(terms: {
     throw new Error('Invalid startDate: must be a positive number');
   }
 
-  const periodAmountHex = bigIntToHex(periodAmount);
-  const periodDurationHex = bigIntToHex(periodDuration);
-  const startDateHex = numberToHex(startDate);
+  const periodAmountHex = toHexString({ value: periodAmount, size: 32 });
+  const periodDurationHex = toHexString({ value: periodDuration, size: 32 });
+  const startDateHex = toHexString({ value: startDate, size: 32 });
 
   return `0x${periodAmountHex}${periodDurationHex}${startDateHex}`;
 }

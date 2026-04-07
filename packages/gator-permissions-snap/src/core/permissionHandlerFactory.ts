@@ -91,12 +91,6 @@ export class PermissionHandlerFactory {
 
     const permissionDefinition = getPermissionDefinition(type);
 
-    if (!permissionDefinition) {
-      throw new InvalidParamsError(
-        `Permission definition not found for permission type: ${type}`,
-      );
-    }
-
     if (
       !permissionDefinition
         .getSupportedChains()
