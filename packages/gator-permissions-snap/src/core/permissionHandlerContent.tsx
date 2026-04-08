@@ -162,6 +162,9 @@ export const PermissionHandlerContent = ({
       value={origin}
       tooltip={t('requestFromTooltip')}
       warningLabel={dappUrlWarningLabel}
+      warningSeverity={
+        recommendedAction === RecommendedAction.WARN ? 'warning' : 'error'
+      }
     />
   );
 
@@ -186,6 +189,9 @@ export const PermissionHandlerContent = ({
       address={delegateAddress}
       tooltip={t('recipientTooltip')}
       warningLabel={addressWarningLabel}
+      warningSeverity={
+        resultType === AddressScanResultType.Warning ? 'warning' : 'error'
+      }
     />
   );
 

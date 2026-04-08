@@ -14,6 +14,8 @@ export type TextFieldParams = Pick<
   value: string;
   /** When set, shows a danger icon and this label below the value. */
   warningLabel?: string | undefined;
+  /** Severity level for the warning: 'warning' (orange) for potential issues, 'error' (red) for definite issues. Defaults to 'error'. */
+  warningSeverity?: 'warning' | 'error';
 };
 
 /**
@@ -26,6 +28,7 @@ export type TextFieldParams = Pick<
  * @param props.tooltip - The tooltip text for the field label.
  * @param props.iconData - Optional icon data.
  * @param props.warningLabel - When set, shows a danger icon and this label below the value.
+ * @param props.warningSeverity - Severity level: 'warning' (orange) or 'error' (red). Defaults to 'error'.
  * @param props.direction - The direction to stack the label and value elements. Default is 'horizontal'.
  * @returns A JSX element containing a text field with optional warning.
  */
@@ -35,14 +38,15 @@ export const TextField = ({
   tooltip,
   iconData,
   warningLabel,
+  warningSeverity = 'error',
   direction = 'horizontal',
 }: TextFieldParams): JSX.Element => {
   const content = warningLabel ? (
     <Box direction="vertical">
       <Text alignment="end">{value}</Text>
       <Box direction="horizontal" alignment="end">
-        <Icon name="danger" size="md" color="error" />
-        <Text color="error">{warningLabel}</Text>
+        <Icon name="danger" size="md" color={warningSeverity} />
+        <Text color={warningSeverity}>{warningLabel}</Text>
       </Box>
     </Box>
   ) : (
