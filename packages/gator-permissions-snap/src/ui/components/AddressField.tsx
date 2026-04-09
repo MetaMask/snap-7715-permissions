@@ -11,6 +11,8 @@ export type AddressFieldParams = Pick<
   address: string;
   /** When set, shows a danger icon and this label below the address. */
   warningLabel?: string | undefined;
+  /** Severity level for the warning: 'warning' (orange) for potential issues, 'error' (red) for definite issues. Defaults to 'error'. */
+  warningSeverity?: 'warning' | 'error';
 };
 
 /**
@@ -24,6 +26,7 @@ export type AddressFieldParams = Pick<
  * @param props.tooltip - The tooltip text for the field label.
  * @param props.iconData - Optional icon data.
  * @param props.warningLabel - When set, shows a danger icon and this label below the address.
+ * @param props.warningSeverity - Severity level: 'warning' (orange) or 'error' (red). Defaults to 'error'.
  * @returns A JSX element containing an address field with optional warning.
  */
 export const AddressField = ({
@@ -32,6 +35,7 @@ export const AddressField = ({
   tooltip,
   iconData,
   warningLabel,
+  warningSeverity = 'error',
 }: AddressFieldParams): JSX.Element => {
   const addressContent = (
     <Tooltip content={address}>
@@ -52,8 +56,8 @@ export const AddressField = ({
             {addressContent}
           </Box>
           <Box direction="horizontal" alignment="end">
-            <Icon name="danger" size="md" color="error" />
-            <Text alignment="end" color="error">
+            <Icon name="danger" size="md" color={warningSeverity} />
+            <Text alignment="end" color={warningSeverity}>
               {warningLabel}
             </Text>
           </Box>
