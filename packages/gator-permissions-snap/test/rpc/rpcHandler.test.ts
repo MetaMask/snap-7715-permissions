@@ -940,14 +940,10 @@ describe('RpcHandler', () => {
       const nativeTokenStream = typedResult['native-token-stream']!;
 
       // Verify structure for one permission type
-      expect(nativeTokenStream).toHaveProperty('chainIds');
+      // chainIds is excluded - indicating all chains are supported
+      expect(nativeTokenStream).not.toHaveProperty('chainIds');
       expect(nativeTokenStream).toHaveProperty('ruleTypes');
-      expect(Array.isArray(nativeTokenStream.chainIds)).toBe(true);
       expect(Array.isArray(nativeTokenStream.ruleTypes)).toBe(true);
-
-      // Chain IDs should be hex strings
-      expect(nativeTokenStream.chainIds.length).toBeGreaterThan(0);
-      expect(nativeTokenStream.chainIds[0]).toMatch(/^0x/u);
 
       // All permission types should support 'expiry' rule
       expect(nativeTokenStream.ruleTypes).toContain('expiry');
