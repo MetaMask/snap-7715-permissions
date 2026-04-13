@@ -921,7 +921,7 @@ describe('RpcHandler', () => {
   });
 
   describe('getSupportedPermissions', () => {
-    it('should return all supported permission types with chainIds and ruleTypes', async () => {
+    it('should return all supported permission types with ruleTypes', async () => {
       const result = await handler.getSupportedPermissions();
 
       // Should return an object with all 5 permission types
@@ -931,9 +931,9 @@ describe('RpcHandler', () => {
       expect(result).toHaveProperty('erc20-token-periodic');
       expect(result).toHaveProperty('erc20-token-revocation');
 
-      // Each permission type should have chainIds and ruleTypes
+      // Each permission type should expose ruleTypes.
       const typedResult = result as {
-        [key: string]: { chainIds: string[]; ruleTypes: string[] };
+        [key: string]: { ruleTypes: string[] };
       };
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -959,24 +959,14 @@ describe('RpcHandler', () => {
       );
     });
 
-    it('should return the same chainIds for all permission types', async () => {
+    it('should omit chainIds for all permission types', async () => {
       const result = (await handler.getSupportedPermissions()) as {
-        [key: string]: { chainIds: string[]; ruleTypes: string[] };
+        [key: string]: { ruleTypes: string[] };
       };
 
-      const nativeStreamChainIds = result['native-token-stream']?.chainIds;
-      expect(result['native-token-periodic']?.chainIds).toStrictEqual(
-        nativeStreamChainIds,
-      );
-      expect(result['erc20-token-stream']?.chainIds).toStrictEqual(
-        nativeStreamChainIds,
-      );
-      expect(result['erc20-token-periodic']?.chainIds).toStrictEqual(
-        nativeStreamChainIds,
-      );
-      expect(result['erc20-token-revocation']?.chainIds).toStrictEqual(
-        nativeStreamChainIds,
-      );
+      for (const permissionType of Object.keys(result)) {
+        expect(result[permissionType]).not.toHaveProperty('chainIds');
+      }
     });
   });
 
