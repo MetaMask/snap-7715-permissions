@@ -19,9 +19,9 @@ export const SUPPORTED_RULE_TYPES = {
  */
 export const zSupportedPermissionInfo = z.object({
   /**
-   * The chain IDs where this permission type is supported.
+   * The chain IDs where this permission type is supported. If not specified, all chains are supported.
    */
-  chainIds: z.array(zHexStr),
+  chainIds: z.array(zHexStr).optional(),
 
   /**
    * The rule types that can be applied to this permission.

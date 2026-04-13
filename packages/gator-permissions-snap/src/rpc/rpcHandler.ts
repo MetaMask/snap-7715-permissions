@@ -10,10 +10,8 @@ import {
   UserRejectedRequestError,
 } from '@metamask/snaps-sdk';
 import type { Json } from '@metamask/snaps-sdk';
-import { numberToHex } from '@metamask/utils';
 
 import type { BlockchainClient } from '../clients/blockchainClient';
-import { nameAndExplorerUrlByChainId } from '../core/chainMetadata';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
@@ -306,10 +304,6 @@ export function createRpcHandler({
   const getSupportedPermissions = async (): Promise<Json> => {
     logger.debug('getSupportedPermissions()');
 
-    const chainIds = Object.keys(nameAndExplorerUrlByChainId).map((id) =>
-      numberToHex(Number(id)),
-    );
-
     const supportedPermissions: GetSupportedPermissionsResult = {};
 
     for (const offer of DEFAULT_GATOR_PERMISSION_TO_OFFER) {
@@ -320,7 +314,9 @@ export function createRpcHandler({
         ];
 
       supportedPermissions[permissionType] = {
-        chainIds,
+        // chainIds is not specified here, as all chains are supported.
+        // if a permission type is added that is supported on a subset of chains,
+        // the chainIds should be specified here.
         ruleTypes: ruleTypes ? [...ruleTypes] : [],
       };
     }
