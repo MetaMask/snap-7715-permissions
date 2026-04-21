@@ -1,5 +1,5 @@
 import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
-import type { RequestExecutionPermissionsParameters } from '@metamask/smart-accounts-kit/actions';
+import type { MetaMaskExtensionClient } from '@metamask/smart-accounts-kit/actions';
 import { useCallback, useMemo, useState } from 'react';
 import {
   createClient,
@@ -54,6 +54,7 @@ import {
   ResponseContainer,
   CopyButton,
 } from '../styles';
+import { formatExecutionPermissionRequestForWallet } from '../utils/formatExecutionPermissionRequestForWallet';
 
 const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
 
@@ -240,22 +241,29 @@ const Index = () => {
       throw new Error('No permission request data');
     }
 
-    const { type, expiry, isAdjustmentAllowed, ...permissionData } =
-      permissionRequest;
+    const {
+      type,
+      expiry,
+      isAdjustmentAllowed,
+      redeemerAddresses,
+      ...permissionData
+    } = permissionRequest;
 
-    const permissionsRequests: RequestExecutionPermissionsParameters = [
-      {
-        chainId,
-        to: delegateAccount.address,
-        expiry,
-        isAdjustmentAllowed,
-        permission: {
-          type,
-          // permission types that are _not_ native token stream are using Hex for token amount types
-          data: permissionData as any,
-        },
+    if (!metaMaskClient) {
+      throw new Error('Wallet client not ready');
+    }
+
+    const permissionRequestParam = formatExecutionPermissionRequestForWallet({
+      chainId,
+      to: delegateAccount.address,
+      expiry,
+      isAdjustmentAllowed,
+      redeemerAddresses,
+      permission: {
+        type,
+        data: permissionData as Record<string, unknown>,
       },
-    ];
+    });
 
     // Generate a unique identifier for this permission request
     const requestId = `${type}-${Date.now()}-${Math.random()}`;
@@ -268,8 +276,15 @@ const Index = () => {
     setPermissionResponseError(null);
 
     try {
-      const response =
-        await metaMaskClient?.requestExecutionPermissions(permissionsRequests);
+      const response = await (
+        metaMaskClient as MetaMaskExtensionClient
+      ).request(
+        {
+          method: 'wallet_requestExecutionPermissions',
+          params: [permissionRequestParam],
+        },
+        { retryCount: 0 },
+      );
       setPermissionResponse(response);
     } catch (error) {
       setPermissionResponse(null);

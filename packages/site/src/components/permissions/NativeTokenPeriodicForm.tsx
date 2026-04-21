@@ -1,7 +1,9 @@
 import { bigIntToHex } from '@metamask/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
+import type { Hex } from 'viem';
 
+import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { NativeTokenPeriodicPermissionRequest } from './types';
 
 type NativeTokenPeriodicFormProps = {
@@ -25,6 +27,7 @@ export const NativeTokenPeriodicForm = ({
     'This is a very important request for periodic allowance for some very important thing',
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
+  const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
 
   const handlePeriodAmountChange = useCallback(
     ({
@@ -94,6 +97,7 @@ export const NativeTokenPeriodicForm = ({
       startTime,
       expiry,
       justification,
+      redeemerAddresses,
       isAdjustmentAllowed,
     });
   }, [
@@ -103,6 +107,7 @@ export const NativeTokenPeriodicForm = ({
     startTime,
     expiry,
     justification,
+    redeemerAddresses,
     isAdjustmentAllowed,
   ]);
 
@@ -158,6 +163,7 @@ export const NativeTokenPeriodicForm = ({
           onChange={handleExpiryChange}
         />
       </div>
+      <RedeemerAddressesField onChange={setRedeemerAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
         <input

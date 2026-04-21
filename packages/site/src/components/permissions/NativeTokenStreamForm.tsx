@@ -1,7 +1,9 @@
 import { bigIntToHex } from '@metamask/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
+import type { Hex } from 'viem';
 
+import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { NativeTokenStreamPermissionRequest } from './types';
 
 type NativeTokenStreamFormProps = {
@@ -30,6 +32,7 @@ export const NativeTokenStreamForm = ({
     'This is a very important request for streaming allowance for some very important thing',
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
+  const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
 
   const handleInitialAmountChange = useCallback(
     ({
@@ -117,6 +120,7 @@ export const NativeTokenStreamForm = ({
       startTime,
       expiry,
       justification,
+      redeemerAddresses,
       isAdjustmentAllowed,
     });
   }, [
@@ -127,6 +131,7 @@ export const NativeTokenStreamForm = ({
     startTime,
     expiry,
     justification,
+    redeemerAddresses,
     isAdjustmentAllowed,
   ]);
 
@@ -192,6 +197,7 @@ export const NativeTokenStreamForm = ({
           onChange={handleExpiryChange}
         />
       </div>
+      <RedeemerAddressesField onChange={setRedeemerAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
         <input
