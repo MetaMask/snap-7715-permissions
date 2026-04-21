@@ -223,11 +223,11 @@ describe('RpcHandler', () => {
       const mockSupportedPermissions: GetSupportedPermissionsResult = {
         'native-token-stream': {
           chainIds: ['0x1', '0xa'],
-          ruleTypes: ['expiry'],
+          ruleTypes: ['expiry', 'redeemer'],
         },
         'erc20-token-stream': {
           chainIds: ['0x1', '0xa'],
-          ruleTypes: ['expiry'],
+          ruleTypes: ['expiry', 'redeemer'],
         },
       };
 

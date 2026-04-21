@@ -1,3 +1,4 @@
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
   createERC20StreamingTerms,
   createValueLteTerms,
@@ -6,6 +7,7 @@ import type { Caveat } from '@metamask/delegation-core';
 
 import type { PopulatedErc20TokenStreamPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
+import { appendRedeemerCaveatIfPresent } from '../../core/redeemerCaveat';
 
 /**
  * ERC-20 token stream permission
@@ -29,14 +31,17 @@ import type { DelegationContracts } from '../../core/chainMetadata';
  * @param options0 - The options object containing the permission and caveat builder.
  * @param options0.permission - The complete ERC20 token stream permission containing stream parameters.
  * @param options0.contracts - The contracts object containing enforcers.
+ * @param options0.rules - Resolved permission request rules (e.g. redeemer).
  * @returns The modified caveat builder with appended ERC20 token stream caveats.
  */
 export async function createPermissionCaveats({
   permission,
   contracts,
+  rules,
 }: {
   permission: PopulatedErc20TokenStreamPermission;
   contracts: DelegationContracts;
+  rules: PermissionRequest['rules'];
 }): Promise<Caveat[]> {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
@@ -63,5 +68,7 @@ export async function createPermissionCaveats({
     args: '0x',
   };
 
-  return [erc20StreamingCaveat, valueLteCaveat];
+  const caveats = [erc20StreamingCaveat, valueLteCaveat];
+  appendRedeemerCaveatIfPresent({ rules, contracts, caveats });
+  return caveats;
 }

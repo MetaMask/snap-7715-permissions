@@ -1,6 +1,7 @@
 import { any, z } from 'zod';
 
 import { extractDescriptorName } from '../utils';
+import { zAddress } from './common';
 
 // Rather than only define permissions by name,
 // Requestors can optionally make this an object and leave room for forward-extensibility.
@@ -43,15 +44,29 @@ export const zRule = z
   })
   .refine(
     (rule) => {
-      // Rules are generally free-form, but expiry is a special case.
       if (extractDescriptorName(rule.type) === 'expiry') {
         return zTimestamp.safeParse(rule.data.timestamp).success;
       }
-
       return true;
     },
     {
       message: 'Expiry timestamp must be a valid positive integer',
+    },
+  )
+  .refine(
+    (rule) => {
+      if (extractDescriptorName(rule.type) === 'redeemer') {
+        return z
+          .object({
+            addresses: z.array(zAddress).min(1),
+          })
+          .safeParse(rule.data).success;
+      }
+      return true;
+    },
+    {
+      message:
+        'Redeemer rule must include a non-empty addresses array of valid Ethereum addresses',
     },
   );
 

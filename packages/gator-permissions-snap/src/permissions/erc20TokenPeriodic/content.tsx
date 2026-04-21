@@ -6,6 +6,7 @@ import {
   periodDurationRule,
   startTimeRule,
   expiryRule,
+  redeemerRule,
 } from './rules';
 import type {
   Erc20TokenPeriodicContext,
@@ -37,7 +38,7 @@ export async function createConfirmationContent({
         })}
         <Divider />
         {renderRules({
-          rules: [startTimeRule, expiryRule],
+          rules: [startTimeRule, expiryRule, redeemerRule],
           context,
           metadata,
         })}

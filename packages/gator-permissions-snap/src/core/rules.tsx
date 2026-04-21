@@ -1,9 +1,12 @@
 import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
+import { Address, Box } from '@metamask/snaps-sdk/jsx';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
+import type { Hex } from '@metamask/utils';
 
 import type { BaseContext, RuleDefinition } from './types';
 import { DateTimePickerField } from '../ui/components/DateTimePickerField';
 import { DropdownField } from '../ui/components/DropdownField';
+import { Field } from '../ui/components/Field';
 import { InputField } from '../ui/components/InputField';
 import type {
   UserEventDispatcher,
@@ -35,6 +38,7 @@ export function renderRule<
   const { label, type, name, isOptional, contentWhenDisabled } = rule;
   const {
     value,
+    addresses,
     error,
     tooltip,
     iconData,
@@ -109,6 +113,26 @@ export function renderRule<
         />
       );
     }
+    case 'addressList': {
+      if (!addresses?.length) {
+        return null;
+      }
+      return (
+        <Field
+          label={t(label)}
+          tooltip={tooltip}
+          iconData={iconData}
+          variant="display"
+          errorMessage={error}
+        >
+          <Box direction="vertical">
+            {addresses.map((addr) => (
+              <Address key={addr} address={addr as Hex} displayName={true} />
+            ))}
+          </Box>
+        </Field>
+      );
+    }
     default: {
       throw new InvalidInputError(`Unknown rule type: ${type as string}`);
     }
@@ -134,8 +158,10 @@ export function renderRules<
   rules: RuleDefinition<TContext, TMetadata>[];
   context: TContext;
   metadata: TMetadata;
-}): (SnapElement | null)[] {
-  return rules.map((rule) => renderRule({ rule, context, metadata }));
+}): SnapElement[] {
+  return rules
+    .map((rule) => renderRule({ rule, context, metadata }))
+    .filter((el): el is SnapElement => el !== null);
 }
 
 /**

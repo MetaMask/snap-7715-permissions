@@ -20,6 +20,7 @@ export type NativeTokenPeriodicMetadata = BaseMetadata & {
     periodDurationError?: string;
     startTimeError?: string;
     expiryError?: string;
+    redeemerError?: string;
   };
 };
 

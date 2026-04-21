@@ -1,7 +1,7 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Section } from '@metamask/snaps-sdk/jsx';
 
-import { expiryRule } from './rules';
+import { expiryRule, redeemerRule } from './rules';
 import type {
   Erc20TokenRevocationContext,
   Erc20TokenRevocationMetadata,
@@ -10,7 +10,7 @@ import { renderRules } from '../../core/rules';
 
 /**
  * Creates UI content for an ERC20 token approval revocation permission.
- * Only expiry is configurable by the user; account selection is provided by the wrapper.
+ * Expiry is configurable by the user; redeemer addresses are read-only from the dapp.
  * @param args - The options object containing the context and metadata.
  * @param args.context - The context containing the permission details.
  * @param args.metadata - The metadata containing the validation errors.
@@ -27,7 +27,7 @@ export async function createConfirmationContent({
     <Box>
       <Section>
         {renderRules({
-          rules: [expiryRule],
+          rules: [expiryRule, redeemerRule],
           context,
           metadata,
         })}

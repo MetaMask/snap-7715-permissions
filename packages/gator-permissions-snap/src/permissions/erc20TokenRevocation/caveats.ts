@@ -1,3 +1,4 @@
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
   createValueLteTerms,
   createAllowedCalldataTerms,
@@ -6,6 +7,7 @@ import type { Caveat } from '@metamask/delegation-core';
 
 import type { PopulatedErc20TokenRevocationPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
+import { appendRedeemerCaveatIfPresent } from '../../core/redeemerCaveat';
 
 /**
  * ERC-20 token revocation permission
@@ -35,13 +37,16 @@ import type { DelegationContracts } from '../../core/chainMetadata';
  * @param args - The options object containing the permission and caveat builder.
  * @param args.permission - The complete ERC20 token revocation permission containing revocation parameters.
  * @param args.contracts - The contracts to use for the caveats.
+ * @param args.rules - Resolved permission request rules (e.g. redeemer).
  * @returns The modified caveat builder with appended ERC20 token revocation caveats.
  */
 export async function createPermissionCaveats({
   contracts,
+  rules,
 }: {
   permission: PopulatedErc20TokenRevocationPermission;
   contracts: DelegationContracts;
+  rules: PermissionRequest['rules'];
 }): Promise<Caveat[]> {
   // keccak256("approve(address,uint256)") - ERC-20 approve function selector
   const approveFunctionSelector = '0x095ea7b3';
@@ -80,5 +85,7 @@ export async function createPermissionCaveats({
     args: '0x',
   };
 
-  return [functionSelectorCaveat, amountCaveat, valueLteCaveat];
+  const caveats = [functionSelectorCaveat, amountCaveat, valueLteCaveat];
+  appendRedeemerCaveatIfPresent({ rules, contracts, caveats });
+  return caveats;
 }

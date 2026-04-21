@@ -569,6 +569,7 @@ export class PermissionRequestLifecycleOrchestrator {
     const caveats = await lifecycleHandlers.createPermissionCaveats({
       permission: populatedPermission,
       contracts,
+      rules: resolvedRequest.rules,
     });
 
     const expiryRule = resolvedRequest.rules?.find(

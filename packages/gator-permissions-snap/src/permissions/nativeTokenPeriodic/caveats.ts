@@ -1,3 +1,4 @@
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
   createExactCalldataTerms,
   createNativeTokenPeriodTransferTerms,
@@ -6,6 +7,7 @@ import type { Caveat } from '@metamask/delegation-core';
 
 import type { PopulatedNativeTokenPeriodicPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
+import { appendRedeemerCaveatIfPresent } from '../../core/redeemerCaveat';
 
 /**
  * Native token periodic permission
@@ -28,14 +30,17 @@ import type { DelegationContracts } from '../../core/chainMetadata';
  * @param options0 - The options object containing the permission and caveat builder.
  * @param options0.permission - The complete native token periodic permission containing periodic parameters.
  * @param options0.contracts - The contracts object containing enforcers.
+ * @param options0.rules - Resolved permission request rules (e.g. redeemer).
  * @returns The modified caveat builder with appended native token periodic caveats.
  */
 export async function createPermissionCaveats({
   permission,
   contracts,
+  rules,
 }: {
   permission: PopulatedNativeTokenPeriodicPermission;
   contracts: DelegationContracts;
+  rules: PermissionRequest['rules'];
 }): Promise<Caveat[]> {
   const { periodAmount, periodDuration, startTime } = permission.data;
 
@@ -59,5 +64,7 @@ export async function createPermissionCaveats({
     args: '0x',
   };
 
-  return [nativeTokenPeriodTransferCaveat, exactCalldataCaveat];
+  const caveats = [nativeTokenPeriodTransferCaveat, exactCalldataCaveat];
+  appendRedeemerCaveatIfPresent({ rules, contracts, caveats });
+  return caveats;
 }

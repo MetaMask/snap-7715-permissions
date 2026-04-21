@@ -1,3 +1,4 @@
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
   createNativeTokenStreamingTerms,
   createExactCalldataTerms,
@@ -6,6 +7,7 @@ import type { Caveat } from '@metamask/delegation-core';
 
 import type { PopulatedNativeTokenStreamPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
+import { appendRedeemerCaveatIfPresent } from '../../core/redeemerCaveat';
 
 /**
  * Native token stream permission
@@ -29,14 +31,17 @@ import type { DelegationContracts } from '../../core/chainMetadata';
  * @param options0 - The options object containing the permission and caveat builder.
  * @param options0.permission - The complete native token stream permission containing stream parameters.
  * @param options0.contracts - The contracts object containing enforcers.
+ * @param options0.rules - Resolved permission request rules (e.g. redeemer).
  * @returns An array of Caveat objects with appended native token stream caveats.
  */
 export async function createPermissionCaveats({
   permission,
   contracts,
+  rules,
 }: {
   permission: PopulatedNativeTokenStreamPermission;
   contracts: DelegationContracts;
+  rules: PermissionRequest['rules'];
 }): Promise<Caveat[]> {
   const { initialAmount, maxAmount, amountPerSecond, startTime } =
     permission.data;
@@ -62,5 +67,7 @@ export async function createPermissionCaveats({
     args: '0x',
   };
 
-  return [nativeTokenStreamingCaveat, exactCalldataCaveat];
+  const caveats = [nativeTokenStreamingCaveat, exactCalldataCaveat];
+  appendRedeemerCaveatIfPresent({ rules, contracts, caveats });
+  return caveats;
 }

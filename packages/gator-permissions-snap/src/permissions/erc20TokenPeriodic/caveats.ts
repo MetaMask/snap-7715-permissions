@@ -1,3 +1,4 @@
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import type { Caveat } from '@metamask/delegation-core';
 import {
   createERC20TokenPeriodTransferTerms,
@@ -6,6 +7,7 @@ import {
 
 import type { PopulatedErc20TokenPeriodicPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
+import { appendRedeemerCaveatIfPresent } from '../../core/redeemerCaveat';
 
 /**
  * ERC-20 token periodic permission
@@ -28,14 +30,17 @@ import type { DelegationContracts } from '../../core/chainMetadata';
  * @param args - The options object containing the permission and caveat builder.
  * @param args.permission - The complete ERC20 token periodic permission containing periodic parameters.
  * @param args.contracts - The contracts to use for the caveats.
+ * @param args.rules - Resolved permission request rules (e.g. redeemer).
  * @returns The modified caveat builder with appended ERC20 token periodic caveats.
  */
 export async function createPermissionCaveats({
   permission,
   contracts,
+  rules,
 }: {
   permission: PopulatedErc20TokenPeriodicPermission;
   contracts: DelegationContracts;
+  rules: PermissionRequest['rules'];
 }): Promise<Caveat[]> {
   const { periodAmount, periodDuration, startTime, tokenAddress } =
     permission.data;
@@ -61,5 +66,7 @@ export async function createPermissionCaveats({
     args: '0x',
   };
 
-  return [erc20PeriodCaveat, valueLteCaveat];
+  const caveats = [erc20PeriodCaveat, valueLteCaveat];
+  appendRedeemerCaveatIfPresent({ rules, contracts, caveats });
+  return caveats;
 }

@@ -21,6 +21,7 @@ export type Erc20TokenPeriodicMetadata = BaseMetadata & {
     periodDurationError?: string;
     startTimeError?: string;
     expiryError?: string;
+    redeemerError?: string;
   };
 };
 

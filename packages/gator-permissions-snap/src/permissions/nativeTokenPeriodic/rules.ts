@@ -1,5 +1,9 @@
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import type {
+  NativeTokenPeriodicContext,
+  NativeTokenPeriodicMetadata,
+} from './types';
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
 import { t } from '../../utils/i18n';
@@ -10,16 +14,13 @@ import {
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
-import type {
-  NativeTokenPeriodicContext,
-  NativeTokenPeriodicMetadata,
-} from './types';
-import { createExpiryRule } from '../rules';
+import { createExpiryRule, createRedeemerRule } from '../rules';
 
 export const PERIOD_AMOUNT_ELEMENT = 'native-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'native-token-periodic-period-type';
 export const START_TIME_ELEMENT = 'native-token-periodic-start-date';
 export const EXPIRY_ELEMENT = 'native-token-periodic-expiry';
+export const REDEEMER_ELEMENT = 'native-token-periodic-redeemer';
 
 export const periodAmountRule: RuleDefinition<
   NativeTokenPeriodicContext,
@@ -119,9 +120,15 @@ export const expiryRule = createExpiryRule<
   NativeTokenPeriodicMetadata
 >({ elementName: EXPIRY_ELEMENT, translate: t });
 
+export const redeemerRule = createRedeemerRule<
+  NativeTokenPeriodicContext,
+  NativeTokenPeriodicMetadata
+>({ elementName: REDEEMER_ELEMENT, translate: t });
+
 export const allRules = [
   periodAmountRule,
   periodDurationRule,
   startTimeRule,
   expiryRule,
+  redeemerRule,
 ];

@@ -14,6 +14,7 @@ import type {
 export type Erc20TokenRevocationMetadata = BaseMetadata & {
   validationErrors: {
     expiryError?: string;
+    redeemerError?: string;
   };
 };
 

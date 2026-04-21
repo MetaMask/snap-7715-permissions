@@ -63,6 +63,10 @@ export type BaseContext = {
    * Omitted or falsey means the normal confirmation content. Set by the permission handler when the user opens the existing-permissions view.
    */
   showExistingPermissions?: boolean | null;
+  /**
+   * Allowed redeemer addresses from the dapp-provided redeemer rule (read-only in the UI).
+   */
+  redeemerAddresses?: string[] | undefined;
 };
 
 export type BaseMetadata = {
@@ -164,6 +168,7 @@ export type LifecycleOrchestrationHandlers<
   createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
+    rules: PermissionRequest['rules'];
   }) => Promise<Caveat[]>;
 
   /**
@@ -191,7 +196,12 @@ export type LifecycleOrchestrationHandlers<
 /**
  * Represents the type of rule input field.
  */
-export type RuleType = 'number' | 'text' | 'dropdown' | 'datetime';
+export type RuleType =
+  | 'number'
+  | 'text'
+  | 'dropdown'
+  | 'datetime'
+  | 'addressList';
 
 export type IconData = {
   iconDataBase64: string;
@@ -200,6 +210,8 @@ export type IconData = {
 
 export type RuleData = {
   value: string | undefined;
+  /** For addressList rules: redeemer addresses to display. */
+  addresses?: string[] | undefined;
   isVisible: boolean;
   tooltip?: string | undefined;
   iconData?: IconData | undefined;
@@ -347,6 +359,7 @@ export type PermissionHandlerDependencies<
   createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
+    rules: PermissionRequest['rules'];
   }) => Promise<Caveat[]>;
 };
 

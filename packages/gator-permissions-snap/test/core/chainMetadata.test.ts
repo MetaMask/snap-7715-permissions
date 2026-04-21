@@ -33,6 +33,7 @@ describe('chainMetadata', () => {
         exactCalldataEnforcer: expect.any(String),
         nonceEnforcer: expect.any(String),
         allowedCalldataEnforcer: expect.any(String),
+        redeemerEnforcer: expect.any(String),
       },
       name: expect.any(String),
       explorerUrl: expect.any(String),
@@ -100,6 +101,7 @@ describe('chainMetadata', () => {
           'nonceEnforcer',
           'delegationManager',
           'allowedCalldataEnforcer',
+          'redeemerEnforcer',
         ];
 
         const metadata = getChainMetadata({ chainId: 11155111 }); // Sepolia

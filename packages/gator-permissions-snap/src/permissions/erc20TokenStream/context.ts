@@ -30,7 +30,9 @@ import {
 } from '../contextValidation';
 import {
   applyExpiryRule,
+  applyRedeemerRule,
   deriveExposureForStreamingPermission,
+  getRedeemerAddressesFromRules,
 } from '../rules';
 
 export const DEFAULT_MAX_AMOUNT =
@@ -59,7 +61,8 @@ export async function applyContext({
     tokenMetadata: { decimals },
   } = context;
 
-  const { rules } = applyExpiryRule(context, originalRequest);
+  const expiryMerged = applyExpiryRule(context, originalRequest);
+  const { rules } = applyRedeemerRule(originalRequest, expiryMerged);
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
@@ -171,6 +174,10 @@ export async function buildContext({
       }
     : undefined;
 
+  const redeemerAddresses = getRedeemerAddressesFromRules(
+    permissionRequest.rules,
+  );
+
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,
     allowNull: true,
@@ -211,6 +218,7 @@ export async function buildContext({
 
   return {
     expiry,
+    ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,

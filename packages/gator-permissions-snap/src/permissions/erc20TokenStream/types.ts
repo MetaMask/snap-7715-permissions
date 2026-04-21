@@ -25,6 +25,7 @@ export type Erc20TokenStreamMetadata = BaseMetadata & {
     amountPerPeriodError?: string;
     startTimeError?: string;
     expiryError?: string;
+    redeemerError?: string;
   };
 };
 

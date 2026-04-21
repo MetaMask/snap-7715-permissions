@@ -43,6 +43,7 @@ describe('erc20TokenStream:caveats', () => {
       const caveats = await createPermissionCaveats({
         permission: mockPermission,
         contracts,
+        rules: [],
       });
       const initialAmountHex = initialAmount.slice(2).padStart(64, '0');
       const maxAmountHex = maxAmount.slice(2).padStart(64, '0');
