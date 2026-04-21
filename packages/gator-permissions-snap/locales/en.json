@@ -68,7 +68,7 @@
       "message": "This permission is ongoing. We recommend setting an expiration date."
     },
     "redeemerLabel": {
-      "message": "Allowed redeemers"
+      "message": "Redeemers"
     },
     "redeemerTooltip": {
       "message": "Only these addresses may redeem this permission. Set by the site requesting access."

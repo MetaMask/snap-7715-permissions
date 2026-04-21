@@ -1,7 +1,7 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Section } from '@metamask/snaps-sdk/jsx';
 
-import { expiryRule, redeemerRule } from './rules';
+import { expiryRule } from './rules';
 import type {
   Erc20TokenRevocationContext,
   Erc20TokenRevocationMetadata,
@@ -27,7 +27,7 @@ export async function createConfirmationContent({
     <Box>
       <Section>
         {renderRules({
-          rules: [expiryRule, redeemerRule],
+          rules: [expiryRule],
           context,
           metadata,
         })}

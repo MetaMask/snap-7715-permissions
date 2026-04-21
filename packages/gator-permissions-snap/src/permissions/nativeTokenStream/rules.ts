@@ -10,7 +10,7 @@ import {
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
-import { createExpiryRule, createRedeemerRule } from '../rules';
+import { createExpiryRule } from '../rules';
 
 export const INITIAL_AMOUNT_ELEMENT = 'native-token-stream-initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'native-token-stream-max-amount';
@@ -19,7 +19,6 @@ export const AMOUNT_PER_PERIOD_ELEMENT =
   'native-token-stream-amount-per-period';
 export const TIME_PERIOD_ELEMENT = 'native-token-stream-time-period';
 export const EXPIRY_ELEMENT = 'native-token-stream-expiry';
-export const REDEEMER_ELEMENT = 'native-token-stream-redeemer';
 
 type NativeTokenStreamRuleDefinition = RuleDefinition<
   NativeTokenStreamContext,
@@ -137,17 +136,11 @@ export const expiryRule = createExpiryRule<
   NativeTokenStreamMetadata
 >({ elementName: EXPIRY_ELEMENT, translate: t });
 
-export const redeemerRule = createRedeemerRule<
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata
->({ elementName: REDEEMER_ELEMENT, translate: t });
-
 export const allRules = [
   initialAmountRule,
   maxAmountRule,
   startTimeRule,
   expiryRule,
-  redeemerRule,
   streamAmountPerPeriodRule,
   streamPeriodRule,
 ];

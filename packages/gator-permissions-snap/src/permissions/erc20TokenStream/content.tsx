@@ -6,7 +6,6 @@ import {
   maxAmountRule,
   startTimeRule,
   expiryRule,
-  redeemerRule,
   streamAmountPerPeriodRule,
   streamPeriodRule,
 } from './rules';
@@ -54,7 +53,7 @@ export async function createConfirmationContent({
         })}
         <Divider />
         {renderRules({
-          rules: [startTimeRule, expiryRule, redeemerRule],
+          rules: [startTimeRule, expiryRule],
           context,
           metadata,
         })}
