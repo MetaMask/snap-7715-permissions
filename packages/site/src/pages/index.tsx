@@ -24,16 +24,11 @@ import {
   ERC20TokenStreamForm,
   NativeTokenPeriodicForm,
   ERC20TokenPeriodicForm,
+  NativeTokenAllowanceForm,
+  ERC20TokenAllowanceForm,
   ERC20TokenRevocationForm,
 } from '../components/permissions';
-import type {
-  PermissionRequest,
-  NativeTokenStreamPermissionRequest,
-  ERC20TokenStreamPermissionRequest,
-  NativeTokenPeriodicPermissionRequest,
-  ERC20TokenPeriodicPermissionRequest,
-  ERC20TokenRevocationPermissionRequest,
-} from '../components/permissions/types';
+import type { PermissionRequest } from '../components/permissions/types';
 import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
 import {
   useMetaMask,
@@ -361,19 +356,9 @@ const Index = () => {
     }
   };
 
-  const onFormChange = useCallback(
-    (
-      request:
-        | ERC20TokenPeriodicPermissionRequest
-        | ERC20TokenStreamPermissionRequest
-        | NativeTokenPeriodicPermissionRequest
-        | NativeTokenStreamPermissionRequest
-        | ERC20TokenRevocationPermissionRequest,
-    ) => {
-      setPermissionRequest(request);
-    },
-    [],
-  );
+  const onFormChange = useCallback((request: PermissionRequest) => {
+    setPermissionRequest(request);
+  }, []);
 
   return (
     <Container>
@@ -505,8 +490,14 @@ const Index = () => {
                   <option value="native-token-periodic">
                     Native Token Periodic
                   </option>
+                  <option value="native-token-allowance">
+                    Native Token Allowance
+                  </option>
                   <option value="erc20-token-periodic">
                     ERC20 Token Periodic
+                  </option>
+                  <option value="erc20-token-allowance">
+                    ERC20 Token Allowance
                   </option>
                   <option value="erc20-token-revocation">
                     ERC20 Token Revocation
@@ -528,6 +519,14 @@ const Index = () => {
 
               {permissionType === 'erc20-token-periodic' && (
                 <ERC20TokenPeriodicForm onChange={onFormChange} />
+              )}
+
+              {permissionType === 'native-token-allowance' && (
+                <NativeTokenAllowanceForm onChange={onFormChange} />
+              )}
+
+              {permissionType === 'erc20-token-allowance' && (
+                <ERC20TokenAllowanceForm onChange={onFormChange} />
               )}
 
               {permissionType === 'erc20-token-revocation' && (

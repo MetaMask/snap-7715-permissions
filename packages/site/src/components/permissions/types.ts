@@ -37,6 +37,17 @@ export type ERC20TokenPeriodicPermissionRequest = BasePermissionRequest & {
   tokenAddress: Hex;
 };
 
+export type NativeTokenAllowancePermissionRequest = BasePermissionRequest & {
+  type: 'native-token-allowance';
+  allowanceAmount: Hex;
+};
+
+export type ERC20TokenAllowancePermissionRequest = BasePermissionRequest & {
+  type: 'erc20-token-allowance';
+  allowanceAmount: Hex;
+  tokenAddress: Hex;
+};
+
 export type ERC20TokenRevocationPermissionRequest = BasePermissionRequest & {
   type: 'erc20-token-revocation';
 };
@@ -44,6 +55,8 @@ export type ERC20TokenRevocationPermissionRequest = BasePermissionRequest & {
 export type PermissionRequest =
   | NativeTokenStreamPermissionRequest
   | NativeTokenPeriodicPermissionRequest
+  | NativeTokenAllowancePermissionRequest
   | ERC20TokenPeriodicPermissionRequest
+  | ERC20TokenAllowancePermissionRequest
   | ERC20TokenRevocationPermissionRequest
   | ERC20TokenStreamPermissionRequest;

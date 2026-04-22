@@ -13,12 +13,20 @@ export const DEFAULT_GATOR_PERMISSION_TO_OFFER: PermissionOffer[] = [
     proposedName: 'Native Token Periodic Transfer',
   },
   {
+    type: 'native-token-allowance',
+    proposedName: 'Native Token Allowance',
+  },
+  {
     type: 'erc20-token-stream',
     proposedName: 'ERC20 Token Stream',
   },
   {
     type: 'erc20-token-periodic',
     proposedName: 'ERC20 Token Periodic Transfer',
+  },
+  {
+    type: 'erc20-token-allowance',
+    proposedName: 'ERC20 Token Allowance',
   },
   {
     type: 'erc20-token-revocation',

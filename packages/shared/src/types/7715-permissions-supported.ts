@@ -7,8 +7,10 @@ import { zHexStr } from './common';
  * This is the single source of truth for which rules can be applied to each permission.
  */
 export const SUPPORTED_RULE_TYPES = {
+  'native-token-allowance': ['expiry', 'redeemer'],
   'native-token-stream': ['expiry', 'redeemer'],
   'native-token-periodic': ['expiry', 'redeemer'],
+  'erc20-token-allowance': ['expiry', 'redeemer'],
   'erc20-token-stream': ['expiry', 'redeemer'],
   'erc20-token-periodic': ['expiry', 'redeemer'],
   'erc20-token-revocation': ['expiry', 'redeemer'],

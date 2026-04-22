@@ -128,6 +128,29 @@ describe('formatPermissionWithTokenMetadata', () => {
     expect(mockTokenMetadataService.getTokenMetadata).not.toHaveBeenCalled();
   });
 
+  it('formats allowanceAmount using token metadata', async () => {
+    const permission = basePermission({
+      permission: {
+        type: 'erc20-token-allowance',
+        data: {
+          allowanceAmount: '0x38d7ea4c68000',
+          tokenAddress: '0x0000000000000000000000000000000000000001',
+          justification: 'j',
+        },
+        isAdjustmentAllowed: true,
+      },
+    });
+
+    const result = await formatPermissionWithTokenMetadata(
+      permission,
+      mockTokenMetadataService as unknown as TokenMetadataService,
+    );
+
+    expect(result.permission.data).toMatchObject({
+      allowanceAmount: expect.stringContaining('ETH') as unknown,
+    });
+  });
+
   it('formats maxAmount using token metadata', async () => {
     const permission = basePermission({
       permission: {
