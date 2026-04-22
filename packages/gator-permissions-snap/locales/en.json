@@ -55,6 +55,9 @@
     "startTimeTooltip": {
       "message": "The time at which the first period begins"
     },
+    "allowanceStartTimeTooltip": {
+      "message": "The earliest time at which the allowance can be used (UTC)"
+    },
     "streamStartTimeTooltip": {
       "message": "The start time of the stream"
     },
@@ -105,6 +108,9 @@
     },
     "amountTooltip": {
       "message": "The amount of tokens granted during each period"
+    },
+    "allowanceAmountTooltip": {
+      "message": "The amount of tokens granted with this permission"
     },
     "periodDurationLabel": {
       "message": "Frequency"
@@ -246,6 +252,12 @@
     },
     "introManageTokenApprovalsDescription": {
       "message": "Token revocation allows sites to revoke token approvals on your behalf."
+    },
+    "introAllowanceTitle": {
+      "message": "Token allowance request"
+    },
+    "introTokenAllowanceDescription": {
+      "message": "Token allowances let a site spend from your wallet up to a single total you set, rather than a recurring schedule like a subscription."
     },
     "introPermissionInControlDescription": {
       "message": "You can revoke this permission at any time in advanced permissions."

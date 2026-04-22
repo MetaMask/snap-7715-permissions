@@ -3,9 +3,11 @@ import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { AccountController } from './accountController';
+import { erc20TokenAllowancePermissionDefinition } from '../permissions/erc20TokenAllowance';
 import { erc20TokenPeriodicPermissionDefinition } from '../permissions/erc20TokenPeriodic';
 import { erc20TokenRevocationPermissionDefinition } from '../permissions/erc20TokenRevocation';
 import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
+import { nativeTokenAllowancePermissionDefinition } from '../permissions/nativeTokenAllowance';
 import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
 import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
@@ -104,9 +106,19 @@ export class PermissionHandlerFactory {
           nativeTokenPeriodicPermissionDefinition,
         );
         break;
+      case 'native-token-allowance':
+        handler = createPermissionHandler(
+          nativeTokenAllowancePermissionDefinition,
+        );
+        break;
       case 'erc20-token-periodic':
         handler = createPermissionHandler(
           erc20TokenPeriodicPermissionDefinition,
+        );
+        break;
+      case 'erc20-token-allowance':
+        handler = createPermissionHandler(
+          erc20TokenAllowancePermissionDefinition,
         );
         break;
       case 'erc20-token-revocation':

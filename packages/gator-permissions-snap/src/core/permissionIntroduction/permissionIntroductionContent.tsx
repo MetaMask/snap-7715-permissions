@@ -91,6 +91,19 @@ const revocationPage1Content: PermissionIntroductionPageConfig = {
   ],
 };
 
+const allowancePage1Content: PermissionIntroductionPageConfig = {
+  headerImageSvg: permissionRequestImage,
+  title: 'introAllowanceTitle',
+  bulletPoints: [
+    {
+      description: 'introTokenAllowanceDescription',
+    },
+    {
+      description: 'introPermissionInControlDescription',
+    },
+  ],
+};
+
 /**
  * Map of permission types to their introduction configurations.
  * Note: Keys must match the permission type descriptor names (kebab-case).
@@ -103,6 +116,10 @@ export const permissionIntroductionConfigs: Record<
     page1: subscriptionPage1Content,
     page2: fixedPage2Content,
   },
+  'erc20-token-allowance': {
+    page1: allowancePage1Content,
+    page2: fixedPage2Content,
+  },
   'erc20-token-revocation': {
     page1: revocationPage1Content,
     page2: fixedPage2Content,
@@ -113,6 +130,10 @@ export const permissionIntroductionConfigs: Record<
   },
   'native-token-periodic': {
     page1: subscriptionPage1Content,
+    page2: fixedPage2Content,
+  },
+  'native-token-allowance': {
+    page1: allowancePage1Content,
     page2: fixedPage2Content,
   },
   'native-token-stream': {

@@ -139,6 +139,39 @@ function extractPermissionDetails(
           value: String(justification),
         };
       }
+    } else if (
+      permissionType === 'erc20-token-allowance' ||
+      permissionType === 'native-token-allowance'
+    ) {
+      const { allowanceAmount, startTime, justification } = permissionData;
+
+      if (allowanceAmount !== undefined && allowanceAmount !== null) {
+        const amountLabel = t('amountLabel');
+        details.allowanceAmount = {
+          label: amountLabel,
+          value: String(allowanceAmount),
+        };
+      }
+
+      if (startTime !== undefined && startTime !== null) {
+        const startTimeLabel = t('startTimeLabel');
+        const date = new Date(Number(startTime) * 1000);
+        const startTimeValue = date.toLocaleString(undefined, {
+          timeZone: 'UTC',
+        });
+        details.startTime = {
+          label: startTimeLabel,
+          value: startTimeValue,
+        };
+      }
+
+      if (justification !== undefined && justification !== null) {
+        const justificationLabel = t('justificationLabel');
+        details.justification = {
+          label: justificationLabel,
+          value: String(justification),
+        };
+      }
     }
     // For stream-type permissions
     else if (
@@ -235,7 +268,9 @@ export async function formatPermissionWithTokenMetadata(
 
   // Check if this permission has token amount fields that need formatting
   const hasTokenAmountFields =
-    'maxAmount' in permissionData || 'periodAmount' in permissionData;
+    'maxAmount' in permissionData ||
+    'periodAmount' in permissionData ||
+    'allowanceAmount' in permissionData;
 
   if (!hasTokenAmountFields) {
     return permission;
@@ -285,6 +320,14 @@ export async function formatPermissionWithTokenMetadata(
     if ('periodAmount' in permissionData) {
       formattedData.periodAmount = formatTokenAmountWithMetadata(
         permissionData.periodAmount as Hex | null | undefined,
+        decimals,
+        symbol,
+      );
+    }
+
+    if ('allowanceAmount' in permissionData) {
+      formattedData.allowanceAmount = formatTokenAmountWithMetadata(
+        permissionData.allowanceAmount as Hex | null | undefined,
         decimals,
         symbol,
       );

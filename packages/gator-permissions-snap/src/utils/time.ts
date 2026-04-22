@@ -99,13 +99,15 @@ export const getClosestTimePeriod = (seconds: number): TimePeriod => {
   return closestPeriod;
 };
 
-const TEN_YEARS = 10 * 365 * 24 * 60 * 60; // 10 years in seconds
+/** Maximum period / allowance window duration in seconds (10 years). */
+export const MAX_PERIOD_DURATION_SECONDS = 10 * 365 * 24 * 60 * 60;
+
 /**
  * period duration in seconds, mapped to closest TransferWindow enum value
  */
 export const zPeriodDuration = zTimestamp
-  .max(TEN_YEARS, {
-    message: `Period duration must be less than or equal to ${TEN_YEARS} seconds (10 years).`,
+  .max(MAX_PERIOD_DURATION_SECONDS, {
+    message: `Period duration must be less than or equal to ${MAX_PERIOD_DURATION_SECONDS} seconds (10 years).`,
   })
   .transform((val) => {
     const periodType = getClosestTimePeriod(val);

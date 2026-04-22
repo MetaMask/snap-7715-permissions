@@ -578,12 +578,20 @@ describe('RpcHandler', () => {
           type: 'native-token-periodic',
         },
         {
+          proposedName: 'Native Token Allowance',
+          type: 'native-token-allowance',
+        },
+        {
           proposedName: 'ERC20 Token Stream',
           type: 'erc20-token-stream',
         },
         {
           proposedName: 'ERC20 Token Periodic Transfer',
           type: 'erc20-token-periodic',
+        },
+        {
+          proposedName: 'ERC20 Token Allowance',
+          type: 'erc20-token-allowance',
         },
         {
           proposedName: 'ERC20 Token Revocation',
@@ -924,11 +932,13 @@ describe('RpcHandler', () => {
     it('should return all supported permission types with ruleTypes', async () => {
       const result = await handler.getSupportedPermissions();
 
-      // Should return an object with all 5 permission types
+      // Should return an object with all supported permission types
       expect(result).toHaveProperty('native-token-stream');
       expect(result).toHaveProperty('native-token-periodic');
+      expect(result).toHaveProperty('native-token-allowance');
       expect(result).toHaveProperty('erc20-token-stream');
       expect(result).toHaveProperty('erc20-token-periodic');
+      expect(result).toHaveProperty('erc20-token-allowance');
       expect(result).toHaveProperty('erc20-token-revocation');
 
       // Each permission type should expose ruleTypes.
@@ -950,8 +960,14 @@ describe('RpcHandler', () => {
       expect(typedResult['native-token-periodic']?.ruleTypes).toContain(
         'expiry',
       );
+      expect(typedResult['native-token-allowance']?.ruleTypes).toContain(
+        'expiry',
+      );
       expect(typedResult['erc20-token-stream']?.ruleTypes).toContain('expiry');
       expect(typedResult['erc20-token-periodic']?.ruleTypes).toContain(
+        'expiry',
+      );
+      expect(typedResult['erc20-token-allowance']?.ruleTypes).toContain(
         'expiry',
       );
       expect(typedResult['erc20-token-revocation']?.ruleTypes).toContain(
