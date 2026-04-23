@@ -18,8 +18,6 @@ export const RedeemerField = ({
     return null;
   }
 
-  console.log('yyyyyyy', addresses);
-
   return (
     <Field label={label} tooltip={tooltip} variant="display">
       <Box direction="vertical">
