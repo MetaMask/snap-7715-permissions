@@ -2960,14 +2960,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-abis@npm:^0.11.0":
-  version: 0.11.0
-  resolution: "@metamask/delegation-abis@npm:0.11.0"
-  checksum: 10/d76ebdd7e74ad453d0e83dd7e8bd01148587d63848e95e5ceaedcae871002011ea3a52f6bef25dcca007f8970eff0de182e881a709d34f032e053086a9809355
+"@metamask/delegation-abis@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@metamask/delegation-abis@npm:1.0.0"
+  checksum: 10/31b58d3080710cd48fbf471a1cb94fc4cae705f2472d392a3daaa7c73603ad6d0b1c9068e3b71b10f9c39bfe19c1fad90ecf3115e20a00b2d39f5c7789c5b932
   languageName: node
   linkType: hard
 
-"@metamask/delegation-core@npm:0.3.0, @metamask/delegation-core@npm:^0.3.0":
+"@metamask/delegation-core@npm:0.3.0":
   version: 0.3.0
   resolution: "@metamask/delegation-core@npm:0.3.0"
   dependencies:
@@ -2978,10 +2978,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-deployments@npm:^0.16.0":
-  version: 0.16.0
-  resolution: "@metamask/delegation-deployments@npm:0.16.0"
-  checksum: 10/94d2917a572280839b95e30402923122c7f6f109d13b101c4c818c56ace6009f86f874d0caf01677198804311f42e1639bd3398162b3c30d180223043e75cf30
+"@metamask/delegation-core@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@metamask/delegation-core@npm:1.1.0"
+  dependencies:
+    "@metamask/abi-utils": "npm:^3.0.0"
+    "@metamask/utils": "npm:^11.4.0"
+    "@noble/hashes": "npm:^1.8.0"
+  checksum: 10/672f9e2e2b4e8c312f2cd2ff166bbc508fbdb6e141fe92e678abc9993b9ccbdd17db711477a9b97b6ce3919fa6d51d759c16f6c6fda3f89cb95e303b8aa76f7d
+  languageName: node
+  linkType: hard
+
+"@metamask/delegation-deployments@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@metamask/delegation-deployments@npm:1.2.0"
+  checksum: 10/f9cd63d05dd9e9627696fd9fea9c32937839fab5e5f4a6ee15a4d32887ec58069aec1626608cfa8b4b5d39f75070c0329347e72d968fa9e3902932da8365d5c1
   languageName: node
   linkType: hard
 
@@ -3375,19 +3386,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/smart-accounts-kit@npm:0.4.0-beta.0":
-  version: 0.4.0-beta.0
-  resolution: "@metamask/smart-accounts-kit@npm:0.4.0-beta.0"
+"@metamask/smart-accounts-kit@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@metamask/smart-accounts-kit@npm:1.3.0"
   dependencies:
     "@metamask/7715-permission-types": "npm:^0.5.0"
-    "@metamask/delegation-abis": "npm:^0.11.0"
-    "@metamask/delegation-core": "npm:^0.3.0"
-    "@metamask/delegation-deployments": "npm:^0.16.0"
-    buffer: "npm:^6.0.3"
-    webauthn-p256: "npm:^0.0.10"
+    "@metamask/delegation-abis": "npm:^1.0.0"
+    "@metamask/delegation-core": "npm:^1.1.0"
+    "@metamask/delegation-deployments": "npm:^1.2.0"
+    openapi-fetch: "npm:^0.13.5"
+    ox: "npm:0.8.1"
   peerDependencies:
     viem: ^2.31.4
-  checksum: 10/f512b87059bbe136135095132329726de7cdbcd6125d5af43c2ed0184ab472a07539d8c37066e05a4f191dd8496364c6df91a236cc00395777fa9131dab49bc9
+  checksum: 10/45da6ddafcdef5c3c0247efa1d2a431349b6bd2684b6b92cc69c3f38eab5816385cbb197c52093811b588b80f4b71c57517861c76cd906c000906d814514430d
   languageName: node
   linkType: hard
 
@@ -3941,7 +3952,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:^1.2.0, @noble/curves@npm:^1.4.0, @noble/curves@npm:^1.8.1, @noble/curves@npm:^1.9.1, @noble/curves@npm:~1.9.0":
+"@noble/curves@npm:^1.2.0, @noble/curves@npm:^1.8.1, @noble/curves@npm:^1.9.1, @noble/curves@npm:~1.9.0":
   version: 1.9.4
   resolution: "@noble/curves@npm:1.9.4"
   dependencies:
@@ -11528,6 +11539,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"openapi-fetch@npm:^0.13.5":
+  version: 0.13.8
+  resolution: "openapi-fetch@npm:0.13.8"
+  dependencies:
+    openapi-typescript-helpers: "npm:^0.0.15"
+  checksum: 10/fed630452ac2d6abc680402651d848b7377b651164ca2be61a8c5e1fc89e41b09c928ba9dc92cf7c7ad2d400b3fbe5af380165303f293501dc08cefa4c0f92fd
+  languageName: node
+  linkType: hard
+
+"openapi-typescript-helpers@npm:^0.0.15":
+  version: 0.0.15
+  resolution: "openapi-typescript-helpers@npm:0.0.15"
+  checksum: 10/63f8f0b8464aed3e5c6910428bd14839bd5c1dd6ddf841bcea9d5f536a6e03e942a028202920da1a8b1ed9e4304c6fca14943d01a8adff2942d1254a229b8c70
+  languageName: node
+  linkType: hard
+
 "opener@npm:^1.5.2":
   version: 1.5.2
   resolution: "opener@npm:1.5.2"
@@ -13180,7 +13207,7 @@ __metadata:
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
     "@metamask/eslint-config-typescript": "npm:15.0.0"
     "@metamask/providers": "npm:22.1.0"
-    "@metamask/smart-accounts-kit": "npm:0.4.0-beta.0"
+    "@metamask/smart-accounts-kit": "npm:1.3.0"
     "@metamask/utils": "npm:11.5.0"
     "@types/jest": "npm:27.5.2"
     "@types/react": "npm:19.2.3"
@@ -14681,16 +14708,6 @@ __metadata:
   dependencies:
     defaults: "npm:^1.0.3"
   checksum: 10/182ebac8ca0b96845fae6ef44afd4619df6987fe5cf552fdee8396d3daa1fb9b8ec5c6c69855acb7b3c1231571393bd1f0a4cdc4028d421575348f64bb0a8817
-  languageName: node
-  linkType: hard
-
-"webauthn-p256@npm:^0.0.10":
-  version: 0.0.10
-  resolution: "webauthn-p256@npm:0.0.10"
-  dependencies:
-    "@noble/curves": "npm:^1.4.0"
-    "@noble/hashes": "npm:^1.4.0"
-  checksum: 10/dde2b6313b6a0f20996f7ee90181258fc7685bfff401df7d904578da75b374f25d5b9c1189cd2fcec30625b1f276b393188d156d49783f0611623cd713bb5b09
   languageName: node
   linkType: hard
 

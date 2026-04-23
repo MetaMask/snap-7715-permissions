@@ -1,5 +1,5 @@
 import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
-import type { MetaMaskExtensionClient } from '@metamask/smart-accounts-kit/actions';
+import type { RequestExecutionPermissionsParameters } from '@metamask/smart-accounts-kit/actions';
 import { useCallback, useMemo, useState } from 'react';
 import {
   createClient,
@@ -54,7 +54,6 @@ import {
   ResponseContainer,
   CopyButton,
 } from '../styles';
-import { formatExecutionPermissionRequestForWallet } from '../utils/formatExecutionPermissionRequestForWallet';
 
 const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
 
@@ -253,17 +252,17 @@ const Index = () => {
       throw new Error('Wallet client not ready');
     }
 
-    const permissionRequestParam = formatExecutionPermissionRequestForWallet({
+    const permissionRequestParam: RequestExecutionPermissionsParameters[0] = {
       chainId,
       to: delegateAccount.address,
       expiry,
-      isAdjustmentAllowed,
-      redeemerAddresses,
+      redeemer: redeemerAddresses,
       permission: {
         type,
-        data: permissionData as Record<string, unknown>,
-      },
-    });
+        isAdjustmentAllowed,
+        data: permissionData,
+      } as RequestExecutionPermissionsParameters[0]['permission'],
+    };
 
     // Generate a unique identifier for this permission request
     const requestId = `${type}-${Date.now()}-${Math.random()}`;
@@ -276,15 +275,9 @@ const Index = () => {
     setPermissionResponseError(null);
 
     try {
-      const response = await (
-        metaMaskClient as MetaMaskExtensionClient
-      ).request(
-        {
-          method: 'wallet_requestExecutionPermissions',
-          params: [permissionRequestParam],
-        },
-        { retryCount: 0 },
-      );
+      const response = await metaMaskClient.requestExecutionPermissions([
+        permissionRequestParam,
+      ]);
       setPermissionResponse(response);
     } catch (error) {
       setPermissionResponse(null);
