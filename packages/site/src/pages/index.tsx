@@ -55,6 +55,13 @@ import {
   CopyButton,
 } from '../styles';
 
+const stringifyWithBigInt = (value: unknown): string =>
+  JSON.stringify(
+    value,
+    (_, v) => (typeof v === 'bigint' ? v.toString() : v),
+    2,
+  );
+
 const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
 
 const ALL_CHAINS = [...Object.values(chains)];
@@ -295,7 +302,7 @@ const Index = () => {
   const handleCopyToClipboard = () => {
     if (permissionResponse) {
       navigator.clipboard
-        .writeText(JSON.stringify(permissionResponse, null, 2))
+        .writeText(stringifyWithBigInt(permissionResponse))
         .then(() => {
           setIsCopied(true);
           setTimeout(() => setIsCopied(false), 2000);
@@ -329,7 +336,7 @@ const Index = () => {
   const handleCopySupportedToClipboard = () => {
     if (supportedPermissionsResponse) {
       navigator.clipboard
-        .writeText(JSON.stringify(supportedPermissionsResponse, null, 2))
+        .writeText(stringifyWithBigInt(supportedPermissionsResponse))
         .then(() => {
           setSupportedIsCopied(true);
           setTimeout(() => setSupportedIsCopied(false), 2000);
@@ -343,7 +350,7 @@ const Index = () => {
   const handleCopyGrantedToClipboard = () => {
     if (grantedPermissionsResponse) {
       navigator.clipboard
-        .writeText(JSON.stringify(grantedPermissionsResponse, null, 2))
+        .writeText(stringifyWithBigInt(grantedPermissionsResponse))
         .then(() => {
           setGrantedIsCopied(true);
           setTimeout(() => setGrantedIsCopied(false), 2000);
@@ -389,14 +396,7 @@ const Index = () => {
               <div style={{ marginTop: '1rem' }}>
                 <ResponseContainer>
                   <Title>User operation receipt</Title>
-                  <pre>
-                    {JSON.stringify(
-                      receipt,
-                      (_key, val) =>
-                        typeof val === 'bigint' ? val.toString() : val,
-                      2,
-                    )}
-                  </pre>
+                  <pre>{stringifyWithBigInt(receipt)}</pre>
                 </ResponseContainer>
               </div>
             )}
@@ -458,7 +458,7 @@ const Index = () => {
                 >
                   {isCopied ? '✅' : '📝'}
                 </CopyButton>
-                <pre>{JSON.stringify(permissionResponse, null, 2)}</pre>
+                <pre>{stringifyWithBigInt(permissionResponse)}</pre>
               </ResponseContainer>
             )}
             <StyledForm>
@@ -570,9 +570,7 @@ const Index = () => {
                 >
                   {supportedIsCopied ? '✅' : '📝'}
                 </CopyButton>
-                <pre>
-                  {JSON.stringify(supportedPermissionsResponse, null, 2)}
-                </pre>
+                <pre>{stringifyWithBigInt(supportedPermissionsResponse)}</pre>
               </ResponseContainer>
             )}
             {grantedPermissionsResponse && (
@@ -584,7 +582,7 @@ const Index = () => {
                 >
                   {grantedIsCopied ? '✅' : '📝'}
                 </CopyButton>
-                <pre>{JSON.stringify(grantedPermissionsResponse, null, 2)}</pre>
+                <pre>{stringifyWithBigInt(grantedPermissionsResponse)}</pre>
               </ResponseContainer>
             )}
           </Box>
