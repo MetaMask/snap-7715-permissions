@@ -256,7 +256,7 @@ const Index = () => {
       chainId,
       to: delegateAccount.address,
       expiry,
-      redeemer: redeemerAddresses,
+      redeemer: (redeemerAddresses?.length ?? 0) > 0 ? redeemerAddresses : null,
       permission: {
         type,
         isAdjustmentAllowed,
