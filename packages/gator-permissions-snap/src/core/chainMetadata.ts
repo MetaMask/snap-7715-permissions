@@ -35,7 +35,7 @@ const contracts: DelegationContracts = {
   exactCalldataEnforcer: '0x99F2e9bF15ce5eC84685604836F71aB835DBBdED',
   nonceEnforcer: '0xDE4f2FAC4B3D87A1d9953Ca5FC09FCa7F366254f',
   allowedCalldataEnforcer: '0xc2b0d624c1c4319760C96503BA27C347F3260f55',
-  redeemerEnforcer: '0xe144b0b2618071b4e56f746313528a669c7e65c5',
+  redeemerEnforcer: '0xE144b0b2618071B4E56f746313528a669c7E65c5',
 };
 
 // derived from https://chainid.network/chains.json
