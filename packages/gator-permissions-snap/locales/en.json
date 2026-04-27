@@ -71,7 +71,7 @@
       "message": "Redeemers"
     },
     "redeemerTooltip": {
-      "message": "Only these addresses may redeem this permission. Set by the site requesting access."
+      "message": "Only these addresses may redeem this permission."
     },
     "streamAmountLabel": {
       "message": "Stream amount"

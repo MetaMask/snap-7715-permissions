@@ -14,12 +14,13 @@ import {
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
-import { createExpiryRule } from '../rules';
+import { createExpiryRule, createRedeemerRule } from '../rules';
 
 export const PERIOD_AMOUNT_ELEMENT = 'native-token-periodic-period-amount';
 export const PERIOD_TYPE_ELEMENT = 'native-token-periodic-period-type';
 export const START_TIME_ELEMENT = 'native-token-periodic-start-date';
 export const EXPIRY_ELEMENT = 'native-token-periodic-expiry';
+export const REDEEMER_ELEMENT = 'native-token-periodic-redeemer';
 
 export const periodAmountRule: RuleDefinition<
   NativeTokenPeriodicContext,
@@ -119,9 +120,18 @@ export const expiryRule = createExpiryRule<
   NativeTokenPeriodicMetadata
 >({ elementName: EXPIRY_ELEMENT, translate: t });
 
+export const redeemerRule = createRedeemerRule<
+  NativeTokenPeriodicContext,
+  NativeTokenPeriodicMetadata
+>({
+  elementName: REDEEMER_ELEMENT,
+  translate: t,
+});
+
 export const allRules = [
   periodAmountRule,
   periodDurationRule,
   startTimeRule,
   expiryRule,
+  redeemerRule,
 ];

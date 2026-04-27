@@ -10,7 +10,7 @@ import {
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
-import { createExpiryRule } from '../rules';
+import { createExpiryRule, createRedeemerRule } from '../rules';
 
 export const INITIAL_AMOUNT_ELEMENT = 'erc20-token-stream-initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'erc20-token-stream-max-amount';
@@ -18,6 +18,7 @@ export const START_TIME_ELEMENT = 'erc20-token-stream-start-time';
 export const AMOUNT_PER_PERIOD_ELEMENT = 'erc20-token-stream-amount-per-period';
 export const TIME_PERIOD_ELEMENT = 'erc20-token-stream-time-period';
 export const EXPIRY_ELEMENT = 'erc20-token-stream-expiry';
+export const REDEEMER_ELEMENT = 'erc20-token-stream-redeemer';
 
 type Erc20TokenStreamRuleDefinition = RuleDefinition<
   Erc20TokenStreamContext,
@@ -135,11 +136,20 @@ export const expiryRule = createExpiryRule<
   Erc20TokenStreamMetadata
 >({ elementName: EXPIRY_ELEMENT, translate: t });
 
+export const redeemerRule = createRedeemerRule<
+  Erc20TokenStreamContext,
+  Erc20TokenStreamMetadata
+>({
+  elementName: REDEEMER_ELEMENT,
+  translate: t,
+});
+
 export const allRules = [
   initialAmountRule,
   maxAmountRule,
   startTimeRule,
   expiryRule,
+  redeemerRule,
   streamAmountPerPeriodRule,
   streamPeriodRule,
 ];
