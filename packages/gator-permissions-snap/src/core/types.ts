@@ -168,7 +168,6 @@ export type LifecycleOrchestrationHandlers<
   createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
-    rules: PermissionRequest['rules'];
   }) => Promise<Caveat[]>;
 
   /**
@@ -359,7 +358,6 @@ export type PermissionHandlerDependencies<
   createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
-    rules: PermissionRequest['rules'];
   }) => Promise<Caveat[]>;
 };
 

@@ -28,7 +28,6 @@ describe('erc20TokenRevocation:caveats', () => {
       const caveats = await createPermissionCaveats({
         permission,
         contracts,
-        rules: [],
       });
 
       // keccak("approve(address,uint256)")

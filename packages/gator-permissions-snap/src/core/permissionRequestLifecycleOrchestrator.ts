@@ -28,7 +28,9 @@ import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
 import type { ExistingPermissionsService } from './existingpermissions';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 import type { PermissionIntroductionService } from './permissionIntroduction';
+import { appendRedeemerCaveatIfPresent } from './redeemerCaveat';
 import type {
   BaseContext,
   BaseMetadata,
@@ -43,7 +45,6 @@ import type {
 } from '../clients/trustSignalsClient';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
-import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -569,7 +570,6 @@ export class PermissionRequestLifecycleOrchestrator {
     const caveats = await lifecycleHandlers.createPermissionCaveats({
       permission: populatedPermission,
       contracts,
-      rules: resolvedRequest.rules,
     });
 
     const expiryRule = resolvedRequest.rules?.find(
@@ -589,6 +589,12 @@ export class PermissionRequestLifecycleOrchestrator {
         args: '0x',
       });
     }
+
+    appendRedeemerCaveatIfPresent({
+      rules: resolvedRequest.rules,
+      contracts,
+      caveats,
+    });
 
     const nonce = await this.#nonceCaveatService.getNonce({
       chainId,

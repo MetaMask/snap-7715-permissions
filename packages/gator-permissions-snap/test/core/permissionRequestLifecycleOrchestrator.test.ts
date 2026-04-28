@@ -1116,7 +1116,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         ).toHaveBeenCalledWith({
           permission: mockPopulatedPermission,
           contracts: expect.any(Object),
-          rules: mockResolvedPermissionRequest.rules,
         });
       });
 

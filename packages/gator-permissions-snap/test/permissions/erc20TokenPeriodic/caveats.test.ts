@@ -52,7 +52,6 @@ describe('erc20TokenPeriodic:caveats', () => {
       const caveats = await createPermissionCaveats({
         permission,
         contracts,
-        rules: [],
       });
 
       const erc20TokenPeriodicExpectedTerms = createExpectedTerms(permission);
@@ -91,7 +90,6 @@ describe('erc20TokenPeriodic:caveats', () => {
       const caveats = await createPermissionCaveats({
         permission,
         contracts,
-        rules: [],
       });
 
       const erc20TokenPeriodicExpectedTerms = createExpectedTerms(permission);
@@ -129,7 +127,6 @@ describe('erc20TokenPeriodic:caveats', () => {
       const caveats = await createPermissionCaveats({
         permission,
         contracts,
-        rules: [],
       });
 
       const erc20TokenPeriodicExpectedTerms = createExpectedTerms(permission);
@@ -167,7 +164,6 @@ describe('erc20TokenPeriodic:caveats', () => {
       const caveats = await createPermissionCaveats({
         permission,
         contracts,
-        rules: [],
       });
 
       const erc20TokenPeriodicExpectedTerms = createExpectedTerms(permission);
