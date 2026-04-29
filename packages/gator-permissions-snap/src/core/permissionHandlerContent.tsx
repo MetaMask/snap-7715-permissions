@@ -196,12 +196,13 @@ export const PermissionHandlerContent = ({
     />
   );
 
-  const hasRedeemerAddress =
-    context.redeemerAddresses && context.redeemerAddresses.length > 0;
-  const redeemerAddresses = hasRedeemerAddress
-    ? (context.redeemerAddresses as string[])
-    : [];
-
+  const redeemerField = context.redeemerAddresses?.length ? (
+    <RedeemerField
+      label={t('redeemerLabel')}
+      addresses={context.redeemerAddresses}
+      tooltip={t('redeemerTooltip')}
+    />
+  ) : null;
   return (
     <Container>
       <Box>
@@ -286,13 +287,7 @@ export const PermissionHandlerContent = ({
                 iconData={tokenIconData}
               />
             )}
-            {hasRedeemerAddress && (
-              <RedeemerField
-                label={t('redeemerLabel')}
-                addresses={redeemerAddresses}
-                tooltip={t('redeemerTooltip')}
-              />
-            )}
+            {redeemerField}
           </Section>
           {children}
         </Box>
