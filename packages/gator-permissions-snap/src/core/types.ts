@@ -195,12 +195,7 @@ export type LifecycleOrchestrationHandlers<
 /**
  * Represents the type of rule input field.
  */
-export type RuleType =
-  | 'number'
-  | 'text'
-  | 'dropdown'
-  | 'datetime'
-  | 'addressList';
+export type RuleType = 'number' | 'text' | 'dropdown' | 'datetime';
 
 export type IconData = {
   iconDataBase64: string;
@@ -209,8 +204,6 @@ export type IconData = {
 
 export type RuleData = {
   value: string | undefined;
-  /** For addressList rules: redeemer addresses to display. */
-  addresses?: string[] | undefined;
   isVisible: boolean;
   tooltip?: string | undefined;
   iconData?: IconData | undefined;

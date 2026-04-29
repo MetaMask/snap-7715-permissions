@@ -22,7 +22,7 @@ export const RedeemerField = ({
     <Field label={label} tooltip={tooltip} variant="display">
       <Box direction="vertical">
         {addresses.map((addr) => (
-          <Address address={addr as Hex} displayName={true} />
+          <Address key={addr} address={addr as Hex} displayName={true} />
         ))}
       </Box>
     </Field>

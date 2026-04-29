@@ -13,7 +13,6 @@ import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { TimePeriod } from '../core/types';
 import type {
   BaseContext,
-  RuleData,
   RuleDefinition,
   TypedPermissionRequest,
 } from '../core/types';
@@ -228,10 +227,6 @@ export const applyExpiryRule = <
   };
 };
 
-export type RedeemerRuleContext = BaseContext;
-
-export type RedeemerRuleMetadata = Record<string, never>;
-
 /**
  * Re-applies the redeemer rule from the original dapp request so users cannot
  * remove or alter redeemer constraints via the confirmation UI.
@@ -277,41 +272,5 @@ export const applyRedeemerRule = <
   return {
     ...requestWithUpdatedRules,
     rules,
-  };
-};
-
-export const createRedeemerRule = <
-  TContext extends RedeemerRuleContext,
-  TMetadata extends RedeemerRuleMetadata,
->({
-  elementName,
-  translate,
-}: {
-  elementName: string;
-  translate: TranslateFunction;
-}): RuleDefinition<TContext, TMetadata> => {
-  return {
-    name: elementName,
-    label: 'redeemerLabel',
-    type: 'addressList',
-    getRuleData: ({
-      context,
-    }: {
-      context: TContext;
-      metadata: TMetadata;
-    }): RuleData => {
-      const addresses = context.redeemerAddresses;
-      const isVisible = Boolean(addresses?.length);
-      return {
-        value: undefined,
-        addresses,
-        isVisible,
-        tooltip: translate('redeemerTooltip'),
-        isEditable: false,
-      };
-    },
-    updateContext: (context: TContext): TContext => {
-      return context;
-    },
   };
 };

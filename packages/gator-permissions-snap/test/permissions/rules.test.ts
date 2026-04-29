@@ -6,7 +6,6 @@ import {
   applyExpiryRule,
   applyRedeemerRule,
   createExpiryRule,
-  createRedeemerRule,
   deriveExposureForStreamingPermission,
 } from '../../src/permissions/rules';
 import { timestampToISO8601 } from '../../src/utils/time';
@@ -211,48 +210,6 @@ describe('applyExpiryRule', () => {
 
     expect(updated.rules).toHaveLength(1);
     expect(updated.rules[0]).toStrictEqual(originalRequest.rules[0]);
-  });
-});
-
-describe('createRedeemerRule', () => {
-  const mockTranslateFunction = jest.fn();
-
-  const baseRuleContext: BaseContext = {
-    expiry: undefined,
-    redeemerAddresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
-    isAdjustmentAllowed: false,
-    justification: 'test justification',
-    accountAddressCaip10: 'eip155:1:0x0000000000000000000000000000000000000000',
-    tokenAddressCaip19:
-      'eip155:1/erc20:0x0000000000000000000000000000000000000000',
-    tokenMetadata: {
-      decimals: 18,
-      symbol: 'TST',
-      iconDataBase64: null,
-    },
-  };
-
-  beforeEach(() => {
-    mockTranslateFunction.mockClear();
-    mockTranslateFunction.mockImplementation(
-      (key: string) => `translation of: ${key}`,
-    );
-  });
-
-  it('returns addressList rule with read-only rule data', () => {
-    const rule = createRedeemerRule<BaseContext, Record<string, never>>({
-      elementName: 'redeemer',
-      translate: mockTranslateFunction,
-    });
-
-    expect(rule.type).toBe('addressList');
-    const data = rule.getRuleData({
-      context: baseRuleContext,
-      metadata: {} as Record<string, never>,
-    });
-    expect(data.isEditable).toBe(false);
-    expect(data.addresses).toStrictEqual(baseRuleContext.redeemerAddresses);
-    expect(rule.updateContext(baseRuleContext)).toStrictEqual(baseRuleContext);
   });
 });
 
