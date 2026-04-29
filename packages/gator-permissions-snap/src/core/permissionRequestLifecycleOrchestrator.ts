@@ -10,7 +10,6 @@ import {
 import type { Delegation } from '@metamask/delegation-core';
 import {
   createNonceTerms,
-  createTimestampTerms,
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
@@ -29,6 +28,7 @@ import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
 import type { ExistingPermissionsService } from './existingpermissions';
 import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
+import { appendExpiryCaveatIfPresent } from './expiryCaveat';
 import type { PermissionIntroductionService } from './permissionIntroduction';
 import { appendRedeemerCaveatIfPresent } from './redeemerCaveat';
 import type {
@@ -572,23 +572,11 @@ export class PermissionRequestLifecycleOrchestrator {
       contracts,
     });
 
-    const expiryRule = resolvedRequest.rules?.find(
-      (rule) => extractDescriptorName(rule.type) === 'expiry',
-    );
-
-    if (expiryRule) {
-      const timestampAfterThreshold = 0;
-      const timestampBeforeThreshold = expiryRule.data.timestamp;
-
-      caveats.push({
-        enforcer: contracts.timestampEnforcer,
-        terms: createTimestampTerms({
-          afterThreshold: timestampAfterThreshold,
-          beforeThreshold: timestampBeforeThreshold,
-        }),
-        args: '0x',
-      });
-    }
+    appendExpiryCaveatIfPresent({
+      rules: resolvedRequest.rules,
+      contracts,
+      caveats,
+    });
 
     appendRedeemerCaveatIfPresent({
       rules: resolvedRequest.rules,
