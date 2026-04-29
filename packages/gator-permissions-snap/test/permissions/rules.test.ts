@@ -240,10 +240,7 @@ describe('createRedeemerRule', () => {
   });
 
   it('returns addressList rule with read-only rule data', () => {
-    const rule = createRedeemerRule<
-      BaseContext,
-      { validationErrors: { redeemerError?: string } }
-    >({
+    const rule = createRedeemerRule<BaseContext, Record<string, never>>({
       elementName: 'redeemer',
       translate: mockTranslateFunction,
     });
@@ -251,7 +248,7 @@ describe('createRedeemerRule', () => {
     expect(rule.type).toBe('addressList');
     const data = rule.getRuleData({
       context: baseRuleContext,
-      metadata: { validationErrors: {} },
+      metadata: {} as Record<string, never>,
     });
     expect(data.isEditable).toBe(false);
     expect(data.addresses).toStrictEqual(baseRuleContext.redeemerAddresses);

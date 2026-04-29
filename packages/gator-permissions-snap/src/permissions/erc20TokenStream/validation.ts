@@ -2,7 +2,11 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
-import { validateHexInteger, validateStartTime } from '../validation';
+import {
+  validateHexInteger,
+  validateRedeemerRule,
+  validateStartTime,
+} from '../validation';
 import type {
   Erc20TokenStreamPermission,
   Erc20TokenStreamPermissionRequest,
@@ -51,6 +55,7 @@ function validatePermissionData(
   }
 
   validateStartTime(startTime, rules);
+  validateRedeemerRule(rules);
 
   return true;
 }

@@ -24,7 +24,6 @@ export type NativeTokenStreamMetadata = BaseMetadata & {
     amountPerPeriodError?: string;
     startTimeError?: string;
     expiryError?: string;
-    redeemerError?: string;
   };
 };
 

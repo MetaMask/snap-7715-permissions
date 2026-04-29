@@ -2,6 +2,7 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import { validateRedeemerRule } from '../validation';
 import type { Erc20TokenRevocationPermissionRequest } from './types';
 import { zErc20TokenRevocationPermission } from './types';
 
@@ -23,6 +24,8 @@ export function parseAndValidatePermission(
   if (!success) {
     throw new InvalidInputError(extractZodError(validationError.errors));
   }
+
+  validateRedeemerRule(permissionRequest.rules);
 
   return {
     ...permissionRequest,

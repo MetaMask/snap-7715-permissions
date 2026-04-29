@@ -230,11 +230,7 @@ export const applyExpiryRule = <
 
 export type RedeemerRuleContext = BaseContext;
 
-export type RedeemerRuleMetadata = {
-  validationErrors: {
-    redeemerError?: string;
-  };
-};
+export type RedeemerRuleMetadata = Record<string, never>;
 
 /**
  * Re-applies the redeemer rule from the original dapp request so users cannot
@@ -250,10 +246,12 @@ export const applyRedeemerRule = <
   originalRequest: TPermissionRequest,
   requestWithUpdatedRules: TPermissionRequest,
 ): TPermissionRequest => {
+  // Search the original dapp request for the redeemer rule (source of truth).
   const redeemerRule = originalRequest.rules?.find(
     (rule) => extractDescriptorName(rule.type) === 'redeemer',
   );
 
+  // Search the user-modified rules for an existing redeemer entry to replace or remove.
   let rules: (typeof originalRequest)['rules'] =
     requestWithUpdatedRules.rules || [];
 
@@ -298,7 +296,6 @@ export const createRedeemerRule = <
     type: 'addressList',
     getRuleData: ({
       context,
-      metadata,
     }: {
       context: TContext;
       metadata: TMetadata;
@@ -310,7 +307,6 @@ export const createRedeemerRule = <
         addresses,
         isVisible,
         tooltip: translate('redeemerTooltip'),
-        error: metadata.validationErrors.redeemerError,
         isEditable: false,
       };
     },
