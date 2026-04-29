@@ -445,8 +445,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
               enforcer: contracts.timestampEnforcer.toLowerCase(),
               args: '0x',
               terms: createTimestampTerms({
-                timestampAfterThreshold: 0,
-                timestampBeforeThreshold: expiryTimestamp,
+                afterThreshold: 0,
+                beforeThreshold: expiryTimestamp,
               }),
             },
             {
@@ -500,8 +500,8 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
               enforcer: contracts.timestampEnforcer.toLowerCase(),
               args: '0x',
               terms: createTimestampTerms({
-                timestampAfterThreshold: 0,
-                timestampBeforeThreshold: expiryTimestamp,
+                afterThreshold: 0,
+                beforeThreshold: expiryTimestamp,
               }),
             },
             {

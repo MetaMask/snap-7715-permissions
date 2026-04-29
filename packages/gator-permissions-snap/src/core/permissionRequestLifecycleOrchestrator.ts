@@ -583,8 +583,8 @@ export class PermissionRequestLifecycleOrchestrator {
       caveats.push({
         enforcer: contracts.timestampEnforcer,
         terms: createTimestampTerms({
-          timestampAfterThreshold,
-          timestampBeforeThreshold,
+          afterThreshold: timestampAfterThreshold,
+          beforeThreshold: timestampBeforeThreshold,
         }),
         args: '0x',
       });
