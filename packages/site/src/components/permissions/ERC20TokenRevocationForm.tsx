@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
+import type { Hex } from 'viem';
 
+import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { ERC20TokenRevocationPermissionRequest } from './types';
 
 type ERC20TokenRevocationFormProps = {
@@ -16,6 +18,7 @@ export const ERC20TokenRevocationForm = ({
     'This site needs to revoke your token approvals for safety.',
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
+  const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
 
   const handleJustificationChange = useCallback(
     ({
@@ -49,10 +52,11 @@ export const ERC20TokenRevocationForm = ({
       type: 'erc20-token-revocation',
       expiry,
       justification,
+      redeemerAddresses,
       isAdjustmentAllowed,
       startTime: null,
     });
-  }, [onChange, expiry, justification, isAdjustmentAllowed]);
+  }, [onChange, expiry, justification, redeemerAddresses, isAdjustmentAllowed]);
 
   return (
     <>
@@ -76,6 +80,7 @@ export const ERC20TokenRevocationForm = ({
           onChange={handleExpiryChange}
         />
       </div>
+      <RedeemerAddressesField onChange={setRedeemerAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
         <input

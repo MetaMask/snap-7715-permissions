@@ -4,6 +4,7 @@ import { TimePeriod } from '../../src/core/types';
 import type { BaseContext } from '../../src/core/types';
 import {
   applyExpiryRule,
+  applyRedeemerRule,
   createExpiryRule,
   deriveExposureForStreamingPermission,
 } from '../../src/permissions/rules';
@@ -209,6 +210,42 @@ describe('applyExpiryRule', () => {
 
     expect(updated.rules).toHaveLength(1);
     expect(updated.rules[0]).toStrictEqual(originalRequest.rules[0]);
+  });
+});
+
+describe('applyRedeemerRule', () => {
+  const redeemerRule = {
+    type: 'redeemer',
+    data: {
+      addresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+    },
+  };
+
+  it('copies redeemer rule from original request onto merged request', () => {
+    const originalRequest: any = {
+      rules: [redeemerRule, { type: 'expiry', data: { timestamp: 999 } }],
+    };
+    const afterExpiry: any = {
+      rules: [{ type: 'expiry', data: { timestamp: 1000 } }],
+    };
+
+    const updated = applyRedeemerRule(originalRequest, afterExpiry);
+
+    expect(updated.rules).toStrictEqual([
+      { type: 'expiry', data: { timestamp: 1000 } },
+      redeemerRule,
+    ]);
+  });
+
+  it('removes stray redeemer rule when original request had none', () => {
+    const originalRequest: any = { rules: [] };
+    const withStray: any = {
+      rules: [redeemerRule],
+    };
+
+    const updated = applyRedeemerRule(originalRequest, withStray);
+
+    expect(updated.rules).toHaveLength(0);
   });
 });
 

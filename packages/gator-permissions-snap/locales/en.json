@@ -67,6 +67,12 @@
     "expiryContentWhenDisabled": {
       "message": "This permission is ongoing. We recommend setting an expiration date."
     },
+    "redeemerLabel": {
+      "message": "Redeemers"
+    },
+    "redeemerTooltip": {
+      "message": "Only these addresses may redeem this permission."
+    },
     "streamAmountLabel": {
       "message": "Stream amount"
     },

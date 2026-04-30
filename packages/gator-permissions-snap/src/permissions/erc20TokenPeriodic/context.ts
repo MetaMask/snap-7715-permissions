@@ -8,6 +8,13 @@ import {
 } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
+import type {
+  Erc20TokenPeriodicContext,
+  Erc20TokenPeriodicPermissionRequest,
+  Erc20TokenPeriodicMetadata,
+  PopulatedErc20TokenPeriodicPermission,
+  Erc20TokenPeriodicPermission,
+} from './types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
@@ -17,14 +24,11 @@ import {
   validatePeriodDuration,
   validateStartTimeVsExpiry,
 } from '../contextValidation';
-import type {
-  Erc20TokenPeriodicContext,
-  Erc20TokenPeriodicPermissionRequest,
-  Erc20TokenPeriodicMetadata,
-  PopulatedErc20TokenPeriodicPermission,
-  Erc20TokenPeriodicPermission,
-} from './types';
-import { applyExpiryRule } from '../rules';
+import {
+  applyExpiryRule,
+  applyRedeemerRule,
+  getRedeemerAddressesFromRules,
+} from '../rules';
 
 const ASSET_NAMESPACE = 'erc20';
 const CHAIN_NAMESPACE = 'eip155';
@@ -49,7 +53,8 @@ export async function applyContext({
     tokenMetadata: { decimals },
   } = context;
 
-  const { rules } = applyExpiryRule(context, originalRequest);
+  const expiryMerged = applyExpiryRule(context, originalRequest);
+  const { rules } = applyRedeemerRule(originalRequest, expiryMerged);
 
   const permissionData = {
     periodAmount: bigIntToHex(
@@ -146,6 +151,10 @@ export async function buildContext({
       }
     : undefined;
 
+  const redeemerAddresses = getRedeemerAddressesFromRules(
+    permissionRequest.rules,
+  );
+
   const periodAmount = formatUnitsFromHex({
     value: data.periodAmount,
     allowNull: false,
@@ -171,6 +180,7 @@ export async function buildContext({
 
   return {
     expiry,
+    ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,

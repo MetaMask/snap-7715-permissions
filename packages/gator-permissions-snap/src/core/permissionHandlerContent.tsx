@@ -27,6 +27,7 @@ import type {
 } from '../clients/trustSignalsClient';
 import {
   AddressField,
+  RedeemerField,
   ShowMoreText,
   SkeletonField,
   TextField,
@@ -195,6 +196,13 @@ export const PermissionHandlerContent = ({
     />
   );
 
+  const redeemerField = context.redeemerAddresses?.length ? (
+    <RedeemerField
+      label={t('redeemerLabel')}
+      addresses={context.redeemerAddresses}
+      tooltip={t('redeemerTooltip')}
+    />
+  ) : null;
   return (
     <Container>
       <Box>
@@ -279,6 +287,7 @@ export const PermissionHandlerContent = ({
                 iconData={tokenIconData}
               />
             )}
+            {redeemerField}
           </Section>
           {children}
         </Box>

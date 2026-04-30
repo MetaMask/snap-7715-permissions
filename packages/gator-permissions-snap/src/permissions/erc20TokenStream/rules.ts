@@ -1,16 +1,16 @@
+import type {
+  Erc20TokenStreamContext,
+  Erc20TokenStreamMetadata,
+} from './types';
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
+import { t } from '../../utils/i18n';
 import {
   timestampToISO8601,
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import { createExpiryRule } from '../rules';
-import type {
-  Erc20TokenStreamContext,
-  Erc20TokenStreamMetadata,
-} from './types';
-import { t } from '../../utils/i18n';
 
 export const INITIAL_AMOUNT_ELEMENT = 'erc20-token-stream-initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'erc20-token-stream-max-amount';

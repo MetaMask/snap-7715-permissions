@@ -1,16 +1,16 @@
+import type {
+  NativeTokenStreamContext,
+  NativeTokenStreamMetadata,
+} from './types';
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
+import { t } from '../../utils/i18n';
 import {
   timestampToISO8601,
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
 import { createExpiryRule } from '../rules';
-import type {
-  NativeTokenStreamContext,
-  NativeTokenStreamMetadata,
-} from './types';
-import { t } from '../../utils/i18n';
 
 export const INITIAL_AMOUNT_ELEMENT = 'native-token-stream-initial-amount';
 export const MAX_AMOUNT_ELEMENT = 'native-token-stream-max-amount';

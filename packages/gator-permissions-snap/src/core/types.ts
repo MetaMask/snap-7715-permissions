@@ -63,6 +63,10 @@ export type BaseContext = {
    * Omitted or falsey means the normal confirmation content. Set by the permission handler when the user opens the existing-permissions view.
    */
   showExistingPermissions?: boolean | null;
+  /**
+   * Allowed redeemer addresses from the dapp-provided redeemer rule (read-only in the UI).
+   */
+  redeemerAddresses?: string[] | undefined;
 };
 
 export type BaseMetadata = {

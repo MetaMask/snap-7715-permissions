@@ -13,7 +13,11 @@ import type {
   Erc20TokenRevocationPermissionRequest,
   PopulatedErc20TokenRevocationPermission,
 } from './types';
-import { applyExpiryRule } from '../rules';
+import {
+  applyExpiryRule,
+  applyRedeemerRule,
+  getRedeemerAddressesFromRules,
+} from '../rules';
 
 const CHAIN_NAMESPACE = 'eip155';
 // presently BaseContext assumes that a token is associated with a permission.
@@ -44,7 +48,8 @@ export async function applyContext({
 }): Promise<Erc20TokenRevocationPermissionRequest> {
   const { justification } = context;
 
-  const { rules } = applyExpiryRule(context, originalRequest);
+  const expiryMerged = applyExpiryRule(context, originalRequest);
+  const { rules } = applyRedeemerRule(originalRequest, expiryMerged);
 
   const { address } = parseCaipAccountId(context.accountAddressCaip10);
 
@@ -115,6 +120,10 @@ export async function buildContext({
       }
     : undefined;
 
+  const redeemerAddresses = getRedeemerAddressesFromRules(
+    permissionRequest.rules,
+  );
+
   const accountAddressCaip10 = toCaipAccountId(
     CHAIN_NAMESPACE,
     chainId.toString(),
@@ -123,6 +132,7 @@ export async function buildContext({
 
   return {
     expiry,
+    ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,

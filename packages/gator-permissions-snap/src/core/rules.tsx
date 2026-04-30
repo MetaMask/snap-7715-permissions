@@ -134,8 +134,10 @@ export function renderRules<
   rules: RuleDefinition<TContext, TMetadata>[];
   context: TContext;
   metadata: TMetadata;
-}): (SnapElement | null)[] {
-  return rules.map((rule) => renderRule({ rule, context, metadata }));
+}): SnapElement[] {
+  return rules
+    .map((rule) => renderRule({ rule, context, metadata }))
+    .filter((el): el is SnapElement => el !== null);
 }
 
 /**

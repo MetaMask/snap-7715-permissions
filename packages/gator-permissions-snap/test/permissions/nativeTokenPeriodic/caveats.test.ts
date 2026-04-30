@@ -46,7 +46,10 @@ describe('nativeTokenPeriodic:caveats', () => {
         isAdjustmentAllowed: true,
       };
 
-      const caveats = await createPermissionCaveats({ permission, contracts });
+      const caveats = await createPermissionCaveats({
+        permission,
+        contracts,
+      });
 
       const nativeTokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
@@ -79,7 +82,10 @@ describe('nativeTokenPeriodic:caveats', () => {
         isAdjustmentAllowed: true,
       };
 
-      const caveats = await createPermissionCaveats({ permission, contracts });
+      const caveats = await createPermissionCaveats({
+        permission,
+        contracts,
+      });
 
       const nativeTokenPeriodicExpectedTerms = createExpectedTerms(permission);
 
@@ -111,7 +117,10 @@ describe('nativeTokenPeriodic:caveats', () => {
         isAdjustmentAllowed: true,
       };
 
-      const caveats = await createPermissionCaveats({ permission, contracts });
+      const caveats = await createPermissionCaveats({
+        permission,
+        contracts,
+      });
 
       const nativeTokenPeriodicExpectedTerms = createExpectedTerms(permission);
 

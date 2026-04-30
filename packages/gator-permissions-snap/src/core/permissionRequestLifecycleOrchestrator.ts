@@ -10,7 +10,6 @@ import {
 import type { Delegation } from '@metamask/delegation-core';
 import {
   createNonceTerms,
-  createTimestampTerms,
   encodeDelegations,
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
@@ -28,7 +27,10 @@ import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
 import type { ExistingPermissionsService } from './existingpermissions';
+import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
+import { appendExpiryCaveatIfPresent } from './expiryCaveat';
 import type { PermissionIntroductionService } from './permissionIntroduction';
+import { appendRedeemerCaveatIfPresent } from './redeemerCaveat';
 import type {
   BaseContext,
   BaseMetadata,
@@ -43,7 +45,6 @@ import type {
 } from '../clients/trustSignalsClient';
 import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
-import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 
 /**
  * Orchestrator for the permission request lifecycle.
@@ -571,23 +572,17 @@ export class PermissionRequestLifecycleOrchestrator {
       contracts,
     });
 
-    const expiryRule = resolvedRequest.rules?.find(
-      (rule) => extractDescriptorName(rule.type) === 'expiry',
-    );
+    appendExpiryCaveatIfPresent({
+      rules: resolvedRequest.rules,
+      contracts,
+      caveats,
+    });
 
-    if (expiryRule) {
-      const timestampAfterThreshold = 0;
-      const timestampBeforeThreshold = expiryRule.data.timestamp;
-
-      caveats.push({
-        enforcer: contracts.timestampEnforcer,
-        terms: createTimestampTerms({
-          timestampAfterThreshold,
-          timestampBeforeThreshold,
-        }),
-        args: '0x',
-      });
-    }
+    appendRedeemerCaveatIfPresent({
+      rules: resolvedRequest.rules,
+      contracts,
+      caveats,
+    });
 
     const nonce = await this.#nonceCaveatService.getNonce({
       chainId,

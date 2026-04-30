@@ -4,6 +4,8 @@ export type BasePermissionRequest = {
   justification: string | null;
   startTime: number | null;
   expiry: number | null;
+  /** Addresses that may redeem this permission; sent as a `redeemer` rule. */
+  redeemerAddresses: Hex[] | null;
   isAdjustmentAllowed: boolean;
 };
 

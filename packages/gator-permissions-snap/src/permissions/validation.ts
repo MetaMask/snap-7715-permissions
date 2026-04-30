@@ -44,6 +44,29 @@ export function validateHexInteger({
 }
 
 /**
+ * Validates the redeemer rule, if present, has a non-empty addresses array.
+ * @param rules - The rules of the permission request.
+ * @throws {InvalidInputError} If a redeemer rule exists with missing or empty addresses.
+ */
+export function validateRedeemerRule(
+  rules: PermissionRequest['rules'] | undefined,
+): void {
+  const redeemerRule = rules?.find(
+    (rule) => extractDescriptorName(rule.type) === 'redeemer',
+  );
+  if (!redeemerRule) {
+    return;
+  }
+
+  const { addresses } = redeemerRule.data;
+  if (!Array.isArray(addresses) || addresses.length === 0) {
+    throw new InvalidInputError(
+      'Invalid redeemer rule: must include a non-empty addresses array',
+    );
+  }
+}
+
+/**
  * Validates a start time to ensure it's before expiry.
  * @param startTime - The start time number to validate.
  * @param rules - The rules of the permission request.

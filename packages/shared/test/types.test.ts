@@ -1,4 +1,9 @@
-import { zSanitizedJustification } from '../src/types/7715-permissions-types';
+import { z } from 'zod';
+
+import {
+  zRule,
+  zSanitizedJustification,
+} from '../src/types/7715-permissions-types';
 
 const DEFAULT_JUSTIFICATION_MESSAGE =
   'No justification was provided for the permission';
@@ -508,5 +513,26 @@ describe('zSanitizedJustification', () => {
       );
     });
     /* eslint-enable no-script-url */
+  });
+});
+
+describe('zRule', () => {
+  it('accepts a valid redeemer rule', () => {
+    const parsed = zRule.parse({
+      type: 'redeemer',
+      data: {
+        addresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+      },
+    });
+    expect(parsed.data.addresses).toHaveLength(1);
+  });
+
+  it('rejects redeemer rule with empty addresses', () => {
+    expect(() =>
+      zRule.parse({
+        type: 'redeemer',
+        data: { addresses: [] },
+      }),
+    ).toThrow(z.ZodError);
   });
 });

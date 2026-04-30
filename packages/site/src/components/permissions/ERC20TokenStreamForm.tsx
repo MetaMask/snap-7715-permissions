@@ -1,8 +1,9 @@
 import { bigIntToHex } from '@metamask/utils';
-import type { Hex } from '@metamask/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
+import type { Hex } from 'viem';
 
+import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { ERC20TokenStreamPermissionRequest } from './types';
 
 type ERC20TokenStreamFormProps = {
@@ -33,6 +34,7 @@ export const ERC20TokenStreamForm = ({
     'This is a very important request for streaming allowance for some very important thing',
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
+  const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
   const [tokenAddress, setTokenAddress] = useState<Hex>(
     '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // Consensys USDC
   );
@@ -132,6 +134,7 @@ export const ERC20TokenStreamForm = ({
       startTime,
       expiry,
       justification,
+      redeemerAddresses,
       isAdjustmentAllowed,
       tokenAddress,
     });
@@ -143,6 +146,7 @@ export const ERC20TokenStreamForm = ({
     startTime,
     expiry,
     justification,
+    redeemerAddresses,
     isAdjustmentAllowed,
     tokenAddress,
   ]);
@@ -220,6 +224,7 @@ export const ERC20TokenStreamForm = ({
           onChange={handleExpiryChange}
         />
       </div>
+      <RedeemerAddressesField onChange={setRedeemerAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
         <input

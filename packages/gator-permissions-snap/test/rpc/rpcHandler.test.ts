@@ -957,6 +957,10 @@ describe('RpcHandler', () => {
       expect(typedResult['erc20-token-revocation']?.ruleTypes).toContain(
         'expiry',
       );
+
+      for (const key of Object.keys(typedResult)) {
+        expect(typedResult[key]?.ruleTypes).toContain('redeemer');
+      }
     });
 
     it('should omit chainIds for all permission types', async () => {

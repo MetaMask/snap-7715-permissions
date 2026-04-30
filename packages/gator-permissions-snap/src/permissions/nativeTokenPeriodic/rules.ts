@@ -1,5 +1,9 @@
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+import type {
+  NativeTokenPeriodicContext,
+  NativeTokenPeriodicMetadata,
+} from './types';
 import type { RuleDefinition } from '../../core/types';
 import { TimePeriod } from '../../core/types';
 import { t } from '../../utils/i18n';
@@ -10,10 +14,6 @@ import {
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
 import { getIconData } from '../iconUtil';
-import type {
-  NativeTokenPeriodicContext,
-  NativeTokenPeriodicMetadata,
-} from './types';
 import { createExpiryRule } from '../rules';
 
 export const PERIOD_AMOUNT_ELEMENT = 'native-token-periodic-period-amount';

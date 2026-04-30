@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { parseUnits, toHex } from 'viem';
 import type { Hex } from 'viem';
 
+import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { ERC20TokenPeriodicPermissionRequest } from './types';
 
 type ERC20TokenPeriodicFormProps = {
@@ -30,6 +31,7 @@ export const ERC20TokenPeriodicForm = ({
   const [tokenAddress, setTokenAddress] = useState<Hex>(
     '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // Consensys USDC
   );
+  const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
 
   const handlePeriodAmountChange = useCallback(
     ({
@@ -108,6 +110,7 @@ export const ERC20TokenPeriodicForm = ({
       startTime,
       expiry,
       justification,
+      redeemerAddresses,
       isAdjustmentAllowed,
       tokenAddress,
     });
@@ -118,6 +121,7 @@ export const ERC20TokenPeriodicForm = ({
     startTime,
     expiry,
     justification,
+    redeemerAddresses,
     isAdjustmentAllowed,
     tokenAddress,
   ]);
@@ -185,6 +189,7 @@ export const ERC20TokenPeriodicForm = ({
           onChange={handleExpiryChange}
         />
       </div>
+      <RedeemerAddressesField onChange={setRedeemerAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
         <input

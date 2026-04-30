@@ -4,7 +4,10 @@
  however, we will keep it.
 */
 
-import type { Permission } from '@metamask/7715-permissions-shared/types';
+import type {
+  Permission,
+  PermissionRequest,
+} from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 
 import { TimePeriod } from '../core/types';
@@ -92,6 +95,26 @@ export function deriveExposureForStreamingPermission(
 }
 
 export type ExpiryRuleContext = BaseContext;
+
+/**
+ * Reads allowed redeemer addresses from validated permission request rules.
+ *
+ * @param rules - Rules from the permission request.
+ * @returns The address list, or undefined when no redeemer rule is present.
+ */
+export function getRedeemerAddressesFromRules(
+  rules: PermissionRequest['rules'] | undefined,
+): string[] | undefined {
+  const rule = rules?.find(
+    (permissionRule) =>
+      extractDescriptorName(permissionRule.type) === 'redeemer',
+  );
+  const addresses = rule?.data?.addresses;
+  if (!Array.isArray(addresses) || addresses.length === 0) {
+    return undefined;
+  }
+  return addresses as string[];
+}
 
 export type ExpiryRuleMetadata = {
   validationErrors: {
@@ -200,6 +223,54 @@ export const applyExpiryRule = <
 
   return {
     ...originalRequest,
+    rules,
+  };
+};
+
+/**
+ * Re-applies the redeemer rule from the original dapp request so users cannot
+ * remove or alter redeemer constraints via the confirmation UI.
+ *
+ * @param originalRequest - The request as originally sent by the dapp (source of truth for redeemer).
+ * @param requestWithUpdatedRules - The request after merging user-editable rules (e.g. expiry).
+ * @returns The merged request with redeemer rules stamped from `originalRequest`.
+ */
+export const applyRedeemerRule = <
+  TPermissionRequest extends TypedPermissionRequest<Permission>,
+>(
+  originalRequest: TPermissionRequest,
+  requestWithUpdatedRules: TPermissionRequest,
+): TPermissionRequest => {
+  // Search the original dapp request for the redeemer rule (source of truth).
+  const redeemerRule = originalRequest.rules?.find(
+    (rule) => extractDescriptorName(rule.type) === 'redeemer',
+  );
+
+  // Search the user-modified rules for an existing redeemer entry to replace or remove.
+  let rules: (typeof originalRequest)['rules'] =
+    requestWithUpdatedRules.rules || [];
+
+  const existingRuleIndex = rules.findIndex(
+    (rule) => extractDescriptorName(rule.type) === 'redeemer',
+  );
+
+  if (redeemerRule) {
+    if (existingRuleIndex === -1) {
+      rules = [...rules, redeemerRule];
+    } else {
+      rules = rules.map((rule, index) => {
+        if (index === existingRuleIndex) {
+          return redeemerRule;
+        }
+        return rule;
+      });
+    }
+  } else if (existingRuleIndex !== -1) {
+    rules = rules.filter((_, index) => index !== existingRuleIndex);
+  }
+
+  return {
+    ...requestWithUpdatedRules,
     rules,
   };
 };
