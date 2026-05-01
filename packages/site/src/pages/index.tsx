@@ -196,7 +196,7 @@ const Index = () => {
 
     const feePerGas = await getFeePerGas();
 
-    const { accountMeta, context, delegationManager } = permissionResponse[0];
+    const { context, delegationManager } = permissionResponse[0];
 
     const publicClient = createPublicClient({
       chain: selectedChain,
@@ -213,12 +213,11 @@ const Index = () => {
               to,
               data,
               value,
-              permissionsContext: context,
+              permissionContext: context,
               delegationManager,
             },
           ],
           ...feePerGas,
-          accountMetadata: accountMeta,
         });
 
       const operationReceipt = await bundlerClient.waitForUserOperationReceipt({
