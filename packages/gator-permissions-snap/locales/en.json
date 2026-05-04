@@ -241,6 +241,12 @@
     "introManageTokenApprovalsDescription": {
       "message": "Token revocation allows sites to revoke token approvals on your behalf."
     },
+    "introAllowanceTitle": {
+      "message": "Token allowance request"
+    },
+    "introTokenAllowanceDescription": {
+      "message": "Token allowances let a site spend from your wallet up to a single total you set, rather than a recurring schedule like a subscription."
+    },
     "introPermissionInControlDescription": {
       "message": "You can revoke this permission at any time in advanced permissions."
     },
