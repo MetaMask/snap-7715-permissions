@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
 import type { Hex } from 'viem';
 
+import { PayeeAddressesField } from './PayeeAddressesField';
 import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { NativeTokenPeriodicPermissionRequest } from './types';
 
@@ -28,6 +29,7 @@ export const NativeTokenPeriodicForm = ({
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
   const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
+  const [payeeAddresses, setPayeeAddresses] = useState<Hex[]>([]);
 
   const handlePeriodAmountChange = useCallback(
     ({
@@ -98,6 +100,7 @@ export const NativeTokenPeriodicForm = ({
       expiry,
       justification,
       redeemerAddresses,
+      payeeAddresses,
       isAdjustmentAllowed,
     });
   }, [
@@ -108,6 +111,7 @@ export const NativeTokenPeriodicForm = ({
     expiry,
     justification,
     redeemerAddresses,
+    payeeAddresses,
     isAdjustmentAllowed,
   ]);
 
@@ -164,6 +168,7 @@ export const NativeTokenPeriodicForm = ({
         />
       </div>
       <RedeemerAddressesField onChange={setRedeemerAddresses} />
+      <PayeeAddressesField onChange={setPayeeAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
         <input

@@ -4,6 +4,7 @@ import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import {
   validateHexInteger,
+  validatePayeeRule,
   validateRedeemerRule,
   validateStartTime,
 } from '../validation';
@@ -56,6 +57,7 @@ function validatePermissionData(
 
   validateStartTime(startTime, rules);
   validateRedeemerRule(rules);
+  validatePayeeRule(rules);
 
   return true;
 }

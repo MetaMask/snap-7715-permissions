@@ -30,8 +30,10 @@ import {
 } from '../contextValidation';
 import {
   applyExpiryRule,
+  applyPayeeRule,
   applyRedeemerRule,
   deriveExposureForStreamingPermission,
+  getPayeeAddressesFromRules,
   getRedeemerAddressesFromRules,
 } from '../rules';
 
@@ -62,7 +64,8 @@ export async function applyContext({
   } = context;
 
   const expiryMerged = applyExpiryRule(context, originalRequest);
-  const { rules } = applyRedeemerRule(originalRequest, expiryMerged);
+  const redeemerMerged = applyRedeemerRule(originalRequest, expiryMerged);
+  const { rules } = applyPayeeRule(originalRequest, redeemerMerged);
 
   const permissionData = {
     maxAmount: permissionDetails.maxAmount
@@ -178,6 +181,8 @@ export async function buildContext({
     permissionRequest.rules,
   );
 
+  const payeeAddresses = getPayeeAddressesFromRules(permissionRequest.rules);
+
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,
     allowNull: true,
@@ -219,6 +224,7 @@ export async function buildContext({
   return {
     expiry,
     ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
+    ...(payeeAddresses === undefined ? {} : { payeeAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,

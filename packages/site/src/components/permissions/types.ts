@@ -6,6 +6,8 @@ export type BasePermissionRequest = {
   expiry: number | null;
   /** Addresses that may redeem this permission; sent as a `redeemer` rule. */
   redeemerAddresses: Hex[] | null;
+  /** Addresses to which payments may be sent; sent as a `payee` rule. */
+  payeeAddresses: Hex[] | null;
   isAdjustmentAllowed: boolean;
 };
 

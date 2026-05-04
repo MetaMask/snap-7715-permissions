@@ -1,7 +1,11 @@
 import { describe, it, expect } from '@jest/globals';
 import type { Hex } from '@metamask/delegation-core';
 
-import { validateHexInteger } from '../../src/permissions/validation';
+import {
+  validateHexInteger,
+  validatePayeeRule,
+  validateRedeemerRule,
+} from '../../src/permissions/validation';
 
 describe('validateHexInteger', () => {
   describe('valid cases', () => {
@@ -231,5 +235,69 @@ describe('validateHexInteger', () => {
         }),
       ).not.toThrow();
     });
+  });
+});
+
+describe('validateRedeemerRule', () => {
+  it('does nothing when no redeemer rule exists', () => {
+    expect(() =>
+      validateRedeemerRule([{ type: 'expiry', data: { timestamp: 999 } }]),
+    ).not.toThrow();
+  });
+
+  it('does nothing when rules is undefined', () => {
+    expect(() => validateRedeemerRule(undefined)).not.toThrow();
+  });
+
+  it('passes for redeemer rule with valid addresses', () => {
+    expect(() =>
+      validateRedeemerRule([
+        {
+          type: 'redeemer',
+          data: {
+            addresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+          },
+        },
+      ]),
+    ).not.toThrow();
+  });
+
+  it('throws for redeemer rule with empty addresses', () => {
+    expect(() =>
+      validateRedeemerRule([{ type: 'redeemer', data: { addresses: [] } }]),
+    ).toThrow(
+      'Invalid redeemer rule: must include a non-empty addresses array',
+    );
+  });
+});
+
+describe('validatePayeeRule', () => {
+  it('does nothing when no payee rule exists', () => {
+    expect(() =>
+      validatePayeeRule([{ type: 'expiry', data: { timestamp: 999 } }]),
+    ).not.toThrow();
+  });
+
+  it('does nothing when rules is undefined', () => {
+    expect(() => validatePayeeRule(undefined)).not.toThrow();
+  });
+
+  it('passes for payee rule with valid addresses', () => {
+    expect(() =>
+      validatePayeeRule([
+        {
+          type: 'payee',
+          data: {
+            addresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+          },
+        },
+      ]),
+    ).not.toThrow();
+  });
+
+  it('throws for payee rule with empty addresses', () => {
+    expect(() =>
+      validatePayeeRule([{ type: 'payee', data: { addresses: [] } }]),
+    ).toThrow('Invalid payee rule: must include a non-empty addresses array');
   });
 });

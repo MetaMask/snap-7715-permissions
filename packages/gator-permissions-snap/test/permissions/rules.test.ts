@@ -4,6 +4,7 @@ import { TimePeriod } from '../../src/core/types';
 import type { BaseContext } from '../../src/core/types';
 import {
   applyExpiryRule,
+  applyPayeeRule,
   applyRedeemerRule,
   createExpiryRule,
   deriveExposureForStreamingPermission,
@@ -244,6 +245,42 @@ describe('applyRedeemerRule', () => {
     };
 
     const updated = applyRedeemerRule(originalRequest, withStray);
+
+    expect(updated.rules).toHaveLength(0);
+  });
+});
+
+describe('applyPayeeRule', () => {
+  const payeeRule = {
+    type: 'payee',
+    data: {
+      addresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+    },
+  };
+
+  it('copies payee rule from original request onto merged request', () => {
+    const originalRequest: any = {
+      rules: [payeeRule, { type: 'expiry', data: { timestamp: 999 } }],
+    };
+    const afterExpiry: any = {
+      rules: [{ type: 'expiry', data: { timestamp: 1000 } }],
+    };
+
+    const updated = applyPayeeRule(originalRequest, afterExpiry);
+
+    expect(updated.rules).toStrictEqual([
+      { type: 'expiry', data: { timestamp: 1000 } },
+      payeeRule,
+    ]);
+  });
+
+  it('removes stray payee rule when original request had none', () => {
+    const originalRequest: any = { rules: [] };
+    const withStray: any = {
+      rules: [payeeRule],
+    };
+
+    const updated = applyPayeeRule(originalRequest, withStray);
 
     expect(updated.rules).toHaveLength(0);
   });

@@ -251,6 +251,7 @@ const Index = () => {
       expiry,
       isAdjustmentAllowed,
       redeemerAddresses,
+      payeeAddresses,
       ...permissionData
     } = permissionRequest;
 
@@ -263,6 +264,7 @@ const Index = () => {
       to: delegateAccount.address,
       expiry,
       redeemer: (redeemerAddresses?.length ?? 0) > 0 ? redeemerAddresses : null,
+      payee: (payeeAddresses?.length ?? 0) > 0 ? payeeAddresses : null,
       permission: {
         type,
         isAdjustmentAllowed,

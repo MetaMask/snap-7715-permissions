@@ -73,6 +73,12 @@
     "redeemerTooltip": {
       "message": "Only these addresses may redeem this permission."
     },
+    "payeeLabel": {
+      "message": "Payees"
+    },
+    "payeeTooltip": {
+      "message": "Payments may only be sent to these addresses."
+    },
     "streamAmountLabel": {
       "message": "Stream amount"
     },

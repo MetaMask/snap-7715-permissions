@@ -116,6 +116,25 @@ export function getRedeemerAddressesFromRules(
   return addresses as string[];
 }
 
+/**
+ * Reads allowed payee addresses from validated permission request rules.
+ *
+ * @param rules - Rules from the permission request.
+ * @returns The address list, or undefined when no payee rule is present.
+ */
+export function getPayeeAddressesFromRules(
+  rules: PermissionRequest['rules'] | undefined,
+): string[] | undefined {
+  const rule = rules?.find(
+    (permissionRule) => extractDescriptorName(permissionRule.type) === 'payee',
+  );
+  const addresses = rule?.data?.addresses;
+  if (!Array.isArray(addresses) || addresses.length === 0) {
+    return undefined;
+  }
+  return addresses as string[];
+}
+
 export type ExpiryRuleMetadata = {
   validationErrors: {
     expiryError?: string;
@@ -261,6 +280,52 @@ export const applyRedeemerRule = <
       rules = rules.map((rule, index) => {
         if (index === existingRuleIndex) {
           return redeemerRule;
+        }
+        return rule;
+      });
+    }
+  } else if (existingRuleIndex !== -1) {
+    rules = rules.filter((_, index) => index !== existingRuleIndex);
+  }
+
+  return {
+    ...requestWithUpdatedRules,
+    rules,
+  };
+};
+
+/**
+ * Re-applies the payee rule from the original dapp request so users cannot
+ * remove or alter payee constraints via the confirmation UI.
+ *
+ * @param originalRequest - The request as originally sent by the dapp (source of truth for payee).
+ * @param requestWithUpdatedRules - The request after merging user-editable rules (e.g. expiry).
+ * @returns The merged request with payee rules stamped from `originalRequest`.
+ */
+export const applyPayeeRule = <
+  TPermissionRequest extends TypedPermissionRequest<Permission>,
+>(
+  originalRequest: TPermissionRequest,
+  requestWithUpdatedRules: TPermissionRequest,
+): TPermissionRequest => {
+  const payeeRule = originalRequest.rules?.find(
+    (rule) => extractDescriptorName(rule.type) === 'payee',
+  );
+
+  let rules: (typeof originalRequest)['rules'] =
+    requestWithUpdatedRules.rules || [];
+
+  const existingRuleIndex = rules.findIndex(
+    (rule) => extractDescriptorName(rule.type) === 'payee',
+  );
+
+  if (payeeRule) {
+    if (existingRuleIndex === -1) {
+      rules = [...rules, payeeRule];
+    } else {
+      rules = rules.map((rule, index) => {
+        if (index === existingRuleIndex) {
+          return payeeRule;
         }
         return rule;
       });

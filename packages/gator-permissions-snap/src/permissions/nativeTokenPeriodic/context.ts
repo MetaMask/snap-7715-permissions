@@ -26,7 +26,9 @@ import {
 } from '../contextValidation';
 import {
   applyExpiryRule,
+  applyPayeeRule,
   applyRedeemerRule,
+  getPayeeAddressesFromRules,
   getRedeemerAddressesFromRules,
 } from '../rules';
 
@@ -55,7 +57,8 @@ export async function applyContext({
   } = context;
 
   const expiryMerged = applyExpiryRule(context, originalRequest);
-  const { rules } = applyRedeemerRule(originalRequest, expiryMerged);
+  const redeemerMerged = applyRedeemerRule(originalRequest, expiryMerged);
+  const { rules } = applyPayeeRule(originalRequest, redeemerMerged);
 
   const permissionData = {
     periodAmount: bigIntToHex(
@@ -155,6 +158,8 @@ export async function buildContext({
     permissionRequest.rules,
   );
 
+  const payeeAddresses = getPayeeAddressesFromRules(permissionRequest.rules);
+
   const periodAmount = formatUnitsFromHex({
     value: data.periodAmount,
     allowNull: false,
@@ -181,6 +186,7 @@ export async function buildContext({
   return {
     expiry,
     ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
+    ...(payeeAddresses === undefined ? {} : { payeeAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,
