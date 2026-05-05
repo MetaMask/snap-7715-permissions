@@ -19,6 +19,8 @@ const NATIVE_PERMISSION_TYPES = new Set([
   'native-token-periodic',
 ]);
 
+const EMPTY_ARGS = new Uint8Array();
+
 /**
  * Pads an Ethereum address to 32 bytes (left-padded with zeros).
  * @param address - The address to pad.
@@ -44,32 +46,32 @@ function buildErc20PayeeCaveat(
       startIndex: 4,
       value: padAddressTo32Bytes(address),
     }),
-    args: '0x00',
+    args: '0x',
   };
 }
 
 /**
  * Builds an allowedTargetsEnforcer caveat restricting the native token recipient.
- * @param address - The allowed payee address.
+ * @param addresses - The allowed payee addresses.
  * @param contracts - Delegation enforcer contract addresses.
  * @returns A caveat for the allowedTargetsEnforcer.
  */
 function buildNativePayeeCaveat(
-  address: Hex,
+  addresses: Hex[],
   contracts: DelegationContracts,
 ): Caveat {
   return {
     enforcer: contracts.allowedTargetsEnforcer,
-    terms: createAllowedTargetsTerms({ targets: [address] }),
-    args: '0x00',
+    terms: createAllowedTargetsTerms({ targets: addresses }),
+    args: '0x',
   };
 }
 
 /**
  * Appends payee-restricting caveats when the permission request includes a payee rule.
  *
- * For a single payee address, the enforcer is used directly.
- * For multiple addresses, individual caveats are wrapped in a LogicalOrWrapperEnforcer.
+ * For native token permissions, allowedTargetsEnforcer supports multiple targets directly.
+ * For ERC-20 permissions, multiple addresses are wrapped in a LogicalOrWrapperEnforcer.
  *
  * @param options - Arguments for appending the caveat.
  * @param options.rules - Resolved permission request rules from the grant flow.
@@ -103,20 +105,22 @@ export function appendPayeeCaveatIfPresent({
     return;
   }
 
-  const buildCaveat = isErc20 ? buildErc20PayeeCaveat : buildNativePayeeCaveat;
+  if (isErc20 && rawAddresses.length > 1) {
+    const caveatGroups = rawAddresses.map((address) => {
+      const caveat = buildErc20PayeeCaveat(address, contracts);
+      return [{ ...caveat, args: EMPTY_ARGS }];
+    });
 
-  if (rawAddresses.length === 1) {
-    caveats.push(buildCaveat(rawAddresses[0] as Hex, contracts));
+    caveats.push({
+      enforcer: contracts.logicalOrWrapperEnforcer,
+      terms: createLogicalOrWrapperTerms({ caveatGroups }),
+      args: '0x',
+    });
     return;
   }
 
-  const caveatGroups = rawAddresses.map((address) => [
-    buildCaveat(address, contracts),
-  ]);
-
-  caveats.push({
-    enforcer: contracts.logicalOrWrapperEnforcer,
-    terms: createLogicalOrWrapperTerms({ caveatGroups }),
-    args: '0x',
-  });
+  const payeeCaveat = isErc20
+    ? buildErc20PayeeCaveat(rawAddresses[0] as Hex, contracts)
+    : buildNativePayeeCaveat(rawAddresses, contracts);
+  caveats.push(payeeCaveat);
 }

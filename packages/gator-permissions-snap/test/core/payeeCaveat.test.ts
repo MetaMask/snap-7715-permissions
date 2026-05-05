@@ -31,6 +31,7 @@ const MOCK_CONTRACTS = {
 
 const PAYEE_ADDRESS_1 = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' as Hex;
 const PAYEE_ADDRESS_2 = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8' as Hex;
+const EMPTY_ARGS = new Uint8Array();
 
 /**
  * Pads an Ethereum address to 32 bytes (left-padded with zeros).
@@ -112,7 +113,7 @@ describe('appendPayeeCaveatIfPresent', () => {
             value: padTo32Bytes(PAYEE_ADDRESS_1),
           }),
         );
-        expect(caveats[0].args).toBe('0x00');
+        expect(caveats[0].args).toBe('0x');
       },
     );
 
@@ -142,7 +143,7 @@ describe('appendPayeeCaveatIfPresent', () => {
                   startIndex: 4,
                   value: padTo32Bytes(PAYEE_ADDRESS_1),
                 }),
-                args: '0x00',
+                args: EMPTY_ARGS,
               },
             ],
             [
@@ -152,7 +153,7 @@ describe('appendPayeeCaveatIfPresent', () => {
                   startIndex: 4,
                   value: padTo32Bytes(PAYEE_ADDRESS_2),
                 }),
-                args: '0x00',
+                args: EMPTY_ARGS,
               },
             ],
           ],
@@ -179,11 +180,11 @@ describe('appendPayeeCaveatIfPresent', () => {
         expect(caveats[0].terms).toStrictEqual(
           createAllowedTargetsTerms({ targets: [PAYEE_ADDRESS_1] }),
         );
-        expect(caveats[0].args).toBe('0x00');
+        expect(caveats[0].args).toBe('0x');
       },
     );
 
-    it('wraps multiple payees in logicalOrWrapperEnforcer for native tokens', () => {
+    it('appends one allowedTargetsEnforcer caveat for multiple native token payees', () => {
       const caveats: Caveat[] = [];
       appendPayeeCaveatIfPresent({
         rules: [
@@ -198,29 +199,10 @@ describe('appendPayeeCaveatIfPresent', () => {
       });
 
       expect(caveats).toHaveLength(1);
-      expect(caveats[0].enforcer).toBe(MOCK_CONTRACTS.logicalOrWrapperEnforcer);
+      expect(caveats[0].enforcer).toBe(MOCK_CONTRACTS.allowedTargetsEnforcer);
       expect(caveats[0].terms).toStrictEqual(
-        createLogicalOrWrapperTerms({
-          caveatGroups: [
-            [
-              {
-                enforcer: MOCK_CONTRACTS.allowedTargetsEnforcer,
-                terms: createAllowedTargetsTerms({
-                  targets: [PAYEE_ADDRESS_1],
-                }),
-                args: '0x00',
-              },
-            ],
-            [
-              {
-                enforcer: MOCK_CONTRACTS.allowedTargetsEnforcer,
-                terms: createAllowedTargetsTerms({
-                  targets: [PAYEE_ADDRESS_2],
-                }),
-                args: '0x00',
-              },
-            ],
-          ],
+        createAllowedTargetsTerms({
+          targets: [PAYEE_ADDRESS_1, PAYEE_ADDRESS_2],
         }),
       );
       expect(caveats[0].args).toBe('0x');

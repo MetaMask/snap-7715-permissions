@@ -28,7 +28,7 @@ import {
   applyExpiryRule,
   applyPayeeRule,
   applyRedeemerRule,
-  getPayeeAddressesFromRules,
+  getPayeeAddressesFromRulesIfPresent,
   getRedeemerAddressesFromRules,
 } from '../rules';
 
@@ -158,7 +158,9 @@ export async function buildContext({
     permissionRequest.rules,
   );
 
-  const payeeAddresses = getPayeeAddressesFromRules(permissionRequest.rules);
+  const payeeAddresses = getPayeeAddressesFromRulesIfPresent(
+    permissionRequest.rules,
+  );
 
   const periodAmount = formatUnitsFromHex({
     value: data.periodAmount,

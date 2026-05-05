@@ -33,7 +33,7 @@ import {
   applyPayeeRule,
   applyRedeemerRule,
   deriveExposureForStreamingPermission,
-  getPayeeAddressesFromRules,
+  getPayeeAddressesFromRulesIfPresent,
   getRedeemerAddressesFromRules,
 } from '../rules';
 
@@ -178,7 +178,9 @@ export async function buildContext({
     permissionRequest.rules,
   );
 
-  const payeeAddresses = getPayeeAddressesFromRules(permissionRequest.rules);
+  const payeeAddresses = getPayeeAddressesFromRulesIfPresent(
+    permissionRequest.rules,
+  );
 
   const initialAmount = formatUnitsFromHex({
     value: data.initialAmount,

@@ -122,7 +122,7 @@ export function getRedeemerAddressesFromRules(
  * @param rules - Rules from the permission request.
  * @returns The address list, or undefined when no payee rule is present.
  */
-export function getPayeeAddressesFromRules(
+export function getPayeeAddressesFromRulesIfPresent(
   rules: PermissionRequest['rules'] | undefined,
 ): string[] | undefined {
   const rule = rules?.find(
