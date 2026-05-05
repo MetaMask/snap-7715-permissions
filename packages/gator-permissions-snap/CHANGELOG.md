@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- feat: add payee rule support to permission requests ([#300](https://github.com/MetaMask/snap-7715-permissions/pull/300))
+- feat: add redeemer rule support across permissions ([#297](https://github.com/MetaMask/snap-7715-permissions/pull/297))
+- `permissionsProvider_getSupportedPermissions` no longer includes chainIds ([#296](https://github.com/MetaMask/snap-7715-permissions/pull/296))
+- fix: change potentially malicious warning color from red to orange ([#294](https://github.com/MetaMask/snap-7715-permissions/pull/294))
+
 ## [1.3.1]
 
 ### Changed
