@@ -3,6 +3,9 @@ import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
+export const MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR =
+  'Multiple payee addresses are not currently supported for ERC20 permissions.';
+
 /**
  * Validates a hex integer value with configurable constraints.
  * @param params - The validation parameters.
@@ -69,10 +72,17 @@ export function validateRedeemerRule(
 /**
  * Validates the payee rule, if present, has a non-empty addresses array.
  * @param rules - The rules of the permission request.
+ * @param options - Payee validation options.
+ * @param options.allowMultiplePayees - Whether more than one payee address is supported.
  * @throws {InvalidInputError} If a payee rule exists with missing or empty addresses.
  */
 export function validatePayeeRule(
   rules: PermissionRequest['rules'] | undefined,
+  {
+    allowMultiplePayees = true,
+  }: {
+    allowMultiplePayees?: boolean;
+  } = {},
 ): void {
   const payeeRule = rules?.find(
     (rule) => extractDescriptorName(rule.type) === 'payee',
@@ -86,6 +96,10 @@ export function validatePayeeRule(
     throw new InvalidInputError(
       'Invalid payee rule: must include a non-empty addresses array',
     );
+  }
+
+  if (!allowMultiplePayees && addresses.length > 1) {
+    throw new InvalidInputError(MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR);
   }
 }
 

@@ -25,7 +25,9 @@ import {
   NativeTokenPeriodicForm,
   ERC20TokenPeriodicForm,
   ERC20TokenRevocationForm,
+  RedemptionForm,
 } from '../components/permissions';
+import type { RedemptionCall } from '../components/permissions';
 import type {
   PermissionRequest,
   NativeTokenStreamPermissionRequest,
@@ -162,23 +164,14 @@ const Index = () => {
     setPermissionType(inputValue);
   };
 
-  const handleToChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setTo(inputValue as Hex);
-  };
-
-  const handleDataChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setData(inputValue as Hex);
-  };
-
-  const handleValueChange = ({
-    target: { value: inputValue },
-  }: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(BigInt(inputValue));
-  };
+  const handleRedemptionCallChange = useCallback(
+    ({ data: nextData, to: nextTo, value: nextValue }: RedemptionCall) => {
+      setTo(nextTo);
+      setData(nextData);
+      setValue(nextValue);
+    },
+    [],
+  );
 
   const handleRedeemPermission = async () => {
     if (!delegateAccount) {
@@ -403,42 +396,22 @@ const Index = () => {
             )}
             <StyledForm>
               <Title>Redeem Permission</Title>
-              <div>
-                <label htmlFor="to">To:</label>
-                <input
-                  type="text"
-                  id="to"
-                  name="to"
-                  value={to}
-                  onChange={handleToChange}
-                  placeholder="Recipient address"
-                />
-              </div>
-              <div>
-                <label htmlFor="data">Data:</label>
-                <input
-                  type="text"
-                  id="data"
-                  name="data"
-                  value={data}
-                  onChange={handleDataChange}
-                  placeholder="Transaction calldata (hex)"
-                />
-              </div>
-              <div>
-                <label htmlFor="value">Value:</label>
-                <input
-                  type="text"
-                  id="value"
-                  name="value"
-                  value={value.toString()}
-                  onChange={handleValueChange}
-                  placeholder="ETH value to send"
-                />
-              </div>
+              <RedemptionForm
+                delegateAddress={delegateAccount?.address}
+                permissionResponse={permissionResponse[0]}
+                onChange={handleRedemptionCallChange}
+              />
               <div>
                 <label>From:</label>
                 <div>{delegateAccount?.address}</div>
+              </div>
+              <div>
+                <label>To:</label>
+                <div>{to}</div>
+              </div>
+              <div>
+                <label>Value:</label>
+                <div>{value.toString()}</div>
               </div>
             </StyledForm>
             <CustomMessageButton

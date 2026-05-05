@@ -4,10 +4,11 @@ import type { Caveat, Hex } from '@metamask/delegation-core';
 import {
   createAllowedCalldataTerms,
   createAllowedTargetsTerms,
-  createLogicalOrWrapperTerms,
 } from '@metamask/delegation-core';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { DelegationContracts } from './chainMetadata';
+import { MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR } from '../permissions/validation';
 
 const ERC20_PERMISSION_TYPES = new Set([
   'erc20-token-stream',
@@ -18,8 +19,6 @@ const NATIVE_PERMISSION_TYPES = new Set([
   'native-token-stream',
   'native-token-periodic',
 ]);
-
-const EMPTY_ARGS = new Uint8Array();
 
 /**
  * Pads an Ethereum address to 32 bytes (left-padded with zeros).
@@ -71,7 +70,7 @@ function buildNativePayeeCaveat(
  * Appends payee-restricting caveats when the permission request includes a payee rule.
  *
  * For native token permissions, allowedTargetsEnforcer supports multiple targets directly.
- * For ERC-20 permissions, multiple addresses are wrapped in a LogicalOrWrapperEnforcer.
+ * For ERC-20 permissions, allowedCalldataEnforcer supports one target.
  *
  * @param options - Arguments for appending the caveat.
  * @param options.rules - Resolved permission request rules from the grant flow.
@@ -106,17 +105,7 @@ export function appendPayeeCaveatIfPresent({
   }
 
   if (isErc20 && rawAddresses.length > 1) {
-    const caveatGroups = rawAddresses.map((address) => {
-      const caveat = buildErc20PayeeCaveat(address, contracts);
-      return [{ ...caveat, args: EMPTY_ARGS }];
-    });
-
-    caveats.push({
-      enforcer: contracts.logicalOrWrapperEnforcer,
-      terms: createLogicalOrWrapperTerms({ caveatGroups }),
-      args: '0x',
-    });
-    return;
+    throw new InvalidInputError(MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR);
   }
 
   const payeeCaveat = isErc20

@@ -20,7 +20,6 @@ export type DelegationContracts = {
   allowedCalldataEnforcer: Hex;
   redeemerEnforcer: Hex;
   allowedTargetsEnforcer: Hex;
-  logicalOrWrapperEnforcer: Hex;
 };
 
 const contracts: DelegationContracts = {
@@ -39,7 +38,6 @@ const contracts: DelegationContracts = {
   allowedCalldataEnforcer: '0xc2b0d624c1c4319760C96503BA27C347F3260f55',
   redeemerEnforcer: '0xE144b0b2618071B4E56f746313528a669c7E65c5',
   allowedTargetsEnforcer: '0x7F20f61b1f09b08D970938F6fa563634d65c4EeB',
-  logicalOrWrapperEnforcer: '0xE1302607a3251AF54c3a6e69318d6aa07F5eB46c',
 };
 
 // derived from https://chainid.network/chains.json

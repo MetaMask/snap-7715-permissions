@@ -92,9 +92,10 @@ export const StyledForm = styled.form`
 
   label {
     display: inline-block;
-    width: 9rem;
+    width: 12rem;
     margin-right: 1rem;
     font-weight: 500;
+    flex-shrink: 0;
   }
 
   textarea,
@@ -103,6 +104,7 @@ export const StyledForm = styled.form`
     border: 1px solid ${({ theme }) => theme.colors.border?.default};
     border-radius: 0.3rem;
     flex-grow: 1;
+    min-width: 0;
   }
 
   div {
