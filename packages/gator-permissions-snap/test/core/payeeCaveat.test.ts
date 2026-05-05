@@ -2,10 +2,10 @@ import type { Caveat, Hex } from '@metamask/delegation-core';
 import {
   createAllowedCalldataTerms,
   createAllowedTargetsTerms,
-  createLogicalOrWrapperTerms,
 } from '@metamask/delegation-core';
 
 import { appendPayeeCaveatIfPresent } from '../../src/core/payeeCaveat';
+import { MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR } from '../../src/permissions/validation';
 
 const MOCK_CONTRACTS = {
   delegationManager: '0x0000000000000000000000000000000000000001' as Hex,
@@ -26,12 +26,10 @@ const MOCK_CONTRACTS = {
   allowedCalldataEnforcer: '0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' as Hex,
   redeemerEnforcer: '0x000000000000000000000000000000000000000c' as Hex,
   allowedTargetsEnforcer: '0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB' as Hex,
-  logicalOrWrapperEnforcer: '0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC' as Hex,
 };
 
 const PAYEE_ADDRESS_1 = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' as Hex;
 const PAYEE_ADDRESS_2 = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8' as Hex;
-const EMPTY_ARGS = new Uint8Array();
 
 /**
  * Pads an Ethereum address to 32 bytes (left-padded with zeros).
@@ -117,49 +115,23 @@ describe('appendPayeeCaveatIfPresent', () => {
       },
     );
 
-    it('wraps multiple payees in logicalOrWrapperEnforcer for ERC-20', () => {
+    it('throws for multiple ERC-20 payees', () => {
       const caveats: Caveat[] = [];
-      appendPayeeCaveatIfPresent({
-        rules: [
-          {
-            type: 'payee',
-            data: { addresses: [PAYEE_ADDRESS_1, PAYEE_ADDRESS_2] },
-          },
-        ],
-        contracts: MOCK_CONTRACTS,
-        caveats,
-        permissionType: 'erc20-token-stream',
-      });
-
-      expect(caveats).toHaveLength(1);
-      expect(caveats[0].enforcer).toBe(MOCK_CONTRACTS.logicalOrWrapperEnforcer);
-      expect(caveats[0].terms).toStrictEqual(
-        createLogicalOrWrapperTerms({
-          caveatGroups: [
-            [
-              {
-                enforcer: MOCK_CONTRACTS.allowedCalldataEnforcer,
-                terms: createAllowedCalldataTerms({
-                  startIndex: 4,
-                  value: padTo32Bytes(PAYEE_ADDRESS_1),
-                }),
-                args: EMPTY_ARGS,
-              },
-            ],
-            [
-              {
-                enforcer: MOCK_CONTRACTS.allowedCalldataEnforcer,
-                terms: createAllowedCalldataTerms({
-                  startIndex: 4,
-                  value: padTo32Bytes(PAYEE_ADDRESS_2),
-                }),
-                args: EMPTY_ARGS,
-              },
-            ],
+      expect(() =>
+        appendPayeeCaveatIfPresent({
+          rules: [
+            {
+              type: 'payee',
+              data: { addresses: [PAYEE_ADDRESS_1, PAYEE_ADDRESS_2] },
+            },
           ],
+          contracts: MOCK_CONTRACTS,
+          caveats,
+          permissionType: 'erc20-token-stream',
         }),
-      );
-      expect(caveats[0].args).toBe('0x');
+      ).toThrow(MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR);
+
+      expect(caveats).toHaveLength(0);
     });
   });
 

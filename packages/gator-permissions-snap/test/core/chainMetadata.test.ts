@@ -35,7 +35,6 @@ describe('chainMetadata', () => {
         allowedCalldataEnforcer: expect.any(String),
         redeemerEnforcer: expect.any(String),
         allowedTargetsEnforcer: expect.any(String),
-        logicalOrWrapperEnforcer: expect.any(String),
       },
       name: expect.any(String),
       explorerUrl: expect.any(String),
@@ -105,7 +104,6 @@ describe('chainMetadata', () => {
           'allowedCalldataEnforcer',
           'redeemerEnforcer',
           'allowedTargetsEnforcer',
-          'logicalOrWrapperEnforcer',
         ];
 
         const metadata = getChainMetadata({ chainId: 11155111 }); // Sepolia

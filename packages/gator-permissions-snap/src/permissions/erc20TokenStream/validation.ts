@@ -57,7 +57,7 @@ function validatePermissionData(
 
   validateStartTime(startTime, rules);
   validateRedeemerRule(rules);
-  validatePayeeRule(rules);
+  validatePayeeRule(rules, { allowMultiplePayees: false });
 
   return true;
 }

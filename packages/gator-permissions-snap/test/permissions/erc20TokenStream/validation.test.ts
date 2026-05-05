@@ -3,6 +3,7 @@ import { bigIntToHex } from '@metamask/utils';
 
 import type { Erc20TokenStreamPermissionRequest } from '../../../src/permissions/erc20TokenStream/types';
 import { parseAndValidatePermission } from '../../../src/permissions/erc20TokenStream/validation';
+import { MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR } from '../../../src/permissions/validation';
 import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 10;
@@ -58,6 +59,49 @@ describe('erc20TokenStream:validation', () => {
       expect(() =>
         parseAndValidatePermission(missingExpiryRequest as any),
       ).not.toThrow();
+    });
+
+    describe('payee rule validation', () => {
+      it('allows one payee', () => {
+        const singlePayeeRequest = {
+          ...validPermissionRequest,
+          rules: [
+            ...validPermissionRequest.rules,
+            {
+              type: 'payee',
+              data: {
+                addresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+              },
+            },
+          ],
+        };
+
+        expect(() =>
+          parseAndValidatePermission(singlePayeeRequest),
+        ).not.toThrow();
+      });
+
+      it('throws for multiple payees', () => {
+        const multiPayeeRequest = {
+          ...validPermissionRequest,
+          rules: [
+            ...validPermissionRequest.rules,
+            {
+              type: 'payee',
+              data: {
+                addresses: [
+                  '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+                  '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+                ],
+              },
+            },
+          ],
+        };
+
+        expect(() => parseAndValidatePermission(multiPayeeRequest)).toThrow(
+          MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR,
+        );
+      });
     });
 
     it('should throw for invalid permission type', () => {
