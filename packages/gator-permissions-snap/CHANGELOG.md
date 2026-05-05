@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.4.0]
+## [2.0.0]
 
 ### Added
 
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `permissionsProvider_getSupportedPermissions` no longer includes chainIds ([#296](https://github.com/MetaMask/snap-7715-permissions/pull/296))
+- **BREAKING**: `permissionsProvider_getSupportedPermissions` no longer includes chainIds ([#296](https://github.com/MetaMask/snap-7715-permissions/pull/296))
 
 ### Fixed
 
@@ -352,8 +352,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.4.0...HEAD
-[1.4.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.1...@metamask/gator-permissions-snap@1.4.0
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.0.0...HEAD
+[2.0.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.1...@metamask/gator-permissions-snap@2.0.0
 [1.3.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.0...@metamask/gator-permissions-snap@1.3.1
 [1.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.2.0...@metamask/gator-permissions-snap@1.3.0
 [1.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.1...@metamask/gator-permissions-snap@1.2.0

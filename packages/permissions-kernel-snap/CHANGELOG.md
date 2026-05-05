@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0]
+
+### Added
+
+- Add payee rule support to allowance permission types ([#300](https://github.com/MetaMask/snap-7715-permissions/pull/300), [#313](https://github.com/MetaMask/snap-7715-permissions/pull/313))
+- Add redeemer rule support to all permission types ([#297](https://github.com/MetaMask/snap-7715-permissions/pull/297))
+
 ## [1.1.0]
 
 ### Added
@@ -118,7 +125,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add validate logic for native token stream permission data ([#33](https://github.com/MetaMask/snap-7715-permissions/pull/33))
 - Update 7715 types to match mm proposed types ([#30](https://github.com/MetaMask/snap-7715-permissions/pull/30))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@1.1.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@1.2.0...HEAD
+[1.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@1.1.0...@metamask/permissions-kernel-snap@1.2.0
 [1.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@1.0.0...@metamask/permissions-kernel-snap@1.1.0
 [1.0.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.6.0...@metamask/permissions-kernel-snap@1.0.0
 [0.6.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/permissions-kernel-snap@0.5.0...@metamask/permissions-kernel-snap@0.6.0
