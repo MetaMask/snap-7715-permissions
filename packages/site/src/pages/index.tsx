@@ -1,3 +1,9 @@
+import {
+  createLogicalOrWrapperArgs,
+  decodeDelegations,
+  decodeLogicalOrWrapperTerms,
+  encodeDelegations,
+} from '@metamask/delegation-core';
 import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
 import type { RequestExecutionPermissionsParameters } from '@metamask/smart-accounts-kit/actions';
 import { useCallback, useMemo, useState } from 'react';
@@ -97,6 +103,9 @@ const ERC20_PERMISSION_TYPES = new Set([
   'erc20-token-periodic',
 ]);
 
+const LOGICAL_OR_WRAPPER_ENFORCER =
+  '0xE1302607a3251AF54c3a6e69318d6aa07F5eB46c';
+
 type PermissionResponseEntry = {
   context: Hex;
   delegationManager: Hex;
@@ -133,6 +142,58 @@ const isPayeeAddress = (to: Hex, payeeAddresses: Hex[]) =>
     (payeeAddress) => payeeAddress.toLowerCase() === to.toLowerCase(),
   );
 
+const getPayeeIndex = (to: Hex, payeeAddresses: Hex[]) =>
+  payeeAddresses.findIndex(
+    (payeeAddress) => payeeAddress.toLowerCase() === to.toLowerCase(),
+  );
+
+const addLogicalOrWrapperArgsForPayee = ({
+  permissionContext,
+  payeeIndex,
+}: {
+  permissionContext: Hex;
+  payeeIndex: number;
+}) => {
+  let didUpdateLogicalOrWrapper = false;
+
+  const delegations = decodeDelegations(permissionContext);
+  const updatedDelegations = delegations.map((delegation) => ({
+    ...delegation,
+    caveats: delegation.caveats.map((caveat) => {
+      if (
+        caveat.enforcer.toLowerCase() !==
+        LOGICAL_OR_WRAPPER_ENFORCER.toLowerCase()
+      ) {
+        return caveat;
+      }
+
+      const { caveatGroups } = decodeLogicalOrWrapperTerms(caveat.terms);
+      const selectedGroup = caveatGroups[payeeIndex];
+      if (!selectedGroup) {
+        throw new Error(
+          'Selected payee does not match the LogicalOrWrapper caveat groups.',
+        );
+      }
+
+      didUpdateLogicalOrWrapper = true;
+
+      return {
+        ...caveat,
+        args: createLogicalOrWrapperArgs({
+          groupIndex: BigInt(payeeIndex),
+          caveatArgs: selectedGroup.map(() => '0x00' as Hex),
+        }),
+      };
+    }),
+  }));
+
+  if (!didUpdateLogicalOrWrapper) {
+    throw new Error('LogicalOrWrapper caveat not found for multiple payees.');
+  }
+
+  return encodeDelegations(updatedDelegations, { out: 'hex' });
+};
+
 const buildRedeemCall = ({
   permission,
   to,
@@ -148,22 +209,31 @@ const buildRedeemCall = ({
   const isPayeeShortcut = payeeAddresses.length > 0 && data === '0x';
 
   if (!isPayeeShortcut) {
-    return { to, data, value };
+    return { to, data, value, permissionContext: permission.context };
   }
 
-  if (!isPayeeAddress(to, payeeAddresses)) {
+  const payeeIndex = getPayeeIndex(to, payeeAddresses);
+  if (payeeIndex === -1 || !isPayeeAddress(to, payeeAddresses)) {
     throw new Error('Redeem target must match one of the payee addresses.');
   }
 
   const permissionType = getDescriptorName(permission.permission?.type ?? '');
   if (!ERC20_PERMISSION_TYPES.has(permissionType)) {
-    return { to, data, value };
+    return { to, data, value, permissionContext: permission.context };
   }
 
   const tokenAddress = permission.permission?.data?.tokenAddress;
   if (!tokenAddress) {
     throw new Error('ERC20 payee redemption requires a token address.');
   }
+
+  const permissionContext =
+    payeeAddresses.length > 1
+      ? addLogicalOrWrapperArgsForPayee({
+          permissionContext: permission.context,
+          payeeIndex,
+        })
+      : permission.context;
 
   return {
     to: tokenAddress,
@@ -173,6 +243,7 @@ const buildRedeemCall = ({
       args: [to, value],
     }),
     value: 0n,
+    permissionContext,
   };
 };
 
@@ -293,7 +364,7 @@ const Index = () => {
       throw new Error('Permission response not found');
     }
 
-    const { context, delegationManager } = permission;
+    const { delegationManager } = permission;
     const redeemCall = buildRedeemCall({ permission, to, data, value });
 
     const publicClient = createPublicClient({
@@ -308,8 +379,10 @@ const Index = () => {
           account: delegateAccount,
           calls: [
             {
-              ...redeemCall,
-              permissionContext: context,
+              to: redeemCall.to,
+              data: redeemCall.data,
+              value: redeemCall.value,
+              permissionContext: redeemCall.permissionContext,
               delegationManager,
             },
           ],
