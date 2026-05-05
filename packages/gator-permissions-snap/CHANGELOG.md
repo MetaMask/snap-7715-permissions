@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- feat: Remove LogicalOrWrapper payee support for ERC20 ([#313](https://github.com/MetaMask/snap-7715-permissions/pull/313))
 - `permissionsProvider_getSupportedPermissions` no longer includes chainIds ([#296](https://github.com/MetaMask/snap-7715-permissions/pull/296))
 
 ### Fixed
