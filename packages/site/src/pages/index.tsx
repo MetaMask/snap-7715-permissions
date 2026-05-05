@@ -6,7 +6,9 @@ import {
   http,
   custom,
   createPublicClient,
+  encodeFunctionData,
   extractChain,
+  parseAbi,
 } from 'viem';
 import type { Chain, Hex } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
@@ -85,6 +87,94 @@ const supportedChains: Chain[] = supportedChainsString
       return chain;
     })
   : DEFAULT_CHAINS;
+
+const ERC20_TRANSFER_ABI = parseAbi([
+  'function transfer(address to, uint256 amount) returns (bool)',
+]);
+
+const ERC20_PERMISSION_TYPES = new Set([
+  'erc20-token-stream',
+  'erc20-token-periodic',
+]);
+
+type PermissionResponseEntry = {
+  context: Hex;
+  delegationManager: Hex;
+  permission?: {
+    type?: string;
+    data?: {
+      tokenAddress?: Hex;
+    };
+  };
+  rules?: {
+    type: string;
+    data?: {
+      addresses?: Hex[];
+    };
+  }[];
+};
+
+const getDescriptorName = (descriptor: string) => {
+  const parts = descriptor.split(':');
+  return parts[parts.length - 1] ?? descriptor;
+};
+
+const getPayeeAddresses = (permission: PermissionResponseEntry) => {
+  const payeeRule = permission.rules?.find(
+    (rule) => getDescriptorName(rule.type) === 'payee',
+  );
+
+  const addresses = payeeRule?.data?.addresses;
+  return Array.isArray(addresses) ? addresses : [];
+};
+
+const isPayeeAddress = (to: Hex, payeeAddresses: Hex[]) =>
+  payeeAddresses.some(
+    (payeeAddress) => payeeAddress.toLowerCase() === to.toLowerCase(),
+  );
+
+const buildRedeemCall = ({
+  permission,
+  to,
+  data,
+  value,
+}: {
+  permission: PermissionResponseEntry;
+  to: Hex;
+  data: Hex;
+  value: bigint;
+}) => {
+  const payeeAddresses = getPayeeAddresses(permission);
+  const isPayeeShortcut = payeeAddresses.length > 0 && data === '0x';
+
+  if (!isPayeeShortcut) {
+    return { to, data, value };
+  }
+
+  if (!isPayeeAddress(to, payeeAddresses)) {
+    throw new Error('Redeem target must match one of the payee addresses.');
+  }
+
+  const permissionType = getDescriptorName(permission.permission?.type ?? '');
+  if (!ERC20_PERMISSION_TYPES.has(permissionType)) {
+    return { to, data, value };
+  }
+
+  const tokenAddress = permission.permission?.data?.tokenAddress;
+  if (!tokenAddress) {
+    throw new Error('ERC20 payee redemption requires a token address.');
+  }
+
+  return {
+    to: tokenAddress,
+    data: encodeFunctionData({
+      abi: ERC20_TRANSFER_ABI,
+      functionName: 'transfer',
+      args: [to, value],
+    }),
+    value: 0n,
+  };
+};
 
 const Index = () => {
   const { error: metaMaskContextError } = useMetaMaskContext();
@@ -196,7 +286,15 @@ const Index = () => {
 
     const feePerGas = await getFeePerGas();
 
-    const { context, delegationManager } = permissionResponse[0];
+    const permission = permissionResponse?.[0] as
+      | PermissionResponseEntry
+      | undefined;
+    if (!permission) {
+      throw new Error('Permission response not found');
+    }
+
+    const { context, delegationManager } = permission;
+    const redeemCall = buildRedeemCall({ permission, to, data, value });
 
     const publicClient = createPublicClient({
       chain: selectedChain,
@@ -210,9 +308,7 @@ const Index = () => {
           account: delegateAccount,
           calls: [
             {
-              to,
-              data,
-              value,
+              ...redeemCall,
               permissionContext: context,
               delegationManager,
             },
