@@ -11,17 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- feat: add payee rule support to permission requests ([#300](https://github.com/MetaMask/snap-7715-permissions/pull/300))
-- feat: add redeemer rule support across permissions ([#297](https://github.com/MetaMask/snap-7715-permissions/pull/297))
+- Add payee rule support to allowance permission types ([#300](https://github.com/MetaMask/snap-7715-permissions/pull/300), [#313](https://github.com/MetaMask/snap-7715-permissions/pull/313))
+- Add redeemer rule support to all permission types ([#297](https://github.com/MetaMask/snap-7715-permissions/pull/297))
 
 ### Changed
 
-- feat: Remove LogicalOrWrapper payee support for ERC20 ([#313](https://github.com/MetaMask/snap-7715-permissions/pull/313))
 - `permissionsProvider_getSupportedPermissions` no longer includes chainIds ([#296](https://github.com/MetaMask/snap-7715-permissions/pull/296))
 
 ### Fixed
 
-- fix: change potentially malicious warning color from red to orange ([#294](https://github.com/MetaMask/snap-7715-permissions/pull/294))
+- Change potentially malicious warning color from red to orange ([#294](https://github.com/MetaMask/snap-7715-permissions/pull/294))
 
 ## [1.3.1]
 
