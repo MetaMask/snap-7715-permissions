@@ -28,9 +28,9 @@
     ]
   },
   "dependencies": {
-    "@metamask/7715-permission-types": "0.5.0",
+    "@metamask/7715-permission-types": "0.6.0",
     "@metamask/providers": "22.1.0",
-    "@metamask/smart-accounts-kit": "1.3.0",
+    "@metamask/smart-accounts-kit": "^1.4.0",
     "@metamask/utils": "11.5.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",

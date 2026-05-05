@@ -535,4 +535,23 @@ describe('zRule', () => {
       }),
     ).toThrow(z.ZodError);
   });
+
+  it('accepts a valid payee rule', () => {
+    const parsed = zRule.parse({
+      type: 'payee',
+      data: {
+        addresses: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
+      },
+    });
+    expect(parsed.data.addresses).toHaveLength(1);
+  });
+
+  it('rejects payee rule with empty addresses', () => {
+    expect(() =>
+      zRule.parse({
+        type: 'payee',
+        data: { addresses: [] },
+      }),
+    ).toThrow(z.ZodError);
+  });
 });

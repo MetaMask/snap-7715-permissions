@@ -68,6 +68,22 @@ export const zRule = z
       message:
         'Redeemer rule must include a non-empty addresses array of valid Ethereum addresses',
     },
+  )
+  .refine(
+    (rule) => {
+      if (extractDescriptorName(rule.type) === 'payee') {
+        return z
+          .object({
+            addresses: z.array(zAddress).min(1),
+          })
+          .safeParse(rule.data).success;
+      }
+      return true;
+    },
+    {
+      message:
+        'Payee rule must include a non-empty addresses array of valid Ethereum addresses',
+    },
   );
 
 /**

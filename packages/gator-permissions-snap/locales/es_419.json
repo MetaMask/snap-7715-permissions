@@ -240,6 +240,12 @@
     },
     "potentiallyMaliciousAddressLabel": {
       "message": ""
+    },
+    "payeeLabel": {
+      "message": "Payees"
+    },
+    "payeeTooltip": {
+      "message": "Payments may only be sent to these addresses."
     }
   }
 }

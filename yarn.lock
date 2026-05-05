@@ -2783,10 +2783,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/7715-permission-types@npm:0.5.0, @metamask/7715-permission-types@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "@metamask/7715-permission-types@npm:0.5.0"
-  checksum: 10/f01dcf7ffc3e39536f7cc4d54c088ea659c392de5bdfcaafb9f4d67bbe6b56010358ed2a2ba3adba4e454af51412a2fd5be377cac5c7ab101b032d30711e0b37
+"@metamask/7715-permission-types@npm:0.6.0, @metamask/7715-permission-types@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@metamask/7715-permission-types@npm:0.6.0"
+  checksum: 10/bac0741ed0d880d9f418a58ef5d1f165cff0171636cb4431bc42a05b471b92afd6593810ac805a427a76dc02abcba651cc3c1c05b67d5a4b6ad3923b057de039
   languageName: node
   linkType: hard
 
@@ -2967,21 +2967,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-core@npm:1.1.0, @metamask/delegation-core@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@metamask/delegation-core@npm:1.1.0"
+"@metamask/delegation-core@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/delegation-core@npm:2.0.0"
   dependencies:
     "@metamask/abi-utils": "npm:^3.0.0"
     "@metamask/utils": "npm:^11.4.0"
     "@noble/hashes": "npm:^1.8.0"
-  checksum: 10/672f9e2e2b4e8c312f2cd2ff166bbc508fbdb6e141fe92e678abc9993b9ccbdd17db711477a9b97b6ce3919fa6d51d759c16f6c6fda3f89cb95e303b8aa76f7d
+  checksum: 10/b473160e4cb4a6d463c6015de6e90d057034d2e8f2905068e1f44f93c8247618c5d84a155e86dfaa125dacb040951643517b9a76961bf8d215c194dc4d1cc0ad
   languageName: node
   linkType: hard
 
-"@metamask/delegation-deployments@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@metamask/delegation-deployments@npm:1.2.0"
-  checksum: 10/f9cd63d05dd9e9627696fd9fea9c32937839fab5e5f4a6ee15a4d32887ec58069aec1626608cfa8b4b5d39f75070c0329347e72d968fa9e3902932da8365d5c1
+"@metamask/delegation-deployments@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "@metamask/delegation-deployments@npm:1.3.0"
+  checksum: 10/58f4aafb5f0e3cbc543811cbc0100efab4ed67b9c9794b83192962153e4edbe12fd6ab6fa7be689503309862a65eb7fde771f632893d38ab54f8171aa682b34f
   languageName: node
   linkType: hard
 
@@ -3078,7 +3078,7 @@ __metadata:
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/abi-utils": "npm:3.0.0"
     "@metamask/auto-changelog": "npm:5.0.2"
-    "@metamask/delegation-core": "npm:1.1.0"
+    "@metamask/delegation-core": "npm:^2.0.0"
     "@metamask/eslint-config": "npm:15.0.0"
     "@metamask/eslint-config-jest": "npm:15.0.0"
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
@@ -3375,19 +3375,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/smart-accounts-kit@npm:1.3.0":
-  version: 1.3.0
-  resolution: "@metamask/smart-accounts-kit@npm:1.3.0"
+"@metamask/smart-accounts-kit@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@metamask/smart-accounts-kit@npm:1.4.0"
   dependencies:
-    "@metamask/7715-permission-types": "npm:^0.5.0"
+    "@metamask/7715-permission-types": "npm:^0.6.0"
     "@metamask/delegation-abis": "npm:^1.0.0"
-    "@metamask/delegation-core": "npm:^1.1.0"
-    "@metamask/delegation-deployments": "npm:^1.2.0"
+    "@metamask/delegation-core": "npm:^2.0.0"
+    "@metamask/delegation-deployments": "npm:^1.3.0"
     openapi-fetch: "npm:^0.13.5"
     ox: "npm:0.8.1"
   peerDependencies:
     viem: ^2.31.4
-  checksum: 10/45da6ddafcdef5c3c0247efa1d2a431349b6bd2684b6b92cc69c3f38eab5816385cbb197c52093811b588b80f4b71c57517861c76cd906c000906d814514430d
+  checksum: 10/9c26d9e43b9495258c2267c8b5dae7b652bf270b87d069322f5c0e6d1388356cab4e57a81c7bdab6c0501269f3f8173f9a68e8a92023e3b7b20024b328afed8b
   languageName: node
   linkType: hard
 
@@ -13190,13 +13190,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask/7715-permission-types": "npm:0.5.0"
+    "@metamask/7715-permission-types": "npm:0.6.0"
     "@metamask/eslint-config": "npm:15.0.0"
     "@metamask/eslint-config-jest": "npm:15.0.0"
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
     "@metamask/eslint-config-typescript": "npm:15.0.0"
     "@metamask/providers": "npm:22.1.0"
-    "@metamask/smart-accounts-kit": "npm:1.3.0"
+    "@metamask/smart-accounts-kit": "npm:^1.4.0"
     "@metamask/utils": "npm:11.5.0"
     "@types/jest": "npm:27.5.2"
     "@types/react": "npm:19.2.3"

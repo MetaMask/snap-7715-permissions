@@ -67,6 +67,10 @@ export type BaseContext = {
    * Allowed redeemer addresses from the dapp-provided redeemer rule (read-only in the UI).
    */
   redeemerAddresses?: string[] | undefined;
+  /**
+   * Allowed payee addresses from the dapp-provided payee rule (read-only in the UI).
+   */
+  payeeAddresses?: string[] | undefined;
 };
 
 export type BaseMetadata = {

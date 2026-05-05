@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
 import type { Hex } from 'viem';
 
+import { PayeeAddressesField } from './PayeeAddressesField';
 import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { NativeTokenStreamPermissionRequest } from './types';
 
@@ -33,6 +34,7 @@ export const NativeTokenStreamForm = ({
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
   const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
+  const [payeeAddresses, setPayeeAddresses] = useState<Hex[]>([]);
 
   const handleInitialAmountChange = useCallback(
     ({
@@ -121,6 +123,7 @@ export const NativeTokenStreamForm = ({
       expiry,
       justification,
       redeemerAddresses,
+      payeeAddresses,
       isAdjustmentAllowed,
     });
   }, [
@@ -132,6 +135,7 @@ export const NativeTokenStreamForm = ({
     expiry,
     justification,
     redeemerAddresses,
+    payeeAddresses,
     isAdjustmentAllowed,
   ]);
 
@@ -198,6 +202,7 @@ export const NativeTokenStreamForm = ({
         />
       </div>
       <RedeemerAddressesField onChange={setRedeemerAddresses} />
+      <PayeeAddressesField onChange={setPayeeAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
         <input

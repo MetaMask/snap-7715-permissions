@@ -29,6 +29,7 @@ import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
 import type { ExistingPermissionsService } from './existingpermissions';
 import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 import { appendExpiryCaveatIfPresent } from './expiryCaveat';
+import { appendPayeeCaveatIfPresent } from './payeeCaveat';
 import type { PermissionIntroductionService } from './permissionIntroduction';
 import { appendRedeemerCaveatIfPresent } from './redeemerCaveat';
 import type {
@@ -582,6 +583,13 @@ export class PermissionRequestLifecycleOrchestrator {
       rules: resolvedRequest.rules,
       contracts,
       caveats,
+    });
+
+    appendPayeeCaveatIfPresent({
+      rules: resolvedRequest.rules,
+      contracts,
+      caveats,
+      permissionType,
     });
 
     const nonce = await this.#nonceCaveatService.getNonce({

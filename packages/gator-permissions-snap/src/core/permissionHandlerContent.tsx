@@ -27,6 +27,7 @@ import type {
 } from '../clients/trustSignalsClient';
 import {
   AddressField,
+  PayeeField,
   RedeemerField,
   ShowMoreText,
   SkeletonField,
@@ -203,6 +204,14 @@ export const PermissionHandlerContent = ({
       tooltip={t('redeemerTooltip')}
     />
   ) : null;
+
+  const payeeField = context.payeeAddresses?.length ? (
+    <PayeeField
+      label={t('payeeLabel')}
+      addresses={context.payeeAddresses}
+      tooltip={t('payeeTooltip')}
+    />
+  ) : null;
   return (
     <Container>
       <Box>
@@ -288,6 +297,7 @@ export const PermissionHandlerContent = ({
               />
             )}
             {redeemerField}
+            {payeeField}
           </Section>
           {children}
         </Box>

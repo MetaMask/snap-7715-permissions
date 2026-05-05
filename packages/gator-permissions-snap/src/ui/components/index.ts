@@ -7,6 +7,7 @@ export { SkeletonField } from './SkeletonField';
 export { TextField } from './TextField';
 export { TokenIcon } from './TokenIcon';
 export { TooltipIcon } from './TooltipIcon';
+export { PayeeField } from './PayeeField';
 export { RedeemerField } from './RedeemerField';
 export { TokenField } from './TokenField';
 export { TokenBalanceField } from './TokenBalanceField';
