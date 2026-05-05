@@ -69,8 +69,5 @@
   },
   "engines": {
     "node": "^20 || >=22"
-  },
-  "resolutions": {
-    "@metamask/delegation-core": "link:../../../smart-accounts-kit/packages/delegation-core"
   }
 }
