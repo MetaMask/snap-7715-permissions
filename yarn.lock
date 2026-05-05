@@ -2783,7 +2783,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/7715-permission-types@npm:0.6.0":
+"@metamask/7715-permission-types@npm:0.6.0, @metamask/7715-permission-types@npm:^0.6.0":
   version: 0.6.0
   resolution: "@metamask/7715-permission-types@npm:0.6.0"
   checksum: 10/bac0741ed0d880d9f418a58ef5d1f165cff0171636cb4431bc42a05b471b92afd6593810ac805a427a76dc02abcba651cc3c1c05b67d5a4b6ad3923b057de039
@@ -2827,7 +2827,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metamask/abi-utils@npm:3.0.0":
+"@metamask/abi-utils@npm:3.0.0, @metamask/abi-utils@npm:^3.0.0":
   version: 3.0.0
   resolution: "@metamask/abi-utils@npm:3.0.0"
   dependencies:
@@ -2960,11 +2960,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-core@link:../../../smart-accounts-kit/packages/delegation-core::locator=%40metamask%2Fgator-permissions-snap%40workspace%3Apackages%2Fgator-permissions-snap":
-  version: 0.0.0-use.local
-  resolution: "@metamask/delegation-core@link:../../../smart-accounts-kit/packages/delegation-core::locator=%40metamask%2Fgator-permissions-snap%40workspace%3Apackages%2Fgator-permissions-snap"
+"@metamask/delegation-abis@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@metamask/delegation-abis@npm:1.0.0"
+  checksum: 10/31b58d3080710cd48fbf471a1cb94fc4cae705f2472d392a3daaa7c73603ad6d0b1c9068e3b71b10f9c39bfe19c1fad90ecf3115e20a00b2d39f5c7789c5b932
   languageName: node
-  linkType: soft
+  linkType: hard
+
+"@metamask/delegation-core@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/delegation-core@npm:2.0.0"
+  dependencies:
+    "@metamask/abi-utils": "npm:^3.0.0"
+    "@metamask/utils": "npm:^11.4.0"
+    "@noble/hashes": "npm:^1.8.0"
+  checksum: 10/b473160e4cb4a6d463c6015de6e90d057034d2e8f2905068e1f44f93c8247618c5d84a155e86dfaa125dacb040951643517b9a76961bf8d215c194dc4d1cc0ad
+  languageName: node
+  linkType: hard
+
+"@metamask/delegation-deployments@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "@metamask/delegation-deployments@npm:1.3.0"
+  checksum: 10/58f4aafb5f0e3cbc543811cbc0100efab4ed67b9c9794b83192962153e4edbe12fd6ab6fa7be689503309862a65eb7fde771f632893d38ab54f8171aa682b34f
+  languageName: node
+  linkType: hard
 
 "@metamask/eslint-config-jest@npm:15.0.0":
   version: 15.0.0
@@ -3059,7 +3078,7 @@ __metadata:
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/abi-utils": "npm:3.0.0"
     "@metamask/auto-changelog": "npm:5.0.2"
-    "@metamask/delegation-core": "link:../../../smart-accounts-kit/packages/delegation-core"
+    "@metamask/delegation-core": "npm:^2.0.0"
     "@metamask/eslint-config": "npm:15.0.0"
     "@metamask/eslint-config-jest": "npm:15.0.0"
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
@@ -3356,11 +3375,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/smart-accounts-kit@link:../../../smart-accounts-kit/packages/smart-accounts-kit::locator=site%40workspace%3Apackages%2Fsite":
-  version: 0.0.0-use.local
-  resolution: "@metamask/smart-accounts-kit@link:../../../smart-accounts-kit/packages/smart-accounts-kit::locator=site%40workspace%3Apackages%2Fsite"
+"@metamask/smart-accounts-kit@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@metamask/smart-accounts-kit@npm:1.4.0"
+  dependencies:
+    "@metamask/7715-permission-types": "npm:^0.6.0"
+    "@metamask/delegation-abis": "npm:^1.0.0"
+    "@metamask/delegation-core": "npm:^2.0.0"
+    "@metamask/delegation-deployments": "npm:^1.3.0"
+    openapi-fetch: "npm:^0.13.5"
+    ox: "npm:0.8.1"
+  peerDependencies:
+    viem: ^2.31.4
+  checksum: 10/9c26d9e43b9495258c2267c8b5dae7b652bf270b87d069322f5c0e6d1388356cab4e57a81c7bdab6c0501269f3f8173f9a68e8a92023e3b7b20024b328afed8b
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "@metamask/snap-7715-permissions-monorepo@workspace:.":
   version: 0.0.0-use.local
@@ -11499,6 +11528,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"openapi-fetch@npm:^0.13.5":
+  version: 0.13.8
+  resolution: "openapi-fetch@npm:0.13.8"
+  dependencies:
+    openapi-typescript-helpers: "npm:^0.0.15"
+  checksum: 10/fed630452ac2d6abc680402651d848b7377b651164ca2be61a8c5e1fc89e41b09c928ba9dc92cf7c7ad2d400b3fbe5af380165303f293501dc08cefa4c0f92fd
+  languageName: node
+  linkType: hard
+
+"openapi-typescript-helpers@npm:^0.0.15":
+  version: 0.0.15
+  resolution: "openapi-typescript-helpers@npm:0.0.15"
+  checksum: 10/63f8f0b8464aed3e5c6910428bd14839bd5c1dd6ddf841bcea9d5f536a6e03e942a028202920da1a8b1ed9e4304c6fca14943d01a8adff2942d1254a229b8c70
+  languageName: node
+  linkType: hard
+
 "opener@npm:^1.5.2":
   version: 1.5.2
   resolution: "opener@npm:1.5.2"
@@ -13151,7 +13196,7 @@ __metadata:
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
     "@metamask/eslint-config-typescript": "npm:15.0.0"
     "@metamask/providers": "npm:22.1.0"
-    "@metamask/smart-accounts-kit": "link:../../../smart-accounts-kit/packages/smart-accounts-kit"
+    "@metamask/smart-accounts-kit": "npm:^1.4.0"
     "@metamask/utils": "npm:11.5.0"
     "@types/jest": "npm:27.5.2"
     "@types/react": "npm:19.2.3"
