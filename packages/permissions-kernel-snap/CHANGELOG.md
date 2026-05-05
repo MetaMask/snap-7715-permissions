@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Uncategorized
-
-- feat: add redeemer rule support across permissions ([#297](https://github.com/MetaMask/snap-7715-permissions/pull/297))
-
 ## [1.1.0]
 
 ### Added
