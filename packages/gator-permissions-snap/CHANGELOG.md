@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0]
+
+### Added
+
+- Add payee rule support to allowance permission types ([#300](https://github.com/MetaMask/snap-7715-permissions/pull/300), [#313](https://github.com/MetaMask/snap-7715-permissions/pull/313))
+- Add redeemer rule support to all permission types ([#297](https://github.com/MetaMask/snap-7715-permissions/pull/297))
+
+### Changed
+
+- **BREAKING**: `permissionsProvider_getSupportedPermissions` no longer includes chainIds ([#296](https://github.com/MetaMask/snap-7715-permissions/pull/296))
+
+### Fixed
+
+- Change potentially malicious warning color from red to orange ([#294](https://github.com/MetaMask/snap-7715-permissions/pull/294))
+
 ## [1.3.1]
 
 ### Changed
@@ -337,7 +352,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.1...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.0.0...HEAD
+[2.0.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.1...@metamask/gator-permissions-snap@2.0.0
 [1.3.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.0...@metamask/gator-permissions-snap@1.3.1
 [1.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.2.0...@metamask/gator-permissions-snap@1.3.0
 [1.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.1.1...@metamask/gator-permissions-snap@1.2.0
