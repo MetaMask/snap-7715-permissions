@@ -2,244 +2,310 @@
   "locale": "tr",
   "messages": {
     "recipientLabel": {
-      "message": ""
+      "message": "Alıcı"
     },
     "recipientTooltip": {
-      "message": ""
+      "message": "İzni talep eden site"
     },
     "networkLabel": {
-      "message": ""
+      "message": "Ağ"
     },
     "networkTooltip": {
-      "message": ""
+      "message": "İznin talep edildiği ağ"
     },
     "tokenLabel": {
-      "message": ""
+      "message": "Token"
     },
     "tokenTooltip": {
-      "message": ""
+      "message": "Talep edilen token"
     },
     "justificationLabel": {
-      "message": ""
+      "message": "Justification"
     },
     "justificationTooltip": {
-      "message": ""
+      "message": "Justification given by the recipient for requesting this permission."
     },
     "accountLabel": {
-      "message": ""
+      "message": "Hesap"
     },
     "accountTooltip": {
-      "message": ""
+      "message": "İznin verildiği hesap."
     },
     "requestFromLabel": {
-      "message": ""
+      "message": "Talebi gönderen"
     },
     "requestFromTooltip": {
-      "message": ""
+      "message": "İzni talep eden site"
     },
     "initialAmountLabel": {
-      "message": ""
+      "message": "Initial amount"
     },
     "initialAmountTooltip": {
-      "message": ""
+      "message": "Akış gerçekleştirilebilecek başlangıç token miktarı."
     },
     "maxAmountLabel": {
-      "message": ""
+      "message": "Max amount"
     },
     "maxAmountTooltip": {
-      "message": ""
+      "message": "Akış gerçekleştirilebilecek maksimum token miktarı."
     },
     "startTimeLabel": {
-      "message": ""
+      "message": "Start time (UTC)"
     },
     "startTimeTooltip": {
-      "message": ""
+      "message": "İlk dönemin başladığı zaman"
     },
     "streamStartTimeTooltip": {
-      "message": ""
+      "message": "Akışın başlangıç zamanı"
     },
     "expiryLabel": {
-      "message": ""
+      "message": "Expiration date (UTC)"
     },
     "expiryTooltip": {
-      "message": ""
+      "message": "The expiration date of the permission"
+    },
+    "expiryContentWhenDisabled": {
+      "message": "This permission is ongoing. We recommend setting an expiration date."
+    },
+    "redeemerLabel": {
+      "message": "Redeemers"
+    },
+    "redeemerTooltip": {
+      "message": "Only these addresses may redeem this permission."
+    },
+    "payeeLabel": {
+      "message": "Payees"
+    },
+    "payeeTooltip": {
+      "message": "Payments may only be sent to these addresses."
     },
     "streamAmountLabel": {
-      "message": ""
+      "message": "Stream amount"
     },
     "streamAmountTooltip": {
-      "message": ""
+      "message": "Dönem başına akış gerçekleştirilebilecek token miktarı."
     },
     "streamPeriodLabel": {
-      "message": ""
+      "message": "Stream period"
     },
     "streamPeriodTooltip": {
-      "message": ""
+      "message": "Akışın dönemi."
+    },
+    "totalExposureUnlimited": {
+      "message": "Unlimited"
+    },
+    "totalExposureLabel": {
+      "message": "Total exposure"
+    },
+    "totalExposureTooltip": {
+      "message": "The total amount of tokens that can be streamed with this permission."
     },
     "amountLabel": {
-      "message": ""
+      "message": "Miktar"
     },
     "amountTooltip": {
-      "message": ""
+      "message": "Her dönem tahsis edilen token miktarı"
     },
     "periodDurationLabel": {
-      "message": ""
+      "message": "Sıklık"
     },
     "periodDurationTooltip": {
-      "message": ""
+      "message": "Dönem süresi"
     },
     "permissionRequestTitle": {
-      "message": ""
+      "message": "İzin talebi"
     },
     "showMoreButton": {
-      "message": ""
+      "message": "Göster"
     },
     "hideButton": {
-      "message": ""
+      "message": "Gizle"
     },
     "streamRateLabel": {
-      "message": ""
+      "message": "Akış oranı"
     },
     "streamRateTooltip": {
-      "message": ""
+      "message": "Saniye başına akış gerçekleştirilecek token miktarı."
     },
     "streamRateValue": {
-      "message": ""
+      "message": "$1 $2/sn"
     },
     "cancelButton": {
-      "message": ""
+      "message": "İptal"
     },
     "grantButton": {
-      "message": ""
+      "message": "Tahsis"
     },
     "hourly": {
-      "message": ""
+      "message": "Saatlik"
     },
     "daily": {
-      "message": ""
+      "message": "Günlük"
     },
     "weekly": {
-      "message": ""
+      "message": "Haftalık"
     },
     "biweekly": {
-      "message": ""
+      "message": "İki Haftalık"
     },
     "monthly": {
-      "message": ""
+      "message": "Aylık"
     },
     "yearly": {
-      "message": ""
+      "message": "Yıllık"
     },
     "availableLabel": {
-      "message": ""
+      "message": "kullanılabilir"
     },
     "permissionRequestSubtitle": {
-      "message": ""
+      "message": "Bu site, tokenlarınızı harcamak için izin istiyor."
     },
     "accountUpgradeWarning": {
-      "message": ""
+      "message": "Bu izni yerine getirmek için bu hesap akıllı hesaba yükseltilecek."
     },
     "removeFieldAlt": {
-      "message": ""
+      "message": "Kaldır: $1"
     },
     "addFieldAlt": {
-      "message": ""
+      "message": "Ekle: $1"
     },
     "errorAmountMustBeGreaterThanZero": {
-      "message": ""
+      "message": "$1, 0'dan büyük olmalıdır"
     },
     "errorAmountMustBeGreaterThanOrEqualToZero": {
-      "message": ""
+      "message": "$1, 0 veya 0'dan büyük olmalıdır"
     },
     "errorInvalidAmount": {
-      "message": ""
+      "message": "$1 geçersiz"
     },
     "errorInvalidStartTime": {
-      "message": ""
+      "message": "Başlangıç zamanı geçersiz"
     },
     "errorStartTimeMustBeTodayOrLater": {
-      "message": ""
+      "message": "Başlangıç zamanı bugün veya daha sonraki bir tarih olmalıdır"
     },
     "errorInvalidExpiry": {
-      "message": ""
+      "message": "Invalid expiration date"
     },
     "errorExpiryMustBeInFuture": {
-      "message": ""
+      "message": "Expiration date must be in the future"
     },
     "errorStartTimeMustBeBeforeExpiry": {
-      "message": ""
+      "message": "Start time must be before expiration date"
     },
     "errorMaxAmountMustBeGreaterThanInitialAmount": {
-      "message": ""
+      "message": "Maksimum miktar başlangıç miktarından büyük olmalıdır"
     },
     "errorPeriodDurationMustBeGreaterThanZero": {
-      "message": ""
+      "message": "Dönem süresi 0'dan büyük olmalıdır"
     },
     "unknownStreamRate": {
-      "message": ""
+      "message": "Bilinmeyen"
     },
     "unknownChain": {
-      "message": ""
+      "message": "Bilinmeyen zincir $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": ""
+      "message": "Bu site, ERC-20 token onaylarınızı iptal etmek için izin istiyor."
     },
     "introAdvancedPermissionsTitle": {
-      "message": ""
+      "message": "Kontrolü elinizde tutabilmeniz için gelişmiş izinler"
     },
     "introSecureLimitedAccessTitle": {
-      "message": ""
+      "message": "Güvenli, sınırlı erişim"
     },
     "introSecureLimitedAccessDescription": {
-      "message": ""
+      "message": "Kendi tercihlerinize göre siteleri kısıtlayın ve erişim yetkilerini iptal edin."
     },
     "introFullyCustomizableControlTitle": {
-      "message": ""
+      "message": "Tamamen kişiselleştirilebilir kontrol"
     },
     "introFullyCustomizableControlDescription": {
-      "message": ""
+      "message": "İzinlerin ihtiyaçlarınızı karşılaması için kuralları gözden geçirin, düzenleyin veya yeni kural ekleyin."
     },
     "introTransparentConvenientTitle": {
-      "message": ""
+      "message": "Şeffaf ve kullanışlı"
     },
     "introTransparentConvenientDescription": {
-      "message": ""
+      "message": "İzinlerin tamamını tek bir yerden kolayca yönetin."
     },
     "introSubscriptionTitle": {
-      "message": ""
+      "message": "Token abonelik talebi"
     },
     "introRecurringPaymentsDescription": {
-      "message": ""
+      "message": "Token abonelikleri, sitelere, sizin belirlediğiniz plana göre cüzdanınızdan token çekme izni verir."
     },
     "introStreamTitle": {
-      "message": ""
+      "message": "Token akış talebi"
     },
     "introContinuousTokenFlowDescription": {
-      "message": ""
+      "message": "Token akışları, sitelere, sizin belirlediğiniz bir süre boyunca cüzdanınızdan kademeli olarak token çekme izni verir."
     },
     "introRevocationTitle": {
-      "message": ""
+      "message": "Token iptal talebi"
     },
     "introManageTokenApprovalsDescription": {
-      "message": ""
+      "message": "Token iptali, sitelerin, token onaylarını sizin adınıza iptal etmesine olanak sağlar."
     },
     "introPermissionInControlDescription": {
-      "message": ""
+      "message": "Bu izni dilediğiniz zaman gelişmiş izinler alanında iptal edebilirsiniz."
     },
     "introGotItButton": {
-      "message": ""
+      "message": "Anladım"
     },
     "maliciousWebsiteLabel": {
-      "message": ""
+      "message": "Malicious website"
     },
     "potentiallyMaliciousWebsiteLabel": {
-      "message": ""
+      "message": "Potentially malicious website"
     },
     "maliciousAddressLabel": {
-      "message": ""
+      "message": "Malicious address"
     },
     "potentiallyMaliciousAddressLabel": {
-      "message": ""
+      "message": "Potentially malicious address"
+    },
+    "existingPermissionsTitle": {
+      "message": "Existing permissions"
+    },
+    "existingPermissionsDescription": {
+      "message": "Permissions you’ve already granted to this site"
+    },
+    "existingPermissionsConfirmButton": {
+      "message": "Back to request"
+    },
+    "existingPermissionsExistingMessage": {
+      "message": "You have granted permissions to this site in the past."
+    },
+    "existingPermissionsSimilarMessage": {
+      "message": "You have granted similar permissions to this site in the past."
+    },
+    "existingPermissionsLink": {
+      "message": "Review them"
+    },
+    "existingPermissionsLoadError": {
+      "message": "We couldn’t load the list. You can go back and try again."
+    },
+    "chainLabel": {
+      "message": "Ağ"
+    },
+    "morePermissionsCountSingle": {
+      "message": "This account has 1 more permission. View and manage all permissions in the "
+    },
+    "morePermissionsCountPlural": {
+      "message": "This account has $1 more permissions. View and manage all permissions in the "
+    },
+    "unlimited": {
+      "message": "Unlimited"
+    },
+    "allTokens": {
+      "message": "All tokens"
+    },
+    "dappConnectionsLink": {
+      "message": "Dapp Connections"
+    },
+    "revokeTokenApprovalsLabel": {
+      "message": "Revoke token approvals"
     }
   }
 }
