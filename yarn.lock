@@ -3673,9 +3673,9 @@ __metadata:
   linkType: hard
 
 "@metamask/snaps-sandbox@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@metamask/snaps-sandbox@npm:1.0.0"
-  checksum: 10/e1c14fe55678556c457088a6390be512a9b684ad6cab39b09881a795a5e33f46f31e6f059697f7e520cba6d265b2b01dc9b5058908df0e1a69688bdfd44b4aca
+  version: 1.0.1
+  resolution: "@metamask/snaps-sandbox@npm:1.0.1"
+  checksum: 10/dbf9aed40b9a063360c4cf8e7b66cc8ae0e51986a819e1ba47d002967574cfd354eb04cbcbc9757365c0bd23c146a065ae98052fe32177044bcf2f808c8aaa77
   languageName: node
   linkType: hard
 
