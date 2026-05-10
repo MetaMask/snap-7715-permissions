@@ -77,6 +77,16 @@ function extractPermissionDetails(
   const permissionData = permission.permission.data;
 
   if (permissionData && typeof permissionData === 'object') {
+    if ('justification' in permissionData) {
+      const { justification } = permissionData;
+      if (typeof justification === 'string') {
+        details.justification = {
+          label: t('justificationLabel'),
+          value: justification,
+        };
+      }
+    }
+
     // For revocation-type permissions
     if (permissionType === 'erc20-token-revocation') {
       const revokeLabel = t('revokeTokenApprovalsLabel');
@@ -85,25 +95,13 @@ function extractPermissionDetails(
         label: revokeLabel,
         value: revokeValue,
       };
-
-      // Add justification if available
-      if ('justification' in permissionData) {
-        const { justification } = permissionData;
-        if (justification !== undefined && justification !== null) {
-          const justificationLabel = t('justificationLabel');
-          details.justification = {
-            label: justificationLabel,
-            value: String(justification),
-          };
-        }
-      }
     }
     // For periodic-type permissions
     else if (
       permissionType === 'erc20-token-periodic' ||
       permissionType === 'native-token-periodic'
     ) {
-      const { periodAmount, periodDuration, justification } = permissionData;
+      const { periodAmount, periodDuration } = permissionData;
 
       if (periodAmount !== undefined && periodAmount !== null) {
         const amountLabel = t('amountLabel');
@@ -131,19 +129,11 @@ function extractPermissionDetails(
           value: durationValue,
         };
       }
-
-      if (justification !== undefined && justification !== null) {
-        const justificationLabel = t('justificationLabel');
-        details.justification = {
-          label: justificationLabel,
-          value: String(justification),
-        };
-      }
     } else if (
       permissionType === 'erc20-token-allowance' ||
       permissionType === 'native-token-allowance'
     ) {
-      const { allowanceAmount, startTime, justification } = permissionData;
+      const { allowanceAmount, startTime } = permissionData;
 
       if (allowanceAmount !== undefined && allowanceAmount !== null) {
         const amountLabel = t('amountLabel');
@@ -164,21 +154,13 @@ function extractPermissionDetails(
           value: startTimeValue,
         };
       }
-
-      if (justification !== undefined && justification !== null) {
-        const justificationLabel = t('justificationLabel');
-        details.justification = {
-          label: justificationLabel,
-          value: String(justification),
-        };
-      }
     }
     // For stream-type permissions
     else if (
       permissionType === 'erc20-token-stream' ||
       permissionType === 'native-token-stream'
     ) {
-      const { maxAmount, startTime, justification } = permissionData;
+      const { maxAmount, startTime } = permissionData;
 
       if (maxAmount !== undefined && maxAmount !== null) {
         const maxAmountLabel = t('maxAmountLabel');
@@ -198,14 +180,6 @@ function extractPermissionDetails(
         details.startTime = {
           label: startTimeLabel,
           value: startTimeValue,
-        };
-      }
-
-      if (justification !== undefined && justification !== null) {
-        const justificationLabel = t('justificationLabel');
-        details.justification = {
-          label: justificationLabel,
-          value: String(justification),
         };
       }
     }
