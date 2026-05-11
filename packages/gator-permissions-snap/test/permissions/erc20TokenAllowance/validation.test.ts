@@ -89,5 +89,69 @@ describe('erc20TokenAllowance:validation', () => {
         'Invalid allowanceAmount: must be greater than 0',
       );
     });
+
+    it('should throw when redeemer rule has no addresses', () => {
+      const invalidRedeemerRuleRequest = {
+        ...validPermissionRequest,
+        rules: [
+          ...(validPermissionRequest.rules ?? []),
+          {
+            type: 'redeemer',
+            data: {
+              addresses: [],
+            },
+          },
+        ],
+      };
+
+      expect(() =>
+        parseAndValidatePermission(invalidRedeemerRuleRequest as any),
+      ).toThrow(
+        'Invalid redeemer rule: must include a non-empty addresses array',
+      );
+    });
+
+    it('should throw when payee rule has no addresses', () => {
+      const invalidPayeeRuleRequest = {
+        ...validPermissionRequest,
+        rules: [
+          ...(validPermissionRequest.rules ?? []),
+          {
+            type: 'payee',
+            data: {
+              addresses: [],
+            },
+          },
+        ],
+      };
+
+      expect(() =>
+        parseAndValidatePermission(invalidPayeeRuleRequest as any),
+      ).toThrow('Invalid payee rule: must include a non-empty addresses array');
+    });
+
+    it('should throw when payee rule has multiple addresses', () => {
+      const multiplePayeesRequest = {
+        ...validPermissionRequest,
+        rules: [
+          ...(validPermissionRequest.rules ?? []),
+          {
+            type: 'payee',
+            data: {
+              addresses: [
+                '0x1111111111111111111111111111111111111111',
+                '0x2222222222222222222222222222222222222222',
+              ],
+            },
+          },
+        ],
+      };
+
+      expect(() =>
+        parseAndValidatePermission(multiplePayeesRequest as any),
+      ).toThrow(
+        'Multiple payee addresses are not currently supported for ERC20 permissions.',
+      );
+    });
   });
 });

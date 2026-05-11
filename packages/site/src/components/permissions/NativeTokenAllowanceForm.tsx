@@ -1,7 +1,10 @@
 import { bigIntToHex } from '@metamask/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
+import type { Hex } from 'viem';
 
+import { PayeeAddressesField } from './PayeeAddressesField';
+import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { NativeTokenAllowancePermissionRequest } from './types';
 
 type NativeTokenAllowanceFormProps = {
@@ -24,6 +27,8 @@ export const NativeTokenAllowanceForm = ({
     'This is a request for a single native token allowance',
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
+  const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
+  const [payeeAddresses, setPayeeAddresses] = useState<Hex[]>([]);
 
   const handleAllowanceAmountChange = useCallback(
     ({
@@ -83,6 +88,8 @@ export const NativeTokenAllowanceForm = ({
       startTime,
       expiry,
       justification,
+      redeemerAddresses,
+      payeeAddresses,
       isAdjustmentAllowed,
     });
   }, [
@@ -91,6 +98,8 @@ export const NativeTokenAllowanceForm = ({
     startTime,
     expiry,
     justification,
+    redeemerAddresses,
+    payeeAddresses,
     isAdjustmentAllowed,
   ]);
 
@@ -136,6 +145,8 @@ export const NativeTokenAllowanceForm = ({
           onChange={handleExpiryChange}
         />
       </div>
+      <RedeemerAddressesField onChange={setRedeemerAddresses} />
+      <PayeeAddressesField onChange={setPayeeAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow adjustments:</label>
         <input

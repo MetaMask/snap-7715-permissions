@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { parseUnits, toHex } from 'viem';
 import type { Hex } from 'viem';
 
+import { PayeeAddressesField } from './PayeeAddressesField';
+import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { ERC20TokenAllowancePermissionRequest } from './types';
 
 type ERC20TokenAllowanceFormProps = {
@@ -29,6 +31,8 @@ export const ERC20TokenAllowanceForm = ({
   const [tokenAddress, setTokenAddress] = useState<Hex>(
     '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // Sepolia / mainnet USDC
   );
+  const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
+  const [payeeAddresses, setPayeeAddresses] = useState<Hex[]>([]);
 
   const handleAllowanceAmountChange = useCallback(
     ({
@@ -97,6 +101,8 @@ export const ERC20TokenAllowanceForm = ({
       startTime,
       expiry,
       justification,
+      redeemerAddresses,
+      payeeAddresses,
       isAdjustmentAllowed,
       tokenAddress,
     });
@@ -106,6 +112,8 @@ export const ERC20TokenAllowanceForm = ({
     startTime,
     expiry,
     justification,
+    redeemerAddresses,
+    payeeAddresses,
     isAdjustmentAllowed,
     tokenAddress,
   ]);
@@ -163,6 +171,8 @@ export const ERC20TokenAllowanceForm = ({
           onChange={handleExpiryChange}
         />
       </div>
+      <RedeemerAddressesField onChange={setRedeemerAddresses} />
+      <PayeeAddressesField onChange={setPayeeAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow adjustments:</label>
         <input

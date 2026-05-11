@@ -4,23 +4,20 @@ import { bigIntToHex } from '@metamask/utils';
 import {
   applyContext,
   buildContext,
-  deriveMetadata,
-} from '../../../src/permissions/erc20TokenAllowance/context';
+} from '../../../src/permissions/nativeTokenAllowance/context';
 import type {
-  Erc20TokenAllowanceContext,
-  Erc20TokenAllowancePermissionRequest,
-} from '../../../src/permissions/erc20TokenAllowance/types';
+  NativeTokenAllowanceContext,
+  NativeTokenAllowancePermissionRequest,
+} from '../../../src/permissions/nativeTokenAllowance/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import { parseUnits } from '../../../src/utils/value';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
-const tokenDecimals = 6;
-const tokenAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
 
 const startTime = 1729900800;
 const expiryTimestamp = startTime + 86400 * 30;
 
-const permissionRequest: Erc20TokenAllowancePermissionRequest = {
+const permissionRequest: NativeTokenAllowancePermissionRequest = {
   from: ACCOUNT_ADDRESS,
   chainId: '0x1',
   rules: [
@@ -45,39 +42,40 @@ const permissionRequest: Erc20TokenAllowancePermissionRequest = {
   ],
   to: '0x1',
   permission: {
-    type: 'erc20-token-allowance',
+    type: 'native-token-allowance',
     data: {
       allowanceAmount: bigIntToHex(
-        parseUnits({ formatted: '100', decimals: tokenDecimals }),
+        parseUnits({ formatted: '1', decimals: 18 }),
       ),
       startTime,
-      tokenAddress,
       justification: 'Permission to do something important',
     },
     isAdjustmentAllowed: true,
   },
 };
 
-const baseContext: Erc20TokenAllowanceContext = {
+const baseContext: NativeTokenAllowanceContext = {
   expiry: {
     timestamp: expiryTimestamp,
   },
+  redeemerAddresses: ['0x1111111111111111111111111111111111111111'],
+  payeeAddresses: ['0x2222222222222222222222222222222222222222'],
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-  tokenAddressCaip19: `eip155:1/erc20:${tokenAddress}`,
+  tokenAddressCaip19: 'eip155:1/slip44:60',
   tokenMetadata: {
-    symbol: 'USDC',
-    decimals: tokenDecimals,
+    symbol: 'ETH',
+    decimals: 18,
     iconDataBase64: null,
   },
   permissionDetails: {
-    allowanceAmount: '100',
+    allowanceAmount: '1',
     startTime,
   },
 };
 
-describe('erc20TokenAllowance:context', () => {
+describe('nativeTokenAllowance:context', () => {
   let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
 
   beforeEach(() => {
@@ -85,7 +83,7 @@ describe('erc20TokenAllowance:context', () => {
       getTokenBalanceAndMetadata: jest.fn(() => ({
         balance: BigInt(0),
         symbol: baseContext.tokenMetadata.symbol,
-        decimals: tokenDecimals,
+        decimals: baseContext.tokenMetadata.decimals,
         iconUrl: 'https://example.com/icon.png',
       })),
       fetchIconDataAsBase64: jest.fn(async () =>
@@ -111,31 +109,13 @@ describe('erc20TokenAllowance:context', () => {
   });
 
   describe('applyContext()', () => {
-    it('writes allowance data without a derived period duration', async () => {
+    it('preserves redeemer and payee rules from the original request', async () => {
       const result = await applyContext({
         context: baseContext,
         originalRequest: permissionRequest,
       });
 
-      expect(result.permission.type).toBe('erc20-token-allowance');
-      expect(result.permission.data).not.toHaveProperty('periodDuration');
-      expect(result.permission.data.tokenAddress).toBe(tokenAddress);
-      expect(result.permission.data.allowanceAmount).toBe(
-        permissionRequest.permission.data.allowanceAmount,
-      );
-    });
-  });
-
-  describe('deriveMetadata()', () => {
-    it('does not require expiry when absent', async () => {
-      const contextNoExpiry: Erc20TokenAllowanceContext = {
-        ...baseContext,
-        expiry: undefined,
-      };
-
-      const metadata = await deriveMetadata({ context: contextNoExpiry });
-
-      expect(metadata.validationErrors.expiryError).toBeUndefined();
+      expect(result.rules).toStrictEqual(permissionRequest.rules);
     });
   });
 });

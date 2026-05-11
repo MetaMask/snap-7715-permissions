@@ -69,5 +69,67 @@ describe('nativeTokenAllowance:validation', () => {
         'Failed type validation: type: Invalid literal value, expected "native-token-allowance"',
       );
     });
+
+    it('should throw when redeemer rule has no addresses', () => {
+      const invalidRedeemerRuleRequest = {
+        ...validPermissionRequest,
+        rules: [
+          ...(validPermissionRequest.rules ?? []),
+          {
+            type: 'redeemer',
+            data: {
+              addresses: [],
+            },
+          },
+        ],
+      };
+
+      expect(() =>
+        parseAndValidatePermission(invalidRedeemerRuleRequest as any),
+      ).toThrow(
+        'Invalid redeemer rule: must include a non-empty addresses array',
+      );
+    });
+
+    it('should throw when payee rule has no addresses', () => {
+      const invalidPayeeRuleRequest = {
+        ...validPermissionRequest,
+        rules: [
+          ...(validPermissionRequest.rules ?? []),
+          {
+            type: 'payee',
+            data: {
+              addresses: [],
+            },
+          },
+        ],
+      };
+
+      expect(() =>
+        parseAndValidatePermission(invalidPayeeRuleRequest as any),
+      ).toThrow('Invalid payee rule: must include a non-empty addresses array');
+    });
+
+    it('should allow multiple payee addresses for native token allowances', () => {
+      const multiplePayeesRequest = {
+        ...validPermissionRequest,
+        rules: [
+          ...(validPermissionRequest.rules ?? []),
+          {
+            type: 'payee',
+            data: {
+              addresses: [
+                '0x1111111111111111111111111111111111111111',
+                '0x2222222222222222222222222222222222222222',
+              ],
+            },
+          },
+        ],
+      };
+
+      expect(() =>
+        parseAndValidatePermission(multiplePayeesRequest as any),
+      ).not.toThrow();
+    });
   });
 });

@@ -16,7 +16,13 @@ import {
   validateExpiry,
   validateStartTimeVsExpiry,
 } from '../contextValidation';
-import { applyExpiryRule } from '../rules';
+import {
+  applyExpiryRule,
+  applyPayeeRule,
+  applyRedeemerRule,
+  getPayeeAddressesFromRulesIfPresent,
+  getRedeemerAddressesFromRules,
+} from '../rules';
 import type {
   NativeTokenAllowanceContext,
   NativeTokenAllowancePermissionRequest,
@@ -48,7 +54,9 @@ export async function applyContext({
     tokenMetadata: { decimals },
   } = context;
 
-  const { rules } = applyExpiryRule(context, originalRequest);
+  const expiryMerged = applyExpiryRule(context, originalRequest);
+  const redeemerMerged = applyRedeemerRule(originalRequest, expiryMerged);
+  const { rules } = applyPayeeRule(originalRequest, redeemerMerged);
 
   const permissionData = {
     allowanceAmount: bigIntToHex(
@@ -141,6 +149,14 @@ export async function buildContext({
       }
     : undefined;
 
+  const redeemerAddresses = getRedeemerAddressesFromRules(
+    permissionRequest.rules,
+  );
+
+  const payeeAddresses = getPayeeAddressesFromRulesIfPresent(
+    permissionRequest.rules,
+  );
+
   const allowanceAmount = formatUnitsFromHex({
     value: data.allowanceAmount,
     allowNull: false,
@@ -164,6 +180,8 @@ export async function buildContext({
 
   return {
     expiry,
+    ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
+    ...(payeeAddresses === undefined ? {} : { payeeAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,

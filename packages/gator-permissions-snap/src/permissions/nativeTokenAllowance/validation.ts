@@ -2,7 +2,12 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractZodError } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
-import { validateHexInteger, validateStartTime } from '../validation';
+import {
+  validateHexInteger,
+  validatePayeeRule,
+  validateRedeemerRule,
+  validateStartTime,
+} from '../validation';
 import type {
   NativeTokenAllowancePermission,
   NativeTokenAllowancePermissionRequest,
@@ -30,6 +35,8 @@ function validatePermissionData(
   });
 
   validateStartTime(startTime, rules);
+  validateRedeemerRule(rules);
+  validatePayeeRule(rules);
 
   return true;
 }
