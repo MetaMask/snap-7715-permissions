@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- Add new simple allowance permission types ([#298](https://github.com/MetaMask/snap-7715-permissions/pull/298))
+- chore(deps-dev): bump @metamask/snaps-cli from 8.1.1 to 8.4.1 ([#307](https://github.com/MetaMask/snap-7715-permissions/pull/307))
+- chore(deps): bump @metamask/utils from 11.4.2 to 11.11.0 ([#306](https://github.com/MetaMask/snap-7715-permissions/pull/306))
+- chore(deps-dev): bump @metamask/auto-changelog from 5.0.2 to 6.1.0 ([#310](https://github.com/MetaMask/snap-7715-permissions/pull/310))
+- chore(deps): bump @metamask/snaps-sdk from 10.2.0 to 11.1.0 ([#303](https://github.com/MetaMask/snap-7715-permissions/pull/303))
+
 ## [2.0.0]
 
 ### Added
@@ -147,7 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New RPC `permissionsProvider_submitRevocation` for marking permission as revoked ([#171](https://github.com/MetaMask/snap-7715-permissions/pull/171))
-- Add basic metrics generation via metrics tracking service ([#198](https://github.com/MetaMask/snap-7715-permissions/pull/198)) and ([#216](https://github.com/MetaMask/snap-7715-permissions/pull/216))
+- Add basic metrics generation via metrics tracking service and ([#198](https://github.com/MetaMask/snap-7715-permissions/pull/198), [#216](https://github.com/MetaMask/snap-7715-permissions/pull/216))
 - Check, and if necessary request, upgrade to smart account ([#188](https://github.com/MetaMask/snap-7715-permissions/pull/188))
 
 ### Changed
