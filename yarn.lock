@@ -2898,12 +2898,13 @@ __metadata:
   linkType: hard
 
 "@metamask/base-controller@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "@metamask/base-controller@npm:8.0.1"
+  version: 8.4.2
+  resolution: "@metamask/base-controller@npm:8.4.2"
   dependencies:
-    "@metamask/utils": "npm:^11.2.0"
+    "@metamask/messenger": "npm:^0.3.0"
+    "@metamask/utils": "npm:^11.8.1"
     immer: "npm:^9.0.6"
-  checksum: 10/5ef02099ce2e2246c534a7742b45704417beebf2c21db70241d09c3ddbb549ff3375284ece00edf4051029facff181e5e05f135e97b943ec6c514eecce4fa37a
+  checksum: 10/e5c4d97a35952072dc8e93c90a334ea60a8d9faa7c15584b5ce8f60b151cf56a7dd5304cb8549b183cdd61d53421b45e3c4688170fcd0a3e2c6a184aeb942067
   languageName: node
   linkType: hard
 
@@ -3770,7 +3771,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/utils@npm:11.11.0, @metamask/utils@npm:^11.0.1, @metamask/utils@npm:^11.10.0, @metamask/utils@npm:^11.11.0, @metamask/utils@npm:^11.2.0, @metamask/utils@npm:^11.4.0, @metamask/utils@npm:^11.4.2, @metamask/utils@npm:^11.8.1, @metamask/utils@npm:^11.9.0":
+"@metamask/utils@npm:11.11.0, @metamask/utils@npm:^11.0.1, @metamask/utils@npm:^11.10.0, @metamask/utils@npm:^11.11.0, @metamask/utils@npm:^11.4.0, @metamask/utils@npm:^11.4.2, @metamask/utils@npm:^11.8.1, @metamask/utils@npm:^11.9.0":
   version: 11.11.0
   resolution: "@metamask/utils@npm:11.11.0"
   dependencies:
