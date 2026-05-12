@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0]
+
+### Added
+
+- Add new simple allowance permission types, `erc20-token-allowance` and `native-token-allowance` ([#298](https://github.com/MetaMask/snap-7715-permissions/pull/298))
+
 ## [2.0.0]
 
 ### Added
@@ -147,7 +153,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New RPC `permissionsProvider_submitRevocation` for marking permission as revoked ([#171](https://github.com/MetaMask/snap-7715-permissions/pull/171))
-- Add basic metrics generation via metrics tracking service ([#198](https://github.com/MetaMask/snap-7715-permissions/pull/198)) and ([#216](https://github.com/MetaMask/snap-7715-permissions/pull/216))
+- Add basic metrics generation via metrics tracking service and ([#198](https://github.com/MetaMask/snap-7715-permissions/pull/198), [#216](https://github.com/MetaMask/snap-7715-permissions/pull/216))
 - Check, and if necessary request, upgrade to smart account ([#188](https://github.com/MetaMask/snap-7715-permissions/pull/188))
 
 ### Changed
@@ -352,7 +358,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.0.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.1.0...HEAD
+[2.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.0.0...@metamask/gator-permissions-snap@2.1.0
 [2.0.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.1...@metamask/gator-permissions-snap@2.0.0
 [1.3.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.0...@metamask/gator-permissions-snap@1.3.1
 [1.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.2.0...@metamask/gator-permissions-snap@1.3.0
