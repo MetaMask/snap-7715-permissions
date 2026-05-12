@@ -1,5 +1,10 @@
+import { getSmartAccountsEnvironment } from '@metamask/smart-accounts-kit';
 import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
 import type { RequestExecutionPermissionsParameters } from '@metamask/smart-accounts-kit/actions';
+import {
+  decodeCaveat,
+  decodeDelegations,
+} from '@metamask/smart-accounts-kit/utils';
 import { useCallback, useMemo, useState } from 'react';
 import {
   createClient,
@@ -134,6 +139,7 @@ const Index = () => {
     useState<PermissionRequest | null>(null);
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [decodedIsCopied, setDecodedIsCopied] = useState(false);
   const [supportedPermissionsResponse, setSupportedPermissionsResponse] =
     useState<any>(null);
   const [grantedPermissionsResponse, setGrantedPermissionsResponse] =
@@ -147,6 +153,48 @@ const Index = () => {
   const [pendingPermissionRequests, setPendingPermissionRequests] = useState<
     Set<string>
   >(new Set());
+
+  const decodedPermissionContext = useMemo(() => {
+    if (!Array.isArray(permissionResponse)) {
+      return null;
+    }
+
+    return permissionResponse.map((responseEntry) => {
+      const permissionContext = responseEntry?.context;
+
+      if (!permissionContext) {
+        return [];
+      }
+
+      try {
+        const delegations = decodeDelegations(permissionContext as Hex);
+        const responseChainId =
+          typeof responseEntry?.chainId === 'number'
+            ? responseEntry.chainId
+            : Number(responseEntry?.chainId);
+        const environment = getSmartAccountsEnvironment(
+          Number.isNaN(responseChainId) ? selectedChain.id : responseChainId,
+        );
+        const decodedDelegations = delegations.map((delegation) => ({
+          ...delegation,
+          caveats: (delegation.caveats ?? []).map((caveat) => {
+            try {
+              return decodeCaveat({
+                caveat,
+                environment,
+              });
+            } catch {
+              return caveat;
+            }
+          }),
+        }));
+
+        return decodedDelegations;
+      } catch {
+        return [];
+      }
+    });
+  }, [permissionResponse, selectedChain.id]);
 
   const handleChainChange = ({
     target: { value: inputValue },
@@ -307,6 +355,20 @@ const Index = () => {
     }
   };
 
+  const handleCopyDecodedToClipboard = () => {
+    if (decodedPermissionContext) {
+      navigator.clipboard
+        .writeText(stringifyWithBigInt(decodedPermissionContext))
+        .then(() => {
+          setDecodedIsCopied(true);
+          setTimeout(() => setDecodedIsCopied(false), 2000);
+        })
+        .catch((clipboardError) => {
+          console.error('Failed to copy: ', clipboardError);
+        });
+    }
+  };
+
   const handleGetSupportedPermissions = async () => {
     setPermissionResponseError(null);
     try {
@@ -421,20 +483,35 @@ const Index = () => {
             />
           </Box>
         )}
-        {metaMaskClient && (
+        {metaMaskClient && permissionResponse && (
           <Box style={{ position: 'relative' }}>
-            {permissionResponse && (
-              <ResponseContainer>
-                <Title>Permission Response</Title>
-                <CopyButton
-                  onClick={handleCopyToClipboard}
-                  title={'Copy to clipboard'}
-                >
-                  {isCopied ? '✅' : '📝'}
-                </CopyButton>
-                <pre>{stringifyWithBigInt(permissionResponse)}</pre>
-              </ResponseContainer>
-            )}
+            <ResponseContainer>
+              <Title>Permission Response</Title>
+              <CopyButton
+                onClick={handleCopyToClipboard}
+                title={'Copy to clipboard'}
+              >
+                {isCopied ? '✅' : '📝'}
+              </CopyButton>
+              <pre>{stringifyWithBigInt(permissionResponse)}</pre>
+              {decodedPermissionContext && (
+                <details style={{ marginTop: '1rem' }}>
+                  <summary>Decoded Permission Context</summary>
+                  <CopyButton
+                    onClick={handleCopyDecodedToClipboard}
+                    title={'Copy to clipboard'}
+                    style={{ position: 'relative', float: 'right' }}
+                  >
+                    {decodedIsCopied ? '✅' : '📝'}
+                  </CopyButton>
+                  <pre>{stringifyWithBigInt(decodedPermissionContext)}</pre>
+                </details>
+              )}
+            </ResponseContainer>
+          </Box>
+        )}
+        {metaMaskClient && (
+          <Box>
             <StyledForm>
               <div>
                 <label htmlFor="chainSelector">Chain:</label>
