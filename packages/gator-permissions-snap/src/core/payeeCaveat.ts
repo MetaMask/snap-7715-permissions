@@ -13,11 +13,13 @@ import { MULTIPLE_ERC20_PAYEES_UNSUPPORTED_ERROR } from '../permissions/validati
 const ERC20_PERMISSION_TYPES = new Set([
   'erc20-token-stream',
   'erc20-token-periodic',
+  'erc20-token-allowance',
 ]);
 
 const NATIVE_PERMISSION_TYPES = new Set([
   'native-token-stream',
   'native-token-periodic',
+  'native-token-allowance',
 ]);
 
 /**

@@ -77,6 +77,16 @@ function extractPermissionDetails(
   const permissionData = permission.permission.data;
 
   if (permissionData && typeof permissionData === 'object') {
+    if ('justification' in permissionData) {
+      const { justification } = permissionData;
+      if (typeof justification === 'string') {
+        details.justification = {
+          label: t('justificationLabel'),
+          value: justification,
+        };
+      }
+    }
+
     // For revocation-type permissions
     if (permissionType === 'erc20-token-revocation') {
       const revokeLabel = t('revokeTokenApprovalsLabel');
@@ -85,25 +95,13 @@ function extractPermissionDetails(
         label: revokeLabel,
         value: revokeValue,
       };
-
-      // Add justification if available
-      if ('justification' in permissionData) {
-        const { justification } = permissionData;
-        if (justification !== undefined && justification !== null) {
-          const justificationLabel = t('justificationLabel');
-          details.justification = {
-            label: justificationLabel,
-            value: String(justification),
-          };
-        }
-      }
     }
     // For periodic-type permissions
     else if (
       permissionType === 'erc20-token-periodic' ||
       permissionType === 'native-token-periodic'
     ) {
-      const { periodAmount, periodDuration, justification } = permissionData;
+      const { periodAmount, periodDuration } = permissionData;
 
       if (periodAmount !== undefined && periodAmount !== null) {
         const amountLabel = t('amountLabel');
@@ -131,12 +129,29 @@ function extractPermissionDetails(
           value: durationValue,
         };
       }
+    } else if (
+      permissionType === 'erc20-token-allowance' ||
+      permissionType === 'native-token-allowance'
+    ) {
+      const { allowanceAmount, startTime } = permissionData;
 
-      if (justification !== undefined && justification !== null) {
-        const justificationLabel = t('justificationLabel');
-        details.justification = {
-          label: justificationLabel,
-          value: String(justification),
+      if (allowanceAmount !== undefined && allowanceAmount !== null) {
+        const amountLabel = t('amountLabel');
+        details.allowanceAmount = {
+          label: amountLabel,
+          value: String(allowanceAmount),
+        };
+      }
+
+      if (startTime !== undefined && startTime !== null) {
+        const startTimeLabel = t('startTimeLabel');
+        const date = new Date(Number(startTime) * 1000);
+        const startTimeValue = date.toLocaleString(undefined, {
+          timeZone: 'UTC',
+        });
+        details.startTime = {
+          label: startTimeLabel,
+          value: startTimeValue,
         };
       }
     }
@@ -145,7 +160,7 @@ function extractPermissionDetails(
       permissionType === 'erc20-token-stream' ||
       permissionType === 'native-token-stream'
     ) {
-      const { maxAmount, startTime, justification } = permissionData;
+      const { maxAmount, startTime } = permissionData;
 
       if (maxAmount !== undefined && maxAmount !== null) {
         const maxAmountLabel = t('maxAmountLabel');
@@ -165,14 +180,6 @@ function extractPermissionDetails(
         details.startTime = {
           label: startTimeLabel,
           value: startTimeValue,
-        };
-      }
-
-      if (justification !== undefined && justification !== null) {
-        const justificationLabel = t('justificationLabel');
-        details.justification = {
-          label: justificationLabel,
-          value: String(justification),
         };
       }
     }
@@ -235,7 +242,9 @@ export async function formatPermissionWithTokenMetadata(
 
   // Check if this permission has token amount fields that need formatting
   const hasTokenAmountFields =
-    'maxAmount' in permissionData || 'periodAmount' in permissionData;
+    'maxAmount' in permissionData ||
+    'periodAmount' in permissionData ||
+    'allowanceAmount' in permissionData;
 
   if (!hasTokenAmountFields) {
     return permission;
@@ -285,6 +294,14 @@ export async function formatPermissionWithTokenMetadata(
     if ('periodAmount' in permissionData) {
       formattedData.periodAmount = formatTokenAmountWithMetadata(
         permissionData.periodAmount as Hex | null | undefined,
+        decimals,
+        symbol,
+      );
+    }
+
+    if ('allowanceAmount' in permissionData) {
+      formattedData.allowanceAmount = formatTokenAmountWithMetadata(
+        permissionData.allowanceAmount as Hex | null | undefined,
         decimals,
         symbol,
       );
