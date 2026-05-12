@@ -409,6 +409,50 @@ describe('ExistingPermissionsService', () => {
         ),
       ).toBe(ExistingPermissionsState.DissimilarPermissions);
     });
+
+    it('returns SimilarPermissions for matching allowance categories', () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-allowance',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const requestedPermission: Permission = {
+        type: 'native-token-allowance',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList(
+          [permission],
+          requestedPermission,
+        ),
+      ).toBe(ExistingPermissionsState.SimilarPermissions);
+    });
+
+    it('returns DissimilarPermissions for allowance vs stream categories', () => {
+      const permission = createMockStoredPermission();
+      permission.permissionResponse.permission = {
+        type: 'erc20-token-allowance',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      const requestedPermission: Permission = {
+        type: 'native-token-stream',
+        data: {},
+        isAdjustmentAllowed: true,
+      };
+
+      expect(
+        service.getExistingPermissionsStatusFromList(
+          [permission],
+          requestedPermission,
+        ),
+      ).toBe(ExistingPermissionsState.DissimilarPermissions);
+    });
   });
 
   describe('showExistingPermissions()', () => {

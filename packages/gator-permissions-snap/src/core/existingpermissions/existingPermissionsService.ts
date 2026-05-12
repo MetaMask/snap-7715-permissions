@@ -30,12 +30,15 @@ export { ExistingPermissionsState } from './existingPermissionsState';
  */
 function extractPermissionCategory(
   permissionTypeName: string,
-): 'stream' | 'periodic' | null {
+): 'stream' | 'periodic' | 'allowance' | null {
   if (permissionTypeName.endsWith('-periodic')) {
     return 'periodic';
   }
   if (permissionTypeName.endsWith('-stream')) {
     return 'stream';
+  }
+  if (permissionTypeName.endsWith('-allowance')) {
+    return 'allowance';
   }
   return null;
 }
