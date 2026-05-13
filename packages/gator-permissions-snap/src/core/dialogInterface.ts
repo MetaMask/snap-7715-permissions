@@ -11,7 +11,7 @@ export class DialogInterface {
 
   #interfaceId: string | undefined;
 
-  #isDialogShown = false;
+  #isClosed = false;
 
   #onDialogClose: (() => void) | undefined;
 
@@ -22,13 +22,18 @@ export class DialogInterface {
   /**
    * Shows content in the dialog interface.
    * Creates interface on first call, updates on subsequent calls.
-   * Shows dialog on first call, no-ops on subsequent calls.
+   * Shows dialog only when creating the interface.
+   * After the dialog is closed, subsequent calls become no-ops and never recreate the interface.
    * Registers close handler if provided (latest handler wins).
    * @param ui - The UI content to display.
    * @param onClose - Optional callback when dialog is closed by user (X button).
    * @returns The interface ID.
    */
   async show(ui: JSX.Element, onClose?: () => void): Promise<string> {
+    if (this.#isClosed) {
+      return this.#interfaceId as string;
+    }
+
     if (this.#interfaceId) {
       await this.#snap.request({
         method: 'snap_updateInterface',
@@ -39,14 +44,7 @@ export class DialogInterface {
         method: 'snap_createInterface',
         params: { ui, context: {} },
       });
-    }
 
-    if (onClose) {
-      this.#onDialogClose = onClose;
-    }
-
-    if (!this.#isDialogShown) {
-      this.#isDialogShown = true;
       this.#snap
         .request({ method: 'snap_dialog', params: { id: this.#interfaceId } })
         .then((result) => {
@@ -58,7 +56,14 @@ export class DialogInterface {
         .catch(() => {
           // Dialog closed with error, treat as user cancel
           this.#onDialogClose?.();
+        })
+        .finally(() => {
+          this.#isClosed = true;
         });
+    }
+
+    if (onClose) {
+      this.#onDialogClose = onClose;
     }
 
     return this.#interfaceId;
@@ -105,16 +110,15 @@ export class DialogInterface {
    * Callers in confirmation.tsx do not catch errors, so this method does not throw.
    */
   async close(): Promise<void> {
+    if (this.#isClosed || !this.#interfaceId) {
+      return;
+    }
+
     const MAX_ATTEMPTS = 3;
 
     const cleanup = (): void => {
-      this.#interfaceId = undefined;
-      this.#isDialogShown = false;
+      this.#isClosed = true;
     };
-
-    if (!this.#interfaceId) {
-      return;
-    }
 
     const id = this.#interfaceId;
 

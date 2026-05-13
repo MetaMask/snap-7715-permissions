@@ -210,7 +210,7 @@ describe('DialogInterface', () => {
   describe('close', () => {
     const mockInterfaceId = 'test-interface-123';
 
-    it('should resolve the interface and clear state on first attempt', async () => {
+    it('should resolve the interface on first attempt', async () => {
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
         if (params.method === 'snap_createInterface') {
           return mockInterfaceId;
@@ -234,7 +234,7 @@ describe('DialogInterface', () => {
           value: {},
         },
       });
-      expect(dialogInterface.interfaceId).toBeUndefined();
+      expect(dialogInterface.interfaceId).toBe(mockInterfaceId);
     });
 
     it('should be safe to call when no interface exists', async () => {
@@ -260,10 +260,10 @@ describe('DialogInterface', () => {
 
       await dialogInterface.show(<Text>Test</Text>);
       await expect(dialogInterface.close()).resolves.toBeUndefined();
-      expect(dialogInterface.interfaceId).toBeUndefined();
+      expect(dialogInterface.interfaceId).toBe(mockInterfaceId);
     });
 
-    it('should retry and clear state when first close fails but second succeeds', async () => {
+    it('should retry close when first attempt fails but second succeeds', async () => {
       let resolveCallCount = 0;
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
         if (params.method === 'snap_createInterface') {
@@ -289,7 +289,7 @@ describe('DialogInterface', () => {
       await dialogInterface.close();
 
       expect(resolveCallCount).toBe(2);
-      expect(dialogInterface.interfaceId).toBeUndefined();
+      expect(dialogInterface.interfaceId).toBe(mockInterfaceId);
     });
 
     it('should not throw when all close attempts fail', async () => {
@@ -313,7 +313,7 @@ describe('DialogInterface', () => {
       await expect(dialogInterface.close()).resolves.toBeUndefined();
     });
 
-    it('should clear state after exhausting retries when all close attempts fail', async () => {
+    it('should keep interface ID after exhausting retries when all close attempts fail', async () => {
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
         if (params.method === 'snap_createInterface') {
           return mockInterfaceId;
@@ -335,7 +335,33 @@ describe('DialogInterface', () => {
 
       await dialogInterface.close();
 
-      expect(dialogInterface.interfaceId).toBeUndefined();
+      expect(dialogInterface.interfaceId).toBe(mockInterfaceId);
+    });
+
+    it('should no-op show after close without calling snap methods', async () => {
+      const testUi = <Text>Test content</Text>;
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {});
+        }
+        if (params.method === 'snap_resolveInterface') {
+          return null;
+        }
+        return null;
+      });
+
+      await dialogInterface.show(testUi);
+      await dialogInterface.close();
+
+      mockSnapsProvider.request.mockClear();
+
+      const result = await dialogInterface.show(<Text>Late update</Text>);
+
+      expect(result).toBe(mockInterfaceId);
+      expect(mockSnapsProvider.request).not.toHaveBeenCalled();
     });
   });
 
