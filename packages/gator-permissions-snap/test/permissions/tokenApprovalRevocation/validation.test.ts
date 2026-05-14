@@ -1,9 +1,18 @@
 import { describe, expect, it } from '@jest/globals';
 
-import type { Erc20TokenRevocationPermissionRequest } from '../../../src/permissions/erc20TokenRevocation/types';
-import { parseAndValidatePermission } from '../../../src/permissions/erc20TokenRevocation/validation';
+import type { TokenApprovalRevocationPermissionRequest } from '../../../src/permissions/tokenApprovalRevocation/types';
+import { parseAndValidatePermission } from '../../../src/permissions/tokenApprovalRevocation/validation';
 
-const validPermissionRequest: Erc20TokenRevocationPermissionRequest = {
+const REVOCATION_MECHANISMS = {
+  erc20Approve: true,
+  erc721Approve: true,
+  erc721SetApprovalForAll: true,
+  permit2Approve: true,
+  permit2Lockdown: true,
+  permit2InvalidateNonces: true,
+};
+
+const validPermissionRequest: TokenApprovalRevocationPermissionRequest = {
   chainId: '0x1',
   rules: [
     {
@@ -15,15 +24,16 @@ const validPermissionRequest: Erc20TokenRevocationPermissionRequest = {
   ],
   to: '0x1',
   permission: {
-    type: 'erc20-token-revocation',
+    type: 'token-approval-revocation',
     data: {
       justification: 'test',
+      ...REVOCATION_MECHANISMS,
     },
     isAdjustmentAllowed: true,
   },
 };
 
-describe('erc20TokenRevocation:validation', () => {
+describe('tokenApprovalRevocation:validation', () => {
   describe('parseAndValidatePermission()', () => {
     it('should validate a valid permission request', () => {
       expect(() =>
@@ -57,7 +67,7 @@ describe('erc20TokenRevocation:validation', () => {
       expect(() =>
         parseAndValidatePermission(invalidTypeRequest as any),
       ).toThrow(
-        'Failed type validation: type: Invalid literal value, expected "erc20-token-revocation"',
+        'Failed type validation: type: Invalid literal value, expected "token-approval-revocation"',
       );
     });
 
@@ -73,6 +83,30 @@ describe('erc20TokenRevocation:validation', () => {
       expect(() =>
         parseAndValidatePermission(requestWithoutAdjustmentFlag),
       ).toThrow('Failed type validation: isAdjustmentAllowed: Required');
+    });
+
+    it('should require at least one revocation mechanism', () => {
+      const requestWithoutMechanisms = {
+        ...validPermissionRequest,
+        permission: {
+          ...validPermissionRequest.permission,
+          data: {
+            ...validPermissionRequest.permission.data,
+            erc20Approve: false,
+            erc721Approve: false,
+            erc721SetApprovalForAll: false,
+            permit2Approve: false,
+            permit2Lockdown: false,
+            permit2InvalidateNonces: false,
+          },
+        },
+      };
+
+      expect(() =>
+        parseAndValidatePermission(requestWithoutMechanisms),
+      ).toThrow(
+        'At least one token approval revocation mechanism must be enabled',
+      );
     });
   });
 });

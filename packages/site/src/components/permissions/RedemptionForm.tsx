@@ -27,6 +27,89 @@ const ERC20_ABI = [
   },
 ] as const;
 
+const ERC721_APPROVAL_ABI = [
+  {
+    type: 'function',
+    name: 'approve',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'tokenId', type: 'uint256' },
+    ],
+    outputs: [],
+  },
+  {
+    type: 'function',
+    name: 'setApprovalForAll',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'operator', type: 'address' },
+      { name: 'approved', type: 'bool' },
+    ],
+    outputs: [],
+  },
+] as const;
+
+const PERMIT2_ABI = [
+  {
+    type: 'function',
+    name: 'approve',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'token', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint160' },
+      { name: 'expiration', type: 'uint48' },
+    ],
+    outputs: [],
+  },
+  {
+    type: 'function',
+    name: 'lockdown',
+    stateMutability: 'nonpayable',
+    inputs: [
+      {
+        name: 'approvals',
+        type: 'tuple[]',
+        components: [
+          { name: 'token', type: 'address' },
+          { name: 'spender', type: 'address' },
+        ],
+      },
+    ],
+    outputs: [],
+  },
+  {
+    type: 'function',
+    name: 'invalidateNonces',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'token', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'newNonce', type: 'uint48' },
+    ],
+    outputs: [],
+  },
+] as const;
+
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const PERMIT2_ADDRESS = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
+
+const TOKEN_APPROVAL_REVOCATION_METHODS = [
+  { key: 'erc20Approve', label: 'ERC-20 approve(spender, 0)' },
+  { key: 'erc721Approve', label: 'ERC-721 approve(address(0), tokenId)' },
+  {
+    key: 'erc721SetApprovalForAll',
+    label: 'ERC-721/ERC-1155 setApprovalForAll(false)',
+  },
+  { key: 'permit2Approve', label: 'Permit2 approve(token, spender, 0, 0)' },
+  { key: 'permit2Lockdown', label: 'Permit2 lockdown' },
+  { key: 'permit2InvalidateNonces', label: 'Permit2 invalidate nonces' },
+] as const;
+
+type TokenApprovalRevocationMethod =
+  (typeof TOKEN_APPROVAL_REVOCATION_METHODS)[number]['key'];
+
 type Rule = {
   type: string;
   data?: {
@@ -42,6 +125,12 @@ type PermissionResponse = {
       initialAmount?: string | null;
       amountPerSecond?: string;
       periodAmount?: string;
+      erc20Approve?: boolean;
+      erc721Approve?: boolean;
+      erc721SetApprovalForAll?: boolean;
+      permit2Approve?: boolean;
+      permit2Lockdown?: boolean;
+      permit2InvalidateNonces?: boolean;
     };
   };
   rules?: Rule[];
@@ -149,6 +238,100 @@ function encodeApproveCalldata(spender: Hex): Hex {
   });
 }
 
+/**
+ * Encodes ERC-721 per-token approval revocation calldata.
+ *
+ * @param tokenId - Token ID whose current approval should be cleared.
+ * @returns Encoded calldata.
+ */
+function encodeErc721ApproveCalldata(tokenId: string): Hex {
+  return encodeFunctionData({
+    abi: ERC721_APPROVAL_ABI,
+    functionName: 'approve',
+    args: [ZERO_ADDRESS, parseBigIntInput(tokenId)],
+  });
+}
+
+/**
+ * Encodes ERC-721/ERC-1155 operator approval revocation calldata.
+ *
+ * @param operator - Operator address whose approval should be cleared.
+ * @returns Encoded calldata, or `0x` while the form is incomplete.
+ */
+function encodeSetApprovalForAllCalldata(operator: Hex): Hex {
+  if (!isAddress(operator)) {
+    return EMPTY_HEX;
+  }
+
+  return encodeFunctionData({
+    abi: ERC721_APPROVAL_ABI,
+    functionName: 'setApprovalForAll',
+    args: [operator, false],
+  });
+}
+
+/**
+ * Encodes Permit2 single-pair approval revocation calldata.
+ *
+ * @param token - Token address whose Permit2 allowance should be cleared.
+ * @param spender - Spender address whose Permit2 allowance should be cleared.
+ * @returns Encoded calldata, or `0x` while the form is incomplete.
+ */
+function encodePermit2ApproveCalldata(token: Hex, spender: Hex): Hex {
+  if (!isAddress(token) || !isAddress(spender)) {
+    return EMPTY_HEX;
+  }
+
+  return encodeFunctionData({
+    abi: PERMIT2_ABI,
+    functionName: 'approve',
+    args: [token, spender, 0n, 0],
+  });
+}
+
+/**
+ * Encodes Permit2 lockdown calldata for one token/spender pair.
+ *
+ * @param token - Token address whose Permit2 allowance should be cleared.
+ * @param spender - Spender address whose Permit2 allowance should be cleared.
+ * @returns Encoded calldata, or `0x` while the form is incomplete.
+ */
+function encodePermit2LockdownCalldata(token: Hex, spender: Hex): Hex {
+  if (!isAddress(token) || !isAddress(spender)) {
+    return EMPTY_HEX;
+  }
+
+  return encodeFunctionData({
+    abi: PERMIT2_ABI,
+    functionName: 'lockdown',
+    args: [[{ token, spender }]],
+  });
+}
+
+/**
+ * Encodes Permit2 nonce invalidation calldata.
+ *
+ * @param token - Token address whose signed Permit2 permits should be invalidated.
+ * @param spender - Spender address whose signed Permit2 permits should be invalidated.
+ * @param newNonce - New Permit2 nonce.
+ * @returns Encoded calldata, or `0x` while the form is incomplete.
+ */
+function encodePermit2InvalidateNoncesCalldata(
+  token: Hex,
+  spender: Hex,
+  newNonce: string,
+): Hex {
+  if (!isAddress(token) || !isAddress(spender)) {
+    return EMPTY_HEX;
+  }
+
+  return encodeFunctionData({
+    abi: PERMIT2_ABI,
+    functionName: 'invalidateNonces',
+    args: [token, spender, parseBigIntInput(newNonce)],
+  });
+}
+
 export const RedemptionForm = ({
   delegateAddress,
   onChange,
@@ -169,6 +352,18 @@ export const RedemptionForm = ({
     permission.data?.tokenAddress ?? EMPTY_HEX,
   );
   const [amount, setAmount] = useState(getDefaultAmount(permission));
+  const [revocationMethod, setRevocationMethod] =
+    useState<TokenApprovalRevocationMethod>('erc20Approve');
+  const [tokenId, setTokenId] = useState('0');
+  const [newNonce, setNewNonce] = useState('1');
+
+  const enabledRevocationMethods = useMemo(() => {
+    const methods = TOKEN_APPROVAL_REVOCATION_METHODS.filter(
+      ({ key }) => permission.data?.[key] === true,
+    );
+
+    return methods.length > 0 ? methods : TOKEN_APPROVAL_REVOCATION_METHODS;
+  }, [permission.data]);
 
   useEffect(() => {
     setRecipientAddress(payeeAddresses[0] ?? EMPTY_HEX);
@@ -177,6 +372,12 @@ export const RedemptionForm = ({
     setAmount(getDefaultAmount(permission));
   }, [delegateAddress, payeeAddresses, permission]);
 
+  useEffect(() => {
+    if (!enabledRevocationMethods.some(({ key }) => key === revocationMethod)) {
+      setRevocationMethod(enabledRevocationMethods[0]?.key ?? 'erc20Approve');
+    }
+  }, [enabledRevocationMethods, revocationMethod]);
+
   const value = parseBigIntInput(amount);
   const isErc20Transfer =
     permission.type === 'erc20-token-stream' ||
@@ -184,13 +385,40 @@ export const RedemptionForm = ({
   const isNativeTransfer =
     permission.type === 'native-token-stream' ||
     permission.type === 'native-token-periodic';
-  const isErc20Revocation = permission.type === 'erc20-token-revocation';
+  const isTokenApprovalRevocation =
+    permission.type === 'token-approval-revocation';
 
   let generatedCalldata: Hex = EMPTY_HEX;
+  let targetAddress = tokenAddress;
   if (isErc20Transfer) {
     generatedCalldata = encodeTransferCalldata(recipientAddress, value);
-  } else if (isErc20Revocation) {
-    generatedCalldata = encodeApproveCalldata(spenderAddress);
+  } else if (isTokenApprovalRevocation) {
+    if (revocationMethod === 'erc20Approve') {
+      generatedCalldata = encodeApproveCalldata(spenderAddress);
+    } else if (revocationMethod === 'erc721Approve') {
+      generatedCalldata = encodeErc721ApproveCalldata(tokenId);
+    } else if (revocationMethod === 'erc721SetApprovalForAll') {
+      generatedCalldata = encodeSetApprovalForAllCalldata(spenderAddress);
+    } else if (revocationMethod === 'permit2Approve') {
+      targetAddress = PERMIT2_ADDRESS;
+      generatedCalldata = encodePermit2ApproveCalldata(
+        tokenAddress,
+        spenderAddress,
+      );
+    } else if (revocationMethod === 'permit2Lockdown') {
+      targetAddress = PERMIT2_ADDRESS;
+      generatedCalldata = encodePermit2LockdownCalldata(
+        tokenAddress,
+        spenderAddress,
+      );
+    } else if (revocationMethod === 'permit2InvalidateNonces') {
+      targetAddress = PERMIT2_ADDRESS;
+      generatedCalldata = encodePermit2InvalidateNoncesCalldata(
+        tokenAddress,
+        spenderAddress,
+        newNonce,
+      );
+    }
   }
 
   useEffect(() => {
@@ -204,7 +432,7 @@ export const RedemptionForm = ({
     }
 
     onChange({
-      to: tokenAddress,
+      to: targetAddress,
       data: generatedCalldata,
       value: 0n,
     });
@@ -213,6 +441,7 @@ export const RedemptionForm = ({
     isNativeTransfer,
     onChange,
     recipientAddress,
+    targetAddress,
     tokenAddress,
     value,
   ]);
@@ -241,9 +470,42 @@ export const RedemptionForm = ({
     setAmount(inputValue);
   };
 
-  if (isErc20Revocation) {
+  const handleRevocationMethodChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLSelectElement>) => {
+    setRevocationMethod(inputValue as TokenApprovalRevocationMethod);
+  };
+
+  const handleTokenIdChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setTokenId(inputValue);
+  };
+
+  const handleNewNonceChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setNewNonce(inputValue);
+  };
+
+  if (isTokenApprovalRevocation) {
     return (
       <>
+        <div>
+          <label htmlFor="redeemRevocationMethod">Revocation method:</label>
+          <select
+            id="redeemRevocationMethod"
+            name="redeemRevocationMethod"
+            value={revocationMethod}
+            onChange={handleRevocationMethodChange}
+          >
+            {enabledRevocationMethods.map(({ key, label }) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label htmlFor="redeemTokenAddress">Token:</label>
           <input
@@ -255,15 +517,51 @@ export const RedemptionForm = ({
             placeholder="0x..."
           />
         </div>
+        {revocationMethod !== 'erc721Approve' && (
+          <div>
+            <label htmlFor="redeemSpenderAddress">Spender/operator:</label>
+            <input
+              type="text"
+              id="redeemSpenderAddress"
+              name="redeemSpenderAddress"
+              value={spenderAddress}
+              onChange={handleSpenderChange}
+              placeholder="0x..."
+            />
+          </div>
+        )}
+        {revocationMethod === 'erc721Approve' && (
+          <div>
+            <label htmlFor="redeemTokenId">Token ID:</label>
+            <input
+              type="text"
+              id="redeemTokenId"
+              name="redeemTokenId"
+              value={tokenId}
+              onChange={handleTokenIdChange}
+            />
+          </div>
+        )}
+        {revocationMethod === 'permit2InvalidateNonces' && (
+          <div>
+            <label htmlFor="redeemNewNonce">New nonce:</label>
+            <input
+              type="text"
+              id="redeemNewNonce"
+              name="redeemNewNonce"
+              value={newNonce}
+              onChange={handleNewNonceChange}
+            />
+          </div>
+        )}
         <div>
-          <label htmlFor="redeemSpenderAddress">Spender:</label>
+          <label htmlFor="redeemTarget">Target:</label>
           <input
             type="text"
-            id="redeemSpenderAddress"
-            name="redeemSpenderAddress"
-            value={spenderAddress}
-            onChange={handleSpenderChange}
-            placeholder="0x..."
+            id="redeemTarget"
+            name="redeemTarget"
+            value={targetAddress}
+            readOnly
           />
         </div>
         <div>

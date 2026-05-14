@@ -113,7 +113,7 @@ describe('formatPermissionWithTokenMetadata', () => {
   it('returns the permission unchanged when data has no token amount fields', async () => {
     const permission = basePermission({
       permission: {
-        type: 'erc20-token-revocation',
+        type: 'token-approval-revocation',
         data: { justification: 'x' },
         isAdjustmentAllowed: true,
       },

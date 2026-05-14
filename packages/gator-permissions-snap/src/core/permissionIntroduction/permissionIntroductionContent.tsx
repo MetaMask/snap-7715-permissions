@@ -120,7 +120,7 @@ export const permissionIntroductionConfigs: Record<
     page1: allowancePage1Content,
     page2: fixedPage2Content,
   },
-  'erc20-token-revocation': {
+  'token-approval-revocation': {
     page1: revocationPage1Content,
     page2: fixedPage2Content,
   },

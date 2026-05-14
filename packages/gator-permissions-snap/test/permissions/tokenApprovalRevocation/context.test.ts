@@ -6,25 +6,35 @@ import {
   buildContext,
   deriveMetadata,
   populatePermission,
-} from '../../../src/permissions/erc20TokenRevocation/context';
+} from '../../../src/permissions/tokenApprovalRevocation/context';
 import type {
-  Erc20TokenRevocationContext,
-  Erc20TokenRevocationPermission,
-  Erc20TokenRevocationPermissionRequest,
-} from '../../../src/permissions/erc20TokenRevocation/types';
+  TokenApprovalRevocationContext,
+  TokenApprovalRevocationPermission,
+  TokenApprovalRevocationPermissionRequest,
+} from '../../../src/permissions/tokenApprovalRevocation/types';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
-const permission: Erc20TokenRevocationPermission = {
-  type: 'erc20-token-revocation',
+const approvalRevocationMechanisms = {
+  erc20Approve: true,
+  erc721Approve: true,
+  erc721SetApprovalForAll: true,
+  permit2Approve: true,
+  permit2Lockdown: true,
+  permit2InvalidateNonces: true,
+};
+
+const permission: TokenApprovalRevocationPermission = {
+  type: 'token-approval-revocation',
   data: {
     justification: 'Permission to revoke approvals',
+    ...approvalRevocationMechanisms,
   },
   isAdjustmentAllowed: true,
 };
 
-const permissionRequest: Erc20TokenRevocationPermissionRequest = {
+const permissionRequest: TokenApprovalRevocationPermissionRequest = {
   from: ACCOUNT_ADDRESS,
   chainId: '0x1',
   rules: [
@@ -39,7 +49,7 @@ const permissionRequest: Erc20TokenRevocationPermissionRequest = {
   permission,
 };
 
-describe('erc20TokenRevocation:context', () => {
+describe('tokenApprovalRevocation:context', () => {
   describe('populatePermission()', () => {
     it('should return the permission unchanged', async () => {
       const populatedPermission = await populatePermission({ permission });
@@ -69,6 +79,7 @@ describe('erc20TokenRevocation:context', () => {
           timestamp: permissionRequest.rules[0]?.data.timestamp,
         },
         justification: permission.data.justification,
+        approvalRevocationMechanisms,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -77,11 +88,11 @@ describe('erc20TokenRevocation:context', () => {
           decimals: 0,
           iconDataBase64: '',
         },
-      } satisfies Erc20TokenRevocationContext);
+      } satisfies TokenApprovalRevocationContext);
     });
 
     it('builds context without expiry when the expiry rule is not found', async () => {
-      const request: Erc20TokenRevocationPermissionRequest = {
+      const request: TokenApprovalRevocationPermissionRequest = {
         ...permissionRequest,
         rules: [],
       };
@@ -94,7 +105,7 @@ describe('erc20TokenRevocation:context', () => {
     });
 
     it('throws an error if the address is missing', async () => {
-      const request: Erc20TokenRevocationPermissionRequest = {
+      const request: TokenApprovalRevocationPermissionRequest = {
         ...permissionRequest,
         from: undefined as any,
       };
@@ -112,11 +123,12 @@ describe('erc20TokenRevocation:context', () => {
 
   describe('deriveMetadata()', () => {
     it('should create metadata without errors for a valid expiry', async () => {
-      const context: Erc20TokenRevocationContext = {
+      const context: TokenApprovalRevocationContext = {
         expiry: {
           timestamp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // +1 day
         },
         justification: 'Permission to revoke approvals',
+        approvalRevocationMechanisms,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -134,11 +146,12 @@ describe('erc20TokenRevocation:context', () => {
     });
 
     it('should return a validation error for expiry in the past', async () => {
-      const context: Erc20TokenRevocationContext = {
+      const context: TokenApprovalRevocationContext = {
         expiry: {
           timestamp: 499161600, // 10/26/1985
         },
         justification: 'Permission to revoke approvals',
+        approvalRevocationMechanisms,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -159,11 +172,12 @@ describe('erc20TokenRevocation:context', () => {
   describe('applyContext()', () => {
     it('should apply context changes to original request', async () => {
       const updatedExpiry = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // +30 days
-      const context: Erc20TokenRevocationContext = {
+      const context: TokenApprovalRevocationContext = {
         expiry: {
           timestamp: updatedExpiry,
         },
         justification: 'Permission to revoke approvals',
+        approvalRevocationMechanisms,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -179,9 +193,12 @@ describe('erc20TokenRevocation:context', () => {
         originalRequest: permissionRequest,
       });
 
-      expect(result.permission.type).toBe('erc20-token-revocation');
+      expect(result.permission.type).toBe('token-approval-revocation');
       expect(result.permission.data.justification).toBe(
         permissionRequest.permission.data.justification,
+      );
+      expect(result.permission.data).toMatchObject(
+        approvalRevocationMechanisms,
       );
       expect(result.permission.isAdjustmentAllowed).toBe(true);
       expect(result.from).toBe(ACCOUNT_ADDRESS);
@@ -191,11 +208,12 @@ describe('erc20TokenRevocation:context', () => {
     });
 
     it('adds an expiry rule if it is not in the original request', async () => {
-      const context: Erc20TokenRevocationContext = {
+      const context: TokenApprovalRevocationContext = {
         expiry: {
           timestamp: Math.floor(Date.now() / 1000) + 60,
         },
         justification: 'Permission to revoke approvals',
+        approvalRevocationMechanisms,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -206,7 +224,7 @@ describe('erc20TokenRevocation:context', () => {
         },
       };
 
-      const originalRequestWithoutExpiry: Erc20TokenRevocationPermissionRequest =
+      const originalRequestWithoutExpiry: TokenApprovalRevocationPermissionRequest =
         {
           ...permissionRequest,
           rules: [],

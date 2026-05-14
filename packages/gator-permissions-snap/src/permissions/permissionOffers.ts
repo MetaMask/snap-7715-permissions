@@ -29,7 +29,7 @@ export const DEFAULT_GATOR_PERMISSION_TO_OFFER: PermissionOffer[] = [
     proposedName: 'ERC20 Token Allowance',
   },
   {
-    type: 'erc20-token-revocation',
-    proposedName: 'ERC20 Token Revocation',
+    type: 'token-approval-revocation',
+    proposedName: 'Token Approval Revocation',
   },
 ];
