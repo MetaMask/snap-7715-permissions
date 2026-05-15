@@ -102,7 +102,7 @@ const TOKEN_APPROVAL_REVOCATION_METHODS = [
     key: 'erc721SetApprovalForAll',
     label: 'ERC-721/ERC-1155 setApprovalForAll(false)',
   },
-  { key: 'permit2Approve', label: 'Permit2 approve(token, spender, 0, 0)' },
+  { key: 'permit2ApproveZero', label: 'Permit2 approve(token, spender, 0, 0)' },
   { key: 'permit2Lockdown', label: 'Permit2 lockdown' },
   { key: 'permit2InvalidateNonces', label: 'Permit2 invalidate nonces' },
 ] as const;
@@ -128,7 +128,7 @@ type PermissionResponse = {
       erc20Approve?: boolean;
       erc721Approve?: boolean;
       erc721SetApprovalForAll?: boolean;
-      permit2Approve?: boolean;
+      permit2ApproveZero?: boolean;
       permit2Lockdown?: boolean;
       permit2InvalidateNonces?: boolean;
     };
@@ -399,7 +399,7 @@ export const RedemptionForm = ({
       generatedCalldata = encodeErc721ApproveCalldata(tokenId);
     } else if (revocationMethod === 'erc721SetApprovalForAll') {
       generatedCalldata = encodeSetApprovalForAllCalldata(spenderAddress);
-    } else if (revocationMethod === 'permit2Approve') {
+    } else if (revocationMethod === 'permit2ApproveZero') {
       targetAddress = PERMIT2_ADDRESS;
       generatedCalldata = encodePermit2ApproveCalldata(
         tokenAddress,

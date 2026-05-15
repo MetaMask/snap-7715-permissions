@@ -7,7 +7,7 @@ import { hexToNumber } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
 import { DEFAULT_MAX_AMOUNT } from '../../permissions/erc20TokenStream/context';
-import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from '../../permissions/tokenApprovalRevocation/primitives';
+import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from '../../permissions/tokenApprovalRevocation/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
 import { getClosestTimePeriod } from '../../utils/time';

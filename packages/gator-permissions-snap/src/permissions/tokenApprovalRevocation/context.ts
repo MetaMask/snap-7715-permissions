@@ -6,7 +6,6 @@ import type { Hex } from '@metamask/utils';
 
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { validateExpiry } from '../contextValidation';
-import { getTokenApprovalRevocationMechanisms } from './primitives';
 import type {
   TokenApprovalRevocationContext,
   TokenApprovalRevocationMetadata,
@@ -132,12 +131,28 @@ export async function buildContext({
     from,
   );
 
+  const {
+    erc20Approve,
+    erc721Approve,
+    erc721SetApprovalForAll,
+    permit2ApproveZero,
+    permit2Lockdown,
+    permit2InvalidateNonces,
+  } = data;
+
   return {
     expiry,
     ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
-    approvalRevocationMechanisms: getTokenApprovalRevocationMechanisms(data),
+    approvalRevocationMechanisms: {
+      erc20Approve,
+      erc721Approve,
+      erc721SetApprovalForAll,
+      permit2ApproveZero,
+      permit2Lockdown,
+      permit2InvalidateNonces,
+    },
     accountAddressCaip10,
     // unfortunately there is a presumption that every permission has a related token.
     ...EXTRANEOUS_CONTEXT_DATA,

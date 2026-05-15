@@ -7,7 +7,7 @@ const REVOCATION_MECHANISMS = {
   erc20Approve: true,
   erc721Approve: true,
   erc721SetApprovalForAll: true,
-  permit2Approve: true,
+  permit2ApproveZero: true,
   permit2Lockdown: true,
   permit2InvalidateNonces: true,
 };
@@ -95,7 +95,7 @@ describe('tokenApprovalRevocation:validation', () => {
             erc20Approve: false,
             erc721Approve: false,
             erc721SetApprovalForAll: false,
-            permit2Approve: false,
+            permit2ApproveZero: false,
             permit2Lockdown: false,
             permit2InvalidateNonces: false,
           },

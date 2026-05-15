@@ -1,8 +1,8 @@
 import { ZERO_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import type { Caveat } from '@metamask/delegation-core';
+import { createApprovalRevocationTerms } from '@metamask/delegation-core';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 
-import { createTokenApprovalRevocationTerms } from './primitives';
 import type { PopulatedTokenApprovalRevocationPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
 
@@ -28,7 +28,7 @@ export async function createPermissionCaveats({
 
   const approvalRevocationCaveat: Caveat = {
     enforcer: contracts.approvalRevocationEnforcer,
-    terms: createTokenApprovalRevocationTerms(permission.data),
+    terms: createApprovalRevocationTerms(permission.data),
     args: '0x',
   };
 

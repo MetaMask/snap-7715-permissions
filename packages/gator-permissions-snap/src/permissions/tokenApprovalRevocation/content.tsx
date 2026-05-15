@@ -1,8 +1,8 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Divider, Section, Text } from '@metamask/snaps-sdk/jsx';
 
-import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from './primitives';
 import { expiryRule } from './rules';
+import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from './types';
 import type {
   TokenApprovalRevocationContext,
   TokenApprovalRevocationMetadata,
