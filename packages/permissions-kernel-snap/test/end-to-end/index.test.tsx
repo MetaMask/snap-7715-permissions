@@ -77,19 +77,19 @@ describe('Kernel Snap', () => {
           data: expect.objectContaining({
             cause: null,
             method: 'snapRpc',
-            params: expect.arrayContaining([
-              expect.stringMatching(/^local:http:\/\/localhost:\d+$/u),
-              'onRpcRequest',
-              'https://metamask.io',
-              expect.objectContaining({
+            params: expect.objectContaining({
+              snapId: expect.stringMatching(/^local:http:\/\/localhost:\d+$/u),
+              handler: 'onRpcRequest',
+              origin: 'https://metamask.io',
+              request: expect.objectContaining({
                 id: 1,
                 jsonrpc: '1.0',
                 method: 'wallet_requestExecutionPermissions',
               }),
-            ]),
+            }),
           }),
           message: expect.stringContaining(
-            'Invalid parameters for method "snapRpc": At path: 3.jsonrpc -- Expected the literal `"2.0"`, but received: "1.0"',
+            'Invalid parameters for method "snapRpc": At path: request.jsonrpc -- Expected the literal `"2.0"`, but received: "1.0"',
           ),
           stack: expect.any(String),
         });
