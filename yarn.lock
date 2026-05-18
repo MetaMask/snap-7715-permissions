@@ -2867,7 +2867,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metamask/abi-utils@npm:3.0.0":
+"@metamask/abi-utils@npm:3.0.0, @metamask/abi-utils@npm:^3.0.0":
   version: 3.0.0
   resolution: "@metamask/abi-utils@npm:3.0.0"
   dependencies:
