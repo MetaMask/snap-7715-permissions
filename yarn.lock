@@ -2888,7 +2888,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/address-book-controller@npm:^7.1.1":
+"@metamask/address-book-controller@npm:^7.1.2":
   version: 7.1.2
   resolution: "@metamask/address-book-controller@npm:7.1.2"
   dependencies:
@@ -3222,7 +3222,7 @@ __metadata:
     "@metamask/eslint-config-jest": "npm:15.0.0"
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
     "@metamask/eslint-config-typescript": "npm:15.0.0"
-    "@metamask/profile-sync-controller": "npm:28.0.2"
+    "@metamask/profile-sync-controller": "npm:28.1.0"
     "@metamask/snaps-cli": "npm:8.4.1"
     "@metamask/snaps-jest": "npm:10.1.2"
     "@metamask/snaps-sdk": "npm:11.1.0"
@@ -3301,7 +3301,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/keyring-controller@npm:^25.1.1":
+"@metamask/keyring-controller@npm:^25.5.0":
   version: 25.5.0
   resolution: "@metamask/keyring-controller@npm:25.5.0"
   dependencies:
@@ -3482,14 +3482,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/profile-sync-controller@npm:28.0.2":
-  version: 28.0.2
-  resolution: "@metamask/profile-sync-controller@npm:28.0.2"
+"@metamask/profile-sync-controller@npm:28.1.0":
+  version: 28.1.0
+  resolution: "@metamask/profile-sync-controller@npm:28.1.0"
   dependencies:
-    "@metamask/address-book-controller": "npm:^7.1.1"
-    "@metamask/base-controller": "npm:^9.0.1"
-    "@metamask/keyring-controller": "npm:^25.1.1"
-    "@metamask/messenger": "npm:^1.0.0"
+    "@metamask/address-book-controller": "npm:^7.1.2"
+    "@metamask/base-controller": "npm:^9.1.0"
+    "@metamask/keyring-controller": "npm:^25.5.0"
+    "@metamask/messenger": "npm:^1.2.0"
     "@metamask/snaps-controllers": "npm:^19.0.0"
     "@metamask/snaps-sdk": "npm:^11.0.0"
     "@metamask/snaps-utils": "npm:^12.1.2"
@@ -3502,7 +3502,7 @@ __metadata:
   peerDependencies:
     "@metamask/providers": ^22.0.0
     webextension-polyfill: ^0.10.0 || ^0.11.0 || ^0.12.0
-  checksum: 10/37cd8032f673436ff7a7b759287731691e864fb94b8a8b16f819de6956652bb51c4b020c1df5213113899feb5c36f03c98a35d8dce3629370725f94964ba5585
+  checksum: 10/33c318fe005e55b38b4d0d603806c9303b8deaddf8f98fc04f89ecb49cf26da2189ceea20ac6a4b1be5da49060a928d6788cb465b4451aa199c8e51172366213
   languageName: node
   linkType: hard
 
