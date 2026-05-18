@@ -3058,13 +3058,13 @@ __metadata:
   linkType: hard
 
 "@metamask/delegation-core@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@metamask/delegation-core@npm:2.0.0"
+  version: 2.1.0
+  resolution: "@metamask/delegation-core@npm:2.1.0"
   dependencies:
     "@metamask/abi-utils": "npm:^3.0.0"
     "@metamask/utils": "npm:^11.4.0"
     "@noble/hashes": "npm:^1.8.0"
-  checksum: 10/b473160e4cb4a6d463c6015de6e90d057034d2e8f2905068e1f44f93c8247618c5d84a155e86dfaa125dacb040951643517b9a76961bf8d215c194dc4d1cc0ad
+  checksum: 10/4b699987e178ce25a4ef726e61290636afd40e4d43cf856163d46f747ee9deb70641501b11e2d13dca9b7fa8bcae287058022929f3507868019e3802d3a52751
   languageName: node
   linkType: hard
 
