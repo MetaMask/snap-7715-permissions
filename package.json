@@ -65,7 +65,6 @@
     "glob@npm:^10.2.2": "10.5.0",
     "tar": "^7.5.3",
     "body-parser@npm:^2.2.0": "2.2.1",
-    "@metamask/delegation-core@npm:^2.0.0": "link:../smart-accounts-kit/packages/delegation-core",
     "@metamask/smart-accounts-kit": "link:../smart-accounts-kit/packages/smart-accounts-kit"
   }
 }

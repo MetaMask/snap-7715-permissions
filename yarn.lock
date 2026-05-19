@@ -2823,10 +2823,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/7715-permission-types@npm:0.6.0":
-  version: 0.6.0
-  resolution: "@metamask/7715-permission-types@npm:0.6.0"
-  checksum: 10/bac0741ed0d880d9f418a58ef5d1f165cff0171636cb4431bc42a05b471b92afd6593810ac805a427a76dc02abcba651cc3c1c05b67d5a4b6ad3923b057de039
+"@metamask/7715-permission-types@npm:0.7.0":
+  version: 0.7.0
+  resolution: "@metamask/7715-permission-types@npm:0.7.0"
+  checksum: 10/b6295e45fd500679b141ae88afd90d0fcea1e2450bc207cf0064ae63eeff2654abd954b58e79b66ded62cbd959bbf6bc8d643d22b8eabf332dde4aa980457d7e
   languageName: node
   linkType: hard
 
@@ -3050,11 +3050,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-core@link:../smart-accounts-kit/packages/delegation-core::locator=%40metamask%2Fsnap-7715-permissions-monorepo%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@metamask/delegation-core@link:../smart-accounts-kit/packages/delegation-core::locator=%40metamask%2Fsnap-7715-permissions-monorepo%40workspace%3A."
+"@metamask/delegation-core@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@metamask/delegation-core@npm:2.2.0"
+  dependencies:
+    "@metamask/abi-utils": "npm:^3.0.0"
+    "@metamask/utils": "npm:^11.4.0"
+    "@noble/hashes": "npm:^1.8.0"
+  checksum: 10/cd9d06f3d5cb778591838e7887f9203791dd37aa366e73bbbc7b1497cce1faed0cb9211e091750531b1210712b591fdbf188851dc19853bef2edf481d3a016a2
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "@metamask/eslint-config-jest@npm:15.0.0":
   version: 15.0.0
@@ -3198,7 +3203,7 @@ __metadata:
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/abi-utils": "npm:3.0.0"
     "@metamask/auto-changelog": "npm:6.1.0"
-    "@metamask/delegation-core": "npm:^2.0.0"
+    "@metamask/delegation-core": "npm:^2.2.0"
     "@metamask/eslint-config": "npm:15.0.0"
     "@metamask/eslint-config-jest": "npm:15.0.0"
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
@@ -13685,13 +13690,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask/7715-permission-types": "npm:0.6.0"
+    "@metamask/7715-permission-types": "npm:0.7.0"
     "@metamask/eslint-config": "npm:15.0.0"
     "@metamask/eslint-config-jest": "npm:15.0.0"
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
     "@metamask/eslint-config-typescript": "npm:15.0.0"
     "@metamask/providers": "npm:22.1.1"
-    "@metamask/smart-accounts-kit": "npm:^1.4.0"
+    "@metamask/smart-accounts-kit": "npm:^1.5.0"
     "@metamask/utils": "npm:11.11.0"
     "@types/jest": "npm:27.5.2"
     "@types/react": "npm:19.2.3"
