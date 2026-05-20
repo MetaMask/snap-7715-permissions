@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@metamask/abi-utils": "3.0.0",
-    "@metamask/delegation-core": "^2.0.0",
+    "@metamask/delegation-core": "^2.2.1",
     "@metamask/profile-sync-controller": "28.1.0",
     "@metamask/snaps-sdk": "11.1.0",
     "@metamask/utils": "11.11.0",

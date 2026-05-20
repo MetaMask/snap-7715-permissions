@@ -7,11 +7,11 @@ import type { Hex } from '@metamask/utils';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { validateExpiry } from '../contextValidation';
 import type {
-  Erc20TokenRevocationContext,
-  Erc20TokenRevocationMetadata,
-  Erc20TokenRevocationPermission,
-  Erc20TokenRevocationPermissionRequest,
-  PopulatedErc20TokenRevocationPermission,
+  TokenApprovalRevocationContext,
+  TokenApprovalRevocationMetadata,
+  TokenApprovalRevocationPermission,
+  TokenApprovalRevocationPermissionRequest,
+  PopulatedTokenApprovalRevocationPermission,
 } from './types';
 import {
   applyExpiryRule,
@@ -43,10 +43,10 @@ export async function applyContext({
   context,
   originalRequest,
 }: {
-  context: Erc20TokenRevocationContext;
-  originalRequest: Erc20TokenRevocationPermissionRequest;
-}): Promise<Erc20TokenRevocationPermissionRequest> {
-  const { justification } = context;
+  context: TokenApprovalRevocationContext;
+  originalRequest: TokenApprovalRevocationPermissionRequest;
+}): Promise<TokenApprovalRevocationPermissionRequest> {
+  const { approvalRevocationPrimitives, justification } = context;
 
   const expiryMerged = applyExpiryRule(context, originalRequest);
   const { rules } = applyRedeemerRule(originalRequest, expiryMerged);
@@ -57,9 +57,10 @@ export async function applyContext({
     ...originalRequest,
     from: address as Hex,
     permission: {
-      type: 'erc20-token-revocation',
+      type: 'token-approval-revocation',
       data: {
         justification,
+        ...approvalRevocationPrimitives,
       },
       isAdjustmentAllowed: originalRequest.permission.isAdjustmentAllowed,
     },
@@ -76,8 +77,8 @@ export async function applyContext({
 export async function populatePermission({
   permission,
 }: {
-  permission: Erc20TokenRevocationPermission;
-}): Promise<PopulatedErc20TokenRevocationPermission> {
+  permission: TokenApprovalRevocationPermission;
+}): Promise<PopulatedTokenApprovalRevocationPermission> {
   return {
     ...permission,
   };
@@ -87,16 +88,16 @@ export async function populatePermission({
  * Converts a permission request into a context object that can be used to render the UI
  * and manage the permission state.
  * @param args - The options object containing the request and required services.
- * @param args.permissionRequest - The Erc20 token revocation permission request to convert.
+ * @param args.permissionRequest - The token approval revocation permission request to convert.
  * @param args.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext({
   permissionRequest,
 }: {
-  permissionRequest: Erc20TokenRevocationPermissionRequest;
+  permissionRequest: TokenApprovalRevocationPermissionRequest;
   tokenMetadataService: TokenMetadataService;
-}): Promise<Erc20TokenRevocationContext> {
+}): Promise<TokenApprovalRevocationContext> {
   const chainId = Number(permissionRequest.chainId);
 
   const {
@@ -130,11 +131,28 @@ export async function buildContext({
     from,
   );
 
+  const {
+    erc20Approve,
+    erc721Approve,
+    erc721SetApprovalForAll,
+    permit2Approve,
+    permit2Lockdown,
+    permit2InvalidateNonces,
+  } = data;
+
   return {
     expiry,
     ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
+    approvalRevocationPrimitives: {
+      erc20Approve,
+      erc721Approve,
+      erc721SetApprovalForAll,
+      permit2Approve,
+      permit2Lockdown,
+      permit2InvalidateNonces,
+    },
     accountAddressCaip10,
     // unfortunately there is a presumption that every permission has a related token.
     ...EXTRANEOUS_CONTEXT_DATA,
@@ -150,11 +168,12 @@ export async function buildContext({
 export async function deriveMetadata({
   context,
 }: {
-  context: Erc20TokenRevocationContext;
-}): Promise<Erc20TokenRevocationMetadata> {
+  context: TokenApprovalRevocationContext;
+}): Promise<TokenApprovalRevocationMetadata> {
   const { expiry } = context;
 
-  const validationErrors: Erc20TokenRevocationMetadata['validationErrors'] = {};
+  const validationErrors: TokenApprovalRevocationMetadata['validationErrors'] =
+    {};
 
   if (expiry) {
     const expiryError = validateExpiry(expiry.timestamp);

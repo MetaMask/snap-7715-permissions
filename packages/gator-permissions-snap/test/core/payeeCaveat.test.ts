@@ -83,7 +83,7 @@ describe('appendPayeeCaveatIfPresent', () => {
       rules: [{ type: 'payee', data: { addresses: [PAYEE_ADDRESS_1] } }],
       contracts: MOCK_CONTRACTS,
       caveats,
-      permissionType: 'erc20-token-revocation',
+      permissionType: 'token-approval-revocation',
     });
 
     expect(caveats).toHaveLength(0);

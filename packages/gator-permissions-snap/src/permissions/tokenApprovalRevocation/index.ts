@@ -8,21 +8,21 @@ import {
 } from './context';
 import { allRules } from './rules';
 import type {
-  Erc20TokenRevocationContext,
-  Erc20TokenRevocationMetadata,
-  Erc20TokenRevocationPermission,
-  Erc20TokenRevocationPermissionRequest,
-  PopulatedErc20TokenRevocationPermission,
+  TokenApprovalRevocationContext,
+  TokenApprovalRevocationMetadata,
+  TokenApprovalRevocationPermission,
+  TokenApprovalRevocationPermissionRequest,
+  PopulatedTokenApprovalRevocationPermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
 import type { PermissionDefinition } from '../../core/types';
 
-export const erc20TokenRevocationPermissionDefinition: PermissionDefinition<
-  Erc20TokenRevocationPermissionRequest,
-  Erc20TokenRevocationContext,
-  Erc20TokenRevocationMetadata,
-  Erc20TokenRevocationPermission,
-  PopulatedErc20TokenRevocationPermission
+export const tokenApprovalRevocationPermissionDefinition: PermissionDefinition<
+  TokenApprovalRevocationPermissionRequest,
+  TokenApprovalRevocationContext,
+  TokenApprovalRevocationMetadata,
+  TokenApprovalRevocationPermission,
+  PopulatedTokenApprovalRevocationPermission
 > = {
   rules: allRules,
   title: 'permissionRequestTitle',

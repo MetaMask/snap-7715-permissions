@@ -45,6 +45,25 @@ describe('PermissionHandlerFactory', () => {
     rules: [],
   };
 
+  const mockTokenApprovalRevocationPermissionRequest: PermissionRequest = {
+    chainId: '0x1',
+    to: TEST_ADDRESS,
+    permission: {
+      type: 'token-approval-revocation',
+      isAdjustmentAllowed: false,
+      data: {
+        erc20Approve: true,
+        erc721Approve: false,
+        erc721SetApprovalForAll: false,
+        permit2Approve: false,
+        permit2Lockdown: false,
+        permit2InvalidateNonces: false,
+        justification: 'test',
+      },
+    },
+    rules: [],
+  };
+
   beforeEach(() => {
     mockAccountController = {
       getAccountAddress: jest.fn(),
@@ -81,6 +100,15 @@ describe('PermissionHandlerFactory', () => {
     it('should create a PermissionHandler when given native-token-stream permission type', () => {
       const handler = permissionHandlerFactory.createPermissionHandler(
         mockPermissionRequest,
+      );
+
+      expect(handler).toBeDefined();
+      expect(handler).toBeInstanceOf(PermissionHandler);
+    });
+
+    it('should create a PermissionHandler when given token-approval-revocation permission type', () => {
+      const handler = permissionHandlerFactory.createPermissionHandler(
+        mockTokenApprovalRevocationPermissionRequest,
       );
 
       expect(handler).toBeDefined();

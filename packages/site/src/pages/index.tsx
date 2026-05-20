@@ -31,7 +31,7 @@ import {
   ERC20TokenPeriodicForm,
   NativeTokenAllowanceForm,
   ERC20TokenAllowanceForm,
-  ERC20TokenRevocationForm,
+  TokenApprovalRevocationForm,
   RedemptionForm,
 } from '../components/permissions';
 import type { RedemptionCall } from '../components/permissions';
@@ -550,8 +550,8 @@ const Index = () => {
                   <option value="erc20-token-allowance">
                     ERC20 Token Allowance
                   </option>
-                  <option value="erc20-token-revocation">
-                    ERC20 Token Revocation
+                  <option value="token-approval-revocation">
+                    Token Approval Revocation
                   </option>
                 </select>
               </div>
@@ -580,8 +580,8 @@ const Index = () => {
                 <ERC20TokenAllowanceForm onChange={onFormChange} />
               )}
 
-              {permissionType === 'erc20-token-revocation' && (
-                <ERC20TokenRevocationForm onChange={onFormChange} />
+              {permissionType === 'token-approval-revocation' && (
+                <TokenApprovalRevocationForm onChange={onFormChange} />
               )}
             </StyledForm>
             <CustomMessageButton

@@ -36,7 +36,7 @@ const manifest: SnapManifest = {
     snap_dialog: {},
     snap_getPreferences: {},
   },
-  platformVersion: '10.2.0',
+  platformVersion: '11.1.0',
   manifestVersion: '0.1',
 };
 
