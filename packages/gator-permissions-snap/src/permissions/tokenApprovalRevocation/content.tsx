@@ -42,10 +42,7 @@ export async function createConfirmationContent({
         >
           <Box>
             {isAllPrimitivesEnabled ? (
-              <Box direction="horizontal">
-                <Icon name="full-circle" color="default" size="inherit" />
-                <Text>{t('allApprovalRevocationPrimitivesLabel')}</Text>
-              </Box>
+              <Text>{t('allApprovalRevocationPrimitivesLabel')}</Text>
             ) : (
               enabledPrimitives.map(({ key, labelKey }) => (
                 <Box direction="horizontal" key={key}>

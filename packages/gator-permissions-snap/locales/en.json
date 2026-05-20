@@ -323,7 +323,7 @@
       "message": "Revocation primitives"
     },
     "allApprovalRevocationPrimitivesLabel": {
-      "message": "All primitives"
+      "message": "All revocation primitives for ERC-20, ERC-1155, ERC-721."
     },
     "erc20ApproveRevocationLabel": {
       "message": "ERC-20 approve(spender, 0)"
