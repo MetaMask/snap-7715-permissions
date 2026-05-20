@@ -27,7 +27,7 @@ const manifest: SnapManifest = {
       snaps: false,
     },
   },
-  platformVersion: '10.2.0',
+  platformVersion: '11.1.0',
   manifestVersion: '0.1',
 };
 

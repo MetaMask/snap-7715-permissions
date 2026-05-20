@@ -13,7 +13,7 @@ export const SUPPORTED_RULE_TYPES = {
   'erc20-token-allowance': ['expiry', 'redeemer', 'payee'],
   'erc20-token-stream': ['expiry', 'redeemer', 'payee'],
   'erc20-token-periodic': ['expiry', 'redeemer', 'payee'],
-  'erc20-token-revocation': ['expiry', 'redeemer'],
+  'token-approval-revocation': ['expiry', 'redeemer'],
 } as const;
 
 /**

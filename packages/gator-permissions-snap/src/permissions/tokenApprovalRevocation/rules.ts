@@ -1,15 +1,15 @@
 import type {
-  Erc20TokenRevocationContext,
-  Erc20TokenRevocationMetadata,
+  TokenApprovalRevocationContext,
+  TokenApprovalRevocationMetadata,
 } from './types';
 import { t as translate } from '../../utils/i18n';
 import { createExpiryRule } from '../rules';
 
-export const EXPIRY_ELEMENT = 'erc20-token-revocation-expiry';
+export const EXPIRY_ELEMENT = 'token-approval-revocation-expiry';
 
 export const expiryRule = createExpiryRule<
-  Erc20TokenRevocationContext,
-  Erc20TokenRevocationMetadata
+  TokenApprovalRevocationContext,
+  TokenApprovalRevocationMetadata
 >({
   elementName: EXPIRY_ELEMENT,
   translate,

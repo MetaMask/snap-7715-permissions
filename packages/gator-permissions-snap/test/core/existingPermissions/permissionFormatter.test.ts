@@ -87,6 +87,71 @@ describe('groupPermissionsByFromAddress', () => {
 
     expect(Object.keys(grouped)).toStrictEqual([fromA]);
   });
+
+  it('summarizes token approval revocation when all primitives are enabled', () => {
+    const permission = basePermission({
+      permission: {
+        type: 'token-approval-revocation',
+        data: {
+          erc20Approve: true,
+          erc721Approve: true,
+          erc721SetApprovalForAll: true,
+          permit2Approve: true,
+          permit2Lockdown: true,
+          permit2InvalidateNonces: true,
+        },
+        isAdjustmentAllowed: true,
+      },
+    });
+
+    const grouped = groupPermissionsByFromAddress([permission]);
+
+    expect(grouped[fromA]?.[0]?.tokenApprovals?.value).toBe('All primitives');
+  });
+
+  it('lists only selected token approval revocation primitives', () => {
+    const permission = basePermission({
+      permission: {
+        type: 'token-approval-revocation',
+        data: {
+          erc20Approve: true,
+          erc721Approve: false,
+          erc721SetApprovalForAll: false,
+          permit2Approve: false,
+          permit2Lockdown: false,
+          permit2InvalidateNonces: false,
+        },
+        isAdjustmentAllowed: true,
+      },
+    });
+
+    const grouped = groupPermissionsByFromAddress([permission]);
+
+    expect(grouped[fromA]?.[0]?.tokenApprovals?.value).toBe(
+      'ERC-20 approve(spender, 0)',
+    );
+  });
+
+  it('does not treat missing token approval revocation primitives as all primitives', () => {
+    const permission = basePermission({
+      permission: {
+        type: 'token-approval-revocation',
+        data: {
+          erc20Approve: false,
+          erc721Approve: false,
+          erc721SetApprovalForAll: false,
+          permit2Approve: false,
+          permit2Lockdown: false,
+          permit2InvalidateNonces: false,
+        },
+        isAdjustmentAllowed: true,
+      },
+    });
+
+    const grouped = groupPermissionsByFromAddress([permission]);
+
+    expect(grouped[fromA]?.[0]?.tokenApprovals).toBeUndefined();
+  });
 });
 
 describe('formatPermissionWithTokenMetadata', () => {
@@ -113,7 +178,7 @@ describe('formatPermissionWithTokenMetadata', () => {
   it('returns the permission unchanged when data has no token amount fields', async () => {
     const permission = basePermission({
       permission: {
-        type: 'erc20-token-revocation',
+        type: 'token-approval-revocation',
         data: { justification: 'x' },
         isAdjustmentAllowed: true,
       },

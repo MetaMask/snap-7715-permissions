@@ -50,9 +50,43 @@ export type ERC20TokenAllowancePermissionRequest = BasePermissionRequest & {
   tokenAddress: Hex;
 };
 
-export type ERC20TokenRevocationPermissionRequest = BasePermissionRequest & {
-  type: 'erc20-token-revocation';
+export type TokenApprovalRevocationPermissionRequest = BasePermissionRequest & {
+  type: 'token-approval-revocation';
+  erc20Approve: boolean;
+  erc721Approve: boolean;
+  erc721SetApprovalForAll: boolean;
+  permit2Approve: boolean;
+  permit2Lockdown: boolean;
+  permit2InvalidateNonces: boolean;
 };
+
+export type TokenApprovalRevocationPrimitive = Pick<
+  TokenApprovalRevocationPermissionRequest,
+  | 'erc20Approve'
+  | 'erc721Approve'
+  | 'erc721SetApprovalForAll'
+  | 'permit2Approve'
+  | 'permit2Lockdown'
+  | 'permit2InvalidateNonces'
+>;
+
+export type TokenApprovalRevocationPrimitiveKey =
+  keyof TokenApprovalRevocationPrimitive;
+
+export const TOKEN_APPROVAL_REVOCATION_PRIMITIVES = [
+  { key: 'erc20Approve', label: 'ERC-20 approve(spender, 0)' },
+  { key: 'erc721Approve', label: 'ERC-721 approve(address(0), tokenId)' },
+  {
+    key: 'erc721SetApprovalForAll',
+    label: 'ERC-721/ERC-1155 setApprovalForAll(false)',
+  },
+  { key: 'permit2Approve', label: 'Permit2 approve(token, spender, 0, 0)' },
+  { key: 'permit2Lockdown', label: 'Permit2 lockdown' },
+  { key: 'permit2InvalidateNonces', label: 'Permit2 invalidate nonces' },
+] as const satisfies readonly {
+  key: TokenApprovalRevocationPrimitiveKey;
+  label: string;
+}[];
 
 export type PermissionRequest =
   | NativeTokenStreamPermissionRequest
@@ -60,5 +94,5 @@ export type PermissionRequest =
   | NativeTokenAllowancePermissionRequest
   | ERC20TokenPeriodicPermissionRequest
   | ERC20TokenAllowancePermissionRequest
-  | ERC20TokenRevocationPermissionRequest
+  | TokenApprovalRevocationPermissionRequest
   | ERC20TokenStreamPermissionRequest;
