@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Uncategorized
+
+- feat: add token approval revocation functionality ([#328](https://github.com/MetaMask/snap-7715-permissions/pull/328))
+- chore(deps-dev): bump @metamask/snaps-jest from 10.1.2 to 10.1.3 ([#304](https://github.com/MetaMask/snap-7715-permissions/pull/304))
+- chore: clean up code structure and remove unused code blocks ([#330](https://github.com/MetaMask/snap-7715-permissions/pull/330))
+- chore: bump yarn from 4.10.1 to 4.14.1 ([#326](https://github.com/MetaMask/snap-7715-permissions/pull/326))
+
 ## [1.3.0]
 
 ### Added
