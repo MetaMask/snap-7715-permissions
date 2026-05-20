@@ -331,7 +331,7 @@
     "erc721SetApprovalForAllRevocationLabel": {
       "message": "ERC-721/ERC-1155 setApprovalForAll(false)"
     },
-    "permit2ApproveZeroRevocationLabel": {
+    "permit2ApproveRevocationLabel": {
       "message": "Permit2 approve(token, spender, 0, 0)"
     },
     "permit2LockdownRevocationLabel": {

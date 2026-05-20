@@ -20,7 +20,7 @@ const approvalRevocationMechanisms = {
   erc20Approve: true,
   erc721Approve: true,
   erc721SetApprovalForAll: true,
-  permit2ApproveZero: true,
+  permit2Approve: true,
   permit2Lockdown: true,
   permit2InvalidateNonces: true,
 };

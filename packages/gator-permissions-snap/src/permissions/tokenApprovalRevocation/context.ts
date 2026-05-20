@@ -135,7 +135,7 @@ export async function buildContext({
     erc20Approve,
     erc721Approve,
     erc721SetApprovalForAll,
-    permit2ApproveZero,
+    permit2Approve,
     permit2Lockdown,
     permit2InvalidateNonces,
   } = data;
@@ -149,7 +149,7 @@ export async function buildContext({
       erc20Approve,
       erc721Approve,
       erc721SetApprovalForAll,
-      permit2ApproveZero,
+      permit2Approve,
       permit2Lockdown,
       permit2InvalidateNonces,
     },

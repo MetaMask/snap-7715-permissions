@@ -55,7 +55,7 @@ export type TokenApprovalRevocationPermissionRequest = BasePermissionRequest & {
   erc20Approve: boolean;
   erc721Approve: boolean;
   erc721SetApprovalForAll: boolean;
-  permit2ApproveZero: boolean;
+  permit2Approve: boolean;
   permit2Lockdown: boolean;
   permit2InvalidateNonces: boolean;
 };

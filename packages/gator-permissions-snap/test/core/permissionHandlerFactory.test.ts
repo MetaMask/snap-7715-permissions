@@ -55,7 +55,7 @@ describe('PermissionHandlerFactory', () => {
         erc20Approve: true,
         erc721Approve: false,
         erc721SetApprovalForAll: false,
-        permit2ApproveZero: false,
+        permit2Approve: false,
         permit2Lockdown: false,
         permit2InvalidateNonces: false,
         justification: 'test',

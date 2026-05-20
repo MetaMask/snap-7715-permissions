@@ -10,7 +10,7 @@ type TokenApprovalRevocationMechanism = Pick<
   | 'erc20Approve'
   | 'erc721Approve'
   | 'erc721SetApprovalForAll'
-  | 'permit2ApproveZero'
+  | 'permit2Approve'
   | 'permit2Lockdown'
   | 'permit2InvalidateNonces'
 >;
@@ -22,7 +22,7 @@ const TOKEN_APPROVAL_REVOCATION_MECHANISMS = [
     key: 'erc721SetApprovalForAll',
     label: 'ERC-721/ERC-1155 setApprovalForAll(false)',
   },
-  { key: 'permit2ApproveZero', label: 'Permit2 approve(token, spender, 0, 0)' },
+  { key: 'permit2Approve', label: 'Permit2 approve(token, spender, 0, 0)' },
   { key: 'permit2Lockdown', label: 'Permit2 lockdown' },
   { key: 'permit2InvalidateNonces', label: 'Permit2 invalidate nonces' },
 ] as const satisfies readonly {
@@ -35,7 +35,7 @@ const DEFAULT_TOKEN_APPROVAL_REVOCATION_MECHANISMS: TokenApprovalRevocationMecha
     erc20Approve: true,
     erc721Approve: true,
     erc721SetApprovalForAll: true,
-    permit2ApproveZero: true,
+    permit2Approve: true,
     permit2Lockdown: true,
     permit2InvalidateNonces: true,
   };

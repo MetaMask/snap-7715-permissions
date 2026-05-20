@@ -26,8 +26,8 @@ export const TOKEN_APPROVAL_REVOCATION_PRIMITIVES = [
     labelKey: 'erc721SetApprovalForAllRevocationLabel' satisfies MessageKey,
   },
   {
-    key: 'permit2ApproveZero',
-    labelKey: 'permit2ApproveZeroRevocationLabel' satisfies MessageKey,
+    key: 'permit2Approve',
+    labelKey: 'permit2ApproveRevocationLabel' satisfies MessageKey,
   },
   {
     key: 'permit2Lockdown',
@@ -62,7 +62,7 @@ export const zTokenApprovalRevocationData = zMetaMaskPermissionData
     erc20Approve: z.boolean(),
     erc721Approve: z.boolean(),
     erc721SetApprovalForAll: z.boolean(),
-    permit2ApproveZero: z.boolean(),
+    permit2Approve: z.boolean(),
     permit2Lockdown: z.boolean(),
     permit2InvalidateNonces: z.boolean(),
   })
