@@ -62,6 +62,5 @@ describe('tokenApprovalRevocation:caveats', () => {
 
       expect(caveats[0]?.terms).toBe('0x38');
     });
-
   });
 });
