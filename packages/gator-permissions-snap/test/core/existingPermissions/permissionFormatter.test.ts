@@ -106,9 +106,7 @@ describe('groupPermissionsByFromAddress', () => {
 
     const grouped = groupPermissionsByFromAddress([permission]);
 
-    expect(grouped[fromA]?.[0]?.tokenApprovals?.value).toBe(
-      'All revocation primitives',
-    );
+    expect(grouped[fromA]?.[0]?.tokenApprovals?.value).toBe('All primitives');
   });
 
   it('lists only selected token approval revocation primitives', () => {
