@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update `@metamask/snaps-jest` from `10.1.2` to `10.1.3` ([#304](https://github.com/MetaMask/snap-7715-permissions/pull/304))
 - Update `@metamask/profile-sync-controller` ([#321](https://github.com/MetaMask/snap-7715-permissions/pull/321))
-- Clean up code structure and remove unused code blocks ([#330](https://github.com/MetaMask/snap-7715-permissions/pull/330))
 - Update Yarn from `4.10.1` to `4.14.1` ([#326](https://github.com/MetaMask/snap-7715-permissions/pull/326))
 
 ### Fixed
