@@ -9,14 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.2.0]
 
-### Uncategorized
+### Added
 
-- feat: add token approval revocation functionality ([#328](https://github.com/MetaMask/snap-7715-permissions/pull/328))
-- chore(deps-dev): bump @metamask/snaps-jest from 10.1.2 to 10.1.3 ([#304](https://github.com/MetaMask/snap-7715-permissions/pull/304))
-- chore(deps): bump @metamask/profile-sync-controller ([#321](https://github.com/MetaMask/snap-7715-permissions/pull/321))
-- chore: clean up code structure and remove unused code blocks ([#330](https://github.com/MetaMask/snap-7715-permissions/pull/330))
-- chore: bump yarn from 4.10.1 to 4.14.1 ([#326](https://github.com/MetaMask/snap-7715-permissions/pull/326))
-- fix: Ensure once the dialog is closed, it stays closed ([#327](https://github.com/MetaMask/snap-7715-permissions/pull/327))
+- Add `token-approval-revocation` permission support ([#328](https://github.com/MetaMask/snap-7715-permissions/pull/328))
+
+### Changed
+
+- Update `@metamask/snaps-jest` from `10.1.2` to `10.1.3` ([#304](https://github.com/MetaMask/snap-7715-permissions/pull/304))
+- Update `@metamask/profile-sync-controller` ([#321](https://github.com/MetaMask/snap-7715-permissions/pull/321))
+- Clean up code structure and remove unused code blocks ([#330](https://github.com/MetaMask/snap-7715-permissions/pull/330))
+- Update Yarn from `4.10.1` to `4.14.1` ([#326](https://github.com/MetaMask/snap-7715-permissions/pull/326))
+
+### Fixed
+
+- Keep the dialog closed once it has been closed ([#327](https://github.com/MetaMask/snap-7715-permissions/pull/327))
 
 ## [2.1.0]
 
