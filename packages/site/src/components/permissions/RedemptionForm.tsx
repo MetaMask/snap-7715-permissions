@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { encodeFunctionData, isAddress } from 'viem';
 import type { Hex } from 'viem';
 
-import type { PermissionRequest } from './types';
+import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from './types';
+import type {
+  PermissionRequest,
+  TokenApprovalRevocationPrimitiveKey,
+} from './types';
 
 const ERC20_ABI = [
   {
@@ -94,21 +98,6 @@ const PERMIT2_ABI = [
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const PERMIT2_ADDRESS = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
-
-const TOKEN_APPROVAL_REVOCATION_PRIMITIVES = [
-  { key: 'erc20Approve', label: 'ERC-20 approve(spender, 0)' },
-  { key: 'erc721Approve', label: 'ERC-721 approve(address(0), tokenId)' },
-  {
-    key: 'erc721SetApprovalForAll',
-    label: 'ERC-721/ERC-1155 setApprovalForAll(false)',
-  },
-  { key: 'permit2Approve', label: 'Permit2 approve(token, spender, 0, 0)' },
-  { key: 'permit2Lockdown', label: 'Permit2 lockdown' },
-  { key: 'permit2InvalidateNonces', label: 'Permit2 invalidate nonces' },
-] as const;
-
-type TokenApprovalRevocationPrimitive =
-  (typeof TOKEN_APPROVAL_REVOCATION_PRIMITIVES)[number]['key'];
 
 type Rule = {
   type: string;
@@ -353,7 +342,7 @@ export const RedemptionForm = ({
   );
   const [amount, setAmount] = useState(getDefaultAmount(permission));
   const [revocationPrimitive, setRevocationPrimitive] =
-    useState<TokenApprovalRevocationPrimitive>('erc20Approve');
+    useState<TokenApprovalRevocationPrimitiveKey>('erc20Approve');
   const [tokenId, setTokenId] = useState('0');
   const [newNonce, setNewNonce] = useState('1');
 
@@ -481,7 +470,7 @@ export const RedemptionForm = ({
   const handleRevocationPrimitiveChange = ({
     target: { value: inputValue },
   }: React.ChangeEvent<HTMLSelectElement>) => {
-    setRevocationPrimitive(inputValue as TokenApprovalRevocationPrimitive);
+    setRevocationPrimitive(inputValue as TokenApprovalRevocationPrimitiveKey);
   };
 
   const handleTokenIdChange = ({

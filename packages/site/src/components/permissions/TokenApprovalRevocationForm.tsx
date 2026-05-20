@@ -3,32 +3,11 @@ import styled from 'styled-components';
 import type { Hex } from 'viem';
 
 import { RedeemerAddressesField } from './RedeemerAddressesField';
-import type { TokenApprovalRevocationPermissionRequest } from './types';
-
-type TokenApprovalRevocationPrimitive = Pick<
+import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from './types';
+import type {
   TokenApprovalRevocationPermissionRequest,
-  | 'erc20Approve'
-  | 'erc721Approve'
-  | 'erc721SetApprovalForAll'
-  | 'permit2Approve'
-  | 'permit2Lockdown'
-  | 'permit2InvalidateNonces'
->;
-
-const TOKEN_APPROVAL_REVOCATION_PRIMITIVES = [
-  { key: 'erc20Approve', label: 'ERC-20 approve(spender, 0)' },
-  { key: 'erc721Approve', label: 'ERC-721 approve(address(0), tokenId)' },
-  {
-    key: 'erc721SetApprovalForAll',
-    label: 'ERC-721/ERC-1155 setApprovalForAll(false)',
-  },
-  { key: 'permit2Approve', label: 'Permit2 approve(token, spender, 0, 0)' },
-  { key: 'permit2Lockdown', label: 'Permit2 lockdown' },
-  { key: 'permit2InvalidateNonces', label: 'Permit2 invalidate nonces' },
-] as const satisfies readonly {
-  key: keyof TokenApprovalRevocationPrimitive;
-  label: string;
-}[];
+  TokenApprovalRevocationPrimitive,
+} from './types';
 
 const DEFAULT_TOKEN_APPROVAL_REVOCATION_PRIMITIVES: TokenApprovalRevocationPrimitive =
   {
