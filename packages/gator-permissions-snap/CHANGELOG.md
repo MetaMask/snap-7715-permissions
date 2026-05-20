@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0]
+
+### Added
+
+- Add `token-approval-revocation` permission support ([#328](https://github.com/MetaMask/snap-7715-permissions/pull/328))
+
+### Changed
+
+- Update `@metamask/snaps-jest` from `10.1.2` to `10.1.3` ([#304](https://github.com/MetaMask/snap-7715-permissions/pull/304))
+- Update `@metamask/profile-sync-controller` ([#321](https://github.com/MetaMask/snap-7715-permissions/pull/321))
+- Update Yarn from `4.10.1` to `4.14.1` ([#326](https://github.com/MetaMask/snap-7715-permissions/pull/326))
+
+### Fixed
+
+- Keep the dialog closed once it has been closed ([#327](https://github.com/MetaMask/snap-7715-permissions/pull/327))
+
 ## [2.1.0]
 
 ### Added
@@ -358,7 +374,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.1.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.2.0...HEAD
+[2.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.1.0...@metamask/gator-permissions-snap@2.2.0
 [2.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.0.0...@metamask/gator-permissions-snap@2.1.0
 [2.0.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.1...@metamask/gator-permissions-snap@2.0.0
 [1.3.1]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.0...@metamask/gator-permissions-snap@1.3.1
