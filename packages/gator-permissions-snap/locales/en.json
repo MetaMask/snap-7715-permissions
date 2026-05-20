@@ -212,7 +212,7 @@
       "message": "Unknown chain $1"
     },
     "permissionRequestSubtitleRevocation": {
-      "message": "This site wants permissions to revoke your ERC-20 token approvals."
+      "message": "This site wants permissions to revoke your token approvals."
     },
     "introAdvancedPermissionsTitle": {
       "message": "Advanced permissions keep you in control"
@@ -251,7 +251,7 @@
       "message": "Token revocation request"
     },
     "introManageTokenApprovalsDescription": {
-      "message": "Token revocation allows sites to revoke token approvals on your behalf."
+      "message": "Token revocation allows sites to revoke ERC-20, NFT, and Permit2 approvals on your behalf."
     },
     "introAllowanceTitle": {
       "message": "Token allowance request"
@@ -318,6 +318,30 @@
     },
     "revokeTokenApprovalsLabel": {
       "message": "Revoke token approvals"
+    },
+    "approvalRevocationPrimitivesLabel": {
+      "message": "Revocation primitives"
+    },
+    "allApprovalRevocationPrimitivesLabel": {
+      "message": "All primitives"
+    },
+    "erc20ApproveRevocationLabel": {
+      "message": "ERC-20 approve(spender, 0)"
+    },
+    "erc721ApproveRevocationLabel": {
+      "message": "ERC-721 approve(address(0), tokenId)"
+    },
+    "erc721SetApprovalForAllRevocationLabel": {
+      "message": "ERC-721/ERC-1155 setApprovalForAll(false)"
+    },
+    "permit2ApproveRevocationLabel": {
+      "message": "Permit2 approve(token, spender, 0, 0)"
+    },
+    "permit2LockdownRevocationLabel": {
+      "message": "Permit2 lockdown"
+    },
+    "permit2InvalidateNoncesRevocationLabel": {
+      "message": "Permit2 invalidate nonces"
     }
   }
 }

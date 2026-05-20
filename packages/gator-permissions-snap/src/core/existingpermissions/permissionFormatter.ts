@@ -7,6 +7,7 @@ import { hexToNumber } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
 import { DEFAULT_MAX_AMOUNT } from '../../permissions/erc20TokenStream/context';
+import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from '../../permissions/tokenApprovalRevocation/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
 import { getClosestTimePeriod } from '../../utils/time';
@@ -88,13 +89,22 @@ function extractPermissionDetails(
     }
 
     // For revocation-type permissions
-    if (permissionType === 'erc20-token-revocation') {
+    if (permissionType === 'token-approval-revocation') {
       const revokeLabel = t('revokeTokenApprovalsLabel');
-      const revokeValue = t('allTokens');
-      details.tokenApprovals = {
-        label: revokeLabel,
-        value: revokeValue,
-      };
+      const revocationPrimitives = TOKEN_APPROVAL_REVOCATION_PRIMITIVES.filter(
+        ({ key }) => permissionData[key] === true,
+      ).map(({ labelKey }) => t(labelKey));
+      if (revocationPrimitives.length > 0) {
+        const revokeValue =
+          revocationPrimitives.length ===
+          TOKEN_APPROVAL_REVOCATION_PRIMITIVES.length
+            ? t('allApprovalRevocationPrimitivesLabel')
+            : revocationPrimitives.join(', ');
+        details.tokenApprovals = {
+          label: revokeLabel,
+          value: revokeValue,
+        };
+      }
     }
     // For periodic-type permissions
     else if (
