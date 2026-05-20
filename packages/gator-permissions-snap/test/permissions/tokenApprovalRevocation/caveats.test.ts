@@ -11,7 +11,7 @@ const contracts = {
 
 describe('tokenApprovalRevocation:caveats', () => {
   describe('createPermissionCaveats()', () => {
-    it('should create an approval revocation caveat with all mechanisms enabled', async () => {
+    it('should create an approval revocation caveat with all primitives enabled', async () => {
       const permission: PopulatedTokenApprovalRevocationPermission = {
         type: 'token-approval-revocation',
         data: {
@@ -40,7 +40,7 @@ describe('tokenApprovalRevocation:caveats', () => {
       ]);
     });
 
-    it('should encode only selected revocation mechanisms', async () => {
+    it('should encode only selected revocation primitives', async () => {
       const permission: PopulatedTokenApprovalRevocationPermission = {
         type: 'token-approval-revocation',
         data: {
@@ -63,33 +63,5 @@ describe('tokenApprovalRevocation:caveats', () => {
       expect(caveats[0]?.terms).toBe('0x38');
     });
 
-    it('should throw when the approval revocation enforcer is not configured', async () => {
-      const permission: PopulatedTokenApprovalRevocationPermission = {
-        type: 'token-approval-revocation',
-        data: {
-          justification: 'Permission to revoke approvals',
-          erc20Approve: true,
-          erc721Approve: false,
-          erc721SetApprovalForAll: false,
-          permit2Approve: false,
-          permit2Lockdown: false,
-          permit2InvalidateNonces: false,
-        },
-        isAdjustmentAllowed: true,
-      };
-
-      await expect(
-        createPermissionCaveats({
-          permission,
-          contracts: {
-            ...contracts,
-            approvalRevocationEnforcer:
-              '0x0000000000000000000000000000000000000000',
-          },
-        }),
-      ).rejects.toThrow(
-        'ApprovalRevocationEnforcer address is not configured.',
-      );
-    });
   });
 });

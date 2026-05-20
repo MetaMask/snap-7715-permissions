@@ -1,7 +1,5 @@
-import { ZERO_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import type { Caveat } from '@metamask/delegation-core';
 import { createApprovalRevocationTerms } from '@metamask/delegation-core';
-import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { PopulatedTokenApprovalRevocationPermission } from './types';
 import type { DelegationContracts } from '../../core/chainMetadata';
@@ -20,12 +18,6 @@ export async function createPermissionCaveats({
   permission: PopulatedTokenApprovalRevocationPermission;
   contracts: DelegationContracts;
 }): Promise<Caveat[]> {
-  if (contracts.approvalRevocationEnforcer === ZERO_ADDRESS) {
-    throw new InvalidInputError(
-      'ApprovalRevocationEnforcer address is not configured.',
-    );
-  }
-
   const approvalRevocationCaveat: Caveat = {
     enforcer: contracts.approvalRevocationEnforcer,
     terms: createApprovalRevocationTerms(permission.data),

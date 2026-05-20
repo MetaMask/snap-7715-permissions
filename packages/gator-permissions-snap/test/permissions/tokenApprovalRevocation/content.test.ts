@@ -11,7 +11,7 @@ const mockContext: TokenApprovalRevocationContext = {
   expiry: {
     timestamp: 1714521600, // 05/01/2024
   },
-  approvalRevocationMechanisms: {
+  approvalRevocationPrimitives: {
     erc20Approve: true,
     erc721Approve: true,
     erc721SetApprovalForAll: true,
@@ -36,7 +36,7 @@ const mockMetadata: TokenApprovalRevocationMetadata = {
 
 describe('tokenApprovalRevocation:content', () => {
   describe('createConfirmationContent()', () => {
-    it('should render content with expiry rule', async () => {
+    it('renders all primitives as a summary list item', async () => {
       const content = await createConfirmationContent({
         context: mockContext,
         metadata: mockMetadata,
@@ -44,10 +44,30 @@ describe('tokenApprovalRevocation:content', () => {
 
       const rendered = JSON.stringify(content);
 
-      expect(rendered).toContain('Revocation methods');
-      expect(rendered).toContain('ERC-20 approve(spender, 0)');
-      expect(rendered).toContain('Permit2 invalidate nonces');
+      expect(rendered).toContain('Revocation primitives');
+      expect(rendered).toContain('All primitives');
+      expect(rendered).toContain('full-circle');
       expect(rendered).toContain('token-approval-revocation-expiry');
+    });
+
+    it('renders selected revocation primitives as a list', async () => {
+      const content = await createConfirmationContent({
+        context: {
+          ...mockContext,
+          approvalRevocationPrimitives: {
+            ...mockContext.approvalRevocationPrimitives,
+            permit2InvalidateNonces: false,
+          },
+        },
+        metadata: mockMetadata,
+      });
+
+      const rendered = JSON.stringify(content);
+
+      expect(rendered).toContain('Revocation primitives');
+      expect(rendered).toContain('full-circle');
+      expect(rendered).toContain('ERC-20 approve(spender, 0)');
+      expect(rendered).not.toContain('All primitives');
     });
   });
 });

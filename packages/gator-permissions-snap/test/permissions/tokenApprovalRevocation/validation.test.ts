@@ -85,8 +85,8 @@ describe('tokenApprovalRevocation:validation', () => {
       ).toThrow('Failed type validation: isAdjustmentAllowed: Required');
     });
 
-    it('should require at least one revocation mechanism', () => {
-      const requestWithoutMechanisms = {
+    it('should require at least one revocation primitive', () => {
+      const requestWithoutPrimitives = {
         ...validPermissionRequest,
         permission: {
           ...validPermissionRequest.permission,
@@ -103,9 +103,9 @@ describe('tokenApprovalRevocation:validation', () => {
       };
 
       expect(() =>
-        parseAndValidatePermission(requestWithoutMechanisms),
+        parseAndValidatePermission(requestWithoutPrimitives),
       ).toThrow(
-        'At least one token approval revocation mechanism must be enabled',
+        'At least one token approval revocation primitive must be enabled',
       );
     });
   });

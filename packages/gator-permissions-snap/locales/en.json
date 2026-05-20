@@ -319,8 +319,11 @@
     "revokeTokenApprovalsLabel": {
       "message": "Revoke token approvals"
     },
-    "approvalRevocationMechanismsLabel": {
-      "message": "Revocation methods"
+    "approvalRevocationPrimitivesLabel": {
+      "message": "Revocation primitives"
+    },
+    "allApprovalRevocationPrimitivesLabel": {
+      "message": "All primitives"
     },
     "erc20ApproveRevocationLabel": {
       "message": "ERC-20 approve(spender, 0)"

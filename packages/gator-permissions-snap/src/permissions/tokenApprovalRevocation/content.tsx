@@ -1,5 +1,5 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
-import { Box, Divider, Section, Text } from '@metamask/snaps-sdk/jsx';
+import { Box, Divider, Icon, Section, Text } from '@metamask/snaps-sdk/jsx';
 
 import { expiryRule } from './rules';
 import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from './types';
@@ -26,22 +26,34 @@ export async function createConfirmationContent({
   context: TokenApprovalRevocationContext;
   metadata: TokenApprovalRevocationMetadata;
 }): Promise<SnapElement> {
-  const enabledMechanisms = TOKEN_APPROVAL_REVOCATION_PRIMITIVES.filter(
-    ({ key }) => context.approvalRevocationMechanisms[key],
+  const enabledPrimitives = TOKEN_APPROVAL_REVOCATION_PRIMITIVES.filter(
+    ({ key }) => context.approvalRevocationPrimitives[key],
   );
+  const isAllPrimitivesEnabled =
+    enabledPrimitives.length === TOKEN_APPROVAL_REVOCATION_PRIMITIVES.length;
 
   return (
     <Box>
       <Section>
         <Field
-          label={t('approvalRevocationMechanismsLabel')}
+          label={t('approvalRevocationPrimitivesLabel')}
           variant="display"
           direction="vertical"
         >
           <Box>
-            {enabledMechanisms.map(({ key, labelKey }) => (
-              <Text key={key}>{t(labelKey)}</Text>
-            ))}
+            {isAllPrimitivesEnabled ? (
+              <Box direction="horizontal">
+                <Icon name="full-circle" color="default" size="inherit" />
+                <Text>{t('allApprovalRevocationPrimitivesLabel')}</Text>
+              </Box>
+            ) : (
+              enabledPrimitives.map(({ key, labelKey }) => (
+                <Box direction="horizontal" key={key}>
+                  <Icon name="full-circle" color="default" size="inherit" />
+                  <Text>{t(labelKey)}</Text>
+                </Box>
+              ))
+            )}
           </Box>
         </Field>
         <Divider />

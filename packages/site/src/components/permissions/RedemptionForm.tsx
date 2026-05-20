@@ -95,7 +95,7 @@ const PERMIT2_ABI = [
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const PERMIT2_ADDRESS = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
 
-const TOKEN_APPROVAL_REVOCATION_METHODS = [
+const TOKEN_APPROVAL_REVOCATION_PRIMITIVES = [
   { key: 'erc20Approve', label: 'ERC-20 approve(spender, 0)' },
   { key: 'erc721Approve', label: 'ERC-721 approve(address(0), tokenId)' },
   {
@@ -107,8 +107,8 @@ const TOKEN_APPROVAL_REVOCATION_METHODS = [
   { key: 'permit2InvalidateNonces', label: 'Permit2 invalidate nonces' },
 ] as const;
 
-type TokenApprovalRevocationMethod =
-  (typeof TOKEN_APPROVAL_REVOCATION_METHODS)[number]['key'];
+type TokenApprovalRevocationPrimitive =
+  (typeof TOKEN_APPROVAL_REVOCATION_PRIMITIVES)[number]['key'];
 
 type Rule = {
   type: string;
@@ -352,17 +352,19 @@ export const RedemptionForm = ({
     permission.data?.tokenAddress ?? EMPTY_HEX,
   );
   const [amount, setAmount] = useState(getDefaultAmount(permission));
-  const [revocationMethod, setRevocationMethod] =
-    useState<TokenApprovalRevocationMethod>('erc20Approve');
+  const [revocationPrimitive, setRevocationPrimitive] =
+    useState<TokenApprovalRevocationPrimitive>('erc20Approve');
   const [tokenId, setTokenId] = useState('0');
   const [newNonce, setNewNonce] = useState('1');
 
-  const enabledRevocationMethods = useMemo(() => {
-    const methods = TOKEN_APPROVAL_REVOCATION_METHODS.filter(
+  const enabledRevocationPrimitives = useMemo(() => {
+    const primitives = TOKEN_APPROVAL_REVOCATION_PRIMITIVES.filter(
       ({ key }) => permission.data?.[key] === true,
     );
 
-    return methods.length > 0 ? methods : TOKEN_APPROVAL_REVOCATION_METHODS;
+    return primitives.length > 0
+      ? primitives
+      : TOKEN_APPROVAL_REVOCATION_PRIMITIVES;
   }, [permission.data]);
 
   useEffect(() => {
@@ -373,10 +375,16 @@ export const RedemptionForm = ({
   }, [delegateAddress, payeeAddresses, permission]);
 
   useEffect(() => {
-    if (!enabledRevocationMethods.some(({ key }) => key === revocationMethod)) {
-      setRevocationMethod(enabledRevocationMethods[0]?.key ?? 'erc20Approve');
+    if (
+      !enabledRevocationPrimitives.some(
+        ({ key }) => key === revocationPrimitive,
+      )
+    ) {
+      setRevocationPrimitive(
+        enabledRevocationPrimitives[0]?.key ?? 'erc20Approve',
+      );
     }
-  }, [enabledRevocationMethods, revocationMethod]);
+  }, [enabledRevocationPrimitives, revocationPrimitive]);
 
   const value = parseBigIntInput(amount);
   const isErc20Transfer =
@@ -393,25 +401,25 @@ export const RedemptionForm = ({
   if (isErc20Transfer) {
     generatedCalldata = encodeTransferCalldata(recipientAddress, value);
   } else if (isTokenApprovalRevocation) {
-    if (revocationMethod === 'erc20Approve') {
+    if (revocationPrimitive === 'erc20Approve') {
       generatedCalldata = encodeApproveCalldata(spenderAddress);
-    } else if (revocationMethod === 'erc721Approve') {
+    } else if (revocationPrimitive === 'erc721Approve') {
       generatedCalldata = encodeErc721ApproveCalldata(tokenId);
-    } else if (revocationMethod === 'erc721SetApprovalForAll') {
+    } else if (revocationPrimitive === 'erc721SetApprovalForAll') {
       generatedCalldata = encodeSetApprovalForAllCalldata(spenderAddress);
-    } else if (revocationMethod === 'permit2Approve') {
+    } else if (revocationPrimitive === 'permit2Approve') {
       targetAddress = PERMIT2_ADDRESS;
       generatedCalldata = encodePermit2ApproveCalldata(
         tokenAddress,
         spenderAddress,
       );
-    } else if (revocationMethod === 'permit2Lockdown') {
+    } else if (revocationPrimitive === 'permit2Lockdown') {
       targetAddress = PERMIT2_ADDRESS;
       generatedCalldata = encodePermit2LockdownCalldata(
         tokenAddress,
         spenderAddress,
       );
-    } else if (revocationMethod === 'permit2InvalidateNonces') {
+    } else if (revocationPrimitive === 'permit2InvalidateNonces') {
       targetAddress = PERMIT2_ADDRESS;
       generatedCalldata = encodePermit2InvalidateNoncesCalldata(
         tokenAddress,
@@ -470,10 +478,10 @@ export const RedemptionForm = ({
     setAmount(inputValue);
   };
 
-  const handleRevocationMethodChange = ({
+  const handleRevocationPrimitiveChange = ({
     target: { value: inputValue },
   }: React.ChangeEvent<HTMLSelectElement>) => {
-    setRevocationMethod(inputValue as TokenApprovalRevocationMethod);
+    setRevocationPrimitive(inputValue as TokenApprovalRevocationPrimitive);
   };
 
   const handleTokenIdChange = ({
@@ -492,14 +500,16 @@ export const RedemptionForm = ({
     return (
       <>
         <div>
-          <label htmlFor="redeemRevocationMethod">Revocation method:</label>
+          <label htmlFor="redeemRevocationPrimitive">
+            Revocation primitive:
+          </label>
           <select
-            id="redeemRevocationMethod"
-            name="redeemRevocationMethod"
-            value={revocationMethod}
-            onChange={handleRevocationMethodChange}
+            id="redeemRevocationPrimitive"
+            name="redeemRevocationPrimitive"
+            value={revocationPrimitive}
+            onChange={handleRevocationPrimitiveChange}
           >
-            {enabledRevocationMethods.map(({ key, label }) => (
+            {enabledRevocationPrimitives.map(({ key, label }) => (
               <option key={key} value={key}>
                 {label}
               </option>
@@ -517,7 +527,7 @@ export const RedemptionForm = ({
             placeholder="0x..."
           />
         </div>
-        {revocationMethod !== 'erc721Approve' && (
+        {revocationPrimitive !== 'erc721Approve' && (
           <div>
             <label htmlFor="redeemSpenderAddress">Spender/operator:</label>
             <input
@@ -530,7 +540,7 @@ export const RedemptionForm = ({
             />
           </div>
         )}
-        {revocationMethod === 'erc721Approve' && (
+        {revocationPrimitive === 'erc721Approve' && (
           <div>
             <label htmlFor="redeemTokenId">Token ID:</label>
             <input
@@ -542,7 +552,7 @@ export const RedemptionForm = ({
             />
           </div>
         )}
-        {revocationMethod === 'permit2InvalidateNonces' && (
+        {revocationPrimitive === 'permit2InvalidateNonces' && (
           <div>
             <label htmlFor="redeemNewNonce">New nonce:</label>
             <input

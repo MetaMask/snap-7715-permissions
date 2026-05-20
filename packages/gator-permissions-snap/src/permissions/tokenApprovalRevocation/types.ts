@@ -42,7 +42,7 @@ export const TOKEN_APPROVAL_REVOCATION_PRIMITIVES = [
 export type TokenApprovalRevocationPrimitiveKey =
   (typeof TOKEN_APPROVAL_REVOCATION_PRIMITIVES)[number]['key'];
 
-export type TokenApprovalRevocationMechanisms = Record<
+export type TokenApprovalRevocationPrimitives = Record<
   TokenApprovalRevocationPrimitiveKey,
   boolean
 >;
@@ -54,7 +54,7 @@ export type TokenApprovalRevocationMetadata = BaseMetadata & {
 };
 
 export type TokenApprovalRevocationContext = BaseContext & {
-  approvalRevocationMechanisms: TokenApprovalRevocationMechanisms;
+  approvalRevocationPrimitives: TokenApprovalRevocationPrimitives;
 };
 
 export const zTokenApprovalRevocationData = zMetaMaskPermissionData
@@ -70,7 +70,7 @@ export const zTokenApprovalRevocationData = zMetaMaskPermissionData
     (data) => TOKEN_APPROVAL_REVOCATION_PRIMITIVES.some(({ key }) => data[key]),
     {
       message:
-        'At least one token approval revocation mechanism must be enabled',
+        'At least one token approval revocation primitive must be enabled',
     },
   );
 

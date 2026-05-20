@@ -46,7 +46,7 @@ export async function applyContext({
   context: TokenApprovalRevocationContext;
   originalRequest: TokenApprovalRevocationPermissionRequest;
 }): Promise<TokenApprovalRevocationPermissionRequest> {
-  const { approvalRevocationMechanisms, justification } = context;
+  const { approvalRevocationPrimitives, justification } = context;
 
   const expiryMerged = applyExpiryRule(context, originalRequest);
   const { rules } = applyRedeemerRule(originalRequest, expiryMerged);
@@ -60,7 +60,7 @@ export async function applyContext({
       type: 'token-approval-revocation',
       data: {
         justification,
-        ...approvalRevocationMechanisms,
+        ...approvalRevocationPrimitives,
       },
       isAdjustmentAllowed: originalRequest.permission.isAdjustmentAllowed,
     },
@@ -145,7 +145,7 @@ export async function buildContext({
     ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
     justification: data.justification,
     isAdjustmentAllowed,
-    approvalRevocationMechanisms: {
+    approvalRevocationPrimitives: {
       erc20Approve,
       erc721Approve,
       erc721SetApprovalForAll,

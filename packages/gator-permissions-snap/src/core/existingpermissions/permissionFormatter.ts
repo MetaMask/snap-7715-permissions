@@ -91,17 +91,20 @@ function extractPermissionDetails(
     // For revocation-type permissions
     if (permissionType === 'token-approval-revocation') {
       const revokeLabel = t('revokeTokenApprovalsLabel');
-      const revocationMechanisms = TOKEN_APPROVAL_REVOCATION_PRIMITIVES.filter(
+      const revocationPrimitives = TOKEN_APPROVAL_REVOCATION_PRIMITIVES.filter(
         ({ key }) => permissionData[key] === true,
       ).map(({ labelKey }) => t(labelKey));
-      const revokeValue =
-        revocationMechanisms.length > 0
-          ? revocationMechanisms.join(', ')
-          : t('allTokens');
-      details.tokenApprovals = {
-        label: revokeLabel,
-        value: revokeValue,
-      };
+      if (revocationPrimitives.length > 0) {
+        const revokeValue =
+          revocationPrimitives.length ===
+          TOKEN_APPROVAL_REVOCATION_PRIMITIVES.length
+            ? t('allApprovalRevocationPrimitivesLabel')
+            : revocationPrimitives.join(', ');
+        details.tokenApprovals = {
+          label: revokeLabel,
+          value: revokeValue,
+        };
+      }
     }
     // For periodic-type permissions
     else if (

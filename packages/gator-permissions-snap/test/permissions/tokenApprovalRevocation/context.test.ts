@@ -16,7 +16,7 @@ import type { TokenMetadataService } from '../../../src/services/tokenMetadataSe
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
-const approvalRevocationMechanisms = {
+const approvalRevocationPrimitives = {
   erc20Approve: true,
   erc721Approve: true,
   erc721SetApprovalForAll: true,
@@ -29,7 +29,7 @@ const permission: TokenApprovalRevocationPermission = {
   type: 'token-approval-revocation',
   data: {
     justification: 'Permission to revoke approvals',
-    ...approvalRevocationMechanisms,
+    ...approvalRevocationPrimitives,
   },
   isAdjustmentAllowed: true,
 };
@@ -79,7 +79,7 @@ describe('tokenApprovalRevocation:context', () => {
           timestamp: permissionRequest.rules[0]?.data.timestamp,
         },
         justification: permission.data.justification,
-        approvalRevocationMechanisms,
+        approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -128,7 +128,7 @@ describe('tokenApprovalRevocation:context', () => {
           timestamp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // +1 day
         },
         justification: 'Permission to revoke approvals',
-        approvalRevocationMechanisms,
+        approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -151,7 +151,7 @@ describe('tokenApprovalRevocation:context', () => {
           timestamp: 499161600, // 10/26/1985
         },
         justification: 'Permission to revoke approvals',
-        approvalRevocationMechanisms,
+        approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -177,7 +177,7 @@ describe('tokenApprovalRevocation:context', () => {
           timestamp: updatedExpiry,
         },
         justification: 'Permission to revoke approvals',
-        approvalRevocationMechanisms,
+        approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,
@@ -198,7 +198,7 @@ describe('tokenApprovalRevocation:context', () => {
         permissionRequest.permission.data.justification,
       );
       expect(result.permission.data).toMatchObject(
-        approvalRevocationMechanisms,
+        approvalRevocationPrimitives,
       );
       expect(result.permission.isAdjustmentAllowed).toBe(true);
       expect(result.from).toBe(ACCOUNT_ADDRESS);
@@ -213,7 +213,7 @@ describe('tokenApprovalRevocation:context', () => {
           timestamp: Math.floor(Date.now() / 1000) + 60,
         },
         justification: 'Permission to revoke approvals',
-        approvalRevocationMechanisms,
+        approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
         tokenAddressCaip19: NO_ASSET_ADDRESS,

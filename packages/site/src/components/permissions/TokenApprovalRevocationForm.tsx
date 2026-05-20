@@ -5,7 +5,7 @@ import type { Hex } from 'viem';
 import { RedeemerAddressesField } from './RedeemerAddressesField';
 import type { TokenApprovalRevocationPermissionRequest } from './types';
 
-type TokenApprovalRevocationMechanism = Pick<
+type TokenApprovalRevocationPrimitive = Pick<
   TokenApprovalRevocationPermissionRequest,
   | 'erc20Approve'
   | 'erc721Approve'
@@ -15,7 +15,7 @@ type TokenApprovalRevocationMechanism = Pick<
   | 'permit2InvalidateNonces'
 >;
 
-const TOKEN_APPROVAL_REVOCATION_MECHANISMS = [
+const TOKEN_APPROVAL_REVOCATION_PRIMITIVES = [
   { key: 'erc20Approve', label: 'ERC-20 approve(spender, 0)' },
   { key: 'erc721Approve', label: 'ERC-721 approve(address(0), tokenId)' },
   {
@@ -26,11 +26,11 @@ const TOKEN_APPROVAL_REVOCATION_MECHANISMS = [
   { key: 'permit2Lockdown', label: 'Permit2 lockdown' },
   { key: 'permit2InvalidateNonces', label: 'Permit2 invalidate nonces' },
 ] as const satisfies readonly {
-  key: keyof TokenApprovalRevocationMechanism;
+  key: keyof TokenApprovalRevocationPrimitive;
   label: string;
 }[];
 
-const DEFAULT_TOKEN_APPROVAL_REVOCATION_MECHANISMS: TokenApprovalRevocationMechanism =
+const DEFAULT_TOKEN_APPROVAL_REVOCATION_PRIMITIVES: TokenApprovalRevocationPrimitive =
   {
     erc20Approve: true,
     erc721Approve: true,
@@ -40,7 +40,7 @@ const DEFAULT_TOKEN_APPROVAL_REVOCATION_MECHANISMS: TokenApprovalRevocationMecha
     permit2InvalidateNonces: true,
   };
 
-const RevocationMethodsFieldset = styled.fieldset`
+const RevocationPrimitivesFieldset = styled.fieldset`
   border: 1px solid ${({ theme }) => theme.colors.border?.default};
   border-radius: 0.3rem;
   margin: 0 0 1rem;
@@ -53,7 +53,7 @@ const RevocationMethodsFieldset = styled.fieldset`
   }
 `;
 
-const RevocationMethodList = styled.div`
+const RevocationPrimitiveList = styled.div`
   && {
     align-items: stretch;
     display: grid;
@@ -63,7 +63,7 @@ const RevocationMethodList = styled.div`
   }
 `;
 
-const RevocationMethodOption = styled.label`
+const RevocationPrimitiveOption = styled.label`
   && {
     align-items: flex-start;
     border: 1px solid ${({ theme }) => theme.colors.border?.default};
@@ -109,9 +109,9 @@ export const TokenApprovalRevocationForm = ({
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
   const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);
-  const [revocationMechanisms, setRevocationMechanisms] =
-    useState<TokenApprovalRevocationMechanism>(
-      DEFAULT_TOKEN_APPROVAL_REVOCATION_MECHANISMS,
+  const [revocationPrimitives, setRevocationPrimitives] =
+    useState<TokenApprovalRevocationPrimitive>(
+      DEFAULT_TOKEN_APPROVAL_REVOCATION_PRIMITIVES,
     );
 
   const handleJustificationChange = useCallback(
@@ -141,10 +141,10 @@ export const TokenApprovalRevocationForm = ({
     [],
   );
 
-  const handleRevocationMechanismChange = useCallback(
-    (key: keyof TokenApprovalRevocationMechanism) =>
+  const handleRevocationPrimitiveChange = useCallback(
+    (key: keyof TokenApprovalRevocationPrimitive) =>
       ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
-        setRevocationMechanisms((current) => ({
+        setRevocationPrimitives((current) => ({
           ...current,
           [key]: checked,
         }));
@@ -161,7 +161,7 @@ export const TokenApprovalRevocationForm = ({
       payeeAddresses: null,
       isAdjustmentAllowed,
       startTime: null,
-      ...revocationMechanisms,
+      ...revocationPrimitives,
     });
   }, [
     onChange,
@@ -169,7 +169,7 @@ export const TokenApprovalRevocationForm = ({
     justification,
     redeemerAddresses,
     isAdjustmentAllowed,
-    revocationMechanisms,
+    revocationPrimitives,
   ]);
 
   return (
@@ -194,23 +194,23 @@ export const TokenApprovalRevocationForm = ({
           onChange={handleExpiryChange}
         />
       </div>
-      <RevocationMethodsFieldset>
-        <legend>Revocation methods:</legend>
-        <RevocationMethodList>
-          {TOKEN_APPROVAL_REVOCATION_MECHANISMS.map(({ key, label }) => (
-            <RevocationMethodOption key={key}>
+      <RevocationPrimitivesFieldset>
+        <legend>Revocation primitives:</legend>
+        <RevocationPrimitiveList>
+          {TOKEN_APPROVAL_REVOCATION_PRIMITIVES.map(({ key, label }) => (
+            <RevocationPrimitiveOption key={key}>
               <input
                 type="checkbox"
                 id={key}
                 name={key}
-                checked={revocationMechanisms[key]}
-                onChange={handleRevocationMechanismChange(key)}
+                checked={revocationPrimitives[key]}
+                onChange={handleRevocationPrimitiveChange(key)}
               />
               <span>{label}</span>
-            </RevocationMethodOption>
+            </RevocationPrimitiveOption>
           ))}
-        </RevocationMethodList>
-      </RevocationMethodsFieldset>
+        </RevocationPrimitiveList>
+      </RevocationPrimitivesFieldset>
       <RedeemerAddressesField onChange={setRedeemerAddresses} />
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="isAdjustmentAllowed">Allow Adjustments:</label>
