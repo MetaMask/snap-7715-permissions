@@ -1,4 +1,8 @@
 import type { Hex } from '@metamask/delegation-core';
+import {
+  CHAIN_ID,
+  DELEGATOR_CONTRACTS,
+} from '@metamask/delegation-deployments';
 import { numberToHex } from '@metamask/utils';
 
 import { t } from '../utils/i18n';
@@ -23,23 +27,111 @@ export type DelegationContracts = {
   approvalRevocationEnforcer: Hex;
 };
 
-const contracts: DelegationContracts = {
-  delegationManager: '0xdb9B1e94B5b69Df7e401DDbedE43491141047dB3',
-  eip7702StatelessDeleGatorImpl: '0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B',
-  limitedCallsEnforcer: '0x04658B29F6b82ed55274221a06Fc97D318E25416',
-  erc20StreamingEnforcer: '0x56c97aE02f233B29fa03502Ecc0457266d9be00e',
-  erc20PeriodTransferEnforcer: '0x474e3Ae7E169e940607cC624Da8A15Eb120139aB',
-  nativeTokenStreamingEnforcer: '0xD10b97905a320b13a0608f7E9cC506b56747df19',
-  nativeTokenPeriodTransferEnforcer:
-    '0x9BC0FAf4Aca5AE429F4c06aEEaC517520CB16BD9',
-  valueLteEnforcer: '0x92Bf12322527cAA612fd31a0e810472BBB106A8F',
-  timestampEnforcer: '0x1046bb45C8d673d4ea75321280DB34899413c069',
-  exactCalldataEnforcer: '0x99F2e9bF15ce5eC84685604836F71aB835DBBdED',
-  nonceEnforcer: '0xDE4f2FAC4B3D87A1d9953Ca5FC09FCa7F366254f',
-  allowedCalldataEnforcer: '0xc2b0d624c1c4319760C96503BA27C347F3260f55',
-  redeemerEnforcer: '0xE144b0b2618071B4E56f746313528a669c7E65c5',
-  allowedTargetsEnforcer: '0x7F20f61b1f09b08D970938F6fa563634d65c4EeB',
-  approvalRevocationEnforcer: '0xe264F1f09A19505a1ca1a86D5b01E8bFdb64324A',
+const DELEGATOR_CONTRACT_VERSION = '1.3.0';
+
+type DeployedContracts = (typeof DELEGATOR_CONTRACTS)[string][number];
+
+const getDeployedContracts = (chainId: number): DeployedContracts => {
+  const deployedContractsByChainId =
+    DELEGATOR_CONTRACTS[DELEGATOR_CONTRACT_VERSION];
+
+  if (!deployedContractsByChainId) {
+    throw new Error(
+      `Delegator contract deployments are missing for version ${DELEGATOR_CONTRACT_VERSION}`,
+    );
+  }
+
+  const deployedContracts =
+    deployedContractsByChainId[chainId] ??
+    deployedContractsByChainId[CHAIN_ID.mainnet];
+
+  if (!deployedContracts) {
+    throw new Error(
+      `Delegator contract deployments are missing for chain ${chainId}`,
+    );
+  }
+
+  return deployedContracts;
+};
+
+const getDeployedContractAddress = (
+  deployedContracts: DeployedContracts,
+  contractName: string,
+): Hex => {
+  const address = deployedContracts[contractName];
+
+  if (!address) {
+    throw new Error(`Delegator contract deployment is missing ${contractName}`);
+  }
+
+  return address;
+};
+
+const getContracts = (chainId: number): DelegationContracts => {
+  const deployedContracts = getDeployedContracts(chainId);
+
+  return {
+    delegationManager: getDeployedContractAddress(
+      deployedContracts,
+      'DelegationManager',
+    ),
+    eip7702StatelessDeleGatorImpl: getDeployedContractAddress(
+      deployedContracts,
+      'EIP7702StatelessDeleGatorImpl',
+    ),
+    limitedCallsEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'LimitedCallsEnforcer',
+    ),
+    erc20StreamingEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'ERC20StreamingEnforcer',
+    ),
+    erc20PeriodTransferEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'ERC20PeriodTransferEnforcer',
+    ),
+    nativeTokenStreamingEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'NativeTokenStreamingEnforcer',
+    ),
+    nativeTokenPeriodTransferEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'NativeTokenPeriodTransferEnforcer',
+    ),
+    valueLteEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'ValueLteEnforcer',
+    ),
+    timestampEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'TimestampEnforcer',
+    ),
+    exactCalldataEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'ExactCalldataEnforcer',
+    ),
+    nonceEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'NonceEnforcer',
+    ),
+    allowedCalldataEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'AllowedCalldataEnforcer',
+    ),
+    redeemerEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'RedeemerEnforcer',
+    ),
+    allowedTargetsEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'AllowedTargetsEnforcer',
+    ),
+    approvalRevocationEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'ApprovalRevocationEnforcer',
+    ),
+  };
 };
 
 // derived from https://chainid.network/chains.json
@@ -121,7 +213,7 @@ export const getChainMetadata = ({
   const { explorerUrl, name } = nameAndExplorerUrlByChainId[chainId] ?? {};
 
   const metadata = {
-    contracts,
+    contracts: getContracts(chainId),
     name: name ?? t('unknownChain', [numberToHex(chainId)]),
     explorerUrl,
   };
