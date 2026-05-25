@@ -46,7 +46,7 @@ export async function createConfirmationContent({
             ) : (
               enabledPrimitives.map(({ key, labelKey }) => (
                 <Box direction="horizontal" key={key}>
-                  <Icon name="full-circle" color="default" size="inherit" />
+                  <Icon name="minus" color="default" size="inherit" />
                   <Text>{t(labelKey)}</Text>
                 </Box>
               ))
