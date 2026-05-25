@@ -3058,9 +3058,9 @@ __metadata:
   linkType: hard
 
 "@metamask/delegation-abis@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@metamask/delegation-abis@npm:1.0.0"
-  checksum: 10/31b58d3080710cd48fbf471a1cb94fc4cae705f2472d392a3daaa7c73603ad6d0b1c9068e3b71b10f9c39bfe19c1fad90ecf3115e20a00b2d39f5c7789c5b932
+  version: 1.1.0
+  resolution: "@metamask/delegation-abis@npm:1.1.0"
+  checksum: 10/fd5cd9cbfbbf725405d2f53de682ab0042959d53486a9b6da32689a8f4f7f0ec1e61bfdc73bbb708055968dd7f71f18ff94cfdcd1c6a8a723bc0a112f6b35f83
   languageName: node
   linkType: hard
 
