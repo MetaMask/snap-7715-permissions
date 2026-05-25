@@ -2,11 +2,18 @@ import {
   Implementation,
   toMetaMaskSmartAccount,
 } from '@metamask/smart-accounts-kit';
-import type { MetaMaskSmartAccount } from '@metamask/smart-accounts-kit';
+import type {
+  AccountSignerConfig,
+  MetaMaskSmartAccount,
+} from '@metamask/smart-accounts-kit';
 import { useEffect, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import type { Chain } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
+
+type ToMetaMaskSmartAccountOptions = Parameters<
+  typeof toMetaMaskSmartAccount
+>[0];
 
 /**
  * Creates and manages a delegate account for smart account interactions.
@@ -33,10 +40,15 @@ export const useDelegateAccount = ({ chain }: { chain: Chain }) => {
 
         const smartAccount = await toMetaMaskSmartAccount({
           implementation: Implementation.MultiSig,
-          signer: [{ account }],
+          signer: [
+            {
+              account: account as AccountSignerConfig['account'],
+            },
+          ],
           deployParams: [[account.address], 1n],
           deploySalt: '0x',
-          client: publicClient,
+          client:
+            publicClient as unknown as ToMetaMaskSmartAccountOptions['client'],
         });
 
         setDelegateAccount(smartAccount);

@@ -2830,13 +2830,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/7715-permission-types@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "@metamask/7715-permission-types@npm:0.6.0"
-  checksum: 10/bac0741ed0d880d9f418a58ef5d1f165cff0171636cb4431bc42a05b471b92afd6593810ac805a427a76dc02abcba651cc3c1c05b67d5a4b6ad3923b057de039
-  languageName: node
-  linkType: hard
-
 "@metamask/7715-permissions-shared@workspace:*, @metamask/7715-permissions-shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "@metamask/7715-permissions-shared@workspace:packages/shared"
@@ -3057,24 +3050,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-abis@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@metamask/delegation-abis@npm:1.0.0"
-  checksum: 10/31b58d3080710cd48fbf471a1cb94fc4cae705f2472d392a3daaa7c73603ad6d0b1c9068e3b71b10f9c39bfe19c1fad90ecf3115e20a00b2d39f5c7789c5b932
-  languageName: node
-  linkType: hard
-
-"@metamask/delegation-core@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@metamask/delegation-core@npm:2.1.0"
-  dependencies:
-    "@metamask/abi-utils": "npm:^3.0.0"
-    "@metamask/utils": "npm:^11.4.0"
-    "@noble/hashes": "npm:^1.8.0"
-  checksum: 10/4b699987e178ce25a4ef726e61290636afd40e4d43cf856163d46f747ee9deb70641501b11e2d13dca9b7fa8bcae287058022929f3507868019e3802d3a52751
-  languageName: node
-  linkType: hard
-
 "@metamask/delegation-core@npm:^2.2.1":
   version: 2.2.1
   resolution: "@metamask/delegation-core@npm:2.2.1"
@@ -3083,13 +3058,6 @@ __metadata:
     "@metamask/utils": "npm:^11.4.0"
     "@noble/hashes": "npm:^1.8.0"
   checksum: 10/8cc532e4a5fdc83eddb36fada6283d51629272fcce8b7c7c2d3b4addde5aff7c741365a3bcd701364460fbbcbbe94fccc0460ee3ef9af284a82f84ca708f0e06
-  languageName: node
-  linkType: hard
-
-"@metamask/delegation-deployments@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@metamask/delegation-deployments@npm:1.3.0"
-  checksum: 10/58f4aafb5f0e3cbc543811cbc0100efab4ed67b9c9794b83192962153e4edbe12fd6ab6fa7be689503309862a65eb7fde771f632893d38ab54f8171aa682b34f
   languageName: node
   linkType: hard
 
@@ -3587,21 +3555,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/smart-accounts-kit@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "@metamask/smart-accounts-kit@npm:1.5.0"
-  dependencies:
-    "@metamask/7715-permission-types": "npm:^0.6.0"
-    "@metamask/delegation-abis": "npm:^1.0.0"
-    "@metamask/delegation-core": "npm:^2.1.0"
-    "@metamask/delegation-deployments": "npm:^1.3.0"
-    openapi-fetch: "npm:^0.13.5"
-    ox: "npm:0.8.1"
-  peerDependencies:
-    viem: ^2.31.4
-  checksum: 10/b7552ef232d984a5e1f7ea32d605de6eb192d15f9e29a0d5c08fa4a674d5d1a989df9277bc60a3bd5de2bec8b8e772b77a02e57471bf969b65f6dcafaca7415a
+"@metamask/smart-accounts-kit@link:../smart-accounts-kit/packages/smart-accounts-kit::locator=%40metamask%2Fsnap-7715-permissions-monorepo%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@metamask/smart-accounts-kit@link:../smart-accounts-kit/packages/smart-accounts-kit::locator=%40metamask%2Fsnap-7715-permissions-monorepo%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@metamask/snap-7715-permissions-monorepo@workspace:.":
   version: 0.0.0-use.local
@@ -11991,22 +11949,6 @@ __metadata:
     is-inside-container: "npm:^1.0.0"
     wsl-utils: "npm:^0.1.0"
   checksum: 10/e6ad9474734eac3549dcc7d85e952394856ccaee48107c453bd6a725b82e3b8ed5f427658935df27efa76b411aeef62888edea8a9e347e8e7c82632ec966b30e
-  languageName: node
-  linkType: hard
-
-"openapi-fetch@npm:^0.13.5":
-  version: 0.13.8
-  resolution: "openapi-fetch@npm:0.13.8"
-  dependencies:
-    openapi-typescript-helpers: "npm:^0.0.15"
-  checksum: 10/fed630452ac2d6abc680402651d848b7377b651164ca2be61a8c5e1fc89e41b09c928ba9dc92cf7c7ad2d400b3fbe5af380165303f293501dc08cefa4c0f92fd
-  languageName: node
-  linkType: hard
-
-"openapi-typescript-helpers@npm:^0.0.15":
-  version: 0.0.15
-  resolution: "openapi-typescript-helpers@npm:0.0.15"
-  checksum: 10/63f8f0b8464aed3e5c6910428bd14839bd5c1dd6ddf841bcea9d5f536a6e03e942a028202920da1a8b1ed9e4304c6fca14943d01a8adff2942d1254a229b8c70
   languageName: node
   linkType: hard
 

@@ -1,7 +1,7 @@
 import { erc7710BundlerActions } from '@metamask/smart-accounts-kit/actions';
 import { useMemo } from 'react';
 import { createClient, http } from 'viem';
-import type { Chain } from 'viem';
+import type { Chain, Hex } from 'viem';
 import {
   createBundlerClient,
   createPaymasterClient,
@@ -31,6 +31,10 @@ type PimlicoRpcSchema = [
   },
 ];
 
+type DelegatedBundlerClient<TBundlerClient> = TBundlerClient & {
+  sendUserOperationWithDelegation: (args: unknown) => Promise<Hex>;
+};
+
 /**
  * Creates and manages bundler client for smart account interactions.
  *
@@ -53,11 +57,15 @@ export const useBundlerClient = ({
       transport,
     });
 
-    const bundlerClient = createBundlerClient({
+    const baseBundlerClient = createBundlerClient({
       transport,
       chain,
       paymaster: paymasterClient,
-    }).extend(erc7710BundlerActions());
+    });
+
+    const bundlerClient = baseBundlerClient.extend(
+      erc7710BundlerActions() as Parameters<typeof baseBundlerClient.extend>[0],
+    ) as unknown as DelegatedBundlerClient<typeof baseBundlerClient>;
 
     const pimlicoClient = createClient<
       typeof transport,

@@ -1,48 +1,33 @@
-import { getSmartAccountsEnvironment } from '@metamask/smart-accounts-kit';
 import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
 import type { RequestExecutionPermissionsParameters } from '@metamask/smart-accounts-kit/actions';
-import {
-  decodeCaveat,
-  decodeDelegations,
-} from '@metamask/smart-accounts-kit/utils';
 import { useCallback, useMemo, useState } from 'react';
-import {
-  createClient,
-  http,
-  custom,
-  createPublicClient,
-  extractChain,
-} from 'viem';
+import type { ChangeEvent } from 'react';
+import { createClient, http, custom, createPublicClient } from 'viem';
 import type { Chain, Hex } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
-import * as chains from 'viem/chains';
 
+import { SnapConnectionCards } from '../components';
 import {
-  ConnectButton,
-  InstallMetaMaskButton,
-  CustomMessageButton,
-  Card,
-  Title,
-} from '../components';
-import {
-  NativeTokenStreamForm,
-  ERC20TokenStreamForm,
-  NativeTokenPeriodicForm,
-  ERC20TokenPeriodicForm,
-  NativeTokenAllowanceForm,
-  ERC20TokenAllowanceForm,
-  TokenApprovalRevocationForm,
-  RedemptionForm,
+  PermissionQueriesPanel,
+  PermissionRequestPanel,
+  PermissionResponsePanel,
+  RedeemPermissionPanel,
 } from '../components/permissions';
 import type { RedemptionCall } from '../components/permissions';
 import type { PermissionRequest } from '../components/permissions/types';
-import { kernelSnapOrigin, gatorSnapOrigin } from '../config';
+import {
+  defaultSupportedChain,
+  gatorSnapOrigin,
+  kernelSnapOrigin,
+  supportedChains,
+} from '../config';
 import {
   useMetaMask,
   useMetaMaskContext,
   useRequestSnap,
   useDelegateAccount,
   useBundlerClient,
+  useCopyToClipboard,
 } from '../hooks';
 import {
   Container,
@@ -52,41 +37,22 @@ import {
   CardContainer,
   Box,
   ErrorMessage,
-  StyledForm,
-  ResponseContainer,
-  CopyButton,
 } from '../styles';
-
-const stringifyWithBigInt = (value: unknown): string =>
-  JSON.stringify(
-    value,
-    (_, v) => (typeof v === 'bigint' ? v.toString() : v),
-    2,
-  );
+import {
+  decodePermissionContext,
+  formatDelegatedExecutionError,
+  stringifyWithBigInt,
+} from '../utils';
 
 const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
 
-const ALL_CHAINS = [...Object.values(chains)];
-
-const supportedChainsString = import.meta.env.VITE_SUPPORTED_CHAINS;
-
-const DEFAULT_CHAINS = [chains.sepolia];
-
-const supportedChains: Chain[] = supportedChainsString
-  ? supportedChainsString.split(',').map((chainIdString) => {
-      const chainId = parseInt(chainIdString);
-      const chain = extractChain({
-        chains: ALL_CHAINS,
-        id: chainId as any,
-      });
-
-      if (!chain) {
-        throw new Error(`Chain ${chainId} not found`);
-      }
-
-      return chain;
-    })
-  : DEFAULT_CHAINS;
+type MetaMaskClient = {
+  getGrantedExecutionPermissions: () => Promise<unknown>;
+  getSupportedExecutionPermissions: () => Promise<unknown>;
+  requestExecutionPermissions: (
+    parameters: RequestExecutionPermissionsParameters,
+  ) => Promise<unknown>;
+};
 
 const Index = () => {
   const { error: metaMaskContextError } = useMetaMaskContext();
@@ -97,11 +63,9 @@ const Index = () => {
     Boolean(e),
   );
 
-  if (!supportedChains[0]) {
-    throw new Error('No supported chains found.');
-  }
-
-  const [selectedChain, setSelectedChain] = useState<Chain>(supportedChains[0]);
+  const [selectedChain, setSelectedChain] = useState<Chain>(
+    defaultSupportedChain,
+  );
 
   const { snapsDetected, installedSnaps, provider } = useMetaMask();
   const requestKernelSnap = useRequestSnap(kernelSnapOrigin);
@@ -115,32 +79,40 @@ const Index = () => {
 
   const isMetaMaskReady = snapsDetected;
 
-  const metaMaskClient = useMemo(() => {
+  const metaMaskClient = useMemo<MetaMaskClient | undefined>(() => {
     if (!provider || !isMetaMaskReady) {
       return undefined;
     }
 
-    return createClient({
+    const baseMetaMaskClient = createClient({
       transport: custom(provider),
-    }).extend(erc7715ProviderActions());
+    });
+
+    return baseMetaMaskClient.extend(
+      erc7715ProviderActions() as Parameters<
+        typeof baseMetaMaskClient.extend
+      >[0],
+    ) as unknown as MetaMaskClient;
   }, [provider, kernelSnapOrigin, gatorSnapOrigin, isMetaMaskReady]);
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);
   const isGatorSnapReady = Boolean(installedSnaps[gatorSnapOrigin]);
 
   const chainId = selectedChain.id;
-  const [permissionType, setPermissionType] = useState('native-token-stream');
+  const [permissionType, setPermissionType] = useState<
+    PermissionRequest['type']
+  >('native-token-stream');
   const [permissionRequest, setPermissionRequest] =
     useState<PermissionRequest | null>(null);
   const [permissionResponse, setPermissionResponse] = useState<any>(null);
-  const [isCopied, setIsCopied] = useState(false);
-  const [decodedIsCopied, setDecodedIsCopied] = useState(false);
+  const permissionResponseClipboard = useCopyToClipboard();
+  const decodedPermissionContextClipboard = useCopyToClipboard();
   const [supportedPermissionsResponse, setSupportedPermissionsResponse] =
     useState<any>(null);
   const [grantedPermissionsResponse, setGrantedPermissionsResponse] =
     useState<any>(null);
-  const [supportedIsCopied, setSupportedIsCopied] = useState(false);
-  const [grantedIsCopied, setGrantedIsCopied] = useState(false);
+  const supportedPermissionsClipboard = useCopyToClipboard();
+  const grantedPermissionsClipboard = useCopyToClipboard();
   const [to, setTo] = useState<Hex>('0x');
   const [data, setData] = useState<Hex>('0x');
   const [value, setValue] = useState<bigint>(0n);
@@ -149,51 +121,18 @@ const Index = () => {
     Set<string>
   >(new Set());
 
-  const decodedPermissionContext = useMemo(() => {
-    if (!Array.isArray(permissionResponse)) {
-      return null;
-    }
+  const selectedPermissionResponse = Array.isArray(permissionResponse)
+    ? permissionResponse[0]
+    : undefined;
 
-    return permissionResponse.map((responseEntry) => {
-      const permissionContext = responseEntry?.context;
-
-      if (!permissionContext) {
-        return [];
-      }
-
-      try {
-        const delegations = decodeDelegations(permissionContext as Hex);
-        const responseChainId =
-          typeof responseEntry?.chainId === 'number'
-            ? responseEntry.chainId
-            : Number(responseEntry?.chainId);
-        const environment = getSmartAccountsEnvironment(
-          Number.isNaN(responseChainId) ? selectedChain.id : responseChainId,
-        );
-        const decodedDelegations = delegations.map((delegation) => ({
-          ...delegation,
-          caveats: (delegation.caveats ?? []).map((caveat) => {
-            try {
-              return decodeCaveat({
-                caveat,
-                environment,
-              });
-            } catch {
-              return caveat;
-            }
-          }),
-        }));
-
-        return decodedDelegations;
-      } catch {
-        return [];
-      }
-    });
-  }, [permissionResponse, selectedChain.id]);
+  const decodedPermissionContext = useMemo(
+    () => decodePermissionContext(permissionResponse, selectedChain.id),
+    [permissionResponse, selectedChain.id],
+  );
 
   const handleChainChange = ({
     target: { value: inputValue },
-  }: React.ChangeEvent<HTMLSelectElement>) => {
+  }: ChangeEvent<HTMLSelectElement>) => {
     const chainId = parseInt(inputValue);
     const chain = supportedChains.find((ch) => ch.id === chainId);
     if (chain) {
@@ -203,8 +142,8 @@ const Index = () => {
 
   const handlePermissionTypeChange = ({
     target: { value: inputValue },
-  }: React.ChangeEvent<HTMLSelectElement>) => {
-    setPermissionType(inputValue);
+  }: ChangeEvent<HTMLSelectElement>) => {
+    setPermissionType(inputValue as PermissionRequest['type']);
   };
 
   const handleRedemptionCallChange = useCallback(
@@ -262,7 +201,7 @@ const Index = () => {
 
       setReceipt(operationReceipt);
     } catch (error) {
-      setPermissionResponseError(error as Error);
+      setPermissionResponseError(formatDelegatedExecutionError(error));
     } finally {
       // Remove this request from pending requests
       setPendingPermissionRequests((prev) => {
@@ -338,29 +277,17 @@ const Index = () => {
 
   const handleCopyToClipboard = () => {
     if (permissionResponse) {
-      navigator.clipboard
-        .writeText(stringifyWithBigInt(permissionResponse))
-        .then(() => {
-          setIsCopied(true);
-          setTimeout(() => setIsCopied(false), 2000);
-        })
-        .catch((clipboardError) => {
-          console.error('Failed to copy: ', clipboardError);
-        });
+      permissionResponseClipboard.copyToClipboard(
+        stringifyWithBigInt(permissionResponse),
+      );
     }
   };
 
   const handleCopyDecodedToClipboard = () => {
     if (decodedPermissionContext) {
-      navigator.clipboard
-        .writeText(stringifyWithBigInt(decodedPermissionContext))
-        .then(() => {
-          setDecodedIsCopied(true);
-          setTimeout(() => setDecodedIsCopied(false), 2000);
-        })
-        .catch((clipboardError) => {
-          console.error('Failed to copy: ', clipboardError);
-        });
+      decodedPermissionContextClipboard.copyToClipboard(
+        stringifyWithBigInt(decodedPermissionContext),
+      );
     }
   };
 
@@ -386,29 +313,17 @@ const Index = () => {
 
   const handleCopySupportedToClipboard = () => {
     if (supportedPermissionsResponse) {
-      navigator.clipboard
-        .writeText(stringifyWithBigInt(supportedPermissionsResponse))
-        .then(() => {
-          setSupportedIsCopied(true);
-          setTimeout(() => setSupportedIsCopied(false), 2000);
-        })
-        .catch((clipboardError) => {
-          console.error('Failed to copy: ', clipboardError);
-        });
+      supportedPermissionsClipboard.copyToClipboard(
+        stringifyWithBigInt(supportedPermissionsResponse),
+      );
     }
   };
 
   const handleCopyGrantedToClipboard = () => {
     if (grantedPermissionsResponse) {
-      navigator.clipboard
-        .writeText(stringifyWithBigInt(grantedPermissionsResponse))
-        .then(() => {
-          setGrantedIsCopied(true);
-          setTimeout(() => setGrantedIsCopied(false), 2000);
-        })
-        .catch((clipboardError) => {
-          console.error('Failed to copy: ', clipboardError);
-        });
+      grantedPermissionsClipboard.copyToClipboard(
+        stringifyWithBigInt(grantedPermissionsResponse),
+      );
     }
   };
 
@@ -431,255 +346,59 @@ const Index = () => {
           </ErrorMessage>
         ))}
 
-        {permissionResponse && (
-          <Box>
-            {receipt && (
-              <div style={{ marginTop: '1rem' }}>
-                <ResponseContainer>
-                  <Title>User operation receipt</Title>
-                  <pre>{stringifyWithBigInt(receipt)}</pre>
-                </ResponseContainer>
-              </div>
-            )}
-            <StyledForm>
-              <Title>Redeem Permission</Title>
-              <RedemptionForm
-                delegateAddress={delegateAccount?.address}
-                permissionResponse={permissionResponse[0]}
-                onChange={handleRedemptionCallChange}
-              />
-              <div>
-                <label>From:</label>
-                <div>{delegateAccount?.address}</div>
-              </div>
-              <div>
-                <label>To:</label>
-                <div>{to}</div>
-              </div>
-              <div>
-                <label>Value:</label>
-                <div>{value.toString()}</div>
-              </div>
-            </StyledForm>
-            <CustomMessageButton
-              $text="Redeem Permission"
-              onClick={handleRedeemPermission}
-              disabled={pendingPermissionRequests.size > 0}
-            />
-          </Box>
+        {selectedPermissionResponse && (
+          <RedeemPermissionPanel
+            delegateAddress={delegateAccount?.address}
+            isPending={pendingPermissionRequests.size > 0}
+            onRedeemPermission={handleRedeemPermission}
+            onRedemptionCallChange={handleRedemptionCallChange}
+            permissionResponse={selectedPermissionResponse}
+            receipt={receipt}
+            to={to}
+            value={value}
+          />
         )}
         {metaMaskClient && permissionResponse && (
-          <Box style={{ position: 'relative' }}>
-            <ResponseContainer>
-              <Title>Permission Response</Title>
-              <CopyButton
-                onClick={handleCopyToClipboard}
-                title={'Copy to clipboard'}
-              >
-                {isCopied ? '✅' : '📝'}
-              </CopyButton>
-              <pre>{stringifyWithBigInt(permissionResponse)}</pre>
-              {decodedPermissionContext && (
-                <details style={{ marginTop: '1rem' }}>
-                  <summary>Decoded Permission Context</summary>
-                  <CopyButton
-                    onClick={handleCopyDecodedToClipboard}
-                    title={'Copy to clipboard'}
-                    style={{ position: 'relative', float: 'right' }}
-                  >
-                    {decodedIsCopied ? '✅' : '📝'}
-                  </CopyButton>
-                  <pre>{stringifyWithBigInt(decodedPermissionContext)}</pre>
-                </details>
-              )}
-            </ResponseContainer>
-          </Box>
+          <PermissionResponsePanel
+            decodedIsCopied={decodedPermissionContextClipboard.isCopied}
+            decodedPermissionContext={decodedPermissionContext}
+            isCopied={permissionResponseClipboard.isCopied}
+            onCopyDecodedPermissionContext={handleCopyDecodedToClipboard}
+            onCopyPermissionResponse={handleCopyToClipboard}
+            permissionResponse={permissionResponse}
+          />
         )}
         {metaMaskClient && (
-          <Box>
-            <StyledForm>
-              <div>
-                <label htmlFor="chainSelector">Chain:</label>
-                <select
-                  id="chainSelector"
-                  name="chainSelector"
-                  value={selectedChain.id}
-                  onChange={handleChainChange}
-                  style={{
-                    padding: '0.8rem',
-                    border: '1px solid',
-                    borderRadius: '0.3rem',
-                    flexGrow: 1,
-                  }}
-                >
-                  {supportedChains.map((chain) => (
-                    <option key={chain.id} value={chain.id}>
-                      {chain.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="permissionType">Permission Type:</label>
-                <select
-                  id="permissionType"
-                  name="permissionType"
-                  value={permissionType}
-                  onChange={handlePermissionTypeChange}
-                  style={{
-                    padding: '0.8rem',
-                    border: '1px solid',
-                    borderRadius: '0.3rem',
-                    flexGrow: 1,
-                  }}
-                >
-                  <option value="native-token-stream">
-                    Native Token Stream
-                  </option>
-                  <option value="erc20-token-stream">ERC20 Token Stream</option>
-                  <option value="native-token-periodic">
-                    Native Token Periodic
-                  </option>
-                  <option value="native-token-allowance">
-                    Native Token Allowance
-                  </option>
-                  <option value="erc20-token-periodic">
-                    ERC20 Token Periodic
-                  </option>
-                  <option value="erc20-token-allowance">
-                    ERC20 Token Allowance
-                  </option>
-                  <option value="token-approval-revocation">
-                    Token Approval Revocation
-                  </option>
-                </select>
-              </div>
-
-              {permissionType === 'native-token-stream' && (
-                <NativeTokenStreamForm onChange={onFormChange} />
-              )}
-
-              {permissionType === 'erc20-token-stream' && (
-                <ERC20TokenStreamForm onChange={onFormChange} />
-              )}
-
-              {permissionType === 'native-token-periodic' && (
-                <NativeTokenPeriodicForm onChange={onFormChange} />
-              )}
-
-              {permissionType === 'erc20-token-periodic' && (
-                <ERC20TokenPeriodicForm onChange={onFormChange} />
-              )}
-
-              {permissionType === 'native-token-allowance' && (
-                <NativeTokenAllowanceForm onChange={onFormChange} />
-              )}
-
-              {permissionType === 'erc20-token-allowance' && (
-                <ERC20TokenAllowanceForm onChange={onFormChange} />
-              )}
-
-              {permissionType === 'token-approval-revocation' && (
-                <TokenApprovalRevocationForm onChange={onFormChange} />
-              )}
-            </StyledForm>
-            <CustomMessageButton
-              $text="Grant Permission"
-              onClick={handleGrantPermissions}
-            />
-          </Box>
-        )}
-
-        {metaMaskClient && (
-          <Box>
-            <Title>Permission Queries</Title>
-            <div
-              style={{
-                display: 'flex',
-                gap: '1rem',
-                marginTop: '1rem',
-                marginBottom: '1rem',
-              }}
-            >
-              <CustomMessageButton
-                $text="Get Supported Permissions"
-                onClick={handleGetSupportedPermissions}
-              />
-              <CustomMessageButton
-                $text="Get Granted Permissions"
-                onClick={handleGetGrantedPermissions}
-              />
-            </div>
-            {supportedPermissionsResponse && (
-              <ResponseContainer>
-                <Title>Supported Permissions</Title>
-                <CopyButton
-                  onClick={handleCopySupportedToClipboard}
-                  title={'Copy to clipboard'}
-                >
-                  {supportedIsCopied ? '✅' : '📝'}
-                </CopyButton>
-                <pre>{stringifyWithBigInt(supportedPermissionsResponse)}</pre>
-              </ResponseContainer>
-            )}
-            {grantedPermissionsResponse && (
-              <ResponseContainer style={{ marginTop: '1rem' }}>
-                <Title>Granted Permissions</Title>
-                <CopyButton
-                  onClick={handleCopyGrantedToClipboard}
-                  title={'Copy to clipboard'}
-                >
-                  {grantedIsCopied ? '✅' : '📝'}
-                </CopyButton>
-                <pre>{stringifyWithBigInt(grantedPermissionsResponse)}</pre>
-              </ResponseContainer>
-            )}
-          </Box>
-        )}
-
-        {!isMetaMaskReady && (
-          <Card
-            content={{
-              title: 'Install',
-              description:
-                'Snaps requires MetaMask to be installed. Install MetaMask to get started.',
-              button: <InstallMetaMaskButton />,
-            }}
-            fullWidth
+          <PermissionRequestPanel
+            onChainChange={handleChainChange}
+            onFormChange={onFormChange}
+            onGrantPermissions={handleGrantPermissions}
+            onPermissionTypeChange={handlePermissionTypeChange}
+            permissionType={permissionType}
+            selectedChain={selectedChain}
+            supportedChains={supportedChains}
           />
         )}
 
-        <Card
-          content={{
-            title: `${isKernelSnapReady ? 'Reconnect' : 'Connect'}(kernel)`,
-            description:
-              'Get started by connecting to and installing the kernel snap.',
-            button: (
-              <ConnectButton
-                onClick={requestKernelSnap}
-                disabled={!isMetaMaskReady}
-                $isReconnect={isKernelSnapReady}
-              />
-            ),
-          }}
-          disabled={!isMetaMaskReady}
-        />
+        {metaMaskClient && (
+          <PermissionQueriesPanel
+            grantedIsCopied={grantedPermissionsClipboard.isCopied}
+            grantedPermissionsResponse={grantedPermissionsResponse}
+            onCopyGrantedPermissions={handleCopyGrantedToClipboard}
+            onCopySupportedPermissions={handleCopySupportedToClipboard}
+            onGetGrantedPermissions={handleGetGrantedPermissions}
+            onGetSupportedPermissions={handleGetSupportedPermissions}
+            supportedIsCopied={supportedPermissionsClipboard.isCopied}
+            supportedPermissionsResponse={supportedPermissionsResponse}
+          />
+        )}
 
-        <Card
-          content={{
-            title: `${isGatorSnapReady ? 'Reconnect' : 'Connect'}(provider)`,
-            description:
-              'Get started by connecting to and installing the permission provider snap.',
-            button: (
-              <ConnectButton
-                onClick={requestPermissionSnap}
-                disabled={!isMetaMaskReady}
-                $isReconnect={isGatorSnapReady}
-              />
-            ),
-          }}
-          disabled={!isMetaMaskReady}
+        <SnapConnectionCards
+          isGatorSnapReady={isGatorSnapReady}
+          isKernelSnapReady={isKernelSnapReady}
+          isMetaMaskReady={isMetaMaskReady}
+          onRequestKernelSnap={requestKernelSnap}
+          onRequestPermissionSnap={requestPermissionSnap}
         />
 
         <Box>
