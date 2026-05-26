@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0]
+
+### Added
+
+- Add `approvalRevocationEnforcer` support and update `@metamask/delegation-deployments` ([#335](https://github.com/MetaMask/snap-7715-permissions/pull/335))
+
+### Changed
+
+- Update the token approval revocation summary copy ([#337](https://github.com/MetaMask/snap-7715-permissions/pull/337))
+
+### Fixed
+
+- Update the icon for enabled approval revocation primitives ([#338](https://github.com/MetaMask/snap-7715-permissions/pull/338))
+
 ## [2.2.0]
 
 ### Added
@@ -374,7 +388,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.2.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.3.0...HEAD
+[2.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.2.0...@metamask/gator-permissions-snap@2.3.0
 [2.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.1.0...@metamask/gator-permissions-snap@2.2.0
 [2.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.0.0...@metamask/gator-permissions-snap@2.1.0
 [2.0.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@1.3.1...@metamask/gator-permissions-snap@2.0.0
