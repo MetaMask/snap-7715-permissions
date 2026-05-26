@@ -6,7 +6,7 @@ import { createClient, http, custom, createPublicClient } from 'viem';
 import type { Chain, Hex } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
 
-import { SnapConnectionCards } from '../components';
+import { ErrorAlert, SnapConnectionCards } from '../components';
 import {
   PermissionQueriesPanel,
   PermissionRequestPanel,
@@ -36,7 +36,6 @@ import {
   Subtitle,
   CardContainer,
   Box,
-  ErrorMessage,
 } from '../styles';
 import {
   decodePermissionContext,
@@ -341,9 +340,7 @@ const Index = () => {
       </Subtitle>
       <CardContainer>
         {errors.map((error, idx) => (
-          <ErrorMessage key={idx}>
-            <b>An error happened:</b> {error?.message}
-          </ErrorMessage>
+          <ErrorAlert key={idx} error={error} />
         ))}
 
         {selectedPermissionResponse && (
