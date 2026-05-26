@@ -9,11 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.3.0]
 
-### Uncategorized
+### Added
 
-- fix: update icon for enabled approval revocation primitives ([#338](https://github.com/MetaMask/snap-7715-permissions/pull/338))
-- feat: add approvalRevocationEnforcer and update delegation-deployments dependency ([#335](https://github.com/MetaMask/snap-7715-permissions/pull/335))
-- feat: updates the token approval revocation summary copy ([#337](https://github.com/MetaMask/snap-7715-permissions/pull/337))
+- Add `approvalRevocationEnforcer` support and update `@metamask/delegation-deployments` ([#335](https://github.com/MetaMask/snap-7715-permissions/pull/335))
+
+### Changed
+
+- Update the token approval revocation summary copy ([#337](https://github.com/MetaMask/snap-7715-permissions/pull/337))
+
+### Fixed
+
+- Update the icon for enabled approval revocation primitives ([#338](https://github.com/MetaMask/snap-7715-permissions/pull/338))
 
 ## [2.2.0]
 
