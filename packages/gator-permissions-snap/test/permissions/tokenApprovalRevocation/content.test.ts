@@ -48,7 +48,7 @@ describe('tokenApprovalRevocation:content', () => {
       expect(rendered).toContain(
         'All revocation primitives for ERC-20, ERC-1155, ERC-721.',
       );
-      expect(rendered).not.toContain('full-circle');
+      expect(rendered).not.toContain('minus');
       expect(rendered).toContain('token-approval-revocation-expiry');
     });
 
@@ -67,7 +67,7 @@ describe('tokenApprovalRevocation:content', () => {
       const rendered = JSON.stringify(content);
 
       expect(rendered).toContain('Revocation primitives');
-      expect(rendered).toContain('full-circle');
+      expect(rendered).toContain('minus');
       expect(rendered).toContain('ERC-20 approve(spender, 0)');
       expect(rendered).not.toContain(
         'All revocation primitives for ERC-20, ERC-1155, ERC-721.',
