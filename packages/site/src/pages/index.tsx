@@ -1,5 +1,8 @@
 import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
-import type { RequestExecutionPermissionsParameters } from '@metamask/smart-accounts-kit/actions';
+import type {
+  Erc7715Client,
+  RequestExecutionPermissionsParameters,
+} from '@metamask/smart-accounts-kit/actions';
 import { useCallback, useMemo, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { createClient, http, custom, createPublicClient } from 'viem';
@@ -45,14 +48,6 @@ import {
 
 const BUNDLER_RPC_URL = import.meta.env.VITE_BUNDLER_RPC_URL;
 
-type MetaMaskClient = {
-  getGrantedExecutionPermissions: () => Promise<unknown>;
-  getSupportedExecutionPermissions: () => Promise<unknown>;
-  requestExecutionPermissions: (
-    parameters: RequestExecutionPermissionsParameters,
-  ) => Promise<unknown>;
-};
-
 const Index = () => {
   const { error: metaMaskContextError } = useMetaMaskContext();
   const [permissionResponseError, setPermissionResponseError] =
@@ -78,7 +73,7 @@ const Index = () => {
 
   const isMetaMaskReady = snapsDetected;
 
-  const metaMaskClient = useMemo<MetaMaskClient | undefined>(() => {
+  const metaMaskClient = useMemo<Erc7715Client | undefined>(() => {
     if (!provider || !isMetaMaskReady) {
       return undefined;
     }
@@ -87,11 +82,7 @@ const Index = () => {
       transport: custom(provider),
     });
 
-    return baseMetaMaskClient.extend(
-      erc7715ProviderActions() as Parameters<
-        typeof baseMetaMaskClient.extend
-      >[0],
-    ) as unknown as MetaMaskClient;
+    return baseMetaMaskClient.extend(erc7715ProviderActions());
   }, [provider, kernelSnapOrigin, gatorSnapOrigin, isMetaMaskReady]);
 
   const isKernelSnapReady = Boolean(installedSnaps[kernelSnapOrigin]);

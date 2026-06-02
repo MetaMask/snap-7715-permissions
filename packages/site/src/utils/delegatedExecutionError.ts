@@ -20,8 +20,14 @@ const getOriginalErrorOutput = (error: unknown): string => {
 };
 
 export const formatDelegatedExecutionError = (error: unknown): Error => {
-  const decodedRevertReason = decodeRevertReason(error);
   const originalErrorOutput = getOriginalErrorOutput(error);
+  let decodedRevertReason: ReturnType<typeof decodeRevertReason> | undefined;
+
+  try {
+    decodedRevertReason = decodeRevertReason(error);
+  } catch {
+    decodedRevertReason = undefined;
+  }
 
   if (!decodedRevertReason) {
     return error instanceof Error ? error : new Error(originalErrorOutput);
