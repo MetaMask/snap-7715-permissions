@@ -76,6 +76,12 @@
     "redeemerTooltip": {
       "message": "Only these addresses may redeem this permission."
     },
+    "facilitatorValue": {
+      "message": "MetaMask facilitator"
+    },
+    "facilitatorTooltip": {
+      "message": "May only be redeemed by the MetaMask facilitator."
+    },
     "payeeLabel": {
       "message": "Payees"
     },

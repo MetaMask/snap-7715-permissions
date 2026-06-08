@@ -6,6 +6,7 @@ import { AddressScanResultType } from '../../src/clients/trustSignalsClient';
 import type { TokenBalanceAndMetadata } from '../../src/clients/types';
 import type { AccountController } from '../../src/core/accountController';
 import { ExistingPermissionsState } from '../../src/core/existingpermissions/existingPermissionsState';
+import { METAMASK_FACILITATOR_ADDRESSES } from '../../src/core/facilitatorAddresses';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import type {
@@ -471,6 +472,89 @@ describe('PermissionHandler', () => {
         // When label is empty, permissionHandlerContent should use t('maliciousAddressLabel')
         const serialized = JSON.stringify(result);
         expect(serialized).toContain('Malicious address');
+      });
+
+      it('renders redeemer addresses as redeemers when no payee rule is present', async () => {
+        const { permissionHandler, getLifecycleHandlers } = setupTest();
+
+        await permissionHandler.handlePermissionRequest(mockOrigin);
+
+        const lifecycleHandlers = getLifecycleHandlers();
+
+        const result = await lifecycleHandlers.createConfirmationContent({
+          context: {
+            ...mockContext,
+            redeemerAddresses: ['0x1111111111111111111111111111111111111111'],
+          },
+          metadata: mockMetadata,
+          origin: mockOrigin,
+          chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
+        });
+
+        const serialized = JSON.stringify(result);
+        expect(serialized).toContain('Redeemers');
+        expect(serialized).not.toContain('Facilitators');
+      });
+
+      it('renders known MetaMask facilitator redeemer addresses as a MetaMask facilitator redeemer', async () => {
+        const { permissionHandler, getLifecycleHandlers } = setupTest();
+
+        await permissionHandler.handlePermissionRequest(mockOrigin);
+
+        const lifecycleHandlers = getLifecycleHandlers();
+
+        const result = await lifecycleHandlers.createConfirmationContent({
+          context: {
+            ...mockContext,
+            redeemerAddresses: [...METAMASK_FACILITATOR_ADDRESSES],
+          },
+          metadata: mockMetadata,
+          origin: mockOrigin,
+          chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
+        });
+
+        const serialized = JSON.stringify(result);
+        expect(serialized).toContain('Redeemers');
+        expect(serialized).toContain('MetaMask facilitator');
+        expect(serialized).toContain(
+          'May only be redeemed by the MetaMask facilitator.',
+        );
+        expect(serialized).not.toContain('Facilitators');
+      });
+
+      it('does not render arbitrary redeemer addresses as facilitators when a payee rule is present', async () => {
+        const { permissionHandler, getLifecycleHandlers } = setupTest();
+
+        await permissionHandler.handlePermissionRequest(mockOrigin);
+
+        const lifecycleHandlers = getLifecycleHandlers();
+
+        const result = await lifecycleHandlers.createConfirmationContent({
+          context: {
+            ...mockContext,
+            redeemerAddresses: ['0x1111111111111111111111111111111111111111'],
+            payeeAddresses: ['0x2222222222222222222222222222222222222222'],
+          },
+          metadata: mockMetadata,
+          origin: mockOrigin,
+          chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
+        });
+
+        const serialized = JSON.stringify(result);
+        expect(serialized).toContain('Redeemers');
+        expect(serialized).not.toContain('Facilitators');
       });
     });
 
