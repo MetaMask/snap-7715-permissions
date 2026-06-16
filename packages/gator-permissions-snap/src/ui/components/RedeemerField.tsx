@@ -1,20 +1,21 @@
-import { Address, Box, Text } from '@metamask/snaps-sdk/jsx';
+import { Address, Box, Text, Tooltip } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from '@metamask/utils';
 
 import { Field } from './Field';
+import { t } from '../../utils/i18n';
 
 export type RedeemerFieldParams = {
   label: string;
   addresses: string[];
-  value?: string | undefined;
   tooltip?: string | undefined;
+  shouldRenderRedeemersAsFacilitators?: boolean;
 };
 
 export const RedeemerField = ({
   label,
   addresses,
-  value,
   tooltip,
+  shouldRenderRedeemersAsFacilitators = false,
 }: RedeemerFieldParams): JSX.Element | null => {
   if (addresses.length === 0) {
     return null;
@@ -22,8 +23,10 @@ export const RedeemerField = ({
 
   return (
     <Field label={label} tooltip={tooltip} variant="display">
-      {value ? (
-        <Text alignment="end">{value}</Text>
+      {shouldRenderRedeemersAsFacilitators ? (
+        <Tooltip content={t('facilitatorTooltip')}>
+          <Text alignment="end">{t('facilitatorValue')}</Text>
+        </Tooltip>
       ) : (
         <Box direction="vertical">
           {addresses.map((addr) => (

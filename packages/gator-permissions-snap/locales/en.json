@@ -80,7 +80,7 @@
       "message": "MetaMask facilitator"
     },
     "facilitatorTooltip": {
-      "message": "May only be redeemed by the MetaMask facilitator."
+      "message": "May only be redeemed via the MetaMask x402 facilitator."
     },
     "payeeLabel": {
       "message": "Payees"

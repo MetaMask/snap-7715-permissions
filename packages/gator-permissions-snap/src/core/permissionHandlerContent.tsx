@@ -205,14 +205,8 @@ export const PermissionHandlerContent = ({
     <RedeemerField
       label={t('redeemerLabel')}
       addresses={context.redeemerAddresses}
-      value={
-        shouldRenderRedeemersAsFacilitators ? t('facilitatorValue') : undefined
-      }
-      tooltip={t(
-        shouldRenderRedeemersAsFacilitators
-          ? 'facilitatorTooltip'
-          : 'redeemerTooltip',
-      )}
+      shouldRenderRedeemersAsFacilitators={shouldRenderRedeemersAsFacilitators}
+      tooltip={t('redeemerTooltip')}
     />
   ) : null;
 
