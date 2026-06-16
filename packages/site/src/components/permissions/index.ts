@@ -7,3 +7,7 @@ export { ERC20TokenAllowanceForm } from './ERC20TokenAllowanceForm';
 export { TokenApprovalRevocationForm } from './TokenApprovalRevocationForm';
 export { RedemptionForm } from './RedemptionForm';
 export type { RedemptionCall } from './RedemptionForm';
+export { PermissionQueriesPanel } from './PermissionQueriesPanel';
+export { PermissionRequestPanel } from './PermissionRequestPanel';
+export { PermissionResponsePanel } from './PermissionResponsePanel';
+export { RedeemPermissionPanel } from './RedeemPermissionPanel';
