@@ -5,3 +5,4 @@ export * from './useRequest';
 export * from './useRequestSnap';
 export * from './useDelegateAccount';
 export * from './useBundlerClient';
+export * from './useCopyToClipboard';

@@ -3,3 +3,7 @@ export * from './snap';
 export * from './theme';
 export * from './localStorage';
 export * from './button';
+export * from './delegatedExecutionError';
+export * from './errorDisplay';
+export * from './permissionContext';
+export * from './stringify';

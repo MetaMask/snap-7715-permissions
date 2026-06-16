@@ -53,11 +53,13 @@ export const useBundlerClient = ({
       transport,
     });
 
-    const bundlerClient = createBundlerClient({
+    const baseBundlerClient = createBundlerClient({
       transport,
       chain,
       paymaster: paymasterClient,
-    }).extend(erc7710BundlerActions());
+    });
+
+    const bundlerClient = baseBundlerClient.extend(erc7710BundlerActions());
 
     const pimlicoClient = createClient<
       typeof transport,

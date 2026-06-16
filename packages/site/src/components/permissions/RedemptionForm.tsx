@@ -317,7 +317,7 @@ function encodePermit2InvalidateNoncesCalldata(
   return encodeFunctionData({
     abi: PERMIT2_ABI,
     functionName: 'invalidateNonces',
-    args: [token, spender, parseBigIntInput(newNonce)],
+    args: [token, spender, Number(parseBigIntInput(newNonce))],
   });
 }
 
