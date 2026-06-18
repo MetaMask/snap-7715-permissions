@@ -1,4 +1,4 @@
-import { Address, Box, Text, Tooltip } from '@metamask/snaps-sdk/jsx';
+import { Address, Box, Text } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from '@metamask/utils';
 
 import { Field } from './Field';
@@ -24,9 +24,7 @@ export const RedeemerField = ({
   return (
     <Field label={label} tooltip={tooltip} variant="display">
       {shouldRenderRedeemersAsFacilitators ? (
-        <Tooltip content={t('facilitatorTooltip')}>
-          <Text alignment="end">{t('facilitatorValue')}</Text>
-        </Tooltip>
+        <Text alignment="end">{t('facilitatorValue')}</Text>
       ) : (
         <Box direction="vertical">
           {addresses.map((addr) => (

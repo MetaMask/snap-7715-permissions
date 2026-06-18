@@ -527,9 +527,6 @@ describe('PermissionHandler', () => {
         expect(serialized).toContain(
           'Only these addresses may redeem this permission.',
         );
-        expect(serialized).toContain(
-          'May only be redeemed via the MetaMask x402 facilitator.',
-        );
         expect(serialized).not.toContain('Facilitators');
       });
 

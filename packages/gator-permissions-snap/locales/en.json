@@ -79,9 +79,6 @@
     "facilitatorValue": {
       "message": "MetaMask facilitator"
     },
-    "facilitatorTooltip": {
-      "message": "May only be redeemed via the MetaMask x402 facilitator."
-    },
     "payeeLabel": {
       "message": "Payees"
     },
