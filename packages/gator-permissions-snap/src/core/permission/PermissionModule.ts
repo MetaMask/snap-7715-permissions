@@ -60,7 +60,7 @@ export type PermissionModule<
   createPermissionCaveats(args: {
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
-  }): Promise<Caveat[]>;
+  }): Caveat[];
 };
 
 /**

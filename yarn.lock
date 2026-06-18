@@ -2830,6 +2830,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/7715-permission-types@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@metamask/7715-permission-types@npm:0.8.0"
+  dependencies:
+    "@metamask/delegation-core": "npm:^2.2.1"
+    "@metamask/utils": "npm:^11.4.0"
+  checksum: 10/843aa511225251b47cf4d3bf1fdb0243825b70be78220ba59c9b70948d03f1ee83a99a41b208ecf1cf62cebeb275d0d8f1b9fc49faf4ff8b34104f8259fa8468
+  languageName: node
+  linkType: hard
+
 "@metamask/7715-permissions-shared@workspace:*, @metamask/7715-permissions-shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "@metamask/7715-permissions-shared@workspace:packages/shared"
@@ -3215,6 +3225,7 @@ __metadata:
   resolution: "@metamask/gator-permissions-snap@workspace:packages/gator-permissions-snap"
   dependencies:
     "@jest/globals": "npm:29.7.0"
+    "@metamask/7715-permission-types": "npm:^0.8.0"
     "@metamask/7715-permissions-shared": "workspace:*"
     "@metamask/abi-utils": "npm:3.0.0"
     "@metamask/auto-changelog": "npm:6.1.1"

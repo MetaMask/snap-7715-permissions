@@ -1,4 +1,6 @@
-import { createPermissionCaveats } from './caveats';
+import { createErc20TokenAllowanceCaveats } from '@metamask/7715-permission-types';
+import type { Caveat } from '@metamask/delegation-core';
+
 import { renderBody } from './content';
 import {
   applyContext,
@@ -15,7 +17,23 @@ import type {
   PopulatedErc20TokenAllowancePermission,
 } from './types';
 import { parseAndValidate } from './validation';
+import type { DelegationContracts } from '../../core/chainMetadata';
 import type { PermissionModule } from '../../core/permission/PermissionModule';
+
+const createPermissionCaveats = ({
+  permission,
+  contracts,
+}: {
+  permission: PopulatedErc20TokenAllowancePermission;
+  contracts: DelegationContracts;
+}): Caveat[] =>
+  createErc20TokenAllowanceCaveats({
+    permission,
+    contracts: {
+      ...contracts,
+      erc20PeriodicEnforcer: contracts.erc20PeriodTransferEnforcer,
+    },
+  });
 
 export const erc20TokenAllowancePermissionModule: PermissionModule<
   Erc20TokenAllowancePermissionRequest,
