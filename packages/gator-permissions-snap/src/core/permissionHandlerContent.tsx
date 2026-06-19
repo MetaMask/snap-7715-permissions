@@ -15,6 +15,7 @@ import {
 import { parseCaipAssetType } from '@metamask/utils';
 
 import { ConfirmationDialog } from './confirmation';
+import { isMetaMaskFacilitatorAddress } from './facilitatorAddresses';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
 import type { BaseContext, IconData } from './types';
 import {
@@ -197,10 +198,14 @@ export const PermissionHandlerContent = ({
     />
   );
 
+  const shouldRenderRedeemersAsFacilitators =
+    context.redeemerAddresses?.every(isMetaMaskFacilitatorAddress) ?? false;
+
   const redeemerField = context.redeemerAddresses?.length ? (
     <RedeemerField
       label={t('redeemerLabel')}
       addresses={context.redeemerAddresses}
+      shouldRenderRedeemersAsFacilitators={shouldRenderRedeemersAsFacilitators}
       tooltip={t('redeemerTooltip')}
     />
   ) : null;
