@@ -1,4 +1,5 @@
-import { createPermissionCaveats } from './caveats';
+import { createTokenApprovalRevocationCaveats as createPermissionCaveats } from '@metamask/7715-permission-types';
+
 import { createConfirmationContent } from './content';
 import {
   applyContext,

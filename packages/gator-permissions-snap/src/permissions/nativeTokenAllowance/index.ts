@@ -1,4 +1,6 @@
-import { createPermissionCaveats } from './caveats';
+import { createNativeTokenAllowanceCaveats } from '@metamask/7715-permission-types';
+import type { Caveat } from '@metamask/delegation-core';
+
 import { createConfirmationContent } from './content';
 import {
   applyContext,
@@ -15,7 +17,23 @@ import type {
   PopulatedNativeTokenAllowancePermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
+import type { DelegationContracts } from '../../core/chainMetadata';
 import type { PermissionDefinition } from '../../core/types';
+
+const createPermissionCaveats = async ({
+  permission,
+  contracts,
+}: {
+  permission: PopulatedNativeTokenAllowancePermission;
+  contracts: DelegationContracts;
+}): Promise<Caveat[]> =>
+  createNativeTokenAllowanceCaveats({
+    permission,
+    contracts: {
+      nativeTokenPeriodicEnforcer: contracts.nativeTokenPeriodTransferEnforcer,
+      exactCalldataEnforcer: contracts.exactCalldataEnforcer,
+    },
+  });
 
 export const nativeTokenAllowancePermissionDefinition: PermissionDefinition<
   NativeTokenAllowancePermissionRequest,
