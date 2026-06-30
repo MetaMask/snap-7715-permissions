@@ -32,6 +32,7 @@ import { appendExpiryCaveatIfPresent } from './expiryCaveat';
 import { appendPayeeCaveatIfPresent } from './payeeCaveat';
 import type { PermissionIntroductionService } from './permissionIntroduction';
 import { appendRedeemerCaveatIfPresent } from './redeemerCaveat';
+import { normalizeSentinelRedeemerRuleForOrigin } from './sentinelRedeemer';
 import type {
   BaseContext,
   BaseMetadata,
@@ -159,6 +160,11 @@ export class PermissionRequestLifecycleOrchestrator {
     // Validate the permission request early, before showing any UI
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);
+    const normalizedPermissionRequest = normalizeSentinelRedeemerRuleForOrigin({
+      origin,
+      permissionRequest: validatedPermissionRequest,
+      chainId,
+    });
 
     // Create shared dialog interface for both intro and confirmation
     const dialogInterface =
@@ -176,7 +182,7 @@ export class PermissionRequestLifecycleOrchestrator {
       .then((list) =>
         this.#existingPermissionsService.getExistingPermissionsStatusFromList(
           list,
-          validatedPermissionRequest.permission,
+          normalizedPermissionRequest.permission,
         ),
       )
       .catch((error: unknown) => {
@@ -261,7 +267,7 @@ export class PermissionRequestLifecycleOrchestrator {
 
     try {
       context = await lifecycleHandlers.buildContext(
-        validatedPermissionRequest,
+        normalizedPermissionRequest,
       );
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
@@ -349,10 +355,10 @@ export class PermissionRequestLifecycleOrchestrator {
       });
 
     // Address scan in the background; only update when the client resolves (non-blocking)
-    const delegateAddress = validatedPermissionRequest.to;
+    const delegateAddress = normalizedPermissionRequest.to;
     if (delegateAddress) {
       this.#trustSignalsClient
-        .fetchAddressScan(validatedPermissionRequest.chainId, delegateAddress)
+        .fetchAddressScan(normalizedPermissionRequest.chainId, delegateAddress)
         .then(async (result) => {
           scanAddressResult = result;
           return updateConfirmation({
@@ -456,7 +462,7 @@ export class PermissionRequestLifecycleOrchestrator {
         }
 
         const response = await this.#resolveResponse({
-          originalRequest: validatedPermissionRequest,
+          originalRequest: normalizedPermissionRequest,
           modifiedContext: context,
           lifecycleHandlers,
           isAdjustmentAllowed,
