@@ -32,7 +32,7 @@ import { appendExpiryCaveatIfPresent } from './expiryCaveat';
 import { appendPayeeCaveatIfPresent } from './payeeCaveat';
 import type { PermissionIntroductionService } from './permissionIntroduction';
 import { appendRedeemerCaveatIfPresent } from './redeemerCaveat';
-import { normalizeSentinelRedeemerRuleForOrigin } from './sentinelRedeemer';
+import { normalizePermissionRequestWithSentinelRedeemerRule } from './sentinelRedeemer';
 import type {
   BaseContext,
   BaseMetadata,
@@ -160,11 +160,12 @@ export class PermissionRequestLifecycleOrchestrator {
     // Validate the permission request early, before showing any UI
     const validatedPermissionRequest =
       lifecycleHandlers.parseAndValidatePermission(permissionRequest);
-    const normalizedPermissionRequest = normalizeSentinelRedeemerRuleForOrigin({
-      origin,
-      permissionRequest: validatedPermissionRequest,
-      chainId,
-    });
+    const normalizedPermissionRequest =
+      normalizePermissionRequestWithSentinelRedeemerRule({
+        origin,
+        permissionRequest: validatedPermissionRequest,
+        chainId,
+      });
 
     // Create shared dialog interface for both intro and confirmation
     const dialogInterface =

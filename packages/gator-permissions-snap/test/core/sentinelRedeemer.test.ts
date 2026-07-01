@@ -2,7 +2,7 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import type { Hex } from '@metamask/utils';
 
 import {
-  normalizeSentinelRedeemerRuleForOrigin,
+  normalizePermissionRequestWithSentinelRedeemerRule,
   SENTINEL_REDEEMER_ADDRESSES,
 } from '../../src/core/sentinelRedeemer';
 
@@ -26,11 +26,11 @@ const MOCK_PERMISSION_REQUEST = {
   },
 } as unknown as PermissionRequest;
 
-describe('normalizeSentinelRedeemerRuleForOrigin', () => {
+describe('normalizePermissionRequestWithSentinelRedeemerRule', () => {
   it.each(['https://uniswap.org', 'https://app.uniswap.org'])(
     'adds the Sentinel redeemer rule for %s when rules are undefined',
     (origin) => {
-      const result = normalizeSentinelRedeemerRuleForOrigin({
+      const result = normalizePermissionRequestWithSentinelRedeemerRule({
         origin,
         permissionRequest: MOCK_PERMISSION_REQUEST,
         chainId: 1,
@@ -45,10 +45,20 @@ describe('normalizeSentinelRedeemerRuleForOrigin', () => {
     },
   );
 
+  it('does not add a Sentinel redeemer rule for unsupported chains', () => {
+    const result = normalizePermissionRequestWithSentinelRedeemerRule({
+      origin: 'https://app.uniswap.org',
+      permissionRequest: MOCK_PERMISSION_REQUEST,
+      chainId: 0x18c6,
+    });
+
+    expect(result).toBe(MOCK_PERMISSION_REQUEST);
+  });
+
   it.each(['https://evil-uniswap.org', 'https://uniswap.org.evil.com'])(
     'does not add a Sentinel redeemer rule for origin-confusable host %s',
     (origin) => {
-      const result = normalizeSentinelRedeemerRuleForOrigin({
+      const result = normalizePermissionRequestWithSentinelRedeemerRule({
         origin,
         permissionRequest: MOCK_PERMISSION_REQUEST,
         chainId: 1,
@@ -59,7 +69,7 @@ describe('normalizeSentinelRedeemerRuleForOrigin', () => {
   );
 
   it('does not add a Sentinel redeemer rule for malformed origins', () => {
-    const result = normalizeSentinelRedeemerRuleForOrigin({
+    const result = normalizePermissionRequestWithSentinelRedeemerRule({
       origin: 'not an origin',
       permissionRequest: MOCK_PERMISSION_REQUEST,
       chainId: 1,
@@ -81,7 +91,7 @@ describe('normalizeSentinelRedeemerRuleForOrigin', () => {
       ],
     };
 
-    const result = normalizeSentinelRedeemerRuleForOrigin({
+    const result = normalizePermissionRequestWithSentinelRedeemerRule({
       origin: 'https://example.com',
       permissionRequest,
       chainId: 1,
@@ -97,7 +107,7 @@ describe('normalizeSentinelRedeemerRuleForOrigin', () => {
     };
 
     expect(() =>
-      normalizeSentinelRedeemerRuleForOrigin({
+      normalizePermissionRequestWithSentinelRedeemerRule({
         origin: 'https://app.uniswap.org',
         permissionRequest,
         chainId: 1,

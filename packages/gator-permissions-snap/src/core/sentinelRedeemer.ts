@@ -14,9 +14,20 @@ export const SENTINEL_REDEEMER_ADDRESSES = [
   '0xb42f812a44c22cc6b861478900401ee759ebead6',
 ] as const satisfies readonly Hex[];
 
+export const SENTINEL_SUPPORTED_CHAINS = [
+  0x1, // Ethereum Mainnet
+  0xa, // OP Mainnet
+  0x38, // BNB Smart Chain Mainnet
+  0x82, // Unichain
+  0x89, // Polygon Mainnet
+  0x2105, // Base
+  0xa4b1, // Arbitrum One
+  0xe708, // Linea Mainnet
+] as const satisfies readonly number[];
+
 const UNISWAP_HOSTNAME = 'uniswap.org';
 
-const isUniswapOrigin = (origin: string): boolean => {
+const originRequiresSentinelRedeemerRule = (origin: string): boolean => {
   try {
     const { hostname } = new URL(origin);
     return (
@@ -28,8 +39,12 @@ const isUniswapOrigin = (origin: string): boolean => {
 };
 
 const getSentinelRedeemerAddressesForChain = (
-  _chainId: number,
+  chainId: number,
 ): readonly Hex[] => {
+  if (!SENTINEL_SUPPORTED_CHAINS.includes(chainId)) {
+    return [];
+  }
+
   return SENTINEL_REDEEMER_ADDRESSES;
 };
 
@@ -48,7 +63,7 @@ const getRedeemerRule = (
  * @returns The original request, or a copy with a Sentinel redeemer rule added.
  * @throws If a Uniswap request includes unsupported redeemer addresses.
  */
-export function normalizeSentinelRedeemerRuleForOrigin({
+export function normalizePermissionRequestWithSentinelRedeemerRule({
   origin,
   permissionRequest,
   chainId,
@@ -57,12 +72,16 @@ export function normalizeSentinelRedeemerRuleForOrigin({
   permissionRequest: PermissionRequest;
   chainId: number;
 }): PermissionRequest {
-  if (!isUniswapOrigin(origin)) {
+  if (!originRequiresSentinelRedeemerRule(origin)) {
     return permissionRequest;
   }
 
   const sentinelRedeemerAddresses =
     getSentinelRedeemerAddressesForChain(chainId);
+  if (sentinelRedeemerAddresses.length === 0) {
+    return permissionRequest;
+  }
+
   const sentinelRedeemerAddressSet = new Set(
     sentinelRedeemerAddresses.map((address) => address.toLowerCase()),
   );
@@ -88,7 +107,7 @@ export function normalizeSentinelRedeemerRuleForOrigin({
 
     if (unsupportedAddress) {
       throw new InvalidInputError(
-        `Redeemer rule includes unsupported Sentinel redeemer address: ${unsupportedAddress}`,
+        `Redeemer rule includes addresses other than allowed values: ${unsupportedAddress}. Permissions granted on this domain may only be redeemed via MetaMask Sentinel.`,
       );
     }
 

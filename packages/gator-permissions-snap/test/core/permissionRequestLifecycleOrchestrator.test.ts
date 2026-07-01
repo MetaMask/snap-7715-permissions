@@ -695,7 +695,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
             lifecycleHandlerMocks,
           ),
         ).rejects.toThrow(
-          'Redeemer rule includes unsupported Sentinel redeemer address: 0x1111111111111111111111111111111111111111',
+          'Redeemer rule includes addresses other than allowed values: 0x1111111111111111111111111111111111111111. Permissions granted on this domain may only be redeemed via MetaMask Sentinel.',
         );
 
         expect(lifecycleHandlerMocks.buildContext).not.toHaveBeenCalled();
