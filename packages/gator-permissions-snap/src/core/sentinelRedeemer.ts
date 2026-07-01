@@ -71,6 +71,16 @@ export function normalizeSentinelRedeemerRuleForOrigin({
     | string[]
     | undefined;
 
+  if (
+    requestedRedeemerAddresses !== undefined &&
+    (!Array.isArray(requestedRedeemerAddresses) ||
+      requestedRedeemerAddresses.length === 0)
+  ) {
+    throw new InvalidInputError(
+      'Invalid redeemer rule: must include a non-empty addresses array',
+    );
+  }
+
   if (requestedRedeemerAddresses) {
     const unsupportedAddress = requestedRedeemerAddresses.find(
       (address) => !sentinelRedeemerAddressSet.has(address.toLowerCase()),
