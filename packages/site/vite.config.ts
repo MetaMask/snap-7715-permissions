@@ -36,6 +36,8 @@ export default defineConfig({
     outDir: 'dist',
   },
   server: {
+    allowedHosts: ['.localhost', '.uniswap.org'],
+    host: '0.0.0.0',
     port: 8000,
   },
 });
