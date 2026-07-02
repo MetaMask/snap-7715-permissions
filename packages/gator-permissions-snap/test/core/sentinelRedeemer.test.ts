@@ -4,6 +4,7 @@ import type { Hex } from '@metamask/utils';
 import {
   normalizePermissionRequestWithSentinelRedeemerRule,
   SENTINEL_REDEEMER_ADDRESSES,
+  SENTINEL_SUPPORTED_CHAINS,
 } from '../../src/core/sentinelRedeemer';
 
 const MOCK_PERMISSION_REQUEST = {
@@ -27,6 +28,26 @@ const MOCK_PERMISSION_REQUEST = {
 } as unknown as PermissionRequest;
 
 describe('normalizePermissionRequestWithSentinelRedeemerRule', () => {
+  it('supports all Sentinel-enabled mainnets and testnets', () => {
+    expect(SENTINEL_SUPPORTED_CHAINS).toStrictEqual([
+      0x1, // Ethereum Mainnet
+      0xa, // OP Mainnet
+      0x38, // BNB Smart Chain Mainnet
+      0x89, // Polygon Mainnet
+      0xa4b1, // Arbitrum One
+      0xa86a, // Avalanche C-Chain
+      0xe708, // Linea Mainnet
+      0x2105, // Base
+      0x531, // Sei Network
+      0x8f, // Monad
+      0x10e6, // MegaETH Mainnet
+      0x1079, // Tempo Mainnet Presto
+      0x13b2, // Arc
+      0xaa36a7, // Ethereum Sepolia
+      0x14a34, // Base Sepolia
+    ]);
+  });
+
   it.each(['https://uniswap.org', 'https://app.uniswap.org'])(
     'adds the Sentinel redeemer rule for %s when rules are undefined',
     (origin) => {
