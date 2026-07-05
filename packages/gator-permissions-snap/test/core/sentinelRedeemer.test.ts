@@ -28,6 +28,31 @@ const MOCK_PERMISSION_REQUEST = {
 } as unknown as PermissionRequest;
 
 describe('normalizePermissionRequestWithSentinelRedeemerRule', () => {
+  it('preserves the specific request subtype', () => {
+    type SpecificPermissionRequest = PermissionRequest & {
+      specificMarker: true;
+    };
+
+    const permissionRequest =
+      MOCK_PERMISSION_REQUEST as SpecificPermissionRequest;
+
+    const result = normalizePermissionRequestWithSentinelRedeemerRule({
+      origin: 'https://app.uniswap.org',
+      permissionRequest,
+      chainId: 1,
+    });
+
+    const assertSpecificRequest = (_request: SpecificPermissionRequest): void =>
+      undefined;
+    assertSpecificRequest(result);
+    expect(result.rules).toStrictEqual([
+      {
+        type: 'redeemer',
+        data: { addresses: [...SENTINEL_REDEEMER_ADDRESSES] },
+      },
+    ]);
+  });
+
   it('supports all Sentinel-enabled mainnets and testnets', () => {
     expect(SENTINEL_SUPPORTED_CHAINS).toStrictEqual([
       0x1, // Ethereum Mainnet

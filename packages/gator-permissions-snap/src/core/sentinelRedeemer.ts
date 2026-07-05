@@ -70,15 +70,17 @@ const getRedeemerRule = (
  * @returns The original request, or a copy with a Sentinel redeemer rule added.
  * @throws If a Uniswap request includes unsupported redeemer addresses.
  */
-export function normalizePermissionRequestWithSentinelRedeemerRule({
+export function normalizePermissionRequestWithSentinelRedeemerRule<
+  TRequest extends PermissionRequest,
+>({
   origin,
   permissionRequest,
   chainId,
 }: {
   origin: string;
-  permissionRequest: PermissionRequest;
+  permissionRequest: TRequest;
   chainId: number;
-}): PermissionRequest {
+}): TRequest {
   if (!originRequiresSentinelRedeemerRule(origin)) {
     return permissionRequest;
   }
@@ -130,5 +132,5 @@ export function normalizePermissionRequestWithSentinelRedeemerRule({
         data: { addresses: [...sentinelRedeemerAddresses] },
       },
     ],
-  };
+  } as TRequest;
 }
