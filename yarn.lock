@@ -3462,14 +3462,14 @@ __metadata:
   linkType: hard
 
 "@metamask/keyring-api@npm:^23.1.0, @metamask/keyring-api@npm:^23.2.0":
-  version: 23.3.0
-  resolution: "@metamask/keyring-api@npm:23.3.0"
+  version: 23.4.0
+  resolution: "@metamask/keyring-api@npm:23.4.0"
   dependencies:
     "@metamask/keyring-utils": "npm:^3.3.1"
     "@metamask/superstruct": "npm:^3.1.0"
     "@metamask/utils": "npm:^11.11.0"
     bitcoin-address-validation: "npm:^2.2.3"
-  checksum: 10/c6ad3bf4294b09730d752d548b1cd0c1c622f357a12c7287af2b5889a01e99a4d20316cc9e96840d5c5619eee0f9305d4dfc03febd0bd136e72de95ce3fd0a1e
+  checksum: 10/2a8152faac3076e12254c74c2e92931a3ecb22b3772985b6e4967aa42be1aa1f294ef56476e3ef6f16c430ee35ab2de38159a2516af01d231bdee9974187ddbf
   languageName: node
   linkType: hard
 
