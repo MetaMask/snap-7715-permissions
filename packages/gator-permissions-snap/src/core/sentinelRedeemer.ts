@@ -34,7 +34,17 @@ export const SENTINEL_SUPPORTED_CHAINS = [
 
 const UNISWAP_HOSTNAME = 'uniswap.org';
 
-const originRequiresSentinelRedeemerRule = (origin: string): boolean => {
+const isSentinelRedeemerRuleRequiredForOriginAndChain = ({
+  origin,
+  chainId,
+}: {
+  origin: string;
+  chainId: number;
+}): boolean => {
+  if (!SENTINEL_SUPPORTED_CHAINS.includes(chainId)) {
+    return false;
+  }
+
   try {
     const { hostname } = new URL(origin);
     return (
@@ -43,16 +53,6 @@ const originRequiresSentinelRedeemerRule = (origin: string): boolean => {
   } catch {
     return false;
   }
-};
-
-const getSentinelRedeemerAddressesForChain = (
-  chainId: number,
-): readonly Hex[] => {
-  if (!SENTINEL_SUPPORTED_CHAINS.includes(chainId)) {
-    return [];
-  }
-
-  return SENTINEL_REDEEMER_ADDRESSES;
 };
 
 const getRedeemerRule = (
@@ -81,18 +81,12 @@ export function normalizePermissionRequestWithSentinelRedeemerRule<
   permissionRequest: TRequest;
   chainId: number;
 }): TRequest {
-  if (!originRequiresSentinelRedeemerRule(origin)) {
-    return permissionRequest;
-  }
-
-  const sentinelRedeemerAddresses =
-    getSentinelRedeemerAddressesForChain(chainId);
-  if (sentinelRedeemerAddresses.length === 0) {
+  if (!isSentinelRedeemerRuleRequiredForOriginAndChain({ origin, chainId })) {
     return permissionRequest;
   }
 
   const sentinelRedeemerAddressSet = new Set(
-    sentinelRedeemerAddresses.map((address) => address.toLowerCase()),
+    SENTINEL_REDEEMER_ADDRESSES.map((address) => address.toLowerCase()),
   );
   const redeemerRule = getRedeemerRule(permissionRequest.rules);
   const requestedRedeemerAddresses = redeemerRule?.data.addresses as
@@ -129,8 +123,8 @@ export function normalizePermissionRequestWithSentinelRedeemerRule<
       ...(permissionRequest.rules ?? []),
       {
         type: 'redeemer',
-        data: { addresses: [...sentinelRedeemerAddresses] },
+        data: { addresses: [...SENTINEL_REDEEMER_ADDRESSES] },
       },
     ],
-  } as TRequest;
+  };
 }

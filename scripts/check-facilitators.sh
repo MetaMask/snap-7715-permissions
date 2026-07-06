@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Checks Sentinel supported endpoints across environments and prints the
+# facilitator addresses each chain reports. Run with:
+# ./scripts/check-facilitators.sh
 set -u
 
 envs=("prod" "uat" "dev")
