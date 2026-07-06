@@ -4,6 +4,7 @@ import {
   ROOT_AUTHORITY,
   createTimestampTerms,
   createNonceTerms,
+  createRedeemerTerms,
 } from '@metamask/delegation-core';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
@@ -26,6 +27,7 @@ import {
 } from '../../src/core/existingpermissions/existingPermissionsService';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
+import { SENTINEL_REDEEMER_ADDRESSES } from '../../src/core/sentinelRedeemer';
 import type { BaseContext } from '../../src/core/types';
 import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
 import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
@@ -588,6 +590,115 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         const result = await orchestrationPromise;
 
         expect(result).toBeDefined();
+      });
+
+      it('adds the sentinel redeemer rule for uniswap.org requests with no redeemer rule', async () => {
+        const requestWithoutRedeemerRule = {
+          ...mockPermissionRequest,
+          rules: [mockPermissionRequest.rules[0]],
+        };
+
+        lifecycleHandlerMocks.applyContext.mockImplementation(
+          ({ originalRequest }) => ({
+            ...mockResolvedPermissionRequest,
+            rules: originalRequest.rules,
+          }),
+        );
+
+        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
+          'https://app.uniswap.org',
+          requestWithoutRedeemerRule,
+          lifecycleHandlerMocks,
+        );
+
+        expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith({
+          ...requestWithoutRedeemerRule,
+          rules: [
+            requestWithoutRedeemerRule.rules[0],
+            {
+              type: 'redeemer',
+              data: { addresses: SENTINEL_REDEEMER_ADDRESSES },
+            },
+          ],
+        });
+
+        expect(result.approved).toBe(true);
+        if (!result.approved) {
+          throw new Error('Expected the permission request to be approved');
+        }
+
+        const delegationsArray = decodeDelegations(result.response.context);
+        const { contracts } = getChainMetadata({
+          chainId: Number(mockPermissionRequest.chainId),
+        });
+
+        expect(delegationsArray[0]?.caveats).toContainEqual({
+          enforcer: contracts.redeemerEnforcer.toLowerCase(),
+          args: '0x',
+          terms: createRedeemerTerms({
+            redeemers: SENTINEL_REDEEMER_ADDRESSES.map(
+              (address) => address.toLowerCase() as Hex,
+            ),
+          }),
+        });
+      });
+
+      it('preserves a uniswap.org redeemer rule that only contains sentinel addresses', async () => {
+        const requestedRedeemerRule = {
+          type: 'redeemer',
+          data: { addresses: [SENTINEL_REDEEMER_ADDRESSES[0]] },
+        };
+        const requestWithSentinelRedeemerRule = {
+          ...mockPermissionRequest,
+          rules: [mockPermissionRequest.rules[0], requestedRedeemerRule],
+        };
+
+        lifecycleHandlerMocks.applyContext.mockImplementation(
+          ({ originalRequest }) => ({
+            ...mockResolvedPermissionRequest,
+            rules: originalRequest.rules,
+          }),
+        );
+
+        await permissionRequestLifecycleOrchestrator.orchestrate(
+          'https://uniswap.org',
+          requestWithSentinelRedeemerRule,
+          lifecycleHandlerMocks,
+        );
+
+        expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith(
+          requestWithSentinelRedeemerRule,
+        );
+      });
+
+      it('rejects uniswap.org redeemer rules with non-sentinel addresses', async () => {
+        const requestWithUnsupportedRedeemerRule = {
+          ...mockPermissionRequest,
+          rules: [
+            mockPermissionRequest.rules[0],
+            {
+              type: 'redeemer',
+              data: {
+                addresses: [
+                  SENTINEL_REDEEMER_ADDRESSES[0],
+                  '0x1111111111111111111111111111111111111111',
+                ],
+              },
+            },
+          ],
+        };
+
+        await expect(
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'https://app.uniswap.org',
+            requestWithUnsupportedRedeemerRule,
+            lifecycleHandlerMocks,
+          ),
+        ).rejects.toThrow(
+          'Redeemer rule includes addresses other than allowed values: 0x1111111111111111111111111111111111111111. Permissions granted on this domain may only be redeemed via MetaMask Sentinel.',
+        );
+
+        expect(lifecycleHandlerMocks.buildContext).not.toHaveBeenCalled();
       });
 
       it('checks account upgrade status and triggers upgrade when needed', async () => {
