@@ -15,26 +15,20 @@ import type {
   ScanDappUrlResult,
   TrustSignalsClient,
 } from '../../src/clients/trustSignalsClient';
-import {
-  AddressScanResultType,
-  RecommendedAction,
-} from '../../src/clients/trustSignalsClient';
+import { AddressScanResultType } from '../../src/clients/trustSignalsClient';
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
+import { ConfirmationSession } from '../../src/core/confirmation/ConfirmationSession';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
 import { ExistingPermissionsCoordinator } from '../../src/core/coordinators/ExistingPermissionsCoordinator';
 import { TrustSignalsCoordinator } from '../../src/core/coordinators/TrustSignalsCoordinator';
 import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFactory';
-import {
-  ExistingPermissionsService,
-  ExistingPermissionsState,
-} from '../../src/core/existingpermissions/existingPermissionsService';
+import { ExistingPermissionsService } from '../../src/core/existingpermissions/existingPermissionsService';
 import { GrantedPermissionResolutionService } from '../../src/core/grant/GrantedPermissionResolutionService';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import { SENTINEL_REDEEMER_ADDRESSES } from '../../src/core/sentinelRedeemer';
-import type { BaseContext } from '../../src/core/types';
 import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
 import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
@@ -200,6 +194,7 @@ type TestLifecycleHandlersMocks = {
 
 describe('PermissionRequestLifecycleOrchestrator', () => {
   let permissionRequestLifecycleOrchestrator: PermissionRequestLifecycleOrchestrator;
+  let confirmationSession: ConfirmationSession;
   let grantedPermissionResolutionService: GrantedPermissionResolutionService;
   let existingPermissionsCoordinator: ExistingPermissionsCoordinator;
   let trustSignalsCoordinator: TrustSignalsCoordinator;
@@ -286,15 +281,21 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
     mockDialogInterfaceFactory.createDialogInterface.mockReturnValue({});
 
+    confirmationSession = new ConfirmationSession({
+      dialogInterfaceFactory: mockDialogInterfaceFactory,
+      confirmationDialogFactory: mockConfirmationDialogFactory,
+      permissionIntroductionService: mockPermissionIntroductionService,
+      existingPermissionsCoordinator,
+      trustSignalsCoordinator,
+      accountController: mockAccountController,
+      snapsMetricsService: mockSnapsMetricsService,
+    });
+
     permissionRequestLifecycleOrchestrator =
       new PermissionRequestLifecycleOrchestrator({
-        accountController: mockAccountController,
-        confirmationDialogFactory: mockConfirmationDialogFactory,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
-        existingPermissionsCoordinator,
-        dialogInterfaceFactory: mockDialogInterfaceFactory,
-        trustSignalsCoordinator,
+        confirmationSession,
         grantedPermissionResolutionService,
       });
   });
@@ -302,13 +303,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
   describe('constructor', () => {
     it('should create an instance with valid supported chains', () => {
       const instance = new PermissionRequestLifecycleOrchestrator({
-        accountController: mockAccountController,
-        confirmationDialogFactory: mockConfirmationDialogFactory,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
-        existingPermissionsCoordinator,
-        dialogInterfaceFactory: mockDialogInterfaceFactory,
-        trustSignalsCoordinator,
+        confirmationSession,
         grantedPermissionResolutionService,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
@@ -340,92 +337,6 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           isAdjustmentAllowed: true,
           to: requestingAccountAddress,
           delegationManager,
-        });
-      });
-
-      it('loads existing permissions from profile sync only once per request', async () => {
-        await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        expect(
-          mockExistingPermissionsService.getExistingPermissions,
-        ).toHaveBeenCalledTimes(1);
-        expect(
-          mockExistingPermissionsService.getExistingPermissions,
-        ).toHaveBeenCalledWith('test-origin');
-      });
-
-      it('creates a skeleton confirmation before the context is resolved', async () => {
-        // this never resolves, because we are testing the behavior _before_ the context is returned.
-        const contextPromise = new Promise<BaseContext>((_resolve) => {
-          console.log('Arrow function cannot be empty');
-        });
-
-        lifecycleHandlerMocks.buildContext.mockReturnValue(contextPromise);
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        // allow the call to getAccountAddresses to complete
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(mockConfirmationDialog.updateContent).not.toHaveBeenCalled();
-
-        expect(
-          lifecycleHandlerMocks.createSkeletonConfirmationContent,
-        ).toHaveBeenCalledTimes(1);
-
-        expect(
-          lifecycleHandlerMocks.createConfirmationContent,
-        ).not.toHaveBeenCalled();
-      });
-
-      it('creates the confirmation dialog with a disabled grant button', async () => {
-        // this never resolves, because we are testing the behavior _before_ the context is returned.
-        const contextPromise = new Promise<BaseContext>((_resolve) => {
-          console.log('Arrow function cannot be empty');
-        });
-
-        lifecycleHandlerMocks.buildContext.mockReturnValue(contextPromise);
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(mockConfirmationDialog.updateContent).not.toHaveBeenCalled();
-        expect(
-          mockConfirmationDialogFactory.createConfirmation,
-        ).toHaveBeenCalledWith({
-          dialogInterface: expect.any(Object),
-          ui: mockSkeletonUiContent,
-          onBeforeGrant: expect.any(Function),
-        });
-      });
-
-      it('enables the grant button when updating the confirmation with the resolved context', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
-          ui: mockUiContent,
         });
       });
 
@@ -725,542 +636,18 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(lifecycleHandlerMocks.buildContext).not.toHaveBeenCalled();
       });
-
-      it('checks account upgrade status and triggers upgrade when needed', async () => {
-        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
-          isUpgraded: false,
-        });
-
-        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        expect(
-          mockAccountController.getAccountUpgradeStatus,
-        ).toHaveBeenCalledWith({
-          account: grantingAccountAddress,
-          chainId: '0x1',
-        });
-        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
-          account: grantingAccountAddress,
-          chainId: '0x1',
-        });
-        expect(result.approved).toBe(true);
-      });
-
-      it('does not trigger upgrade when account is already upgraded', async () => {
-        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
-          isUpgraded: true,
-        });
-
-        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        expect(
-          mockAccountController.getAccountUpgradeStatus,
-        ).toHaveBeenCalledWith({
-          account: grantingAccountAddress,
-          chainId: '0x1',
-        });
-        expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
-        expect(result.approved).toBe(true);
-      });
-
-      it('tracks smart account upgrade success when upgrade is successful', async () => {
-        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
-          isUpgraded: false,
-        });
-        mockAccountController.upgradeAccount.mockResolvedValueOnce({
-          transactionHash: '0xabc123',
-        });
-
-        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
-          account: grantingAccountAddress,
-          chainId: '0x1',
-        });
-        expect(
-          mockSnapsMetricsService.trackSmartAccountUpgraded,
-        ).toHaveBeenCalledWith({
-          origin: 'test-origin',
-          accountAddress: grantingAccountAddress,
-          chainId: '0x1',
-          success: true,
-        });
-        expect(result.approved).toBe(true);
-      });
-
-      it('tracks smart account upgrade failure when upgrade fails', async () => {
-        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
-          isUpgraded: false,
-        });
-        mockAccountController.upgradeAccount.mockRejectedValueOnce(
-          new Error('Upgrade failed'),
-        );
-
-        // The permission request should still succeed despite upgrade failure
-        const result = await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        expect(mockAccountController.upgradeAccount).toHaveBeenCalledWith({
-          account: grantingAccountAddress,
-          chainId: '0x1',
-        });
-        expect(
-          mockSnapsMetricsService.trackSmartAccountUpgraded,
-        ).toHaveBeenCalledWith({
-          origin: 'test-origin',
-          accountAddress: grantingAccountAddress,
-          chainId: '0x1',
-          success: false,
-        });
-        expect(result.approved).toBe(true);
-      });
-
-      it('does not track smart account upgrade when account is already upgraded', async () => {
-        mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
-          isUpgraded: true,
-        });
-
-        await permissionRequestLifecycleOrchestrator.orchestrate(
-          'test-origin',
-          mockPermissionRequest,
-          lifecycleHandlerMocks,
-        );
-
-        expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
-        expect(
-          mockSnapsMetricsService.trackSmartAccountUpgraded,
-        ).not.toHaveBeenCalled();
-      });
-
-      it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
-        const initialContext = {
-          foo: 'original',
-          expiry: '2024-12-31',
-          isAdjustmentAllowed: true,
-          accountAddressCaip10: fixedCaip10Address,
-          tokenAddressCaip19: 'eip155:1:0x1234',
-          tokenMetadata: {
-            decimals: 18,
-            symbol: 'TEST',
-            iconDataBase64: null,
-          },
-        };
-        const modifiedContext = {
-          foo: 'updated',
-          expiry: '2025-01-01',
-          isAdjustmentAllowed: true,
-          accountAddressCaip10: fixedCaip10Address,
-          tokenAddressCaip19: 'eip155:1:0x1234',
-          tokenMetadata: {
-            decimals: 18,
-            symbol: 'TEST',
-            iconDataBase64: null,
-          },
-        };
-
-        lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
-
-        let capturedParams: any;
-
-        lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
-          (params) => {
-            capturedParams = params;
-          },
-        );
-
-        let resolveUserDecision: (decision: boolean) => void = (_) => {
-          throw new Error('resolveUserDecision not set');
-        };
-        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
-          async () => {
-            const isConfirmationGranted = await new Promise<boolean>(
-              (resolve) => {
-                resolveUserDecision = resolve;
-              },
-            );
-            return { isConfirmationGranted };
-          },
-        );
-
-        const orchestrationPromise =
-          permissionRequestLifecycleOrchestrator.orchestrate(
-            'test-origin',
-            mockPermissionRequest,
-            lifecycleHandlerMocks,
-          );
-
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(lifecycleHandlerMocks.onConfirmationCreated).toHaveBeenCalled();
-        expect(capturedParams).toBeDefined();
-        expect(capturedParams.interfaceId).toBe(mockInterfaceId);
-        expect(capturedParams.initialContext).toStrictEqual(initialContext);
-        expect(typeof capturedParams.updateContext).toBe('function');
-
-        await capturedParams.updateContext({ updatedContext: modifiedContext });
-
-        expect(mockConfirmationDialog.updateContent).toHaveBeenCalled();
-
-        resolveUserDecision(true);
-
-        await orchestrationPromise;
-
-        expect(lifecycleHandlerMocks.applyContext).toHaveBeenCalledWith({
-          context: modifiedContext,
-          originalRequest: mockPermissionRequest,
-        });
-      });
-
-      it('shows the existing permissions subview when updateContext sets showExistingPermissions', async () => {
-        const subviewContext: BaseContext = {
-          ...mockContext,
-          showExistingPermissions: true,
-          justification: '',
-          expiry: { timestamp: 1733088000 },
-          accountAddressCaip10: fixedCaip10Address,
-          tokenAddressCaip19: 'eip155:1:0x1234',
-          tokenMetadata: {
-            decimals: 18,
-            symbol: 'TEST',
-            iconDataBase64: null,
-          },
-        };
-
-        let capturedParams: any;
-
-        lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
-          (params) => {
-            capturedParams = params;
-          },
-        );
-
-        let resolveUserDecision: (decision: boolean) => void = (_) => {
-          throw new Error('resolveUserDecision not set');
-        };
-        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
-          async () => {
-            const isConfirmationGranted = await new Promise<boolean>(
-              (resolve) => {
-                resolveUserDecision = resolve;
-              },
-            );
-            return { isConfirmationGranted };
-          },
-        );
-
-        const orchestrationPromise =
-          permissionRequestLifecycleOrchestrator.orchestrate(
-            'test-origin',
-            mockPermissionRequest,
-            lifecycleHandlerMocks,
-          );
-
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(capturedParams).toBeDefined();
-
-        const createContentCallsBefore =
-          lifecycleHandlerMocks.createConfirmationContent.mock.calls.length;
-
-        await capturedParams.updateContext({ updatedContext: subviewContext });
-
-        expect(
-          mockExistingPermissionsService.showExistingPermissions,
-        ).toHaveBeenCalledWith(expect.any(Object), []);
-        expect(
-          lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenCalledTimes(createContentCallsBefore);
-
-        resolveUserDecision(true);
-        await orchestrationPromise;
-      });
-
-      it('does not re-render confirmation content when trust signals resolve while the existing permissions subview is open', async () => {
-        let resolveDappScan: (result: ScanDappUrlResult) => void = (_) => {
-          throw new Error('resolveDappScan not set');
-        };
-
-        mockTrustSignalsClient.scanDappUrl.mockImplementation(
-          async () =>
-            new Promise<ScanDappUrlResult>((resolve) => {
-              resolveDappScan = resolve;
-            }),
-        );
-        mockTrustSignalsClient.fetchAddressScan.mockImplementation(
-          async () => new Promise<FetchAddressScanResult>(() => {}),
-        );
-
-        const subviewContext: BaseContext = {
-          ...mockContext,
-          showExistingPermissions: true,
-          justification: '',
-          expiry: { timestamp: 1733088000 },
-          accountAddressCaip10: fixedCaip10Address,
-          tokenAddressCaip19: 'eip155:1:0x1234',
-          tokenMetadata: {
-            decimals: 18,
-            symbol: 'TEST',
-            iconDataBase64: null,
-          },
-        };
-
-        let capturedParams: any;
-
-        lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
-          (params) => {
-            capturedParams = params;
-          },
-        );
-
-        let resolveUserDecision: (decision: boolean) => void = (_) => {
-          throw new Error('resolveUserDecision not set');
-        };
-        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
-          async () => {
-            const isConfirmationGranted = await new Promise<boolean>(
-              (resolve) => {
-                resolveUserDecision = resolve;
-              },
-            );
-            return { isConfirmationGranted };
-          },
-        );
-
-        const orchestrationPromise =
-          permissionRequestLifecycleOrchestrator.orchestrate(
-            'test-origin',
-            mockPermissionRequest,
-            lifecycleHandlerMocks,
-          );
-
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(capturedParams).toBeDefined();
-
-        await capturedParams.updateContext({ updatedContext: subviewContext });
-
-        const createContentCallsAfterSubview =
-          lifecycleHandlerMocks.createConfirmationContent.mock.calls.length;
-        const updateContentCallsAfterSubview =
-          mockConfirmationDialog.updateContent.mock.calls.length;
-
-        resolveDappScan({
-          isComplete: true,
-          recommendedAction: RecommendedAction.WARN,
-        });
-
-        await new Promise((resolve) => setTimeout(resolve, 50));
-
-        expect(
-          lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenCalledTimes(createContentCallsAfterSubview);
-        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(
-          updateContentCallsAfterSubview,
-        );
-
-        resolveUserDecision(true);
-        await orchestrationPromise;
-      });
-
-      it('serializes consecutive updateConfirmation calls so they run in order and do not overwrite each other', async () => {
-        // updateConfirmation is called with optional newContext; scan results are read from closure variables.
-        mockTrustSignalsClient.scanDappUrl.mockImplementationOnce(
-          async (): Promise<ScanDappUrlResult> =>
-            new Promise<ScanDappUrlResult>(() => {}),
-        );
-
-        const contextWithMarker = (
-          marker: string,
-        ): BaseContext & { foo?: string } => ({
-          ...mockContext,
-          foo: marker,
-          justification: '',
-          expiry: { timestamp: 1733088000 },
-          isAdjustmentAllowed: true,
-          accountAddressCaip10: 'caip:10:address',
-          tokenAddressCaip19: 'caip:19/asset:address',
-          tokenMetadata: {
-            decimals: 18,
-            symbol: 'TEST',
-            iconDataBase64: null,
-          },
-        });
-
-        const delay = async (ms: number): Promise<void> =>
-          new Promise<void>((resolve) => setTimeout(resolve, ms));
-
-        lifecycleHandlerMocks.createConfirmationContent.mockImplementation(
-          async ({
-            context,
-          }: {
-            context: BaseContext & { foo?: string };
-          }): Promise<SnapElement> => {
-            await delay(10);
-            return {
-              ...mockUiContent,
-              contextMarker: context.foo,
-            } as SnapElement;
-          },
-        );
-
-        let resolveUserDecision: (decision: boolean) => void = (_) => {
-          throw new Error('resolveUserDecision not set');
-        };
-        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
-          async () => {
-            const isConfirmationGranted = await new Promise<boolean>(
-              (resolve) => {
-                resolveUserDecision = resolve;
-              },
-            );
-            return { isConfirmationGranted };
-          },
-        );
-
-        const onConfirmationCreatedPromise = new Promise<{
-          updateContext: (args: {
-            updatedContext: BaseContext & { foo?: string };
-          }) => Promise<void>;
-        }>((resolve) => {
-          lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
-            (params) => {
-              resolve(params);
-            },
-          );
-        });
-
-        const orchestrationPromise =
-          permissionRequestLifecycleOrchestrator.orchestrate(
-            'test-origin',
-            mockPermissionRequest,
-            lifecycleHandlerMocks,
-          );
-
-        const { updateContext } = await onConfirmationCreatedPromise;
-
-        const contextFirst = contextWithMarker('first');
-        const contextSecond = contextWithMarker('second');
-        const contextThird = contextWithMarker('third');
-
-        const initialUpdateContentCalls =
-          mockConfirmationDialog.updateContent.mock.calls.length;
-
-        const promise1 = updateContext({ updatedContext: contextFirst });
-        const promise2 = updateContext({ updatedContext: contextSecond });
-        const promise3 = updateContext({ updatedContext: contextThird });
-
-        await Promise.all([promise1, promise2, promise3]);
-
-        const updateContentCalls =
-          mockConfirmationDialog.updateContent.mock.calls;
-        expect(updateContentCalls.length).toBeGreaterThanOrEqual(
-          initialUpdateContentCalls + 3,
-        );
-
-        // The three updateContext calls may not be at fixed indices (scan callbacks can add earlier updateContent calls), so assert on the last three
-        const lastThreeCalls = updateContentCalls.slice(-3);
-        const firstUpdateUi = lastThreeCalls[0]?.[0]?.ui as SnapElement & {
-          contextMarker?: string;
-        };
-        const secondUpdateUi = lastThreeCalls[1]?.[0]?.ui as SnapElement & {
-          contextMarker?: string;
-        };
-        const thirdUpdateUi = lastThreeCalls[2]?.[0]?.ui as SnapElement & {
-          contextMarker?: string;
-        };
-
-        expect(firstUpdateUi.contextMarker).toBe('first');
-        expect(secondUpdateUi.contextMarker).toBe('second');
-        expect(thirdUpdateUi.contextMarker).toBe('third');
-
-        resolveUserDecision(true);
-        await orchestrationPromise;
-      });
-
-      it('prevents race condition when grant is clicked before debounced validation completes', async () => {
-        // This test simulates the race condition scenario:
-        // 1. User types invalid input → validation debounced (500ms delay)
-        // 2. User clicks Grant before debounce completes (button still enabled)
-        // 3. beforeGrantCallback validates fresh state → detects errors → prevents grant
-
-        let validationErrorsState = {};
-
-        // Mock deriveMetadata to return our controlled validation state
-        lifecycleHandlerMocks.deriveMetadata.mockImplementation(async () => ({
-          test: 'metadata',
-          validationErrors: validationErrorsState,
-        }));
-
-        // Start orchestration
-        const orchestrationPromise =
-          permissionRequestLifecycleOrchestrator.orchestrate(
-            'test-origin',
-            mockPermissionRequest,
-            lifecycleHandlerMocks,
-          );
-
-        // Wait for initial setup
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        // Extract the onBeforeGrant callback that was passed to createConfirmation
-        expect(
-          mockConfirmationDialogFactory.createConfirmation,
-        ).toHaveBeenCalledTimes(1);
-        const createConfirmationCall =
-          mockConfirmationDialogFactory.createConfirmation.mock.calls[0]?.[0];
-
-        if (!createConfirmationCall?.onBeforeGrant) {
-          throw new Error('Expected onBeforeGrant to be defined');
-        }
-
-        const beforeGrantCallback = createConfirmationCall.onBeforeGrant;
-
-        // Valid state: grant should be allowed
-        validationErrorsState = {};
-        let result = await beforeGrantCallback();
-        expect(result).toBe(true);
-
-        // Invalid state (simulating user typed invalid input before debounce completed)
-        validationErrorsState = { amount: 'Amount must be positive' };
-        result = await beforeGrantCallback();
-        expect(result).toBe(false); // Should prevent grant
-
-        // Back to valid state
-        validationErrorsState = {};
-        result = await beforeGrantCallback();
-        expect(result).toBe(true); // Should allow grant
-
-        await orchestrationPromise;
-      });
     });
 
     describe('nominal path', () => {
       /*
-       * The PermissionRequestLifecycleOrchestrator orchestrates a permission request by performing the following steps:
+       * End-to-end orchestrator path after Stage 5: preflight and grant resolution
+       * remain here; confirmation UI lifecycle is owned by ConfirmationSession.
        *
        * 1. Validates and builds the initial permission request.
-       * 2. Creates the confirmation dialog with skeleton UI content.
-       * 3. Builds context, derives metadata and updates the UI content for confirmation.
-       * 4. Applies context to resolve the permission request.
-       * 5. Populates the permission with required values.
-       * 6. Appends caveats to the permission.
-       * 7. Checks and upgrades account if necessary.
-       * 8. Signs the delegation for the permission.
+       * 2. Applies context to resolve the permission request.
+       * 3. Populates the permission with required values.
+       * 4. Appends caveats to the permission.
+       * 5. Signs the delegation for the permission.
        */
 
       beforeEach(async () => {
@@ -1295,88 +682,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 2. Creates the confirmation dialog with skeleton UI content
-       */
-      it('creates the confirmation dialog with skeleton UI content', async () => {
-        expect(
-          lifecycleHandlerMocks.createSkeletonConfirmationContent,
-        ).toHaveBeenCalled();
-
-        expect(
-          mockConfirmationDialogFactory.createConfirmation,
-        ).toHaveBeenCalledWith({
-          dialogInterface: expect.any(Object),
-          ui: mockSkeletonUiContent,
-          onBeforeGrant: expect.any(Function),
-        });
-
-        expect(mockConfirmationDialog.initialize).toHaveBeenCalled();
-
-        expect(
-          mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision,
-        ).toHaveBeenCalled();
-      });
-
-      /*
-       * 3. Builds context, derives metadata and updates the UI content for confirmation.
-       * The orchestrator reads scan results from closure variables when calling createConfirmationContent (not passed into updateConfirmation).
-       */
-      it('builds context, derives metadata and updates the UI content for confirmation', async () => {
-        // Allow time for delayed scan mocks to resolve so we get all 3 createConfirmationContent calls
-        await new Promise<void>((resolve) => setTimeout(resolve, 100));
-
-        expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith(
-          mockPermissionRequest,
-        );
-
-        expect(lifecycleHandlerMocks.deriveMetadata).toHaveBeenCalledWith({
-          context: mockContext,
-        });
-
-        // createConfirmationContent receives scan results from orchestrator closure (initial render, then when each scan resolves)
-        expect(
-          lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenCalledTimes(3);
-
-        expect(
-          lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenNthCalledWith(1, {
-          context: mockContext,
-          metadata: mockMetadata,
-          origin: 'test-origin',
-          chainId: 1,
-          scanDappUrlResult: null,
-          scanAddressResult: null,
-          existingPermissionsStatus: ExistingPermissionsState.None,
-          isGrantDisabled: false,
-        });
-
-        // Final call has both scan results from closure (after both background scans resolve)
-        expect(
-          lifecycleHandlerMocks.createConfirmationContent,
-        ).toHaveBeenNthCalledWith(3, {
-          context: mockContext,
-          metadata: mockMetadata,
-          origin: 'test-origin',
-          chainId: 1,
-          scanDappUrlResult: { isComplete: false },
-          scanAddressResult: mockScanAddressResult,
-          existingPermissionsStatus: ExistingPermissionsState.None,
-          isGrantDisabled: false,
-        });
-
-        expect(mockTrustSignalsClient.fetchAddressScan).toHaveBeenCalledWith(
-          mockPermissionRequest.chainId,
-          mockPermissionRequest.to,
-        );
-
-        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledWith({
-          ui: mockUiContent,
-        });
-      });
-
-      /*
-       * 4. Applies context to resolve the permission request.
+       * 2. Applies context to resolve the permission request.
        */
       it('applies context to resolve the permission request', async () => {
         expect(lifecycleHandlerMocks.applyContext).toHaveBeenCalledWith({
@@ -1386,7 +692,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 5. Populates the permission with required values.
+       * 3. Populates the permission with required values.
        */
       it('populates the permission with required values', async () => {
         expect(lifecycleHandlerMocks.populatePermission).toHaveBeenCalledWith({
@@ -1395,7 +701,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 6. Appends caveats to the permission.
+       * 4. Appends caveats to the permission.
        */
       it('appends caveats to the permission', async () => {
         expect(
@@ -1407,19 +713,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       });
 
       /*
-       * 7. Checks and upgrades account if necessary.
-       */
-      it('checks account upgrade status before processing permission', async () => {
-        expect(
-          mockAccountController.getAccountUpgradeStatus,
-        ).toHaveBeenCalledWith({
-          account: grantingAccountAddress,
-          chainId: '0x1',
-        });
-      });
-
-      /*
-       * 8. Signs the delegation for the permission.
+       * 5. Signs the delegation for the permission.
        */
       it('signs the delegation for the permission', async () => {
         expect(mockAccountController.signDelegation).toHaveBeenCalledWith(

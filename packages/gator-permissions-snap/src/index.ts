@@ -29,6 +29,7 @@ import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
 import { TrustSignalsClient } from './clients/trustSignalsClient';
 import { AccountController } from './core/accountController';
+import { ConfirmationSession } from './core/confirmation/ConfirmationSession';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { ExistingPermissionsCoordinator } from './core/coordinators/ExistingPermissionsCoordinator';
 import { TrustSignalsCoordinator } from './core/coordinators/TrustSignalsCoordinator';
@@ -216,14 +217,20 @@ const trustSignalsCoordinator = new TrustSignalsCoordinator({
   trustSignalsClient,
 });
 
-const orchestrator = new PermissionRequestLifecycleOrchestrator({
-  accountController,
+const confirmationSession = new ConfirmationSession({
+  dialogInterfaceFactory,
   confirmationDialogFactory,
-  snapsMetricsService,
   permissionIntroductionService,
   existingPermissionsCoordinator,
-  dialogInterfaceFactory,
   trustSignalsCoordinator,
+  accountController,
+  snapsMetricsService,
+});
+
+const orchestrator = new PermissionRequestLifecycleOrchestrator({
+  snapsMetricsService,
+  permissionIntroductionService,
+  confirmationSession,
   grantedPermissionResolutionService,
 });
 
