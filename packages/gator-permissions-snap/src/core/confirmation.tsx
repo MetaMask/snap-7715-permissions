@@ -185,7 +185,7 @@ export class ConfirmationDialog {
 
   /**
    * Updates the confirmation dialog content.
-   * Grant enable/disable is encoded in the `ui` tree (for example `PermissionHandlerContent` props).
+   * Grant enable/disable is encoded in the `ui` tree (for example `ConfirmationShellContent` props).
    *
    * @param options - The update options.
    * @param options.ui - The new UI content.
