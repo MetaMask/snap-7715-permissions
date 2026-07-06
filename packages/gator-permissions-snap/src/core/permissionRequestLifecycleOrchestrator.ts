@@ -1,26 +1,10 @@
-import type {
-  Dependency,
-  PermissionRequest,
-  PermissionResponse,
-} from '@metamask/7715-permissions-shared/types';
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import {
   extractDescriptorName,
   logger,
 } from '@metamask/7715-permissions-shared/utils';
-import type { Delegation } from '@metamask/delegation-core';
-import {
-  createNonceTerms,
-  encodeDelegations,
-  ROOT_AUTHORITY,
-} from '@metamask/delegation-core';
-import { InvalidInputError, InvalidParamsError } from '@metamask/snaps-sdk';
-import {
-  bigIntToHex,
-  bytesToHex,
-  hexToNumber,
-  numberToHex,
-  parseCaipAccountId,
-} from '@metamask/utils';
+import { InvalidParamsError } from '@metamask/snaps-sdk';
+import { hexToNumber, numberToHex, parseCaipAccountId } from '@metamask/utils';
 
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
@@ -28,10 +12,8 @@ import type { ConfirmationDialogFactory } from './confirmationFactory';
 import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
 import type { ExistingPermissionsService } from './existingpermissions';
 import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
-import { appendExpiryCaveatIfPresent } from './expiryCaveat';
-import { appendPayeeCaveatIfPresent } from './payeeCaveat';
+import type { GrantedPermissionResolutionService } from './grant/GrantedPermissionResolutionService';
 import type { PermissionIntroductionService } from './permissionIntroduction';
-import { appendRedeemerCaveatIfPresent } from './redeemerCaveat';
 import { normalizePermissionRequestWithSentinelRedeemerRule } from './sentinelRedeemer';
 import type {
   BaseContext,
@@ -45,7 +27,6 @@ import type {
   ScanDappUrlResult,
   TrustSignalsClient,
 } from '../clients/trustSignalsClient';
-import type { NonceCaveatService } from '../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 /**
@@ -57,8 +38,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
-  readonly #nonceCaveatService: NonceCaveatService;
-
   readonly #snapsMetricsService: SnapsMetricsService;
 
   readonly #permissionIntroductionService: PermissionIntroductionService;
@@ -69,33 +48,36 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #trustSignalsClient: TrustSignalsClient;
 
+  readonly #grantedPermissionResolutionService: GrantedPermissionResolutionService;
+
   constructor({
     accountController,
     confirmationDialogFactory,
-    nonceCaveatService,
     snapsMetricsService,
     permissionIntroductionService,
     existingPermissionsService,
     dialogInterfaceFactory,
     trustSignalsClient,
+    grantedPermissionResolutionService,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
-    nonceCaveatService: NonceCaveatService;
     snapsMetricsService: SnapsMetricsService;
     permissionIntroductionService: PermissionIntroductionService;
     existingPermissionsService: ExistingPermissionsService;
     dialogInterfaceFactory: DialogInterfaceFactory;
     trustSignalsClient: TrustSignalsClient;
+    grantedPermissionResolutionService: GrantedPermissionResolutionService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
-    this.#nonceCaveatService = nonceCaveatService;
     this.#snapsMetricsService = snapsMetricsService;
     this.#permissionIntroductionService = permissionIntroductionService;
     this.#existingPermissionsService = existingPermissionsService;
     this.#dialogInterfaceFactory = dialogInterfaceFactory;
     this.#trustSignalsClient = trustSignalsClient;
+    this.#grantedPermissionResolutionService =
+      grantedPermissionResolutionService;
   }
 
   /**
@@ -462,14 +444,16 @@ export class PermissionRequestLifecycleOrchestrator {
           // TODO: When we know extension has support for account upgrade, we can show an error to the user
         }
 
-        const response = await this.#resolveResponse({
-          originalRequest: normalizedPermissionRequest,
-          modifiedContext: context,
-          lifecycleHandlers,
-          isAdjustmentAllowed,
-          chainId,
-          origin,
-        });
+        const response = await this.#grantedPermissionResolutionService.resolve(
+          {
+            originalRequest: normalizedPermissionRequest,
+            modifiedContext: context,
+            lifecycleHandlers,
+            isAdjustmentAllowed,
+            chainId,
+            origin,
+          },
+        );
 
         return {
           approved: true,
@@ -498,183 +482,5 @@ export class PermissionRequestLifecycleOrchestrator {
         lifecycleHandlers.onConfirmationResolved();
       }
     }
-  }
-
-  /**
-   * Resolves a permission request into a final permission response.
-   * @template TRequest - Type of permission request
-   * @template TContext - Type of context for the permission request.
-   * @template TMetadata - Type of metadata associated with the permission request.
-   * @template TPermission - Type of permission being requested.
-   * @template TPopulatedPermission - Type of fully populated permission with all required fields.
-   * @param params - Parameters for resolving the response.
-   * @param params.originalRequest - The original unmodified permission request.
-   * @param params.modifiedContext - The possibly modified context after user interaction.
-   * @param params.isAdjustmentAllowed - Whether the permission can be adjusted.
-   * @param params.chainId - The chain ID for the permission.
-   * @param params.origin - The origin of the permission request.
-   * @param params.lifecycleHandlers - Handlers for the permission lifecycle.
-   * @returns The resolved permission response.
-   */
-  async #resolveResponse<
-    TRequest extends PermissionRequest,
-    TContext extends BaseContext,
-    TMetadata extends object,
-    TPermission extends TRequest['permission'],
-    TPopulatedPermission extends DeepRequired<TPermission>,
-  >({
-    originalRequest,
-    modifiedContext,
-    isAdjustmentAllowed,
-    chainId,
-    origin,
-    lifecycleHandlers,
-  }: {
-    originalRequest: TRequest;
-    modifiedContext: TContext;
-    isAdjustmentAllowed: boolean;
-    chainId: number;
-    origin: string;
-    lifecycleHandlers: LifecycleOrchestrationHandlers<
-      TRequest,
-      TContext,
-      TMetadata,
-      TPermission,
-      TPopulatedPermission
-    >;
-  }): Promise<PermissionResponse> {
-    const permissionType = extractDescriptorName(
-      originalRequest.permission.type,
-    );
-
-    // apply the changes made to the context to the request
-    const resolvedRequest = await lifecycleHandlers.applyContext({
-      context: modifiedContext,
-      originalRequest,
-    });
-
-    // populate optional values of the permission
-    const populatedPermission = await lifecycleHandlers.populatePermission({
-      permission: resolvedRequest.permission as TPermission,
-    });
-
-    // the actual permission being granted
-    const grantedPermissionRequest = {
-      ...resolvedRequest,
-      permission: populatedPermission,
-      isAdjustmentAllowed,
-    };
-
-    const { from, to } = grantedPermissionRequest;
-    if (!from) {
-      throw new InvalidInputError('Address is undefined');
-    }
-    if (!to) {
-      throw new InvalidInputError('Delegate address is undefined');
-    }
-
-    const { contracts } = getChainMetadata({ chainId });
-
-    const caveats = await lifecycleHandlers.createPermissionCaveats({
-      permission: populatedPermission,
-      contracts,
-    });
-
-    appendExpiryCaveatIfPresent({
-      rules: resolvedRequest.rules,
-      contracts,
-      caveats,
-    });
-
-    appendRedeemerCaveatIfPresent({
-      rules: resolvedRequest.rules,
-      contracts,
-      caveats,
-    });
-
-    appendPayeeCaveatIfPresent({
-      rules: resolvedRequest.rules,
-      contracts,
-      caveats,
-      permissionType,
-    });
-
-    const nonce = await this.#nonceCaveatService.getNonce({
-      chainId,
-      account: from,
-    });
-
-    caveats.push({
-      enforcer: contracts.nonceEnforcer,
-      terms: createNonceTerms({
-        nonce: bigIntToHex(nonce),
-      }),
-      args: '0x',
-    });
-
-    // eslint-disable-next-line no-restricted-globals
-    const saltBytes = crypto.getRandomValues(new Uint8Array(32));
-    const salt = bytesToHex(saltBytes);
-
-    const delegation = {
-      delegate: to,
-      authority: ROOT_AUTHORITY,
-      delegator: from,
-      caveats,
-      salt: BigInt(salt),
-    } as const;
-
-    const { justification } = modifiedContext;
-
-    let signedDelegation: Delegation;
-    let signingSuccess = false;
-    let signingError: Error | undefined;
-    try {
-      signedDelegation = await this.#accountController.signDelegation({
-        chainId,
-        delegation,
-        address: from,
-        origin,
-        justification,
-      });
-      signingSuccess = true;
-    } catch (error) {
-      signingError = error as Error;
-      throw error;
-    } finally {
-      // Track delegation signing result
-      await this.#snapsMetricsService.trackDelegationSigning({
-        origin,
-        permissionType,
-        success: signingSuccess,
-        ...(signingError && { errorMessage: signingError.message }),
-      });
-    }
-
-    const context = encodeDelegations([signedDelegation], { out: 'hex' });
-
-    // dependencies is always empty for EIP-7702 accounts
-    const dependencies: Dependency[] = [];
-
-    const response: PermissionResponse = {
-      ...grantedPermissionRequest,
-      chainId: numberToHex(chainId),
-      from,
-      dependencies,
-      context,
-      delegationManager: contracts.delegationManager,
-    };
-
-    // Track successful permission grant
-    await this.#snapsMetricsService.trackPermissionGranted({
-      origin,
-      permissionType,
-      chainId: numberToHex(chainId),
-      permissionData: populatedPermission.data,
-      justification: modifiedContext.justification,
-      isAdjustmentAllowed,
-    });
-
-    return response;
   }
 }

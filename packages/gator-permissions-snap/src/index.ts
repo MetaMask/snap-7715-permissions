@@ -32,6 +32,7 @@ import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from './core/existingpermissions';
+import { GrantedPermissionResolutionService } from './core/grant/GrantedPermissionResolutionService';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
@@ -198,15 +199,22 @@ const dialogInterfaceFactory = new DialogInterfaceFactory({
   snap,
 });
 
+const grantedPermissionResolutionService =
+  new GrantedPermissionResolutionService({
+    accountController,
+    nonceCaveatService,
+    snapsMetricsService,
+  });
+
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
-  nonceCaveatService,
   snapsMetricsService,
   permissionIntroductionService,
   existingPermissionsService,
   dialogInterfaceFactory,
   trustSignalsClient,
+  grantedPermissionResolutionService,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({

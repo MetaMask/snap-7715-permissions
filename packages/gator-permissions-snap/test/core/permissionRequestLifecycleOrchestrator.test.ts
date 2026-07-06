@@ -25,6 +25,7 @@ import {
   ExistingPermissionsService,
   ExistingPermissionsState,
 } from '../../src/core/existingpermissions/existingPermissionsService';
+import { GrantedPermissionResolutionService } from '../../src/core/grant/GrantedPermissionResolutionService';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
 import { SENTINEL_REDEEMER_ADDRESSES } from '../../src/core/sentinelRedeemer';
@@ -194,10 +195,19 @@ type TestLifecycleHandlersMocks = {
 
 describe('PermissionRequestLifecycleOrchestrator', () => {
   let permissionRequestLifecycleOrchestrator: PermissionRequestLifecycleOrchestrator;
+  let grantedPermissionResolutionService: GrantedPermissionResolutionService;
   let lifecycleHandlerMocks: TestLifecycleHandlersMocks;
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    grantedPermissionResolutionService = new GrantedPermissionResolutionService(
+      {
+        accountController: mockAccountController,
+        nonceCaveatService: mockNonceCaveatService,
+        snapsMetricsService: mockSnapsMetricsService,
+      },
+    );
 
     // Reset existing permissions service mocks after clearing
     mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
@@ -265,12 +275,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       new PermissionRequestLifecycleOrchestrator({
         accountController: mockAccountController,
         confirmationDialogFactory: mockConfirmationDialogFactory,
-        nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
         existingPermissionsService: mockExistingPermissionsService,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
         trustSignalsClient: mockTrustSignalsClient,
+        grantedPermissionResolutionService,
       });
   });
 
@@ -279,12 +289,12 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       const instance = new PermissionRequestLifecycleOrchestrator({
         accountController: mockAccountController,
         confirmationDialogFactory: mockConfirmationDialogFactory,
-        nonceCaveatService: mockNonceCaveatService,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
         existingPermissionsService: mockExistingPermissionsService,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
         trustSignalsClient: mockTrustSignalsClient,
+        grantedPermissionResolutionService,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });
