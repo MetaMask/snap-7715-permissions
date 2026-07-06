@@ -9,9 +9,9 @@ import { hexToNumber, numberToHex, parseCaipAccountId } from '@metamask/utils';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import type { ConfirmationDialogFactory } from './confirmationFactory';
+import type { ExistingPermissionsCoordinator } from './coordinators/ExistingPermissionsCoordinator';
+import type { TrustSignalsCoordinator } from './coordinators/TrustSignalsCoordinator';
 import type { DialogInterfaceFactory } from './dialogInterfaceFactory';
-import type { ExistingPermissionsService } from './existingpermissions';
-import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
 import type { GrantedPermissionResolutionService } from './grant/GrantedPermissionResolutionService';
 import type { PermissionIntroductionService } from './permissionIntroduction';
 import { normalizePermissionRequestWithSentinelRedeemerRule } from './sentinelRedeemer';
@@ -22,11 +22,6 @@ import type {
   LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
-import type {
-  FetchAddressScanResult,
-  ScanDappUrlResult,
-  TrustSignalsClient,
-} from '../clients/trustSignalsClient';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 /**
@@ -42,11 +37,11 @@ export class PermissionRequestLifecycleOrchestrator {
 
   readonly #permissionIntroductionService: PermissionIntroductionService;
 
-  readonly #existingPermissionsService: ExistingPermissionsService;
+  readonly #existingPermissionsCoordinator: ExistingPermissionsCoordinator;
 
   readonly #dialogInterfaceFactory: DialogInterfaceFactory;
 
-  readonly #trustSignalsClient: TrustSignalsClient;
+  readonly #trustSignalsCoordinator: TrustSignalsCoordinator;
 
   readonly #grantedPermissionResolutionService: GrantedPermissionResolutionService;
 
@@ -55,27 +50,27 @@ export class PermissionRequestLifecycleOrchestrator {
     confirmationDialogFactory,
     snapsMetricsService,
     permissionIntroductionService,
-    existingPermissionsService,
+    existingPermissionsCoordinator,
     dialogInterfaceFactory,
-    trustSignalsClient,
+    trustSignalsCoordinator,
     grantedPermissionResolutionService,
   }: {
     accountController: AccountController;
     confirmationDialogFactory: ConfirmationDialogFactory;
     snapsMetricsService: SnapsMetricsService;
     permissionIntroductionService: PermissionIntroductionService;
-    existingPermissionsService: ExistingPermissionsService;
+    existingPermissionsCoordinator: ExistingPermissionsCoordinator;
     dialogInterfaceFactory: DialogInterfaceFactory;
-    trustSignalsClient: TrustSignalsClient;
+    trustSignalsCoordinator: TrustSignalsCoordinator;
     grantedPermissionResolutionService: GrantedPermissionResolutionService;
   }) {
     this.#accountController = accountController;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#snapsMetricsService = snapsMetricsService;
     this.#permissionIntroductionService = permissionIntroductionService;
-    this.#existingPermissionsService = existingPermissionsService;
+    this.#existingPermissionsCoordinator = existingPermissionsCoordinator;
     this.#dialogInterfaceFactory = dialogInterfaceFactory;
-    this.#trustSignalsClient = trustSignalsClient;
+    this.#trustSignalsCoordinator = trustSignalsCoordinator;
     this.#grantedPermissionResolutionService =
       grantedPermissionResolutionService;
   }
@@ -125,11 +120,11 @@ export class PermissionRequestLifecycleOrchestrator {
     >,
   ): Promise<PermissionRequestResult> {
     const chainId = hexToNumber(permissionRequest.chainId);
+    this.#assertIsSupportedChainId(chainId);
+
     const permissionType = extractDescriptorName(
       permissionRequest.permission.type,
     );
-
-    this.#assertIsSupportedChainId(chainId);
 
     // Track permission request started
     await this.#snapsMetricsService.trackPermissionRequestStarted({
@@ -153,31 +148,13 @@ export class PermissionRequestLifecycleOrchestrator {
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
 
-    // One profile-sync read per permission request: same snapshot drives the banner and the
-    // "review existing" list. getExistingPermissions() already resolves to [] on failure (never rejects).
-    const existingPermissionsForOriginPromise =
-      this.#existingPermissionsService.getExistingPermissions(origin);
-
-    // Derive banner state from that snapshot in parallel with the introduction flow.
-    // Chain .catch() so the promise never rejects: if the user cancels at intro we return
-    // without awaiting it, and any processing error should not cause an unhandled rejection.
-    const existingPermissionsStatusPromise = existingPermissionsForOriginPromise
-      .then((list) =>
-        this.#existingPermissionsService.getExistingPermissionsStatusFromList(
-          list,
-          normalizedPermissionRequest.permission,
-        ),
-      )
-      .catch((error: unknown) => {
-        logger.error(
-          'PermissionRequestLifecycleOrchestrator: existing permissions status from snapshot failed',
-          {
-            origin,
-            error: error instanceof Error ? error.message : error,
-          },
-        );
-        return ExistingPermissionsState.None;
-      });
+    const {
+      snapshotPromise: existingPermissionsForOriginPromise,
+      statusPromise: existingPermissionsStatusPromise,
+    } = this.#existingPermissionsCoordinator.prefetch(
+      origin,
+      normalizedPermissionRequest.permission,
+    );
 
     // Check if we need to show introduction
     if (
@@ -262,9 +239,6 @@ export class PermissionRequestLifecycleOrchestrator {
 
     let lastUpdateConfirmationPromise: Promise<void> = Promise.resolve();
 
-    let scanDappUrlResult: ScanDappUrlResult | null = null;
-    let scanAddressResult: FetchAddressScanResult | null = null;
-
     /** Avoid re-running skeleton + format when trust-signal refreshes fire while the subview is open. */
     let existingPermissionsSubviewActive = false;
 
@@ -287,32 +261,41 @@ export class PermissionRequestLifecycleOrchestrator {
 
         const grantDisabled = isGrantDisabled || hasValidationErrors(metadata);
 
+        const { scanDappUrlResult, scanAddressResult } =
+          this.#trustSignalsCoordinator.getResults();
+
         if (context.showExistingPermissions) {
-          if (!existingPermissionsSubviewActive) {
+          const enteringSubview = !existingPermissionsSubviewActive;
+          if (enteringSubview) {
             // Set synchronously before awaits so eslint require-atomic-updates is satisfied;
             // runUpdate calls are serialized via lastUpdateConfirmationPromise.
             existingPermissionsSubviewActive = true;
-            const snapshot = await existingPermissionsForOriginPromise;
-            await this.#existingPermissionsService.showExistingPermissions(
-              dialogInterface,
-              snapshot,
-            );
           }
-        } else {
-          existingPermissionsSubviewActive = false;
-          const ui = await lifecycleHandlers.createConfirmationContent({
+
+          await this.#existingPermissionsCoordinator.maybeShowSubview({
+            dialogInterface,
             context,
-            metadata,
-            origin,
-            chainId,
-            scanDappUrlResult,
-            scanAddressResult,
-            existingPermissionsStatus,
-            isGrantDisabled: grantDisabled,
+            enteringSubview,
+            snapshotPromise: existingPermissionsForOriginPromise,
           });
 
-          await confirmationDialog.updateContent({ ui });
+          return;
         }
+
+        existingPermissionsSubviewActive = false;
+
+        const ui = await lifecycleHandlers.createConfirmationContent({
+          context,
+          metadata,
+          origin,
+          chainId,
+          scanDappUrlResult,
+          scanAddressResult,
+          existingPermissionsStatus,
+          isGrantDisabled: grantDisabled,
+        });
+
+        await confirmationDialog.updateContent({ ui });
       };
 
       lastUpdateConfirmationPromise =
@@ -321,43 +304,21 @@ export class PermissionRequestLifecycleOrchestrator {
       await lastUpdateConfirmationPromise;
     };
 
-    // Scan dapp URL in the background; only update when the client resolves (non-blocking)
-    this.#trustSignalsClient
-      .scanDappUrl(origin)
-      .then(async (result) => {
-        scanDappUrlResult = result;
-        return updateConfirmation({
+    this.#trustSignalsCoordinator.start({
+      origin,
+      chainId: normalizedPermissionRequest.chainId,
+      delegateAddress: normalizedPermissionRequest.to,
+      onResults: () => {
+        updateConfirmation({
           isGrantDisabled: false,
-        });
-      })
-      .catch((error) => {
-        logger.debug(
-          'PermissionRequestLifecycleOrchestrator: dapp URL scan or UI update failed',
-          { origin, error: error instanceof Error ? error.message : error },
-        );
-      });
-
-    // Address scan in the background; only update when the client resolves (non-blocking)
-    const delegateAddress = normalizedPermissionRequest.to;
-    if (delegateAddress) {
-      this.#trustSignalsClient
-        .fetchAddressScan(normalizedPermissionRequest.chainId, delegateAddress)
-        .then(async (result) => {
-          scanAddressResult = result;
-          return updateConfirmation({
-            isGrantDisabled: false,
-          });
-        })
-        .catch((error) => {
+        }).catch((error: unknown) => {
           logger.debug(
-            'PermissionRequestLifecycleOrchestrator: address scan or UI update failed',
-            {
-              address: delegateAddress,
-              error: error instanceof Error ? error.message : error,
-            },
+            'PermissionRequestLifecycleOrchestrator: trust signal UI update failed',
+            { origin, error: error instanceof Error ? error.message : error },
           );
         });
-    }
+      },
+    });
 
     // replace the skeleton content with the actual content rendered with the resolved context
     try {

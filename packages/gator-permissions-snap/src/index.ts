@@ -30,6 +30,8 @@ import { PriceApiClient } from './clients/priceApiClient';
 import { TrustSignalsClient } from './clients/trustSignalsClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
+import { ExistingPermissionsCoordinator } from './core/coordinators/ExistingPermissionsCoordinator';
+import { TrustSignalsCoordinator } from './core/coordinators/TrustSignalsCoordinator';
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from './core/existingpermissions';
 import { GrantedPermissionResolutionService } from './core/grant/GrantedPermissionResolutionService';
@@ -206,14 +208,22 @@ const grantedPermissionResolutionService =
     snapsMetricsService,
   });
 
+const existingPermissionsCoordinator = new ExistingPermissionsCoordinator({
+  existingPermissionsService,
+});
+
+const trustSignalsCoordinator = new TrustSignalsCoordinator({
+  trustSignalsClient,
+});
+
 const orchestrator = new PermissionRequestLifecycleOrchestrator({
   accountController,
   confirmationDialogFactory,
   snapsMetricsService,
   permissionIntroductionService,
-  existingPermissionsService,
+  existingPermissionsCoordinator,
   dialogInterfaceFactory,
-  trustSignalsClient,
+  trustSignalsCoordinator,
   grantedPermissionResolutionService,
 });
 

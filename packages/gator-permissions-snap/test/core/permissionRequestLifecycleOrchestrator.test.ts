@@ -15,11 +15,16 @@ import type {
   ScanDappUrlResult,
   TrustSignalsClient,
 } from '../../src/clients/trustSignalsClient';
-import { AddressScanResultType } from '../../src/clients/trustSignalsClient';
+import {
+  AddressScanResultType,
+  RecommendedAction,
+} from '../../src/clients/trustSignalsClient';
 import type { AccountController } from '../../src/core/accountController';
 import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
+import { ExistingPermissionsCoordinator } from '../../src/core/coordinators/ExistingPermissionsCoordinator';
+import { TrustSignalsCoordinator } from '../../src/core/coordinators/TrustSignalsCoordinator';
 import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFactory';
 import {
   ExistingPermissionsService,
@@ -196,6 +201,8 @@ type TestLifecycleHandlersMocks = {
 describe('PermissionRequestLifecycleOrchestrator', () => {
   let permissionRequestLifecycleOrchestrator: PermissionRequestLifecycleOrchestrator;
   let grantedPermissionResolutionService: GrantedPermissionResolutionService;
+  let existingPermissionsCoordinator: ExistingPermissionsCoordinator;
+  let trustSignalsCoordinator: TrustSignalsCoordinator;
   let lifecycleHandlerMocks: TestLifecycleHandlersMocks;
 
   beforeEach(() => {
@@ -208,6 +215,14 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         snapsMetricsService: mockSnapsMetricsService,
       },
     );
+
+    existingPermissionsCoordinator = new ExistingPermissionsCoordinator({
+      existingPermissionsService: mockExistingPermissionsService,
+    });
+
+    trustSignalsCoordinator = new TrustSignalsCoordinator({
+      trustSignalsClient: mockTrustSignalsClient,
+    });
 
     // Reset existing permissions service mocks after clearing
     mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
@@ -277,9 +292,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         confirmationDialogFactory: mockConfirmationDialogFactory,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
-        existingPermissionsService: mockExistingPermissionsService,
+        existingPermissionsCoordinator,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
-        trustSignalsClient: mockTrustSignalsClient,
+        trustSignalsCoordinator,
         grantedPermissionResolutionService,
       });
   });
@@ -291,9 +306,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
         confirmationDialogFactory: mockConfirmationDialogFactory,
         snapsMetricsService: mockSnapsMetricsService,
         permissionIntroductionService: mockPermissionIntroductionService,
-        existingPermissionsService: mockExistingPermissionsService,
+        existingPermissionsCoordinator,
         dialogInterfaceFactory: mockDialogInterfaceFactory,
-        trustSignalsClient: mockTrustSignalsClient,
+        trustSignalsCoordinator,
         grantedPermissionResolutionService,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
@@ -909,6 +924,157 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           context: modifiedContext,
           originalRequest: mockPermissionRequest,
         });
+      });
+
+      it('shows the existing permissions subview when updateContext sets showExistingPermissions', async () => {
+        const subviewContext: BaseContext = {
+          ...mockContext,
+          showExistingPermissions: true,
+          justification: '',
+          expiry: { timestamp: 1733088000 },
+          accountAddressCaip10: fixedCaip10Address,
+          tokenAddressCaip19: 'eip155:1:0x1234',
+          tokenMetadata: {
+            decimals: 18,
+            symbol: 'TEST',
+            iconDataBase64: null,
+          },
+        };
+
+        let capturedParams: any;
+
+        lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+          (params) => {
+            capturedParams = params;
+          },
+        );
+
+        let resolveUserDecision: (decision: boolean) => void = (_) => {
+          throw new Error('resolveUserDecision not set');
+        };
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
+          async () => {
+            const isConfirmationGranted = await new Promise<boolean>(
+              (resolve) => {
+                resolveUserDecision = resolve;
+              },
+            );
+            return { isConfirmationGranted };
+          },
+        );
+
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequest,
+            lifecycleHandlerMocks,
+          );
+
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(capturedParams).toBeDefined();
+
+        const createContentCallsBefore =
+          lifecycleHandlerMocks.createConfirmationContent.mock.calls.length;
+
+        await capturedParams.updateContext({ updatedContext: subviewContext });
+
+        expect(
+          mockExistingPermissionsService.showExistingPermissions,
+        ).toHaveBeenCalledWith(expect.any(Object), []);
+        expect(
+          lifecycleHandlerMocks.createConfirmationContent,
+        ).toHaveBeenCalledTimes(createContentCallsBefore);
+
+        resolveUserDecision(true);
+        await orchestrationPromise;
+      });
+
+      it('does not re-render confirmation content when trust signals resolve while the existing permissions subview is open', async () => {
+        let resolveDappScan: (result: ScanDappUrlResult) => void = (_) => {
+          throw new Error('resolveDappScan not set');
+        };
+
+        mockTrustSignalsClient.scanDappUrl.mockImplementation(
+          async () =>
+            new Promise<ScanDappUrlResult>((resolve) => {
+              resolveDappScan = resolve;
+            }),
+        );
+        mockTrustSignalsClient.fetchAddressScan.mockImplementation(
+          async () => new Promise<FetchAddressScanResult>(() => {}),
+        );
+
+        const subviewContext: BaseContext = {
+          ...mockContext,
+          showExistingPermissions: true,
+          justification: '',
+          expiry: { timestamp: 1733088000 },
+          accountAddressCaip10: fixedCaip10Address,
+          tokenAddressCaip19: 'eip155:1:0x1234',
+          tokenMetadata: {
+            decimals: 18,
+            symbol: 'TEST',
+            iconDataBase64: null,
+          },
+        };
+
+        let capturedParams: any;
+
+        lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+          (params) => {
+            capturedParams = params;
+          },
+        );
+
+        let resolveUserDecision: (decision: boolean) => void = (_) => {
+          throw new Error('resolveUserDecision not set');
+        };
+        mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
+          async () => {
+            const isConfirmationGranted = await new Promise<boolean>(
+              (resolve) => {
+                resolveUserDecision = resolve;
+              },
+            );
+            return { isConfirmationGranted };
+          },
+        );
+
+        const orchestrationPromise =
+          permissionRequestLifecycleOrchestrator.orchestrate(
+            'test-origin',
+            mockPermissionRequest,
+            lifecycleHandlerMocks,
+          );
+
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(capturedParams).toBeDefined();
+
+        await capturedParams.updateContext({ updatedContext: subviewContext });
+
+        const createContentCallsAfterSubview =
+          lifecycleHandlerMocks.createConfirmationContent.mock.calls.length;
+        const updateContentCallsAfterSubview =
+          mockConfirmationDialog.updateContent.mock.calls.length;
+
+        resolveDappScan({
+          isComplete: true,
+          recommendedAction: RecommendedAction.WARN,
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        expect(
+          lifecycleHandlerMocks.createConfirmationContent,
+        ).toHaveBeenCalledTimes(createContentCallsAfterSubview);
+        expect(mockConfirmationDialog.updateContent).toHaveBeenCalledTimes(
+          updateContentCallsAfterSubview,
+        );
+
+        resolveUserDecision(true);
+        await orchestrationPromise;
       });
 
       it('serializes consecutive updateConfirmation calls so they run in order and do not overwrite each other', async () => {
