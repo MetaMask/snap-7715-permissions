@@ -6,7 +6,6 @@ import type { PermissionGrantPipeline } from '../PermissionGrantPipeline';
 import type { PermissionRequestResult } from '../types';
 import type { ConfirmationShellFactory } from './ConfirmationShellFactory';
 import { buildGrantLifecycleHandlers } from './PermissionModule';
-import type { PermissionModule } from './PermissionModule';
 import type { PermissionRegistry } from './PermissionRegistry';
 
 /**
@@ -49,7 +48,7 @@ export class PermissionRequestProcessor {
     request: PermissionRequest,
   ): Promise<PermissionRequestResult> {
     const type = extractDescriptorName(request.permission.type);
-    const module = this.#registry.get(type) as PermissionModule;
+    const module = this.#registry.get(type);
     const confirmationShell = this.#confirmationShellFactory.create({
       module,
       permissionRequest: request,

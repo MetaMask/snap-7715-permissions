@@ -243,7 +243,6 @@ const confirmationSession = new ConfirmationSession({
 
 const permissionGrantPipeline = new PermissionGrantPipeline({
   permissionGrantPreparator,
-  introductionPhase,
   confirmationSession,
   grantedPermissionResolutionService,
 });

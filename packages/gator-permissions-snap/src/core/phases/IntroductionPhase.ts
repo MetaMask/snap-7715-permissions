@@ -8,9 +8,7 @@ import type { PermissionIntroductionService } from '../permissionIntroduction';
 /**
  * Result of running the permission introduction step.
  */
-export type IntroductionPhaseResult =
-  | { cancelled: true }
-  | { cancelled: false };
+export type IntroductionPhaseResult = { cancelled: boolean };
 
 /**
  * Wraps first-time permission introduction UI, rejection metrics, and seen-state updates.

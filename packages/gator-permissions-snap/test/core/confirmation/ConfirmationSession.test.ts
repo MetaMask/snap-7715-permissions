@@ -102,6 +102,7 @@ const mockSnapsMetricsService = {
 } as unknown as jest.Mocked<SnapsMetricsService>;
 
 const mockPermissionIntroductionService = {
+  shouldShowIntroduction: jest.fn().mockResolvedValue(false),
   markIntroductionAsSeen: jest.fn().mockResolvedValue(undefined),
   showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
@@ -159,7 +160,6 @@ describe('ConfirmationSession', () => {
 
   const runSession = async (
     overrides: {
-      shouldShowIntroduction?: boolean;
       normalizedRequest?: PermissionRequest;
     } = {},
   ): Promise<ConfirmationSessionResult<BaseContext>> =>
@@ -169,7 +169,6 @@ describe('ConfirmationSession', () => {
       normalizedRequest: overrides.normalizedRequest ?? mockPermissionRequest,
       chainId: 1,
       lifecycleHandlers: lifecycleHandlerMocks as never,
-      shouldShowIntroduction: overrides.shouldShowIntroduction ?? false,
     });
 
   beforeEach(() => {
@@ -228,6 +227,9 @@ describe('ConfirmationSession', () => {
       mockScanAddressResult,
     );
 
+    mockPermissionIntroductionService.shouldShowIntroduction.mockResolvedValue(
+      false,
+    );
     mockPermissionIntroductionService.showIntroduction.mockResolvedValue({
       wasCancelled: false,
     });
@@ -341,11 +343,14 @@ describe('ConfirmationSession', () => {
   });
 
   it('returns rejected when the user cancels at introduction', async () => {
+    mockPermissionIntroductionService.shouldShowIntroduction.mockResolvedValueOnce(
+      true,
+    );
     mockPermissionIntroductionService.showIntroduction.mockResolvedValueOnce({
       wasCancelled: true,
     });
 
-    const result = await runSession({ shouldShowIntroduction: true });
+    const result = await runSession();
 
     expect(result).toStrictEqual({
       isApproved: false,
@@ -357,7 +362,11 @@ describe('ConfirmationSession', () => {
   });
 
   it('marks introduction as seen after a successful intro', async () => {
-    await runSession({ shouldShowIntroduction: true });
+    mockPermissionIntroductionService.shouldShowIntroduction.mockResolvedValueOnce(
+      true,
+    );
+
+    await runSession();
 
     expect(
       mockPermissionIntroductionService.markIntroductionAsSeen,
@@ -600,6 +609,9 @@ describe('ConfirmationSession', () => {
   it('passes the same dialog interface to intro and confirmation', async () => {
     let capturedIntroDialogInterface: unknown;
 
+    mockPermissionIntroductionService.shouldShowIntroduction.mockResolvedValueOnce(
+      true,
+    );
     mockPermissionIntroductionService.showIntroduction.mockImplementation(
       async ({ dialogInterface }) => {
         capturedIntroDialogInterface = dialogInterface;
@@ -607,7 +619,7 @@ describe('ConfirmationSession', () => {
       },
     );
 
-    await runSession({ shouldShowIntroduction: true });
+    await runSession();
 
     expect(
       mockPermissionIntroductionService.showIntroduction,

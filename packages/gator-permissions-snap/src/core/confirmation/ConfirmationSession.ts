@@ -78,7 +78,6 @@ export class ConfirmationSession {
    * @param args.normalizedRequest - Validated and normalized permission request.
    * @param args.chainId - Numeric chain ID for confirmation rendering.
    * @param args.lifecycleHandlers - Permission-specific lifecycle callbacks.
-   * @param args.shouldShowIntroduction - Whether to show the first-time intro screen.
    * @returns Approved context or rejection reason with the phase where it occurred.
    */
   async run<
@@ -99,7 +98,6 @@ export class ConfirmationSession {
       TPermission,
       TPopulatedPermission
     >;
-    shouldShowIntroduction: boolean;
   }): Promise<ConfirmationSessionResult<TContext>> {
     const {
       origin,
@@ -107,7 +105,6 @@ export class ConfirmationSession {
       normalizedRequest,
       chainId,
       lifecycleHandlers,
-      shouldShowIntroduction,
     } = args;
 
     const dialogInterface =
@@ -120,6 +117,9 @@ export class ConfirmationSession {
       origin,
       normalizedRequest.permission,
     );
+
+    const shouldShowIntroduction =
+      await this.#introductionPhase.shouldShow(permissionType);
 
     if (shouldShowIntroduction) {
       const introResult = await this.#introductionPhase.run({

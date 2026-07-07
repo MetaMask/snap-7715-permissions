@@ -4,7 +4,6 @@ import type { ConfirmationSession } from './confirmation/ConfirmationSession';
 import type { GrantedPermissionResolutionService } from './grant/GrantedPermissionResolutionService';
 import type { PermissionGrantLifecycleHandlers } from './permission/PermissionGrantLifecycleHandlers';
 import type { PermissionGrantPreparator } from './PermissionGrantPreparator';
-import type { IntroductionPhase } from './phases/IntroductionPhase';
 import type {
   BaseContext,
   BaseMetadata,
@@ -19,25 +18,20 @@ import type {
 export class PermissionGrantPipeline {
   readonly #permissionGrantPreparator: PermissionGrantPreparator;
 
-  readonly #introductionPhase: IntroductionPhase;
-
   readonly #confirmationSession: ConfirmationSession;
 
   readonly #grantedPermissionResolutionService: GrantedPermissionResolutionService;
 
   constructor({
     permissionGrantPreparator,
-    introductionPhase,
     confirmationSession,
     grantedPermissionResolutionService,
   }: {
     permissionGrantPreparator: PermissionGrantPreparator;
-    introductionPhase: IntroductionPhase;
     confirmationSession: ConfirmationSession;
     grantedPermissionResolutionService: GrantedPermissionResolutionService;
   }) {
     this.#permissionGrantPreparator = permissionGrantPreparator;
-    this.#introductionPhase = introductionPhase;
     this.#confirmationSession = confirmationSession;
     this.#grantedPermissionResolutionService =
       grantedPermissionResolutionService;
@@ -83,16 +77,12 @@ export class PermissionGrantPipeline {
 
     const { normalizedRequest, chainId, permissionType } = preparationResult;
 
-    const shouldShowIntroduction =
-      await this.#introductionPhase.shouldShow(permissionType);
-
     const sessionResult = await this.#confirmationSession.run({
       origin,
       permissionType,
       normalizedRequest,
       chainId,
       lifecycleHandlers,
-      shouldShowIntroduction,
     });
 
     if (!sessionResult.isApproved) {

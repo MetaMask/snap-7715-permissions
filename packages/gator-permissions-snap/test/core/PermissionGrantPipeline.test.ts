@@ -27,7 +27,6 @@ import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFacto
 import { ExistingPermissionsService } from '../../src/core/existingpermissions/existingPermissionsService';
 import { GrantedPermissionResolutionService } from '../../src/core/grant/GrantedPermissionResolutionService';
 import { PermissionGrantPipeline } from '../../src/core/PermissionGrantPipeline';
-import { PermissionGrantPipeline } from '../../src/core/PermissionGrantPipeline';
 import { PermissionGrantPreparator } from '../../src/core/PermissionGrantPreparator';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { IntroductionPhase } from '../../src/core/phases/IntroductionPhase';
@@ -316,7 +315,6 @@ describe('PermissionGrantPipeline', () => {
 
     permissionGrantPipeline = new PermissionGrantPipeline({
       permissionGrantPreparator,
-      introductionPhase,
       confirmationSession,
       grantedPermissionResolutionService,
     });
@@ -330,7 +328,6 @@ describe('PermissionGrantPipeline', () => {
       });
       const instance = new PermissionGrantPipeline({
         permissionGrantPreparator,
-        introductionPhase,
         confirmationSession,
         grantedPermissionResolutionService,
       });

@@ -1,5 +1,5 @@
-import { PermissionRegistry } from './PermissionRegistry';
 import type { PermissionModule } from './PermissionModule';
+import { PermissionRegistry } from './PermissionRegistry';
 import { erc20TokenAllowancePermissionModule } from '../../permissions/erc20TokenAllowance';
 import { erc20TokenPeriodicPermissionModule } from '../../permissions/erc20TokenPeriodic';
 import { erc20TokenStreamPermissionModule } from '../../permissions/erc20TokenStream';
