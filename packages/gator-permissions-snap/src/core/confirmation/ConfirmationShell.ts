@@ -78,6 +78,7 @@ export type ConfirmationShellParams<
   title: MessageKey;
   subtitle: MessageKey;
   permissionRequest: PermissionRequest;
+  showTokenBalance: boolean;
   renderBody: (args: {
     context: TContext;
     metadata: TMetadata;
@@ -105,6 +106,8 @@ export class ConfirmationShell<
 
   readonly #permissionRequest: PermissionRequest;
 
+  readonly #showTokenBalance: boolean;
+
   readonly #renderBody: ConfirmationShellParams<
     TContext,
     TMetadata
@@ -128,6 +131,7 @@ export class ConfirmationShell<
     title,
     subtitle,
     permissionRequest,
+    showTokenBalance,
     renderBody,
   }: ConfirmationShellParams<TContext, TMetadata>) {
     this.#userEventDispatcher = userEventDispatcher;
@@ -137,6 +141,7 @@ export class ConfirmationShell<
     this.#permissionTitle = title;
     this.#permissionSubtitle = subtitle;
     this.#permissionRequest = permissionRequest;
+    this.#showTokenBalance = showTokenBalance;
     this.#renderBody = renderBody;
   }
 
@@ -210,6 +215,7 @@ export class ConfirmationShell<
       isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
       existingPermissionsStatus,
       isGrantDisabled,
+      showTokenBalance: this.#showTokenBalance,
     });
   }
 
@@ -295,8 +301,10 @@ export class ConfirmationShell<
       },
     });
 
-    const hasAsset = currentContext.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
-    if (hasAsset) {
+    const shouldFetchTokenBalance =
+      this.#showTokenBalance &&
+      currentContext.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
+    if (shouldFetchTokenBalance) {
       fetchAccountBalance(currentContext).catch((error) => {
         const { message } = error as Error;
         logger.error(`Fetching account balance failed: ${message}`);
@@ -339,9 +347,10 @@ export class ConfirmationShell<
         this.#accountUpgradeStatus = { isUpgraded: true }; // Reset to default while fetching
 
         // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
-        const hasAssetForAccount =
+        const shouldFetchTokenBalanceForAccount =
+          this.#showTokenBalance &&
           currentContext.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
-        if (hasAssetForAccount) {
+        if (shouldFetchTokenBalanceForAccount) {
           fetchAccountBalance(currentContext).catch((error) => {
             const { message } = error as Error;
             logger.error(`Fetching account balance failed: ${message}`);

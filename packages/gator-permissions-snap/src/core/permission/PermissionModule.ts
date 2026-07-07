@@ -10,7 +10,6 @@ import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { MessageKey } from '../../utils/i18n';
 import type { DelegationContracts } from '../chainMetadata';
 import { ConfirmationShell } from '../confirmation/ConfirmationShell';
-import type { ConfirmationShellConfig } from '../confirmation/ConfirmationShellConfig';
 import type {
   BaseContext,
   BaseMetadata,
@@ -40,7 +39,8 @@ export type PermissionModule<
   title: MessageKey;
   subtitle: MessageKey;
   rules: RuleDefinition<TContext, TMetadata>[];
-  confirmationShell: ConfirmationShellConfig;
+  /** When false, omits token balance from the confirmation shell. Defaults to true. */
+  showTokenBalance?: boolean;
 
   parseAndValidate(request: PermissionRequest): TRequest;
   buildContext(

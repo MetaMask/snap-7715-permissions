@@ -58,6 +58,7 @@ export class ConfirmationShellFactory {
       title: module.title,
       subtitle: module.subtitle,
       permissionRequest,
+      showTokenBalance: module.showTokenBalance ?? true,
       renderBody: async (renderArgs) => module.renderBody(renderArgs),
     });
   }

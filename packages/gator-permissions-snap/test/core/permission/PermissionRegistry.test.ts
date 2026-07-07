@@ -91,7 +91,7 @@ describe('PermissionRegistry', () => {
 
       expect(module.renderBody).toStrictEqual(expect.any(Function));
       expect(module.parseAndValidate).toStrictEqual(expect.any(Function));
-      expect(module.confirmationShell.tokenBalance).toBe(false);
+      expect(module.showTokenBalance).toBe(false);
     });
   });
 });

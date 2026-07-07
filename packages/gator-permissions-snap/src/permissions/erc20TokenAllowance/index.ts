@@ -15,7 +15,6 @@ import type {
   PopulatedErc20TokenAllowancePermission,
 } from './types';
 import { parseAndValidate } from './validation';
-import { DEFAULT_CONFIRMATION_SHELL_CONFIG } from '../../core/confirmation/ConfirmationShellConfig';
 import type { PermissionModule } from '../../core/permission/PermissionModule';
 
 export const erc20TokenAllowancePermissionModule: PermissionModule<
@@ -29,7 +28,6 @@ export const erc20TokenAllowancePermissionModule: PermissionModule<
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
-  confirmationShell: DEFAULT_CONFIRMATION_SHELL_CONFIG,
   parseAndValidate,
   buildContext,
   deriveMetadata,

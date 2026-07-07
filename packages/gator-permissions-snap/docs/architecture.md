@@ -303,7 +303,7 @@ Each `PermissionModule` exposes a flat contract:
 
 - `parseAndValidate`, `buildContext`, `deriveMetadata`, `renderBody`
 - `applyContext`, `populatePermission`, `createPermissionCaveats`
-- `rules`, `title`, `subtitle`, `confirmationShell`
+- `rules`, `title`, `subtitle`, `showTokenBalance` (optional, defaults to true)
 
 Permission folders export `PermissionModule` objects directly; each module is registered in `createPermissionRegistry()` at startup.
 

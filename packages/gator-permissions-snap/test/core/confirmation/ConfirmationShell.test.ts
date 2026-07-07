@@ -168,6 +168,7 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
     title,
     subtitle,
     permissionRequest: mockPermissionRequest,
+    showTokenBalance: true,
     renderBody,
   });
 

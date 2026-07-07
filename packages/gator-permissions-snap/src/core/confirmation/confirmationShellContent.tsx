@@ -69,6 +69,8 @@ export type ConfirmationShellContentProps = {
   existingPermissionsStatus: ExistingPermissionsState;
   /** When true, the primary grant button is not clickable. */
   isGrantDisabled: boolean;
+  /** When false, token balance fields are omitted from the account section. */
+  showTokenBalance: boolean;
 };
 
 /**
@@ -94,6 +96,7 @@ export type ConfirmationShellContentProps = {
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
  * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
  * @param options.isGrantDisabled - Whether the grant button should render disabled.
+ * @param options.showTokenBalance - Whether to show token balance in the account section.
  * @returns The confirmation content.
  */
 export const ConfirmationShellContent = ({
@@ -117,6 +120,7 @@ export const ConfirmationShellContent = ({
   isAccountUpgraded,
   existingPermissionsStatus,
   isGrantDisabled,
+  showTokenBalance,
 }: ConfirmationShellContentProps): SnapElement => {
   const tokenBalanceComponent = TokenBalanceField({
     tokenBalance,
@@ -244,7 +248,7 @@ export const ConfirmationShellContent = ({
                   {t('accountUpgradeWarning')}
                 </Text>
               )}
-              {hasAsset && (
+              {showTokenBalance && hasAsset && (
                 <Box direction="horizontal" alignment="end">
                   {fiatBalanceComponent}
                   {tokenBalanceComponent}
