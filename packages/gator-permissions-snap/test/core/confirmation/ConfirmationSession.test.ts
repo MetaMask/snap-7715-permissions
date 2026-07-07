@@ -23,6 +23,7 @@ import type { DialogInterfaceFactory } from '../../../src/core/dialogInterfaceFa
 import { ExistingPermissionsService } from '../../../src/core/existingpermissions/existingPermissionsService';
 import { ExistingPermissionsState } from '../../../src/core/existingpermissions/existingPermissionsState';
 import type { PermissionIntroductionService } from '../../../src/core/permissionIntroduction';
+import { IntroductionPhase } from '../../../src/core/phases/IntroductionPhase';
 import type { BaseContext } from '../../../src/core/types';
 import type { ProfileSyncManager } from '../../../src/profileSync/profileSync';
 import type { SnapsMetricsService } from '../../../src/services/snapsMetricsService';
@@ -153,6 +154,7 @@ describe('ConfirmationSession', () => {
   let confirmationSession: ConfirmationSession;
   let existingPermissionsCoordinator: ExistingPermissionsCoordinator;
   let trustSignalsCoordinator: TrustSignalsCoordinator;
+  let introductionPhase: IntroductionPhase;
   let lifecycleHandlerMocks: TestLifecycleHandlersMocks;
 
   const runSession = async (
@@ -233,12 +235,17 @@ describe('ConfirmationSession', () => {
       undefined,
     );
 
+    introductionPhase = new IntroductionPhase({
+      permissionIntroductionService: mockPermissionIntroductionService,
+      snapsMetricsService: mockSnapsMetricsService,
+    });
+
     mockDialogInterfaceFactory.createDialogInterface.mockReturnValue({});
 
     confirmationSession = new ConfirmationSession({
       dialogInterfaceFactory: mockDialogInterfaceFactory,
       confirmationDialogFactory: mockConfirmationDialogFactory,
-      permissionIntroductionService: mockPermissionIntroductionService,
+      introductionPhase,
       existingPermissionsCoordinator,
       trustSignalsCoordinator,
       accountController: mockAccountController,

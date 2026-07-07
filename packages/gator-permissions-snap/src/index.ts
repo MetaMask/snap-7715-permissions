@@ -36,9 +36,12 @@ import { TrustSignalsCoordinator } from './core/coordinators/TrustSignalsCoordin
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from './core/existingpermissions';
 import { GrantedPermissionResolutionService } from './core/grant/GrantedPermissionResolutionService';
+import { PermissionGrantPipeline } from './core/PermissionGrantPipeline';
+import { PermissionGrantPreparator } from './core/PermissionGrantPreparator';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
+import { IntroductionPhase } from './core/phases/IntroductionPhase';
 import { createTimeoutFactory } from './core/timeoutFactory';
 import {
   createProfileSyncOptions,
@@ -217,21 +220,35 @@ const trustSignalsCoordinator = new TrustSignalsCoordinator({
   trustSignalsClient,
 });
 
+const permissionGrantPreparator = new PermissionGrantPreparator({
+  accountController,
+  snapsMetricsService,
+});
+
+const introductionPhase = new IntroductionPhase({
+  permissionIntroductionService,
+  snapsMetricsService,
+});
+
 const confirmationSession = new ConfirmationSession({
   dialogInterfaceFactory,
   confirmationDialogFactory,
-  permissionIntroductionService,
+  introductionPhase,
   existingPermissionsCoordinator,
   trustSignalsCoordinator,
   accountController,
   snapsMetricsService,
 });
 
-const orchestrator = new PermissionRequestLifecycleOrchestrator({
-  snapsMetricsService,
-  permissionIntroductionService,
+const permissionGrantPipeline = new PermissionGrantPipeline({
+  permissionGrantPreparator,
+  introductionPhase,
   confirmationSession,
   grantedPermissionResolutionService,
+});
+
+const orchestrator = new PermissionRequestLifecycleOrchestrator({
+  pipeline: permissionGrantPipeline,
 });
 
 const permissionHandlerFactory = new PermissionHandlerFactory({

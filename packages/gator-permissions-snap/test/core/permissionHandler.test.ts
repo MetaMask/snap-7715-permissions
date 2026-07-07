@@ -23,7 +23,6 @@ import type {
 import type { MessageKey } from '../../src/utils/i18n';
 
 const mockAddress = '0x1234567890123456789012345678901234567890' as const;
-const mockAddress2 = '0x1234567890123456789012345678901234567891' as const;
 const mockAssetAddress = '0x38c4A4F071d33d6Cf83e2e81F12D9B5D30E611F3' as const;
 const mockOrigin = 'https://example.com';
 const mockTokenBalanceFiat = '$1000';
@@ -286,103 +285,28 @@ describe('PermissionHandler', () => {
       expect(typeof lifecycleHandlers.onConfirmationResolved).toBe('function');
     });
 
-    it('resolves the address if one is not provided', async () => {
+    it('delegates buildContext to permission dependencies with the resolved request', async () => {
       const {
         permissionHandler,
-        accountController,
         getLifecycleHandlers,
         dependencies,
         tokenMetadataService,
       } = setupTest();
 
-      accountController.getAccountAddresses.mockResolvedValue([
-        mockAddress,
-        mockAddress2,
-      ]);
-
       await permissionHandler.handlePermissionRequest(mockOrigin);
 
       const lifecycleHandlers = getLifecycleHandlers();
-
-      await lifecycleHandlers.buildContext({
-        ...mockPermissionRequest,
-        // it's already undefined, but we make sure here
-        from: undefined,
-      });
-
-      expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
-
-      const permissionRequestWithResolvedAddress = {
+      const requestWithFrom = {
         ...mockPermissionRequest,
         from: mockAddress,
       };
 
+      await lifecycleHandlers.buildContext(requestWithFrom);
+
       expect(dependencies.buildContext).toHaveBeenCalledWith({
-        permissionRequest: permissionRequestWithResolvedAddress,
+        permissionRequest: requestWithFrom,
         tokenMetadataService,
       });
-    });
-
-    it.each([mockAddress, mockAddress2])(
-      'accepts the address if one is provided',
-      async (specifiedAddress) => {
-        const {
-          permissionHandler,
-          accountController,
-          getLifecycleHandlers,
-          dependencies,
-          tokenMetadataService,
-        } = setupTest();
-
-        accountController.getAccountAddresses.mockResolvedValue([
-          mockAddress,
-          mockAddress2,
-        ]);
-
-        await permissionHandler.handlePermissionRequest(mockOrigin);
-
-        const lifecycleHandlers = getLifecycleHandlers();
-
-        await lifecycleHandlers.buildContext({
-          ...mockPermissionRequest,
-          from: specifiedAddress,
-        });
-
-        expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
-
-        const permissionRequestWithResolvedAddress = {
-          ...mockPermissionRequest,
-          from: specifiedAddress,
-        };
-
-        expect(dependencies.buildContext).toHaveBeenCalledWith({
-          permissionRequest: permissionRequestWithResolvedAddress,
-          tokenMetadataService,
-        });
-      },
-    );
-
-    it('rejects the address if it is not one of the addresses available for the account', async () => {
-      const { permissionHandler, accountController, getLifecycleHandlers } =
-        setupTest();
-
-      accountController.getAccountAddresses.mockResolvedValue([
-        mockAddress,
-        mockAddress2,
-      ]);
-
-      await permissionHandler.handlePermissionRequest(mockOrigin);
-
-      const lifecycleHandlers = getLifecycleHandlers();
-
-      await expect(
-        lifecycleHandlers.buildContext({
-          ...mockPermissionRequest,
-          from: '0x9876543210987654321098765432109876543210',
-        }),
-      ).rejects.toThrow('Requested address not found');
-
-      expect(accountController.getAccountAddresses).toHaveBeenCalledTimes(1);
     });
 
     it('throws error when called multiple times', async () => {

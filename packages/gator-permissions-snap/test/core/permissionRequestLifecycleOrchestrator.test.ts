@@ -26,8 +26,11 @@ import { TrustSignalsCoordinator } from '../../src/core/coordinators/TrustSignal
 import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from '../../src/core/existingpermissions/existingPermissionsService';
 import { GrantedPermissionResolutionService } from '../../src/core/grant/GrantedPermissionResolutionService';
+import { PermissionGrantPipeline } from '../../src/core/PermissionGrantPipeline';
+import { PermissionGrantPreparator } from '../../src/core/PermissionGrantPreparator';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
+import { IntroductionPhase } from '../../src/core/phases/IntroductionPhase';
 import { SENTINEL_REDEEMER_ADDRESSES } from '../../src/core/sentinelRedeemer';
 import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
 import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
@@ -198,7 +201,13 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
   let grantedPermissionResolutionService: GrantedPermissionResolutionService;
   let existingPermissionsCoordinator: ExistingPermissionsCoordinator;
   let trustSignalsCoordinator: TrustSignalsCoordinator;
+  let introductionPhase: IntroductionPhase;
   let lifecycleHandlerMocks: TestLifecycleHandlersMocks;
+
+  const normalizedPermissionRequest = {
+    ...mockPermissionRequest,
+    from: grantingAccountAddress,
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -217,6 +226,11 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
     trustSignalsCoordinator = new TrustSignalsCoordinator({
       trustSignalsClient: mockTrustSignalsClient,
+    });
+
+    introductionPhase = new IntroductionPhase({
+      permissionIntroductionService: mockPermissionIntroductionService,
+      snapsMetricsService: mockSnapsMetricsService,
     });
 
     // Reset existing permissions service mocks after clearing
@@ -258,6 +272,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       async () => ({ isUpgraded: false }),
     );
 
+    mockAccountController.getAccountAddresses.mockResolvedValue([
+      grantingAccountAddress,
+    ]);
+
     mockConfirmationDialogFactory.createConfirmation.mockReturnValue(
       mockConfirmationDialog,
     );
@@ -284,29 +302,45 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
     confirmationSession = new ConfirmationSession({
       dialogInterfaceFactory: mockDialogInterfaceFactory,
       confirmationDialogFactory: mockConfirmationDialogFactory,
-      permissionIntroductionService: mockPermissionIntroductionService,
+      introductionPhase,
       existingPermissionsCoordinator,
       trustSignalsCoordinator,
       accountController: mockAccountController,
       snapsMetricsService: mockSnapsMetricsService,
     });
 
+    const permissionGrantPreparator = new PermissionGrantPreparator({
+      accountController: mockAccountController,
+      snapsMetricsService: mockSnapsMetricsService,
+    });
+
+    const permissionGrantPipeline = new PermissionGrantPipeline({
+      permissionGrantPreparator,
+      introductionPhase,
+      confirmationSession,
+      grantedPermissionResolutionService,
+    });
+
     permissionRequestLifecycleOrchestrator =
       new PermissionRequestLifecycleOrchestrator({
-        snapsMetricsService: mockSnapsMetricsService,
-        permissionIntroductionService: mockPermissionIntroductionService,
-        confirmationSession,
-        grantedPermissionResolutionService,
+        pipeline: permissionGrantPipeline,
       });
   });
 
   describe('constructor', () => {
-    it('should create an instance with valid supported chains', () => {
-      const instance = new PermissionRequestLifecycleOrchestrator({
+    it('should create an instance', () => {
+      const permissionGrantPreparator = new PermissionGrantPreparator({
+        accountController: mockAccountController,
         snapsMetricsService: mockSnapsMetricsService,
-        permissionIntroductionService: mockPermissionIntroductionService,
+      });
+      const pipeline = new PermissionGrantPipeline({
+        permissionGrantPreparator,
+        introductionPhase,
         confirmationSession,
         grantedPermissionResolutionService,
+      });
+      const instance = new PermissionRequestLifecycleOrchestrator({
+        pipeline,
       });
       expect(instance).toBeInstanceOf(PermissionRequestLifecycleOrchestrator);
     });
@@ -549,6 +583,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
         expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith({
           ...requestWithoutRedeemerRule,
+          from: grantingAccountAddress,
           rules: [
             requestWithoutRedeemerRule.rules[0],
             {
@@ -602,9 +637,10 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
           lifecycleHandlerMocks,
         );
 
-        expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith(
-          requestWithSentinelRedeemerRule,
-        );
+        expect(lifecycleHandlerMocks.buildContext).toHaveBeenCalledWith({
+          ...requestWithSentinelRedeemerRule,
+          from: grantingAccountAddress,
+        });
       });
 
       it('rejects uniswap.org redeemer rules with non-sentinel addresses', async () => {
@@ -640,8 +676,9 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
 
     describe('nominal path', () => {
       /*
-       * End-to-end orchestrator path after Stage 5: preflight and grant resolution
-       * remain here; confirmation UI lifecycle is owned by ConfirmationSession.
+       * End-to-end pipeline path after Stage 6: grant preparation and grant resolution
+       * run in PermissionGrantPipeline; confirmation UI lifecycle is owned by
+       * ConfirmationSession. Orchestrator delegates to the pipeline.
        *
        * 1. Validates and builds the initial permission request.
        * 2. Applies context to resolve the permission request.
@@ -687,7 +724,7 @@ describe('PermissionRequestLifecycleOrchestrator', () => {
       it('applies context to resolve the permission request', async () => {
         expect(lifecycleHandlerMocks.applyContext).toHaveBeenCalledWith({
           context: mockContext,
-          originalRequest: mockPermissionRequest,
+          originalRequest: normalizedPermissionRequest,
         });
       });
 

@@ -1,11 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import {
-  InvalidRequestError,
-  ResourceNotFoundError,
-} from '@metamask/snaps-sdk';
-import type { Hex } from '@metamask/utils';
+import { InvalidRequestError } from '@metamask/snaps-sdk';
 
-import type { AccountController } from './accountController';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
 import type {
   BaseContext,
@@ -32,8 +27,6 @@ export class PermissionHandler<
   TPopulatedPermission extends DeepRequired<TPermission>,
 > implements PermissionHandlerType
 {
-  readonly #accountController: AccountController;
-
   readonly #orchestrator: PermissionRequestLifecycleOrchestrator;
 
   readonly #permissionRequest: PermissionRequest;
@@ -72,7 +65,6 @@ export class PermissionHandler<
     TPermission,
     TPopulatedPermission
   >) {
-    this.#accountController = accountController;
     this.#orchestrator = orchestrator;
     this.#permissionRequest = permissionRequest;
     this.#dependencies = dependencies;
@@ -128,33 +120,8 @@ export class PermissionHandler<
     const buildContextHandler = async (
       request: TRequest,
     ): Promise<TContext> => {
-      const requestedAddressLowercase = request.from?.toLowerCase() as
-        | Hex
-        | undefined;
-
-      const allAvailableAddresses =
-        await this.#accountController.getAccountAddresses();
-
-      let from: Hex;
-
-      if (requestedAddressLowercase) {
-        // validate that the requested address is one of the addresses available for the account
-        if (
-          !allAvailableAddresses.some(
-            (availableAddress) =>
-              availableAddress.toLowerCase() === requestedAddressLowercase,
-          )
-        ) {
-          throw new ResourceNotFoundError('Requested address not found');
-        }
-        from = request.from as Hex;
-      } else {
-        // use the first address available for the account
-        from = allAvailableAddresses[0];
-      }
-
       return await this.#dependencies.buildContext({
-        permissionRequest: { ...request, from },
+        permissionRequest: request,
         tokenMetadataService: this.#tokenMetadataService,
       });
     };

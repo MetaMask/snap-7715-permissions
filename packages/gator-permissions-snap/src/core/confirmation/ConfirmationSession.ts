@@ -8,7 +8,7 @@ import type { ConfirmationDialogFactory } from '../confirmationFactory';
 import type { ExistingPermissionsCoordinator } from '../coordinators/ExistingPermissionsCoordinator';
 import type { TrustSignalsCoordinator } from '../coordinators/TrustSignalsCoordinator';
 import type { DialogInterfaceFactory } from '../dialogInterfaceFactory';
-import type { PermissionIntroductionService } from '../permissionIntroduction';
+import type { IntroductionPhase } from '../phases/IntroductionPhase';
 import type {
   BaseContext,
   BaseMetadata,
@@ -37,7 +37,7 @@ export class ConfirmationSession {
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
-  readonly #permissionIntroductionService: PermissionIntroductionService;
+  readonly #introductionPhase: IntroductionPhase;
 
   readonly #existingPermissionsCoordinator: ExistingPermissionsCoordinator;
 
@@ -50,7 +50,7 @@ export class ConfirmationSession {
   constructor({
     dialogInterfaceFactory,
     confirmationDialogFactory,
-    permissionIntroductionService,
+    introductionPhase,
     existingPermissionsCoordinator,
     trustSignalsCoordinator,
     accountController,
@@ -58,7 +58,7 @@ export class ConfirmationSession {
   }: {
     dialogInterfaceFactory: DialogInterfaceFactory;
     confirmationDialogFactory: ConfirmationDialogFactory;
-    permissionIntroductionService: PermissionIntroductionService;
+    introductionPhase: IntroductionPhase;
     existingPermissionsCoordinator: ExistingPermissionsCoordinator;
     trustSignalsCoordinator: TrustSignalsCoordinator;
     accountController: AccountController;
@@ -66,7 +66,7 @@ export class ConfirmationSession {
   }) {
     this.#dialogInterfaceFactory = dialogInterfaceFactory;
     this.#confirmationDialogFactory = confirmationDialogFactory;
-    this.#permissionIntroductionService = permissionIntroductionService;
+    this.#introductionPhase = introductionPhase;
     this.#existingPermissionsCoordinator = existingPermissionsCoordinator;
     this.#trustSignalsCoordinator = trustSignalsCoordinator;
     this.#accountController = accountController;
@@ -126,30 +126,21 @@ export class ConfirmationSession {
     );
 
     if (shouldShowIntroduction) {
-      const { wasCancelled } =
-        await this.#permissionIntroductionService.showIntroduction({
-          dialogInterface,
-          permissionType,
-        });
+      const introResult = await this.#introductionPhase.run({
+        dialogInterface,
+        permissionType,
+        origin,
+        chainId: normalizedRequest.chainId,
+        permission: normalizedRequest.permission,
+      });
 
-      if (wasCancelled) {
-        await this.#snapsMetricsService.trackPermissionRejected({
-          origin,
-          permissionType,
-          chainId: normalizedRequest.chainId,
-          permissionData: normalizedRequest.permission.data,
-        });
-
+      if (introResult.cancelled) {
         return {
           isApproved: false,
           reason: 'Permission request denied at introduction screen',
           phase: 'introduction',
         };
       }
-
-      await this.#permissionIntroductionService.markIntroductionAsSeen(
-        permissionType,
-      );
     }
 
     // only necessary when not pre-installed, to ensure that the account
