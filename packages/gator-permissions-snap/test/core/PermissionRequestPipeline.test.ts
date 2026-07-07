@@ -21,8 +21,6 @@ import { getChainMetadata } from '../../src/core/chainMetadata';
 import type { ConfirmationDialog } from '../../src/core/confirmation';
 import { ConfirmationSession } from '../../src/core/confirmation/ConfirmationSession';
 import type { ConfirmationDialogFactory } from '../../src/core/confirmationFactory';
-import { ExistingPermissionsCoordinator } from '../../src/core/coordinators/ExistingPermissionsCoordinator';
-import { TrustSignalsCoordinator } from '../../src/core/coordinators/TrustSignalsCoordinator';
 import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from '../../src/core/existingpermissions/existingPermissionsService';
 import { GrantedPermissionResolutionService } from '../../src/core/grant/GrantedPermissionResolutionService';
@@ -198,8 +196,6 @@ describe('PermissionRequestPipeline', () => {
   let permissionRequestPipeline: PermissionRequestPipeline;
   let confirmationSession: ConfirmationSession;
   let grantedPermissionResolutionService: GrantedPermissionResolutionService;
-  let existingPermissionsCoordinator: ExistingPermissionsCoordinator;
-  let trustSignalsCoordinator: TrustSignalsCoordinator;
   let introductionPhase: IntroductionPhase;
   let lifecycleHandlerMocks: TestLifecycleHandlersMocks;
 
@@ -218,14 +214,6 @@ describe('PermissionRequestPipeline', () => {
         snapsMetricsService: mockSnapsMetricsService,
       },
     );
-
-    existingPermissionsCoordinator = new ExistingPermissionsCoordinator({
-      existingPermissionsService: mockExistingPermissionsService,
-    });
-
-    trustSignalsCoordinator = new TrustSignalsCoordinator({
-      trustSignalsClient: mockTrustSignalsClient,
-    });
 
     introductionPhase = new IntroductionPhase({
       permissionIntroductionService: mockPermissionIntroductionService,
@@ -302,8 +290,8 @@ describe('PermissionRequestPipeline', () => {
       dialogInterfaceFactory: mockDialogInterfaceFactory,
       confirmationDialogFactory: mockConfirmationDialogFactory,
       introductionPhase,
-      existingPermissionsCoordinator,
-      trustSignalsCoordinator,
+      existingPermissionsService: mockExistingPermissionsService,
+      trustSignalsClient: mockTrustSignalsClient,
       accountController: mockAccountController,
       snapsMetricsService: mockSnapsMetricsService,
     });

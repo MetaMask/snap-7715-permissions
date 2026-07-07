@@ -1,5 +1,6 @@
 import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import { InternalError } from '@metamask/snaps-sdk';
 
 import { ExistingPermissionsCoordinator } from '../../../src/core/coordinators/ExistingPermissionsCoordinator';
 import type { DialogInterface } from '../../../src/core/dialogInterface';
@@ -71,10 +72,7 @@ describe('ExistingPermissionsCoordinator', () => {
 
   describe('prefetch()', () => {
     it('loads existing permissions once and derives banner status from the snapshot', async () => {
-      const { snapshotPromise, statusPromise } = coordinator.prefetch(
-        'https://example.com',
-        mockPermission,
-      );
+      coordinator.prefetch('https://example.com', mockPermission);
 
       expect(
         mockExistingPermissionsService.getExistingPermissions,
@@ -83,8 +81,9 @@ describe('ExistingPermissionsCoordinator', () => {
         mockExistingPermissionsService.getExistingPermissions,
       ).toHaveBeenCalledWith('https://example.com');
 
-      await expect(snapshotPromise).resolves.toStrictEqual(mockSnapshot);
-      await expect(statusPromise).resolves.toBe(ExistingPermissionsState.None);
+      await expect(coordinator.getStatus()).resolves.toBe(
+        ExistingPermissionsState.None,
+      );
       expect(
         mockExistingPermissionsService.getExistingPermissionsStatusFromList,
       ).toHaveBeenCalledWith(mockSnapshot, mockPermission);
@@ -95,15 +94,36 @@ describe('ExistingPermissionsCoordinator', () => {
         new Error('status failed'),
       );
 
-      const { statusPromise } = coordinator.prefetch(
-        'https://example.com',
-        mockPermission,
-      );
+      coordinator.prefetch('https://example.com', mockPermission);
 
-      await expect(statusPromise).resolves.toBe(ExistingPermissionsState.None);
+      await expect(coordinator.getStatus()).resolves.toBe(
+        ExistingPermissionsState.None,
+      );
       expect(logger.error).toHaveBeenCalledWith(
         'ExistingPermissionsCoordinator: existing permissions status from snapshot failed',
         expect.objectContaining({ origin: 'https://example.com' }),
+      );
+    });
+
+    it('throws if prefetch is called more than once', () => {
+      coordinator.prefetch('https://example.com', mockPermission);
+
+      expect(() =>
+        coordinator.prefetch('https://example.com', mockPermission),
+      ).toThrow(
+        new InternalError(
+          'ExistingPermissionsCoordinator.prefetch() called more than once',
+        ),
+      );
+    });
+  });
+
+  describe('getStatus()', () => {
+    it('throws if called before prefetch', () => {
+      expect(async () => coordinator.getStatus()).toThrow(
+        new InternalError(
+          'ExistingPermissionsCoordinator.getStatus() called before prefetch()',
+        ),
       );
     });
   });
@@ -111,14 +131,34 @@ describe('ExistingPermissionsCoordinator', () => {
   describe('maybeShowSubview()', () => {
     const dialogInterface = {} as DialogInterface;
 
-    it('shows the subview when entering for the first time', async () => {
-      const snapshotPromise = Promise.resolve(mockSnapshot);
+    beforeEach(() => {
+      coordinator.prefetch('https://example.com', mockPermission);
+    });
 
+    it('throws if called before prefetch', async () => {
+      const freshCoordinator = new ExistingPermissionsCoordinator({
+        existingPermissionsService:
+          mockExistingPermissionsService as unknown as ExistingPermissionsService,
+      });
+
+      await expect(
+        freshCoordinator.maybeShowSubview({
+          dialogInterface,
+          context: { ...mockContext, showExistingPermissions: true },
+          enteringSubview: true,
+        }),
+      ).rejects.toThrow(
+        new InternalError(
+          'ExistingPermissionsCoordinator.maybeShowSubview() called before prefetch()',
+        ),
+      );
+    });
+
+    it('shows the subview when entering for the first time', async () => {
       const result = await coordinator.maybeShowSubview({
         dialogInterface,
         context: { ...mockContext, showExistingPermissions: true },
         enteringSubview: true,
-        snapshotPromise,
       });
 
       expect(result).toStrictEqual({ handled: true });
@@ -132,7 +172,6 @@ describe('ExistingPermissionsCoordinator', () => {
         dialogInterface,
         context: { ...mockContext, showExistingPermissions: true },
         enteringSubview: false,
-        snapshotPromise: Promise.resolve(mockSnapshot),
       });
 
       expect(result).toStrictEqual({ handled: true });
@@ -146,7 +185,6 @@ describe('ExistingPermissionsCoordinator', () => {
         dialogInterface,
         context: { ...mockContext, showExistingPermissions: false },
         enteringSubview: false,
-        snapshotPromise: Promise.resolve(mockSnapshot),
       });
 
       expect(result).toStrictEqual({ handled: false });
@@ -160,7 +198,6 @@ describe('ExistingPermissionsCoordinator', () => {
         dialogInterface,
         context: { ...mockContext, showExistingPermissions: null },
         enteringSubview: false,
-        snapshotPromise: Promise.resolve(mockSnapshot),
       });
 
       expect(result).toStrictEqual({ handled: false });

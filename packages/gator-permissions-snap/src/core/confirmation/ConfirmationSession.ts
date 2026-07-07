@@ -2,12 +2,14 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { numberToHex, parseCaipAccountId } from '@metamask/utils';
 
+import type { TrustSignalsClient } from '../../clients/trustSignalsClient';
 import type { SnapsMetricsService } from '../../services/snapsMetricsService';
 import type { AccountController } from '../accountController';
 import type { ConfirmationDialogFactory } from '../confirmationFactory';
-import type { ExistingPermissionsCoordinator } from '../coordinators/ExistingPermissionsCoordinator';
-import type { TrustSignalsCoordinator } from '../coordinators/TrustSignalsCoordinator';
+import { ExistingPermissionsCoordinator } from '../coordinators/ExistingPermissionsCoordinator';
+import { TrustSignalsCoordinator } from '../coordinators/TrustSignalsCoordinator';
 import type { DialogInterfaceFactory } from '../dialogInterfaceFactory';
+import type { ExistingPermissionsService } from '../existingpermissions';
 import type { PermissionRequestLifecycleHandlers } from '../permission/PermissionRequestLifecycleHandlers';
 import type { IntroductionPhase } from '../phases/IntroductionPhase';
 import type { BaseContext, BaseMetadata, DeepRequired } from '../types';
@@ -19,7 +21,6 @@ export type ConfirmationSessionResult<TContext extends BaseContext> =
   | {
       isApproved: false;
       reason: string;
-      phase: 'introduction' | 'confirmation';
     }
   | { isApproved: true; context: TContext };
 
@@ -35,9 +36,9 @@ export class ConfirmationSession {
 
   readonly #introductionPhase: IntroductionPhase;
 
-  readonly #existingPermissionsCoordinator: ExistingPermissionsCoordinator;
+  readonly #existingPermissionsService: ExistingPermissionsService;
 
-  readonly #trustSignalsCoordinator: TrustSignalsCoordinator;
+  readonly #trustSignalsClient: TrustSignalsClient;
 
   readonly #accountController: AccountController;
 
@@ -47,24 +48,24 @@ export class ConfirmationSession {
     dialogInterfaceFactory,
     confirmationDialogFactory,
     introductionPhase,
-    existingPermissionsCoordinator,
-    trustSignalsCoordinator,
+    existingPermissionsService,
+    trustSignalsClient,
     accountController,
     snapsMetricsService,
   }: {
     dialogInterfaceFactory: DialogInterfaceFactory;
     confirmationDialogFactory: ConfirmationDialogFactory;
     introductionPhase: IntroductionPhase;
-    existingPermissionsCoordinator: ExistingPermissionsCoordinator;
-    trustSignalsCoordinator: TrustSignalsCoordinator;
+    existingPermissionsService: ExistingPermissionsService;
+    trustSignalsClient: TrustSignalsClient;
     accountController: AccountController;
     snapsMetricsService: SnapsMetricsService;
   }) {
     this.#dialogInterfaceFactory = dialogInterfaceFactory;
     this.#confirmationDialogFactory = confirmationDialogFactory;
     this.#introductionPhase = introductionPhase;
-    this.#existingPermissionsCoordinator = existingPermissionsCoordinator;
-    this.#trustSignalsCoordinator = trustSignalsCoordinator;
+    this.#existingPermissionsService = existingPermissionsService;
+    this.#trustSignalsClient = trustSignalsClient;
     this.#accountController = accountController;
     this.#snapsMetricsService = snapsMetricsService;
   }
@@ -110,10 +111,14 @@ export class ConfirmationSession {
     const dialogInterface =
       this.#dialogInterfaceFactory.createDialogInterface();
 
-    const {
-      snapshotPromise: existingPermissionsForOriginPromise,
-      statusPromise: existingPermissionsStatusPromise,
-    } = this.#existingPermissionsCoordinator.prefetch(
+    const existingPermissionsCoordinator = new ExistingPermissionsCoordinator({
+      existingPermissionsService: this.#existingPermissionsService,
+    });
+    const trustSignalsCoordinator = new TrustSignalsCoordinator({
+      trustSignalsClient: this.#trustSignalsClient,
+    });
+
+    existingPermissionsCoordinator.prefetch(
       origin,
       normalizedRequest.permission,
     );
@@ -134,7 +139,6 @@ export class ConfirmationSession {
         return {
           isApproved: false,
           reason: 'Permission request denied at introduction screen',
-          phase: 'introduction',
         };
       }
     }
@@ -204,12 +208,12 @@ export class ConfirmationSession {
         const metadata = await lifecycleHandlers.deriveMetadata({ context });
 
         const existingPermissionsStatus =
-          await existingPermissionsStatusPromise;
+          await existingPermissionsCoordinator.getStatus();
 
         const grantDisabled = isGrantDisabled || hasValidationErrors(metadata);
 
         const { scanDappUrlResult, scanAddressResult } =
-          this.#trustSignalsCoordinator.getResults();
+          trustSignalsCoordinator.getResults();
 
         if (context.showExistingPermissions) {
           const enteringSubview = !existingPermissionsSubviewActive;
@@ -219,11 +223,10 @@ export class ConfirmationSession {
             existingPermissionsSubviewActive = true;
           }
 
-          await this.#existingPermissionsCoordinator.maybeShowSubview({
+          await existingPermissionsCoordinator.maybeShowSubview({
             dialogInterface,
             context,
             enteringSubview,
-            snapshotPromise: existingPermissionsForOriginPromise,
           });
 
           return;
@@ -251,7 +254,7 @@ export class ConfirmationSession {
       await lastUpdateConfirmationPromise;
     };
 
-    this.#trustSignalsCoordinator.start({
+    trustSignalsCoordinator.start({
       origin,
       chainId: normalizedRequest.chainId,
       delegateAddress: normalizedRequest.to,
@@ -359,7 +362,6 @@ export class ConfirmationSession {
       return {
         isApproved: false,
         reason: 'Permission request denied at confirmation screen',
-        phase: 'confirmation',
       };
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);

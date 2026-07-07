@@ -1,4 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import { InternalError } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 
 import type {
@@ -105,9 +106,7 @@ describe('TrustSignalsCoordinator', () => {
     });
   });
 
-  it('resets stored results when start is called again', async () => {
-    mockTrustSignalsClient.scanDappUrl.mockResolvedValue(mockDappScanResult);
-
+  it('throws if start is called more than once', () => {
     coordinator.start({
       origin: 'https://example.com',
       chainId: '0x1' as Hex,
@@ -115,23 +114,18 @@ describe('TrustSignalsCoordinator', () => {
       onResults: jest.fn(),
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(coordinator.getResults().scanDappUrlResult).toStrictEqual(
-      mockDappScanResult,
+    expect(() =>
+      coordinator.start({
+        origin: 'https://other.example.com',
+        chainId: '0x1' as Hex,
+        delegateAddress: undefined,
+        onResults: jest.fn(),
+      }),
+    ).toThrow(
+      new InternalError(
+        'TrustSignalsCoordinator.start() called more than once',
+      ),
     );
-
-    coordinator.start({
-      origin: 'https://other.example.com',
-      chainId: '0x1' as Hex,
-      delegateAddress: undefined,
-      onResults: jest.fn(),
-    });
-
-    expect(coordinator.getResults()).toStrictEqual({
-      scanDappUrlResult: null,
-      scanAddressResult: null,
-    });
   });
 
   it('logs and swallows dapp URL scan failures without calling onResults', async () => {

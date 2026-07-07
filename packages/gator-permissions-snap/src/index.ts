@@ -31,8 +31,6 @@ import { TrustSignalsClient } from './clients/trustSignalsClient';
 import { AccountController } from './core/accountController';
 import { ConfirmationSession } from './core/confirmation/ConfirmationSession';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
-import { ExistingPermissionsCoordinator } from './core/coordinators/ExistingPermissionsCoordinator';
-import { TrustSignalsCoordinator } from './core/coordinators/TrustSignalsCoordinator';
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from './core/existingpermissions';
 import { GrantedPermissionResolutionService } from './core/grant/GrantedPermissionResolutionService';
@@ -213,14 +211,6 @@ const grantedPermissionResolutionService =
     snapsMetricsService,
   });
 
-const existingPermissionsCoordinator = new ExistingPermissionsCoordinator({
-  existingPermissionsService,
-});
-
-const trustSignalsCoordinator = new TrustSignalsCoordinator({
-  trustSignalsClient,
-});
-
 const permissionRequestPreparator = new PermissionRequestPreparator({
   accountController,
   snapsMetricsService,
@@ -235,8 +225,8 @@ const confirmationSession = new ConfirmationSession({
   dialogInterfaceFactory,
   confirmationDialogFactory,
   introductionPhase,
-  existingPermissionsCoordinator,
-  trustSignalsCoordinator,
+  existingPermissionsService,
+  trustSignalsClient,
   accountController,
   snapsMetricsService,
 });

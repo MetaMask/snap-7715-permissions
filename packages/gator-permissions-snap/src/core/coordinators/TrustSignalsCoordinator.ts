@@ -1,4 +1,5 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import { InternalError } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 
 import type {
@@ -9,6 +10,7 @@ import type {
 
 /**
  * Runs trust-signal scans in the background and tracks the latest results.
+ * One instance per permission request; {@link start} must only be called once.
  * Callers refresh confirmation UI when {@link TrustSignalsCoordinator.start}'s
  * `onResults` callback fires.
  */
@@ -18,6 +20,8 @@ export class TrustSignalsCoordinator {
   #scanDappUrlResult: ScanDappUrlResult | null = null;
 
   #scanAddressResult: FetchAddressScanResult | null = null;
+
+  #started = false;
 
   constructor({
     trustSignalsClient,
@@ -51,6 +55,7 @@ export class TrustSignalsCoordinator {
    * @param args.chainId - Chain ID for address scanning.
    * @param args.delegateAddress - Delegate address to scan, if present.
    * @param args.onResults - Called with the latest combined results after each scan.
+   * @throws If called more than once on the same instance.
    */
   start(args: {
     origin: string;
@@ -61,6 +66,13 @@ export class TrustSignalsCoordinator {
       scanAddressResult: FetchAddressScanResult | null;
     }) => void;
   }): void {
+    if (this.#started) {
+      throw new InternalError(
+        'TrustSignalsCoordinator.start() called more than once',
+      );
+    }
+    this.#started = true;
+
     const { origin, chainId, delegateAddress, onResults } = args;
 
     this.#scanDappUrlResult = null;

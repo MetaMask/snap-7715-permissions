@@ -17,8 +17,6 @@ import type { ConfirmationDialog } from '../../../src/core/confirmation';
 import { ConfirmationSession } from '../../../src/core/confirmation/ConfirmationSession';
 import type { ConfirmationSessionResult } from '../../../src/core/confirmation/ConfirmationSession';
 import type { ConfirmationDialogFactory } from '../../../src/core/confirmationFactory';
-import { ExistingPermissionsCoordinator } from '../../../src/core/coordinators/ExistingPermissionsCoordinator';
-import { TrustSignalsCoordinator } from '../../../src/core/coordinators/TrustSignalsCoordinator';
 import type { DialogInterfaceFactory } from '../../../src/core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from '../../../src/core/existingpermissions/existingPermissionsService';
 import { ExistingPermissionsState } from '../../../src/core/existingpermissions/existingPermissionsState';
@@ -153,8 +151,6 @@ type TestLifecycleHandlersMocks = {
 
 describe('ConfirmationSession', () => {
   let confirmationSession: ConfirmationSession;
-  let existingPermissionsCoordinator: ExistingPermissionsCoordinator;
-  let trustSignalsCoordinator: TrustSignalsCoordinator;
   let introductionPhase: IntroductionPhase;
   let lifecycleHandlerMocks: TestLifecycleHandlersMocks;
 
@@ -173,14 +169,6 @@ describe('ConfirmationSession', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    existingPermissionsCoordinator = new ExistingPermissionsCoordinator({
-      existingPermissionsService: mockExistingPermissionsService,
-    });
-
-    trustSignalsCoordinator = new TrustSignalsCoordinator({
-      trustSignalsClient: mockTrustSignalsClient,
-    });
 
     mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
     mockExistingPermissionsService.getExistingPermissionsStatusFromList.mockImplementation(
@@ -248,8 +236,9 @@ describe('ConfirmationSession', () => {
       dialogInterfaceFactory: mockDialogInterfaceFactory,
       confirmationDialogFactory: mockConfirmationDialogFactory,
       introductionPhase,
-      existingPermissionsCoordinator,
-      trustSignalsCoordinator,
+      existingPermissionsService:
+        mockExistingPermissionsService as unknown as ExistingPermissionsService,
+      trustSignalsClient: mockTrustSignalsClient,
       accountController: mockAccountController,
       snapsMetricsService: mockSnapsMetricsService,
     });
@@ -337,7 +326,6 @@ describe('ConfirmationSession', () => {
     expect(result).toStrictEqual({
       isApproved: false,
       reason: 'Permission request denied at confirmation screen',
-      phase: 'confirmation',
     });
     expect(mockSnapsMetricsService.trackPermissionRejected).toHaveBeenCalled();
   });
@@ -355,7 +343,6 @@ describe('ConfirmationSession', () => {
     expect(result).toStrictEqual({
       isApproved: false,
       reason: 'Permission request denied at introduction screen',
-      phase: 'introduction',
     });
     expect(mockSnapsMetricsService.trackPermissionRejected).toHaveBeenCalled();
     expect(mockConfirmationDialog.initialize).not.toHaveBeenCalled();
