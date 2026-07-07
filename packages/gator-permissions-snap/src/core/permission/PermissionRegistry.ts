@@ -1,19 +1,14 @@
 import { InvalidInputError, InternalError } from '@metamask/snaps-sdk';
 
-import type { RegisteredPermissionModule } from './PermissionModule';
+import type { PermissionModule } from './PermissionModule';
 
 /**
  * Registry mapping permission type strings to their modules.
  */
 export class PermissionRegistry {
-  readonly #modules = new Map<string, RegisteredPermissionModule>();
+  readonly #modules = new Map<string, PermissionModule>();
 
-  /**
-   * Registers a permission module. Each type may only be registered once.
-   * @param module - The permission module including its type string.
-   * @throws If the type is already registered.
-   */
-  register(module: RegisteredPermissionModule): void {
+  register(module: PermissionModule): void {
     if (this.#modules.has(module.type)) {
       throw new InternalError(`Duplicate permission type: ${module.type}`);
     }
@@ -26,7 +21,7 @@ export class PermissionRegistry {
    * @returns The registered permission module.
    * @throws If the type is not registered.
    */
-  get(type: string): RegisteredPermissionModule {
+  get(type: string): PermissionModule {
     const module = this.#modules.get(type);
     if (!module) {
       throw new InvalidInputError(`Unsupported permission type: ${type}`);

@@ -1,7 +1,4 @@
-import type {
-  Permission,
-  PermissionRequest,
-} from '@metamask/7715-permissions-shared/types';
+import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import type { Caveat } from '@metamask/delegation-core';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
@@ -64,15 +61,6 @@ export type PermissionModule<
     contracts: DelegationContracts;
   }): Promise<Caveat[]>;
 };
-
-/** Erased module stored in the registry. */
-export type RegisteredPermissionModule = PermissionModule<
-  PermissionRequest,
-  BaseContext,
-  BaseMetadata,
-  Permission,
-  DeepRequired<Permission>
->;
 
 /**
  * Builds pipeline lifecycle handlers from a module and its confirmation shell.
