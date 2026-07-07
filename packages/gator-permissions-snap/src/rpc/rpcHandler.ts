@@ -1,9 +1,6 @@
 import type { GetSupportedPermissionsResult } from '@metamask/7715-permissions-shared/types';
 import { SUPPORTED_RULE_TYPES } from '@metamask/7715-permissions-shared/types';
-import {
-  extractDescriptorName,
-  logger,
-} from '@metamask/7715-permissions-shared/utils';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
 import {
   InvalidInputError,
@@ -12,6 +9,7 @@ import {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { BlockchainClient } from '../clients/blockchainClient';
+import type { PermissionRegistry } from '../core/permission/PermissionRegistry';
 import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
@@ -73,16 +71,19 @@ export type RpcHandler = {
  *
  * @param config - The parameters for creating the RPC handler.
  * @param config.permissionHandlerFactory - The factory for creating permission handlers.
+ * @param config.permissionRegistry - Registry of supported permission types.
  * @param config.profileSyncManager - The profile sync manager.
  * @param config.blockchainClient - The blockchain client for on-chain checks.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler({
   permissionHandlerFactory,
+  permissionRegistry,
   profileSyncManager,
   blockchainClient,
 }: {
   permissionHandlerFactory: PermissionHandlerFactory;
+  permissionRegistry: PermissionRegistry;
   profileSyncManager: ProfileSyncManager;
   blockchainClient: BlockchainClient;
 }): RpcHandler {
@@ -306,8 +307,7 @@ export function createRpcHandler({
 
     const supportedPermissions: GetSupportedPermissionsResult = {};
 
-    for (const offer of DEFAULT_GATOR_PERMISSION_TO_OFFER) {
-      const permissionType = extractDescriptorName(offer.type);
+    for (const permissionType of permissionRegistry.getSupportedTypes()) {
       const ruleTypes =
         SUPPORTED_RULE_TYPES[
           permissionType as keyof typeof SUPPORTED_RULE_TYPES

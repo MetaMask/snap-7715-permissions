@@ -265,6 +265,7 @@ const permissionHandlerFactory = new PermissionHandlerFactory({
 
 const rpcHandler = createRpcHandler({
   permissionHandlerFactory,
+  permissionRegistry,
   profileSyncManager,
   blockchainClient,
 });

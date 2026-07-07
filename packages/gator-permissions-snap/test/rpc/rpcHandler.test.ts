@@ -13,6 +13,7 @@ import {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { BlockchainClient } from '../../src/clients/blockchainClient';
+import { createPermissionRegistry } from '../../src/core/permission/registerPermissionModules';
 import type { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionHandlerType } from '../../src/core/types';
 import type {
@@ -136,6 +137,7 @@ describe('RpcHandler', () => {
 
     handler = createRpcHandler({
       permissionHandlerFactory: mockHandlerFactory,
+      permissionRegistry: createPermissionRegistry(),
       profileSyncManager: mockProfileSyncManager,
       blockchainClient: mockBlockchainClient,
     });
