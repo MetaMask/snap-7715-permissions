@@ -11,7 +11,7 @@ import {
   ROOT_AUTHORITY,
 } from '@metamask/delegation-core';
 import { InvalidInputError } from '@metamask/snaps-sdk';
-import { bigIntToHex, bytesToHex, numberToHex } from '@metamask/utils';
+import { bigIntToHex, bytesToBigInt, numberToHex } from '@metamask/utils';
 
 import type { NonceCaveatService } from '../../services/nonceCaveatService';
 import type { SnapsMetricsService } from '../../services/snapsMetricsService';
@@ -164,14 +164,14 @@ export class GrantedPermissionResolutionService {
 
     // eslint-disable-next-line no-restricted-globals
     const saltBytes = crypto.getRandomValues(new Uint8Array(32));
-    const salt = bytesToHex(saltBytes);
+    const salt = bytesToBigInt(saltBytes);
 
     const delegation = {
       delegate: to,
       authority: ROOT_AUTHORITY,
       delegator: from,
       caveats,
-      salt: BigInt(salt),
+      salt,
     } as const;
 
     const { justification } = modifiedContext;
