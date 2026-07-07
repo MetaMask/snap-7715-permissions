@@ -10,7 +10,7 @@ import type { Json } from '@metamask/snaps-sdk';
 
 import type { BlockchainClient } from '../clients/blockchainClient';
 import type { PermissionRegistry } from '../core/permission/PermissionRegistry';
-import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
+import type { PermissionRequestProcessor } from '../core/permission/PermissionRequestProcessor';
 import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
   ProfileSyncManager,
@@ -70,19 +70,19 @@ export type RpcHandler = {
  * Creates an RPC handler with methods for handling permission-related RPC requests.
  *
  * @param config - The parameters for creating the RPC handler.
- * @param config.permissionHandlerFactory - The factory for creating permission handlers.
+ * @param config.permissionRequestProcessor - Processor for permission grant requests.
  * @param config.permissionRegistry - Registry of supported permission types.
  * @param config.profileSyncManager - The profile sync manager.
  * @param config.blockchainClient - The blockchain client for on-chain checks.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler({
-  permissionHandlerFactory,
+  permissionRequestProcessor,
   permissionRegistry,
   profileSyncManager,
   blockchainClient,
 }: {
-  permissionHandlerFactory: PermissionHandlerFactory;
+  permissionRequestProcessor: PermissionRequestProcessor;
   permissionRegistry: PermissionRegistry;
   profileSyncManager: ProfileSyncManager;
   blockchainClient: BlockchainClient;
@@ -102,10 +102,10 @@ export function createRpcHandler({
 
     // First, process all permissions to collect responses and validate all are approved
     for (const request of permissionsRequest) {
-      const handler = permissionHandlerFactory.createPermissionHandler(request);
-
-      const permissionResponse =
-        await handler.handlePermissionRequest(siteOrigin);
+      const permissionResponse = await permissionRequestProcessor.process(
+        siteOrigin,
+        request,
+      );
 
       if (!permissionResponse.approved) {
         throw new UserRejectedRequestError(permissionResponse.reason);

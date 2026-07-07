@@ -36,12 +36,12 @@ import { TrustSignalsCoordinator } from './core/coordinators/TrustSignalsCoordin
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from './core/existingpermissions';
 import { GrantedPermissionResolutionService } from './core/grant/GrantedPermissionResolutionService';
+import { ConfirmationShellFactory } from './core/permission/ConfirmationShellFactory';
+import { PermissionRequestProcessor } from './core/permission/PermissionRequestProcessor';
 import { createPermissionRegistry } from './core/permission/registerPermissionModules';
 import { PermissionGrantPipeline } from './core/PermissionGrantPipeline';
 import { PermissionGrantPreparator } from './core/PermissionGrantPreparator';
-import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
 import { PermissionIntroductionService } from './core/permissionIntroduction';
-import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
 import { IntroductionPhase } from './core/phases/IntroductionPhase';
 import { createTimeoutFactory } from './core/timeoutFactory';
 import {
@@ -248,23 +248,24 @@ const permissionGrantPipeline = new PermissionGrantPipeline({
   grantedPermissionResolutionService,
 });
 
-const orchestrator = new PermissionRequestLifecycleOrchestrator({
-  pipeline: permissionGrantPipeline,
-});
-
 const permissionRegistry = createPermissionRegistry();
 
-const permissionHandlerFactory = new PermissionHandlerFactory({
+const confirmationShellFactory = new ConfirmationShellFactory({
   accountController,
-  tokenPricesService,
-  tokenMetadataService,
   userEventDispatcher,
-  orchestrator,
+  tokenMetadataService,
+  tokenPricesService,
+});
+
+const permissionRequestProcessor = new PermissionRequestProcessor({
   registry: permissionRegistry,
+  pipeline: permissionGrantPipeline,
+  confirmationShellFactory,
+  tokenMetadataService,
 });
 
 const rpcHandler = createRpcHandler({
-  permissionHandlerFactory,
+  permissionRequestProcessor,
   permissionRegistry,
   profileSyncManager,
   blockchainClient,

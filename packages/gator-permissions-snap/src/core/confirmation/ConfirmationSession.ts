@@ -8,13 +8,9 @@ import type { ConfirmationDialogFactory } from '../confirmationFactory';
 import type { ExistingPermissionsCoordinator } from '../coordinators/ExistingPermissionsCoordinator';
 import type { TrustSignalsCoordinator } from '../coordinators/TrustSignalsCoordinator';
 import type { DialogInterfaceFactory } from '../dialogInterfaceFactory';
+import type { PermissionGrantLifecycleHandlers } from '../permission/PermissionGrantLifecycleHandlers';
 import type { IntroductionPhase } from '../phases/IntroductionPhase';
-import type {
-  BaseContext,
-  BaseMetadata,
-  DeepRequired,
-  LifecycleOrchestrationHandlers,
-} from '../types';
+import type { BaseContext, BaseMetadata, DeepRequired } from '../types';
 
 /**
  * Result of running a confirmation session through intro and grant UI.
@@ -96,7 +92,7 @@ export class ConfirmationSession {
     permissionType: string;
     normalizedRequest: TRequest;
     chainId: number;
-    lifecycleHandlers: LifecycleOrchestrationHandlers<
+    lifecycleHandlers: PermissionGrantLifecycleHandlers<
       TRequest,
       TContext,
       TMetadata,

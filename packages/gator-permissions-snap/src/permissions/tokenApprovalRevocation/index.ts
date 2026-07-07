@@ -15,7 +15,15 @@ import type {
   PopulatedTokenApprovalRevocationPermission,
 } from './types';
 import { parseAndValidatePermission } from './validation';
+import type { ConfirmationShellConfig } from '../../core/confirmation/ConfirmationShellConfig';
 import type { PermissionDefinition } from '../../core/types';
+
+const TOKEN_APPROVAL_REVOCATION_SHELL_CONFIG: ConfirmationShellConfig = {
+  accountSelector: true,
+  tokenBalance: false,
+  accountUpgradeBanner: true,
+  existingPermissionsReview: true,
+};
 
 export const tokenApprovalRevocationPermissionDefinition: PermissionDefinition<
   TokenApprovalRevocationPermissionRequest,
@@ -27,6 +35,7 @@ export const tokenApprovalRevocationPermissionDefinition: PermissionDefinition<
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitleRevocation',
+  confirmationShell: TOKEN_APPROVAL_REVOCATION_SHELL_CONFIG,
   dependencies: {
     parseAndValidatePermission,
     buildContext,

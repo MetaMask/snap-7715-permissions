@@ -1,39 +1,9 @@
-import type {
-  Permission,
-  PermissionRequest,
-} from '@metamask/7715-permissions-shared/types';
 import { InvalidInputError, InternalError } from '@metamask/snaps-sdk';
 
-import type { MessageKey } from '../../utils/i18n';
-import type {
-  BaseContext,
-  BaseMetadata,
-  DeepRequired,
-  PermissionDefinition,
-  PermissionHandlerDependencies,
-  RuleDefinition,
-} from '../types';
+import type { PermissionDefinition } from '../types';
+import type { RegisteredPermissionModule } from './PermissionModule';
 
-/**
- * Erased permission definition stored in the registry.
- * Heterogeneous permission modules are widened at registration time because
- * the registry must hold every type behind one lookup key.
- */
-export type RegisteredPermissionDefinition = {
-  type: string;
-  rules: RuleDefinition<BaseContext, BaseMetadata>[];
-  title: MessageKey;
-  subtitle: MessageKey;
-  dependencies: PermissionHandlerDependencies<
-    PermissionRequest,
-    BaseContext,
-    BaseMetadata,
-    Permission,
-    DeepRequired<Permission>
-  >;
-};
-
-/** Map of permission type strings to their definitions before registry erasure. */
+/** Map of permission type strings to their folder definitions before module conversion. */
 export type PermissionModuleMap = Record<string, PermissionDefinition>;
 
 /**
@@ -46,55 +16,30 @@ export function permissionModuleMap(modules: unknown): PermissionModuleMap {
 }
 
 /**
- * Registers a typed permission definition in the registry's erased shape.
- * @param type - The permission type string (descriptor name).
- * @param definition - A permission-specific definition without its type string.
- * @returns The definition widened for registry storage.
- */
-export function toRegisteredPermissionDefinition<
-  TRequest extends PermissionRequest,
-  TContext extends BaseContext,
-  TMetadata extends BaseMetadata,
-  TPermission extends TRequest['permission'],
-  TPopulatedPermission extends DeepRequired<TPermission>,
->(
-  type: string,
-  definition: PermissionDefinition<
-    TRequest,
-    TContext,
-    TMetadata,
-    TPermission,
-    TPopulatedPermission
-  >,
-): RegisteredPermissionDefinition {
-  return { type, ...definition } as unknown as RegisteredPermissionDefinition;
-}
-
-/**
- * Registry mapping permission type strings to their definitions.
+ * Registry mapping permission type strings to their modules.
  */
 export class PermissionRegistry {
-  readonly #modules = new Map<string, RegisteredPermissionDefinition>();
+  readonly #modules = new Map<string, RegisteredPermissionModule>();
 
   /**
-   * Registers a permission definition. Each type may only be registered once.
-   * @param definition - The permission definition including its type string.
+   * Registers a permission module. Each type may only be registered once.
+   * @param module - The permission module including its type string.
    * @throws If the type is already registered.
    */
-  register(definition: RegisteredPermissionDefinition): void {
-    if (this.#modules.has(definition.type)) {
-      throw new InternalError(`Duplicate permission type: ${definition.type}`);
+  register(module: RegisteredPermissionModule): void {
+    if (this.#modules.has(module.type)) {
+      throw new InternalError(`Duplicate permission type: ${module.type}`);
     }
-    this.#modules.set(definition.type, definition);
+    this.#modules.set(module.type, module);
   }
 
   /**
-   * Returns the registered definition for a permission type.
+   * Returns the registered module for a permission type.
    * @param type - The permission type string (descriptor name).
-   * @returns The registered permission definition.
+   * @returns The registered permission module.
    * @throws If the type is not registered.
    */
-  get(type: string): RegisteredPermissionDefinition {
+  get(type: string): RegisteredPermissionModule {
     const module = this.#modules.get(type);
     if (!module) {
       throw new InvalidInputError(`Unsupported permission type: ${type}`);

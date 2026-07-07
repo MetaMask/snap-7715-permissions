@@ -1,39 +1,28 @@
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { InternalError, InvalidInputError } from '@metamask/snaps-sdk';
 
+import { toPermissionModule } from '../../../src/core/permission/PermissionModule';
+import type { RegisteredPermissionModule } from '../../../src/core/permission/PermissionModule';
 import { PermissionRegistry } from '../../../src/core/permission/PermissionRegistry';
-import type { RegisteredPermissionDefinition } from '../../../src/core/permission/PermissionRegistry';
 import { createPermissionRegistry } from '../../../src/core/permission/registerPermissionModules';
+import { nativeTokenStreamPermissionDefinition } from '../../../src/permissions/nativeTokenStream';
 
-const createMinimalDefinition = (
-  type: string,
-): RegisteredPermissionDefinition =>
-  ({
-    type,
+const createMinimalModule = (type: string): RegisteredPermissionModule =>
+  toPermissionModule(type, {
+    ...nativeTokenStreamPermissionDefinition,
     rules: [],
-    title: 'permissionRequestTitle',
-    subtitle: 'permissionRequestSubtitle',
-    dependencies: {
-      parseAndValidatePermission: jest.fn(),
-      buildContext: jest.fn(),
-      deriveMetadata: jest.fn(),
-      createConfirmationContent: jest.fn(),
-      applyContext: jest.fn(),
-      populatePermission: jest.fn(),
-      createPermissionCaveats: jest.fn(),
-    },
-  }) as RegisteredPermissionDefinition;
+  });
 
 describe('PermissionRegistry', () => {
   describe('register', () => {
     it('throws InternalError when registering a duplicate type', () => {
       const registry = new PermissionRegistry();
-      const definition = createMinimalDefinition('native-token-stream');
+      const module = createMinimalModule('native-token-stream');
 
-      registry.register(definition);
+      registry.register(module);
 
-      expect(() => registry.register(definition)).toThrow(InternalError);
-      expect(() => registry.register(definition)).toThrow(
+      expect(() => registry.register(module)).toThrow(InternalError);
+      expect(() => registry.register(module)).toThrow(
         'Duplicate permission type: native-token-stream',
       );
     });
@@ -51,21 +40,21 @@ describe('PermissionRegistry', () => {
       );
     });
 
-    it('returns the registered definition for a known type', () => {
+    it('returns the registered module for a known type', () => {
       const registry = new PermissionRegistry();
-      const definition = createMinimalDefinition('native-token-stream');
+      const module = createMinimalModule('native-token-stream');
 
-      registry.register(definition);
+      registry.register(module);
 
-      expect(registry.get('native-token-stream')).toBe(definition);
+      expect(registry.get('native-token-stream')).toBe(module);
     });
   });
 
   describe('getSupportedTypes', () => {
     it('returns all registered type strings', () => {
       const registry = new PermissionRegistry();
-      registry.register(createMinimalDefinition('native-token-stream'));
-      registry.register(createMinimalDefinition('erc20-token-stream'));
+      registry.register(createMinimalModule('native-token-stream'));
+      registry.register(createMinimalModule('erc20-token-stream'));
 
       expect(registry.getSupportedTypes()).toStrictEqual([
         'native-token-stream',
@@ -95,6 +84,15 @@ describe('PermissionRegistry', () => {
       for (const type of registry.getSupportedTypes()) {
         expect(registry.get(type).type).toBe(type);
       }
+    });
+
+    it('exposes flat module methods for token-approval-revocation', () => {
+      const registry = createPermissionRegistry();
+      const module = registry.get('token-approval-revocation');
+
+      expect(module.renderBody).toStrictEqual(expect.any(Function));
+      expect(module.parseAndValidate).toStrictEqual(expect.any(Function));
+      expect(module.confirmationShell.tokenBalance).toBe(false);
     });
   });
 });

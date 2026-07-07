@@ -30,9 +30,10 @@ This document outlines the architecture of the Permissions Provider Snap system 
 
 - **EntryPoint (index.ts)**: The main entrypoint for the snap. Sets up all services, dependencies, and lifecycle handlers. Connects RPC handlers and UserEventDispatcher to the Snaps runtime.
 - **RpcHandler**: Functional RPC handler created by `createRpcHandler()` that responds to JSON-RPC requests from external systems. Supports three methods: grantPermission, getPermissionOffers, getGrantedPermissions.
-- **PermissionHandlerFactory**: Creates and manages specific permission handlers using a generic PermissionHandler class with permission-specific type parameters and dependencies.
-- **PermissionHandler**: A generic class used for all permission types, instantiated with permission-specific configuration and implementations to handle the complete permission lifecycle.
-- **PermissionRequestLifecycleOrchestrator**: Orchestrates the complete permission request lifecycle across all permission types using handler-provided functions.
+- **PermissionRequestProcessor**: Looks up permission modules from the registry and runs each request through the grant pipeline.
+- **PermissionRegistry**: Maps permission type strings to unified `PermissionModule` definitions.
+- **PermissionGrantPipeline**: Sequences grant preparation, confirmation session, and grant resolution for each request.
+- **PermissionModule**: Per-type contract (parse, buildContext, renderBody, caveats, etc.) registered in the registry.
 - **UserEventDispatcher**: Manages user input events from the snaps environment, providing event registration, cleanup, and sequential event processing.
 
 ### Service Components
@@ -120,29 +121,30 @@ src/
 graph TD
     EntryPoint[EntryPoint]
     RpcHandler[RpcHandler]
-    PermissionHandlerFactory[PermissionHandlerFactory]
-    PermissionHandler[PermissionHandler]
-    PermissionRequestLifecycleOrchestrator[PermissionRequestLifecycleOrchestrator]
-    ConfirmationDialog[ConfirmationDialog]
+    PermissionRequestProcessor[PermissionRequestProcessor]
+    PermissionRegistry[PermissionRegistry]
+    PermissionGrantPipeline[PermissionGrantPipeline]
+    ConfirmationSession[ConfirmationSession]
     AccountController[AccountController]
     User((User))
 
     %% Request Flow
     EntryPoint -->|"1 grantPermission(request)"| RpcHandler
-    RpcHandler -->|"2 createPermissionHandler(type)"| PermissionHandlerFactory
-    PermissionHandlerFactory -->|"3 create type-specific handler"| PermissionHandler
-    PermissionHandler -->|"4 orchestrate(request)"| PermissionRequestLifecycleOrchestrator
-    PermissionRequestLifecycleOrchestrator -->|"5 show confirmation dialog"| ConfirmationDialog
-    User -->|"6 user interaction"| ConfirmationDialog
-    ConfirmationDialog -->|"7 resolve decision"| PermissionRequestLifecycleOrchestrator
-    PermissionRequestLifecycleOrchestrator -->|"8 create delegation"| AccountController
-    PermissionHandler -->|"9 return response"| RpcHandler
-    RpcHandler -->|"10 return response"| EntryPoint
+    RpcHandler -->|"2 process(request)"| PermissionRequestProcessor
+    PermissionRequestProcessor -->|"3 lookup(type)"| PermissionRegistry
+    PermissionRequestProcessor -->|"4 run pipeline"| PermissionGrantPipeline
+    PermissionGrantPipeline -->|"5 confirmation UI"| ConfirmationSession
+    User -->|"6 user interaction"| ConfirmationSession
+    ConfirmationSession -->|"7 resolve decision"| PermissionGrantPipeline
+    PermissionGrantPipeline -->|"8 create delegation"| AccountController
+    PermissionGrantPipeline -->|"9 return response"| PermissionRequestProcessor
+    PermissionRequestProcessor -->|"10 return response"| RpcHandler
+    RpcHandler -->|"11 return response"| EntryPoint
 
     %% Style
     classDef component fill:#000,stroke:#333,stroke-width:2px,color:#fff;
     classDef user fill:#fff,stroke:#333,stroke-width:2px;
-    class EntryPoint,RpcHandler,PermissionHandlerFactory,PermissionHandler,PermissionRequestLifecycleOrchestrator,ConfirmationDialog,AccountController component;
+    class EntryPoint,RpcHandler,PermissionRequestProcessor,PermissionRegistry,PermissionGrantPipeline,ConfirmationSession,AccountController component;
     class User user;
 ```
 
@@ -150,24 +152,22 @@ graph TD
 
 1. A `grantPermission` request is received by the `EntryPoint` and passed to the `RpcHandler`'s `grantPermission` function
 2. `RpcHandler` validates the request parameters and extracts permission requests and site origin
-3. For each permission request, `PermissionHandlerFactory` creates a permission-specific `PermissionHandler` using the generic class with permission-specific type parameters and dependencies
-4. `RpcHandler` calls the `handlePermissionRequest()` function on each `PermissionHandler`
-5. `PermissionHandler` provides lifecycle functions to the `PermissionRequestLifecycleOrchestrator`
-6. `PermissionRequestLifecycleOrchestrator` executes the lifecycle functions in sequence:
-   - Validates the request using permission-specific validation
-   - Builds the context using permission-specific context builders
-   - Creates the confirmation dialog with skeleton content
-   - Updates dialog with actual content once context is resolved
+3. For each permission request, `PermissionRequestProcessor` looks up the `PermissionModule` in `PermissionRegistry` by type
+4. `PermissionRequestProcessor` builds grant lifecycle handlers from the module and `ConfirmationShell`, then invokes `PermissionGrantPipeline.run()`
+5. `PermissionGrantPipeline` executes the lifecycle in sequence:
+   - Validates the request using `PermissionGrantPreparator`
+   - Runs introduction (if needed) and confirmation via `ConfirmationSession`
+   - Builds context and renders confirmation content (shell chrome + module `renderBody`)
    - Manages user interaction and context updates
    - Processes the user's decision
-   - Creates and signs the delegation
-7. `PermissionHandler` returns the result to the `RpcHandler`
+   - Creates and signs the delegation via `GrantedPermissionResolutionService`
+6. `PermissionRequestProcessor` returns the result to the `RpcHandler`
 8. `RpcHandler` stores approved permissions via `ProfileSyncManager` for cross-device sync
 9. Response is returned through the call stack
 
-## Permission Request Lifecycle Orchestration
+## Permission Request Grant Pipeline
 
-The `PermissionRequestLifecycleOrchestrator` implements a clear lifecycle for permission requests that defines distinct steps for the flow. This ensures that the implementation is flexible enough to accommodate different permission types while providing a consistent framework for permission-specific customizations.
+The `PermissionGrantPipeline` implements a clear lifecycle for permission requests that defines distinct steps for the flow. This ensures that the implementation is flexible enough to accommodate different permission types while providing a consistent framework for permission-specific customizations.
 
 ```mermaid
 flowchart TD
@@ -198,7 +198,7 @@ The EntryPoint serves as the main initialization and configuration point for the
    - State management (StateManager for snap persistence)
    - Profile sync (ProfileSyncManager for cross-device permission sync)
    - UI components (ConfirmationDialogFactory, UserEventDispatcher)
-   - Permission handling (PermissionHandlerFactory, PermissionRequestLifecycleOrchestrator)
+   - Permission handling (PermissionRegistry, PermissionRequestProcessor, PermissionGrantPipeline)
    - RPC handling (createRpcHandler for processing requests)
 
 2. Configuring RPC method bindings:
@@ -256,14 +256,14 @@ The UserEventDispatcher provides:
 
 ### RpcHandler
 
-The RpcHandler is created by the `createRpcHandler()` function and provides a clean interface for handling permission-related RPC methods. It coordinates with the PermissionHandlerFactory to process permission requests.
+The RpcHandler is created by the `createRpcHandler()` function and provides a clean interface for handling permission-related RPC methods. It coordinates with the `PermissionRequestProcessor` to process permission requests.
 
 Key architectural points:
 
 - Uses functional approach rather than class-based architecture
 - Validates incoming permission request parameters
-- Coordinates with PermissionHandlerFactory to create permission-specific handlers
-- Handles multiple permission requests in parallel
+- Delegates each request to `PermissionRequestProcessor.process()`
+- Processes permission requests sequentially in a batch (all must succeed before storing)
 - Integrates with ProfileSyncManager to store approved permissions
 - Returns filtered arrays of valid permission responses
 
@@ -272,9 +272,8 @@ The RpcHandler provides three main functions:
 1. `grantPermission()`:
    - Validates incoming permission request parameters
    - Extracts permissions request array and site origin
-   - Creates appropriate permission handlers for each permission request
-   - Processes permission requests in parallel using Promise.all
-   - Stores approved permissions via ProfileSyncManager
+   - Processes each permission request via `PermissionRequestProcessor`
+   - Stores approved permissions via ProfileSyncManager only after all requests succeed
    - Returns array of permission responses
 
 2. `getPermissionOffers()`:
@@ -285,93 +284,55 @@ The RpcHandler provides three main functions:
    - Retrieves all previously granted permissions from ProfileSyncManager
    - Returns permissions for cross-device synchronization
 
-### PermissionHandlerFactory
+### PermissionRequestProcessor
 
-The PermissionHandlerFactory creates permission-specific handlers using a generic `PermissionHandler` class. It provides a centralized factory for instantiating handlers with all required dependencies and permission-specific configurations.
-
-Key architectural points:
-
-- Uses a factory pattern for creating permission handlers
-- Manages dependencies required by handlers (services, orchestrator, user event dispatcher)
-- Creates instances of the generic PermissionHandler class with permission-specific type parameters
-- Supports extensibility for new permission types through a simple switch statement
-- Ensures consistent dependency injection across all permission types
-
-The factory provides:
-
-1. Permission handler creation via `createPermissionHandler()`:
-   - Extracts permission type from request using `extractPermissionName()`
-   - Creates generic PermissionHandler instances with permission-specific configurations
-   - Injects base dependencies (AccountController, services, orchestrator)
-   - Uses permission definitions imported from each permission type folder
-   - Supports four permission types: native-token-stream, native-token-periodic, erc20-token-stream, erc20-token-periodic
-
-Each permission type provides a `PermissionDefinition` object containing:
-
-- `rules`: Permission-specific validation rules and UI constraints
-- `title`: Human-readable permission name
-- `dependencies`: Object containing all lifecycle functions (parseAndValidatePermission, buildContext, deriveMetadata, createConfirmationContent, applyContext, populatePermission, createPermissionCaveats)
-
-### PermissionHandler
-
-The `PermissionHandler` is a generic class that implements the `PermissionHandlerType` interface. All permission types use this same handler class, but it is instantiated with different type parameters and injected dependencies for each permission type.
+The `PermissionRequestProcessor` is the RPC-facing entry point for grant requests. It looks up the `PermissionModule` by type, creates a per-request `ConfirmationShell`, builds grant lifecycle handlers, and delegates to `PermissionGrantPipeline`.
 
 Key architectural points:
 
-- Single generic class used for all permission types with type parameters for request, context, metadata, and permission types
-- Permission-specific logic is injected through the dependencies object from permission definitions
-- Coordinates between permission-specific logic and the common lifecycle orchestrator
-- Uses dependency injection for required services and orchestrator
-- Prevents multiple permission request handling on the same instance
-- Manages state and renders UI for shared logic such as Granting address, token balance etc.
+- One processor instance shared across all requests (no per-request handler object)
+- Registry lookup via `extractDescriptorName(request.permission.type)`
+- Bridges folder-level `PermissionDefinition` exports to runtime `PermissionModule` via `toPermissionModule()`
+- Builds lifecycle handlers from module + shell (replaces the former `PermissionHandler` adapter)
 
-The handler provides:
+### PermissionRegistry and PermissionModule
 
-1. `handlePermissionRequest()`:
-   - Ensures single-use pattern (can only handle one request per instance)
-   - Delegates to the PermissionRequestLifecycleOrchestrator with permission-specific lifecycle handlers
-   - Returns permission request results (approved/rejected with reasons)
+`PermissionRegistry` maps permission type strings to `PermissionModule` instances registered at startup via `createPermissionRegistry()`.
 
-2. Lifecycle handler coordination via `#getLifecycleHandlers()`:
-   - Provides permission-specific functions to the orchestrator
-   - Includes validation, context building, UI creation, and delegation creation
-   - Handles token balance fetching and price conversion
-   - Manages UI updates and user interaction callbacks
+Each `PermissionModule` exposes a flat contract:
 
-### PermissionRequestLifecycleOrchestrator
+- `parseAndValidate`, `buildContext`, `deriveMetadata`, `renderBody`
+- `applyContext`, `populatePermission`, `createPermissionCaveats`
+- `rules`, `title`, `subtitle`, `confirmationShell`
 
-The PermissionRequestLifecycleOrchestrator manages the complete lifecycle of permission requests across all permission types. It provides a template method pattern that defines the core flow while allowing permission-specific handlers to provide customized implementations for each step.
+Permission folders still export `PermissionDefinition` objects (with a `dependencies` bag); `toPermissionModule()` adapts them at registration time so permission-specific `context.ts` files remain unchanged.
+
+### PermissionGrantPipeline
+
+The `PermissionGrantPipeline` sequences grant preparation, confirmation session, and grant resolution for a single request.
 
 Key architectural points:
 
-- Provides a common lifecycle for all permission types
-- Uses handler-provided functions for permission-specific steps
-- Manages confirmation dialog creation and updates
-- Handles user decision processing and context updates
-- Creates and manages delegations through AccountController
-- Supports adjustment workflows where users can modify permission parameters
+- Uses `PermissionGrantPreparator` for chain validation, parsing, and address resolution
+- Delegates UI to `ConfirmationSession` (shared `DialogInterface` per request)
+- Resolves approved grants via `GrantedPermissionResolutionService`
+- Accepts `PermissionGrantLifecycleHandlers` built by the processor
 
-The orchestrator manages the following lifecycle:
+The pipeline manages the following lifecycle:
 
-1. **Initial Setup**:
-   - Ensures account addresses are available
-   - Validates permission requests using handler-provided validators
+1. **Preparation**:
+   - Validates chain support and parses the request
+   - Normalizes sentinel redeemer rules and resolves `from` address
 
-2. **Dialog Management**:
-   - Creates confirmation dialogs with skeleton content initially
-   - Builds context data using handler-provided context builders
-   - Updates dialogs with actual content once context is resolved
-   - Manages real-time UI updates based on user interaction
+2. **Confirmation**:
+   - Shows introduction when needed
+   - Creates confirmation dialog with skeleton content initially
+   - Builds context and updates dialog with shell chrome + module body
+   - Manages user interaction, trust signals, and existing-permissions subview
 
-3. **User Interaction**:
-   - Handles user input for permission parameter adjustments
-   - Validates changes and updates UI accordingly
-   - Processes approval or rejection decisions
-
-4. **Delegation Creation**:
-   - Populates permissions based on user decisions
-   - Appends permission-specific caveats
-   - Creates and signs delegations through AccountController
+3. **Grant resolution**:
+   - Applies context, populates permission, creates caveats
+   - Signs delegation and returns `PermissionResponse`
 
 ### ConfirmationDialogFactory & ConfirmationDialog
 

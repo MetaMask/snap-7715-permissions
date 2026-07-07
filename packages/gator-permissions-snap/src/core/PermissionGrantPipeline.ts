@@ -2,13 +2,13 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 
 import type { ConfirmationSession } from './confirmation/ConfirmationSession';
 import type { GrantedPermissionResolutionService } from './grant/GrantedPermissionResolutionService';
+import type { PermissionGrantLifecycleHandlers } from './permission/PermissionGrantLifecycleHandlers';
 import type { PermissionGrantPreparator } from './PermissionGrantPreparator';
 import type { IntroductionPhase } from './phases/IntroductionPhase';
 import type {
   BaseContext,
   BaseMetadata,
   DeepRequired,
-  LifecycleOrchestrationHandlers,
   PermissionRequestResult,
 } from './types';
 
@@ -61,7 +61,7 @@ export class PermissionGrantPipeline {
   >(args: {
     origin: string;
     permissionRequest: PermissionRequest;
-    lifecycleHandlers: LifecycleOrchestrationHandlers<
+    lifecycleHandlers: PermissionGrantLifecycleHandlers<
       TRequest,
       TContext,
       TMetadata,

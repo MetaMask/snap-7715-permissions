@@ -1,8 +1,5 @@
-import {
-  PermissionRegistry,
-  permissionModuleMap,
-  toRegisteredPermissionDefinition,
-} from './PermissionRegistry';
+import { toPermissionModule } from './PermissionModule';
+import { PermissionRegistry, permissionModuleMap } from './PermissionRegistry';
 import { erc20TokenAllowancePermissionDefinition } from '../../permissions/erc20TokenAllowance';
 import { erc20TokenPeriodicPermissionDefinition } from '../../permissions/erc20TokenPeriodic';
 import { erc20TokenStreamPermissionDefinition } from '../../permissions/erc20TokenStream';
@@ -29,7 +26,7 @@ export function createPermissionRegistry(): PermissionRegistry {
   const registry = new PermissionRegistry();
 
   for (const [type, definition] of Object.entries(PERMISSION_MODULES)) {
-    registry.register(toRegisteredPermissionDefinition(type, definition));
+    registry.register(toPermissionModule(type, definition));
   }
 
   return registry;

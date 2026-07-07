@@ -19,12 +19,9 @@ import type { AccountController } from '../accountController';
 import { getChainMetadata } from '../chainMetadata';
 import { appendExpiryCaveatIfPresent } from '../expiryCaveat';
 import { appendPayeeCaveatIfPresent } from '../payeeCaveat';
+import type { PermissionGrantLifecycleHandlers } from '../permission/PermissionGrantLifecycleHandlers';
 import { appendRedeemerCaveatIfPresent } from '../redeemerCaveat';
-import type {
-  BaseContext,
-  DeepRequired,
-  LifecycleOrchestrationHandlers,
-} from '../types';
+import type { BaseContext, DeepRequired } from '../types';
 
 /**
  * Resolves an approved permission request into a signed delegation response.
@@ -86,7 +83,7 @@ export class GrantedPermissionResolutionService {
     modifiedContext: TContext;
     isAdjustmentAllowed: boolean;
     lifecycleHandlers: Pick<
-      LifecycleOrchestrationHandlers<
+      PermissionGrantLifecycleHandlers<
         TRequest,
         TContext,
         TMetadata,
