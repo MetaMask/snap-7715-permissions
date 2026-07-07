@@ -13,8 +13,8 @@ import {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { BlockchainClient } from '../../src/clients/blockchainClient';
+import { createPermissionRegistry } from '../../src/core/permission/createPermissionRegistry';
 import type { PermissionRequestProcessor } from '../../src/core/permission/PermissionRequestProcessor';
-import { createPermissionRegistry } from '../../src/core/permission/registerPermissionModules';
 import type {
   ProfileSyncManager,
   StoredGrantedPermission,

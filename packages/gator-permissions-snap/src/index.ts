@@ -37,11 +37,11 @@ import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from './core/existingpermissions';
 import { GrantedPermissionResolutionService } from './core/grant/GrantedPermissionResolutionService';
 import { ConfirmationShellFactory } from './core/permission/ConfirmationShellFactory';
+import { createPermissionRegistry } from './core/permission/createPermissionRegistry';
 import { PermissionRequestProcessor } from './core/permission/PermissionRequestProcessor';
-import { createPermissionRegistry } from './core/permission/registerPermissionModules';
-import { PermissionGrantPipeline } from './core/PermissionGrantPipeline';
-import { PermissionGrantPreparator } from './core/PermissionGrantPreparator';
 import { PermissionIntroductionService } from './core/permissionIntroduction';
+import { PermissionRequestPipeline } from './core/PermissionRequestPipeline';
+import { PermissionRequestPreparator } from './core/PermissionRequestPreparator';
 import { IntroductionPhase } from './core/phases/IntroductionPhase';
 import { createTimeoutFactory } from './core/timeoutFactory';
 import {
@@ -221,7 +221,7 @@ const trustSignalsCoordinator = new TrustSignalsCoordinator({
   trustSignalsClient,
 });
 
-const permissionGrantPreparator = new PermissionGrantPreparator({
+const permissionRequestPreparator = new PermissionRequestPreparator({
   accountController,
   snapsMetricsService,
 });
@@ -241,8 +241,8 @@ const confirmationSession = new ConfirmationSession({
   snapsMetricsService,
 });
 
-const permissionGrantPipeline = new PermissionGrantPipeline({
-  permissionGrantPreparator,
+const permissionRequestPipeline = new PermissionRequestPipeline({
+  permissionRequestPreparator,
   confirmationSession,
   grantedPermissionResolutionService,
 });
@@ -258,7 +258,7 @@ const confirmationShellFactory = new ConfirmationShellFactory({
 
 const permissionRequestProcessor = new PermissionRequestProcessor({
   registry: permissionRegistry,
-  pipeline: permissionGrantPipeline,
+  pipeline: permissionRequestPipeline,
   confirmationShellFactory,
   tokenMetadataService,
 });

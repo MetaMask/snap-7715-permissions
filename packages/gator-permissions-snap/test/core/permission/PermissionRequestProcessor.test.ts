@@ -3,16 +3,16 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 
 import type { AccountController } from '../../../src/core/accountController';
 import { ConfirmationShellFactory } from '../../../src/core/permission/ConfirmationShellFactory';
+import { createPermissionRegistry } from '../../../src/core/permission/createPermissionRegistry';
 import { PermissionRequestProcessor } from '../../../src/core/permission/PermissionRequestProcessor';
-import { createPermissionRegistry } from '../../../src/core/permission/registerPermissionModules';
-import type { PermissionGrantPipeline } from '../../../src/core/PermissionGrantPipeline';
+import type { PermissionRequestPipeline } from '../../../src/core/PermissionRequestPipeline';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import type { TokenPricesService } from '../../../src/services/tokenPricesService';
 import type { UserEventDispatcher } from '../../../src/userEventDispatcher';
 
 describe('PermissionRequestProcessor', () => {
   let permissionRequestProcessor: PermissionRequestProcessor;
-  let mockPipeline: jest.Mocked<PermissionGrantPipeline>;
+  let mockPipeline: jest.Mocked<PermissionRequestPipeline>;
   let mockAccountController: jest.Mocked<AccountController>;
   let mockTokenPricesService: jest.Mocked<TokenPricesService>;
   let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
@@ -90,7 +90,7 @@ describe('PermissionRequestProcessor', () => {
 
     mockPipeline = {
       run: jest.fn(),
-    } as unknown as jest.Mocked<PermissionGrantPipeline>;
+    } as unknown as jest.Mocked<PermissionRequestPipeline>;
 
     const confirmationShellFactory = new ConfirmationShellFactory({
       accountController: mockAccountController,

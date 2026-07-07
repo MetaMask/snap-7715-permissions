@@ -2,8 +2,8 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 
 import type { ConfirmationSession } from './confirmation/ConfirmationSession';
 import type { GrantedPermissionResolutionService } from './grant/GrantedPermissionResolutionService';
-import type { PermissionGrantLifecycleHandlers } from './permission/PermissionGrantLifecycleHandlers';
-import type { PermissionGrantPreparator } from './PermissionGrantPreparator';
+import type { PermissionRequestLifecycleHandlers } from './permission/PermissionRequestLifecycleHandlers';
+import type { PermissionRequestPreparator } from './PermissionRequestPreparator';
 import type {
   BaseContext,
   BaseMetadata,
@@ -12,33 +12,33 @@ import type {
 } from './types';
 
 /**
- * Sequences grant preparation, confirmation session, and grant resolution
+ * Sequences request preparation, confirmation session, and grant resolution
  * for a single permission request.
  */
-export class PermissionGrantPipeline {
-  readonly #permissionGrantPreparator: PermissionGrantPreparator;
+export class PermissionRequestPipeline {
+  readonly #permissionRequestPreparator: PermissionRequestPreparator;
 
   readonly #confirmationSession: ConfirmationSession;
 
   readonly #grantedPermissionResolutionService: GrantedPermissionResolutionService;
 
   constructor({
-    permissionGrantPreparator,
+    permissionRequestPreparator,
     confirmationSession,
     grantedPermissionResolutionService,
   }: {
-    permissionGrantPreparator: PermissionGrantPreparator;
+    permissionRequestPreparator: PermissionRequestPreparator;
     confirmationSession: ConfirmationSession;
     grantedPermissionResolutionService: GrantedPermissionResolutionService;
   }) {
-    this.#permissionGrantPreparator = permissionGrantPreparator;
+    this.#permissionRequestPreparator = permissionRequestPreparator;
     this.#confirmationSession = confirmationSession;
     this.#grantedPermissionResolutionService =
       grantedPermissionResolutionService;
   }
 
   /**
-   * Runs the full permission grant pipeline for one request.
+   * Runs the full permission request pipeline for one request.
    *
    * @param args - Site origin, raw request, and permission-specific lifecycle handlers.
    * @param args.origin - Site origin for the permission request.
@@ -55,7 +55,7 @@ export class PermissionGrantPipeline {
   >(args: {
     origin: string;
     permissionRequest: PermissionRequest;
-    lifecycleHandlers: PermissionGrantLifecycleHandlers<
+    lifecycleHandlers: PermissionRequestLifecycleHandlers<
       TRequest,
       TContext,
       TMetadata,
@@ -65,7 +65,7 @@ export class PermissionGrantPipeline {
   }): Promise<PermissionRequestResult> {
     const { origin, permissionRequest, lifecycleHandlers } = args;
 
-    const preparationResult = await this.#permissionGrantPreparator.prepare({
+    const preparationResult = await this.#permissionRequestPreparator.prepare({
       origin,
       permissionRequest,
       parseAndValidate: lifecycleHandlers.parseAndValidatePermission,

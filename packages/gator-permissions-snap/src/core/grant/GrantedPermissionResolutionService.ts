@@ -19,7 +19,7 @@ import type { AccountController } from '../accountController';
 import { getChainMetadata } from '../chainMetadata';
 import { appendExpiryCaveatIfPresent } from '../expiryCaveat';
 import { appendPayeeCaveatIfPresent } from '../payeeCaveat';
-import type { PermissionGrantLifecycleHandlers } from '../permission/PermissionGrantLifecycleHandlers';
+import type { PermissionRequestLifecycleHandlers } from '../permission/PermissionRequestLifecycleHandlers';
 import { appendRedeemerCaveatIfPresent } from '../redeemerCaveat';
 import type { BaseContext, DeepRequired } from '../types';
 
@@ -83,7 +83,7 @@ export class GrantedPermissionResolutionService {
     modifiedContext: TContext;
     isAdjustmentAllowed: boolean;
     lifecycleHandlers: Pick<
-      PermissionGrantLifecycleHandlers<
+      PermissionRequestLifecycleHandlers<
         TRequest,
         TContext,
         TMetadata,

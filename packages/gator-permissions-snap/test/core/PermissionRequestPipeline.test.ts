@@ -26,9 +26,9 @@ import { TrustSignalsCoordinator } from '../../src/core/coordinators/TrustSignal
 import type { DialogInterfaceFactory } from '../../src/core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from '../../src/core/existingpermissions/existingPermissionsService';
 import { GrantedPermissionResolutionService } from '../../src/core/grant/GrantedPermissionResolutionService';
-import { PermissionGrantPipeline } from '../../src/core/PermissionGrantPipeline';
-import { PermissionGrantPreparator } from '../../src/core/PermissionGrantPreparator';
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
+import { PermissionRequestPipeline } from '../../src/core/PermissionRequestPipeline';
+import { PermissionRequestPreparator } from '../../src/core/PermissionRequestPreparator';
 import { IntroductionPhase } from '../../src/core/phases/IntroductionPhase';
 import { SENTINEL_REDEEMER_ADDRESSES } from '../../src/core/sentinelRedeemer';
 import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
@@ -194,8 +194,8 @@ type TestLifecycleHandlersMocks = {
   onConfirmationResolved?: jest.Mock;
 };
 
-describe('PermissionGrantPipeline', () => {
-  let permissionGrantPipeline: PermissionGrantPipeline;
+describe('PermissionRequestPipeline', () => {
+  let permissionRequestPipeline: PermissionRequestPipeline;
   let confirmationSession: ConfirmationSession;
   let grantedPermissionResolutionService: GrantedPermissionResolutionService;
   let existingPermissionsCoordinator: ExistingPermissionsCoordinator;
@@ -308,13 +308,13 @@ describe('PermissionGrantPipeline', () => {
       snapsMetricsService: mockSnapsMetricsService,
     });
 
-    const permissionGrantPreparator = new PermissionGrantPreparator({
+    const permissionRequestPreparator = new PermissionRequestPreparator({
       accountController: mockAccountController,
       snapsMetricsService: mockSnapsMetricsService,
     });
 
-    permissionGrantPipeline = new PermissionGrantPipeline({
-      permissionGrantPreparator,
+    permissionRequestPipeline = new PermissionRequestPipeline({
+      permissionRequestPreparator,
       confirmationSession,
       grantedPermissionResolutionService,
     });
@@ -322,23 +322,23 @@ describe('PermissionGrantPipeline', () => {
 
   describe('constructor', () => {
     it('should create an instance', () => {
-      const permissionGrantPreparator = new PermissionGrantPreparator({
+      const permissionRequestPreparator = new PermissionRequestPreparator({
         accountController: mockAccountController,
         snapsMetricsService: mockSnapsMetricsService,
       });
-      const instance = new PermissionGrantPipeline({
-        permissionGrantPreparator,
+      const instance = new PermissionRequestPipeline({
+        permissionRequestPreparator,
         confirmationSession,
         grantedPermissionResolutionService,
       });
-      expect(instance).toBeInstanceOf(PermissionGrantPipeline);
+      expect(instance).toBeInstanceOf(PermissionRequestPipeline);
     });
   });
 
   describe('run', () => {
     describe('functional tests', () => {
       it('successfully orchestrates a permission request', async () => {
-        const result = await permissionGrantPipeline.run({
+        const result = await permissionRequestPipeline.run({
           origin: 'test-origin',
           permissionRequest: mockPermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -369,7 +369,7 @@ describe('PermissionGrantPipeline', () => {
             isConfirmationGranted: false,
           },
         );
-        const result = await permissionGrantPipeline.run({
+        const result = await permissionRequestPipeline.run({
           origin: 'test-origin',
           permissionRequest: mockPermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -381,7 +381,7 @@ describe('PermissionGrantPipeline', () => {
       });
 
       it('returns a context encoding the expected delegation', async () => {
-        const result = await permissionGrantPipeline.run({
+        const result = await permissionRequestPipeline.run({
           origin: 'test-origin',
           permissionRequest: mockPermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -435,7 +435,7 @@ describe('PermissionGrantPipeline', () => {
           }),
         );
 
-        const result = await permissionGrantPipeline.run({
+        const result = await permissionRequestPipeline.run({
           origin: 'test-origin',
           permissionRequest: mockResolvedPermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -487,7 +487,7 @@ describe('PermissionGrantPipeline', () => {
           chainId: '0x9999999' as Hex, // non-existent chain
         };
 
-        const result = await permissionGrantPipeline.run({
+        const result = await permissionRequestPipeline.run({
           origin: 'test-origin',
           permissionRequest: chainRequestWithUnknownChain,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -515,7 +515,7 @@ describe('PermissionGrantPipeline', () => {
           }),
         );
 
-        const orchestrationPromise = permissionGrantPipeline.run({
+        const orchestrationPromise = permissionRequestPipeline.run({
           origin: 'test-origin',
           permissionRequest: mockPermissionRequestWithRandomRule,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -538,7 +538,7 @@ describe('PermissionGrantPipeline', () => {
           }),
         );
 
-        const orchestrationPromise = permissionGrantPipeline.run({
+        const orchestrationPromise = permissionRequestPipeline.run({
           origin: 'test-origin',
           permissionRequest: mockPermissionRequestWithRandomRule,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -562,7 +562,7 @@ describe('PermissionGrantPipeline', () => {
           }),
         );
 
-        const result = await permissionGrantPipeline.run({
+        const result = await permissionRequestPipeline.run({
           origin: 'https://app.uniswap.org',
           permissionRequest: requestWithoutRedeemerRule,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -618,7 +618,7 @@ describe('PermissionGrantPipeline', () => {
           }),
         );
 
-        await permissionGrantPipeline.run({
+        await permissionRequestPipeline.run({
           origin: 'https://uniswap.org',
           permissionRequest: requestWithSentinelRedeemerRule,
           lifecycleHandlers: lifecycleHandlerMocks,
@@ -648,7 +648,7 @@ describe('PermissionGrantPipeline', () => {
         };
 
         await expect(
-          permissionGrantPipeline.run({
+          permissionRequestPipeline.run({
             origin: 'https://app.uniswap.org',
             permissionRequest: requestWithUnsupportedRedeemerRule,
             lifecycleHandlers: lifecycleHandlerMocks,
@@ -664,7 +664,7 @@ describe('PermissionGrantPipeline', () => {
     describe('nominal path', () => {
       /*
        * End-to-end pipeline path after Stage 6: grant preparation and grant resolution
-       * run in PermissionGrantPipeline; confirmation UI lifecycle is owned by
+       * run in PermissionRequestPipeline; confirmation UI lifecycle is owned by
        * ConfirmationSession. Orchestrator delegates to the pipeline.
        *
        * 1. Validates and builds the initial permission request.
@@ -689,7 +689,7 @@ describe('PermissionGrantPipeline', () => {
             ),
         );
 
-        await permissionGrantPipeline.run({
+        await permissionRequestPipeline.run({
           origin: 'test-origin',
           permissionRequest: mockPermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,

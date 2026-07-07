@@ -11,10 +11,10 @@ import type { ExistingPermissionsState } from '../existingpermissions/existingPe
 import type { BaseContext, BaseMetadata, DeepRequired } from '../types';
 
 /**
- * Lifecycle callbacks used by the grant pipeline for a single permission request.
+ * Lifecycle callbacks used by the request pipeline for a single permission request.
  * Built from a {@link PermissionModule} and {@link ConfirmationShell} at runtime.
  */
-export type PermissionGrantLifecycleHandlers<
+export type PermissionRequestLifecycleHandlers<
   TRequest extends PermissionRequest,
   TContext extends BaseContext,
   TMetadata extends BaseMetadata,

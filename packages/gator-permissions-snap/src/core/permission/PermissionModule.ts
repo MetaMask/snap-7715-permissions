@@ -2,7 +2,7 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import type { Caveat } from '@metamask/delegation-core';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { PermissionGrantLifecycleHandlers } from './PermissionGrantLifecycleHandlers';
+import type { PermissionRequestLifecycleHandlers } from './PermissionRequestLifecycleHandlers';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { MessageKey } from '../../utils/i18n';
 import type { DelegationContracts } from '../chainMetadata';
@@ -68,9 +68,9 @@ export type PermissionModule<
  * @param args.module - Registered permission module for the request type.
  * @param args.confirmationShell - Per-request confirmation shell instance.
  * @param args.tokenMetadataService - Service injected into module context building.
- * @returns Lifecycle handlers consumed by {@link PermissionGrantPipeline}.
+ * @returns Lifecycle handlers consumed by {@link PermissionRequestPipeline}.
  */
-export function buildGrantLifecycleHandlers<
+export function buildRequestLifecycleHandlers<
   TRequest extends PermissionRequest,
   TContext extends BaseContext,
   TMetadata extends BaseMetadata,
@@ -86,7 +86,7 @@ export function buildGrantLifecycleHandlers<
   >;
   confirmationShell: ConfirmationShell<TContext, TMetadata>;
   tokenMetadataService: TokenMetadataService;
-}): PermissionGrantLifecycleHandlers<
+}): PermissionRequestLifecycleHandlers<
   TRequest,
   TContext,
   TMetadata,

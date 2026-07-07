@@ -16,7 +16,7 @@ import type { SnapsMetricsService } from '../services/snapsMetricsService';
 /**
  * Outcome of preparing a permission request before confirmation UI.
  */
-export type PermissionGrantPreparationResult<
+export type PermissionRequestPreparationResult<
   TRequest extends PermissionRequest,
 > =
   | {
@@ -31,7 +31,7 @@ export type PermissionGrantPreparationResult<
  * Validates chain support, parses the request, applies sentinel redeemer rules,
  * resolves the granting address, and records request-start metrics.
  */
-export class PermissionGrantPreparator {
+export class PermissionRequestPreparator {
   readonly #accountController: AccountController;
 
   readonly #snapsMetricsService: SnapsMetricsService;
@@ -60,7 +60,7 @@ export class PermissionGrantPreparator {
     origin: string;
     permissionRequest: PermissionRequest;
     parseAndValidate: (request: PermissionRequest) => TRequest;
-  }): Promise<PermissionGrantPreparationResult<TRequest>> {
+  }): Promise<PermissionRequestPreparationResult<TRequest>> {
     const { origin, permissionRequest, parseAndValidate } = args;
 
     const chainId = hexToNumber(permissionRequest.chainId);
@@ -108,7 +108,7 @@ export class PermissionGrantPreparator {
       getChainMetadata({ chainId });
     } catch (error) {
       logger.error(
-        'PermissionGrantPreparator:assertIsSupportedChainId() - unsupported chainId',
+        'PermissionRequestPreparator:assertIsSupportedChainId() - unsupported chainId',
         {
           chainId,
           error,

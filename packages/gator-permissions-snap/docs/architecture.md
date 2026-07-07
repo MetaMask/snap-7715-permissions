@@ -30,9 +30,9 @@ This document outlines the architecture of the Permissions Provider Snap system 
 
 - **EntryPoint (index.ts)**: The main entrypoint for the snap. Sets up all services, dependencies, and lifecycle handlers. Connects RPC handlers and UserEventDispatcher to the Snaps runtime.
 - **RpcHandler**: Functional RPC handler created by `createRpcHandler()` that responds to JSON-RPC requests from external systems. Supports grant, permission offers, granted permissions, revocation submission, and supported-permissions queries.
-- **PermissionRequestProcessor**: Looks up permission modules from the registry, creates a per-request `ConfirmationShell`, builds grant lifecycle handlers, and runs each request through the grant pipeline.
+- **PermissionRequestProcessor**: Looks up permission modules from the registry, creates a per-request `ConfirmationShell`, builds request lifecycle handlers, and runs each request through the request pipeline.
 - **PermissionRegistry**: Maps permission type strings to unified `PermissionModule` definitions.
-- **PermissionGrantPipeline**: Sequences grant preparation, confirmation session, and grant resolution for each request.
+- **PermissionRequestPipeline**: Sequences grant preparation, confirmation session, and grant resolution for each request.
 - **PermissionModule**: Per-type contract (parse, buildContext, renderBody, caveats, etc.) registered in the registry.
 - **ConfirmationShellFactory**: Creates a per-request `ConfirmationShell` wired to a module's `renderBody` and shell options.
 - **ConfirmationShell**: Permission-agnostic confirmation chrome (account selector, trust signals, token balance, existing-permissions subview) and session event wiring.
@@ -104,7 +104,7 @@ src/
 
 ### Folder Descriptions
 
-- **`core/`**: Contains core application components including `PermissionRequestProcessor`, `PermissionGrantPipeline`, `PermissionRegistry`, `ConfirmationShell`/`ConfirmationShellFactory`, `ConfirmationSession`, confirmation dialogs, coordinators, account controller, and shared type definitions.
+- **`core/`**: Contains core application components including `PermissionRequestProcessor`, `PermissionRequestPipeline`, `PermissionRegistry`, `ConfirmationShell`/`ConfirmationShellFactory`, `ConfirmationSession`, confirmation dialogs, coordinators, account controller, and shared type definitions.
 
 - **`rpc/`**: Handles all RPC-related functionality including the main RPC handler factory, method definitions, and origin permission validation.
 
@@ -118,7 +118,7 @@ src/
 
 - **`utils/`**: Static utility functions for common operations like address formatting, validation, time handling, and value conversion.
 
-- **`permissions/`**: Permission-specific implementations; each folder exports a `PermissionModule` registered in `registerPermissionModules.ts`
+- **`permissions/`**: Permission-specific implementations; each folder exports a `PermissionModule` registered in `createPermissionRegistry.ts`
 
 ## Component Overview
 
@@ -129,7 +129,7 @@ graph TD
     PermissionRequestProcessor[PermissionRequestProcessor]
     PermissionRegistry[PermissionRegistry]
     ConfirmationShellFactory[ConfirmationShellFactory]
-    PermissionGrantPipeline[PermissionGrantPipeline]
+    PermissionRequestPipeline[PermissionRequestPipeline]
     ConfirmationSession[ConfirmationSession]
     AccountController[AccountController]
     User((User))
@@ -139,19 +139,19 @@ graph TD
     RpcHandler -->|"2 process(request)"| PermissionRequestProcessor
     PermissionRequestProcessor -->|"3 lookup(type)"| PermissionRegistry
     PermissionRequestProcessor -->|"4 create shell"| ConfirmationShellFactory
-    PermissionRequestProcessor -->|"5 run pipeline"| PermissionGrantPipeline
-    PermissionGrantPipeline -->|"6 confirmation UI"| ConfirmationSession
+    PermissionRequestProcessor -->|"5 run pipeline"| PermissionRequestPipeline
+    PermissionRequestPipeline -->|"6 confirmation UI"| ConfirmationSession
     User -->|"7 user interaction"| ConfirmationSession
-    ConfirmationSession -->|"8 resolve decision"| PermissionGrantPipeline
-    PermissionGrantPipeline -->|"9 create delegation"| AccountController
-    PermissionGrantPipeline -->|"10 return response"| PermissionRequestProcessor
+    ConfirmationSession -->|"8 resolve decision"| PermissionRequestPipeline
+    PermissionRequestPipeline -->|"9 create delegation"| AccountController
+    PermissionRequestPipeline -->|"10 return response"| PermissionRequestProcessor
     PermissionRequestProcessor -->|"11 return response"| RpcHandler
     RpcHandler -->|"12 return response"| EntryPoint
 
     %% Style
     classDef component fill:#000,stroke:#333,stroke-width:2px,color:#fff;
     classDef user fill:#fff,stroke:#333,stroke-width:2px;
-    class EntryPoint,RpcHandler,PermissionRequestProcessor,PermissionRegistry,ConfirmationShellFactory,PermissionGrantPipeline,ConfirmationSession,AccountController component;
+    class EntryPoint,RpcHandler,PermissionRequestProcessor,PermissionRegistry,ConfirmationShellFactory,PermissionRequestPipeline,ConfirmationSession,AccountController component;
     class User user;
 ```
 
@@ -160,9 +160,9 @@ graph TD
 1. A `grantPermission` request is received by the `EntryPoint` and passed to the `RpcHandler`'s `grantPermission` function
 2. `RpcHandler` validates the request parameters and extracts permission requests and site origin
 3. For each permission request, `PermissionRequestProcessor` looks up the `PermissionModule` in `PermissionRegistry` by type
-4. `PermissionRequestProcessor` creates a per-request `ConfirmationShell` via `ConfirmationShellFactory`, builds grant lifecycle handlers via `buildGrantLifecycleHandlers()`, then invokes `PermissionGrantPipeline.run()`
-5. `PermissionGrantPipeline` executes the lifecycle in sequence:
-   - Validates the request using `PermissionGrantPreparator`
+4. `PermissionRequestProcessor` creates a per-request `ConfirmationShell` via `ConfirmationShellFactory`, builds request lifecycle handlers via `buildRequestLifecycleHandlers()`, then invokes `PermissionRequestPipeline.run()`
+5. `PermissionRequestPipeline` executes the lifecycle in sequence:
+   - Validates the request using `PermissionRequestPreparator`
    - Runs introduction (if needed) and confirmation via `ConfirmationSession`
    - Builds context and renders confirmation content (shell chrome + module `renderBody`)
    - Manages user interaction and context updates
@@ -174,7 +174,7 @@ graph TD
 
 ## Permission Request Grant Pipeline
 
-The `PermissionGrantPipeline` implements a clear lifecycle for permission requests that defines distinct steps for the flow. This ensures that the implementation is flexible enough to accommodate different permission types while providing a consistent framework for permission-specific customizations.
+The `PermissionRequestPipeline` implements a clear lifecycle for permission requests that defines distinct steps for the flow. This ensures that the implementation is flexible enough to accommodate different permission types while providing a consistent framework for permission-specific customizations.
 
 ```mermaid
 flowchart TD
@@ -205,7 +205,7 @@ The EntryPoint serves as the main initialization and configuration point for the
    - State management (StateManager for snap persistence)
    - Profile sync (ProfileSyncManager for cross-device permission sync)
    - UI components (ConfirmationDialogFactory, DialogInterfaceFactory, UserEventDispatcher)
-   - Permission handling (PermissionRegistry, ConfirmationShellFactory, PermissionRequestProcessor, PermissionGrantPipeline, ConfirmationSession)
+   - Permission handling (PermissionRegistry, ConfirmationShellFactory, PermissionRequestProcessor, PermissionRequestPipeline, ConfirmationSession)
    - RPC handling (createRpcHandler for processing requests)
 
 2. Configuring RPC method bindings:
@@ -300,15 +300,15 @@ The RpcHandler provides five main functions:
 
 ### PermissionRequestProcessor
 
-The `PermissionRequestProcessor` is the RPC-facing entry point for grant requests. It looks up the `PermissionModule` by type, creates a per-request `ConfirmationShell` via `ConfirmationShellFactory`, builds grant lifecycle handlers via `buildGrantLifecycleHandlers()`, and delegates to `PermissionGrantPipeline`.
+The `PermissionRequestProcessor` is the RPC-facing entry point for grant requests. It looks up the `PermissionModule` by type, creates a per-request `ConfirmationShell` via `ConfirmationShellFactory`, builds request lifecycle handlers via `buildRequestLifecycleHandlers()`, and delegates to `PermissionRequestPipeline`.
 
 Key architectural points:
 
 - One processor instance shared across all requests (no per-request handler object)
 - Registry lookup via `extractDescriptorName(request.permission.type)`
-- Each permission folder exports a `PermissionModule` registered at startup in `registerPermissionModules.ts`
+- Each permission folder exports a `PermissionModule` registered at startup in `createPermissionRegistry.ts`
 - `ConfirmationShellFactory` wires shell chrome (balance, account selector, trust signals) to the module's `renderBody`
-- `buildGrantLifecycleHandlers()` adapts a module + shell into `PermissionGrantLifecycleHandlers` for the pipeline
+- `buildRequestLifecycleHandlers()` adapts a module + shell into `PermissionRequestLifecycleHandlers` for the pipeline
 
 ### PermissionRegistry and PermissionModule
 
@@ -320,7 +320,7 @@ Each `PermissionModule` exposes a flat contract:
 - `applyContext`, `populatePermission`, `createPermissionCaveats`
 - `rules`, `title`, `subtitle`, `showTokenBalance` (optional, defaults to `true`)
 
-Permission folders export `PermissionModule` objects directly; all modules are registered in `createPermissionRegistry()` via `registerPermissionModules.ts`.
+Permission folders export `PermissionModule` objects directly; all modules are registered via `createPermissionRegistry()`.
 
 ### ConfirmationShell and ConfirmationShellFactory
 
@@ -332,18 +332,18 @@ Permission folders export `PermissionModule` objects directly; all modules are r
 - Trust signal display, justification, existing-permissions subview
 - Session event binding for rules, account changes, and shell interactions
 
-The shell's lifecycle methods (`createConfirmationContent`, `createSkeletonContent`, `bindSessionEvents`) are exposed to the pipeline via `PermissionGrantLifecycleHandlers`.
+The shell's lifecycle methods (`createConfirmationContent`, `createSkeletonContent`, `bindSessionEvents`) are exposed to the pipeline via `PermissionRequestLifecycleHandlers`.
 
-### PermissionGrantPipeline
+### PermissionRequestPipeline
 
-The `PermissionGrantPipeline` sequences grant preparation, confirmation session, and grant resolution for a single request.
+The `PermissionRequestPipeline` sequences request preparation, confirmation session, and grant resolution for a single request.
 
 Key architectural points:
 
-- Uses `PermissionGrantPreparator` for chain validation, parsing, and address resolution
+- Uses `PermissionRequestPreparator` for chain validation, parsing, and address resolution
 - Delegates UI to `ConfirmationSession` (shared `DialogInterface` per request)
 - Resolves approved grants via `GrantedPermissionResolutionService`
-- Accepts `PermissionGrantLifecycleHandlers` built by the processor
+- Accepts `PermissionRequestLifecycleHandlers` built by the processor
 
 The pipeline manages the following lifecycle:
 

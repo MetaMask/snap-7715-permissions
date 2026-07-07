@@ -2,10 +2,10 @@ import type { PermissionRequest } from '@metamask/7715-permissions-shared/types'
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { PermissionGrantPipeline } from '../PermissionGrantPipeline';
+import type { PermissionRequestPipeline } from '../PermissionRequestPipeline';
 import type { PermissionRequestResult } from '../types';
 import type { ConfirmationShellFactory } from './ConfirmationShellFactory';
-import { buildGrantLifecycleHandlers } from './PermissionModule';
+import { buildRequestLifecycleHandlers } from './PermissionModule';
 import type { PermissionRegistry } from './PermissionRegistry';
 
 /**
@@ -14,7 +14,7 @@ import type { PermissionRegistry } from './PermissionRegistry';
 export class PermissionRequestProcessor {
   readonly #registry: PermissionRegistry;
 
-  readonly #pipeline: PermissionGrantPipeline;
+  readonly #pipeline: PermissionRequestPipeline;
 
   readonly #confirmationShellFactory: ConfirmationShellFactory;
 
@@ -27,7 +27,7 @@ export class PermissionRequestProcessor {
     tokenMetadataService,
   }: {
     registry: PermissionRegistry;
-    pipeline: PermissionGrantPipeline;
+    pipeline: PermissionRequestPipeline;
     confirmationShellFactory: ConfirmationShellFactory;
     tokenMetadataService: TokenMetadataService;
   }) {
@@ -53,7 +53,7 @@ export class PermissionRequestProcessor {
       module,
       permissionRequest: request,
     });
-    const lifecycleHandlers = buildGrantLifecycleHandlers({
+    const lifecycleHandlers = buildRequestLifecycleHandlers({
       module,
       confirmationShell,
       tokenMetadataService: this.#tokenMetadataService,

@@ -3,7 +3,7 @@ import { bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
 import type { AccountController } from '../../src/core/accountController';
-import { PermissionGrantPreparator } from '../../src/core/PermissionGrantPreparator';
+import { PermissionRequestPreparator } from '../../src/core/PermissionRequestPreparator';
 import { SENTINEL_REDEEMER_ADDRESSES } from '../../src/core/sentinelRedeemer';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
 
@@ -47,8 +47,8 @@ const mockSnapsMetricsService = {
   trackPermissionRequestStarted: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<SnapsMetricsService>;
 
-describe('PermissionGrantPreparator', () => {
-  let permissionGrantPreparator: PermissionGrantPreparator;
+describe('PermissionRequestPreparator', () => {
+  let permissionRequestPreparator: PermissionRequestPreparator;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -56,7 +56,7 @@ describe('PermissionGrantPreparator', () => {
       grantingAccountAddress,
     ]);
 
-    permissionGrantPreparator = new PermissionGrantPreparator({
+    permissionRequestPreparator = new PermissionRequestPreparator({
       accountController: mockAccountController,
       snapsMetricsService: mockSnapsMetricsService,
     });
@@ -65,7 +65,7 @@ describe('PermissionGrantPreparator', () => {
   it('validates chain, tracks metrics, and normalizes the request', async () => {
     const parseAndValidate = jest.fn().mockImplementation((req) => req);
 
-    const result = await permissionGrantPreparator.prepare({
+    const result = await permissionRequestPreparator.prepare({
       origin: 'test-origin',
       permissionRequest: mockPermissionRequest,
       parseAndValidate,
@@ -96,7 +96,7 @@ describe('PermissionGrantPreparator', () => {
       mockAddress2,
     ]);
 
-    const result = await permissionGrantPreparator.prepare({
+    const result = await permissionRequestPreparator.prepare({
       origin: 'test-origin',
       permissionRequest: mockPermissionRequest,
       parseAndValidate: (req) => req,
@@ -119,7 +119,7 @@ describe('PermissionGrantPreparator', () => {
         mockAddress2,
       ]);
 
-      const result = await permissionGrantPreparator.prepare({
+      const result = await permissionRequestPreparator.prepare({
         origin: 'test-origin',
         permissionRequest: {
           ...mockPermissionRequest,
@@ -144,7 +144,7 @@ describe('PermissionGrantPreparator', () => {
     ]);
 
     await expect(
-      permissionGrantPreparator.prepare({
+      permissionRequestPreparator.prepare({
         origin: 'test-origin',
         permissionRequest: {
           ...mockPermissionRequest,
@@ -161,7 +161,7 @@ describe('PermissionGrantPreparator', () => {
       rules: [mockPermissionRequest.rules[0]],
     };
 
-    const result = await permissionGrantPreparator.prepare({
+    const result = await permissionRequestPreparator.prepare({
       origin: 'https://app.uniswap.org',
       permissionRequest: requestWithoutRedeemerRule,
       parseAndValidate: (req) => req,
@@ -191,7 +191,7 @@ describe('PermissionGrantPreparator', () => {
       rules: [mockPermissionRequest.rules[0], requestedRedeemerRule],
     };
 
-    const result = await permissionGrantPreparator.prepare({
+    const result = await permissionRequestPreparator.prepare({
       origin: 'https://uniswap.org',
       permissionRequest: requestWithSentinelRedeemerRule,
       parseAndValidate: (req) => req,
@@ -225,7 +225,7 @@ describe('PermissionGrantPreparator', () => {
     };
 
     await expect(
-      permissionGrantPreparator.prepare({
+      permissionRequestPreparator.prepare({
         origin: 'https://app.uniswap.org',
         permissionRequest: requestWithUnsupportedRedeemerRule,
         parseAndValidate: (req) => req,
