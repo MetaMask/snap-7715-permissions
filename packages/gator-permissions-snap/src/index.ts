@@ -36,6 +36,7 @@ import { TrustSignalsCoordinator } from './core/coordinators/TrustSignalsCoordin
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from './core/existingpermissions';
 import { GrantedPermissionResolutionService } from './core/grant/GrantedPermissionResolutionService';
+import { createPermissionRegistry } from './core/permission/registerPermissionModules';
 import { PermissionGrantPipeline } from './core/PermissionGrantPipeline';
 import { PermissionGrantPreparator } from './core/PermissionGrantPreparator';
 import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
@@ -251,12 +252,15 @@ const orchestrator = new PermissionRequestLifecycleOrchestrator({
   pipeline: permissionGrantPipeline,
 });
 
+const permissionRegistry = createPermissionRegistry();
+
 const permissionHandlerFactory = new PermissionHandlerFactory({
   accountController,
   tokenPricesService,
   tokenMetadataService,
   userEventDispatcher,
   orchestrator,
+  registry: permissionRegistry,
 });
 
 const rpcHandler = createRpcHandler({

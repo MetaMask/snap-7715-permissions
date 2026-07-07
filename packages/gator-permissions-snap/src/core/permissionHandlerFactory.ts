@@ -1,23 +1,11 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
-import { InvalidInputError } from '@metamask/snaps-sdk';
 
 import type { AccountController } from './accountController';
+import type { PermissionRegistry } from './permission/PermissionRegistry';
 import { PermissionHandler } from './permissionHandler';
 import type { PermissionRequestLifecycleOrchestrator } from './permissionRequestLifecycleOrchestrator';
-import type {
-  BaseContext,
-  DeepRequired,
-  PermissionDefinition,
-  PermissionHandlerType,
-} from './types';
-import { erc20TokenAllowancePermissionDefinition } from '../permissions/erc20TokenAllowance';
-import { erc20TokenPeriodicPermissionDefinition } from '../permissions/erc20TokenPeriodic';
-import { erc20TokenStreamPermissionDefinition } from '../permissions/erc20TokenStream';
-import { nativeTokenAllowancePermissionDefinition } from '../permissions/nativeTokenAllowance';
-import { nativeTokenPeriodicPermissionDefinition } from '../permissions/nativeTokenPeriodic';
-import { nativeTokenStreamPermissionDefinition } from '../permissions/nativeTokenStream';
-import { tokenApprovalRevocationPermissionDefinition } from '../permissions/tokenApprovalRevocation';
+import type { PermissionHandlerType } from './types';
 import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { TokenPricesService } from '../services/tokenPricesService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
@@ -37,24 +25,29 @@ export class PermissionHandlerFactory {
 
   readonly #orchestrator: PermissionRequestLifecycleOrchestrator;
 
+  readonly #registry: PermissionRegistry;
+
   constructor({
     accountController,
     tokenPricesService,
     tokenMetadataService,
     userEventDispatcher,
     orchestrator,
+    registry,
   }: {
     accountController: AccountController;
     tokenPricesService: TokenPricesService;
     tokenMetadataService: TokenMetadataService;
     userEventDispatcher: UserEventDispatcher;
     orchestrator: PermissionRequestLifecycleOrchestrator;
+    registry: PermissionRegistry;
   }) {
     this.#accountController = accountController;
     this.#tokenPricesService = tokenPricesService;
     this.#tokenMetadataService = tokenMetadataService;
     this.#userEventDispatcher = userEventDispatcher;
     this.#orchestrator = orchestrator;
+    this.#registry = registry;
   }
 
   /**
@@ -67,72 +60,17 @@ export class PermissionHandlerFactory {
     permissionRequest: PermissionRequest,
   ): PermissionHandlerType {
     const type = extractDescriptorName(permissionRequest.permission.type);
+    const { type: _permissionType, ...permissionDefinition } =
+      this.#registry.get(type);
 
-    const createPermissionHandler = <
-      TRequest extends PermissionRequest,
-      TContext extends BaseContext,
-      TMetadata extends object,
-      TPermission extends TRequest['permission'],
-      TPopulatedPermission extends DeepRequired<TPermission>,
-    >(
-      permissionDefinition: PermissionDefinition<
-        TRequest,
-        TContext,
-        TMetadata,
-        TPermission,
-        TPopulatedPermission
-      >,
-    ): PermissionHandlerType => {
-      return new PermissionHandler({
-        ...permissionDefinition,
-        accountController: this.#accountController,
-        userEventDispatcher: this.#userEventDispatcher,
-        orchestrator: this.#orchestrator,
-        permissionRequest,
-        tokenPricesService: this.#tokenPricesService,
-        tokenMetadataService: this.#tokenMetadataService,
-      });
-    };
-    let handler: PermissionHandlerType;
-
-    switch (type) {
-      case 'native-token-stream':
-        handler = createPermissionHandler(
-          nativeTokenStreamPermissionDefinition,
-        );
-        break;
-      case 'native-token-periodic':
-        handler = createPermissionHandler(
-          nativeTokenPeriodicPermissionDefinition,
-        );
-        break;
-      case 'native-token-allowance':
-        handler = createPermissionHandler(
-          nativeTokenAllowancePermissionDefinition,
-        );
-        break;
-      case 'erc20-token-periodic':
-        handler = createPermissionHandler(
-          erc20TokenPeriodicPermissionDefinition,
-        );
-        break;
-      case 'erc20-token-allowance':
-        handler = createPermissionHandler(
-          erc20TokenAllowancePermissionDefinition,
-        );
-        break;
-      case 'token-approval-revocation':
-        handler = createPermissionHandler(
-          tokenApprovalRevocationPermissionDefinition,
-        );
-        break;
-      case 'erc20-token-stream':
-        handler = createPermissionHandler(erc20TokenStreamPermissionDefinition);
-        break;
-      default:
-        throw new InvalidInputError(`Unsupported permission type: ${type}`);
-    }
-
-    return handler;
+    return new PermissionHandler({
+      ...permissionDefinition,
+      accountController: this.#accountController,
+      userEventDispatcher: this.#userEventDispatcher,
+      orchestrator: this.#orchestrator,
+      permissionRequest,
+      tokenPricesService: this.#tokenPricesService,
+      tokenMetadataService: this.#tokenMetadataService,
+    });
   }
 }

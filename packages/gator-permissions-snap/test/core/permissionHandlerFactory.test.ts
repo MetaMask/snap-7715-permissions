@@ -2,6 +2,7 @@ import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 
 import type { AccountController } from '../../src/core/accountController';
+import { createPermissionRegistry } from '../../src/core/permission/registerPermissionModules';
 import { PermissionHandler } from '../../src/core/permissionHandler';
 import { PermissionHandlerFactory } from '../../src/core/permissionHandlerFactory';
 import type { PermissionRequestLifecycleOrchestrator } from '../../src/core/permissionRequestLifecycleOrchestrator';
@@ -93,6 +94,7 @@ describe('PermissionHandlerFactory', () => {
       tokenMetadataService: mockTokenMetadataService,
       userEventDispatcher: mockUserEventDispatcher,
       orchestrator: mockOrchestrator,
+      registry: createPermissionRegistry(),
     });
   });
 
@@ -113,6 +115,25 @@ describe('PermissionHandlerFactory', () => {
 
       expect(handler).toBeDefined();
       expect(handler).toBeInstanceOf(PermissionHandler);
+    });
+
+    it('should create a PermissionHandler for every registered permission type', () => {
+      const registry = createPermissionRegistry();
+
+      for (const type of registry.getSupportedTypes()) {
+        const request: PermissionRequest = {
+          ...mockPermissionRequest,
+          permission: {
+            ...mockPermissionRequest.permission,
+            type,
+          },
+        };
+
+        const handler =
+          permissionHandlerFactory.createPermissionHandler(request);
+
+        expect(handler).toBeInstanceOf(PermissionHandler);
+      }
     });
 
     it('should throw an error when given an unsupported permission type', () => {
