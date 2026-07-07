@@ -15,9 +15,9 @@ This document outlines the architecture of the Permissions Provider Snap system 
    - This helps maintain clear boundaries between components
 
 3. **Functional Dependencies**
-   - Permission-specific logic is implemented through functional dependencies
+   - Permission-specific logic is implemented through functional dependencies on each `PermissionModule`
    - Each function has a single responsibility (parse, validate, append caveats, etc.)
-   - The orchestrator coordinates these functions without knowing their implementation details
+   - The grant pipeline coordinates these functions without knowing their implementation details
 
 4. **Dependency Injection**
    - Components receive their dependencies from the entrypoint, not from callers
@@ -29,11 +29,14 @@ This document outlines the architecture of the Permissions Provider Snap system 
 ### Core Components
 
 - **EntryPoint (index.ts)**: The main entrypoint for the snap. Sets up all services, dependencies, and lifecycle handlers. Connects RPC handlers and UserEventDispatcher to the Snaps runtime.
-- **RpcHandler**: Functional RPC handler created by `createRpcHandler()` that responds to JSON-RPC requests from external systems. Supports three methods: grantPermission, getPermissionOffers, getGrantedPermissions.
-- **PermissionRequestProcessor**: Looks up permission modules from the registry and runs each request through the grant pipeline.
+- **RpcHandler**: Functional RPC handler created by `createRpcHandler()` that responds to JSON-RPC requests from external systems. Supports grant, permission offers, granted permissions, revocation submission, and supported-permissions queries.
+- **PermissionRequestProcessor**: Looks up permission modules from the registry, creates a per-request `ConfirmationShell`, builds grant lifecycle handlers, and runs each request through the grant pipeline.
 - **PermissionRegistry**: Maps permission type strings to unified `PermissionModule` definitions.
 - **PermissionGrantPipeline**: Sequences grant preparation, confirmation session, and grant resolution for each request.
 - **PermissionModule**: Per-type contract (parse, buildContext, renderBody, caveats, etc.) registered in the registry.
+- **ConfirmationShellFactory**: Creates a per-request `ConfirmationShell` wired to a module's `renderBody` and shell options.
+- **ConfirmationShell**: Permission-agnostic confirmation chrome (account selector, trust signals, token balance, existing-permissions subview) and session event wiring.
+- **ConfirmationSession**: Owns dialog lifecycle for introduction, confirmation, and existing-permissions subviews per request.
 - **UserEventDispatcher**: Manages user input events from the snaps environment, providing event registration, cleanup, and sequential event processing.
 
 ### Service Components
@@ -57,15 +60,21 @@ This document outlines the architecture of the Permissions Provider Snap system 
 
 ### Permission-Specific Components
 
-Each permission type (native-token-stream, native-token-periodic, erc20-token-stream, erc20-token-periodic) includes:
+Each permission type includes:
 
-- **Permission Module**: Each permission folder exports a flat `PermissionModule` with parse, buildContext, renderBody, and caveat methods.
-- **Types**: Permission-specific TypeScript types for requests, contexts, metadata, and permissions.
-- **Validation**: Request parsing and validation logic.
-- **Context**: Functions for building, applying, and populating permission context data.
-- **Content**: UI components for permission-specific confirmation dialogs.
-- **Rules**: Permission-specific validation rules and constraints.
-- **Caveats**: Functions for creating permission-specific caveats.
+- **native-token-stream**, **native-token-periodic**, **native-token-allowance**
+- **erc20-token-stream**, **erc20-token-periodic**, **erc20-token-allowance**
+- **token-approval-revocation**
+
+Each permission folder exports a flat `PermissionModule` and typically contains:
+
+- **index.ts**: Exports the `PermissionModule` (type, rules, title, lifecycle functions, optional `showTokenBalance`)
+- **types.ts**: Permission-specific TypeScript types for requests, contexts, metadata, and permissions
+- **validation.ts**: Request parsing and validation logic (`parseAndValidate`)
+- **context.ts**: Functions for building, applying, and populating permission context
+- **content.tsx**: Permission-specific confirmation body (`renderBody`)
+- **rules.ts**: Permission-specific validation rules and constraints
+- **caveats.ts**: Functions for creating permission-specific caveats
 
 ## Folder Structure
 
@@ -75,7 +84,7 @@ src/
 ├── constants.ts               # Global constants
 ├── stateManagement.ts         # Snap state persistence utilities
 ├── userEventDispatcher.ts     # User input event management
-├── core/                      # Core application logic and orchestration
+├── core/                      # Core application logic, grant pipeline, and confirmation UI
 ├── rpc/                       # RPC request handling and method definitions
 ├── services/                  # Business logic services (token prices, metadata)
 ├── clients/                   # External API clients (Account API, Price API, blockchain)
@@ -84,15 +93,18 @@ src/
 ├── utils/                     # Static utility functions
 └── permissions/               # Permission-specific implementations
     ├── [shared files]         # Common validation utilities and permission offers
-    ├── nativeTokenStream/     # Native token streaming permission implementation
-    ├── nativeTokenPeriodic/   # Native token periodic transfer permission implementation
-    ├── erc20TokenStream/      # ERC20 token streaming permission implementation
-    └── erc20TokenPeriodic/    # ERC20 token periodic transfer permission implementation
+    ├── nativeTokenStream/     # native-token-stream
+    ├── nativeTokenPeriodic/   # native-token-periodic
+    ├── nativeTokenAllowance/  # native-token-allowance
+    ├── erc20TokenStream/      # erc20-token-stream
+    ├── erc20TokenPeriodic/    # erc20-token-periodic
+    ├── erc20TokenAllowance/   # erc20-token-allowance
+    └── tokenApprovalRevocation/ # token-approval-revocation
 ```
 
 ### Folder Descriptions
 
-- **`core/`**: Contains core application components including the permission handler factory, lifecycle orchestrator, confirmation dialogs, account controller, and shared type definitions.
+- **`core/`**: Contains core application components including `PermissionRequestProcessor`, `PermissionGrantPipeline`, `PermissionRegistry`, `ConfirmationShell`/`ConfirmationShellFactory`, `ConfirmationSession`, confirmation dialogs, coordinators, account controller, and shared type definitions.
 
 - **`rpc/`**: Handles all RPC-related functionality including the main RPC handler factory, method definitions, and origin permission validation.
 
@@ -106,14 +118,7 @@ src/
 
 - **`utils/`**: Static utility functions for common operations like address formatting, validation, time handling, and value conversion.
 
-- **`permissions/`**: Permission-specific implementations, with each permission type having its own folder containing:
-  - **Permission definition**: Exports the complete permission configuration with rules, title, and lifecycle functions
-  - **Types**: TypeScript type definitions specific to the permission
-  - **Validation**: Request parsing and validation logic
-  - **Context**: Functions for building, applying, and populating permission context
-  - **Content**: UI components for permission-specific confirmation dialogs
-  - **Rules**: Permission-specific validation rules and constraints
-  - **Caveats**: Functions for creating permission-specific caveats
+- **`permissions/`**: Permission-specific implementations; each folder exports a `PermissionModule` registered in `registerPermissionModules.ts`
 
 ## Component Overview
 
@@ -123,6 +128,7 @@ graph TD
     RpcHandler[RpcHandler]
     PermissionRequestProcessor[PermissionRequestProcessor]
     PermissionRegistry[PermissionRegistry]
+    ConfirmationShellFactory[ConfirmationShellFactory]
     PermissionGrantPipeline[PermissionGrantPipeline]
     ConfirmationSession[ConfirmationSession]
     AccountController[AccountController]
@@ -132,19 +138,20 @@ graph TD
     EntryPoint -->|"1 grantPermission(request)"| RpcHandler
     RpcHandler -->|"2 process(request)"| PermissionRequestProcessor
     PermissionRequestProcessor -->|"3 lookup(type)"| PermissionRegistry
-    PermissionRequestProcessor -->|"4 run pipeline"| PermissionGrantPipeline
-    PermissionGrantPipeline -->|"5 confirmation UI"| ConfirmationSession
-    User -->|"6 user interaction"| ConfirmationSession
-    ConfirmationSession -->|"7 resolve decision"| PermissionGrantPipeline
-    PermissionGrantPipeline -->|"8 create delegation"| AccountController
-    PermissionGrantPipeline -->|"9 return response"| PermissionRequestProcessor
-    PermissionRequestProcessor -->|"10 return response"| RpcHandler
-    RpcHandler -->|"11 return response"| EntryPoint
+    PermissionRequestProcessor -->|"4 create shell"| ConfirmationShellFactory
+    PermissionRequestProcessor -->|"5 run pipeline"| PermissionGrantPipeline
+    PermissionGrantPipeline -->|"6 confirmation UI"| ConfirmationSession
+    User -->|"7 user interaction"| ConfirmationSession
+    ConfirmationSession -->|"8 resolve decision"| PermissionGrantPipeline
+    PermissionGrantPipeline -->|"9 create delegation"| AccountController
+    PermissionGrantPipeline -->|"10 return response"| PermissionRequestProcessor
+    PermissionRequestProcessor -->|"11 return response"| RpcHandler
+    RpcHandler -->|"12 return response"| EntryPoint
 
     %% Style
     classDef component fill:#000,stroke:#333,stroke-width:2px,color:#fff;
     classDef user fill:#fff,stroke:#333,stroke-width:2px;
-    class EntryPoint,RpcHandler,PermissionRequestProcessor,PermissionRegistry,PermissionGrantPipeline,ConfirmationSession,AccountController component;
+    class EntryPoint,RpcHandler,PermissionRequestProcessor,PermissionRegistry,ConfirmationShellFactory,PermissionGrantPipeline,ConfirmationSession,AccountController component;
     class User user;
 ```
 
@@ -153,7 +160,7 @@ graph TD
 1. A `grantPermission` request is received by the `EntryPoint` and passed to the `RpcHandler`'s `grantPermission` function
 2. `RpcHandler` validates the request parameters and extracts permission requests and site origin
 3. For each permission request, `PermissionRequestProcessor` looks up the `PermissionModule` in `PermissionRegistry` by type
-4. `PermissionRequestProcessor` builds grant lifecycle handlers from the module and `ConfirmationShell`, then invokes `PermissionGrantPipeline.run()`
+4. `PermissionRequestProcessor` creates a per-request `ConfirmationShell` via `ConfirmationShellFactory`, builds grant lifecycle handlers via `buildGrantLifecycleHandlers()`, then invokes `PermissionGrantPipeline.run()`
 5. `PermissionGrantPipeline` executes the lifecycle in sequence:
    - Validates the request using `PermissionGrantPreparator`
    - Runs introduction (if needed) and confirmation via `ConfirmationSession`
@@ -197,13 +204,13 @@ The EntryPoint serves as the main initialization and configuration point for the
    - Core services (TokenMetadataService, TokenPricesService, AccountController)
    - State management (StateManager for snap persistence)
    - Profile sync (ProfileSyncManager for cross-device permission sync)
-   - UI components (ConfirmationDialogFactory, UserEventDispatcher)
-   - Permission handling (PermissionRegistry, PermissionRequestProcessor, PermissionGrantPipeline)
+   - UI components (ConfirmationDialogFactory, DialogInterfaceFactory, UserEventDispatcher)
+   - Permission handling (PermissionRegistry, ConfirmationShellFactory, PermissionRequestProcessor, PermissionGrantPipeline, ConfirmationSession)
    - RPC handling (createRpcHandler for processing requests)
 
 2. Configuring RPC method bindings:
    - Maps RPC methods to their corresponding handlers
-   - Supports `permissionsProvider_grantPermissions`, `permissionsProvider_getPermissionOffers`, and `permissionsProvider_getGrantedPermissions`
+   - Supports `permissionsProvider_grantPermissions`, `permissionsProvider_getPermissionOffers`, `permissionsProvider_getGrantedPermissions`, `permissionsProvider_submitRevocation`, and `permissionsProvider_getSupportedPermissions`
 
 3. Handling lifecycle events:
    - `onRpcRequest`: Processes incoming JSON-RPC requests with origin validation
@@ -267,7 +274,7 @@ Key architectural points:
 - Integrates with ProfileSyncManager to store approved permissions
 - Returns filtered arrays of valid permission responses
 
-The RpcHandler provides three main functions:
+The RpcHandler provides five main functions:
 
 1. `grantPermission()`:
    - Validates incoming permission request parameters
@@ -278,22 +285,30 @@ The RpcHandler provides three main functions:
 
 2. `getPermissionOffers()`:
    - Returns the default permission offers that the snap supports
-   - Currently supports 4 permission types: native-token-stream, native-token-periodic, erc20-token-stream, erc20-token-periodic
+   - Currently supports 7 permission types (see `permissions/permissionOffers.ts`)
 
 3. `getGrantedPermissions()`:
    - Retrieves all previously granted permissions from ProfileSyncManager
    - Returns permissions for cross-device synchronization
 
+4. `submitRevocation()`:
+   - Validates and stores revocation metadata via ProfileSyncManager
+   - Used by MetaMask extension to mark delegations as revoked
+
+5. `getSupportedPermissions()`:
+   - Returns supported permission types, chain IDs, and rule types for the kernel snap
+
 ### PermissionRequestProcessor
 
-The `PermissionRequestProcessor` is the RPC-facing entry point for grant requests. It looks up the `PermissionModule` by type, creates a per-request `ConfirmationShell`, builds grant lifecycle handlers, and delegates to `PermissionGrantPipeline`.
+The `PermissionRequestProcessor` is the RPC-facing entry point for grant requests. It looks up the `PermissionModule` by type, creates a per-request `ConfirmationShell` via `ConfirmationShellFactory`, builds grant lifecycle handlers via `buildGrantLifecycleHandlers()`, and delegates to `PermissionGrantPipeline`.
 
 Key architectural points:
 
 - One processor instance shared across all requests (no per-request handler object)
 - Registry lookup via `extractDescriptorName(request.permission.type)`
-- Each permission folder exports a `PermissionModule` registered at startup
-- Builds lifecycle handlers from module + shell (replaces the former `PermissionHandler` adapter)
+- Each permission folder exports a `PermissionModule` registered at startup in `registerPermissionModules.ts`
+- `ConfirmationShellFactory` wires shell chrome (balance, account selector, trust signals) to the module's `renderBody`
+- `buildGrantLifecycleHandlers()` adapts a module + shell into `PermissionGrantLifecycleHandlers` for the pipeline
 
 ### PermissionRegistry and PermissionModule
 
@@ -303,9 +318,21 @@ Each `PermissionModule` exposes a flat contract:
 
 - `parseAndValidate`, `buildContext`, `deriveMetadata`, `renderBody`
 - `applyContext`, `populatePermission`, `createPermissionCaveats`
-- `rules`, `title`, `subtitle`, `showTokenBalance` (optional, defaults to true)
+- `rules`, `title`, `subtitle`, `showTokenBalance` (optional, defaults to `true`)
 
-Permission folders export `PermissionModule` objects directly; each module is registered in `createPermissionRegistry()` at startup.
+Permission folders export `PermissionModule` objects directly; all modules are registered in `createPermissionRegistry()` via `registerPermissionModules.ts`.
+
+### ConfirmationShell and ConfirmationShellFactory
+
+`ConfirmationShellFactory` creates a `ConfirmationShell` per request, wired to the module's `renderBody`, title, subtitle, and `showTokenBalance` option.
+
+`ConfirmationShell` provides permission-agnostic confirmation chrome:
+
+- Account selector, upgrade banner, and optional token balance (controlled by `showTokenBalance`)
+- Trust signal display, justification, existing-permissions subview
+- Session event binding for rules, account changes, and shell interactions
+
+The shell's lifecycle methods (`createConfirmationContent`, `createSkeletonContent`, `bindSessionEvents`) are exposed to the pipeline via `PermissionGrantLifecycleHandlers`.
 
 ### PermissionGrantPipeline
 
@@ -334,30 +361,29 @@ The pipeline manages the following lifecycle:
    - Applies context, populates permission, creates caveats
    - Signs delegation and returns `PermissionResponse`
 
-### ConfirmationDialogFactory & ConfirmationDialog
+### ConfirmationDialogFactory, ConfirmationDialog, and ConfirmationSession
 
-The ConfirmationDialogFactory creates confirmation dialogs that handle user interaction during permission requests, while ConfirmationDialog manages the complete dialog lifecycle.
+`ConfirmationSession` orchestrates the full confirmation flow for one request: introduction (when needed), skeleton loading, context building, trust-signal fetching, and user decision. It uses a shared `DialogInterface` across intro, confirmation, and existing-permissions subviews.
+
+`ConfirmationDialogFactory` creates `ConfirmationDialog` instances that handle grant/cancel interaction during the confirmation phase.
 
 **ConfirmationDialogFactory** provides:
 
-- Factory pattern for creating confirmation dialogs
-- Dependency injection for snaps provider and user event dispatcher
-- Consistent dialog structure across permission types
+- Factory for creating `ConfirmationDialog` instances with injected `UserEventDispatcher` and timeout handling
 
 **ConfirmationDialog** manages:
 
 - Complete dialog lifecycle from creation to cleanup
-- User input event handling through UserEventDispatcher
+- User input event handling through `UserEventDispatcher`
 - Dynamic content updates based on context changes
-- Promise-based user decision resolution
+- Promise-based user decision resolution (grant/cancel)
 - Event handler cleanup and resource management
 
 Key features:
 
 - Supports dynamic content updates during user interaction
 - Handles both grant and cancel user decisions
-- Manages UI state for complex form interactions
-- Integrates with UserEventDispatcher for event handling
+- Integrates with `UserEventDispatcher` for event handling
 - Provides clean teardown and resource cleanup
 
 ### ProfileSyncManager
