@@ -69,8 +69,7 @@ describe('tokenApprovalRevocation:context', () => {
     });
 
     it('should create a context from a permission request', async () => {
-      const context = await buildContext({
-        permissionRequest,
+      const context = await buildContext(permissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -97,8 +96,7 @@ describe('tokenApprovalRevocation:context', () => {
         rules: [],
       };
 
-      const context = await buildContext({
-        permissionRequest: request,
+      const context = await buildContext(request, {
         tokenMetadataService: mockTokenMetadataService,
       });
       expect(context.expiry).toBeUndefined();
@@ -111,8 +109,7 @@ describe('tokenApprovalRevocation:context', () => {
       };
 
       await expect(
-        buildContext({
-          permissionRequest: request,
+        buildContext(request, {
           tokenMetadataService: mockTokenMetadataService,
         }),
       ).rejects.toThrow(

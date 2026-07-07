@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 import { TimePeriod } from '../../../src/core/types';
-import { createConfirmationContent } from '../../../src/permissions/erc20TokenPeriodic/content';
+import { renderBody } from '../../../src/permissions/erc20TokenPeriodic/content';
 import type {
   Erc20TokenPeriodicContext,
   Erc20TokenPeriodicMetadata,
@@ -36,9 +36,9 @@ const mockMetadata: Erc20TokenPeriodicMetadata = {
 };
 
 describe('erc20TokenPeriodic:content', () => {
-  describe('createConfirmationContent()', () => {
+  describe('renderBody()', () => {
     it('should render content with ERC20 token details', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
       });
@@ -480,7 +480,7 @@ describe('erc20TokenPeriodic:content', () => {
         },
       };
 
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: contextWithErrors,
         metadata: metadataWithErrors,
       });
@@ -917,7 +917,7 @@ describe('erc20TokenPeriodic:content', () => {
         },
       };
 
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: weeklyContext,
         metadata: mockMetadata,
       });
@@ -1353,7 +1353,7 @@ describe('erc20TokenPeriodic:content', () => {
         },
       };
 
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: contextWithoutIcon,
         metadata: mockMetadata,
       });
@@ -1772,7 +1772,7 @@ describe('erc20TokenPeriodic:content', () => {
     });
 
     it('should handle different chain IDs correctly', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
       });
@@ -2209,7 +2209,7 @@ describe('erc20TokenPeriodic:content', () => {
         },
       };
 
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: metadataWithMultipleErrors,
       });
@@ -2641,7 +2641,7 @@ describe('erc20TokenPeriodic:content', () => {
     });
 
     it('should render with expanded justification', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
       });

@@ -3,17 +3,14 @@ import type {
   Permission,
   PermissionResponse,
 } from '@metamask/7715-permissions-shared/types';
-import type { Hex, Caveat, Delegation } from '@metamask/delegation-core';
+import type { Hex, Delegation } from '@metamask/delegation-core';
 import type { CaipAccountId, CaipAssetType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { TokenMetadataService } from '../services/tokenMetadataService';
 import type { UserEventDispatcher } from '../userEventDispatcher';
-import type { DelegationContracts } from './chainMetadata';
 import type { DialogInterface } from './dialogInterface';
 import type { TimeoutFactory } from './timeoutFactory';
 import type { MessageKey } from '../utils/i18n';
-import type { ConfirmationShellConfig } from './confirmation/ConfirmationShellConfig';
 
 /**
  * Represents the result of a permission request.
@@ -165,73 +162,6 @@ export type RuleDefinition<
   updateContext: (context: TContext, value: any) => TContext;
   /** When provided, called to get content shown when the field is toggled off. */
   contentWhenDisabled?: () => string;
-};
-
-/**
- * Defines the structure and dependencies for a permission type.
- * @template TRequest - The type of permission request.
- * @template TContext - The type of context object used during request processing.
- * @template TMetadata - The type of metadata object used for request processing.
- * @template TPermission - The type of permission object.
- * @template TPopulatedPermission - The type of populated permission object with all required fields.
- */
-export type PermissionDefinition<
-  TRequest extends PermissionRequest = PermissionRequest,
-  TContext extends BaseContext = BaseContext,
-  TMetadata extends object = object,
-  TPermission extends TRequest['permission'] = TRequest['permission'],
-  TPopulatedPermission extends
-    DeepRequired<TPermission> = DeepRequired<TPermission>,
-> = {
-  rules: RuleDefinition<TContext, TMetadata>[];
-  title: MessageKey;
-  subtitle: MessageKey;
-  confirmationShell?: ConfirmationShellConfig;
-  dependencies: PermissionHandlerDependencies<
-    TRequest,
-    TContext,
-    TMetadata,
-    TPermission,
-    TPopulatedPermission
-  >;
-};
-
-/**
- * Dependencies required for a permission folder definition.
- * @template TRequest - The type of permission request being handled.
- * @template TContext - The type of context object used during request processing.
- * @template TMetadata - The type of metadata object used for request processing.
- * @template TPermission - The type of permission object from the request.
- * @template TPopulatedPermission - The type of fully populated permission object.
- */
-export type PermissionHandlerDependencies<
-  TRequest extends PermissionRequest,
-  TContext extends BaseContext,
-  TMetadata extends object,
-  TPermission extends TRequest['permission'],
-  TPopulatedPermission extends DeepRequired<TPermission>,
-> = {
-  parseAndValidatePermission: (request: PermissionRequest) => TRequest;
-  buildContext: (args: {
-    permissionRequest: TRequest;
-    tokenMetadataService: TokenMetadataService;
-  }) => Promise<TContext>;
-  deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
-  createConfirmationContent: (args: {
-    context: TContext;
-    metadata: TMetadata;
-  }) => Promise<SnapElement>;
-  applyContext: (args: {
-    context: TContext;
-    originalRequest: TRequest;
-  }) => Promise<TRequest>;
-  populatePermission: (args: {
-    permission: TPermission;
-  }) => Promise<TPopulatedPermission>;
-  createPermissionCaveats: (args: {
-    permission: TPopulatedPermission;
-    contracts: DelegationContracts;
-  }) => Promise<Caveat[]>;
 };
 
 /**

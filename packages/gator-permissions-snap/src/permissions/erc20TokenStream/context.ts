@@ -15,8 +15,8 @@ import type {
   PopulatedErc20TokenStreamPermission,
   Erc20TokenStreamPermission,
 } from './types';
+import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
 import { TimePeriod } from '../../core/types';
-import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
@@ -128,18 +128,16 @@ export async function populatePermission({
 /**
  * Converts a permission request into a context object that can be used to render the UI
  * and manage the permission state.
- * @param options0 - The options object containing the request and required services.
- * @param options0.permissionRequest - The Erc20 token stream permission request to convert.
- * @param options0.tokenMetadataService - Service for fetching token metadata.
+ * @param permissionRequest - The Erc20 token stream permission request to convert.
+ * @param services - Services required to build permission context.
+ * @param services.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
-export async function buildContext({
-  permissionRequest,
-  tokenMetadataService,
-}: {
-  permissionRequest: Erc20TokenStreamPermissionRequest;
-  tokenMetadataService: TokenMetadataService;
-}): Promise<Erc20TokenStreamContext> {
+export async function buildContext(
+  permissionRequest: Erc20TokenStreamPermissionRequest,
+  services: PermissionBuildServices,
+): Promise<Erc20TokenStreamContext> {
+  const { tokenMetadataService } = services;
   const chainId = Number(permissionRequest.chainId);
 
   const {

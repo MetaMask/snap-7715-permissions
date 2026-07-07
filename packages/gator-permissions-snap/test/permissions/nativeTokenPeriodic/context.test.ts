@@ -159,8 +159,7 @@ describe('nativeTokenPeriodic:context', () => {
         imageDataBase64: `data:image/png;base64,${base64}`,
       });
 
-      const context = await buildContext({
-        permissionRequest: alreadyPopulatedPermissionRequest,
+      const context = await buildContext(alreadyPopulatedPermissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -186,8 +185,7 @@ describe('nativeTokenPeriodic:context', () => {
         rules: [],
       };
 
-      const context = await buildContext({
-        permissionRequest,
+      const context = await buildContext(permissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
       expect(context.expiry).toBeUndefined();
@@ -200,8 +198,7 @@ describe('nativeTokenPeriodic:context', () => {
         // rules is optional, but may not be explicitly set to undefined
       } as unknown as NativeTokenPeriodicPermissionRequest;
 
-      const context = await buildContext({
-        permissionRequest,
+      const context = await buildContext(permissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
       expect(context.expiry).toBeUndefined();

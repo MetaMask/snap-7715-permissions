@@ -19,7 +19,7 @@ import { t } from '../../utils/i18n';
  * @param args.metadata - The metadata containing the validation errors.
  * @returns A Promise that resolves to the UI element for the confirmation dialog.
  */
-export async function createConfirmationContent({
+export async function renderBody({
   context,
   metadata,
 }: {

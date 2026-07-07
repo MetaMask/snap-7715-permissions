@@ -1,17 +1,16 @@
 import { describe, expect, it } from '@jest/globals';
 import { InternalError, InvalidInputError } from '@metamask/snaps-sdk';
 
-import { toPermissionModule } from '../../../src/core/permission/PermissionModule';
 import type { RegisteredPermissionModule } from '../../../src/core/permission/PermissionModule';
 import { PermissionRegistry } from '../../../src/core/permission/PermissionRegistry';
 import { createPermissionRegistry } from '../../../src/core/permission/registerPermissionModules';
-import { nativeTokenStreamPermissionDefinition } from '../../../src/permissions/nativeTokenStream';
+import { nativeTokenStreamPermissionModule } from '../../../src/permissions/nativeTokenStream';
 
-const createMinimalModule = (type: string): RegisteredPermissionModule =>
-  toPermissionModule(type, {
-    ...nativeTokenStreamPermissionDefinition,
-    rules: [],
-  });
+const createMinimalModule = (type: string): RegisteredPermissionModule => ({
+  ...nativeTokenStreamPermissionModule,
+  type,
+  rules: [],
+});
 
 describe('PermissionRegistry', () => {
   describe('register', () => {

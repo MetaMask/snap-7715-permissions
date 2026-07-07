@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
 import type { Erc20TokenAllowancePermissionRequest } from '../../../src/permissions/erc20TokenAllowance/types';
-import { parseAndValidatePermission } from '../../../src/permissions/erc20TokenAllowance/validation';
+import { parseAndValidate } from '../../../src/permissions/erc20TokenAllowance/validation';
 import { parseUnits } from '../../../src/utils/value';
 
 const tokenDecimals = 6;
@@ -36,12 +36,10 @@ const validPermissionRequest: Erc20TokenAllowancePermissionRequest = {
 };
 
 describe('erc20TokenAllowance:validation', () => {
-  describe('parseAndValidatePermission()', () => {
+  describe('parseAndValidate()', () => {
     it('should validate a valid permission request', () => {
-      expect(() =>
-        parseAndValidatePermission(validPermissionRequest),
-      ).not.toThrow();
-      expect(parseAndValidatePermission(validPermissionRequest)).toStrictEqual(
+      expect(() => parseAndValidate(validPermissionRequest)).not.toThrow();
+      expect(parseAndValidate(validPermissionRequest)).toStrictEqual(
         validPermissionRequest,
       );
     });
@@ -52,9 +50,7 @@ describe('erc20TokenAllowance:validation', () => {
         rules: [],
       };
 
-      expect(() =>
-        parseAndValidatePermission(missingExpiry as any),
-      ).not.toThrow();
+      expect(() => parseAndValidate(missingExpiry as any)).not.toThrow();
     });
 
     it('should throw for invalid permission type', () => {
@@ -66,9 +62,7 @@ describe('erc20TokenAllowance:validation', () => {
         },
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidTypeRequest as any),
-      ).toThrow(
+      expect(() => parseAndValidate(invalidTypeRequest as any)).toThrow(
         'Failed type validation: type: Invalid literal value, expected "erc20-token-allowance"',
       );
     });
@@ -85,7 +79,7 @@ describe('erc20TokenAllowance:validation', () => {
         },
       };
 
-      expect(() => parseAndValidatePermission(zeroRequest)).toThrow(
+      expect(() => parseAndValidate(zeroRequest)).toThrow(
         'Invalid allowanceAmount: must be greater than 0',
       );
     });
@@ -104,9 +98,7 @@ describe('erc20TokenAllowance:validation', () => {
         ],
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidRedeemerRuleRequest as any),
-      ).toThrow(
+      expect(() => parseAndValidate(invalidRedeemerRuleRequest as any)).toThrow(
         'Invalid redeemer rule: must include a non-empty addresses array',
       );
     });
@@ -125,9 +117,9 @@ describe('erc20TokenAllowance:validation', () => {
         ],
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidPayeeRuleRequest as any),
-      ).toThrow('Invalid payee rule: must include a non-empty addresses array');
+      expect(() => parseAndValidate(invalidPayeeRuleRequest as any)).toThrow(
+        'Invalid payee rule: must include a non-empty addresses array',
+      );
     });
 
     it('should throw when payee rule has multiple addresses', () => {
@@ -147,9 +139,7 @@ describe('erc20TokenAllowance:validation', () => {
         ],
       };
 
-      expect(() =>
-        parseAndValidatePermission(multiplePayeesRequest as any),
-      ).toThrow(
+      expect(() => parseAndValidate(multiplePayeesRequest as any)).toThrow(
         'Multiple payee addresses are not currently supported for ERC20 permissions.',
       );
     });

@@ -1,19 +1,6 @@
 import { InvalidInputError, InternalError } from '@metamask/snaps-sdk';
 
-import type { PermissionDefinition } from '../types';
 import type { RegisteredPermissionModule } from './PermissionModule';
-
-/** Map of permission type strings to their folder definitions before module conversion. */
-export type PermissionModuleMap = Record<string, PermissionDefinition>;
-
-/**
- * Builds a permission module map from heterogeneous permission definitions.
- * @param modules - Permission definitions keyed by type string.
- * @returns The same map widened for registry registration.
- */
-export function permissionModuleMap(modules: unknown): PermissionModuleMap {
-  return modules as PermissionModuleMap;
-}
 
 /**
  * Registry mapping permission type strings to their modules.

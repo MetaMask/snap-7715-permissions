@@ -59,7 +59,7 @@ This document outlines the architecture of the Permissions Provider Snap system 
 
 Each permission type (native-token-stream, native-token-periodic, erc20-token-stream, erc20-token-periodic) includes:
 
-- **Permission Definition**: Exports a `PermissionDefinition` object containing rules, title, and lifecycle function dependencies.
+- **Permission Module**: Each permission folder exports a flat `PermissionModule` with parse, buildContext, renderBody, and caveat methods.
 - **Types**: Permission-specific TypeScript types for requests, contexts, metadata, and permissions.
 - **Validation**: Request parsing and validation logic.
 - **Context**: Functions for building, applying, and populating permission context data.
@@ -162,8 +162,8 @@ graph TD
    - Processes the user's decision
    - Creates and signs the delegation via `GrantedPermissionResolutionService`
 6. `PermissionRequestProcessor` returns the result to the `RpcHandler`
-8. `RpcHandler` stores approved permissions via `ProfileSyncManager` for cross-device sync
-9. Response is returned through the call stack
+7. `RpcHandler` stores approved permissions via `ProfileSyncManager` for cross-device sync
+8. Response is returned through the call stack
 
 ## Permission Request Grant Pipeline
 
@@ -292,7 +292,7 @@ Key architectural points:
 
 - One processor instance shared across all requests (no per-request handler object)
 - Registry lookup via `extractDescriptorName(request.permission.type)`
-- Bridges folder-level `PermissionDefinition` exports to runtime `PermissionModule` via `toPermissionModule()`
+- Each permission folder exports a `PermissionModule` registered at startup
 - Builds lifecycle handlers from module + shell (replaces the former `PermissionHandler` adapter)
 
 ### PermissionRegistry and PermissionModule
@@ -305,7 +305,7 @@ Each `PermissionModule` exposes a flat contract:
 - `applyContext`, `populatePermission`, `createPermissionCaveats`
 - `rules`, `title`, `subtitle`, `confirmationShell`
 
-Permission folders still export `PermissionDefinition` objects (with a `dependencies` bag); `toPermissionModule()` adapts them at registration time so permission-specific `context.ts` files remain unchanged.
+Permission folders export `PermissionModule` objects directly; each module is registered in `createPermissionRegistry()` at startup.
 
 ### PermissionGrantPipeline
 

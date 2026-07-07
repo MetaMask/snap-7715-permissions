@@ -1,5 +1,5 @@
 import { createPermissionCaveats } from './caveats';
-import { createConfirmationContent } from './content';
+import { renderBody } from './content';
 import {
   applyContext,
   buildContext,
@@ -14,26 +14,27 @@ import type {
   Erc20TokenStreamPermissionRequest,
   PopulatedErc20TokenStreamPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
-import type { PermissionDefinition } from '../../core/types';
+import { parseAndValidate } from './validation';
+import { DEFAULT_CONFIRMATION_SHELL_CONFIG } from '../../core/confirmation/ConfirmationShellConfig';
+import type { PermissionModule } from '../../core/permission/PermissionModule';
 
-export const erc20TokenStreamPermissionDefinition: PermissionDefinition<
+export const erc20TokenStreamPermissionModule: PermissionModule<
   Erc20TokenStreamPermissionRequest,
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
   Erc20TokenStreamPermission,
   PopulatedErc20TokenStreamPermission
 > = {
+  type: 'erc20-token-stream',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
-  dependencies: {
-    parseAndValidatePermission,
-    buildContext,
-    deriveMetadata,
-    createConfirmationContent,
-    applyContext,
-    populatePermission,
-    createPermissionCaveats,
-  },
+  confirmationShell: DEFAULT_CONFIRMATION_SHELL_CONFIG,
+  parseAndValidate,
+  buildContext,
+  deriveMetadata,
+  renderBody,
+  applyContext,
+  populatePermission,
+  createPermissionCaveats,
 };

@@ -1,5 +1,5 @@
 import { createPermissionCaveats } from './caveats';
-import { createConfirmationContent } from './content';
+import { renderBody } from './content';
 import {
   applyContext,
   buildContext,
@@ -14,9 +14,9 @@ import type {
   TokenApprovalRevocationPermissionRequest,
   PopulatedTokenApprovalRevocationPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
+import { parseAndValidate } from './validation';
 import type { ConfirmationShellConfig } from '../../core/confirmation/ConfirmationShellConfig';
-import type { PermissionDefinition } from '../../core/types';
+import type { PermissionModule } from '../../core/permission/PermissionModule';
 
 const TOKEN_APPROVAL_REVOCATION_SHELL_CONFIG: ConfirmationShellConfig = {
   accountSelector: true,
@@ -25,24 +25,23 @@ const TOKEN_APPROVAL_REVOCATION_SHELL_CONFIG: ConfirmationShellConfig = {
   existingPermissionsReview: true,
 };
 
-export const tokenApprovalRevocationPermissionDefinition: PermissionDefinition<
+export const tokenApprovalRevocationPermissionModule: PermissionModule<
   TokenApprovalRevocationPermissionRequest,
   TokenApprovalRevocationContext,
   TokenApprovalRevocationMetadata,
   TokenApprovalRevocationPermission,
   PopulatedTokenApprovalRevocationPermission
 > = {
+  type: 'token-approval-revocation',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitleRevocation',
   confirmationShell: TOKEN_APPROVAL_REVOCATION_SHELL_CONFIG,
-  dependencies: {
-    parseAndValidatePermission,
-    buildContext,
-    deriveMetadata,
-    createConfirmationContent,
-    applyContext,
-    populatePermission,
-    createPermissionCaveats,
-  },
+  parseAndValidate,
+  buildContext,
+  deriveMetadata,
+  renderBody,
+  applyContext,
+  populatePermission,
+  createPermissionCaveats,
 };

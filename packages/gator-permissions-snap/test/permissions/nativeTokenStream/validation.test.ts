@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
 import type { NativeTokenStreamPermissionRequest } from '../../../src/permissions/nativeTokenStream/types';
-import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenStream/validation';
+import { parseAndValidate } from '../../../src/permissions/nativeTokenStream/validation';
 import { parseUnits } from '../../../src/utils/value';
 
 const validPermissionRequest: NativeTokenStreamPermissionRequest = {
@@ -32,13 +32,11 @@ const validPermissionRequest: NativeTokenStreamPermissionRequest = {
 };
 
 describe('nativeTokenStream:validation', () => {
-  describe('parseAndValidatePermission()', () => {
+  describe('parseAndValidate()', () => {
     it('should validate a valid permission request', () => {
-      expect(() =>
-        parseAndValidatePermission(validPermissionRequest),
-      ).not.toThrow();
+      expect(() => parseAndValidate(validPermissionRequest)).not.toThrow();
 
-      const result = parseAndValidatePermission(validPermissionRequest);
+      const result = parseAndValidate(validPermissionRequest);
       expect(result).toStrictEqual(validPermissionRequest);
     });
 
@@ -48,9 +46,7 @@ describe('nativeTokenStream:validation', () => {
         rules: [],
       };
 
-      expect(() =>
-        parseAndValidatePermission(missingExpiryRequest as any),
-      ).not.toThrow();
+      expect(() => parseAndValidate(missingExpiryRequest as any)).not.toThrow();
     });
 
     describe('payee rule validation', () => {
@@ -71,9 +67,7 @@ describe('nativeTokenStream:validation', () => {
           ],
         };
 
-        expect(() =>
-          parseAndValidatePermission(multiPayeeRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(multiPayeeRequest)).not.toThrow();
       });
     });
 
@@ -86,9 +80,7 @@ describe('nativeTokenStream:validation', () => {
         },
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidTypeRequest as any),
-      ).toThrow(
+      expect(() => parseAndValidate(invalidTypeRequest as any)).toThrow(
         'Failed type validation: type: Invalid literal value, expected "native-token-stream"',
       );
     });
@@ -106,7 +98,7 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() => parseAndValidatePermission(zeroMaxAmountRequest)).toThrow(
+        expect(() => parseAndValidate(zeroMaxAmountRequest)).toThrow(
           'Invalid maxAmount: must be greater than 0',
         );
       });
@@ -128,9 +120,9 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(invalidMaxAmountRequest),
-        ).toThrow('Invalid maxAmount: must be greater than initialAmount');
+        expect(() => parseAndValidate(invalidMaxAmountRequest)).toThrow(
+          'Invalid maxAmount: must be greater than initialAmount',
+        );
       });
 
       it('should allow missing maxAmount', () => {
@@ -145,9 +137,7 @@ describe('nativeTokenStream:validation', () => {
         };
         delete noMaxAmountRequest.permission.data.maxAmount;
 
-        expect(() =>
-          parseAndValidatePermission(noMaxAmountRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(noMaxAmountRequest)).not.toThrow();
       });
 
       it('should allow null maxAmount', () => {
@@ -162,11 +152,9 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(nullMaxAmountRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(nullMaxAmountRequest)).not.toThrow();
 
-        const result = parseAndValidatePermission(nullMaxAmountRequest);
+        const result = parseAndValidate(nullMaxAmountRequest);
         expect(result).toBeDefined();
       });
     });
@@ -184,9 +172,7 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(zeroInitialAmountRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(zeroInitialAmountRequest)).not.toThrow();
       });
 
       it('should allow missing initialAmount', () => {
@@ -201,9 +187,7 @@ describe('nativeTokenStream:validation', () => {
         };
         delete noInitialAmountRequest.permission.data.initialAmount;
 
-        expect(() =>
-          parseAndValidatePermission(noInitialAmountRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(noInitialAmountRequest)).not.toThrow();
       });
 
       it('should allow null initialAmount', () => {
@@ -218,11 +202,9 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(nullInitialAmountRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(nullInitialAmountRequest)).not.toThrow();
 
-        const result = parseAndValidatePermission(nullInitialAmountRequest);
+        const result = parseAndValidate(nullInitialAmountRequest);
         expect(result).toBeDefined();
       });
     });
@@ -240,9 +222,9 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(zeroAmountPerSecondRequest),
-        ).toThrow('Invalid amountPerSecond: must be greater than 0');
+        expect(() => parseAndValidate(zeroAmountPerSecondRequest)).toThrow(
+          'Invalid amountPerSecond: must be greater than 0',
+        );
       });
     });
 
@@ -259,9 +241,7 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(negativeStartTimeRequest),
-        ).toThrow(
+        expect(() => parseAndValidate(negativeStartTimeRequest)).toThrow(
           'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
         );
       });
@@ -278,7 +258,7 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() => parseAndValidatePermission(zeroStartTimeRequest)).toThrow(
+        expect(() => parseAndValidate(zeroStartTimeRequest)).toThrow(
           'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
         );
       });
@@ -295,7 +275,7 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
+        expect(() => parseAndValidate(floatStartTimeRequest)).toThrow(
           'Failed type validation: data.startTime: Expected integer, received float',
         );
       });
@@ -312,9 +292,7 @@ describe('nativeTokenStream:validation', () => {
         };
         delete noStartTimeRequest.permission.data.startTime;
 
-        expect(() =>
-          parseAndValidatePermission(noStartTimeRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(noStartTimeRequest)).not.toThrow();
       });
 
       it('should allow null startTime', () => {
@@ -329,11 +307,9 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(nullStartTimeRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(nullStartTimeRequest)).not.toThrow();
 
-        const result = parseAndValidatePermission(nullStartTimeRequest);
+        const result = parseAndValidate(nullStartTimeRequest);
         expect(result).toBeDefined();
       });
     });
@@ -361,9 +337,9 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(startTimeVsExpiryRequest),
-        ).toThrow('Invalid startTime: must be before expiry');
+        expect(() => parseAndValidate(startTimeVsExpiryRequest)).toThrow(
+          'Invalid startTime: must be before expiry',
+        );
       });
 
       it('should throw when startTime is after expiry', () => {
@@ -388,9 +364,9 @@ describe('nativeTokenStream:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(startTimeAfterExpiryRequest),
-        ).toThrow('Invalid startTime: must be before expiry');
+        expect(() => parseAndValidate(startTimeAfterExpiryRequest)).toThrow(
+          'Invalid startTime: must be before expiry',
+        );
       });
 
       it('should validate when startTime is before expiry', () => {
@@ -416,7 +392,7 @@ describe('nativeTokenStream:validation', () => {
         };
 
         expect(() =>
-          parseAndValidatePermission(validStartTimeVsExpiryRequest),
+          parseAndValidate(validStartTimeVsExpiryRequest),
         ).not.toThrow();
       });
     });

@@ -10,13 +10,11 @@ import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { MessageKey } from '../../utils/i18n';
 import type { DelegationContracts } from '../chainMetadata';
 import { ConfirmationShell } from '../confirmation/ConfirmationShell';
-import { DEFAULT_CONFIRMATION_SHELL_CONFIG } from '../confirmation/ConfirmationShellConfig';
 import type { ConfirmationShellConfig } from '../confirmation/ConfirmationShellConfig';
 import type {
   BaseContext,
   BaseMetadata,
   DeepRequired,
-  PermissionDefinition,
   RuleDefinition,
 } from '../types';
 
@@ -75,54 +73,6 @@ export type RegisteredPermissionModule = PermissionModule<
   Permission,
   DeepRequired<Permission>
 >;
-
-/**
- * Converts a permission folder definition into a {@link PermissionModule}.
- * @param type - Permission type string (descriptor name).
- * @param definition - Permission-specific definition from a permission folder.
- * @returns A module ready for registry registration.
- */
-export function toPermissionModule<
-  TRequest extends PermissionRequest,
-  TContext extends BaseContext,
-  TMetadata extends BaseMetadata,
-  TPermission extends TRequest['permission'],
-  TPopulatedPermission extends DeepRequired<TPermission>,
->(
-  type: string,
-  definition: PermissionDefinition<
-    TRequest,
-    TContext,
-    TMetadata,
-    TPermission,
-    TPopulatedPermission
-  >,
-): PermissionModule<
-  TRequest,
-  TContext,
-  TMetadata,
-  TPermission,
-  TPopulatedPermission
-> {
-  const { dependencies, confirmationShell, ...rest } = definition;
-
-  return {
-    type,
-    ...rest,
-    confirmationShell: confirmationShell ?? DEFAULT_CONFIRMATION_SHELL_CONFIG,
-    parseAndValidate: dependencies.parseAndValidatePermission,
-    buildContext: async (request, services) =>
-      dependencies.buildContext({
-        permissionRequest: request,
-        tokenMetadataService: services.tokenMetadataService,
-      }),
-    deriveMetadata: dependencies.deriveMetadata,
-    renderBody: dependencies.createConfirmationContent,
-    applyContext: dependencies.applyContext,
-    populatePermission: dependencies.populatePermission,
-    createPermissionCaveats: dependencies.createPermissionCaveats,
-  };
-}
 
 /**
  * Builds pipeline lifecycle handlers from a module and its confirmation shell.

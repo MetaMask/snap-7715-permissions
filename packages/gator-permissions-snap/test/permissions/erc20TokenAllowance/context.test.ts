@@ -96,8 +96,7 @@ describe('erc20TokenAllowance:context', () => {
 
   describe('buildContext()', () => {
     it('includes redeemer and payee addresses from rules', async () => {
-      const context = await buildContext({
-        permissionRequest,
+      const context = await buildContext(permissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
 

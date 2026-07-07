@@ -4,7 +4,7 @@ import { InvalidInputError } from '@metamask/snaps-sdk';
 import { parseCaipAccountId, toCaipAccountId } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
-import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
 import { validateExpiry } from '../contextValidation';
 import type {
   TokenApprovalRevocationContext,
@@ -87,17 +87,15 @@ export async function populatePermission({
 /**
  * Converts a permission request into a context object that can be used to render the UI
  * and manage the permission state.
- * @param args - The options object containing the request and required services.
- * @param args.permissionRequest - The token approval revocation permission request to convert.
- * @param args.tokenMetadataService - Service for fetching token metadata.
+ * @param permissionRequest - The token approval revocation permission request to convert.
+ * @param _services - Services required to build permission context (unused for this permission type).
+ * @param _services.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
-export async function buildContext({
-  permissionRequest,
-}: {
-  permissionRequest: TokenApprovalRevocationPermissionRequest;
-  tokenMetadataService: TokenMetadataService;
-}): Promise<TokenApprovalRevocationContext> {
+export async function buildContext(
+  permissionRequest: TokenApprovalRevocationPermissionRequest,
+  _services: PermissionBuildServices,
+): Promise<TokenApprovalRevocationContext> {
   const chainId = Number(permissionRequest.chainId);
 
   const {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 import { TimePeriod } from '../../../src/core/types';
-import { createConfirmationContent } from '../../../src/permissions/erc20TokenStream/content';
+import { renderBody } from '../../../src/permissions/erc20TokenStream/content';
 import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
@@ -39,9 +39,9 @@ const mockMetadata: Erc20TokenStreamMetadata = {
 };
 
 describe('erc20TokenStream:content', () => {
-  describe('createConfirmationContent()', () => {
+  describe('renderBody()', () => {
     it('should render content with all permission details', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
       });
@@ -945,7 +945,7 @@ describe('erc20TokenStream:content', () => {
     });
 
     it('should render content with validation errors', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: {
           ...mockMetadata,
@@ -1863,7 +1863,7 @@ describe('erc20TokenStream:content', () => {
     });
 
     it('should render content with total exposure', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
       });
@@ -2767,7 +2767,7 @@ describe('erc20TokenStream:content', () => {
     });
 
     it('should handle disabled fields when adjustment is not allowed', async () => {
-      const contentWithoutAdjustment = await createConfirmationContent({
+      const contentWithoutAdjustment = await renderBody({
         context: {
           ...mockContext,
           isAdjustmentAllowed: false,
@@ -3664,7 +3664,7 @@ describe('erc20TokenStream:content', () => {
     });
 
     it('should handle missing optional fields', async () => {
-      const contentWithMissingFields = await createConfirmationContent({
+      const contentWithMissingFields = await renderBody({
         context: {
           ...mockContext,
           permissionDetails: {
@@ -4497,7 +4497,7 @@ describe('erc20TokenStream:content', () => {
     });
 
     it('should render content with unlimited total exposure', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: {
           ...mockMetadata,

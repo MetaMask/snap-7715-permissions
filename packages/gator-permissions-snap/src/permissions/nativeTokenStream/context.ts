@@ -15,8 +15,8 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
+import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
 import { TimePeriod } from '../../core/types';
-import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
 import { parseUnits, formatUnits, formatUnitsFromHex } from '../../utils/value';
@@ -126,18 +126,16 @@ export async function populatePermission({
 /**
  * Converts a permission request into a context object that can be used to render the UI
  * and manage the permission state.
- * @param options0 - The options object containing the request and required services.
- * @param options0.permissionRequest - The native token stream permission request to convert.
- * @param options0.tokenMetadataService - Service for fetching token metadata.
+ * @param permissionRequest - The native token stream permission request to convert.
+ * @param services - Services required to build permission context.
+ * @param services.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
-export async function buildContext({
-  permissionRequest,
-  tokenMetadataService,
-}: {
-  permissionRequest: NativeTokenStreamPermissionRequest;
-  tokenMetadataService: TokenMetadataService;
-}): Promise<NativeTokenStreamContext> {
+export async function buildContext(
+  permissionRequest: NativeTokenStreamPermissionRequest,
+  services: PermissionBuildServices,
+): Promise<NativeTokenStreamContext> {
+  const { tokenMetadataService } = services;
   const chainId = Number(permissionRequest.chainId);
 
   const {
