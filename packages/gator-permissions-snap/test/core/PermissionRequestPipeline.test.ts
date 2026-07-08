@@ -33,6 +33,8 @@ import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
 import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
 import type { TokenMetadataService } from '../../src/services/tokenMetadataService';
+import { DialogInterface } from 'src/core/dialogInterface';
+import { BaseContext } from 'src/core/types';
 
 const randomAddress = (): Hex => {
   const randomBytes = new Uint8Array(20);
@@ -45,13 +47,18 @@ const randomAddress = (): Hex => {
 const mockSignature = '0x1234';
 const mockInterfaceId = 'test-interface-id';
 const grantingAccountAddress = randomAddress();
-const fixedCaip10Address = `eip155:1:${grantingAccountAddress}`;
 
-const mockContext = {
-  expiry: '2024-12-31',
+const mockContext: BaseContext = {
+  tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
+  expiry: { timestamp: 1717987200 },
   isAdjustmentAllowed: true,
-  from: grantingAccountAddress,
-  accountAddressCaip10: fixedCaip10Address,
+  accountAddressCaip10: 'eip155:1:0x1234',
+  justification: 'Justification',
+  tokenMetadata: {
+    decimals: 18,
+    symbol: 'TKN',
+    iconDataBase64: null,
+  },
 };
 
 const mockMetadata = {
@@ -278,7 +285,9 @@ describe('PermissionRequestPipeline', () => {
       mockScanAddressResult,
     );
 
-    mockDialogInterfaceFactory.createDialogInterface.mockReturnValue({});
+    mockDialogInterfaceFactory.createDialogInterface.mockReturnValue(
+      {} as DialogInterface,
+    );
 
     confirmationSession = new ConfirmationSession({
       dialogInterfaceFactory: mockDialogInterfaceFactory,
@@ -546,7 +555,7 @@ describe('PermissionRequestPipeline', () => {
 
         const result = await permissionRequestPipeline.run({
           origin: 'https://app.uniswap.org',
-          permissionRequest: requestWithoutRedeemerRule,
+          permissionRequest: requestWithoutRedeemerRule as PermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,
         });
 
@@ -602,7 +611,8 @@ describe('PermissionRequestPipeline', () => {
 
         await permissionRequestPipeline.run({
           origin: 'https://uniswap.org',
-          permissionRequest: requestWithSentinelRedeemerRule,
+          permissionRequest:
+            requestWithSentinelRedeemerRule as PermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,
         });
 
@@ -632,7 +642,8 @@ describe('PermissionRequestPipeline', () => {
         await expect(
           permissionRequestPipeline.run({
             origin: 'https://app.uniswap.org',
-            permissionRequest: requestWithUnsupportedRedeemerRule,
+            permissionRequest:
+              requestWithUnsupportedRedeemerRule as PermissionRequest,
             lifecycleHandlers: lifecycleHandlerMocks,
           }),
         ).rejects.toThrow(InvalidInputError);

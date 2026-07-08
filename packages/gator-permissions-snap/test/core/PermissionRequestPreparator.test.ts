@@ -149,7 +149,8 @@ describe('PermissionRequestPreparator', () => {
 
     const result = await permissionRequestPreparator.prepare({
       origin: 'https://app.uniswap.org',
-      permissionRequest: requestWithoutRedeemerRule,
+      permissionRequest:
+        requestWithoutRedeemerRule as unknown as PermissionRequest,
       parseAndValidate: (req) => req,
     });
 
@@ -174,7 +175,8 @@ describe('PermissionRequestPreparator', () => {
 
     const result = await permissionRequestPreparator.prepare({
       origin: 'https://uniswap.org',
-      permissionRequest: requestWithSentinelRedeemerRule,
+      permissionRequest:
+        requestWithSentinelRedeemerRule as unknown as PermissionRequest,
       parseAndValidate: (req) => req,
     });
 
@@ -203,7 +205,8 @@ describe('PermissionRequestPreparator', () => {
     await expect(
       permissionRequestPreparator.prepare({
         origin: 'https://app.uniswap.org',
-        permissionRequest: requestWithUnsupportedRedeemerRule,
+        permissionRequest:
+          requestWithUnsupportedRedeemerRule as unknown as PermissionRequest,
         parseAndValidate: (req) => req,
       }),
     ).rejects.toThrow(InvalidInputError);

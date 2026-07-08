@@ -6,7 +6,6 @@ import {
   createNonceTerms,
   createRedeemerTerms,
 } from '@metamask/delegation-core';
-import { InvalidInputError } from '@metamask/snaps-sdk';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
@@ -28,14 +27,18 @@ const randomAddress = (): Hex => {
 
 const mockSignature = '0x1234';
 const grantingAccountAddress = randomAddress();
-const fixedCaip10Address = `eip155:1:${grantingAccountAddress}`;
 
 const mockContext: BaseContext = {
-  expiry: '2024-12-31',
+  tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
+  expiry: { timestamp: 1717987200 },
   isAdjustmentAllowed: true,
-  from: grantingAccountAddress,
-  accountAddressCaip10: fixedCaip10Address,
-  justification: '',
+  accountAddressCaip10: `eip155:1:${grantingAccountAddress}`,
+  justification: 'Justification',
+  tokenMetadata: {
+    decimals: 18,
+    symbol: 'TKN',
+    iconDataBase64: null,
+  },
 };
 
 const requestingAccountAddress = randomAddress();
@@ -326,7 +329,7 @@ describe('GrantedPermissionResolutionService', () => {
       const response = await grantedPermissionResolutionService.resolve({
         origin: 'test-origin',
         chainId: 1,
-        originalRequest: requestWithRedeemerRule,
+        originalRequest: requestWithRedeemerRule as PermissionRequest,
         modifiedContext: mockContext,
         isAdjustmentAllowed: true,
         lifecycleHandlers: lifecycleHandlerMocks,
@@ -497,7 +500,7 @@ describe('GrantedPermissionResolutionService', () => {
           isAdjustmentAllowed: true,
           lifecycleHandlers: lifecycleHandlerMocks,
         }),
-      ).rejects.toThrow(new InvalidInputError('Address is undefined'));
+      ).rejects.toThrow('Address is undefined');
     });
 
     it('throws when delegate address is undefined', async () => {
@@ -515,7 +518,7 @@ describe('GrantedPermissionResolutionService', () => {
           isAdjustmentAllowed: true,
           lifecycleHandlers: lifecycleHandlerMocks,
         }),
-      ).rejects.toThrow(new InvalidInputError('Delegate address is undefined'));
+      ).rejects.toThrow('Delegate address is undefined');
     });
   });
 });

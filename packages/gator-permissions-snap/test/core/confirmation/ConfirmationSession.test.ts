@@ -36,14 +36,19 @@ const randomAddress = (): Hex => {
 
 const mockInterfaceId = 'test-interface-id';
 const grantingAccountAddress = randomAddress();
-const fixedCaip10Address = `eip155:1:${grantingAccountAddress}`;
+const fixedCaip10Address = `eip155:1:${grantingAccountAddress}` as const;
 
-const mockContext = {
-  expiry: '2024-12-31',
+const mockContext: BaseContext = {
+  tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
+  expiry: { timestamp: 1717987200 },
   isAdjustmentAllowed: true,
-  from: grantingAccountAddress,
   accountAddressCaip10: fixedCaip10Address,
-  justification: 'test justification',
+  justification: 'Justification',
+  tokenMetadata: {
+    decimals: 18,
+    symbol: 'TKN',
+    iconDataBase64: null,
+  },
 };
 
 const mockMetadata = {
@@ -432,7 +437,7 @@ describe('ConfirmationSession', () => {
       justification: '',
       expiry: { timestamp: 1733088000 },
       accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234',
+      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
       tokenMetadata: {
         decimals: 18,
         symbol: 'TEST',
@@ -509,7 +514,7 @@ describe('ConfirmationSession', () => {
       justification: '',
       expiry: { timestamp: 1733088000 },
       accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234',
+      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
       tokenMetadata: {
         decimals: 18,
         symbol: 'TEST',
@@ -676,30 +681,30 @@ describe('ConfirmationSession', () => {
   });
 
   it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
-    const initialContext = {
+    const initialContext: BaseContext = {
       foo: 'original',
-      expiry: '2024-12-31',
+      expiry: { timestamp: 1717987200 },
       isAdjustmentAllowed: true,
       accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234',
+      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
       tokenMetadata: {
         decimals: 18,
         symbol: 'TEST',
         iconDataBase64: null,
       },
-    };
-    const modifiedContext = {
+    } as unknown as BaseContext;
+    const modifiedContext: BaseContext = {
       foo: 'updated',
-      expiry: '2025-01-01',
+      expiry: { timestamp: 1733088000 },
       isAdjustmentAllowed: true,
       accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234',
+      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
       tokenMetadata: {
         decimals: 18,
         symbol: 'TEST',
         iconDataBase64: null,
       },
-    };
+    } as unknown as BaseContext;
 
     lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
 

@@ -1,6 +1,5 @@
 import type { Permission } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { InternalError } from '@metamask/snaps-sdk';
 
 import { ExistingPermissionsCoordinator } from '../../../src/core/coordinators/ExistingPermissionsCoordinator';
 import type { DialogInterface } from '../../../src/core/dialogInterface';
@@ -9,11 +8,7 @@ import {
   ExistingPermissionsState,
 } from '../../../src/core/existingpermissions/existingPermissionsService';
 import type { BaseContext } from '../../../src/core/types';
-import type {
-  ProfileSyncManager,
-  StoredGrantedPermission,
-} from '../../../src/profileSync/profileSync';
-import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
+import type { StoredGrantedPermission } from '../../../src/profileSync/profileSync';
 
 const mockPermission: Permission = {
   type: 'native-token-stream',
@@ -24,11 +19,16 @@ const mockPermission: Permission = {
 const mockSnapshot: StoredGrantedPermission[] = [];
 
 const mockContext: BaseContext = {
-  expiry: '2024-12-31',
+  tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
+  expiry: { timestamp: 1717987200 },
   isAdjustmentAllowed: true,
-  from: '0x1234',
   accountAddressCaip10: 'eip155:1:0x1234',
-  justification: '',
+  justification: 'Justification',
+  tokenMetadata: {
+    decimals: 18,
+    symbol: 'TKN',
+    iconDataBase64: null,
+  },
 };
 
 describe('ExistingPermissionsCoordinator', () => {
@@ -46,13 +46,6 @@ describe('ExistingPermissionsCoordinator', () => {
     jest.clearAllMocks();
     jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 
-    const statusHelper = new ExistingPermissionsService({
-      profileSyncManager: {
-        getAllGrantedPermissions: jest.fn(),
-      } as unknown as ProfileSyncManager,
-      tokenMetadataService: {} as unknown as TokenMetadataService,
-    });
-
     mockExistingPermissionsService = {
       getExistingPermissions: jest.fn().mockResolvedValue(mockSnapshot),
       getExistingPermissionsStatusFromList: jest.fn(),
@@ -60,8 +53,7 @@ describe('ExistingPermissionsCoordinator', () => {
     };
 
     mockExistingPermissionsService.getExistingPermissionsStatusFromList.mockImplementation(
-      (list, permission) =>
-        statusHelper.getExistingPermissionsStatusFromList(list, permission),
+      (_list, _permission) => ExistingPermissionsState.None,
     );
 
     coordinator = new ExistingPermissionsCoordinator({
@@ -90,8 +82,10 @@ describe('ExistingPermissionsCoordinator', () => {
     });
 
     it('returns ExistingPermissionsState.None when status derivation fails', async () => {
-      mockExistingPermissionsService.getExistingPermissionsStatusFromList.mockRejectedValue(
-        new Error('status failed'),
+      mockExistingPermissionsService.getExistingPermissionsStatusFromList.mockImplementation(
+        () => {
+          throw new Error('status failed');
+        },
       );
 
       coordinator.prefetch('https://example.com', mockPermission);
@@ -111,9 +105,7 @@ describe('ExistingPermissionsCoordinator', () => {
       expect(() =>
         coordinator.prefetch('https://example.com', mockPermission),
       ).toThrow(
-        new InternalError(
-          'ExistingPermissionsCoordinator.prefetch() called more than once',
-        ),
+        'ExistingPermissionsCoordinator.prefetch() called more than once',
       );
     });
   });
@@ -121,9 +113,7 @@ describe('ExistingPermissionsCoordinator', () => {
   describe('getStatus()', () => {
     it('rejects if called before prefetch', async () => {
       await expect(coordinator.getStatus()).rejects.toThrow(
-        new InternalError(
-          'ExistingPermissionsCoordinator.getStatus() called before prefetch()',
-        ),
+        'ExistingPermissionsCoordinator.getStatus() called before prefetch()',
       );
     });
   });
@@ -148,9 +138,7 @@ describe('ExistingPermissionsCoordinator', () => {
           enteringSubview: true,
         }),
       ).rejects.toThrow(
-        new InternalError(
-          'ExistingPermissionsCoordinator.maybeShowSubview() called before prefetch()',
-        ),
+        'ExistingPermissionsCoordinator.maybeShowSubview() called before prefetch()',
       );
     });
 

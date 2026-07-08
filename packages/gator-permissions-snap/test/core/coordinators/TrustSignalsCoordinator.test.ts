@@ -1,5 +1,4 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { InternalError } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 
 import type {
@@ -121,11 +120,7 @@ describe('TrustSignalsCoordinator', () => {
         delegateAddress: undefined,
         onResults: jest.fn(),
       }),
-    ).toThrow(
-      new InternalError(
-        'TrustSignalsCoordinator.start() called more than once',
-      ),
-    );
+    ).toThrow('TrustSignalsCoordinator.start() called more than once');
   });
 
   it('logs and swallows dapp URL scan failures without calling onResults', async () => {
