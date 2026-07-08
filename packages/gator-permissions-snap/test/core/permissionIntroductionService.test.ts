@@ -131,14 +131,14 @@ describe('PermissionIntroductionService', () => {
   describe('showIntroduction', () => {
     const mockInterfaceId = 'intro-interface-123';
 
-    it('should return wasCancelled false for unknown permission types', async () => {
+    it('should return isCancelled false for unknown permission types', async () => {
       const result = await service.showIntroduction({
         dialogInterface,
         permissionType: 'unknown-permission-type',
       });
 
       expect(result).toStrictEqual({
-        wasCancelled: false,
+        isCancelled: false,
       });
       expect(mockSnapsProvider.request).not.toHaveBeenCalled();
     });
@@ -180,7 +180,7 @@ describe('PermissionIntroductionService', () => {
       const result = await showPromise;
 
       expect(result).toStrictEqual({
-        wasCancelled: false,
+        isCancelled: false,
       });
       expect(mockSnapsProvider.request).toHaveBeenCalledWith({
         method: 'snap_createInterface',
@@ -191,7 +191,7 @@ describe('PermissionIntroductionService', () => {
       });
     });
 
-    it('should return wasCancelled true when dialog is dismissed', async () => {
+    it('should return isCancelled true when dialog is dismissed', async () => {
       // Mock snap_createInterface and snap_dialog (returns null when dismissed)
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
         if (params.method === 'snap_createInterface') {
@@ -210,11 +210,11 @@ describe('PermissionIntroductionService', () => {
       });
 
       expect(result).toStrictEqual({
-        wasCancelled: true,
+        isCancelled: true,
       });
     });
 
-    it('should return wasCancelled true when dialog throws error', async () => {
+    it('should return isCancelled true when dialog throws error', async () => {
       // Mock snap_createInterface and snap_dialog (dialog throws error)
       mockSnapsProvider.request.mockImplementation(async (params: any) => {
         if (params.method === 'snap_createInterface') {
@@ -232,7 +232,7 @@ describe('PermissionIntroductionService', () => {
       });
 
       expect(result).toStrictEqual({
-        wasCancelled: true,
+        isCancelled: true,
       });
     });
   });

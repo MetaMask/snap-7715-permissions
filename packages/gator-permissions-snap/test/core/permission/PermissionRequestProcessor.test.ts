@@ -110,7 +110,7 @@ describe('PermissionRequestProcessor', () => {
   describe('process', () => {
     it('delegates native-token-stream requests to the grant pipeline', async () => {
       mockPipeline.run.mockResolvedValue({
-        approved: true,
+        isApproved: true,
         response: {} as never,
       });
 
@@ -138,7 +138,7 @@ describe('PermissionRequestProcessor', () => {
 
     it('processes token-approval-revocation requests', async () => {
       mockPipeline.run.mockResolvedValue({
-        approved: true,
+        isApproved: true,
         response: {} as never,
       });
 
@@ -153,7 +153,7 @@ describe('PermissionRequestProcessor', () => {
     it('processes every registered permission type', async () => {
       const registry = createPermissionRegistry();
       mockPipeline.run.mockResolvedValue({
-        approved: true,
+        isApproved: true,
         response: {} as never,
       });
 

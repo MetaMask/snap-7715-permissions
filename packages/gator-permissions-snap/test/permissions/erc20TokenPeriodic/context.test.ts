@@ -153,7 +153,7 @@ describe('erc20TokenPeriodic:context', () => {
           iconUrl: 'https://example.com/icon.png',
         })),
         fetchIconDataAsBase64: jest.fn(async () =>
-          Promise.resolve({ success: false }),
+          Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
         ),
       } as unknown as jest.Mocked<TokenMetadataService>;
     });
@@ -164,7 +164,7 @@ describe('erc20TokenPeriodic:context', () => {
       const base64 = Buffer.from(text, 'utf8').toString('base64');
 
       mockTokenMetadataService.fetchIconDataAsBase64.mockResolvedValueOnce({
-        success: true,
+        ok: true,
         imageDataBase64: `data:image/png;base64,${base64}`,
       });
 

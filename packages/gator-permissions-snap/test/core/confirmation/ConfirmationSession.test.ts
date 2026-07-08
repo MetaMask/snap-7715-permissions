@@ -102,7 +102,7 @@ const mockSnapsMetricsService = {
 const mockPermissionIntroductionService = {
   shouldShowIntroduction: jest.fn().mockResolvedValue(false),
   markIntroductionAsSeen: jest.fn().mockResolvedValue(undefined),
-  showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
+  showIntroduction: jest.fn().mockResolvedValue({ isCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
 const existingPermissionsStatusHelper = new ExistingPermissionsService({
@@ -203,7 +203,7 @@ describe('ConfirmationSession', () => {
     mockConfirmationDialog.initialize.mockResolvedValue(mockInterfaceId);
     mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
       {
-        isConfirmationGranted: true,
+        isApproved: true,
       },
     );
     mockConfirmationDialog.updateContent.mockResolvedValue(undefined);
@@ -219,7 +219,7 @@ describe('ConfirmationSession', () => {
       false,
     );
     mockPermissionIntroductionService.showIntroduction.mockResolvedValue({
-      wasCancelled: false,
+      isCancelled: false,
     });
     mockPermissionIntroductionService.markIntroductionAsSeen.mockResolvedValue(
       undefined,
@@ -317,7 +317,7 @@ describe('ConfirmationSession', () => {
   it('returns rejected when the user denies at confirmation', async () => {
     mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValueOnce(
       {
-        isConfirmationGranted: false,
+        isApproved: false,
       },
     );
 
@@ -335,7 +335,7 @@ describe('ConfirmationSession', () => {
       true,
     );
     mockPermissionIntroductionService.showIntroduction.mockResolvedValueOnce({
-      wasCancelled: true,
+      isCancelled: true,
     });
 
     const result = await runSession();
@@ -466,10 +466,10 @@ describe('ConfirmationSession', () => {
     };
     mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
       async () => {
-        const isConfirmationGranted = await new Promise<boolean>((resolve) => {
+        const isApproved = await new Promise<boolean>((resolve) => {
           resolveUserDecision = resolve;
         });
-        return { isConfirmationGranted };
+        return { isApproved };
       },
     );
 
@@ -543,10 +543,10 @@ describe('ConfirmationSession', () => {
     };
     mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
       async () => {
-        const isConfirmationGranted = await new Promise<boolean>((resolve) => {
+        const isApproved = await new Promise<boolean>((resolve) => {
           resolveUserDecision = resolve;
         });
-        return { isConfirmationGranted };
+        return { isApproved };
       },
     );
 
@@ -602,7 +602,7 @@ describe('ConfirmationSession', () => {
     mockPermissionIntroductionService.showIntroduction.mockImplementation(
       async ({ dialogInterface }) => {
         capturedIntroDialogInterface = dialogInterface;
-        return { wasCancelled: false };
+        return { isCancelled: false };
       },
     );
 
@@ -731,10 +731,10 @@ describe('ConfirmationSession', () => {
     };
     mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
       async () => {
-        const isConfirmationGranted = await new Promise<boolean>((resolve) => {
+        const isApproved = await new Promise<boolean>((resolve) => {
           resolveUserDecision = resolve;
         });
-        return { isConfirmationGranted };
+        return { isApproved };
       },
     );
 
@@ -807,10 +807,10 @@ describe('ConfirmationSession', () => {
     };
     mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
       async () => {
-        const isConfirmationGranted = await new Promise<boolean>((resolve) => {
+        const isApproved = await new Promise<boolean>((resolve) => {
           resolveUserDecision = resolve;
         });
-        return { isConfirmationGranted };
+        return { isApproved };
       },
     );
 

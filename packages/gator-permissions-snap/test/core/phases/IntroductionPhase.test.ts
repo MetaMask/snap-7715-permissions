@@ -14,7 +14,7 @@ const mockPermission: Permission = {
 
 const mockPermissionIntroductionService = {
   shouldShowIntroduction: jest.fn().mockResolvedValue(false),
-  showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
+  showIntroduction: jest.fn().mockResolvedValue({ isCancelled: false }),
   markIntroductionAsSeen: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
@@ -31,7 +31,7 @@ describe('IntroductionPhase', () => {
       false,
     );
     mockPermissionIntroductionService.showIntroduction.mockResolvedValue({
-      wasCancelled: false,
+      isCancelled: false,
     });
 
     introductionPhase = new IntroductionPhase({
@@ -62,15 +62,15 @@ describe('IntroductionPhase', () => {
       permission: mockPermission,
     });
 
-    expect(result).toStrictEqual({ cancelled: false });
+    expect(result).toStrictEqual({ isCancelled: false });
     expect(
       mockPermissionIntroductionService.markIntroductionAsSeen,
     ).toHaveBeenCalledWith('native-token-stream');
   });
 
-  it('tracks rejection metrics and returns cancelled when intro is dismissed', async () => {
+  it('tracks rejection metrics when intro is dismissed', async () => {
     mockPermissionIntroductionService.showIntroduction.mockResolvedValueOnce({
-      wasCancelled: true,
+      isCancelled: true,
     });
 
     const result = await introductionPhase.run({
@@ -81,7 +81,7 @@ describe('IntroductionPhase', () => {
       permission: mockPermission,
     });
 
-    expect(result).toStrictEqual({ cancelled: true });
+    expect(result).toStrictEqual({ isCancelled: true });
     expect(
       mockSnapsMetricsService.trackPermissionRejected,
     ).toHaveBeenCalledWith({

@@ -119,8 +119,8 @@ describe('ExistingPermissionsCoordinator', () => {
   });
 
   describe('getStatus()', () => {
-    it('throws if called before prefetch', () => {
-      expect(async () => coordinator.getStatus()).toThrow(
+    it('rejects if called before prefetch', async () => {
+      await expect(coordinator.getStatus()).rejects.toThrow(
         new InternalError(
           'ExistingPermissionsCoordinator.getStatus() called before prefetch()',
         ),

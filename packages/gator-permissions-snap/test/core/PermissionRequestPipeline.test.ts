@@ -140,7 +140,7 @@ const mockPermissionIntroductionService = {
   shouldShowIntroduction: jest.fn().mockResolvedValue(false),
   markIntroductionAsSeen: jest.fn().mockResolvedValue(undefined),
   buildIntroductionContent: jest.fn().mockReturnValue({ type: 'intro-ui' }),
-  showIntroduction: jest.fn().mockResolvedValue({ wasCancelled: false }),
+  showIntroduction: jest.fn().mockResolvedValue({ isCancelled: false }),
 } as unknown as jest.Mocked<PermissionIntroductionService>;
 
 const existingPermissionsStatusHelper = new ExistingPermissionsService({
@@ -269,7 +269,7 @@ describe('PermissionRequestPipeline', () => {
     mockConfirmationDialog.initialize.mockResolvedValue(mockInterfaceId);
     mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValue(
       {
-        isConfirmationGranted: true,
+        isApproved: true,
       },
     );
     mockConfirmationDialog.updateContent.mockResolvedValue(undefined);
@@ -338,8 +338,8 @@ describe('PermissionRequestPipeline', () => {
           chainId: Number(mockPermissionRequest.chainId),
         });
 
-        expect(result.approved).toBe(true);
-        expect(result.approved && result.response).toStrictEqual({
+        expect(result.isApproved).toBe(true);
+        expect(result.isApproved && result.response).toStrictEqual({
           ...mockPermissionRequest,
           dependencies: [],
           permission: mockPopulatedPermission,
@@ -354,7 +354,7 @@ describe('PermissionRequestPipeline', () => {
       it('returns failure if user rejects the request', async () => {
         mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockResolvedValueOnce(
           {
-            isConfirmationGranted: false,
+            isApproved: false,
           },
         );
         const result = await permissionRequestPipeline.run({
@@ -362,8 +362,8 @@ describe('PermissionRequestPipeline', () => {
           permissionRequest: mockPermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,
         });
-        expect(result.approved).toBe(false);
-        expect(!result.approved && result.reason).toBe(
+        expect(result.isApproved).toBe(false);
+        expect(!result.isApproved && result.reason).toBe(
           'Permission request denied at confirmation screen',
         );
       });
@@ -374,8 +374,8 @@ describe('PermissionRequestPipeline', () => {
           permissionRequest: mockPermissionRequest,
           lifecycleHandlers: lifecycleHandlerMocks,
         });
-        expect(result.approved).toBe(true);
-        if (!result.approved) {
+        expect(result.isApproved).toBe(true);
+        if (!result.isApproved) {
           throw new Error('Expected the permission request to be approved');
         }
 
@@ -429,8 +429,8 @@ describe('PermissionRequestPipeline', () => {
           lifecycleHandlers: lifecycleHandlerMocks,
         });
 
-        expect(result.approved).toBe(true);
-        if (!result.approved) {
+        expect(result.isApproved).toBe(true);
+        if (!result.isApproved) {
           throw new Error('Expected the permission request to be approved');
         }
 
@@ -568,8 +568,8 @@ describe('PermissionRequestPipeline', () => {
           ],
         });
 
-        expect(result.approved).toBe(true);
-        if (!result.approved) {
+        expect(result.isApproved).toBe(true);
+        if (!result.isApproved) {
           throw new Error('Expected the permission request to be approved');
         }
 
@@ -635,15 +635,17 @@ describe('PermissionRequestPipeline', () => {
           ],
         };
 
-        await expect(
-          permissionRequestPipeline.run({
-            origin: 'https://app.uniswap.org',
-            permissionRequest: requestWithUnsupportedRedeemerRule,
-            lifecycleHandlers: lifecycleHandlerMocks,
-          }),
-        ).rejects.toThrow(
-          'Redeemer rule includes addresses other than allowed values: 0x1111111111111111111111111111111111111111. Permissions granted on this domain may only be redeemed via MetaMask Sentinel.',
-        );
+        const result = await permissionRequestPipeline.run({
+          origin: 'https://app.uniswap.org',
+          permissionRequest: requestWithUnsupportedRedeemerRule,
+          lifecycleHandlers: lifecycleHandlerMocks,
+        });
+
+        expect(result).toStrictEqual({
+          isApproved: false,
+          reason:
+            'Redeemer rule includes addresses other than allowed values: 0x1111111111111111111111111111111111111111. Permissions granted on this domain may only be redeemed via MetaMask Sentinel.',
+        });
 
         expect(lifecycleHandlerMocks.buildContext).not.toHaveBeenCalled();
       });

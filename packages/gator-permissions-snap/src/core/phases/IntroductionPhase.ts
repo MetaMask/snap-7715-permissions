@@ -8,7 +8,7 @@ import type { PermissionIntroductionService } from '../permissionIntroduction';
 /**
  * Result of running the permission introduction step.
  */
-export type IntroductionPhaseResult = { cancelled: boolean };
+export type IntroductionPhaseResult = { isCancelled: boolean };
 
 /**
  * Wraps first-time permission introduction UI, rejection metrics, and seen-state updates.
@@ -63,13 +63,13 @@ export class IntroductionPhase {
     const { dialogInterface, permissionType, origin, chainId, permission } =
       args;
 
-    const { wasCancelled } =
+    const { isCancelled } =
       await this.#permissionIntroductionService.showIntroduction({
         dialogInterface,
         permissionType,
       });
 
-    if (wasCancelled) {
+    if (isCancelled) {
       await this.#snapsMetricsService.trackPermissionRejected({
         origin,
         permissionType,
@@ -77,13 +77,13 @@ export class IntroductionPhase {
         permissionData: permission.data,
       });
 
-      return { cancelled: true };
+      return { isCancelled: true };
     }
 
     await this.#permissionIntroductionService.markIntroductionAsSeen(
       permissionType,
     );
 
-    return { cancelled: false };
+    return { isCancelled: false };
   }
 }

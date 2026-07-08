@@ -161,7 +161,7 @@ export async function buildContext(
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
 
-  const iconDataBase64 = iconDataResponse.success
+  const iconDataBase64 = iconDataResponse.ok
     ? iconDataResponse.imageDataBase64
     : null;
 

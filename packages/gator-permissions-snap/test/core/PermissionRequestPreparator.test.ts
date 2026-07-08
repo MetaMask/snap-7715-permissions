@@ -143,16 +143,19 @@ describe('PermissionRequestPreparator', () => {
       mockAddress2,
     ]);
 
-    await expect(
-      permissionRequestPreparator.prepare({
-        origin: 'test-origin',
-        permissionRequest: {
-          ...mockPermissionRequest,
-          from: '0x9876543210987654321098765432109876543210',
-        },
-        parseAndValidate: (req) => req,
-      }),
-    ).rejects.toThrow('Requested address not found');
+    const result = await permissionRequestPreparator.prepare({
+      origin: 'test-origin',
+      permissionRequest: {
+        ...mockPermissionRequest,
+        from: '0x9876543210987654321098765432109876543210',
+      },
+      parseAndValidate: (req) => req,
+    });
+
+    expect(result).toStrictEqual({
+      ok: false,
+      reason: 'Requested address not found',
+    });
   });
 
   it('adds the sentinel redeemer rule for uniswap.org requests with no redeemer rule', async () => {
@@ -224,13 +227,18 @@ describe('PermissionRequestPreparator', () => {
       ],
     };
 
-    await expect(
-      permissionRequestPreparator.prepare({
-        origin: 'https://app.uniswap.org',
-        permissionRequest: requestWithUnsupportedRedeemerRule,
-        parseAndValidate: (req) => req,
-      }),
-    ).rejects.toThrow(
+    const result = await permissionRequestPreparator.prepare({
+      origin: 'https://app.uniswap.org',
+      permissionRequest: requestWithUnsupportedRedeemerRule,
+      parseAndValidate: (req) => req,
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      throw new Error('Expected preparation to fail');
+    }
+
+    expect(result.reason).toBe(
       'Redeemer rule includes addresses other than allowed values: 0x1111111111111111111111111111111111111111. Permissions granted on this domain may only be redeemed via MetaMask Sentinel.',
     );
   });

@@ -83,7 +83,7 @@ const VALID_PERMISSION_RESPONSE: PermissionResponse = {
 };
 
 const MOCK_SUCCESS_RESPONSE = {
-  approved: true,
+  isApproved: true,
   response: VALID_PERMISSION_RESPONSE,
 } as const;
 
@@ -169,7 +169,7 @@ describe('RpcHandler', () => {
       };
 
       const responseWithDifferentSupportedChainId = {
-        approved: true,
+        isApproved: true,
         response: {
           ...VALID_PERMISSION_RESPONSE,
           chainId: differentSupportedChainId,
@@ -230,7 +230,7 @@ describe('RpcHandler', () => {
       };
 
       const mockSuccessResponseWithDefaultJustification = {
-        approved: true as const,
+        isApproved: true as const,
         response: expectedResponseWithDefaultJustification,
       };
 
@@ -294,7 +294,7 @@ describe('RpcHandler', () => {
       mockPermissionRequestProcessor.process
         .mockImplementationOnce(async () => MOCK_SUCCESS_RESPONSE)
         .mockImplementationOnce(async () => ({
-          approved: true,
+          isApproved: true,
           response: secondResponse,
         }));
 
@@ -332,7 +332,7 @@ describe('RpcHandler', () => {
       mockPermissionRequestProcessor.process
         .mockImplementationOnce(async () => MOCK_SUCCESS_RESPONSE)
         .mockImplementationOnce(async () => ({
-          approved: false,
+          isApproved: false,
           reason: 'User rejected the permissions request',
         }));
 
@@ -375,7 +375,7 @@ describe('RpcHandler', () => {
             >,
         )
         .mockImplementationOnce(async () => ({
-          approved: true,
+          isApproved: true,
           response: secondResponse,
         }));
 
@@ -387,7 +387,7 @@ describe('RpcHandler', () => {
 
       // Resolve the first request and then ensure the second starts
       // @ts-expect-error - resolveFirst is assigned above
-      resolveFirst({ approved: true, response: VALID_PERMISSION_RESPONSE });
+      resolveFirst({ isApproved: true, response: VALID_PERMISSION_RESPONSE });
       const result = await resultPromise;
 
       expect(mockPermissionRequestProcessor.process).toHaveBeenCalledTimes(2);
@@ -406,7 +406,7 @@ describe('RpcHandler', () => {
 
     it('should throw an error if orchestration fails', async () => {
       mockPermissionRequestProcessor.process.mockImplementation(async () => ({
-        approved: false,
+        isApproved: false,
         reason: 'Orchestration failed',
       }));
 
@@ -483,7 +483,7 @@ describe('RpcHandler', () => {
       };
 
       mockPermissionRequestProcessor.process.mockImplementation(async () => ({
-        approved: true,
+        isApproved: true,
         response: differentResponse,
       }));
 
@@ -519,7 +519,7 @@ describe('RpcHandler', () => {
             ),
         )
         .mockImplementationOnce(async () => ({
-          approved: true,
+          isApproved: true,
           response: secondResponse,
         }));
 
@@ -994,7 +994,7 @@ describe('RpcHandler', () => {
 
       const result = await handler.submitRevocation(validRevocationParams);
 
-      expect(result).toStrictEqual({ success: true });
+      expect(result).toStrictEqual({ ok: true });
       expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
         validRevocationParams.permissionContext,
       );
@@ -1165,7 +1165,7 @@ describe('RpcHandler', () => {
 
       const result = await handler.submitRevocation(upperCaseParams);
 
-      expect(result).toStrictEqual({ success: true });
+      expect(result).toStrictEqual({ ok: true });
       expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
         upperCaseParams.permissionContext,
       );
@@ -1213,7 +1213,7 @@ describe('RpcHandler', () => {
 
       const result = await handler.submitRevocation(testParams);
 
-      expect(result).toStrictEqual({ success: true });
+      expect(result).toStrictEqual({ ok: true });
       expect(mockProfileSyncManager.getGrantedPermission).toHaveBeenCalledWith(
         testParams.permissionContext,
       );

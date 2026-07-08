@@ -10,7 +10,6 @@ import type { Hex } from '@metamask/utils';
 import type { AccountController } from './accountController';
 import { getChainMetadata } from './chainMetadata';
 import { normalizePermissionRequestWithSentinelRedeemerRule } from './sentinelRedeemer';
-import type { PermissionRequestResult } from './types';
 import type { SnapsMetricsService } from '../services/snapsMetricsService';
 
 /**
@@ -25,7 +24,7 @@ export type PermissionRequestPreparationResult<
       chainId: number;
       permissionType: string;
     }
-  | { ok: false; result: PermissionRequestResult };
+  | { ok: false; reason: string };
 
 /**
  * Validates chain support, parses the request, applies sentinel redeemer rules,
@@ -61,40 +60,49 @@ export class PermissionRequestPreparator {
     permissionRequest: PermissionRequest;
     parseAndValidate: (request: PermissionRequest) => TRequest;
   }): Promise<PermissionRequestPreparationResult<TRequest>> {
-    const { origin, permissionRequest, parseAndValidate } = args;
+    try {
+      const { origin, permissionRequest, parseAndValidate } = args;
 
-    const chainId = hexToNumber(permissionRequest.chainId);
-    this.#assertIsSupportedChainId(chainId);
+      const chainId = hexToNumber(permissionRequest.chainId);
+      this.#assertIsSupportedChainId(chainId);
 
-    const permissionType = extractDescriptorName(
-      permissionRequest.permission.type,
-    );
+      const permissionType = extractDescriptorName(
+        permissionRequest.permission.type,
+      );
 
-    await this.#snapsMetricsService.trackPermissionRequestStarted({
-      origin,
-      permissionType,
-      chainId: permissionRequest.chainId,
-      permissionData: permissionRequest.permission.data,
-    });
-
-    const validatedPermissionRequest = parseAndValidate(permissionRequest);
-    const normalizedPermissionRequest =
-      normalizePermissionRequestWithSentinelRedeemerRule({
+      await this.#snapsMetricsService.trackPermissionRequestStarted({
         origin,
-        permissionRequest: validatedPermissionRequest,
-        chainId,
+        permissionType,
+        chainId: permissionRequest.chainId,
+        permissionData: permissionRequest.permission.data,
       });
 
-    const requestWithFrom = await this.#resolveFromAddress(
-      normalizedPermissionRequest,
-    );
+      const validatedPermissionRequest = parseAndValidate(permissionRequest);
+      const normalizedPermissionRequest =
+        normalizePermissionRequestWithSentinelRedeemerRule({
+          origin,
+          permissionRequest: validatedPermissionRequest,
+          chainId,
+        });
 
-    return {
-      ok: true,
-      normalizedRequest: requestWithFrom,
-      chainId,
-      permissionType,
-    };
+      const requestWithFrom = await this.#resolveFromAddress(
+        normalizedPermissionRequest,
+      );
+
+      return {
+        ok: true,
+        normalizedRequest: requestWithFrom,
+        chainId,
+        permissionType,
+      };
+    } catch (error) {
+      const reason =
+        error instanceof Error
+          ? error.message
+          : 'Permission request preparation failed';
+
+      return { ok: false, reason };
+    }
   }
 
   /**

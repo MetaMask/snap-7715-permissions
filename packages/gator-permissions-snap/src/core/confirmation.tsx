@@ -76,17 +76,17 @@ export class ConfirmationDialog {
 
   /**
    * Waits for the user to grant or cancel the confirmation.
-   * @returns Object with isConfirmationGranted boolean.
+   * @returns Object with isApproved boolean.
    */
   async displayConfirmationDialogAndAwaitUserDecision(): Promise<{
-    isConfirmationGranted: boolean;
+    isApproved: boolean;
   }> {
     const { interfaceId } = this.#dialogInterface;
     if (!interfaceId) {
       throw new Error('Interface not yet created. Call initialize() first.');
     }
 
-    const isConfirmationGranted = new Promise<boolean>((resolve, reject) => {
+    const isApproved = new Promise<boolean>((resolve, reject) => {
       this.#decisionResolve = resolve;
       this.#decisionReject = reject;
 
@@ -153,7 +153,7 @@ export class ConfirmationDialog {
     });
 
     return {
-      isConfirmationGranted: await isConfirmationGranted,
+      isApproved: await isApproved,
     };
   }
 

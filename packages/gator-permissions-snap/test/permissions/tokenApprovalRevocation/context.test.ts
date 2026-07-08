@@ -63,7 +63,7 @@ describe('tokenApprovalRevocation:context', () => {
       mockTokenMetadataService = {
         getTokenBalanceAndMetadata: jest.fn(),
         fetchIconDataAsBase64: jest.fn(async () =>
-          Promise.resolve({ success: false }),
+          Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
         ),
       } as unknown as jest.Mocked<TokenMetadataService>;
     });

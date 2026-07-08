@@ -79,7 +79,7 @@ export class PermissionIntroductionService {
    * @param options - The options object.
    * @param options.dialogInterface - The dialog interface to use for displaying content.
    * @param options.permissionType - The permission type to show introduction for.
-   * @returns Object with wasCancelled flag indicating if user dismissed the intro.
+   * @returns Object with isCancelled flag indicating if user dismissed the intro.
    */
   async showIntroduction({
     dialogInterface,
@@ -87,10 +87,10 @@ export class PermissionIntroductionService {
   }: {
     dialogInterface: DialogInterface;
     permissionType: string;
-  }): Promise<{ wasCancelled: boolean }> {
+  }): Promise<{ isCancelled: boolean }> {
     const config = getPermissionIntroductionConfig(permissionType);
     if (!config) {
-      return { wasCancelled: false };
+      return { isCancelled: false };
     }
 
     // Start on page 1
@@ -172,6 +172,6 @@ export class PermissionIntroductionService {
         });
     });
 
-    return { wasCancelled: !wasConfirmed };
+    return { isCancelled: !wasConfirmed };
   }
 }

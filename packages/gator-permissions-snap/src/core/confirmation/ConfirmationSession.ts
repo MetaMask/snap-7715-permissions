@@ -135,7 +135,7 @@ export class ConfirmationSession {
         permission: normalizedRequest.permission,
       });
 
-      if (introResult.cancelled) {
+      if (introResult.isCancelled) {
         return {
           isApproved: false,
           reason: 'Permission request denied at introduction screen',
@@ -312,9 +312,9 @@ export class ConfirmationSession {
     }
 
     try {
-      const { isConfirmationGranted } = await decisionPromise;
+      const { isApproved } = await decisionPromise;
 
-      if (isConfirmationGranted) {
+      if (isApproved) {
         try {
           const { address } = parseCaipAccountId(context.accountAddressCaip10);
           const upgradeStatus =

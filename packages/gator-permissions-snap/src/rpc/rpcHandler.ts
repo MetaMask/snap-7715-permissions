@@ -107,7 +107,7 @@ export function createRpcHandler({
         request,
       );
 
-      if (!permissionResponse.approved) {
+      if (!permissionResponse.isApproved) {
         throw new UserRejectedRequestError(permissionResponse.reason);
       }
 
@@ -293,7 +293,7 @@ export function createRpcHandler({
       revocationMetadata,
     );
 
-    return { success: true };
+    return { ok: true };
   };
 
   /**

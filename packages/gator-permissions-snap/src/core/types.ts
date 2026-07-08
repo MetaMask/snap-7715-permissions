@@ -14,11 +14,11 @@ import type { MessageKey } from '../utils/i18n';
 
 /**
  * Represents the result of a permission request.
- * Can be either approved with a response or rejected with a reason.
+ * Can be either approved with a response or rejected with a reason via isApproved.
  */
 export type PermissionRequestResult =
-  | { approved: true; response: PermissionResponse }
-  | { approved: false; reason: string };
+  | { isApproved: true; response: PermissionResponse }
+  | { isApproved: false; reason: string };
 
 /**
  * Represents a Permission request with an explicitly typed permission field.

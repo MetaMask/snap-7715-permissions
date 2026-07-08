@@ -72,7 +72,10 @@ export class PermissionRequestPipeline {
     });
 
     if (!preparationResult.ok) {
-      return preparationResult.result;
+      return {
+        isApproved: false,
+        reason: preparationResult.reason,
+      };
     }
 
     const { normalizedRequest, chainId, permissionType } = preparationResult;
@@ -87,7 +90,7 @@ export class PermissionRequestPipeline {
 
     if (!sessionResult.isApproved) {
       return {
-        approved: false,
+        isApproved: false,
         reason: sessionResult.reason,
       };
     }
@@ -105,7 +108,7 @@ export class PermissionRequestPipeline {
     });
 
     return {
-      approved: true,
+      isApproved: true,
       response,
     };
   }
