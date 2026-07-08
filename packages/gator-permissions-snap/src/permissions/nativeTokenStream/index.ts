@@ -25,6 +25,7 @@ export const nativeTokenStreamPermissionModule: PermissionModule<
   PopulatedNativeTokenStreamPermission
 > = {
   type: 'native-token-stream',
+  name: 'Native Token Stream',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',

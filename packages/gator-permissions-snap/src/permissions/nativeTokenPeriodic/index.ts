@@ -25,6 +25,7 @@ export const nativeTokenPeriodicPermissionModule: PermissionModule<
   PopulatedNativeTokenPeriodicPermission
 > = {
   type: 'native-token-periodic',
+  name: 'Native Token Periodic Transfer',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',

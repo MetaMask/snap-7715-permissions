@@ -25,6 +25,7 @@ export const erc20TokenStreamPermissionModule: PermissionModule<
   PopulatedErc20TokenStreamPermission
 > = {
   type: 'erc20-token-stream',
+  name: 'ERC20 Token Stream',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',

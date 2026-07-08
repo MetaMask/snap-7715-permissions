@@ -11,7 +11,6 @@ import type { Json } from '@metamask/snaps-sdk';
 import type { BlockchainClient } from '../clients/blockchainClient';
 import type { PermissionRegistry } from '../core/permission/PermissionRegistry';
 import type { PermissionRequestProcessor } from '../core/permission/PermissionRequestProcessor';
-import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
 import type {
   ProfileSyncManager,
   RevocationMetadata,
@@ -136,7 +135,13 @@ export function createRpcHandler({
    */
   const getPermissionOffers = async (): Promise<Json> => {
     logger.debug('getPermissionOffers()');
-    return DEFAULT_GATOR_PERMISSION_TO_OFFER as Json[];
+    return permissionRegistry.getSupportedTypes().map((key) => {
+      const { type, name } = permissionRegistry.get(key);
+      return {
+        type,
+        proposedName: name,
+      };
+    });
   };
 
   /**

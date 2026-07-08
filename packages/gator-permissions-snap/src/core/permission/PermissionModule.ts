@@ -33,6 +33,7 @@ export type PermissionModule<
     DeepRequired<TPermission> = DeepRequired<TPermission>,
 > = {
   type: string;
+  name: string;
   title: MessageKey;
   subtitle: MessageKey;
   rules: RuleDefinition<TContext, TMetadata>[];

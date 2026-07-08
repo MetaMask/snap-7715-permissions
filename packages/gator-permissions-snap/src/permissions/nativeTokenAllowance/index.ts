@@ -25,6 +25,7 @@ export const nativeTokenAllowancePermissionModule: PermissionModule<
   PopulatedNativeTokenAllowancePermission
 > = {
   type: 'native-token-allowance',
+  name: 'Native Token Allowance',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',

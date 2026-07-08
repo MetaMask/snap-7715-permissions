@@ -25,6 +25,7 @@ export const tokenApprovalRevocationPermissionModule: PermissionModule<
   PopulatedTokenApprovalRevocationPermission
 > = {
   type: 'token-approval-revocation',
+  name: 'Token Approval Revocation',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitleRevocation',

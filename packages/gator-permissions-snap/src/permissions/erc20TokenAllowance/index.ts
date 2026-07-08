@@ -25,6 +25,7 @@ export const erc20TokenAllowancePermissionModule: PermissionModule<
   PopulatedErc20TokenAllowancePermission
 > = {
   type: 'erc20-token-allowance',
+  name: 'ERC20 Token Allowance',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',

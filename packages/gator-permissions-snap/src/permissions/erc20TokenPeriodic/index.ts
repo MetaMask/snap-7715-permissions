@@ -25,6 +25,7 @@ export const erc20TokenPeriodicPermissionModule: PermissionModule<
   PopulatedErc20TokenPeriodicPermission
 > = {
   type: 'erc20-token-periodic',
+  name: 'ERC20 Token Periodic Transfer',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
