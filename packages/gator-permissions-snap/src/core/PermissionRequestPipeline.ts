@@ -65,20 +65,12 @@ export class PermissionRequestPipeline {
   }): Promise<PermissionRequestResult> {
     const { origin, permissionRequest, lifecycleHandlers } = args;
 
-    const preparationResult = await this.#permissionRequestPreparator.prepare({
-      origin,
-      permissionRequest,
-      parseAndValidate: lifecycleHandlers.parseAndValidatePermission,
-    });
-
-    if (!preparationResult.ok) {
-      return {
-        isApproved: false,
-        reason: preparationResult.reason,
-      };
-    }
-
-    const { normalizedRequest, chainId, permissionType } = preparationResult;
+    const { normalizedRequest, chainId, permissionType } =
+      await this.#permissionRequestPreparator.prepare({
+        origin,
+        permissionRequest,
+        parseAndValidate: lifecycleHandlers.parseAndValidatePermission,
+      });
 
     const sessionResult = await this.#confirmationSession.run({
       origin,

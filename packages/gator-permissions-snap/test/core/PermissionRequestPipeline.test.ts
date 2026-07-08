@@ -6,6 +6,7 @@ import {
   createNonceTerms,
   createRedeemerTerms,
 } from '@metamask/delegation-core';
+import { InvalidInputError } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { bigIntToHex, bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
@@ -611,7 +612,7 @@ describe('PermissionRequestPipeline', () => {
         });
       });
 
-      it('rejects uniswap.org redeemer rules with non-sentinel addresses', async () => {
+      it('throws for uniswap.org redeemer rules with non-sentinel addresses', async () => {
         const requestWithUnsupportedRedeemerRule = {
           ...mockPermissionRequest,
           rules: [
@@ -628,17 +629,13 @@ describe('PermissionRequestPipeline', () => {
           ],
         };
 
-        const result = await permissionRequestPipeline.run({
-          origin: 'https://app.uniswap.org',
-          permissionRequest: requestWithUnsupportedRedeemerRule,
-          lifecycleHandlers: lifecycleHandlerMocks,
-        });
-
-        expect(result).toStrictEqual({
-          isApproved: false,
-          reason:
-            'Redeemer rule includes addresses other than allowed values: 0x1111111111111111111111111111111111111111. Permissions granted on this domain may only be redeemed via MetaMask Sentinel.',
-        });
+        await expect(
+          permissionRequestPipeline.run({
+            origin: 'https://app.uniswap.org',
+            permissionRequest: requestWithUnsupportedRedeemerRule,
+            lifecycleHandlers: lifecycleHandlerMocks,
+          }),
+        ).rejects.toThrow(InvalidInputError);
 
         expect(lifecycleHandlerMocks.buildContext).not.toHaveBeenCalled();
       });

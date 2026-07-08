@@ -1,4 +1,5 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import { InvalidInputError, ResourceNotFoundError } from '@metamask/snaps-sdk';
 import { bytesToHex } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
@@ -71,11 +72,6 @@ describe('PermissionRequestPreparator', () => {
       parseAndValidate,
     });
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) {
-      throw new Error('Expected preparation to succeed');
-    }
-
     expect(parseAndValidate).toHaveBeenCalledWith(mockPermissionRequest);
     expect(
       mockSnapsMetricsService.trackPermissionRequestStarted,
@@ -102,11 +98,6 @@ describe('PermissionRequestPreparator', () => {
       parseAndValidate: (req) => req,
     });
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) {
-      throw new Error('Expected preparation to succeed');
-    }
-
     expect(result.normalizedRequest.from).toBe(mockAddress);
     expect(mockAccountController.getAccountAddresses).toHaveBeenCalledTimes(1);
   });
@@ -128,34 +119,26 @@ describe('PermissionRequestPreparator', () => {
         parseAndValidate: (req) => req,
       });
 
-      expect(result.ok).toBe(true);
-      if (!result.ok) {
-        throw new Error('Expected preparation to succeed');
-      }
-
       expect(result.normalizedRequest.from).toBe(specifiedAddress);
     },
   );
 
-  it('rejects a from address that is not available for the account', async () => {
+  it('throws when a from address is not available for the account', async () => {
     mockAccountController.getAccountAddresses.mockResolvedValue([
       mockAddress,
       mockAddress2,
     ]);
 
-    const result = await permissionRequestPreparator.prepare({
-      origin: 'test-origin',
-      permissionRequest: {
-        ...mockPermissionRequest,
-        from: '0x9876543210987654321098765432109876543210',
-      },
-      parseAndValidate: (req) => req,
-    });
-
-    expect(result).toStrictEqual({
-      ok: false,
-      reason: 'Requested address not found',
-    });
+    await expect(
+      permissionRequestPreparator.prepare({
+        origin: 'test-origin',
+        permissionRequest: {
+          ...mockPermissionRequest,
+          from: '0x9876543210987654321098765432109876543210',
+        },
+        parseAndValidate: (req) => req,
+      }),
+    ).rejects.toThrow(ResourceNotFoundError);
   });
 
   it('adds the sentinel redeemer rule for uniswap.org requests with no redeemer rule', async () => {
@@ -169,11 +152,6 @@ describe('PermissionRequestPreparator', () => {
       permissionRequest: requestWithoutRedeemerRule,
       parseAndValidate: (req) => req,
     });
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) {
-      throw new Error('Expected preparation to succeed');
-    }
 
     expect(result.normalizedRequest.rules).toStrictEqual([
       requestWithoutRedeemerRule.rules[0],
@@ -200,17 +178,12 @@ describe('PermissionRequestPreparator', () => {
       parseAndValidate: (req) => req,
     });
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) {
-      throw new Error('Expected preparation to succeed');
-    }
-
     expect(result.normalizedRequest.rules).toStrictEqual(
       requestWithSentinelRedeemerRule.rules,
     );
   });
 
-  it('rejects uniswap.org redeemer rules with non-sentinel addresses', async () => {
+  it('throws for uniswap.org redeemer rules with non-sentinel addresses', async () => {
     const requestWithUnsupportedRedeemerRule = {
       ...mockPermissionRequest,
       rules: [
@@ -227,19 +200,12 @@ describe('PermissionRequestPreparator', () => {
       ],
     };
 
-    const result = await permissionRequestPreparator.prepare({
-      origin: 'https://app.uniswap.org',
-      permissionRequest: requestWithUnsupportedRedeemerRule,
-      parseAndValidate: (req) => req,
-    });
-
-    expect(result.ok).toBe(false);
-    if (result.ok) {
-      throw new Error('Expected preparation to fail');
-    }
-
-    expect(result.reason).toBe(
-      'Redeemer rule includes addresses other than allowed values: 0x1111111111111111111111111111111111111111. Permissions granted on this domain may only be redeemed via MetaMask Sentinel.',
-    );
+    await expect(
+      permissionRequestPreparator.prepare({
+        origin: 'https://app.uniswap.org',
+        permissionRequest: requestWithUnsupportedRedeemerRule,
+        parseAndValidate: (req) => req,
+      }),
+    ).rejects.toThrow(InvalidInputError);
   });
 });
