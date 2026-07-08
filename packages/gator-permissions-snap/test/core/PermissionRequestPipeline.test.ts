@@ -27,7 +27,6 @@ import { GrantedPermissionResolutionService } from '../../src/core/grant/Granted
 import type { PermissionIntroductionService } from '../../src/core/permissionIntroduction';
 import { PermissionRequestPipeline } from '../../src/core/PermissionRequestPipeline';
 import { PermissionRequestPreparator } from '../../src/core/PermissionRequestPreparator';
-import { IntroductionPhase } from '../../src/core/phases/IntroductionPhase';
 import { SENTINEL_REDEEMER_ADDRESSES } from '../../src/core/sentinelRedeemer';
 import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
 import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
@@ -196,7 +195,6 @@ describe('PermissionRequestPipeline', () => {
   let permissionRequestPipeline: PermissionRequestPipeline;
   let confirmationSession: ConfirmationSession;
   let grantedPermissionResolutionService: GrantedPermissionResolutionService;
-  let introductionPhase: IntroductionPhase;
   let lifecycleHandlerMocks: TestLifecycleHandlersMocks;
 
   const normalizedPermissionRequest = {
@@ -214,11 +212,6 @@ describe('PermissionRequestPipeline', () => {
         snapsMetricsService: mockSnapsMetricsService,
       },
     );
-
-    introductionPhase = new IntroductionPhase({
-      permissionIntroductionService: mockPermissionIntroductionService,
-      snapsMetricsService: mockSnapsMetricsService,
-    });
 
     // Reset existing permissions service mocks after clearing
     mockExistingPermissionsService.getExistingPermissions.mockResolvedValue([]);
@@ -289,7 +282,7 @@ describe('PermissionRequestPipeline', () => {
     confirmationSession = new ConfirmationSession({
       dialogInterfaceFactory: mockDialogInterfaceFactory,
       confirmationDialogFactory: mockConfirmationDialogFactory,
-      introductionPhase,
+      permissionIntroductionService: mockPermissionIntroductionService,
       existingPermissionsService: mockExistingPermissionsService,
       trustSignalsClient: mockTrustSignalsClient,
       accountController: mockAccountController,

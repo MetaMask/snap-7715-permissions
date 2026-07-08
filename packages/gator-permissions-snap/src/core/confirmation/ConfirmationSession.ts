@@ -1,6 +1,10 @@
-import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
+import type {
+  Permission,
+  PermissionRequest,
+} from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import { numberToHex, parseCaipAccountId } from '@metamask/utils';
+import type { Hex } from '@metamask/utils';
 
 import type { TrustSignalsClient } from '../../clients/trustSignalsClient';
 import type { SnapsMetricsService } from '../../services/snapsMetricsService';
@@ -8,10 +12,11 @@ import type { AccountController } from '../accountController';
 import type { ConfirmationDialogFactory } from '../confirmationFactory';
 import { ExistingPermissionsCoordinator } from '../coordinators/ExistingPermissionsCoordinator';
 import { TrustSignalsCoordinator } from '../coordinators/TrustSignalsCoordinator';
+import type { DialogInterface } from '../dialogInterface';
 import type { DialogInterfaceFactory } from '../dialogInterfaceFactory';
 import type { ExistingPermissionsService } from '../existingpermissions';
 import type { PermissionRequestLifecycleHandlers } from '../permission/PermissionRequestLifecycleHandlers';
-import type { IntroductionPhase } from '../phases/IntroductionPhase';
+import type { PermissionIntroductionService } from '../permissionIntroduction';
 import type { BaseContext, BaseMetadata, DeepRequired } from '../types';
 
 /**
@@ -34,7 +39,7 @@ export class ConfirmationSession {
 
   readonly #confirmationDialogFactory: ConfirmationDialogFactory;
 
-  readonly #introductionPhase: IntroductionPhase;
+  readonly #permissionIntroductionService: PermissionIntroductionService;
 
   readonly #existingPermissionsService: ExistingPermissionsService;
 
@@ -47,7 +52,7 @@ export class ConfirmationSession {
   constructor({
     dialogInterfaceFactory,
     confirmationDialogFactory,
-    introductionPhase,
+    permissionIntroductionService,
     existingPermissionsService,
     trustSignalsClient,
     accountController,
@@ -55,7 +60,7 @@ export class ConfirmationSession {
   }: {
     dialogInterfaceFactory: DialogInterfaceFactory;
     confirmationDialogFactory: ConfirmationDialogFactory;
-    introductionPhase: IntroductionPhase;
+    permissionIntroductionService: PermissionIntroductionService;
     existingPermissionsService: ExistingPermissionsService;
     trustSignalsClient: TrustSignalsClient;
     accountController: AccountController;
@@ -63,7 +68,7 @@ export class ConfirmationSession {
   }) {
     this.#dialogInterfaceFactory = dialogInterfaceFactory;
     this.#confirmationDialogFactory = confirmationDialogFactory;
-    this.#introductionPhase = introductionPhase;
+    this.#permissionIntroductionService = permissionIntroductionService;
     this.#existingPermissionsService = existingPermissionsService;
     this.#trustSignalsClient = trustSignalsClient;
     this.#accountController = accountController;
@@ -123,24 +128,19 @@ export class ConfirmationSession {
       normalizedRequest.permission,
     );
 
-    const shouldShowIntroduction =
-      await this.#introductionPhase.shouldShow(permissionType);
+    const introResult = await this.#runIntroductionIfNeeded({
+      dialogInterface,
+      permissionType,
+      origin,
+      chainId: normalizedRequest.chainId,
+      permission: normalizedRequest.permission,
+    });
 
-    if (shouldShowIntroduction) {
-      const introResult = await this.#introductionPhase.run({
-        dialogInterface,
-        permissionType,
-        origin,
-        chainId: normalizedRequest.chainId,
-        permission: normalizedRequest.permission,
-      });
-
-      if (introResult.isCancelled) {
-        return {
-          isApproved: false,
-          reason: 'Permission request denied at introduction screen',
-        };
-      }
+    if (introResult?.isCancelled) {
+      return {
+        isApproved: false,
+        reason: 'Permission request denied at introduction screen',
+      };
     }
 
     // only necessary when not pre-installed, to ensure that the account
@@ -371,5 +371,59 @@ export class ConfirmationSession {
         lifecycleHandlers.onConfirmationResolved();
       }
     }
+  }
+
+  /**
+   * Shows the first-time introduction screen when needed.
+   *
+   * @param args - Dialog interface and permission metadata for the intro flow.
+   * @param args.dialogInterface - Shared dialog interface for the request.
+   * @param args.permissionType - Descriptor name of the permission type.
+   * @param args.origin - Site origin for the permission request.
+   * @param args.chainId - Chain ID for rejection metrics.
+   * @param args.permission - Permission object for rejection metrics.
+   * @returns `null` when intro is skipped; otherwise whether the user cancelled.
+   */
+  async #runIntroductionIfNeeded(args: {
+    dialogInterface: DialogInterface;
+    permissionType: string;
+    origin: string;
+    chainId: Hex;
+    permission: Permission;
+  }): Promise<{ isCancelled: boolean } | null> {
+    const { dialogInterface, permissionType, origin, chainId, permission } =
+      args;
+
+    const shouldShowIntroduction =
+      await this.#permissionIntroductionService.shouldShowIntroduction(
+        permissionType,
+      );
+
+    if (!shouldShowIntroduction) {
+      return null;
+    }
+
+    const { isCancelled } =
+      await this.#permissionIntroductionService.showIntroduction({
+        dialogInterface,
+        permissionType,
+      });
+
+    if (isCancelled) {
+      await this.#snapsMetricsService.trackPermissionRejected({
+        origin,
+        permissionType,
+        chainId,
+        permissionData: permission.data,
+      });
+
+      return { isCancelled: true };
+    }
+
+    await this.#permissionIntroductionService.markIntroductionAsSeen(
+      permissionType,
+    );
+
+    return { isCancelled: false };
   }
 }

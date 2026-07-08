@@ -40,7 +40,6 @@ import { PermissionRequestProcessor } from './core/permission/PermissionRequestP
 import { PermissionIntroductionService } from './core/permissionIntroduction';
 import { PermissionRequestPipeline } from './core/PermissionRequestPipeline';
 import { PermissionRequestPreparator } from './core/PermissionRequestPreparator';
-import { IntroductionPhase } from './core/phases/IntroductionPhase';
 import { createTimeoutFactory } from './core/timeoutFactory';
 import {
   createProfileSyncOptions,
@@ -216,15 +215,10 @@ const permissionRequestPreparator = new PermissionRequestPreparator({
   snapsMetricsService,
 });
 
-const introductionPhase = new IntroductionPhase({
-  permissionIntroductionService,
-  snapsMetricsService,
-});
-
 const confirmationSession = new ConfirmationSession({
   dialogInterfaceFactory,
   confirmationDialogFactory,
-  introductionPhase,
+  permissionIntroductionService,
   existingPermissionsService,
   trustSignalsClient,
   accountController,
