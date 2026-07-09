@@ -53,21 +53,12 @@ describe('normalizePermissionRequestWithSentinelRedeemerRule', () => {
     ]);
   });
 
-  it('supports all Sentinel-enabled mainnets and testnets', () => {
+  it('supports all designated Sentinel mainnets and testnets', () => {
     expect(SENTINEL_SUPPORTED_CHAINS).toStrictEqual([
       0x1, // Ethereum Mainnet
-      0xa, // OP Mainnet
-      0x38, // BNB Smart Chain Mainnet
-      0x89, // Polygon Mainnet
       0xa4b1, // Arbitrum One
-      0xa86a, // Avalanche C-Chain
-      0xe708, // Linea Mainnet
       0x2105, // Base
-      0x531, // Sei Network
-      0x8f, // Monad
-      0x10e6, // MegaETH Mainnet
-      0x1079, // Tempo Mainnet Presto
-      0x13b2, // Arc
+      0x38, // BNB Smart Chain Mainnet
       0xaa36a7, // Ethereum Sepolia
       0x14a34, // Base Sepolia
     ]);
