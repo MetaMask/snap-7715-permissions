@@ -2842,7 +2842,7 @@ __metadata:
     "@metamask/eslint-config-typescript": "npm:15.0.0"
     "@metamask/snaps-cli": "npm:8.4.1"
     "@metamask/snaps-jest": "npm:10.1.4"
-    "@metamask/snaps-sdk": "npm:11.1.1"
+    "@metamask/snaps-sdk": "npm:11.2.0"
     "@metamask/utils": "npm:11.11.0"
     "@types/react": "npm:18.2.4"
     "@types/react-dom": "npm:18.2.4"
@@ -3227,7 +3227,7 @@ __metadata:
     "@metamask/profile-sync-controller": "npm:28.2.0"
     "@metamask/snaps-cli": "npm:8.4.1"
     "@metamask/snaps-jest": "npm:10.1.4"
-    "@metamask/snaps-sdk": "npm:11.1.1"
+    "@metamask/snaps-sdk": "npm:11.2.0"
     "@metamask/utils": "npm:11.11.0"
     "@types/react": "npm:18.2.4"
     "@types/react-dom": "npm:18.2.4"
@@ -3381,6 +3381,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/messenger@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/messenger@npm:2.0.0"
+  dependencies:
+    "@metamask/utils": "npm:^11.11.0"
+  peerDependencies:
+    typescript: ">=5.0.0"
+  checksum: 10/c387511edd89db73b774f631fb4bb382c9254af2dd7f80f9bd45f776e618cf90f653cc0e9744b1bf491f71f99c8318b16e8230a847f619a4fca655ea3f6a08e1
+  languageName: node
+  linkType: hard
+
 "@metamask/number-to-bn@npm:^1.7.1":
   version: 1.7.1
   resolution: "@metamask/number-to-bn@npm:1.7.1"
@@ -3452,7 +3463,7 @@ __metadata:
     "@metamask/eslint-config-typescript": "npm:15.0.0"
     "@metamask/snaps-cli": "npm:8.4.1"
     "@metamask/snaps-jest": "npm:10.1.4"
-    "@metamask/snaps-sdk": "npm:11.1.1"
+    "@metamask/snaps-sdk": "npm:11.2.0"
     "@types/react": "npm:18.2.4"
     "@types/react-dom": "npm:18.2.4"
     dotenv: "npm:17.2.0"
@@ -3856,17 +3867,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/snaps-sdk@npm:11.1.1, @metamask/snaps-sdk@npm:^11.0.0, @metamask/snaps-sdk@npm:^11.1.0, @metamask/snaps-sdk@npm:^11.1.1":
-  version: 11.1.1
-  resolution: "@metamask/snaps-sdk@npm:11.1.1"
+"@metamask/snaps-sdk@npm:11.2.0":
+  version: 11.2.0
+  resolution: "@metamask/snaps-sdk@npm:11.2.0"
   dependencies:
     "@metamask/key-tree": "npm:^10.1.1"
+    "@metamask/messenger": "npm:^2.0.0"
     "@metamask/providers": "npm:^22.1.1"
     "@metamask/rpc-errors": "npm:^7.0.3"
-    "@metamask/superstruct": "npm:^3.2.1"
+    "@metamask/superstruct": "npm:^3.3.0"
     "@metamask/utils": "npm:^11.11.0"
     luxon: "npm:^3.5.0"
-  checksum: 10/8419625775b83045d98c4ed920002ad884471e2303f6650104c97457c238f095ff35030663ddf111ebb6ce8f4cd915f57b7b9a5597d00288093701dbb79e787c
+  checksum: 10/ce5bb2c6427283b14121996e4d32c4aa95a6a9372419bb0d77998f697f61c76c45aa165d5f949d40797a9dbfe65d8d5c9bb9deaad2a2d5c7ad33d5e6329f7473
   languageName: node
   linkType: hard
 
@@ -3881,6 +3893,20 @@ __metadata:
     "@metamask/utils": "npm:^11.9.0"
     luxon: "npm:^3.5.0"
   checksum: 10/215a73f41f5043ca9767241da83308bb25b3faae96521ed71a63a9d29078461bcf278a01799e014bb20b49e34d96a05ea1822648c9bcf81e92f22e8c9b6c0f94
+  languageName: node
+  linkType: hard
+
+"@metamask/snaps-sdk@npm:^11.0.0, @metamask/snaps-sdk@npm:^11.1.0, @metamask/snaps-sdk@npm:^11.1.1":
+  version: 11.1.1
+  resolution: "@metamask/snaps-sdk@npm:11.1.1"
+  dependencies:
+    "@metamask/key-tree": "npm:^10.1.1"
+    "@metamask/providers": "npm:^22.1.1"
+    "@metamask/rpc-errors": "npm:^7.0.3"
+    "@metamask/superstruct": "npm:^3.2.1"
+    "@metamask/utils": "npm:^11.11.0"
+    luxon: "npm:^3.5.0"
+  checksum: 10/8419625775b83045d98c4ed920002ad884471e2303f6650104c97457c238f095ff35030663ddf111ebb6ce8f4cd915f57b7b9a5597d00288093701dbb79e787c
   languageName: node
   linkType: hard
 
@@ -3973,6 +3999,13 @@ __metadata:
   version: 3.2.1
   resolution: "@metamask/superstruct@npm:3.2.1"
   checksum: 10/9e29380f2cf8b129283ccb2b568296d92682b705109ba62dbd7739ffd6a1982fe38c7228cdcf3cbee94dbcdd5fcc1c846ab9d1dd3582167154f914422fcff547
+  languageName: node
+  linkType: hard
+
+"@metamask/superstruct@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "@metamask/superstruct@npm:3.3.0"
+  checksum: 10/664d5e330484a86420bc004b1c7f8301e1501cce712f611fe657176b2979edbd7cc6f4c77c8b1610486a685ebbd0b72dacf4bd6cf143d6b52038069d2f4e84ab
   languageName: node
   linkType: hard
 
