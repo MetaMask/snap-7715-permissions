@@ -3292,14 +3292,14 @@ __metadata:
   linkType: hard
 
 "@metamask/keyring-api@npm:^23.1.0, @metamask/keyring-api@npm:^23.2.0":
-  version: 23.3.0
-  resolution: "@metamask/keyring-api@npm:23.3.0"
+  version: 23.5.0
+  resolution: "@metamask/keyring-api@npm:23.5.0"
   dependencies:
     "@metamask/keyring-utils": "npm:^3.3.1"
-    "@metamask/superstruct": "npm:^3.1.0"
+    "@metamask/superstruct": "npm:^3.3.0"
     "@metamask/utils": "npm:^11.11.0"
     bitcoin-address-validation: "npm:^2.2.3"
-  checksum: 10/c6ad3bf4294b09730d752d548b1cd0c1c622f357a12c7287af2b5889a01e99a4d20316cc9e96840d5c5619eee0f9305d4dfc03febd0bd136e72de95ce3fd0a1e
+  checksum: 10/2d8a4b378f5bad77284feb58bc7f3b64d541751527c693e43f7e4d860333bc55593e27fc5264fc908d719912b374f77dabec3f5e491bb49f72501fd2f5c43e68
   languageName: node
   linkType: hard
 
@@ -3973,6 +3973,13 @@ __metadata:
   version: 3.2.1
   resolution: "@metamask/superstruct@npm:3.2.1"
   checksum: 10/9e29380f2cf8b129283ccb2b568296d92682b705109ba62dbd7739ffd6a1982fe38c7228cdcf3cbee94dbcdd5fcc1c846ab9d1dd3582167154f914422fcff547
+  languageName: node
+  linkType: hard
+
+"@metamask/superstruct@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "@metamask/superstruct@npm:3.3.0"
+  checksum: 10/664d5e330484a86420bc004b1c7f8301e1501cce712f611fe657176b2979edbd7cc6f4c77c8b1610486a685ebbd0b72dacf4bd6cf143d6b52038069d2f4e84ab
   languageName: node
   linkType: hard
 
