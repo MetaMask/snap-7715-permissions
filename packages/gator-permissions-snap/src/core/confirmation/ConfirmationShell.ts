@@ -37,6 +37,7 @@ import type {
   AccountController,
   AccountUpgradeStatus,
 } from '../accountController';
+import { createCallOnceGuard } from '../callOnceGuard';
 import { getChainMetadata } from '../chainMetadata';
 import { EXISTING_PERMISSIONS_CONFIRM_BUTTON } from '../existingpermissions';
 import type { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
@@ -87,6 +88,7 @@ export type ConfirmationShellParams<
 
 /**
  * Permission-agnostic confirmation chrome and event wiring for permission requests.
+ * One instance per permission request; {@link bindSessionEvents} must only be called once.
  */
 export class ConfirmationShell<
   TContext extends BaseContext,
@@ -122,6 +124,10 @@ export class ConfirmationShell<
   #tokenBalanceFiat: string | null = null;
 
   #accountUpgradeStatus: AccountUpgradeStatus = { isUpgraded: true };
+
+  readonly #callOnceGuard = createCallOnceGuard(
+    'ConfirmationShell.bindSessionEvents()',
+  );
 
   constructor({
     userEventDispatcher,
@@ -223,10 +229,13 @@ export class ConfirmationShell<
    * Registers session events for the confirmation dialog.
    * @param args - Session identifiers, rules, and context update callback.
    * @returns Unbind function for the registered handlers.
+   * @throws If called more than once on the same instance.
    */
   bindSessionEvents(
     args: ConfirmationShellBindSessionArgs<TContext, TMetadata>,
   ): () => void {
+    this.#callOnceGuard();
+
     const { interfaceId, initialContext, rules, updateContext } = args;
 
     let currentContext = initialContext;

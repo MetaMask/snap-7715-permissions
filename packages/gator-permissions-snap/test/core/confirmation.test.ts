@@ -1,6 +1,6 @@
 import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import { createMockSnapsProvider } from '@metamask/7715-permissions-shared/testing';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { InternalError, UserInputEventType } from '@metamask/snaps-sdk';
 import { Text } from '@metamask/snaps-sdk/jsx';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
@@ -161,6 +161,87 @@ describe('ConfirmationDialog', () => {
       await expect(
         newDialog.displayConfirmationDialogAndAwaitUserDecision(),
       ).rejects.toThrow('Interface not yet created. Call initialize() first.');
+    });
+
+    it('throws if displayConfirmationDialogAndAwaitUserDecision is called more than once', async () => {
+      const first =
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      await expect(
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision(),
+      ).rejects.toThrow(InternalError);
+      await expect(
+        confirmationDialog.displayConfirmationDialogAndAwaitUserDecision(),
+      ).rejects.toThrow(
+        'ConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision() called more than once',
+      );
+
+      const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
+        (call) => call[0].elementName === 'grant-button',
+      )?.[0]?.handler;
+
+      if (grantButtonHandler === undefined) {
+        throw new Error('Grant button handler is undefined');
+      }
+
+      await grantButtonHandler({
+        event: { type: UserInputEventType.ButtonClickEvent },
+        interfaceId: mockInterfaceId,
+      });
+
+      await first;
+    });
+
+    it('does not consume the call-once guard when initialize has not run', async () => {
+      const newDialogInterface = new DialogInterface(mockSnapsProvider);
+      const newDialog = new ConfirmationDialog({
+        dialogInterface: newDialogInterface,
+        ui: mockUi,
+        userEventDispatcher: mockUserEventDispatcher,
+        onBeforeGrant: mockOnBeforeGrant,
+        timeoutFactory: mockTimeoutFactory,
+      });
+
+      await expect(
+        newDialog.displayConfirmationDialogAndAwaitUserDecision(),
+      ).rejects.toThrow('Interface not yet created. Call initialize() first.');
+
+      mockSnapsProvider.request.mockImplementation(async (params: any) => {
+        if (params.method === 'snap_createInterface') {
+          return mockInterfaceId;
+        }
+        if (params.method === 'snap_dialog') {
+          return new Promise(() => {
+            // Dialog stays open
+          });
+        }
+        if (params.method === 'snap_resolveInterface') {
+          return null;
+        }
+        return null;
+      });
+
+      await newDialog.initialize();
+
+      const awaitingUserDecision =
+        newDialog.displayConfirmationDialogAndAwaitUserDecision();
+
+      const grantButtonHandler = mockUserEventDispatcher.on.mock.calls.find(
+        (call) => call[0].elementName === 'grant-button',
+      )?.[0]?.handler;
+
+      if (grantButtonHandler === undefined) {
+        throw new Error('Grant button handler is undefined');
+      }
+
+      await grantButtonHandler({
+        event: { type: UserInputEventType.ButtonClickEvent },
+        interfaceId: mockInterfaceId,
+      });
+
+      await expect(awaitingUserDecision).resolves.toStrictEqual({
+        isApproved: true,
+      });
     });
 
     it('should resolve with true when grant button clicked', async () => {

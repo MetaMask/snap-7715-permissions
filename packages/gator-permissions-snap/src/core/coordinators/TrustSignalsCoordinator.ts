@@ -1,5 +1,4 @@
 import { logger } from '@metamask/7715-permissions-shared/utils';
-import { InternalError } from '@metamask/snaps-sdk';
 import type { Hex } from '@metamask/utils';
 
 import type {
@@ -7,6 +6,7 @@ import type {
   ScanDappUrlResult,
   TrustSignalsClient,
 } from '../../clients/trustSignalsClient';
+import { createCallOnceGuard } from '../callOnceGuard';
 
 /**
  * Runs trust-signal scans in the background and tracks the latest results.
@@ -21,7 +21,9 @@ export class TrustSignalsCoordinator {
 
   #scanAddressResult: FetchAddressScanResult | null = null;
 
-  #started = false;
+  readonly #callOnceGuard = createCallOnceGuard(
+    'TrustSignalsCoordinator.start()',
+  );
 
   constructor({
     trustSignalsClient,
@@ -66,12 +68,7 @@ export class TrustSignalsCoordinator {
       scanAddressResult: FetchAddressScanResult | null;
     }) => void;
   }): void {
-    if (this.#started) {
-      throw new InternalError(
-        'TrustSignalsCoordinator.start() called more than once',
-      );
-    }
-    this.#started = true;
+    this.#callOnceGuard();
 
     const { origin, chainId, delegateAddress, onResults } = args;
 
