@@ -52,15 +52,15 @@ describe('TrustSignalsCoordinator', () => {
     });
   });
 
-  it('starts dapp URL scan and notifies when it resolves', async () => {
+  it('starts dapp URL scan and calls onUpdate when it resolves', async () => {
     mockTrustSignalsClient.scanDappUrl.mockResolvedValue(mockDappScanResult);
 
-    const onResults = jest.fn();
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
     coordinator.start({
       origin: 'https://example.com',
       chainId: '0x1' as Hex,
       delegateAddress: undefined,
-      onResults,
     });
 
     expect(mockTrustSignalsClient.scanDappUrl).toHaveBeenCalledWith(
@@ -70,39 +70,127 @@ describe('TrustSignalsCoordinator', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(onResults).toHaveBeenCalledWith({
-      scanDappUrlResult: mockDappScanResult,
-      scanAddressResult: null,
-    });
+    expect(onUpdate).toHaveBeenCalledTimes(1);
     expect(coordinator.getResults()).toStrictEqual({
       scanDappUrlResult: mockDappScanResult,
       scanAddressResult: null,
     });
   });
 
-  it('starts address scan when delegate address is provided', async () => {
-    const delegateAddress = '0xabc123';
-    const onResults = jest.fn();
+  it('calls onUpdate once per scan as each result settles', async () => {
+    let resolveDappScan!: (result: ScanDappUrlResult) => void;
+    let resolveAddressScan!: (result: FetchAddressScanResult) => void;
 
+    mockTrustSignalsClient.scanDappUrl.mockImplementation(
+      async () =>
+        new Promise<ScanDappUrlResult>((resolve) => {
+          resolveDappScan = resolve;
+        }),
+    );
+    mockTrustSignalsClient.fetchAddressScan.mockImplementation(
+      async () =>
+        new Promise<FetchAddressScanResult>((resolve) => {
+          resolveAddressScan = resolve;
+        }),
+    );
+
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
     coordinator.start({
       origin: 'https://example.com',
       chainId: '0x1' as Hex,
-      delegateAddress,
-      onResults,
+      delegateAddress: '0xabc123',
     });
 
     expect(mockTrustSignalsClient.fetchAddressScan).toHaveBeenCalledWith(
       '0x1',
-      delegateAddress,
+      '0xabc123',
     );
+    expect(onUpdate).not.toHaveBeenCalled();
+
+    resolveDappScan(mockDappScanResult);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+    expect(coordinator.getResults()).toStrictEqual({
+      scanDappUrlResult: mockDappScanResult,
+      scanAddressResult: null,
+    });
+
+    resolveAddressScan(mockScanAddressResult);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onUpdate).toHaveBeenCalledTimes(2);
+    expect(coordinator.getResults()).toStrictEqual({
+      scanDappUrlResult: mockDappScanResult,
+      scanAddressResult: mockScanAddressResult,
+    });
+  });
+
+  it('allows start before onUpdate and still calls onUpdate for later completions', async () => {
+    let resolveScan!: (result: ScanDappUrlResult) => void;
+    mockTrustSignalsClient.scanDappUrl.mockImplementation(
+      async () =>
+        new Promise<ScanDappUrlResult>((resolve) => {
+          resolveScan = resolve;
+        }),
+    );
+
+    coordinator.start({
+      origin: 'https://example.com',
+      chainId: '0x1' as Hex,
+      delegateAddress: undefined,
+    });
+
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
+
+    resolveScan(mockDappScanResult);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onUpdate immediately when results already settled before registration', async () => {
+    mockTrustSignalsClient.scanDappUrl.mockResolvedValue(mockDappScanResult);
+    mockTrustSignalsClient.fetchAddressScan.mockResolvedValue(
+      mockScanAddressResult,
+    );
+
+    coordinator.start({
+      origin: 'https://example.com',
+      chainId: '0x1' as Hex,
+      delegateAddress: '0xabc123',
+    });
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(onResults).toHaveBeenCalledTimes(2);
     expect(coordinator.getResults()).toStrictEqual({
-      scanDappUrlResult: { isComplete: false },
+      scanDappUrlResult: mockDappScanResult,
       scanAddressResult: mockScanAddressResult,
     });
+
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
+
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call onUpdate on registration when scans are still pending', () => {
+    mockTrustSignalsClient.scanDappUrl.mockImplementation(
+      async () => new Promise(() => undefined),
+    );
+
+    coordinator.start({
+      origin: 'https://example.com',
+      chainId: '0x1' as Hex,
+      delegateAddress: undefined,
+    });
+
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
+
+    expect(onUpdate).not.toHaveBeenCalled();
   });
 
   it('throws if start is called more than once', () => {
@@ -110,7 +198,6 @@ describe('TrustSignalsCoordinator', () => {
       origin: 'https://example.com',
       chainId: '0x1' as Hex,
       delegateAddress: undefined,
-      onResults: jest.fn(),
     });
 
     expect(() =>
@@ -118,51 +205,58 @@ describe('TrustSignalsCoordinator', () => {
         origin: 'https://other.example.com',
         chainId: '0x1' as Hex,
         delegateAddress: undefined,
-        onResults: jest.fn(),
       }),
     ).toThrow('TrustSignalsCoordinator.start() called more than once');
   });
 
-  it('logs and swallows dapp URL scan failures without calling onResults', async () => {
+  it('throws if onUpdate is called more than once', () => {
+    coordinator.onUpdate(jest.fn());
+
+    expect(() => coordinator.onUpdate(jest.fn())).toThrow(
+      'TrustSignalsCoordinator onUpdate callback already registered',
+    );
+  });
+
+  it('logs and swallows dapp URL scan failures without calling onUpdate', async () => {
     mockTrustSignalsClient.scanDappUrl.mockRejectedValue(
       new Error('scan failed'),
     );
 
-    const onResults = jest.fn();
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
     coordinator.start({
       origin: 'https://example.com',
       chainId: '0x1' as Hex,
       delegateAddress: undefined,
-      onResults,
     });
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(onResults).not.toHaveBeenCalled();
+    expect(onUpdate).not.toHaveBeenCalled();
     expect(logger.debug).toHaveBeenCalledWith(
-      'TrustSignalsCoordinator: dapp URL scan or UI update failed',
+      'TrustSignalsCoordinator: dapp URL scan failed',
       expect.objectContaining({ origin: 'https://example.com' }),
     );
   });
 
-  it('logs and swallows address scan failures without calling onResults', async () => {
+  it('logs and swallows address scan failures without calling onUpdate', async () => {
     mockTrustSignalsClient.fetchAddressScan.mockRejectedValue(
       new Error('address scan failed'),
     );
 
-    const onResults = jest.fn();
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
     coordinator.start({
       origin: 'https://example.com',
       chainId: '0x1' as Hex,
       delegateAddress: '0xabc123',
-      onResults,
     });
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(onResults).toHaveBeenCalledTimes(1);
+    expect(onUpdate).toHaveBeenCalledTimes(1);
     expect(logger.debug).toHaveBeenCalledWith(
-      'TrustSignalsCoordinator: address scan or UI update failed',
+      'TrustSignalsCoordinator: address scan failed',
       expect.objectContaining({ address: '0xabc123' }),
     );
   });

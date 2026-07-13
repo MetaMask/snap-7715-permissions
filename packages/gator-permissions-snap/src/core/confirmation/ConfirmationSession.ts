@@ -127,6 +127,11 @@ export class ConfirmationSession {
       origin,
       normalizedRequest.permission,
     );
+    trustSignalsCoordinator.start({
+      origin,
+      chainId: normalizedRequest.chainId,
+      delegateAddress: normalizedRequest.to,
+    });
 
     const introResult = await this.#runIntroductionIfNeeded({
       dialogInterface,
@@ -254,20 +259,16 @@ export class ConfirmationSession {
       await lastUpdateConfirmationPromise;
     };
 
-    trustSignalsCoordinator.start({
-      origin,
-      chainId: normalizedRequest.chainId,
-      delegateAddress: normalizedRequest.to,
-      onResults: () => {
-        updateConfirmation({
-          isGrantDisabled: false,
-        }).catch((error: unknown) => {
-          logger.debug('ConfirmationSession: trust signal UI update failed', {
-            origin,
-            error: error instanceof Error ? error.message : error,
-          });
+    // this handler can be registered even after the results have settled
+    trustSignalsCoordinator.onUpdate(() => {
+      updateConfirmation({
+        isGrantDisabled: false,
+      }).catch((error: unknown) => {
+        logger.debug('ConfirmationSession: trust signal UI update failed', {
+          origin,
+          error: error instanceof Error ? error.message : error,
         });
-      },
+      });
     });
 
     try {
