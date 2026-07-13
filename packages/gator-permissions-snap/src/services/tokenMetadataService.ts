@@ -202,15 +202,17 @@ export class TokenMetadataService {
    */
   public async fetchIconDataAsBase64(
     iconUrl: string | undefined,
-  ): Promise<{ success: true; imageDataBase64: string } | { success: false }> {
+  ): Promise<
+    { ok: true; imageDataBase64: string } | { ok: false; reason: string }
+  > {
     if (!iconUrl) {
-      return { success: false };
+      return { ok: false, reason: 'Icon URL not provided' };
     }
 
     try {
       const iconResponse = await this.#fetcher(iconUrl);
       if (!iconResponse.ok) {
-        return { success: false };
+        return { ok: false, reason: 'Icon fetch failed' };
       }
 
       const iconBuffer = await iconResponse.arrayBuffer();
@@ -219,10 +221,10 @@ export class TokenMetadataService {
 
       const imageDataBase64 = `data:image/png;base64,${buffer.toString('base64')}`;
 
-      return { success: true, imageDataBase64 };
+      return { ok: true, imageDataBase64 };
     } catch {
       logger.error('Error fetching icon data');
-      return { success: false };
+      return { ok: false, reason: 'Error fetching icon data' };
     }
   }
 }

@@ -15,7 +15,7 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
   NativeTokenPeriodicPermission,
 } from './types';
-import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
@@ -106,18 +106,16 @@ export async function populatePermission({
 /**
  * Converts a permission request into a context object that can be used to render the UI
  * and manage the permission state.
- * @param args - The options object containing the request and required services.
- * @param args.permissionRequest - The native token periodic permission request to convert.
- * @param args.tokenMetadataService - Service for fetching token metadata.
+ * @param permissionRequest - The native token periodic permission request to convert.
+ * @param services - Services required to build permission context.
+ * @param services.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
-export async function buildContext({
-  permissionRequest,
-  tokenMetadataService,
-}: {
-  permissionRequest: NativeTokenPeriodicPermissionRequest;
-  tokenMetadataService: TokenMetadataService;
-}): Promise<NativeTokenPeriodicContext> {
+export async function buildContext(
+  permissionRequest: NativeTokenPeriodicPermissionRequest,
+  services: PermissionBuildServices,
+): Promise<NativeTokenPeriodicContext> {
+  const { tokenMetadataService } = services;
   const chainId = Number(permissionRequest.chainId);
 
   const {
@@ -140,7 +138,7 @@ export async function buildContext({
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
 
-  const iconDataBase64 = iconDataResponse.success
+  const iconDataBase64 = iconDataResponse.ok
     ? iconDataResponse.imageDataBase64
     : null;
 

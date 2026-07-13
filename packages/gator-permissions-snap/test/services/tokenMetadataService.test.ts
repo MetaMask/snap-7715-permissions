@@ -323,31 +323,33 @@ describe('TokenMetadataService', () => {
       expect(response.arrayBuffer).toHaveBeenCalledTimes(1);
       expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
       expect(result).toStrictEqual({
-        success: true,
+        ok: true,
         imageDataBase64: expectedBase64,
       });
     });
 
-    it('returns success false when iconUrl is undefined', async () => {
+    it('returns ok false when iconUrl is undefined', async () => {
       const result =
         await tokenMetadataService.fetchIconDataAsBase64(undefined);
 
       expect(mockFetcher).not.toHaveBeenCalled();
       expect(result).toStrictEqual({
-        success: false,
+        ok: false,
+        reason: 'Icon URL not provided',
       });
     });
 
-    it('returns success false when iconUrl is empty string', async () => {
+    it('returns ok false when iconUrl is empty string', async () => {
       const result = await tokenMetadataService.fetchIconDataAsBase64('');
 
       expect(mockFetcher).not.toHaveBeenCalled();
       expect(result).toStrictEqual({
-        success: false,
+        ok: false,
+        reason: 'Icon URL not provided',
       });
     });
 
-    it('returns success false when fetch response is not ok', async () => {
+    it('returns ok false when fetch response is not ok', async () => {
       mockFetcher.mockResolvedValueOnce({
         ok: false,
         status: 404,
@@ -358,11 +360,12 @@ describe('TokenMetadataService', () => {
 
       expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
       expect(result).toStrictEqual({
-        success: false,
+        ok: false,
+        reason: 'Icon fetch failed',
       });
     });
 
-    it('returns success false when fetch throws an error', async () => {
+    it('returns ok false when fetch throws an error', async () => {
       const consoleErrorSpy = jest.spyOn(console, 'error');
       mockFetcher.mockRejectedValueOnce(new Error('Network error'));
 
@@ -371,13 +374,14 @@ describe('TokenMetadataService', () => {
 
       expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
       expect(result).toStrictEqual({
-        success: false,
+        ok: false,
+        reason: 'Error fetching icon data',
       });
 
       consoleErrorSpy.mockRestore();
     });
 
-    it('returns success false when arrayBuffer() throws an error', async () => {
+    it('returns ok false when arrayBuffer() throws an error', async () => {
       const consoleErrorSpy = jest.spyOn(console, 'error');
 
       mockFetcher.mockResolvedValueOnce({
@@ -390,7 +394,8 @@ describe('TokenMetadataService', () => {
 
       expect(mockFetcher).toHaveBeenCalledWith(mockIconUrl);
       expect(result).toStrictEqual({
-        success: false,
+        ok: false,
+        reason: 'Error fetching icon data',
       });
 
       consoleErrorSpy.mockRestore();

@@ -1,5 +1,5 @@
 import { createPermissionCaveats } from './caveats';
-import { createConfirmationContent } from './content';
+import { renderBody } from './content';
 import {
   applyContext,
   buildContext,
@@ -14,26 +14,27 @@ import type {
   TokenApprovalRevocationPermissionRequest,
   PopulatedTokenApprovalRevocationPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
-import type { PermissionDefinition } from '../../core/types';
+import { parseAndValidate } from './validation';
+import type { PermissionModule } from '../../core/permission/PermissionModule';
 
-export const tokenApprovalRevocationPermissionDefinition: PermissionDefinition<
+export const tokenApprovalRevocationPermissionModule: PermissionModule<
   TokenApprovalRevocationPermissionRequest,
   TokenApprovalRevocationContext,
   TokenApprovalRevocationMetadata,
   TokenApprovalRevocationPermission,
   PopulatedTokenApprovalRevocationPermission
 > = {
+  type: 'token-approval-revocation',
+  name: 'Token Approval Revocation',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitleRevocation',
-  dependencies: {
-    parseAndValidatePermission,
-    buildContext,
-    deriveMetadata,
-    createConfirmationContent,
-    applyContext,
-    populatePermission,
-    createPermissionCaveats,
-  },
+  showTokenBalance: false,
+  parseAndValidate,
+  buildContext,
+  deriveMetadata,
+  renderBody,
+  applyContext,
+  populatePermission,
+  createPermissionCaveats,
 };

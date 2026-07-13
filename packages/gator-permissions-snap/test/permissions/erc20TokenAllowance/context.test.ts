@@ -89,15 +89,14 @@ describe('erc20TokenAllowance:context', () => {
         iconUrl: 'https://example.com/icon.png',
       })),
       fetchIconDataAsBase64: jest.fn(async () =>
-        Promise.resolve({ success: false }),
+        Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
       ),
     } as unknown as jest.Mocked<TokenMetadataService>;
   });
 
   describe('buildContext()', () => {
     it('includes redeemer and payee addresses from rules', async () => {
-      const context = await buildContext({
-        permissionRequest,
+      const context = await buildContext(permissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
 

@@ -8,7 +8,7 @@ import {
 } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
-import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
@@ -101,19 +101,18 @@ export async function populatePermission({
 }
 
 /**
- * Build UI context from a validated permission request.
- * @param args - The options object containing the request and required services.
- * @param args.permissionRequest - Request for this permission type.
- * @param args.tokenMetadataService - Token metadata service.
- * @returns Context for confirmation UI and validation.
+ * Converts a permission request into a context object that can be used to render the UI
+ * and manage the permission state.
+ * @param permissionRequest - The ERC-20 token allowance permission request to convert.
+ * @param services - Services required to build permission context.
+ * @param services.tokenMetadataService - Service for fetching token metadata.
+ * @returns A context object containing the formatted permission details and account information.
  */
-export async function buildContext({
-  permissionRequest,
-  tokenMetadataService,
-}: {
-  permissionRequest: Erc20TokenAllowancePermissionRequest;
-  tokenMetadataService: TokenMetadataService;
-}): Promise<Erc20TokenAllowanceContext> {
+export async function buildContext(
+  permissionRequest: Erc20TokenAllowancePermissionRequest,
+  services: PermissionBuildServices,
+): Promise<Erc20TokenAllowanceContext> {
+  const { tokenMetadataService } = services;
   const chainId = Number(permissionRequest.chainId);
   const {
     from,
@@ -136,7 +135,7 @@ export async function buildContext({
   const iconDataResponse =
     await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
 
-  const iconDataBase64 = iconDataResponse.success
+  const iconDataBase64 = iconDataResponse.ok
     ? iconDataResponse.imageDataBase64
     : null;
 

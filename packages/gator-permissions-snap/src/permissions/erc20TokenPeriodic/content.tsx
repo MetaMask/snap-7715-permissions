@@ -20,7 +20,7 @@ import { renderRules } from '../../core/rules';
  * @param args.metadata - Metadata including derived values and validation errors.
  * @returns A Promise that resolves to the UI element for the confirmation dialog.
  */
-export async function createConfirmationContent({
+export async function renderBody({
   context,
   metadata,
 }: {

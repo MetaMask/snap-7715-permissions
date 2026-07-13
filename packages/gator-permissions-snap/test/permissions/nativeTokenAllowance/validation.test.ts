@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { bigIntToHex } from '@metamask/utils';
 
 import type { NativeTokenAllowancePermissionRequest } from '../../../src/permissions/nativeTokenAllowance/types';
-import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenAllowance/validation';
+import { parseAndValidate } from '../../../src/permissions/nativeTokenAllowance/validation';
 import { parseUnits } from '../../../src/utils/value';
 
 const startTime = Math.floor(Date.now() / 1000) + 86400;
@@ -33,12 +33,10 @@ const validPermissionRequest: NativeTokenAllowancePermissionRequest = {
 };
 
 describe('nativeTokenAllowance:validation', () => {
-  describe('parseAndValidatePermission()', () => {
+  describe('parseAndValidate()', () => {
     it('should validate a valid permission request', () => {
-      expect(() =>
-        parseAndValidatePermission(validPermissionRequest),
-      ).not.toThrow();
-      expect(parseAndValidatePermission(validPermissionRequest)).toStrictEqual(
+      expect(() => parseAndValidate(validPermissionRequest)).not.toThrow();
+      expect(parseAndValidate(validPermissionRequest)).toStrictEqual(
         validPermissionRequest,
       );
     });
@@ -49,9 +47,7 @@ describe('nativeTokenAllowance:validation', () => {
         rules: [],
       };
 
-      expect(() =>
-        parseAndValidatePermission(missingExpiry as any),
-      ).not.toThrow();
+      expect(() => parseAndValidate(missingExpiry as any)).not.toThrow();
     });
 
     it('should throw for invalid permission type', () => {
@@ -63,9 +59,7 @@ describe('nativeTokenAllowance:validation', () => {
         },
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidTypeRequest as any),
-      ).toThrow(
+      expect(() => parseAndValidate(invalidTypeRequest as any)).toThrow(
         'Failed type validation: type: Invalid literal value, expected "native-token-allowance"',
       );
     });
@@ -84,9 +78,7 @@ describe('nativeTokenAllowance:validation', () => {
         ],
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidRedeemerRuleRequest as any),
-      ).toThrow(
+      expect(() => parseAndValidate(invalidRedeemerRuleRequest as any)).toThrow(
         'Invalid redeemer rule: must include a non-empty addresses array',
       );
     });
@@ -105,9 +97,9 @@ describe('nativeTokenAllowance:validation', () => {
         ],
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidPayeeRuleRequest as any),
-      ).toThrow('Invalid payee rule: must include a non-empty addresses array');
+      expect(() => parseAndValidate(invalidPayeeRuleRequest as any)).toThrow(
+        'Invalid payee rule: must include a non-empty addresses array',
+      );
     });
 
     it('should allow multiple payee addresses for native token allowances', () => {
@@ -128,7 +120,7 @@ describe('nativeTokenAllowance:validation', () => {
       };
 
       expect(() =>
-        parseAndValidatePermission(multiplePayeesRequest as any),
+        parseAndValidate(multiplePayeesRequest as any),
       ).not.toThrow();
     });
   });

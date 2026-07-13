@@ -15,7 +15,7 @@ import { renderRules } from '../../core/rules';
  * @param args.metadata - Validation state for rules.
  * @returns Confirmation section content.
  */
-export async function createConfirmationContent({
+export async function renderBody({
   context,
   metadata,
 }: {

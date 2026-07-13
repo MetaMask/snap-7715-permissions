@@ -29,12 +29,17 @@ import { NonceCaveatClient } from './clients/nonceCaveatClient';
 import { PriceApiClient } from './clients/priceApiClient';
 import { TrustSignalsClient } from './clients/trustSignalsClient';
 import { AccountController } from './core/accountController';
+import { ConfirmationSession } from './core/confirmation/ConfirmationSession';
 import { ConfirmationDialogFactory } from './core/confirmationFactory';
 import { DialogInterfaceFactory } from './core/dialogInterfaceFactory';
 import { ExistingPermissionsService } from './core/existingpermissions';
-import { PermissionHandlerFactory } from './core/permissionHandlerFactory';
+import { GrantedPermissionResolutionService } from './core/grant/GrantedPermissionResolutionService';
+import { ConfirmationShellFactory } from './core/permission/ConfirmationShellFactory';
+import { createPermissionRegistry } from './core/permission/createPermissionRegistry';
+import { PermissionRequestProcessor } from './core/permission/PermissionRequestProcessor';
 import { PermissionIntroductionService } from './core/permissionIntroduction';
-import { PermissionRequestLifecycleOrchestrator } from './core/permissionRequestLifecycleOrchestrator';
+import { PermissionRequestPipeline } from './core/PermissionRequestPipeline';
+import { PermissionRequestPreparator } from './core/PermissionRequestPreparator';
 import { createTimeoutFactory } from './core/timeoutFactory';
 import {
   createProfileSyncOptions,
@@ -198,27 +203,53 @@ const dialogInterfaceFactory = new DialogInterfaceFactory({
   snap,
 });
 
-const orchestrator = new PermissionRequestLifecycleOrchestrator({
+const grantedPermissionResolutionService =
+  new GrantedPermissionResolutionService({
+    accountController,
+    nonceCaveatService,
+    snapsMetricsService,
+  });
+
+const permissionRequestPreparator = new PermissionRequestPreparator({
   accountController,
-  confirmationDialogFactory,
-  nonceCaveatService,
   snapsMetricsService,
-  permissionIntroductionService,
-  existingPermissionsService,
-  dialogInterfaceFactory,
-  trustSignalsClient,
 });
 
-const permissionHandlerFactory = new PermissionHandlerFactory({
+const confirmationSession = new ConfirmationSession({
+  dialogInterfaceFactory,
+  confirmationDialogFactory,
+  permissionIntroductionService,
+  existingPermissionsService,
+  trustSignalsClient,
   accountController,
-  tokenPricesService,
-  tokenMetadataService,
+  snapsMetricsService,
+});
+
+const permissionRequestPipeline = new PermissionRequestPipeline({
+  permissionRequestPreparator,
+  confirmationSession,
+  grantedPermissionResolutionService,
+});
+
+const permissionRegistry = createPermissionRegistry();
+
+const confirmationShellFactory = new ConfirmationShellFactory({
+  accountController,
   userEventDispatcher,
-  orchestrator,
+  tokenMetadataService,
+  tokenPricesService,
+});
+
+const permissionRequestProcessor = new PermissionRequestProcessor({
+  registry: permissionRegistry,
+  pipeline: permissionRequestPipeline,
+  confirmationShellFactory,
+  tokenMetadataService,
 });
 
 const rpcHandler = createRpcHandler({
-  permissionHandlerFactory,
+  permissionRequestProcessor,
+  permissionRegistry,
   profileSyncManager,
   blockchainClient,
 });

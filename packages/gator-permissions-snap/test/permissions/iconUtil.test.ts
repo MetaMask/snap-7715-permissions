@@ -9,7 +9,7 @@ describe('iconUtil', () => {
       iconDataBase64: string | null,
       symbol = 'USDC',
     ): BaseContext => ({
-      expiry: '05/01/2024',
+      expiry: { timestamp: 1714521600 },
       isAdjustmentAllowed: true,
       justification: 'Test permission',
       accountAddressCaip10:

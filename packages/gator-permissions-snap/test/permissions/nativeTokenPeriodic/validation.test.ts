@@ -3,7 +3,7 @@ import { bigIntToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
 import type { NativeTokenPeriodicPermissionRequest } from '../../../src/permissions/nativeTokenPeriodic/types';
-import { parseAndValidatePermission } from '../../../src/permissions/nativeTokenPeriodic/validation';
+import { parseAndValidate } from '../../../src/permissions/nativeTokenPeriodic/validation';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
 
@@ -31,13 +31,11 @@ const validPermissionRequest: NativeTokenPeriodicPermissionRequest = {
 };
 
 describe('nativeTokenPeriodic:validation', () => {
-  describe('parseAndValidatePermission()', () => {
+  describe('parseAndValidate()', () => {
     it('should validate a valid permission request', () => {
-      expect(() =>
-        parseAndValidatePermission(validPermissionRequest),
-      ).not.toThrow();
+      expect(() => parseAndValidate(validPermissionRequest)).not.toThrow();
 
-      const result = parseAndValidatePermission(validPermissionRequest);
+      const result = parseAndValidate(validPermissionRequest);
       expect(result).toStrictEqual(validPermissionRequest);
     });
 
@@ -47,9 +45,7 @@ describe('nativeTokenPeriodic:validation', () => {
         rules: [],
       };
 
-      expect(() =>
-        parseAndValidatePermission(missingExpiryRequest as any),
-      ).not.toThrow();
+      expect(() => parseAndValidate(missingExpiryRequest as any)).not.toThrow();
     });
 
     describe('payee rule validation', () => {
@@ -70,9 +66,7 @@ describe('nativeTokenPeriodic:validation', () => {
           ],
         };
 
-        expect(() =>
-          parseAndValidatePermission(multiPayeeRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(multiPayeeRequest)).not.toThrow();
       });
     });
 
@@ -85,9 +79,7 @@ describe('nativeTokenPeriodic:validation', () => {
         },
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidTypeRequest as any),
-      ).toThrow(
+      expect(() => parseAndValidate(invalidTypeRequest as any)).toThrow(
         'Failed type validation: type: Invalid literal value, expected "native-token-periodic"',
       );
     });
@@ -105,9 +97,9 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(zeroPeriodAmountRequest),
-        ).toThrow('Invalid periodAmount: must be greater than 0');
+        expect(() => parseAndValidate(zeroPeriodAmountRequest)).toThrow(
+          'Invalid periodAmount: must be greater than 0',
+        );
       });
     });
 
@@ -124,9 +116,7 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(zeroPeriodDurationRequest),
-        ).toThrow(
+        expect(() => parseAndValidate(zeroPeriodDurationRequest)).toThrow(
           'Failed type validation: data.periodDuration: Number must be greater than 0',
         );
       });
@@ -143,9 +133,7 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(negativePeriodDurationRequest),
-        ).toThrow(
+        expect(() => parseAndValidate(negativePeriodDurationRequest)).toThrow(
           'Failed type validation: data.periodDuration: Number must be greater than 0',
         );
       });
@@ -162,9 +150,7 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(floatPeriodDurationRequest),
-        ).toThrow(
+        expect(() => parseAndValidate(floatPeriodDurationRequest)).toThrow(
           'Failed type validation: data.periodDuration: Expected integer, received float',
         );
       });
@@ -181,9 +167,7 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(dailyPeriodRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(dailyPeriodRequest)).not.toThrow();
       });
 
       it('should validate periodDuration for weekly period', () => {
@@ -198,9 +182,7 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(weeklyPeriodRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(weeklyPeriodRequest)).not.toThrow();
       });
     });
 
@@ -217,9 +199,7 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(negativeStartTimeRequest),
-        ).toThrow(
+        expect(() => parseAndValidate(negativeStartTimeRequest)).toThrow(
           'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
         );
       });
@@ -236,7 +216,7 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() => parseAndValidatePermission(zeroStartTimeRequest)).toThrow(
+        expect(() => parseAndValidate(zeroStartTimeRequest)).toThrow(
           'Failed type validation: data.startTime: Number must be greater than 0, data.startTime: Start time must be today or later',
         );
       });
@@ -253,7 +233,7 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() => parseAndValidatePermission(floatStartTimeRequest)).toThrow(
+        expect(() => parseAndValidate(floatStartTimeRequest)).toThrow(
           'Failed type validation: data.startTime: Expected integer, received float',
         );
       });
@@ -270,9 +250,7 @@ describe('nativeTokenPeriodic:validation', () => {
         };
         delete noStartTimeRequest.permission.data.startTime;
 
-        expect(() =>
-          parseAndValidatePermission(noStartTimeRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(noStartTimeRequest)).not.toThrow();
       });
 
       it('should allow null startTime', () => {
@@ -287,11 +265,9 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(nullStartTimeRequest),
-        ).not.toThrow();
+        expect(() => parseAndValidate(nullStartTimeRequest)).not.toThrow();
 
-        const result = parseAndValidatePermission(nullStartTimeRequest);
+        const result = parseAndValidate(nullStartTimeRequest);
         expect(result).toBeDefined();
       });
     });
@@ -319,9 +295,9 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(startTimeVsExpiryRequest),
-        ).toThrow('Invalid startTime: must be before expiry');
+        expect(() => parseAndValidate(startTimeVsExpiryRequest)).toThrow(
+          'Invalid startTime: must be before expiry',
+        );
       });
 
       it('should throw when startTime is after expiry', () => {
@@ -346,9 +322,9 @@ describe('nativeTokenPeriodic:validation', () => {
           },
         };
 
-        expect(() =>
-          parseAndValidatePermission(startTimeAfterExpiryRequest),
-        ).toThrow('Invalid startTime: must be before expiry');
+        expect(() => parseAndValidate(startTimeAfterExpiryRequest)).toThrow(
+          'Invalid startTime: must be before expiry',
+        );
       });
 
       it('should validate when startTime is before expiry', () => {
@@ -374,7 +350,7 @@ describe('nativeTokenPeriodic:validation', () => {
         };
 
         expect(() =>
-          parseAndValidatePermission(validStartTimeVsExpiryRequest),
+          parseAndValidate(validStartTimeVsExpiryRequest),
         ).not.toThrow();
       });
     });

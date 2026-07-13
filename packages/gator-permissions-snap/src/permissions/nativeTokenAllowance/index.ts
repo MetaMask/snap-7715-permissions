@@ -1,5 +1,5 @@
 import { createPermissionCaveats } from './caveats';
-import { createConfirmationContent } from './content';
+import { renderBody } from './content';
 import {
   applyContext,
   buildContext,
@@ -14,26 +14,26 @@ import type {
   NativeTokenAllowancePermissionRequest,
   PopulatedNativeTokenAllowancePermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
-import type { PermissionDefinition } from '../../core/types';
+import { parseAndValidate } from './validation';
+import type { PermissionModule } from '../../core/permission/PermissionModule';
 
-export const nativeTokenAllowancePermissionDefinition: PermissionDefinition<
+export const nativeTokenAllowancePermissionModule: PermissionModule<
   NativeTokenAllowancePermissionRequest,
   NativeTokenAllowanceContext,
   NativeTokenAllowanceMetadata,
   NativeTokenAllowancePermission,
   PopulatedNativeTokenAllowancePermission
 > = {
+  type: 'native-token-allowance',
+  name: 'Native Token Allowance',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
-  dependencies: {
-    parseAndValidatePermission,
-    buildContext,
-    deriveMetadata,
-    createConfirmationContent,
-    applyContext,
-    populatePermission,
-    createPermissionCaveats,
-  },
+  parseAndValidate,
+  buildContext,
+  deriveMetadata,
+  renderBody,
+  applyContext,
+  populatePermission,
+  createPermissionCaveats,
 };

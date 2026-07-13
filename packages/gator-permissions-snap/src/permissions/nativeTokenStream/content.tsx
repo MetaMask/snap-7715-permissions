@@ -24,7 +24,7 @@ import { t } from '../../utils/i18n';
  * @param options.metadata - The metadata containing stream configuration.
  * @returns A promise that resolves to a SnapElement containing the confirmation UI.
  */
-export async function createConfirmationContent({
+export async function renderBody({
   context,
   metadata,
 }: {

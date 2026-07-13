@@ -182,7 +182,7 @@ describe('ConfirmationDialog', () => {
       });
 
       const result = await awaitingUserDecision;
-      expect(result).toStrictEqual({ isConfirmationGranted: true });
+      expect(result).toStrictEqual({ isApproved: true });
       expect(mockCancel).toHaveBeenCalledTimes(1);
     });
 
@@ -204,7 +204,7 @@ describe('ConfirmationDialog', () => {
       });
 
       const result = await awaitingUserDecision;
-      expect(result).toStrictEqual({ isConfirmationGranted: false });
+      expect(result).toStrictEqual({ isApproved: false });
     });
 
     it('should clean up event listeners after decision', async () => {

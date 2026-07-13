@@ -68,7 +68,7 @@ function validatePermissionData(
  * @returns A validated permission request object.
  * @throws {Error} If the permission request is invalid.
  */
-export function parseAndValidatePermission(
+export function parseAndValidate(
   permissionRequest: PermissionRequest,
 ): Erc20TokenStreamPermissionRequest {
   const {

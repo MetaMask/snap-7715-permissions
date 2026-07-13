@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 
-import { createConfirmationContent } from '../../../src/permissions/tokenApprovalRevocation/content';
+import { renderBody } from '../../../src/permissions/tokenApprovalRevocation/content';
 import type {
   TokenApprovalRevocationContext,
   TokenApprovalRevocationMetadata,
@@ -35,9 +35,9 @@ const mockMetadata: TokenApprovalRevocationMetadata = {
 };
 
 describe('tokenApprovalRevocation:content', () => {
-  describe('createConfirmationContent()', () => {
+  describe('renderBody()', () => {
     it('renders all primitives as a summary list item', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
       });
@@ -53,7 +53,7 @@ describe('tokenApprovalRevocation:content', () => {
     });
 
     it('renders selected revocation primitives as a list', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: {
           ...mockContext,
           approvalRevocationPrimitives: {

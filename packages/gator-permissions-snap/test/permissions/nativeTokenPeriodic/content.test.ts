@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 import { TimePeriod } from '../../../src/core/types';
-import { createConfirmationContent } from '../../../src/permissions/nativeTokenPeriodic/content';
+import { renderBody } from '../../../src/permissions/nativeTokenPeriodic/content';
 import type {
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
@@ -34,9 +34,9 @@ const mockMetadata: NativeTokenPeriodicMetadata = {
 };
 
 describe('nativeTokenPeriodic:content', () => {
-  describe('createConfirmationContent()', () => {
+  describe('renderBody()', () => {
     it('should render content with all permission details', async () => {
-      const content = await createConfirmationContent({
+      const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
       });

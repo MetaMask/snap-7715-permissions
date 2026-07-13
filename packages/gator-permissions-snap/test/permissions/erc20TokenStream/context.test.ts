@@ -152,7 +152,7 @@ describe('erc20TokenStream:context', () => {
           iconUrl: 'https://example.com/icon.png',
         })),
         fetchIconDataAsBase64: jest.fn(async () =>
-          Promise.resolve({ success: false }),
+          Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
         ),
       } as unknown as jest.Mocked<TokenMetadataService>;
     });
@@ -163,12 +163,11 @@ describe('erc20TokenStream:context', () => {
       const base64 = Buffer.from(text, 'utf8').toString('base64');
 
       mockTokenMetadataService.fetchIconDataAsBase64.mockResolvedValueOnce({
-        success: true,
+        ok: true,
         imageDataBase64: `data:image/png;base64,${base64}`,
       });
 
-      const context = await buildContext({
-        permissionRequest: alreadyPopulatedPermissionRequest,
+      const context = await buildContext(alreadyPopulatedPermissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -221,8 +220,7 @@ describe('erc20TokenStream:context', () => {
         },
       );
 
-      const context = await buildContext({
-        permissionRequest: daiPermissionRequest,
+      const context = await buildContext(daiPermissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
 
@@ -242,8 +240,7 @@ describe('erc20TokenStream:context', () => {
         rules: [],
       };
 
-      const context = await buildContext({
-        permissionRequest,
+      const context = await buildContext(permissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
       expect(context.expiry).toBeUndefined();
@@ -256,8 +253,7 @@ describe('erc20TokenStream:context', () => {
         // rules is optional, but may not be explicitly set to undefined
       } as unknown as Erc20TokenStreamPermissionRequest;
 
-      const context = await buildContext({
-        permissionRequest,
+      const context = await buildContext(permissionRequest, {
         tokenMetadataService: mockTokenMetadataService,
       });
       expect(context.expiry).toBeUndefined();

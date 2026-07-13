@@ -12,7 +12,7 @@ import { zTokenApprovalRevocationPermission } from './types';
  * @returns A validated permission request object.
  * @throws {Error} If the permission request is invalid.
  */
-export function parseAndValidatePermission(
+export function parseAndValidate(
   permissionRequest: PermissionRequest,
 ): TokenApprovalRevocationPermissionRequest {
   const {

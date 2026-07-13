@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 import type { TokenApprovalRevocationPermissionRequest } from '../../../src/permissions/tokenApprovalRevocation/types';
-import { parseAndValidatePermission } from '../../../src/permissions/tokenApprovalRevocation/validation';
+import { parseAndValidate } from '../../../src/permissions/tokenApprovalRevocation/validation';
 
 const REVOCATION_MECHANISMS = {
   erc20Approve: true,
@@ -34,13 +34,11 @@ const validPermissionRequest: TokenApprovalRevocationPermissionRequest = {
 };
 
 describe('tokenApprovalRevocation:validation', () => {
-  describe('parseAndValidatePermission()', () => {
+  describe('parseAndValidate()', () => {
     it('should validate a valid permission request', () => {
-      expect(() =>
-        parseAndValidatePermission(validPermissionRequest),
-      ).not.toThrow();
+      expect(() => parseAndValidate(validPermissionRequest)).not.toThrow();
 
-      const result = parseAndValidatePermission(validPermissionRequest);
+      const result = parseAndValidate(validPermissionRequest);
       expect(result).toStrictEqual(validPermissionRequest);
     });
 
@@ -50,9 +48,7 @@ describe('tokenApprovalRevocation:validation', () => {
         rules: [],
       };
 
-      expect(() =>
-        parseAndValidatePermission(missingExpiryRequest as any),
-      ).not.toThrow();
+      expect(() => parseAndValidate(missingExpiryRequest as any)).not.toThrow();
     });
 
     it('should throw for invalid permission type', () => {
@@ -64,9 +60,7 @@ describe('tokenApprovalRevocation:validation', () => {
         },
       };
 
-      expect(() =>
-        parseAndValidatePermission(invalidTypeRequest as any),
-      ).toThrow(
+      expect(() => parseAndValidate(invalidTypeRequest as any)).toThrow(
         'Failed type validation: type: Invalid literal value, expected "token-approval-revocation"',
       );
     });
@@ -80,9 +74,9 @@ describe('tokenApprovalRevocation:validation', () => {
         },
       } as any;
 
-      expect(() =>
-        parseAndValidatePermission(requestWithoutAdjustmentFlag),
-      ).toThrow('Failed type validation: isAdjustmentAllowed: Required');
+      expect(() => parseAndValidate(requestWithoutAdjustmentFlag)).toThrow(
+        'Failed type validation: isAdjustmentAllowed: Required',
+      );
     });
 
     it('should require at least one revocation primitive', () => {
@@ -102,9 +96,7 @@ describe('tokenApprovalRevocation:validation', () => {
         },
       };
 
-      expect(() =>
-        parseAndValidatePermission(requestWithoutPrimitives),
-      ).toThrow(
+      expect(() => parseAndValidate(requestWithoutPrimitives)).toThrow(
         'At least one token approval revocation primitive must be enabled',
       );
     });

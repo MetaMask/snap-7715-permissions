@@ -1,5 +1,5 @@
 import { createPermissionCaveats } from './caveats';
-import { createConfirmationContent } from './content';
+import { renderBody } from './content';
 import {
   applyContext,
   buildContext,
@@ -14,26 +14,26 @@ import type {
   NativeTokenPeriodicPermissionRequest,
   PopulatedNativeTokenPeriodicPermission,
 } from './types';
-import { parseAndValidatePermission } from './validation';
-import type { PermissionDefinition } from '../../core/types';
+import { parseAndValidate } from './validation';
+import type { PermissionModule } from '../../core/permission/PermissionModule';
 
-export const nativeTokenPeriodicPermissionDefinition: PermissionDefinition<
+export const nativeTokenPeriodicPermissionModule: PermissionModule<
   NativeTokenPeriodicPermissionRequest,
   NativeTokenPeriodicContext,
   NativeTokenPeriodicMetadata,
   NativeTokenPeriodicPermission,
   PopulatedNativeTokenPeriodicPermission
 > = {
+  type: 'native-token-periodic',
+  name: 'Native Token Periodic Transfer',
   rules: allRules,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
-  dependencies: {
-    parseAndValidatePermission,
-    buildContext,
-    deriveMetadata,
-    createConfirmationContent,
-    applyContext,
-    populatePermission,
-    createPermissionCaveats,
-  },
+  parseAndValidate,
+  buildContext,
+  deriveMetadata,
+  renderBody,
+  applyContext,
+  populatePermission,
+  createPermissionCaveats,
 };

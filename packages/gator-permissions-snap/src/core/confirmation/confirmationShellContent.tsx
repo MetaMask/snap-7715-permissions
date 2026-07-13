@@ -14,18 +14,14 @@ import {
 } from '@metamask/snaps-sdk/jsx';
 import { parseCaipAssetType } from '@metamask/utils';
 
-import { ConfirmationDialog } from './confirmation';
-import { isMetaMaskFacilitatorAddress } from './facilitatorAddresses';
-import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './permissionHandler';
-import type { BaseContext, IconData } from './types';
 import {
   AddressScanResultType,
   RecommendedAction,
-} from '../clients/trustSignalsClient';
+} from '../../clients/trustSignalsClient';
 import type {
   FetchAddressScanResult,
   ScanDappUrlResult,
-} from '../clients/trustSignalsClient';
+} from '../../clients/trustSignalsClient';
 import {
   AddressField,
   PayeeField,
@@ -36,16 +32,20 @@ import {
   TooltipIcon,
   TokenBalanceField,
   TokenField,
-} from '../ui/components';
-import type { MessageKey } from '../utils/i18n';
-import { t } from '../utils/i18n';
-import { ExistingPermissionsState } from './existingpermissions/existingPermissionsState';
+} from '../../ui/components';
+import type { MessageKey } from '../../utils/i18n';
+import { t } from '../../utils/i18n';
+import { ConfirmationDialog } from '../confirmation';
+import { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
+import { isMetaMaskFacilitatorAddress } from '../facilitatorAddresses';
+import type { BaseContext, IconData } from '../types';
+import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './constants';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 export const SHOW_EXISTING_PERMISSIONS_BUTTON_NAME =
   'show-existing-permissions-button';
 
-export type PermissionHandlerContentProps = {
+export type ConfirmationShellContentProps = {
   children: SnapElement;
   permissionTitle: MessageKey;
   permissionSubtitle: MessageKey;
@@ -69,10 +69,12 @@ export type PermissionHandlerContentProps = {
   existingPermissionsStatus: ExistingPermissionsState;
   /** When true, the primary grant button is not clickable. */
   isGrantDisabled: boolean;
+  /** When false, token balance fields are omitted from the account section. */
+  showTokenBalance: boolean;
 };
 
 /**
- * Content wrapping a permission confirmation, including the title and add-more-rules button.
+ * Permission-agnostic confirmation chrome wrapping permission-specific body content.
  * @param options - The params for the content.
  * @param options.children - The children of the content.
  * @param options.permissionTitle - The title of the permission.
@@ -94,9 +96,10 @@ export type PermissionHandlerContentProps = {
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
  * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
  * @param options.isGrantDisabled - Whether the grant button should render disabled.
+ * @param options.showTokenBalance - Whether to show token balance in the account section.
  * @returns The confirmation content.
  */
-export const PermissionHandlerContent = ({
+export const ConfirmationShellContent = ({
   children,
   permissionTitle,
   permissionSubtitle,
@@ -117,7 +120,8 @@ export const PermissionHandlerContent = ({
   isAccountUpgraded,
   existingPermissionsStatus,
   isGrantDisabled,
-}: PermissionHandlerContentProps): SnapElement => {
+  showTokenBalance,
+}: ConfirmationShellContentProps): SnapElement => {
   const tokenBalanceComponent = TokenBalanceField({
     tokenBalance,
   });
@@ -244,7 +248,7 @@ export const PermissionHandlerContent = ({
                   {t('accountUpgradeWarning')}
                 </Text>
               )}
-              {hasAsset && (
+              {showTokenBalance && hasAsset && (
                 <Box direction="horizontal" alignment="end">
                   {fiatBalanceComponent}
                   {tokenBalanceComponent}
@@ -323,13 +327,20 @@ export const PermissionHandlerContent = ({
   );
 };
 
-export const SkeletonPermissionHandlerContent = ({
+/**
+ * Skeleton confirmation chrome shown while permission context is loading.
+ * @param options - Title and subtitle for the permission request.
+ * @param options.permissionTitle - The title of the permission.
+ * @param options.permissionSubtitle - The subtitle of the permission.
+ * @returns Skeleton confirmation UI.
+ */
+export const SkeletonConfirmationShellContent = ({
   permissionTitle,
   permissionSubtitle,
 }: {
   permissionTitle: MessageKey;
   permissionSubtitle: MessageKey;
-}): JSX.Element => {
+}): SnapElement => {
   return (
     <Container>
       <Box>

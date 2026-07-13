@@ -1,9 +1,6 @@
 import type { GetSupportedPermissionsResult } from '@metamask/7715-permissions-shared/types';
 import { SUPPORTED_RULE_TYPES } from '@metamask/7715-permissions-shared/types';
-import {
-  extractDescriptorName,
-  logger,
-} from '@metamask/7715-permissions-shared/utils';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import { decodeDelegations, hashDelegation } from '@metamask/delegation-core';
 import {
   InvalidInputError,
@@ -12,8 +9,8 @@ import {
 import type { Json } from '@metamask/snaps-sdk';
 
 import type { BlockchainClient } from '../clients/blockchainClient';
-import type { PermissionHandlerFactory } from '../core/permissionHandlerFactory';
-import { DEFAULT_GATOR_PERMISSION_TO_OFFER } from '../permissions/permissionOffers';
+import type { PermissionRegistry } from '../core/permission/PermissionRegistry';
+import type { PermissionRequestProcessor } from '../core/permission/PermissionRequestProcessor';
 import type {
   ProfileSyncManager,
   RevocationMetadata,
@@ -72,17 +69,20 @@ export type RpcHandler = {
  * Creates an RPC handler with methods for handling permission-related RPC requests.
  *
  * @param config - The parameters for creating the RPC handler.
- * @param config.permissionHandlerFactory - The factory for creating permission handlers.
+ * @param config.permissionRequestProcessor - Processor for permission grant requests.
+ * @param config.permissionRegistry - Registry of supported permission types.
  * @param config.profileSyncManager - The profile sync manager.
  * @param config.blockchainClient - The blockchain client for on-chain checks.
  * @returns An object with RPC handler methods.
  */
 export function createRpcHandler({
-  permissionHandlerFactory,
+  permissionRequestProcessor,
+  permissionRegistry,
   profileSyncManager,
   blockchainClient,
 }: {
-  permissionHandlerFactory: PermissionHandlerFactory;
+  permissionRequestProcessor: PermissionRequestProcessor;
+  permissionRegistry: PermissionRegistry;
   profileSyncManager: ProfileSyncManager;
   blockchainClient: BlockchainClient;
 }): RpcHandler {
@@ -101,12 +101,12 @@ export function createRpcHandler({
 
     // First, process all permissions to collect responses and validate all are approved
     for (const request of permissionsRequest) {
-      const handler = permissionHandlerFactory.createPermissionHandler(request);
+      const permissionResponse = await permissionRequestProcessor.process(
+        siteOrigin,
+        request,
+      );
 
-      const permissionResponse =
-        await handler.handlePermissionRequest(siteOrigin);
-
-      if (!permissionResponse.approved) {
+      if (!permissionResponse.isApproved) {
         throw new UserRejectedRequestError(permissionResponse.reason);
       }
 
@@ -135,7 +135,13 @@ export function createRpcHandler({
    */
   const getPermissionOffers = async (): Promise<Json> => {
     logger.debug('getPermissionOffers()');
-    return DEFAULT_GATOR_PERMISSION_TO_OFFER as Json[];
+    return permissionRegistry.getSupportedTypes().map((key) => {
+      const { type, name } = permissionRegistry.get(key);
+      return {
+        type,
+        proposedName: name,
+      };
+    });
   };
 
   /**
@@ -292,7 +298,7 @@ export function createRpcHandler({
       revocationMetadata,
     );
 
-    return { success: true };
+    return { ok: true };
   };
 
   /**
@@ -306,8 +312,7 @@ export function createRpcHandler({
 
     const supportedPermissions: GetSupportedPermissionsResult = {};
 
-    for (const offer of DEFAULT_GATOR_PERMISSION_TO_OFFER) {
-      const permissionType = extractDescriptorName(offer.type);
+    for (const permissionType of permissionRegistry.getSupportedTypes()) {
       const ruleTypes =
         SUPPORTED_RULE_TYPES[
           permissionType as keyof typeof SUPPORTED_RULE_TYPES
