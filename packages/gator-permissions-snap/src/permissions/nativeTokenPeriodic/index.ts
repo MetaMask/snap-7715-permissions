@@ -1,5 +1,4 @@
-import { createNativeTokenPeriodicCaveats } from '@metamask/7715-permission-types';
-import type { Caveat } from '@metamask/delegation-core';
+import { createNativeTokenPeriodicCaveats as createPermissionCaveats } from '@metamask/7715-permission-types';
 
 import { renderBody } from './content';
 import {
@@ -17,23 +16,7 @@ import type {
   PopulatedNativeTokenPeriodicPermission,
 } from './types';
 import { parseAndValidate } from './validation';
-import type { DelegationContracts } from '../../core/chainMetadata';
 import type { PermissionModule } from '../../core/permission/PermissionModule';
-
-const createPermissionCaveats = ({
-  permission,
-  contracts,
-}: {
-  permission: PopulatedNativeTokenPeriodicPermission;
-  contracts: DelegationContracts;
-}): Caveat[] =>
-  createNativeTokenPeriodicCaveats({
-    permission,
-    contracts: {
-      ...contracts,
-      nativeTokenPeriodicEnforcer: contracts.nativeTokenPeriodTransferEnforcer,
-    },
-  });
 
 export const nativeTokenPeriodicPermissionModule: PermissionModule<
   NativeTokenPeriodicPermissionRequest,
