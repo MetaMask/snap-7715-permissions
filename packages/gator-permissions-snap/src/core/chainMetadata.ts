@@ -146,6 +146,10 @@ export const nameAndExplorerUrlByChainId: Record<
   0x64: { name: 'Gnosis', explorerUrl: 'https://gnosisscan.io' },
   0x82: { name: 'Unichain', explorerUrl: 'https://uniscan.xyz' },
   0x89: { name: 'Polygon Mainnet', explorerUrl: 'https://polygonscan.com' },
+  0x1237: {
+    name: 'Robinhood Chain',
+    explorerUrl: 'https://robinhoodchain.blockscout.com',
+  },
   0x2105: { name: 'Base', explorerUrl: 'https://basescan.org' },
   0xa4b1: { name: 'Arbitrum One', explorerUrl: 'https://arbiscan.io' },
   0xa4ba: {
@@ -172,6 +176,10 @@ export const nameAndExplorerUrlByChainId: Record<
   0x27d8: {
     name: 'Gnosis Chiado Testnet',
     explorerUrl: 'https://gnosis-chiado.blockscout.com',
+  },
+  0xb626: {
+    name: 'Robinhood Chain Testnet',
+    explorerUrl: 'https://explorer.testnet.chain.robinhood.com',
   },
   0xe705: {
     name: 'Linea Sepolia Testnet',
