@@ -7,17 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Uncategorized
-
-- feat: enforce sentinel redeemers for Uniswap permissions ([#366](https://github.com/MetaMask/snap-7715-permissions/pull/366))
-- chore(deps-dev): bump @metamask/snaps-jest from 10.1.3 to 10.1.4 ([#352](https://github.com/MetaMask/snap-7715-permissions/pull/352))
-- chore(deps-dev): bump @metamask/auto-changelog from 6.1.0 to 6.1.1 ([#341](https://github.com/MetaMask/snap-7715-permissions/pull/341))
-- chore(deps): bump @metamask/snaps-sdk from 11.1.0 to 11.1.1 ([#331](https://github.com/MetaMask/snap-7715-permissions/pull/331))
-- feat: add token approval revocation functionality ([#328](https://github.com/MetaMask/snap-7715-permissions/pull/328))
-- chore(deps-dev): bump @metamask/snaps-jest from 10.1.2 to 10.1.3 ([#304](https://github.com/MetaMask/snap-7715-permissions/pull/304))
-- chore: clean up code structure and remove unused code blocks ([#330](https://github.com/MetaMask/snap-7715-permissions/pull/330))
-- chore: bump yarn from 4.10.1 to 4.14.1 ([#326](https://github.com/MetaMask/snap-7715-permissions/pull/326))
-
 ## [1.3.0]
 
 ### Added
