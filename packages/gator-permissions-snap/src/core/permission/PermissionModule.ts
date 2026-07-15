@@ -104,7 +104,7 @@ export function buildRequestLifecycleHandlers<
     applyContext: async (applyArgs) => module.applyContext(applyArgs),
     populatePermission: async (populateArgs) =>
       module.populatePermission(populateArgs),
-    createPermissionCaveats: async (caveatArgs) =>
+    createPermissionCaveats: (caveatArgs) =>
       module.createPermissionCaveats(caveatArgs),
     createConfirmationContent: async (renderArgs) =>
       confirmationShell.createConfirmationContent(renderArgs),
