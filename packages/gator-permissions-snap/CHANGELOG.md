@@ -9,18 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.4.0]
 
-### Uncategorized
+### Added
 
-- feat: Add Robinhood chain and Robinhood chain testnet ([#382](https://github.com/MetaMask/snap-7715-permissions/pull/382))
-- Refactor core architecture away from monolithic orchestrator ([#371](https://github.com/MetaMask/snap-7715-permissions/pull/371))
-- Narrow the list of chains on which we enforce sentinel redemption ([#372](https://github.com/MetaMask/snap-7715-permissions/pull/372))
-- feat: enforce sentinel redeemers for Uniswap permissions ([#366](https://github.com/MetaMask/snap-7715-permissions/pull/366))
-- chore(deps-dev): bump @metamask/snaps-jest from 10.1.3 to 10.1.4 ([#352](https://github.com/MetaMask/snap-7715-permissions/pull/352))
-- chore(deps): bump @metamask/profile-sync-controller ([#365](https://github.com/MetaMask/snap-7715-permissions/pull/365))
-- feat: render known facilitator redeemers by name ([#354](https://github.com/MetaMask/snap-7715-permissions/pull/354))
-- chore(deps): bump @metamask/profile-sync-controller ([#347](https://github.com/MetaMask/snap-7715-permissions/pull/347))
-- chore(deps-dev): bump @metamask/auto-changelog from 6.1.0 to 6.1.1 ([#341](https://github.com/MetaMask/snap-7715-permissions/pull/341))
-- chore(deps): bump @metamask/snaps-sdk from 11.1.0 to 11.1.1 ([#331](https://github.com/MetaMask/snap-7715-permissions/pull/331))
+- Chain configuration for Robinhood chain and Robinhood chain testnet ([#382](https://github.com/MetaMask/snap-7715-permissions/pull/382))
+- Sentinel redeemers constraint for permissions granted on Uniswap domain ([#366](https://github.com/MetaMask/snap-7715-permissions/pull/366), [#372](https://github.com/MetaMask/snap-7715-permissions/pull/372))
+
+### Changed
+
+- Render known facilitator redeemers by name ([#354](https://github.com/MetaMask/snap-7715-permissions/pull/354))
+- Bump @metamask/snaps-jest from `10.1.3` to `10.1.4` ([#352](https://github.com/MetaMask/snap-7715-permissions/pull/352))
+- Bump @metamask/profile-sync-controller from `28.1.0` to `28.2.0` ([#347](https://github.com/MetaMask/snap-7715-permissions/pull/347), [#365](https://github.com/MetaMask/snap-7715-permissions/pull/365))
+- Bump @metamask/auto-changelog from `6.1.0` to `6.1.1` ([#341](https://github.com/MetaMask/snap-7715-permissions/pull/341))
+- Bump @metamask/snaps-sdk from `11.1.0` to `11.1.1` ([#331](https://github.com/MetaMask/snap-7715-permissions/pull/331))
 
 ## [2.3.0]
 
