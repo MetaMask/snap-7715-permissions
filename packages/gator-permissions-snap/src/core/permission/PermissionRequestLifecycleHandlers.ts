@@ -45,7 +45,7 @@ export type PermissionRequestLifecycleHandlers<
   createPermissionCaveats: (args: {
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
-  }) => Promise<Caveat[]>;
+  }) => Caveat[];
   onConfirmationCreated?: (confirmationCreatedArgs: {
     interfaceId: string;
     initialContext: TContext;
