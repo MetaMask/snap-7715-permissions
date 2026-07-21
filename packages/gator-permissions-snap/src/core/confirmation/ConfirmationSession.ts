@@ -259,7 +259,8 @@ export class ConfirmationSession {
       await lastUpdateConfirmationPromise;
     };
 
-    // this handler can be registered even after the results have settled
+    // no need to execute the update handler if the results have already settled, as we immediately
+    // call updateConfirmation below.
     trustSignalsCoordinator.onUpdate(() => {
       updateConfirmation({
         isGrantDisabled: false,

@@ -151,7 +151,7 @@ describe('TrustSignalsCoordinator', () => {
     expect(onUpdate).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onUpdate immediately when results already settled before registration', async () => {
+  it('does not call onUpdate on registration when results already settled', async () => {
     mockTrustSignalsClient.scanDappUrl.mockResolvedValue(mockDappScanResult);
     mockTrustSignalsClient.fetchAddressScan.mockResolvedValue(
       mockScanAddressResult,
@@ -173,7 +173,7 @@ describe('TrustSignalsCoordinator', () => {
     const onUpdate = jest.fn();
     coordinator.onUpdate(onUpdate);
 
-    expect(onUpdate).toHaveBeenCalledTimes(1);
+    expect(onUpdate).not.toHaveBeenCalled();
   });
 
   it('does not call onUpdate on registration when scans are still pending', () => {

@@ -51,10 +51,9 @@ export class TrustSignalsCoordinator {
   }
 
   /**
-   * Registers a callback invoked whenever a scan completes.
-   * Safe to call after {@link start}; if any scan has already completed,
-   * the callback is invoked immediately. Callers should read results via
-   * {@link getResults}.
+   * Registers a callback invoked whenever a scan completes after registration.
+   * Safe to call after {@link start}; callers that register after early
+   * completions should read settled results via {@link getResults} themselves.
    *
    * @param callback - Called after each successful scan completion.
    * @throws If called more than once on the same instance.
@@ -66,11 +65,6 @@ export class TrustSignalsCoordinator {
       );
     }
     this.#onUpdate = callback;
-
-    // Replay any completions that arrived before the callback was registered.
-    if (this.#scanDappUrlResult !== null || this.#scanAddressResult !== null) {
-      callback();
-    }
   }
 
   /**
