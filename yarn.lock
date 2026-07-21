@@ -2823,10 +2823,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/7715-permission-types@npm:0.7.1, @metamask/7715-permission-types@npm:^0.7.1":
-  version: 0.7.1
-  resolution: "@metamask/7715-permission-types@npm:0.7.1"
-  checksum: 10/2cbe7b8d09ae9b11171d2f9c36bf94f1acea17f9541b399bf99caa14e500c0e91d79e69a4846db2c80b18aa0df0215b36be1ea661cc99f4d6b5bc8d9eea5a4dd
+"@metamask/7715-permission-types@npm:1.0.0, @metamask/7715-permission-types@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@metamask/7715-permission-types@npm:1.0.0"
+  dependencies:
+    "@metamask/delegation-core": "npm:^2.2.1"
+    "@metamask/utils": "npm:^11.4.0"
+  checksum: 10/df565c43c05daa4ef35b2e57bfdf9062e3e928d8fa43194c27c7149f4e2fdb7bda05b2397267b2f9fed3e42a8c26e956483262b2e8d39e63c2045c069cb53e66
   languageName: node
   linkType: hard
 
@@ -3563,11 +3566,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/smart-accounts-kit@npm:^1.6.0":
-  version: 1.6.0
-  resolution: "@metamask/smart-accounts-kit@npm:1.6.0"
+"@metamask/smart-accounts-kit@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "@metamask/smart-accounts-kit@npm:1.7.0"
   dependencies:
-    "@metamask/7715-permission-types": "npm:^0.7.1"
+    "@metamask/7715-permission-types": "npm:^1.0.0"
     "@metamask/delegation-abis": "npm:^1.1.0"
     "@metamask/delegation-core": "npm:^2.2.1"
     "@metamask/delegation-deployments": "npm:^1.4.0"
@@ -3576,7 +3579,7 @@ __metadata:
     ox: "npm:0.8.1"
   peerDependencies:
     viem: ^2.31.4
-  checksum: 10/807713727f6c65a2a4b94c226b4db20128e0dcdf48bc8ec3f1022ac081a058e90a5c2a69c9e99729eb600f955ac52c91dea949fee1e9a9a82585788081924b9a
+  checksum: 10/4258c02743d57f13b0962e4a07acd7ae6d73fd68b1694dc80becdc4f9d73557ed725754dbbfba4b75aeb394fccf97fd1f528a457e8713abea3161e2b93689e49
   languageName: node
   linkType: hard
 
@@ -13648,13 +13651,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "site@workspace:packages/site"
   dependencies:
-    "@metamask/7715-permission-types": "npm:0.7.1"
+    "@metamask/7715-permission-types": "npm:1.0.0"
     "@metamask/eslint-config": "npm:15.0.0"
     "@metamask/eslint-config-jest": "npm:15.0.0"
     "@metamask/eslint-config-nodejs": "npm:15.0.0"
     "@metamask/eslint-config-typescript": "npm:15.0.0"
     "@metamask/providers": "npm:22.1.1"
-    "@metamask/smart-accounts-kit": "npm:^1.6.0"
+    "@metamask/smart-accounts-kit": "npm:^1.7.0"
     "@metamask/utils": "npm:11.11.0"
     "@types/jest": "npm:27.5.2"
     "@types/react": "npm:19.2.3"
