@@ -151,7 +151,7 @@ describe('TrustSignalsCoordinator', () => {
     expect(onUpdate).toHaveBeenCalledTimes(1);
   });
 
-  it('does not call onUpdate on registration when results already settled', async () => {
+  it('stores settled results in getResults when scans complete before onUpdate registration', async () => {
     mockTrustSignalsClient.scanDappUrl.mockResolvedValue(mockDappScanResult);
     mockTrustSignalsClient.fetchAddressScan.mockResolvedValue(
       mockScanAddressResult,
