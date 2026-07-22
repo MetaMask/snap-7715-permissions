@@ -10,12 +10,7 @@ import type { Hex } from '@metamask/utils';
 
 import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
-import {
-  validateAndParseAmount,
-  validateStartTime,
-  validateExpiry,
-  validateStartTimeVsExpiry,
-} from '../contextValidation';
+import { validateAndParseAmount, validateExpiry } from '../contextValidation';
 import {
   applyExpiryRule,
   applyPayeeRule,
@@ -62,7 +57,6 @@ export async function applyContext({
     allowanceAmount: bigIntToHex(
       parseUnits({ formatted: permissionDetails.allowanceAmount, decimals }),
     ),
-    startTime: permissionDetails.startTime,
     justification: originalRequest.permission.data.justification,
   };
 
@@ -84,20 +78,14 @@ export async function applyContext({
  * Populate optional permission fields before signing.
  * @param options - The options object containing the permission to populate.
  * @param options.permission - Permission after applyContext.
- * @returns Permission with defaulted start time when missing.
+ * @returns Permission ready for signing.
  */
 export async function populatePermission({
   permission,
 }: {
   permission: NativeTokenAllowancePermission;
 }): Promise<PopulatedNativeTokenAllowancePermission> {
-  return {
-    ...permission,
-    data: {
-      ...permission.data,
-      startTime: permission.data.startTime ?? Math.floor(Date.now() / 1000),
-    },
-  };
+  return permission;
 }
 
 /**
@@ -162,8 +150,6 @@ export async function buildContext(
     decimals,
   });
 
-  const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
-
   const tokenAddressCaip19 = toCaipAssetType(
     CHAIN_NAMESPACE,
     chainId.toString(),
@@ -192,7 +178,6 @@ export async function buildContext(
     },
     permissionDetails: {
       allowanceAmount,
-      startTime,
     },
   };
 }
@@ -225,29 +210,10 @@ export async function deriveMetadata({
     validationErrors.allowanceAmountError = allowanceAmountResult.error;
   }
 
-  const startTimeError = validateStartTime(permissionDetails.startTime);
-  if (startTimeError) {
-    validationErrors.startTimeError = startTimeError;
-  }
-
   if (expiry) {
     const expiryError = validateExpiry(expiry.timestamp);
     if (expiryError) {
       validationErrors.expiryError = expiryError;
-    }
-  }
-
-  if (
-    expiry &&
-    !validationErrors.startTimeError &&
-    !validationErrors.expiryError
-  ) {
-    const startTimeVsExpiryError = validateStartTimeVsExpiry(
-      permissionDetails.startTime,
-      expiry.timestamp,
-    );
-    if (startTimeVsExpiryError) {
-      validationErrors.startTimeError = startTimeVsExpiryError;
     }
   }
 

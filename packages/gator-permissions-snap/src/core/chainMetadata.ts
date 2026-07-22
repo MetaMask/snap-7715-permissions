@@ -15,8 +15,10 @@ export type DelegationContracts = {
   limitedCallsEnforcer: Hex;
   erc20StreamingEnforcer: Hex;
   erc20PeriodTransferEnforcer: Hex;
+  erc20TransferAmountEnforcer: Hex;
   nativeTokenStreamingEnforcer: Hex;
   nativeTokenPeriodTransferEnforcer: Hex;
+  nativeTokenTransferAmountEnforcer: Hex;
   valueLteEnforcer: Hex;
   timestampEnforcer: Hex;
   exactCalldataEnforcer: Hex;
@@ -91,6 +93,10 @@ const getContracts = (chainId: number): DelegationContracts => {
       deployedContracts,
       'ERC20PeriodTransferEnforcer',
     ),
+    erc20TransferAmountEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'ERC20TransferAmountEnforcer',
+    ),
     nativeTokenStreamingEnforcer: getDeployedContractAddress(
       deployedContracts,
       'NativeTokenStreamingEnforcer',
@@ -98,6 +104,10 @@ const getContracts = (chainId: number): DelegationContracts => {
     nativeTokenPeriodTransferEnforcer: getDeployedContractAddress(
       deployedContracts,
       'NativeTokenPeriodTransferEnforcer',
+    ),
+    nativeTokenTransferAmountEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'NativeTokenTransferAmountEnforcer',
     ),
     valueLteEnforcer: getDeployedContractAddress(
       deployedContracts,

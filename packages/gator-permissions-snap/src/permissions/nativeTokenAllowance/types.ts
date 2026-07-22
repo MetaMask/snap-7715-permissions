@@ -2,7 +2,6 @@ import {
   zHexStr,
   zPermission,
   zMetaMaskPermissionData,
-  zStartTime,
 } from '@metamask/7715-permissions-shared/types';
 import { z } from 'zod';
 
@@ -16,7 +15,6 @@ import type {
 export type NativeTokenAllowanceMetadata = BaseMetadata & {
   validationErrors: {
     allowanceAmountError?: string;
-    startTimeError?: string;
     expiryError?: string;
   };
 };
@@ -24,7 +22,6 @@ export type NativeTokenAllowanceMetadata = BaseMetadata & {
 export type NativeTokenAllowanceContext = BaseContext & {
   permissionDetails: {
     allowanceAmount: string;
-    startTime: number;
   };
 };
 
@@ -34,7 +31,6 @@ export const zNativeTokenAllowancePermission = zPermission.extend({
     zMetaMaskPermissionData,
     z.object({
       allowanceAmount: zHexStr,
-      startTime: zStartTime,
     }),
   ),
 });
