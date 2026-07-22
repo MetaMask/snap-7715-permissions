@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { describe, it, beforeEach, expect, jest } from '@jest/globals';
 import type { InputChangeEvent, ButtonClickEvent } from '@metamask/snaps-sdk';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { InternalError, UserInputEventType } from '@metamask/snaps-sdk';
 
 import { UserEventDispatcher } from '../src/userEventDispatcher';
 
@@ -316,12 +316,17 @@ describe('UserEventDispatcher', () => {
   });
 
   describe('createUserInputEventHandler', () => {
-    it('should throw error when creating multiple handlers', () => {
+    it('throws if createUserInputEventHandler is called more than once', () => {
       userEventDispatcher.createUserInputEventHandler();
 
       expect(() => {
         userEventDispatcher.createUserInputEventHandler();
-      }).toThrow('User input event handler has already been created');
+      }).toThrow(InternalError);
+      expect(() => {
+        userEventDispatcher.createUserInputEventHandler();
+      }).toThrow(
+        'UserEventDispatcher.createUserInputEventHandler() called more than once',
+      );
     });
 
     it('should do nothing when no handlers are registered', async () => {

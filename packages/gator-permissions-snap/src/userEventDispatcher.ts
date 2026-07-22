@@ -6,7 +6,9 @@ import type {
   InputChangeEvent,
   UserInputEvent,
 } from '@metamask/snaps-sdk';
-import { InternalError, UserInputEventType } from '@metamask/snaps-sdk';
+import { UserInputEventType } from '@metamask/snaps-sdk';
+
+import { createCallOnceGuard } from './core/callOnceGuard';
 
 export type DialogContentEventHandlers = {
   elementName: string;
@@ -63,10 +65,9 @@ export class UserEventDispatcher {
     [userInputEventKey: string]: UserEventHandler<UserInputEventType>[];
   };
 
-  /**
-   * Flag to ensure only one component can get the event handler
-   */
-  #hasEventHandler = false;
+  readonly #callOnceGuard = createCallOnceGuard(
+    'UserEventDispatcher.createUserInputEventHandler()',
+  );
 
   /**
    * Queue for processing events sequentially to prevent race conditions
@@ -222,18 +223,13 @@ export class UserEventDispatcher {
    * for other event types, while maintaining proper ordering and sequential execution.
    *
    * @returns A function that handles user input events.
-   * @throws If the handler has already been created.
+   * @throws If called more than once on the same instance.
    */
   public createUserInputEventHandler(): (args: {
     event: UserInputEvent;
     id: string;
   }) => Promise<void> {
-    if (this.#hasEventHandler) {
-      throw new InternalError(
-        'User input event handler has already been created',
-      );
-    }
-    this.#hasEventHandler = true;
+    this.#callOnceGuard();
 
     return async (args: { event: UserInputEvent; id: string }) => {
       const { event, id } = args;

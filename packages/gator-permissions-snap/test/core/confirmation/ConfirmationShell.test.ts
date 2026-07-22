@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
-import { UserInputEventType } from '@metamask/snaps-sdk';
+import { InternalError, UserInputEventType } from '@metamask/snaps-sdk';
 import { Text } from '@metamask/snaps-sdk/jsx';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
@@ -347,6 +347,34 @@ describe('ConfirmationShell', () => {
 
       expect(accountSelectorBoundEvent).toBeDefined();
       expect(showMoreButtonBoundEvent).toBeDefined();
+    });
+
+    it('throws if bindSessionEvents is called more than once', () => {
+      const { confirmationShell, rules, updateContext } = setupTest();
+
+      confirmationShell.bindSessionEvents({
+        interfaceId: mockInterfaceId,
+        initialContext: mockContext,
+        rules,
+        updateContext,
+      });
+
+      expect(() =>
+        confirmationShell.bindSessionEvents({
+          interfaceId: mockInterfaceId,
+          initialContext: mockContext,
+          rules,
+          updateContext,
+        }),
+      ).toThrow(InternalError);
+      expect(() =>
+        confirmationShell.bindSessionEvents({
+          interfaceId: mockInterfaceId,
+          initialContext: mockContext,
+          rules,
+          updateContext,
+        }),
+      ).toThrow('ConfirmationShell.bindSessionEvents() called more than once');
     });
 
     it('loads the balance for the selected account', async () => {
