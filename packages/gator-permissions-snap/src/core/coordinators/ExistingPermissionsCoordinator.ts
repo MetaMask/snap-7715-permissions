@@ -3,6 +3,7 @@ import { logger } from '@metamask/7715-permissions-shared/utils';
 import { InternalError } from '@metamask/snaps-sdk';
 
 import type { StoredGrantedPermission } from '../../profileSync/profileSync';
+import { createCallOnceGuard } from '../callOnceGuard';
 import type { DialogInterface } from '../dialogInterface';
 import type { ExistingPermissionsService } from '../existingpermissions';
 import { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
@@ -15,11 +16,13 @@ import type { BaseContext } from '../types';
 export class ExistingPermissionsCoordinator {
   readonly #existingPermissionsService: ExistingPermissionsService;
 
-  #prefetched = false;
-
   #snapshotPromise: Promise<StoredGrantedPermission[]> | undefined;
 
   #statusPromise: Promise<ExistingPermissionsState> | undefined;
+
+  readonly #callOnceGuard = createCallOnceGuard(
+    'ExistingPermissionsCoordinator.prefetch()',
+  );
 
   constructor({
     existingPermissionsService,
@@ -38,12 +41,7 @@ export class ExistingPermissionsCoordinator {
    * @throws If called more than once on the same instance.
    */
   prefetch(origin: string, permission: Permission): void {
-    if (this.#prefetched) {
-      throw new InternalError(
-        'ExistingPermissionsCoordinator.prefetch() called more than once',
-      );
-    }
-    this.#prefetched = true;
+    this.#callOnceGuard();
 
     this.#snapshotPromise =
       this.#existingPermissionsService.getExistingPermissions(origin);

@@ -7,6 +7,7 @@ import type {
   ScanDappUrlResult,
   TrustSignalsClient,
 } from '../../clients/trustSignalsClient';
+import { createCallOnceGuard } from '../callOnceGuard';
 
 type TrustSignalsResults = {
   scanDappUrlResult: ScanDappUrlResult | null;
@@ -26,7 +27,9 @@ export class TrustSignalsCoordinator {
 
   #scanAddressResult: FetchAddressScanResult | null = null;
 
-  #started = false;
+  readonly #callOnceGuard = createCallOnceGuard(
+    'TrustSignalsCoordinator.start()',
+  );
 
   #onUpdate: (() => void) | undefined;
 
@@ -82,12 +85,7 @@ export class TrustSignalsCoordinator {
     chainId: Hex;
     delegateAddress: string | undefined;
   }): void {
-    if (this.#started) {
-      throw new InternalError(
-        'TrustSignalsCoordinator.start() called more than once',
-      );
-    }
-    this.#started = true;
+    this.#callOnceGuard();
 
     const { origin, chainId, delegateAddress } = args;
 

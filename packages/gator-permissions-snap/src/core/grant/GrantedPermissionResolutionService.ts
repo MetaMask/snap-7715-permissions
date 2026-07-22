@@ -125,7 +125,7 @@ export class GrantedPermissionResolutionService {
 
     const { contracts } = getChainMetadata({ chainId });
 
-    const caveats = await lifecycleHandlers.createPermissionCaveats({
+    const caveats = lifecycleHandlers.createPermissionCaveats({
       permission: populatedPermission,
       contracts,
     });

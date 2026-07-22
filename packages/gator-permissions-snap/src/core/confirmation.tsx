@@ -1,14 +1,17 @@
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { DialogInterface } from './dialogInterface';
 import type { UserEventDispatcher } from '../userEventDispatcher';
+import { createCallOnceGuard } from './callOnceGuard';
+import type { DialogInterface } from './dialogInterface';
 import type { Timeout, TimeoutFactory } from './timeoutFactory';
 import type { ConfirmationProps } from './types';
 
 /**
  * Dialog for handling user confirmation of permission grants.
  * Manages the UI state, timeout behavior, and user interactions.
+ * One instance per permission request; {@link displayConfirmationDialogAndAwaitUserDecision}
+ * must only be called once.
  */
 export class ConfirmationDialog {
   static readonly cancelButton = 'cancel-button';
@@ -35,6 +38,10 @@ export class ConfirmationDialog {
   #decisionResolve: ((value: boolean) => void) | undefined;
 
   readonly #onBeforeGrant: () => Promise<boolean>;
+
+  readonly #callOnceGuard = createCallOnceGuard(
+    'ConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision()',
+  );
 
   constructor({
     dialogInterface,
@@ -77,6 +84,8 @@ export class ConfirmationDialog {
   /**
    * Waits for the user to grant or cancel the confirmation.
    * @returns Object with isApproved boolean.
+   * @throws If called more than once on the same instance.
+   * @throws If {@link initialize} has not been called.
    */
   async displayConfirmationDialogAndAwaitUserDecision(): Promise<{
     isApproved: boolean;
@@ -85,6 +94,8 @@ export class ConfirmationDialog {
     if (!interfaceId) {
       throw new Error('Interface not yet created. Call initialize() first.');
     }
+
+    this.#callOnceGuard();
 
     const isApproved = new Promise<boolean>((resolve, reject) => {
       this.#decisionResolve = resolve;

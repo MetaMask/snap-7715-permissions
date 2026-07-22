@@ -1,4 +1,5 @@
-import { createPermissionCaveats } from './caveats';
+import { createNativeTokenStreamCaveats as createPermissionCaveats } from '@metamask/7715-permission-types';
+
 import { renderBody } from './content';
 import {
   applyContext,

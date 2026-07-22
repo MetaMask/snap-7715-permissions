@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0]
+
+### Added
+
+- Chain configuration for Robinhood chain and Robinhood chain testnet ([#382](https://github.com/MetaMask/snap-7715-permissions/pull/382))
+- Sentinel redeemers constraint for permissions granted on Uniswap domain ([#366](https://github.com/MetaMask/snap-7715-permissions/pull/366), [#372](https://github.com/MetaMask/snap-7715-permissions/pull/372))
+
+### Changed
+
+- Render known facilitator redeemers by name ([#354](https://github.com/MetaMask/snap-7715-permissions/pull/354))
+- Bump @metamask/snaps-jest from `10.1.3` to `10.1.4` ([#352](https://github.com/MetaMask/snap-7715-permissions/pull/352))
+- Bump @metamask/profile-sync-controller from `28.1.0` to `28.2.0` ([#347](https://github.com/MetaMask/snap-7715-permissions/pull/347), [#365](https://github.com/MetaMask/snap-7715-permissions/pull/365))
+- Bump @metamask/auto-changelog from `6.1.0` to `6.1.1` ([#341](https://github.com/MetaMask/snap-7715-permissions/pull/341))
+- Bump @metamask/snaps-sdk from `11.1.0` to `11.1.1` ([#331](https://github.com/MetaMask/snap-7715-permissions/pull/331))
+
 ## [2.3.0]
 
 ### Added
@@ -388,7 +403,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure create-release-branch cli tool passes ([#54](https://github.com/MetaMask/snap-7715-permissions/pull/54))
 - Add changelog scripts ([#55](https://github.com/MetaMask/snap-7715-permissions/pull/55))
 
-[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.3.0...HEAD
+[Unreleased]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.4.0...HEAD
+[2.4.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.3.0...@metamask/gator-permissions-snap@2.4.0
 [2.3.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.2.0...@metamask/gator-permissions-snap@2.3.0
 [2.2.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.1.0...@metamask/gator-permissions-snap@2.2.0
 [2.1.0]: https://github.com/MetaMask/snap-7715-permissions/compare/@metamask/gator-permissions-snap@2.0.0...@metamask/gator-permissions-snap@2.1.0
