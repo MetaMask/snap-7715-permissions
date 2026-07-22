@@ -223,7 +223,7 @@ export class UserEventDispatcher {
    * for other event types, while maintaining proper ordering and sequential execution.
    *
    * @returns A function that handles user input events.
-   * @throws If the handler has already been created.
+   * @throws If called more than once on the same instance.
    */
   public createUserInputEventHandler(): (args: {
     event: UserInputEvent;
