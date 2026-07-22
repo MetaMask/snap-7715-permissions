@@ -865,6 +865,87 @@ describe('ConfirmationSession', () => {
     await sessionPromise;
   });
 
+  describe('trust signals', () => {
+    const mockEarlyDappScanResult: ScanDappUrlResult = {
+      isComplete: true,
+      recommendedAction: RecommendedAction.WARN,
+    };
+
+    it('renders settled scan results on the initial confirmation update when scans complete before onUpdate registration', async () => {
+      mockTrustSignalsClient.scanDappUrl.mockResolvedValue(
+        mockEarlyDappScanResult,
+      );
+      mockTrustSignalsClient.fetchAddressScan.mockResolvedValue(
+        mockScanAddressResult,
+      );
+
+      await runSession();
+
+      expect(
+        lifecycleHandlerMocks.createConfirmationContent,
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        lifecycleHandlerMocks.createConfirmationContent,
+      ).toHaveBeenCalledWith({
+        context: mockContext,
+        metadata: mockMetadata,
+        origin: 'test-origin',
+        chainId: 1,
+        scanDappUrlResult: mockEarlyDappScanResult,
+        scanAddressResult: mockScanAddressResult,
+        existingPermissionsStatus: ExistingPermissionsState.None,
+        isGrantDisabled: false,
+      });
+    });
+
+    it('renders scan results via onUpdate when scans complete after onUpdate registration', async () => {
+      mockTrustSignalsClient.scanDappUrl.mockImplementation(
+        async () =>
+          new Promise<ScanDappUrlResult>((resolve) =>
+            setTimeout(() => resolve({ isComplete: false }), 50),
+          ),
+      );
+      mockTrustSignalsClient.fetchAddressScan.mockImplementation(
+        async () =>
+          new Promise<FetchAddressScanResult>((resolve) =>
+            setTimeout(() => resolve(mockScanAddressResult), 50),
+          ),
+      );
+
+      const sessionPromise = runSession();
+      await new Promise<void>((resolve) => setTimeout(resolve, 100));
+      await sessionPromise;
+
+      expect(
+        lifecycleHandlerMocks.createConfirmationContent,
+      ).toHaveBeenCalledTimes(3);
+      expect(
+        lifecycleHandlerMocks.createConfirmationContent,
+      ).toHaveBeenNthCalledWith(1, {
+        context: mockContext,
+        metadata: mockMetadata,
+        origin: 'test-origin',
+        chainId: 1,
+        scanDappUrlResult: null,
+        scanAddressResult: null,
+        existingPermissionsStatus: ExistingPermissionsState.None,
+        isGrantDisabled: false,
+      });
+      expect(
+        lifecycleHandlerMocks.createConfirmationContent,
+      ).toHaveBeenNthCalledWith(3, {
+        context: mockContext,
+        metadata: mockMetadata,
+        origin: 'test-origin',
+        chainId: 1,
+        scanDappUrlResult: { isComplete: false },
+        scanAddressResult: mockScanAddressResult,
+        existingPermissionsStatus: ExistingPermissionsState.None,
+        isGrantDisabled: false,
+      });
+    });
+  });
+
   describe('nominal path', () => {
     beforeEach(async () => {
       mockTrustSignalsClient.scanDappUrl.mockImplementation(
