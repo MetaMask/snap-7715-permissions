@@ -1,7 +1,7 @@
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Divider, Section } from '@metamask/snaps-sdk/jsx';
 
-import { allowanceAmountRule, startTimeRule, expiryRule } from './rules';
+import { allowanceAmountRule, expiryRule } from './rules';
 import type {
   NativeTokenAllowanceContext,
   NativeTokenAllowanceMetadata,
@@ -32,7 +32,7 @@ export async function renderBody({
         })}
         <Divider />
         {renderRules({
-          rules: [startTimeRule, expiryRule],
+          rules: [expiryRule],
           context,
           metadata,
         })}

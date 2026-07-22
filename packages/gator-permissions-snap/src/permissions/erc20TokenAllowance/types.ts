@@ -2,7 +2,6 @@ import {
   zHexStr,
   zPermission,
   zMetaMaskPermissionData,
-  zStartTime,
   zAddressNotZeroAddress,
 } from '@metamask/7715-permissions-shared/types';
 import { z } from 'zod';
@@ -17,7 +16,6 @@ import type {
 export type Erc20TokenAllowanceMetadata = BaseMetadata & {
   validationErrors: {
     allowanceAmountError?: string;
-    startTimeError?: string;
     expiryError?: string;
   };
 };
@@ -25,7 +23,6 @@ export type Erc20TokenAllowanceMetadata = BaseMetadata & {
 export type Erc20TokenAllowanceContext = BaseContext & {
   permissionDetails: {
     allowanceAmount: string;
-    startTime: number;
   };
 };
 
@@ -35,7 +32,6 @@ export const zErc20TokenAllowancePermission = zPermission.extend({
     zMetaMaskPermissionData,
     z.object({
       allowanceAmount: zHexStr,
-      startTime: zStartTime,
       tokenAddress: zAddressNotZeroAddress,
     }),
   ),

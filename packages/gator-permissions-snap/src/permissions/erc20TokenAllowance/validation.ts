@@ -6,7 +6,6 @@ import {
   validateHexInteger,
   validatePayeeRule,
   validateRedeemerRule,
-  validateStartTime,
 } from '../validation';
 import type {
   Erc20TokenAllowancePermission,
@@ -25,7 +24,7 @@ function validatePermissionData(
   permission: Erc20TokenAllowancePermission,
   rules: Erc20TokenAllowancePermissionRequest['rules'],
 ): true {
-  const { allowanceAmount, startTime } = permission.data;
+  const { allowanceAmount } = permission.data;
 
   validateHexInteger({
     name: 'allowanceAmount',
@@ -34,7 +33,6 @@ function validatePermissionData(
     allowZero: false,
   });
 
-  validateStartTime(startTime, rules);
   validateRedeemerRule(rules);
   validatePayeeRule(rules, { allowMultiplePayees: false });
 

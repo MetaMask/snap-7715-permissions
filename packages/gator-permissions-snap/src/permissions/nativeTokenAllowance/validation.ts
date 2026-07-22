@@ -6,7 +6,6 @@ import {
   validateHexInteger,
   validatePayeeRule,
   validateRedeemerRule,
-  validateStartTime,
 } from '../validation';
 import type {
   NativeTokenAllowancePermission,
@@ -25,7 +24,7 @@ function validatePermissionData(
   permission: NativeTokenAllowancePermission,
   rules: NativeTokenAllowancePermissionRequest['rules'],
 ): true {
-  const { allowanceAmount, startTime } = permission.data;
+  const { allowanceAmount } = permission.data;
 
   validateHexInteger({
     name: 'allowanceAmount',
@@ -34,7 +33,6 @@ function validatePermissionData(
     allowZero: false,
   });
 
-  validateStartTime(startTime, rules);
   validateRedeemerRule(rules);
   validatePayeeRule(rules);
 
