@@ -404,34 +404,57 @@ export class ConfirmationSession {
       update: ConfirmationSessionUpdateRequest<TContext> = {},
     ): Promise<void> => {
       const runUpdate = async (): Promise<void> => {
+        let stepFailed = false;
+        let stepError: unknown;
+
         renderChain = renderChain.then(async (currentState) => {
-          const resolvedUpdate = this.#resolveStateUpdate(currentState, update);
-          const updatedState = this.#applyStateUpdate(
-            currentState,
-            resolvedUpdate,
-          );
-          state = updatedState;
+          try {
+            const resolvedUpdate = this.#resolveStateUpdate(
+              currentState,
+              update,
+            );
+            const updatedState = this.#applyStateUpdate(
+              currentState,
+              resolvedUpdate,
+            );
+            state = updatedState;
 
-          const view = await this.#renderConfirmation({
-            state: updatedState,
-            lifecycleHandlers,
-            existingPermissionsCoordinator,
-            trustSignalsCoordinator,
-            dialogInterface,
-            confirmationDialog,
-            origin,
-            chainId,
-            hasValidationErrors,
-          });
+            const view = await this.#renderConfirmation({
+              state: updatedState,
+              lifecycleHandlers,
+              existingPermissionsCoordinator,
+              trustSignalsCoordinator,
+              dialogInterface,
+              confirmationDialog,
+              origin,
+              chainId,
+              hasValidationErrors,
+            });
 
-          state = this.#applyStateUpdate(updatedState, { view });
-          return state;
+            state = this.#applyStateUpdate(updatedState, { view });
+            return state;
+          } catch (error) {
+            state = currentState;
+            stepFailed = true;
+            stepError = error;
+            logger.debug('ConfirmationSession: render update failed', {
+              origin,
+              error: error instanceof Error ? error.message : error,
+            });
+            return currentState;
+          }
         });
 
         await renderChain;
+
+        if (stepFailed) {
+          throw stepError;
+        }
       };
 
-      lastRenderPromise = lastRenderPromise.finally(runUpdate);
+      lastRenderPromise = lastRenderPromise
+        .catch(() => undefined)
+        .then(runUpdate);
 
       await lastRenderPromise;
     };
@@ -441,12 +464,7 @@ export class ConfirmationSession {
     trustSignalsCoordinator.onUpdate(() => {
       updateConfirmation({
         isGrantDisabled: false,
-      }).catch((error: unknown) => {
-        logger.debug('ConfirmationSession: trust signal UI update failed', {
-          origin,
-          error: error instanceof Error ? error.message : error,
-        });
-      });
+      }).catch(() => undefined);
     });
 
     try {
