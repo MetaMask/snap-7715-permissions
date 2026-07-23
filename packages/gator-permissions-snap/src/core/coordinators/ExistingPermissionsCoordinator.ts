@@ -7,7 +7,6 @@ import { createCallOnceGuard } from '../callOnceGuard';
 import type { DialogInterface } from '../dialogInterface';
 import type { ExistingPermissionsService } from '../existingpermissions';
 import { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
-import type { BaseContext } from '../types';
 
 /**
  * Prefetches existing-permissions snapshot data and manages the existing-permissions subview.
@@ -83,40 +82,33 @@ export class ExistingPermissionsCoordinator {
   }
 
   /**
-   * Shows the existing-permissions subview when requested by context.
+   * Shows the existing-permissions subview when the session enters it for the first time.
    *
    * @param args - Subview display parameters.
    * @param args.dialogInterface - Shared dialog interface for the request.
-   * @param args.context - Current confirmation context.
    * @param args.enteringSubview - Whether the subview is being entered for the first time.
-   * @returns `handled: true` when the caller should skip the normal confirmation content update.
    * @throws If {@link prefetch} has not been called.
    */
-  async maybeShowSubview(args: {
+  async showSubview(args: {
     dialogInterface: DialogInterface;
-    context: BaseContext;
     enteringSubview: boolean;
-  }): Promise<{ handled: boolean }> {
+  }): Promise<void> {
     if (!this.#snapshotPromise) {
       throw new InternalError(
-        'ExistingPermissionsCoordinator.maybeShowSubview() called before prefetch()',
+        'ExistingPermissionsCoordinator.showSubview() called before prefetch()',
       );
     }
 
-    const { dialogInterface, context, enteringSubview } = args;
+    const { dialogInterface, enteringSubview } = args;
 
-    if (context.showExistingPermissions) {
-      if (enteringSubview) {
-        const snapshot = await this.#snapshotPromise;
-        await this.#existingPermissionsService.showExistingPermissions(
-          dialogInterface,
-          snapshot,
-        );
-      }
-
-      return { handled: true };
+    if (!enteringSubview) {
+      return;
     }
 
-    return { handled: false };
+    const snapshot = await this.#snapshotPromise;
+    await this.#existingPermissionsService.showExistingPermissions(
+      dialogInterface,
+      snapshot,
+    );
   }
 }

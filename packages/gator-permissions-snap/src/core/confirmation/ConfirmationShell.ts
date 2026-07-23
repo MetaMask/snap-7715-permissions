@@ -66,6 +66,7 @@ export type ConfirmationShellBindSessionArgs<
   initialContext: TContext;
   rules: RuleDefinition<TContext, TMetadata>[];
   updateContext: (args: { updatedContext: TContext }) => Promise<void>;
+  onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
 };
 
 export type ConfirmationShellParams<
@@ -236,7 +237,13 @@ export class ConfirmationShell<
   ): () => void {
     this.#callOnceGuard();
 
-    const { interfaceId, initialContext, rules, updateContext } = args;
+    const {
+      interfaceId,
+      initialContext,
+      rules,
+      updateContext,
+      onExistingPermissionsViewChange,
+    } = args;
 
     let currentContext = initialContext;
     const rerender = async (): Promise<void> => {
@@ -382,11 +389,7 @@ export class ConfirmationShell<
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          currentContext = {
-            ...currentContext,
-            showExistingPermissions: true,
-          };
-          await rerender();
+          await onExistingPermissionsViewChange(true);
         },
       });
 
@@ -396,11 +399,7 @@ export class ConfirmationShell<
         eventType: UserInputEventType.ButtonClickEvent,
         interfaceId,
         handler: async () => {
-          currentContext = {
-            ...currentContext,
-            showExistingPermissions: false,
-          };
-          await rerender();
+          await onExistingPermissionsViewChange(false);
         },
       });
 

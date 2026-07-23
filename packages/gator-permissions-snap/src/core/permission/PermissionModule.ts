@@ -116,6 +116,8 @@ export function buildRequestLifecycleHandlers<
         initialContext: sessionArgs.initialContext,
         rules: module.rules,
         updateContext: sessionArgs.updateContext,
+        onExistingPermissionsViewChange:
+          sessionArgs.onExistingPermissionsViewChange,
       });
     },
     onConfirmationResolved: (): void => {

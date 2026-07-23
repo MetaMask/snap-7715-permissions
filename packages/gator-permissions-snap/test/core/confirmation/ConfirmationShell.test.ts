@@ -175,10 +175,15 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
   const updateContext =
     jest.fn<(args: { updatedContext: TestContextType }) => Promise<void>>();
 
+  const onExistingPermissionsViewChange = jest.fn(async () =>
+    Promise.resolve(),
+  );
+
   return {
     confirmationShell,
     renderBody,
     updateContext,
+    onExistingPermissionsViewChange,
     rules,
     getBoundEvent,
     getUnboundEvent,
@@ -324,13 +329,19 @@ describe('ConfirmationShell', () => {
         }),
         updateContext: (context) => context,
       };
-      const { confirmationShell, rules, getBoundEvent, updateContext } =
-        setupTest({ rules: [rule] });
+      const {
+        confirmationShell,
+        rules,
+        getBoundEvent,
+        updateContext,
+        onExistingPermissionsViewChange,
+      } = setupTest({ rules: [rule] });
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       const accountSelectorBoundEvent = getBoundEvent({
@@ -350,13 +361,19 @@ describe('ConfirmationShell', () => {
     });
 
     it('throws if bindSessionEvents is called more than once', () => {
-      const { confirmationShell, rules, updateContext } = setupTest();
+      const {
+        confirmationShell,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+      } = setupTest();
 
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       expect(() =>
@@ -365,6 +382,7 @@ describe('ConfirmationShell', () => {
           initialContext: mockContext,
           rules,
           updateContext,
+          onExistingPermissionsViewChange,
         }),
       ).toThrow(InternalError);
       expect(() =>
@@ -373,18 +391,25 @@ describe('ConfirmationShell', () => {
           initialContext: mockContext,
           rules,
           updateContext,
+          onExistingPermissionsViewChange,
         }),
       ).toThrow('ConfirmationShell.bindSessionEvents() called more than once');
     });
 
     it('loads the balance for the selected account', async () => {
-      const { confirmationShell, rules, tokenMetadataService, updateContext } =
-        setupTest();
+      const {
+        confirmationShell,
+        rules,
+        tokenMetadataService,
+        updateContext,
+        onExistingPermissionsViewChange,
+      } = setupTest();
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       expect(
@@ -397,13 +422,19 @@ describe('ConfirmationShell', () => {
     });
 
     it('updates the context when the account is changed', async () => {
-      const { confirmationShell, rules, getBoundEvent, updateContext } =
-        setupTest();
+      const {
+        confirmationShell,
+        rules,
+        getBoundEvent,
+        updateContext,
+        onExistingPermissionsViewChange,
+      } = setupTest();
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       const accountSelectorChangeHandler = getBoundEvent({
@@ -442,12 +473,14 @@ describe('ConfirmationShell', () => {
         getBoundEvent,
         tokenMetadataService,
         updateContext,
+        onExistingPermissionsViewChange,
       } = setupTest();
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       const accountSelectorChangeHandler = getBoundEvent({
@@ -483,12 +516,18 @@ describe('ConfirmationShell', () => {
     });
 
     it('renders the balance in the confirmation content', async () => {
-      const { confirmationShell, rules, updateContext } = setupTest();
+      const {
+        confirmationShell,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+      } = setupTest();
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       const confirmationContent =
@@ -1100,12 +1139,14 @@ describe('ConfirmationShell', () => {
         getBoundEvent,
         tokenPricesService,
         updateContext,
+        onExistingPermissionsViewChange,
       } = setupTest();
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       const accountSelectorChangeHandler = getBoundEvent({
@@ -1746,6 +1787,7 @@ describe('ConfirmationShell', () => {
         tokenMetadataService,
         tokenPricesService,
         updateContext,
+        onExistingPermissionsViewChange,
       } = setupTest();
 
       let resolveTokenBalancePromise: () => void = (): void => {
@@ -1776,6 +1818,7 @@ describe('ConfirmationShell', () => {
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       const accountSelectorChangeHandler = getBoundEvent({
@@ -3651,6 +3694,7 @@ describe('ConfirmationShell', () => {
         getBoundEvent,
         tokenMetadataService,
         updateContext,
+        onExistingPermissionsViewChange,
       } = setupTest();
 
       let resolveTokenBalancePromise: () => void = (): void => {
@@ -3671,6 +3715,7 @@ describe('ConfirmationShell', () => {
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       const accountSelectorChangeHandler = getBoundEvent({
@@ -3713,12 +3758,14 @@ describe('ConfirmationShell', () => {
         getUnboundEvent,
         getBoundEvent,
         updateContext,
+        onExistingPermissionsViewChange,
       } = setupTest();
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       const accountSelectorBoundEvent = getBoundEvent({
@@ -3765,13 +3812,19 @@ describe('ConfirmationShell', () => {
         }),
         updateContext: (context) => context,
       };
-      const { confirmationShell, rules, getBoundEvent, updateContext } =
-        setupTest({ rules: [rule] });
+      const {
+        confirmationShell,
+        rules,
+        getBoundEvent,
+        updateContext,
+        onExistingPermissionsViewChange,
+      } = setupTest({ rules: [rule] });
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
         initialContext: mockContext,
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       // Try to get a rule input handler - it should still be bound
@@ -3794,8 +3847,13 @@ describe('ConfirmationShell', () => {
     });
 
     it('skips balance fetch when context has no asset address', () => {
-      const { confirmationShell, updateContext, tokenMetadataService, rules } =
-        setupTest();
+      const {
+        confirmationShell,
+        updateContext,
+        tokenMetadataService,
+        rules,
+        onExistingPermissionsViewChange,
+      } = setupTest();
 
       confirmationShell.bindSessionEvents({
         interfaceId: mockInterfaceId,
@@ -3805,6 +3863,7 @@ describe('ConfirmationShell', () => {
         },
         rules,
         updateContext,
+        onExistingPermissionsViewChange,
       });
 
       expect(

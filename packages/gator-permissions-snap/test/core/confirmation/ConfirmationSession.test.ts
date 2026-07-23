@@ -430,26 +430,10 @@ describe('ConfirmationSession', () => {
     await sessionPromise;
   });
 
-  it('shows the existing permissions subview when updateContext sets showExistingPermissions', async () => {
-    const subviewContext: BaseContext = {
-      ...mockContext,
-      showExistingPermissions: true,
-      justification: '',
-      expiry: { timestamp: 1733088000 },
-      accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
-      tokenMetadata: {
-        decimals: 18,
-        symbol: 'TEST',
-        iconDataBase64: null,
-      },
-    };
-
+  it('shows the existing permissions subview when onExistingPermissionsViewChange is called', async () => {
     let capturedParams:
       | {
-          updateContext: (args: {
-            updatedContext: BaseContext;
-          }) => Promise<void>;
+          onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
         }
       | undefined;
 
@@ -480,7 +464,7 @@ describe('ConfirmationSession', () => {
     const createContentCallsBefore =
       lifecycleHandlerMocks.createConfirmationContent.mock.calls.length;
 
-    await capturedParams?.updateContext({ updatedContext: subviewContext });
+    await capturedParams?.onExistingPermissionsViewChange(true);
 
     expect(
       mockExistingPermissionsService.showExistingPermissions,
@@ -508,25 +492,9 @@ describe('ConfirmationSession', () => {
       async () => new Promise<FetchAddressScanResult>(() => {}),
     );
 
-    const subviewContext: BaseContext = {
-      ...mockContext,
-      showExistingPermissions: true,
-      justification: '',
-      expiry: { timestamp: 1733088000 },
-      accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
-      tokenMetadata: {
-        decimals: 18,
-        symbol: 'TEST',
-        iconDataBase64: null,
-      },
-    };
-
     let capturedParams:
       | {
-          updateContext: (args: {
-            updatedContext: BaseContext;
-          }) => Promise<void>;
+          onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
         }
       | undefined;
 
@@ -552,7 +520,7 @@ describe('ConfirmationSession', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await capturedParams?.updateContext({ updatedContext: subviewContext });
+    await capturedParams?.onExistingPermissionsViewChange(true);
 
     const createContentCallsAfterSubview =
       lifecycleHandlerMocks.createConfirmationContent.mock.calls.length;

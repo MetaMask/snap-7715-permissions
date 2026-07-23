@@ -49,11 +49,6 @@ export type BaseContext = {
     iconDataBase64: string | null;
   };
   /**
-   * When true, the confirmation UI shows stored permissions for this site instead of the grant form.
-   * Omitted or falsey means the normal confirmation content. Set by the permission handler when the user opens the existing-permissions view.
-   */
-  showExistingPermissions?: boolean | null;
-  /**
    * Allowed redeemer addresses from the dapp-provided redeemer rule (read-only in the UI).
    */
   redeemerAddresses?: string[] | undefined;
