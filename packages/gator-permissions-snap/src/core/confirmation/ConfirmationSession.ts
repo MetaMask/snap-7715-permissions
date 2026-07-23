@@ -245,7 +245,6 @@ export class ConfirmationSession {
     if (state.view === 'enteringExistingPermissions') {
       await existingPermissionsCoordinator.showSubview({
         dialogInterface,
-        enteringSubview: true,
       });
 
       // within this function, the view only changes when transitioning from 'enteringExistingPermissions' to 'existingPermissions'

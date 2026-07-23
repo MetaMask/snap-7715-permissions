@@ -82,28 +82,20 @@ export class ExistingPermissionsCoordinator {
   }
 
   /**
-   * Shows the existing-permissions subview when the session enters it for the first time.
+   * Shows the existing-permissions subview.
    *
    * @param args - Subview display parameters.
    * @param args.dialogInterface - Shared dialog interface for the request.
-   * @param args.enteringSubview - Whether the subview is being entered for the first time.
    * @throws If {@link prefetch} has not been called.
    */
-  async showSubview(args: {
-    dialogInterface: DialogInterface;
-    enteringSubview: boolean;
-  }): Promise<void> {
+  async showSubview(args: { dialogInterface: DialogInterface }): Promise<void> {
     if (!this.#snapshotPromise) {
       throw new InternalError(
         'ExistingPermissionsCoordinator.showSubview() called before prefetch()',
       );
     }
 
-    const { dialogInterface, enteringSubview } = args;
-
-    if (!enteringSubview) {
-      return;
-    }
+    const { dialogInterface } = args;
 
     const snapshot = await this.#snapshotPromise;
     await this.#existingPermissionsService.showExistingPermissions(

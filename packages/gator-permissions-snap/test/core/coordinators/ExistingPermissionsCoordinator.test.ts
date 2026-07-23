@@ -120,33 +120,20 @@ describe('ExistingPermissionsCoordinator', () => {
       await expect(
         freshCoordinator.showSubview({
           dialogInterface,
-          enteringSubview: true,
         }),
       ).rejects.toThrow(
         'ExistingPermissionsCoordinator.showSubview() called before prefetch()',
       );
     });
 
-    it('shows the subview when entering for the first time', async () => {
+    it('shows the subview', async () => {
       await coordinator.showSubview({
         dialogInterface,
-        enteringSubview: true,
       });
 
       expect(
         mockExistingPermissionsService.showExistingPermissions,
       ).toHaveBeenCalledWith(dialogInterface, mockSnapshot);
-    });
-
-    it('does not re-show the subview when already entered', async () => {
-      await coordinator.showSubview({
-        dialogInterface,
-        enteringSubview: false,
-      });
-
-      expect(
-        mockExistingPermissionsService.showExistingPermissions,
-      ).not.toHaveBeenCalled();
     });
   });
 });
