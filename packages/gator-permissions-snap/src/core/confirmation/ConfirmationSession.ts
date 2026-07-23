@@ -54,6 +54,15 @@ type ConfirmationSessionStateUpdate<TContext extends BaseContext> = Partial<
 >;
 
 /**
+ * Update request for {@link ConfirmationSession}'s serialized render pipeline.
+ * `showExistingPermissions` is resolved against the chained state, not outer `state`.
+ */
+type ConfirmationSessionUpdateRequest<TContext extends BaseContext> =
+  ConfirmationSessionStateUpdate<TContext> & {
+    showExistingPermissions?: boolean;
+  };
+
+/**
  * Lifecycle callbacks used by {@link ConfirmationSession.#renderConfirmation}.
  */
 type ConfirmationRenderLifecycleHandlers<
@@ -164,6 +173,36 @@ export class ConfirmationSession {
         isGrantDisabled: update.isGrantDisabled,
       }),
       ...(update.view !== undefined && { view: update.view }),
+    };
+  }
+
+  /**
+   * Resolves navigation intent and explicit field updates against chained state.
+   * @param currentState - Latest serialized session state for the request.
+   * @param update - Partial update and optional existing-permissions navigation.
+   * @returns Fields to merge before rendering.
+   */
+  #resolveStateUpdate<TContext extends BaseContext>(
+    currentState: ConfirmationSessionState<TContext>,
+    update: ConfirmationSessionUpdateRequest<TContext>,
+  ): ConfirmationSessionStateUpdate<TContext> {
+    const { showExistingPermissions, ...stateUpdate } = update;
+
+    if (showExistingPermissions === undefined) {
+      return stateUpdate;
+    }
+
+    let view: ConfirmationView = 'main';
+    if (showExistingPermissions) {
+      view =
+        currentState.view === 'main'
+          ? 'enteringExistingPermissions'
+          : 'existingPermissions';
+    }
+
+    return {
+      ...stateUpdate,
+      view,
     };
   }
 
@@ -362,11 +401,16 @@ export class ConfirmationSession {
       Promise.resolve(state);
 
     const updateConfirmation = async (
-      update: ConfirmationSessionStateUpdate<TContext> = {},
+      update: ConfirmationSessionUpdateRequest<TContext> = {},
     ): Promise<void> => {
       const runUpdate = async (): Promise<void> => {
         renderChain = renderChain.then(async (currentState) => {
-          const updatedState = this.#applyStateUpdate(currentState, update);
+          const resolvedUpdate = this.#resolveStateUpdate(currentState, update);
+          const updatedState = this.#applyStateUpdate(
+            currentState,
+            resolvedUpdate,
+          );
+          state = updatedState;
 
           const view = await this.#renderConfirmation({
             state: updatedState,
@@ -380,11 +424,11 @@ export class ConfirmationSession {
             hasValidationErrors,
           });
 
-          // the view may have changed during render, so we need to update the state
-          return this.#applyStateUpdate(updatedState, { view });
+          state = this.#applyStateUpdate(updatedState, { view });
+          return state;
         });
 
-        state = await renderChain;
+        await renderChain;
       };
 
       lastRenderPromise = lastRenderPromise.finally(runUpdate);
@@ -438,15 +482,7 @@ export class ConfirmationSession {
         show: boolean,
       ): Promise<void> => {
         try {
-          let view: ConfirmationView = 'main';
-          if (show) {
-            view =
-              state.view === 'main'
-                ? 'enteringExistingPermissions'
-                : 'existingPermissions';
-          }
-
-          await updateConfirmation({ view });
+          await updateConfirmation({ showExistingPermissions: show });
         } catch (error) {
           await confirmationDialog.closeWithError(error as Error);
           throw error;

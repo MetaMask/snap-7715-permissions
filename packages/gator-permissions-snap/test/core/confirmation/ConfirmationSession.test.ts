@@ -477,6 +477,70 @@ describe('ConfirmationSession', () => {
     await sessionPromise;
   });
 
+  it('does not call showExistingPermissions twice when existing permissions is opened twice before the first subview render completes', async () => {
+    let resolveShowExistingPermissions: () => void = () => {
+      throw new Error('resolveShowExistingPermissions not set');
+    };
+
+    mockExistingPermissionsService.showExistingPermissions.mockImplementation(
+      async () =>
+        new Promise<void>((resolve) => {
+          resolveShowExistingPermissions = resolve;
+        }),
+    );
+
+    let capturedParams:
+      | {
+          onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
+        }
+      | undefined;
+
+    lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+      (params) => {
+        capturedParams = params;
+      },
+    );
+
+    let resolveUserDecision: (decision: boolean) => void = (_) => {
+      throw new Error('resolveUserDecision not set');
+    };
+    mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
+      async () => {
+        const isApproved = await new Promise<boolean>((resolve) => {
+          resolveUserDecision = resolve;
+        });
+        return { isApproved };
+      },
+    );
+
+    const sessionPromise = runSession();
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(capturedParams).toBeDefined();
+
+    const firstOpen = capturedParams?.onExistingPermissionsViewChange(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(
+      mockExistingPermissionsService.showExistingPermissions,
+    ).toHaveBeenCalledTimes(1);
+
+    const secondOpen = capturedParams?.onExistingPermissionsViewChange(true);
+
+    resolveShowExistingPermissions();
+    await firstOpen;
+    await secondOpen;
+
+    expect(
+      mockExistingPermissionsService.showExistingPermissions,
+    ).toHaveBeenCalledTimes(1);
+
+    resolveUserDecision(true);
+    await sessionPromise;
+  });
+
   it('does not re-render confirmation content when trust signals resolve while the existing permissions subview is open', async () => {
     let resolveDappScan: (result: ScanDappUrlResult) => void = (_) => {
       throw new Error('resolveDappScan not set');
