@@ -55,7 +55,8 @@ type ConfirmationSessionStateUpdate<TContext extends BaseContext> = Partial<
 
 /**
  * Update request for {@link ConfirmationSession}'s serialized render pipeline.
- * `showExistingPermissions` is resolved against the chained state, not outer `state`.
+ * `showExistingPermissions` is resolved against the latest session state when the
+ * update runs, not when the caller enqueues it.
  */
 type ConfirmationSessionUpdateRequest<TContext extends BaseContext> =
   ConfirmationSessionStateUpdate<TContext> & {
@@ -177,8 +178,8 @@ export class ConfirmationSession {
   }
 
   /**
-   * Resolves navigation intent and explicit field updates against chained state.
-   * @param currentState - Latest serialized session state for the request.
+   * Resolves navigation intent and explicit field updates against session state.
+   * @param currentState - Session state at the start of this serialized update.
    * @param update - Partial update and optional existing-permissions navigation.
    * @returns Fields to merge before rendering.
    */
@@ -396,61 +397,57 @@ export class ConfirmationSession {
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
     let lastRenderPromise: Promise<void> = Promise.resolve();
-    let renderChain: Promise<ConfirmationSessionState<TContext>> =
-      Promise.resolve(state);
 
     const updateConfirmation = async (
       update: ConfirmationSessionUpdateRequest<TContext> = {},
     ): Promise<void> => {
       const runUpdate = async (): Promise<void> => {
-        let stepFailed = false;
-        let stepError: unknown;
+        const previousState = state;
+        let nextState = previousState;
+        try {
+          const resolvedUpdate = this.#resolveStateUpdate(
+            previousState,
+            update,
+          );
+          const updatedState = this.#applyStateUpdate(
+            previousState,
+            resolvedUpdate,
+          );
 
-        renderChain = renderChain.then(async (currentState) => {
-          try {
-            const resolvedUpdate = this.#resolveStateUpdate(
-              currentState,
-              update,
-            );
-            const updatedState = this.#applyStateUpdate(
-              currentState,
-              resolvedUpdate,
-            );
-            state = updatedState;
+          const view = await this.#renderConfirmation({
+            state: updatedState,
+            lifecycleHandlers,
+            existingPermissionsCoordinator,
+            trustSignalsCoordinator,
+            dialogInterface,
+            confirmationDialog,
+            origin,
+            chainId,
+            hasValidationErrors,
+          });
 
-            const view = await this.#renderConfirmation({
-              state: updatedState,
-              lifecycleHandlers,
-              existingPermissionsCoordinator,
-              trustSignalsCoordinator,
-              dialogInterface,
-              confirmationDialog,
-              origin,
-              chainId,
-              hasValidationErrors,
-            });
-
-            state = this.#applyStateUpdate(updatedState, { view });
-            return state;
-          } catch (error) {
-            state = currentState;
-            stepFailed = true;
-            stepError = error;
-            logger.debug('ConfirmationSession: render update failed', {
-              origin,
-              error: error instanceof Error ? error.message : error,
-            });
-            return currentState;
-          }
-        });
-
-        await renderChain;
-
-        if (stepFailed) {
-          throw stepError;
+          nextState = this.#applyStateUpdate(updatedState, { view });
+        } catch (error) {
+          nextState = previousState;
+          logger.debug('ConfirmationSession: render update failed', {
+            origin,
+            error: error instanceof Error ? error.message : error,
+          });
+          throw error;
+        } finally {
+          // Updates are serialized via lastRenderPromise; previousState is the authoritative pre-await snapshot.
+          // eslint-disable-next-line require-atomic-updates -- see lastRenderPromise comment below
+          state = nextState;
         }
       };
 
+      // Serialize confirmation renders so concurrent updates (trust signals, context
+      // edits, subview navigation) never interleave. Each runUpdate snapshots `state`
+      // as previousState at entry; that is only safe because lastRenderPromise
+      // guarantees the prior update finished and assigned `state`. On failure, roll
+      // back to previousState so UI and session state stay aligned, then rethrow.
+      // The leading .catch() keeps the queue alive after a rejected step so later
+      // updates still run (trust-signal callers swallow errors locally).
       lastRenderPromise = lastRenderPromise
         .catch(() => undefined)
         .then(runUpdate);
@@ -458,12 +455,8 @@ export class ConfirmationSession {
       await lastRenderPromise;
     };
 
-    // no need to execute the update handler if the results have already settled, as we immediately
-    // call updateConfirmation below.
     trustSignalsCoordinator.onUpdate(() => {
-      updateConfirmation({
-        isGrantDisabled: false,
-      }).catch(() => undefined);
+      updateConfirmation().catch(() => undefined);
     });
 
     try {
