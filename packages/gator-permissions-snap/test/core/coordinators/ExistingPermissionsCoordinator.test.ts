@@ -7,7 +7,6 @@ import {
   ExistingPermissionsService,
   ExistingPermissionsState,
 } from '../../../src/core/existingpermissions/existingPermissionsService';
-import type { BaseContext } from '../../../src/core/types';
 import type { StoredGrantedPermission } from '../../../src/profileSync/profileSync';
 
 const mockPermission: Permission = {
@@ -17,19 +16,6 @@ const mockPermission: Permission = {
 };
 
 const mockSnapshot: StoredGrantedPermission[] = [];
-
-const mockContext: BaseContext = {
-  tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
-  expiry: { timestamp: 1717987200 },
-  isAdjustmentAllowed: true,
-  accountAddressCaip10: 'eip155:1:0x1234',
-  justification: 'Justification',
-  tokenMetadata: {
-    decimals: 18,
-    symbol: 'TKN',
-    iconDataBase64: null,
-  },
-};
 
 describe('ExistingPermissionsCoordinator', () => {
   let mockExistingPermissionsService: jest.Mocked<
@@ -118,7 +104,7 @@ describe('ExistingPermissionsCoordinator', () => {
     });
   });
 
-  describe('maybeShowSubview()', () => {
+  describe('showSubview()', () => {
     const dialogInterface = {} as DialogInterface;
 
     beforeEach(() => {
@@ -132,66 +118,22 @@ describe('ExistingPermissionsCoordinator', () => {
       });
 
       await expect(
-        freshCoordinator.maybeShowSubview({
+        freshCoordinator.showSubview({
           dialogInterface,
-          context: { ...mockContext, showExistingPermissions: true },
-          enteringSubview: true,
         }),
       ).rejects.toThrow(
-        'ExistingPermissionsCoordinator.maybeShowSubview() called before prefetch()',
+        'ExistingPermissionsCoordinator.showSubview() called before prefetch()',
       );
     });
 
-    it('shows the subview when entering for the first time', async () => {
-      const result = await coordinator.maybeShowSubview({
+    it('shows the subview', async () => {
+      await coordinator.showSubview({
         dialogInterface,
-        context: { ...mockContext, showExistingPermissions: true },
-        enteringSubview: true,
       });
 
-      expect(result).toStrictEqual({ handled: true });
       expect(
         mockExistingPermissionsService.showExistingPermissions,
       ).toHaveBeenCalledWith(dialogInterface, mockSnapshot);
-    });
-
-    it('does not re-show the subview when already entered', async () => {
-      const result = await coordinator.maybeShowSubview({
-        dialogInterface,
-        context: { ...mockContext, showExistingPermissions: true },
-        enteringSubview: false,
-      });
-
-      expect(result).toStrictEqual({ handled: true });
-      expect(
-        mockExistingPermissionsService.showExistingPermissions,
-      ).not.toHaveBeenCalled();
-    });
-
-    it('returns handled false when the subview is not requested', async () => {
-      const result = await coordinator.maybeShowSubview({
-        dialogInterface,
-        context: { ...mockContext, showExistingPermissions: false },
-        enteringSubview: false,
-      });
-
-      expect(result).toStrictEqual({ handled: false });
-      expect(
-        mockExistingPermissionsService.showExistingPermissions,
-      ).not.toHaveBeenCalled();
-    });
-
-    it('returns handled false when showExistingPermissions is null', async () => {
-      const result = await coordinator.maybeShowSubview({
-        dialogInterface,
-        context: { ...mockContext, showExistingPermissions: null },
-        enteringSubview: false,
-      });
-
-      expect(result).toStrictEqual({ handled: false });
-      expect(
-        mockExistingPermissionsService.showExistingPermissions,
-      ).not.toHaveBeenCalled();
     });
   });
 });

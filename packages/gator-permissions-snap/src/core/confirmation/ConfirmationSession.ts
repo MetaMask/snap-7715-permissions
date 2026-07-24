@@ -3,21 +3,103 @@ import type {
   PermissionRequest,
 } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { numberToHex, parseCaipAccountId } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
-import type { TrustSignalsClient } from '../../clients/trustSignalsClient';
+import type {
+  FetchAddressScanResult,
+  ScanDappUrlResult,
+  TrustSignalsClient,
+} from '../../clients/trustSignalsClient';
 import type { SnapsMetricsService } from '../../services/snapsMetricsService';
 import type { AccountController } from '../accountController';
+import { ConfirmationDialog } from '../confirmation';
 import type { ConfirmationDialogFactory } from '../confirmationFactory';
 import { ExistingPermissionsCoordinator } from '../coordinators/ExistingPermissionsCoordinator';
 import { TrustSignalsCoordinator } from '../coordinators/TrustSignalsCoordinator';
 import type { DialogInterface } from '../dialogInterface';
 import type { DialogInterfaceFactory } from '../dialogInterfaceFactory';
 import type { ExistingPermissionsService } from '../existingpermissions';
+import type { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
 import type { PermissionRequestLifecycleHandlers } from '../permission/PermissionRequestLifecycleHandlers';
 import type { PermissionIntroductionService } from '../permissionIntroduction';
 import type { BaseContext, BaseMetadata, DeepRequired } from '../types';
+
+/**
+ * Which confirmation surface is active for the session.
+ */
+type ConfirmationView =
+  | 'main'
+  | 'enteringExistingPermissions'
+  | 'existingPermissions';
+
+/**
+ * UI and permission state for a single confirmation session.
+ */
+type ConfirmationSessionState<TContext extends BaseContext> = {
+  context: TContext;
+  isGrantDisabled: boolean;
+  view: ConfirmationView;
+};
+
+/**
+ * Partial updates applied before re-rendering the confirmation dialog.
+ */
+type ConfirmationSessionStateUpdate<TContext extends BaseContext> = Partial<
+  Pick<
+    ConfirmationSessionState<TContext>,
+    'context' | 'isGrantDisabled' | 'view'
+  >
+>;
+
+/**
+ * Update request for {@link ConfirmationSession}'s serialized render pipeline.
+ * `showExistingPermissions` is resolved against the latest session state when the
+ * update runs, not when the caller enqueues it.
+ */
+type ConfirmationSessionUpdateRequest<TContext extends BaseContext> =
+  ConfirmationSessionStateUpdate<TContext> & {
+    showExistingPermissions?: boolean;
+  };
+
+/**
+ * Lifecycle callbacks used by {@link ConfirmationSession.#renderConfirmation}.
+ */
+type ConfirmationRenderLifecycleHandlers<
+  TContext extends BaseContext,
+  TMetadata extends BaseMetadata,
+> = {
+  deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
+  createConfirmationContent: (args: {
+    context: TContext;
+    metadata: TMetadata;
+    origin: string;
+    chainId: number;
+    scanDappUrlResult: ScanDappUrlResult | null;
+    scanAddressResult: FetchAddressScanResult | null;
+    existingPermissionsStatus: ExistingPermissionsState;
+    isGrantDisabled: boolean;
+  }) => Promise<SnapElement>;
+};
+
+/**
+ * Per-request dependencies passed into {@link ConfirmationSession.#renderConfirmation}.
+ */
+type ConfirmationRenderContext<
+  TContext extends BaseContext,
+  TMetadata extends BaseMetadata,
+> = {
+  state: ConfirmationSessionState<TContext>;
+  lifecycleHandlers: ConfirmationRenderLifecycleHandlers<TContext, TMetadata>;
+  existingPermissionsCoordinator: ExistingPermissionsCoordinator;
+  trustSignalsCoordinator: TrustSignalsCoordinator;
+  dialogInterface: DialogInterface;
+  confirmationDialog: ConfirmationDialog;
+  origin: string;
+  chainId: number;
+  hasValidationErrors: (metadata: TMetadata) => boolean;
+};
 
 /**
  * Result of running a confirmation session through intro and grant UI.
@@ -73,6 +155,119 @@ export class ConfirmationSession {
     this.#trustSignalsClient = trustSignalsClient;
     this.#accountController = accountController;
     this.#snapsMetricsService = snapsMetricsService;
+  }
+
+  /**
+   * Returns session state with a partial update applied.
+   * @param state - Current session state for the request.
+   * @param update - Fields to merge into the returned state.
+   * @returns Updated session state.
+   */
+  #applyStateUpdate<TContext extends BaseContext>(
+    state: ConfirmationSessionState<TContext>,
+    update: ConfirmationSessionStateUpdate<TContext>,
+  ): ConfirmationSessionState<TContext> {
+    return {
+      ...state,
+      ...(update.context !== undefined && { context: update.context }),
+      ...(update.isGrantDisabled !== undefined && {
+        isGrantDisabled: update.isGrantDisabled,
+      }),
+      ...(update.view !== undefined && { view: update.view }),
+    };
+  }
+
+  /**
+   * Resolves navigation intent and explicit field updates against session state.
+   * @param currentState - Session state at the start of this serialized update.
+   * @param update - Partial update and optional existing-permissions navigation.
+   * @returns Fields to merge before rendering.
+   */
+  #resolveStateUpdate<TContext extends BaseContext>(
+    currentState: ConfirmationSessionState<TContext>,
+    update: ConfirmationSessionUpdateRequest<TContext>,
+  ): ConfirmationSessionStateUpdate<TContext> {
+    const { showExistingPermissions, ...stateUpdate } = update;
+
+    if (showExistingPermissions === undefined) {
+      return stateUpdate;
+    }
+
+    let view: ConfirmationView = 'main';
+    if (showExistingPermissions) {
+      view =
+        currentState.view === 'main'
+          ? 'enteringExistingPermissions'
+          : 'existingPermissions';
+    }
+
+    return {
+      ...stateUpdate,
+      view,
+    };
+  }
+
+  /**
+   * Re-renders the confirmation dialog from the current session state.
+   * @param context - Per-request render dependencies and state.
+   * @returns The view state after rendering.
+   */
+  async #renderConfirmation<
+    TContext extends BaseContext,
+    TMetadata extends BaseMetadata,
+  >(
+    context: ConfirmationRenderContext<TContext, TMetadata>,
+  ): Promise<ConfirmationView> {
+    const {
+      state,
+      lifecycleHandlers,
+      existingPermissionsCoordinator,
+      trustSignalsCoordinator,
+      dialogInterface,
+      confirmationDialog,
+      origin,
+      chainId,
+      hasValidationErrors,
+    } = context;
+
+    const metadata = await lifecycleHandlers.deriveMetadata({
+      context: state.context,
+    });
+
+    const existingPermissionsStatus =
+      await existingPermissionsCoordinator.getStatus();
+
+    const grantDisabled =
+      state.isGrantDisabled || hasValidationErrors(metadata);
+
+    const { scanDappUrlResult, scanAddressResult } =
+      trustSignalsCoordinator.getResults();
+
+    if (state.view === 'enteringExistingPermissions') {
+      await existingPermissionsCoordinator.showSubview({
+        dialogInterface,
+      });
+
+      // within this function, the view only changes when transitioning from 'enteringExistingPermissions' to 'existingPermissions'
+      return 'existingPermissions';
+    }
+
+    if (state.view === 'main') {
+      const ui = await lifecycleHandlers.createConfirmationContent({
+        context: state.context,
+        metadata,
+        origin,
+        chainId,
+        scanDappUrlResult,
+        scanAddressResult,
+        existingPermissionsStatus,
+        isGrantDisabled: grantDisabled,
+      });
+
+      await confirmationDialog.updateContent({ ui });
+    }
+
+    return state.view;
   }
 
   /**
@@ -152,13 +347,13 @@ export class ConfirmationSession {
     // permissions are requested before the confirmation dialog is shown.
     await this.#accountController.getAccountAddresses();
 
-    let context: TContext;
-
     const hasValidationErrors = (metadata: TMetadata): boolean => {
       return Object.values(metadata?.validationErrors ?? {}).some(
         (message) => typeof message === 'string',
       );
     };
+
+    let state: ConfirmationSessionState<TContext>;
 
     // Validation callback that runs when grant button is clicked.
     // Race condition scenario this prevents:
@@ -169,12 +364,15 @@ export class ConfirmationSession {
     //   5. Button handler already invoked (button was enabled at click time)
     //   6. This callback catches it → returns false → dialog stays open
     const onBeforeGrant = async (): Promise<boolean> => {
-      const metadata = await lifecycleHandlers.deriveMetadata({ context });
+      const metadata = await lifecycleHandlers.deriveMetadata({
+        context: state.context,
+      });
       return !hasValidationErrors(metadata);
     };
 
     const skeletonUi =
       await lifecycleHandlers.createSkeletonConfirmationContent();
+
     const confirmationDialog =
       this.#confirmationDialogFactory.createConfirmation({
         dialogInterface,
@@ -185,7 +383,11 @@ export class ConfirmationSession {
     const interfaceId = await confirmationDialog.initialize();
 
     try {
-      context = await lifecycleHandlers.buildContext(normalizedRequest);
+      state = {
+        context: await lifecycleHandlers.buildContext(normalizedRequest),
+        isGrantDisabled: false,
+        view: 'main',
+      };
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
       throw error;
@@ -194,95 +396,78 @@ export class ConfirmationSession {
     const decisionPromise =
       confirmationDialog.displayConfirmationDialogAndAwaitUserDecision();
 
-    let lastUpdateConfirmationPromise: Promise<void> = Promise.resolve();
+    let lastRenderPromise: Promise<void> = Promise.resolve();
 
-    let existingPermissionsSubviewActive = false;
-
-    const updateConfirmation = async ({
-      newContext,
-      isGrantDisabled,
-    }: {
-      newContext?: TContext;
-      isGrantDisabled: boolean;
-    }): Promise<void> => {
+    const updateConfirmation = async (
+      update: ConfirmationSessionUpdateRequest<TContext> = {},
+    ): Promise<void> => {
       const runUpdate = async (): Promise<void> => {
-        if (newContext) {
-          context = newContext;
-        }
+        const previousState = state;
+        let nextState = previousState;
+        try {
+          const resolvedUpdate = this.#resolveStateUpdate(
+            previousState,
+            update,
+          );
+          const updatedState = this.#applyStateUpdate(
+            previousState,
+            resolvedUpdate,
+          );
 
-        const metadata = await lifecycleHandlers.deriveMetadata({ context });
-
-        const existingPermissionsStatus =
-          await existingPermissionsCoordinator.getStatus();
-
-        const grantDisabled = isGrantDisabled || hasValidationErrors(metadata);
-
-        const { scanDappUrlResult, scanAddressResult } =
-          trustSignalsCoordinator.getResults();
-
-        if (context.showExistingPermissions) {
-          const enteringSubview = !existingPermissionsSubviewActive;
-          if (enteringSubview) {
-            // Set synchronously before awaits so eslint require-atomic-updates is satisfied;
-            // runUpdate calls are serialized via lastUpdateConfirmationPromise.
-            existingPermissionsSubviewActive = true;
-          }
-
-          await existingPermissionsCoordinator.maybeShowSubview({
+          const view = await this.#renderConfirmation({
+            state: updatedState,
+            lifecycleHandlers,
+            existingPermissionsCoordinator,
+            trustSignalsCoordinator,
             dialogInterface,
-            context,
-            enteringSubview,
+            confirmationDialog,
+            origin,
+            chainId,
+            hasValidationErrors,
           });
 
-          return;
+          nextState = this.#applyStateUpdate(updatedState, { view });
+        } catch (error) {
+          nextState = previousState;
+          logger.debug('ConfirmationSession: render update failed', {
+            origin,
+            error: error instanceof Error ? error.message : error,
+          });
+          throw error;
+        } finally {
+          // Updates are serialized via lastRenderPromise; previousState is the authoritative pre-await snapshot.
+          // eslint-disable-next-line require-atomic-updates -- see lastRenderPromise comment below
+          state = nextState;
         }
-
-        existingPermissionsSubviewActive = false;
-
-        const ui = await lifecycleHandlers.createConfirmationContent({
-          context,
-          metadata,
-          origin,
-          chainId,
-          scanDappUrlResult,
-          scanAddressResult,
-          existingPermissionsStatus,
-          isGrantDisabled: grantDisabled,
-        });
-
-        await confirmationDialog.updateContent({ ui });
       };
 
-      lastUpdateConfirmationPromise =
-        lastUpdateConfirmationPromise.finally(runUpdate);
+      // Serialize confirmation renders so concurrent updates (trust signals, context
+      // edits, subview navigation) never interleave. Each runUpdate snapshots `state`
+      // as previousState at entry; that is only safe because lastRenderPromise
+      // guarantees the prior update finished and assigned `state`. On failure, roll
+      // back to previousState so UI and session state stay aligned, then rethrow.
+      // The leading .catch() keeps the queue alive after a rejected step so later
+      // updates still run (trust-signal callers swallow errors locally).
+      lastRenderPromise = lastRenderPromise
+        .catch(() => undefined)
+        .then(runUpdate);
 
-      await lastUpdateConfirmationPromise;
+      await lastRenderPromise;
     };
 
-    // no need to execute the update handler if the results have already settled, as we immediately
-    // call updateConfirmation below.
     trustSignalsCoordinator.onUpdate(() => {
-      updateConfirmation({
-        isGrantDisabled: false,
-      }).catch((error: unknown) => {
-        logger.debug('ConfirmationSession: trust signal UI update failed', {
-          origin,
-          error: error instanceof Error ? error.message : error,
-        });
-      });
+      updateConfirmation().catch(() => undefined);
     });
 
     try {
-      await updateConfirmation({
-        isGrantDisabled: false,
-      });
+      await updateConfirmation();
 
       await this.#snapsMetricsService.trackPermissionDialogShown({
         origin,
         permissionType,
         chainId: normalizedRequest.chainId,
         permissionData: normalizedRequest.permission.data,
-        justification: context.justification,
+        justification: state.context.justification,
       });
     } catch (error) {
       await confirmationDialog.closeWithError(error as Error);
@@ -296,10 +481,18 @@ export class ConfirmationSession {
         updatedContext: TContext;
       }): Promise<void> => {
         try {
-          await updateConfirmation({
-            newContext: updatedContext,
-            isGrantDisabled: false,
-          });
+          await updateConfirmation({ context: updatedContext });
+        } catch (error) {
+          await confirmationDialog.closeWithError(error as Error);
+          throw error;
+        }
+      };
+
+      const onExistingPermissionsViewChange = async (
+        show: boolean,
+      ): Promise<void> => {
+        try {
+          await updateConfirmation({ showExistingPermissions: show });
         } catch (error) {
           await confirmationDialog.closeWithError(error as Error);
           throw error;
@@ -309,7 +502,8 @@ export class ConfirmationSession {
       lifecycleHandlers.onConfirmationCreated({
         interfaceId,
         updateContext,
-        initialContext: context,
+        onExistingPermissionsViewChange,
+        initialContext: state.context,
       });
     }
 
@@ -318,7 +512,9 @@ export class ConfirmationSession {
 
       if (isApproved) {
         try {
-          const { address } = parseCaipAccountId(context.accountAddressCaip10);
+          const { address } = parseCaipAccountId(
+            state.context.accountAddressCaip10,
+          );
           const upgradeStatus =
             await this.#accountController.getAccountUpgradeStatus({
               account: address,
@@ -349,7 +545,7 @@ export class ConfirmationSession {
 
         return {
           isApproved: true,
-          context,
+          context: state.context,
         };
       }
 
@@ -358,7 +554,7 @@ export class ConfirmationSession {
         permissionType,
         chainId: normalizedRequest.chainId,
         permissionData: normalizedRequest.permission.data,
-        justification: context.justification,
+        justification: state.context.justification,
       });
 
       return {
