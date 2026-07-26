@@ -430,26 +430,10 @@ describe('ConfirmationSession', () => {
     await sessionPromise;
   });
 
-  it('shows the existing permissions subview when updateContext sets showExistingPermissions', async () => {
-    const subviewContext: BaseContext = {
-      ...mockContext,
-      showExistingPermissions: true,
-      justification: '',
-      expiry: { timestamp: 1733088000 },
-      accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
-      tokenMetadata: {
-        decimals: 18,
-        symbol: 'TEST',
-        iconDataBase64: null,
-      },
-    };
-
+  it('shows the existing permissions subview when onExistingPermissionsViewChange is called', async () => {
     let capturedParams:
       | {
-          updateContext: (args: {
-            updatedContext: BaseContext;
-          }) => Promise<void>;
+          onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
         }
       | undefined;
 
@@ -480,7 +464,7 @@ describe('ConfirmationSession', () => {
     const createContentCallsBefore =
       lifecycleHandlerMocks.createConfirmationContent.mock.calls.length;
 
-    await capturedParams?.updateContext({ updatedContext: subviewContext });
+    await capturedParams?.onExistingPermissionsViewChange(true);
 
     expect(
       mockExistingPermissionsService.showExistingPermissions,
@@ -493,7 +477,83 @@ describe('ConfirmationSession', () => {
     await sessionPromise;
   });
 
-  it('does not re-render confirmation content when trust signals resolve while the existing permissions subview is open', async () => {
+  it('does not call showExistingPermissions twice when existing permissions is opened twice before the first subview render completes', async () => {
+    let resolveShowExistingPermissions: () => void = () => {
+      throw new Error('resolveShowExistingPermissions not set');
+    };
+
+    mockExistingPermissionsService.showExistingPermissions.mockImplementation(
+      async () =>
+        new Promise<void>((resolve) => {
+          resolveShowExistingPermissions = resolve;
+        }),
+    );
+
+    let capturedParams:
+      | {
+          onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
+        }
+      | undefined;
+
+    lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+      (params) => {
+        capturedParams = params;
+      },
+    );
+
+    let resolveUserDecision: (decision: boolean) => void = (_) => {
+      throw new Error('resolveUserDecision not set');
+    };
+    mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
+      async () => {
+        const isApproved = await new Promise<boolean>((resolve) => {
+          resolveUserDecision = resolve;
+        });
+        return { isApproved };
+      },
+    );
+
+    const sessionPromise = runSession();
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(capturedParams).toBeDefined();
+
+    const firstOpen = capturedParams?.onExistingPermissionsViewChange(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(
+      mockExistingPermissionsService.showExistingPermissions,
+    ).toHaveBeenCalledTimes(1);
+
+    const secondOpen = capturedParams?.onExistingPermissionsViewChange(true);
+
+    resolveShowExistingPermissions();
+    await firstOpen;
+    await secondOpen;
+
+    expect(
+      mockExistingPermissionsService.showExistingPermissions,
+    ).toHaveBeenCalledTimes(1);
+
+    resolveUserDecision(true);
+    await sessionPromise;
+  });
+
+  it('continues processing confirmation updates after a failed trust signal render', async () => {
+    let createContentCallCount = 0;
+
+    lifecycleHandlerMocks.createConfirmationContent.mockImplementation(
+      async () => {
+        createContentCallCount += 1;
+        if (createContentCallCount === 2) {
+          throw new Error('trust signal render failed');
+        }
+        return mockUiContent;
+      },
+    );
+
     let resolveDappScan: (result: ScanDappUrlResult) => void = (_) => {
       throw new Error('resolveDappScan not set');
     };
@@ -507,20 +567,6 @@ describe('ConfirmationSession', () => {
     mockTrustSignalsClient.fetchAddressScan.mockImplementation(
       async () => new Promise<FetchAddressScanResult>(() => {}),
     );
-
-    const subviewContext: BaseContext = {
-      ...mockContext,
-      showExistingPermissions: true,
-      justification: '',
-      expiry: { timestamp: 1733088000 },
-      accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
-      tokenMetadata: {
-        decimals: 18,
-        symbol: 'TEST',
-        iconDataBase64: null,
-      },
-    };
 
     let capturedParams:
       | {
@@ -552,7 +598,81 @@ describe('ConfirmationSession', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await capturedParams?.updateContext({ updatedContext: subviewContext });
+    expect(createContentCallCount).toBe(1);
+
+    resolveDappScan({
+      isComplete: true,
+      recommendedAction: RecommendedAction.WARN,
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(createContentCallCount).toBe(2);
+
+    const modifiedContext = {
+      ...mockContext,
+      justification: 'after failed trust signal render',
+    };
+
+    await capturedParams?.updateContext({ updatedContext: modifiedContext });
+
+    expect(createContentCallCount).toBe(3);
+    expect(mockConfirmationDialog.updateContent).toHaveBeenCalled();
+
+    resolveUserDecision(true);
+
+    const result = await sessionPromise;
+
+    expect(result).toStrictEqual({
+      isApproved: true,
+      context: modifiedContext,
+    });
+  });
+
+  it('does not re-render confirmation content when trust signals resolve while the existing permissions subview is open', async () => {
+    let resolveDappScan: (result: ScanDappUrlResult) => void = (_) => {
+      throw new Error('resolveDappScan not set');
+    };
+
+    mockTrustSignalsClient.scanDappUrl.mockImplementation(
+      async () =>
+        new Promise<ScanDappUrlResult>((resolve) => {
+          resolveDappScan = resolve;
+        }),
+    );
+    mockTrustSignalsClient.fetchAddressScan.mockImplementation(
+      async () => new Promise<FetchAddressScanResult>(() => {}),
+    );
+
+    let capturedParams:
+      | {
+          onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
+        }
+      | undefined;
+
+    lifecycleHandlerMocks.onConfirmationCreated?.mockImplementation(
+      (params) => {
+        capturedParams = params;
+      },
+    );
+
+    let resolveUserDecision: (decision: boolean) => void = (_) => {
+      throw new Error('resolveUserDecision not set');
+    };
+    mockConfirmationDialog.displayConfirmationDialogAndAwaitUserDecision.mockImplementation(
+      async () => {
+        const isApproved = await new Promise<boolean>((resolve) => {
+          resolveUserDecision = resolve;
+        });
+        return { isApproved };
+      },
+    );
+
+    const sessionPromise = runSession();
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await capturedParams?.onExistingPermissionsViewChange(true);
 
     const createContentCallsAfterSubview =
       lifecycleHandlerMocks.createConfirmationContent.mock.calls.length;

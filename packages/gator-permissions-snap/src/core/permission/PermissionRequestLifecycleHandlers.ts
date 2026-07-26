@@ -52,6 +52,7 @@ export type PermissionRequestLifecycleHandlers<
     updateContext: (updateContextArgs: {
       updatedContext: TContext;
     }) => Promise<void>;
+    onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
   }) => void;
   onConfirmationResolved?: () => void;
 };
