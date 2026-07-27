@@ -3367,7 +3367,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/keyring-api@npm:^23.1.0, @metamask/keyring-api@npm:^23.2.0":
+"@metamask/keyring-api@npm:^23.1.0, @metamask/keyring-api@npm:^23.2.0, @metamask/keyring-api@npm:^23.6.0":
   version: 23.7.0
   resolution: "@metamask/keyring-api@npm:23.7.0"
   dependencies:
@@ -3403,13 +3403,13 @@ __metadata:
   linkType: hard
 
 "@metamask/keyring-internal-api@npm:^11.0.1":
-  version: 11.0.1
-  resolution: "@metamask/keyring-internal-api@npm:11.0.1"
+  version: 11.0.2
+  resolution: "@metamask/keyring-internal-api@npm:11.0.2"
   dependencies:
-    "@metamask/keyring-api": "npm:^23.1.0"
-    "@metamask/keyring-utils": "npm:^3.2.0"
-    "@metamask/superstruct": "npm:^3.1.0"
-  checksum: 10/d35a5b45887566f47e41c1109e9f4eca5108fd1b8402773d40a882c904de0f33cc70e0cc7d1e1a34397ae434646c597d9793c31dbedc83cdf64e41f8e719ccc4
+    "@metamask/keyring-api": "npm:^23.6.0"
+    "@metamask/keyring-utils": "npm:^4.0.0"
+    "@metamask/superstruct": "npm:^3.4.1"
+  checksum: 10/7a5d817b93d3f0bd54860d7747833ace48e46d079e700d98f87c76a79b4da25acc1ba0aec3fdc4ff49c36fb3dc0a3378d27c7b970cdb31c88f8caa13c8199086
   languageName: node
   linkType: hard
 
