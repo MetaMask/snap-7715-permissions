@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Bump @metamask/snaps-sdk from `11.1.1` to `11.2.0` ([#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
+- Bump @metamask/snaps-jest from `10.1.4` to `10.2.0` ([#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
 - Remove unnecessary code within the permission provider and add placeholder confirmation with simple "Confirm" "Reject" options. ([#21](https://github.com/MetaMask/snap-7715-permissions/pull/18))
 
 [Unreleased]: git+https://github.com/MetaMask/snap-7715-permissions/

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Bump @metamask/snaps-sdk from `11.1.1` to `11.2.0` ([#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
+- Bump @metamask/snaps-jest from `10.1.4` to `10.2.0` ([#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
+- Bump @metamask/profile-sync-controller from `28.2.0` to `28.3.0` ([#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
+
 ## [2.4.0]
 
 ### Added
