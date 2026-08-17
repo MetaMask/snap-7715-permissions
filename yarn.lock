@@ -3164,6 +3164,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/delegation-deployments@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/delegation-deployments@npm:2.0.0"
+  checksum: 10/7f2712ab5e48551880f2ce49d6bd6434b7587772b5053504b1186ae1a894313e9a30ef7ba94cceb7ee80a91c31764ca1a92aec9d8a30de925524a6314f163a7d
+  languageName: node
+  linkType: hard
+
 "@metamask/eslint-config-jest@npm:15.0.1":
   version: 15.0.1
   resolution: "@metamask/eslint-config-jest@npm:15.0.1"
@@ -3308,7 +3315,7 @@ __metadata:
     "@metamask/abi-utils": "npm:3.0.0"
     "@metamask/auto-changelog": "npm:6.2.0"
     "@metamask/delegation-core": "npm:^2.2.1"
-    "@metamask/delegation-deployments": "npm:^1.4.0"
+    "@metamask/delegation-deployments": "npm:^2.0.0"
     "@metamask/eslint-config": "npm:15.0.1"
     "@metamask/eslint-config-jest": "npm:15.0.1"
     "@metamask/eslint-config-nodejs": "npm:15.0.1"
