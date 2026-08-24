@@ -59,7 +59,7 @@
   "devDependencies": {
     "@jest/globals": "29.7.0",
     "@metamask/7715-permissions-shared": "workspace:*",
-    "@metamask/auto-changelog": "6.2.0",
+    "@metamask/auto-changelog": "6.2.1",
     "@metamask/eslint-config": "15.0.1",
     "@metamask/eslint-config-jest": "15.0.1",
     "@metamask/eslint-config-nodejs": "15.0.1",
