@@ -8,6 +8,7 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { AddressScanResultType } from '../../../src/clients/trustSignalsClient';
 import type { TokenBalanceAndMetadata } from '../../../src/clients/types';
 import type { AccountController } from '../../../src/core/accountController';
+import { ConfirmationDialog } from '../../../src/core/confirmation';
 import { ConfirmationShell } from '../../../src/core/confirmation/ConfirmationShell';
 import { ExistingPermissionsState } from '../../../src/core/existingpermissions/existingPermissionsState';
 import { METAMASK_FACILITATOR_ADDRESSES } from '../../../src/core/facilitatorAddresses';
@@ -135,6 +136,7 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
   } as unknown as jest.Mocked<AccountController>;
 
   accountController.getAccountUpgradeStatus.mockResolvedValue({
+    isSupported: true,
     isUpgraded: false,
   });
 
@@ -314,6 +316,78 @@ describe('ConfirmationShell', () => {
       expect(serialized).toContain('Redeemers');
       expect(serialized).not.toContain('Facilitators');
     });
+  });
+
+  it('renders an error and disables grant for an account that does not support EIP-7702', async () => {
+    const {
+      confirmationShell,
+      rules,
+      updateContext,
+      onExistingPermissionsViewChange,
+      accountController,
+    } = setupTest();
+    accountController.getAccountUpgradeStatus.mockResolvedValue({
+      isSupported: false,
+      isUpgraded: false,
+    });
+
+    confirmationShell.bindSessionEvents({
+      interfaceId: mockInterfaceId,
+      initialContext: mockContext,
+      rules,
+      updateContext,
+      onExistingPermissionsViewChange,
+    });
+
+    const result = await confirmationShell.createConfirmationContent({
+      context: mockContext,
+      metadata: mockMetadata,
+      origin: mockOrigin,
+      chainId: 1,
+      scanDappUrlResult: null,
+      scanAddressResult: null,
+      existingPermissionsStatus: ExistingPermissionsState.None,
+      isGrantDisabled: false,
+    });
+
+    const flatten = (element: SnapElement): SnapElement[] => {
+      const { props } = element;
+      const children = Array.isArray(props.children)
+        ? props.children
+        : [props.children];
+      return [
+        element,
+        ...children.flatMap((child) =>
+          child && typeof child === 'object' && 'type' in child
+            ? flatten(child as SnapElement)
+            : [],
+        ),
+      ];
+    };
+
+    const flattened = flatten(result);
+
+    const errorText = flattened.find(
+      (element) =>
+        element.type === 'Text' &&
+        element.props.children ===
+          'This account does not support EIP-7702 and cannot grant permissions.',
+    );
+    expect(errorText).toBeDefined();
+    expect(errorText?.props).toMatchObject({ color: 'error', size: 'sm' });
+
+    const grantButton = flattened.find(
+      (element) =>
+        element.type === 'Button' &&
+        element.props.name === ConfirmationDialog.grantButton,
+    );
+    expect(grantButton).toBeDefined();
+    expect(grantButton?.props.disabled).toBe(true);
+
+    const accountSelector = flattened.find(
+      (element) => element.type === 'AccountSelector',
+    );
+    expect(accountSelector).toBeDefined();
   });
 
   describe('bindSessionEvents', () => {

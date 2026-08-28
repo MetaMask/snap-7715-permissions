@@ -42,6 +42,7 @@ describe('AccountController', () => {
           return expectedBalance;
         case 'wallet_getAccountUpgradeStatus':
           return {
+            isSupported: true,
             isUpgraded: false,
             upgradedAddress: null,
           };
@@ -104,6 +105,7 @@ describe('AccountController', () => {
   describe('getAccountUpgradeStatus()', () => {
     it('should return upgrade status', async () => {
       mockEthereumProvider.request.mockResolvedValueOnce({
+        isSupported: true,
         isUpgraded: true,
         upgradedAddress: '0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B', // eip7702StatelessDeleGatorImpl address
       });
@@ -113,7 +115,55 @@ describe('AccountController', () => {
         chainId: mockChainId,
       });
 
-      expect(result).toStrictEqual({ isUpgraded: true });
+      expect(result).toStrictEqual({ isSupported: true, isUpgraded: true });
+      expect(mockEthereumProvider.request).toHaveBeenCalledWith({
+        method: 'wallet_getAccountUpgradeStatus',
+        params: { account: mockAddress, chainId: mockChainId },
+      });
+    });
+
+    it('should return isSupported false when the account does not support EIP-7702', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        isSupported: false,
+        isUpgraded: false,
+        upgradedAddress: null,
+      });
+
+      const result = await accountController.getAccountUpgradeStatus({
+        account: mockAddress,
+        chainId: mockChainId,
+      });
+
+      expect(result).toStrictEqual({ isSupported: false, isUpgraded: false });
+    });
+
+    it('should return isUpgraded false when the account is supported but not upgraded', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        isSupported: true,
+        isUpgraded: false,
+        upgradedAddress: null,
+      });
+
+      const result = await accountController.getAccountUpgradeStatus({
+        account: mockAddress,
+        chainId: mockChainId,
+      });
+
+      expect(result).toStrictEqual({ isSupported: true, isUpgraded: false });
+    });
+
+    it('should treat a missing isSupported field as supported', async () => {
+      mockEthereumProvider.request.mockResolvedValueOnce({
+        isUpgraded: false,
+        upgradedAddress: null,
+      });
+
+      const result = await accountController.getAccountUpgradeStatus({
+        account: mockAddress,
+        chainId: mockChainId,
+      });
+
+      expect(result).toStrictEqual({ isSupported: true, isUpgraded: false });
     });
   });
 
@@ -132,6 +182,10 @@ describe('AccountController', () => {
 
       expect(result).toStrictEqual({
         transactionHash: mockTransactionHash,
+      });
+      expect(mockEthereumProvider.request).toHaveBeenCalledWith({
+        method: 'wallet_upgradeAccount',
+        params: { account: mockAddress, chainId: mockChainId },
       });
     });
   });

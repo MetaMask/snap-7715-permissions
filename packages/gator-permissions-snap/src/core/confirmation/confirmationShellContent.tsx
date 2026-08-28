@@ -66,6 +66,7 @@ export type ConfirmationShellContentProps = {
   chainId: number;
   explorerUrl: string | undefined;
   isAccountUpgraded: boolean;
+  isAccountSupported: boolean;
   existingPermissionsStatus: ExistingPermissionsState;
   /** When true, the primary grant button is not clickable. */
   isGrantDisabled: boolean;
@@ -94,6 +95,7 @@ export type ConfirmationShellContentProps = {
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
+ * @param options.isAccountSupported - Whether the account supports EIP-7702.
  * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
  * @param options.isGrantDisabled - Whether the grant button should render disabled.
  * @param options.showTokenBalance - Whether to show token balance in the account section.
@@ -118,6 +120,7 @@ export const ConfirmationShellContent = ({
   chainId,
   explorerUrl,
   isAccountUpgraded,
+  isAccountSupported,
   existingPermissionsStatus,
   isGrantDisabled,
   showTokenBalance,
@@ -243,9 +246,15 @@ export const ConfirmationShellContent = ({
                 switchGlobalAccount={false}
                 value={context.accountAddressCaip10}
               />
-              {!isAccountUpgraded && (
-                <Text size="sm" color="warning">
-                  {t('accountUpgradeWarning')}
+              {isAccountSupported ? (
+                !isAccountUpgraded && (
+                  <Text size="sm" color="warning">
+                    {t('accountUpgradeWarning')}
+                  </Text>
+                )
+              ) : (
+                <Text size="sm" color="error">
+                  {t('accountNotSupportingEip7702')}
                 </Text>
               )}
               {showTokenBalance && hasAsset && (

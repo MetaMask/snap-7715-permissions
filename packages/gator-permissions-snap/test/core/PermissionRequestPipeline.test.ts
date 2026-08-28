@@ -110,7 +110,10 @@ const mockPopulatedPermission = {
 const mockAccountController = {
   signDelegation: jest.fn(),
   getAccountAddresses: jest.fn(),
-  getAccountUpgradeStatus: jest.fn(async () => ({ isUpgraded: false })),
+  getAccountUpgradeStatus: jest.fn(async () => ({
+    isSupported: true,
+    isUpgraded: false,
+  })),
   upgradeAccount: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<AccountController>;
 
@@ -257,7 +260,7 @@ describe('PermissionRequestPipeline', () => {
     );
 
     mockAccountController.getAccountUpgradeStatus.mockImplementation(
-      async () => ({ isUpgraded: false }),
+      async () => ({ isSupported: true, isUpgraded: false }),
     );
 
     mockAccountController.getAccountAddresses.mockResolvedValue([

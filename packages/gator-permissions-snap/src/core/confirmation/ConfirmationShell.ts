@@ -124,7 +124,10 @@ export class ConfirmationShell<
 
   #tokenBalanceFiat: string | null = null;
 
-  #accountUpgradeStatus: AccountUpgradeStatus = { isUpgraded: true };
+  #accountUpgradeStatus: AccountUpgradeStatus = {
+    isSupported: true,
+    isUpgraded: true,
+  };
 
   readonly #callOnceGuard = createCallOnceGuard(
     'ConfirmationShell.bindSessionEvents()',
@@ -220,8 +223,10 @@ export class ConfirmationShell<
       chainId,
       explorerUrl,
       isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
+      isAccountSupported: this.#accountUpgradeStatus.isSupported,
       existingPermissionsStatus,
-      isGrantDisabled,
+      isGrantDisabled:
+        isGrantDisabled || !this.#accountUpgradeStatus.isSupported,
       showTokenBalance: this.#showTokenBalance,
     });
   }
@@ -360,7 +365,7 @@ export class ConfirmationShell<
 
         this.#tokenBalance = null;
         this.#tokenBalanceFiat = null;
-        this.#accountUpgradeStatus = { isUpgraded: true }; // Reset to default while fetching
+        this.#accountUpgradeStatus = { isSupported: true, isUpgraded: true }; // Reset to default while fetching
 
         // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
         const shouldFetchTokenBalanceForAccount =

@@ -78,8 +78,12 @@ const mockPermissionRequest: PermissionRequest = {
 
 const mockAccountController = {
   getAccountAddresses: jest.fn(),
-  getAccountUpgradeStatus: jest.fn(async () => ({ isUpgraded: false })),
+  getAccountUpgradeStatus: jest.fn(async () => ({
+    isSupported: true,
+    isUpgraded: false,
+  })),
   upgradeAccount: jest.fn().mockResolvedValue(undefined),
+  signDelegation: jest.fn().mockResolvedValue(undefined),
 } as unknown as jest.Mocked<AccountController>;
 
 const mockDialogInterfaceFactory = {
@@ -197,7 +201,7 @@ describe('ConfirmationSession', () => {
     };
 
     mockAccountController.getAccountUpgradeStatus.mockImplementation(
-      async () => ({ isUpgraded: false }),
+      async () => ({ isSupported: true, isUpgraded: false }),
     );
 
     mockConfirmationDialogFactory.createConfirmation.mockReturnValue(
@@ -368,6 +372,7 @@ describe('ConfirmationSession', () => {
 
   it('checks account upgrade status and triggers upgrade when needed', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isSupported: true,
       isUpgraded: false,
     });
 
@@ -386,6 +391,7 @@ describe('ConfirmationSession', () => {
 
   it('does not trigger upgrade when account is already upgraded', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isSupported: true,
       isUpgraded: true,
     });
 
@@ -395,6 +401,50 @@ describe('ConfirmationSession', () => {
     expect(
       mockSnapsMetricsService.trackSmartAccountUpgraded,
     ).not.toHaveBeenCalled();
+  });
+
+  it('rejects the grant when the account does not support EIP-7702', async () => {
+    mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isSupported: false,
+      isUpgraded: false,
+    });
+
+    await expect(runSession()).rejects.toThrow(
+      'This account does not support EIP-7702 and cannot grant permissions.',
+    );
+
+    expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
+    expect(mockAccountController.signDelegation).not.toHaveBeenCalled();
+    expect(mockConfirmationDialog.closeWithError).toHaveBeenCalled();
+  });
+
+  it('approves without upgrading when the account is supported and upgraded', async () => {
+    mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isSupported: true,
+      isUpgraded: true,
+    });
+
+    const result = await runSession();
+
+    expect(result).toStrictEqual({
+      isApproved: true,
+      context: expect.any(Object),
+    });
+    expect(mockAccountController.upgradeAccount).not.toHaveBeenCalled();
+  });
+
+  it('approves the grant when the account upgrade status lookup fails', async () => {
+    mockAccountController.getAccountUpgradeStatus.mockRejectedValueOnce(
+      new Error('Failed to check account upgrade status'),
+    );
+
+    const result = await runSession();
+
+    expect(result).toStrictEqual({
+      isApproved: true,
+      context: expect.any(Object),
+    });
+    expect(mockConfirmationDialog.closeWithError).not.toHaveBeenCalled();
   });
 
   it('prevents race condition when grant is clicked before debounced validation completes', async () => {
@@ -752,6 +802,7 @@ describe('ConfirmationSession', () => {
 
   it('tracks smart account upgrade success when upgrade is successful', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isSupported: true,
       isUpgraded: false,
     });
     mockAccountController.upgradeAccount.mockResolvedValueOnce({
@@ -777,6 +828,7 @@ describe('ConfirmationSession', () => {
 
   it('tracks smart account upgrade failure when upgrade fails', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isSupported: true,
       isUpgraded: false,
     });
     mockAccountController.upgradeAccount.mockRejectedValueOnce(
