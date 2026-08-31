@@ -13,9 +13,9 @@ import type {
   NativeTokenPeriodicPermission,
   NativeTokenPeriodicPermissionRequest,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
-import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
 import { parseUnits } from '../../../src/utils/value';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const permissionWithoutOptionals: NativeTokenPeriodicPermission = {
   type: 'native-token-periodic',
@@ -66,12 +66,7 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-  tokenAddressCaip19: 'eip155:1/slip44:60',
-  tokenMetadata: {
-    symbol: 'ETH',
-    decimals: 18,
-    iconDataBase64: null,
-  },
+  primaryTokenCaip19: 'eip155:1/slip44:60',
   permissionDetails: {
     periodAmount: '1',
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
@@ -80,6 +75,20 @@ const alreadyPopulatedContext: NativeTokenPeriodicContext = {
 } as const;
 
 describe('nativeTokenPeriodic:context', () => {
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
+
+  beforeEach(() => {
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator({
+      metadata: {
+        symbol: 'ETH',
+        decimals: 18,
+        iconDataBase64: null,
+      },
+    });
+  });
+
   describe('populatePermission()', () => {
     it('should return the permission unchanged if it is already populated', async () => {
       const populatedPermission = await populatePermission({
@@ -132,51 +141,20 @@ describe('nativeTokenPeriodic:context', () => {
   });
 
   describe('buildContext()', () => {
-    let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
-    beforeEach(() => {
-      mockTokenMetadataService = {
-        getTokenBalanceAndMetadata: jest.fn(() => ({
-          balance: BigInt(
-            alreadyPopulatedContext.permissionDetails.periodAmount,
-          ),
-          symbol: alreadyPopulatedContext.tokenMetadata.symbol,
-          decimals: 18,
-          iconUrl: 'https://example.com/icon.png',
-        })),
-        fetchIconDataAsBase64: jest.fn(async () =>
-          Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
-        ),
-      } as unknown as jest.Mocked<TokenMetadataService>;
-    });
-
     it('should create a context from a permission request', async () => {
-      const text = 'The contents of the image';
-      /* eslint-disable no-restricted-globals */
-      const base64 = Buffer.from(text, 'utf8').toString('base64');
-
-      mockTokenMetadataService.fetchIconDataAsBase64.mockResolvedValueOnce({
-        ok: true,
-        imageDataBase64: `data:image/png;base64,${base64}`,
-      });
-
       const context = await buildContext(alreadyPopulatedPermissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(context).toStrictEqual({
         ...alreadyPopulatedContext,
-        tokenMetadata: {
-          ...alreadyPopulatedContext.tokenMetadata,
-          iconDataBase64: `data:image/png;base64,${base64}`,
-        },
       });
 
-      expect(
-        mockTokenMetadataService.getTokenBalanceAndMetadata,
-      ).toHaveBeenCalledWith({
-        chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-        account: ACCOUNT_ADDRESS,
-      });
+      expect(mockTokenMetadataCoordinator.ensureMetadata).toHaveBeenCalledWith(
+        expect.objectContaining({
+          accountCaip10: expect.stringContaining('eip155:1:'),
+        }),
+      );
     });
 
     it('builds context without expiry when the expiry rule is not found', async () => {
@@ -186,7 +164,7 @@ describe('nativeTokenPeriodic:context', () => {
       };
 
       const context = await buildContext(permissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
       expect(context.expiry).toBeUndefined();
     });
@@ -199,7 +177,7 @@ describe('nativeTokenPeriodic:context', () => {
       } as unknown as NativeTokenPeriodicPermissionRequest;
 
       const context = await buildContext(permissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
       expect(context.expiry).toBeUndefined();
     });
@@ -224,6 +202,7 @@ describe('nativeTokenPeriodic:context', () => {
     it('should create metadata for a context', async () => {
       const metadata = await deriveMetadata({
         context,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(metadata).toStrictEqual({
@@ -245,6 +224,7 @@ describe('nativeTokenPeriodic:context', () => {
 
           const metadata = await deriveMetadata({
             context: contextWithInvalidPeriodAmount,
+            tokenMetadata: mockTokenMetadataCoordinator,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
@@ -264,6 +244,7 @@ describe('nativeTokenPeriodic:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithNegativePeriodAmount,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -284,6 +265,7 @@ describe('nativeTokenPeriodic:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithInvalidPeriodDuration,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -302,6 +284,7 @@ describe('nativeTokenPeriodic:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithNegativePeriodDuration,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -322,6 +305,7 @@ describe('nativeTokenPeriodic:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithInvalidStartTime,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -340,6 +324,7 @@ describe('nativeTokenPeriodic:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithPastStartTime,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -363,6 +348,7 @@ describe('nativeTokenPeriodic:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithExpiryInThePast,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -384,6 +370,7 @@ describe('nativeTokenPeriodic:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithInvalidExpiry,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -407,6 +394,7 @@ describe('nativeTokenPeriodic:context', () => {
 
           const metadata = await deriveMetadata({
             context: contextWithInvalidExpiry,
+            tokenMetadata: mockTokenMetadataCoordinator,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
@@ -422,6 +410,7 @@ describe('nativeTokenPeriodic:context', () => {
       const permissionRequest = await applyContext({
         context: alreadyPopulatedContext,
         originalRequest: alreadyPopulatedPermissionRequest,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(permissionRequest).toStrictEqual(
@@ -436,6 +425,7 @@ describe('nativeTokenPeriodic:context', () => {
           ...alreadyPopulatedPermissionRequest,
           rules: [],
         },
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
       const expiryRule = permissionRequest.rules.find(
         (rule) => rule.type === 'expiry',

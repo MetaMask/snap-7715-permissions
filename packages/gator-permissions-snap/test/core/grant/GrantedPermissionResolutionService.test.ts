@@ -16,6 +16,10 @@ import { SENTINEL_REDEEMER_ADDRESSES } from '../../../src/core/sentinelRedeemer'
 import type { BaseContext } from '../../../src/core/types';
 import type { NonceCaveatService } from '../../../src/services/nonceCaveatService';
 import type { SnapsMetricsService } from '../../../src/services/snapsMetricsService';
+import {
+  createMockTokenMetadataCoordinator,
+  createTestBaseContext,
+} from '../../testContext';
 
 const randomAddress = (): Hex => {
   const randomBytes = new Uint8Array(20);
@@ -28,18 +32,11 @@ const randomAddress = (): Hex => {
 const mockSignature = '0x1234';
 const grantingAccountAddress = randomAddress();
 
-const mockContext: BaseContext = {
-  tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
+const mockContext: BaseContext = createTestBaseContext({
   expiry: { timestamp: 1717987200 },
-  isAdjustmentAllowed: true,
   accountAddressCaip10: `eip155:1:${grantingAccountAddress}`,
   justification: 'Justification',
-  tokenMetadata: {
-    decimals: 18,
-    symbol: 'TKN',
-    iconDataBase64: null,
-  },
-};
+});
 
 const requestingAccountAddress = randomAddress();
 const expiryTimestamp = Math.floor(Date.now() / 1000 + 3600);
@@ -92,6 +89,9 @@ type ResolutionHandlerMocks = {
   applyContext: jest.Mock;
   populatePermission: jest.Mock;
   createPermissionCaveats: jest.Mock;
+  tokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
 };
 
 describe('GrantedPermissionResolutionService', () => {
@@ -105,6 +105,7 @@ describe('GrantedPermissionResolutionService', () => {
       applyContext: jest.fn().mockResolvedValue(mockResolvedPermissionRequest),
       populatePermission: jest.fn().mockResolvedValue(mockPopulatedPermission),
       createPermissionCaveats: jest.fn(() => []),
+      tokenMetadataCoordinator: createMockTokenMetadataCoordinator(),
     };
 
     mockAccountController.signDelegation.mockImplementation(
@@ -364,6 +365,7 @@ describe('GrantedPermissionResolutionService', () => {
       expect(lifecycleHandlerMocks.applyContext).toHaveBeenCalledWith({
         context: mockContext,
         originalRequest: mockPermissionRequest,
+        tokenMetadata: lifecycleHandlerMocks.tokenMetadataCoordinator,
       });
     });
 

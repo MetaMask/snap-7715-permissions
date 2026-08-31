@@ -1,22 +1,46 @@
-import type { BaseContext, IconData } from '../core/types';
+import type { CaipAssetType } from '@metamask/snaps-sdk';
+
+import type { TokenMetadataCoordinator } from '../core/coordinators/TokenMetadataCoordinator';
+import type { IconData } from '../core/types';
 
 /**
- * Extracts icon data from a token permission context.
- *
- * This function takes a token permission context and extracts the icon data
- * from the token metadata. It returns an IconData object containing the base64
- * encoded icon and alt text, or undefined if no icon data is available.
- * @param context - The token permission context containing token metadata.
- * @returns An IconData object with iconDataBase64 and iconAltText, or undefined if no icon data exists.
+ * Extracts icon data from the token metadata coordinator for a CAIP-19 asset.
+ * @param coordinator - Token metadata coordinator for the request.
+ * @param caip19 - CAIP-19 asset identifier.
+ * @returns Icon data or undefined when metadata or icon is unavailable.
  */
-export const getIconData = (context: BaseContext): IconData | undefined => {
-  const { iconDataBase64: iconUrl } = context.tokenMetadata;
-  if (!iconUrl) {
+export const getIconData = (
+  coordinator: TokenMetadataCoordinator,
+  caip19: CaipAssetType | undefined,
+): IconData | undefined => {
+  if (!caip19) {
+    return undefined;
+  }
+
+  const metadata = coordinator.getMetadata(caip19);
+  if (!metadata?.iconDataBase64) {
     return undefined;
   }
 
   return {
-    iconDataBase64: iconUrl,
-    iconAltText: context.tokenMetadata.symbol,
+    iconDataBase64: metadata.iconDataBase64,
+    iconAltText: metadata.symbol,
   };
+};
+
+/**
+ * Returns the token symbol from the coordinator for a CAIP-19 asset.
+ * @param coordinator - Token metadata coordinator for the request.
+ * @param caip19 - CAIP-19 asset identifier.
+ * @returns Token symbol or empty string when unavailable.
+ */
+export const getTokenSymbol = (
+  coordinator: TokenMetadataCoordinator,
+  caip19: CaipAssetType | undefined,
+): string => {
+  if (!caip19) {
+    return '';
+  }
+
+  return coordinator.getMetadata(caip19)?.symbol ?? '';
 };

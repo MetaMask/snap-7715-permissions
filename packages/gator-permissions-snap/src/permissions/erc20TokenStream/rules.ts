@@ -9,7 +9,6 @@ import {
   timestampToISO8601,
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
-import { getIconData } from '../iconUtil';
 import { createExpiryRule } from '../rules';
 
 export const INITIAL_AMOUNT_ELEMENT = 'erc20-token-stream-initial-amount';
@@ -33,7 +32,6 @@ export const initialAmountRule: Erc20TokenStreamRuleDefinition = {
     value: context.permissionDetails.initialAmount ?? undefined,
     isVisible: true,
     tooltip: t('initialAmountTooltip'),
-    iconData: getIconData(context),
     error: metadata.validationErrors.initialAmountError,
     isEditable: context.isAdjustmentAllowed,
   }),
@@ -55,7 +53,6 @@ export const maxAmountRule: Erc20TokenStreamRuleDefinition = {
     value: context.permissionDetails.maxAmount ?? undefined,
     isVisible: true,
     tooltip: t('maxAmountTooltip'),
-    iconData: getIconData(context),
     error: metadata.validationErrors.maxAmountError,
     isEditable: context.isAdjustmentAllowed,
   }),
@@ -97,7 +94,6 @@ export const streamAmountPerPeriodRule: Erc20TokenStreamRuleDefinition = {
     value: context.permissionDetails.amountPerPeriod,
     isVisible: true,
     tooltip: t('streamAmountTooltip'),
-    iconData: getIconData(context),
     error: metadata.validationErrors.amountPerPeriodError,
     isEditable: context.isAdjustmentAllowed,
   }),

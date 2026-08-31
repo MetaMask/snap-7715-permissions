@@ -17,6 +17,7 @@ import type {
 } from './types';
 import { parseAndValidate } from './validation';
 import type { PermissionModule } from '../../core/permission/PermissionModule';
+import { primaryTokenCaip19Selector } from '../../core/token/tokenSelectors';
 
 export const erc20TokenPeriodicPermissionModule: PermissionModule<
   Erc20TokenPeriodicPermissionRequest,
@@ -28,6 +29,9 @@ export const erc20TokenPeriodicPermissionModule: PermissionModule<
   type: 'erc20-token-periodic',
   name: 'ERC20 Token Periodic Transfer',
   rules: allRules,
+  tokenCaip19s: [primaryTokenCaip19Selector],
+  balanceTokenCaip19: primaryTokenCaip19Selector,
+  shellTokenCaip19s: [primaryTokenCaip19Selector],
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
   parseAndValidate,

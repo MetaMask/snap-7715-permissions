@@ -1,5 +1,5 @@
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
-import { InvalidInputError } from '@metamask/snaps-sdk';
+import { InvalidInputError, InternalError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   parseCaipAccountId,
@@ -8,6 +8,7 @@ import {
 } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
+import type { TokenMetadataCoordinator } from '../../core/coordinators/TokenMetadataCoordinator';
 import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
@@ -39,19 +40,25 @@ const CHAIN_NAMESPACE = 'eip155';
  * @param options - The options object containing the context and original request.
  * @param options.context - Context with formatted allowance and times.
  * @param options.originalRequest - Original request.
+ * @param options.tokenMetadata - Coordinator providing token metadata.
  * @returns Request with hex allowance and merged expiry rule (optional, like other types).
  */
 export async function applyContext({
   context,
   originalRequest,
+  tokenMetadata,
 }: {
   context: Erc20TokenAllowanceContext;
   originalRequest: Erc20TokenAllowancePermissionRequest;
+  tokenMetadata: TokenMetadataCoordinator;
 }): Promise<Erc20TokenAllowancePermissionRequest> {
-  const {
-    permissionDetails,
-    tokenMetadata: { decimals },
-  } = context;
+  const { permissionDetails } = context;
+  const decimals = tokenMetadata.getMetadata(
+    context.primaryTokenCaip19,
+  )?.decimals;
+  if (decimals === undefined) {
+    throw new InternalError('Token metadata not available for applyContext');
+  }
 
   const expiryMerged = applyExpiryRule(context, originalRequest);
   const redeemerMerged = applyRedeemerRule(originalRequest, expiryMerged);
@@ -105,14 +112,14 @@ export async function populatePermission({
  * and manage the permission state.
  * @param permissionRequest - The ERC-20 token allowance permission request to convert.
  * @param services - Services required to build permission context.
- * @param services.tokenMetadataService - Service for fetching token metadata.
+ * @param services.tokenMetadataCoordinator - Coordinator for token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext(
   permissionRequest: Erc20TokenAllowancePermissionRequest,
   services: PermissionBuildServices,
 ): Promise<Erc20TokenAllowanceContext> {
-  const { tokenMetadataService } = services;
+  const { tokenMetadataCoordinator } = services;
   const chainId = Number(permissionRequest.chainId);
   const {
     from,
@@ -125,19 +132,23 @@ export async function buildContext(
     );
   }
 
-  const { decimals, symbol, iconUrl } =
-    await tokenMetadataService.getTokenBalanceAndMetadata({
-      chainId,
-      account: from,
-      assetAddress: data.tokenAddress,
-    });
+  const accountAddressCaip10 = toCaipAccountId(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    from,
+  );
 
-  const iconDataResponse =
-    await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
+  const primaryTokenCaip19 = toCaipAssetType(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    ASSET_NAMESPACE,
+    data.tokenAddress,
+  );
 
-  const iconDataBase64 = iconDataResponse.ok
-    ? iconDataResponse.imageDataBase64
-    : null;
+  const { decimals } = await tokenMetadataCoordinator.ensureMetadata({
+    caip19: primaryTokenCaip19,
+    accountCaip10: accountAddressCaip10,
+  });
 
   const expiryRule = permissionRequest.rules?.find(
     (rule) => extractDescriptorName(rule.type) === 'expiry',
@@ -165,19 +176,6 @@ export async function buildContext(
 
   const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
 
-  const tokenAddressCaip19 = toCaipAssetType(
-    CHAIN_NAMESPACE,
-    chainId.toString(),
-    ASSET_NAMESPACE,
-    data.tokenAddress,
-  );
-
-  const accountAddressCaip10 = toCaipAccountId(
-    CHAIN_NAMESPACE,
-    chainId.toString(),
-    from,
-  );
-
   return {
     expiry,
     ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
@@ -185,12 +183,7 @@ export async function buildContext(
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,
-    tokenAddressCaip19,
-    tokenMetadata: {
-      symbol,
-      decimals,
-      iconDataBase64,
-    },
+    primaryTokenCaip19,
     permissionDetails: {
       allowanceAmount,
       startTime,
@@ -202,18 +195,23 @@ export async function buildContext(
  * Derive validation metadata for the confirmation UI.
  * @param options - The options object containing the context to create metadata for.
  * @param options.context - Built context.
+ * @param options.tokenMetadata - Coordinator providing token metadata.
  * @returns Metadata with validation errors for rules.
  */
 export async function deriveMetadata({
   context,
+  tokenMetadata,
 }: {
   context: Erc20TokenAllowanceContext;
+  tokenMetadata: TokenMetadataCoordinator;
 }): Promise<Erc20TokenAllowanceMetadata> {
-  const {
-    permissionDetails,
-    expiry,
-    tokenMetadata: { decimals },
-  } = context;
+  const { permissionDetails, expiry } = context;
+  const decimals = tokenMetadata.getMetadata(
+    context.primaryTokenCaip19,
+  )?.decimals;
+  if (decimals === undefined) {
+    return { validationErrors: {} };
+  }
 
   const validationErrors: Erc20TokenAllowanceMetadata['validationErrors'] = {};
 

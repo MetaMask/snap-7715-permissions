@@ -1,14 +1,8 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
-import {
-  NO_ASSET_ADDRESS,
-  ZERO_ADDRESS,
-} from '@metamask/7715-permissions-shared/types';
 import { InvalidRequestError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from '@metamask/utils';
 import {
-  bigIntToHex,
-  isStrictHexString,
   numberToHex,
   parseCaipAccountId,
   parseCaipAssetType,
@@ -27,22 +21,25 @@ import type {
   ScanDappUrlResult,
 } from '../../clients/trustSignalsClient';
 import { getIconData } from '../../permissions/iconUtil';
-import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { TokenPricesService } from '../../services/tokenPricesService';
 import type { UserEventDispatcher } from '../../userEventDispatcher';
-import { createCancellableOperation } from '../../utils/cancellableOperation';
 import type { MessageKey } from '../../utils/i18n';
-import { formatUnits } from '../../utils/value';
 import type {
   AccountController,
   AccountUpgradeStatus,
 } from '../accountController';
 import { createCallOnceGuard } from '../callOnceGuard';
 import { getChainMetadata } from '../chainMetadata';
+import type { TokenMetadataCoordinator } from '../coordinators/TokenMetadataCoordinator';
 import { EXISTING_PERMISSIONS_CONFIRM_BUTTON } from '../existingpermissions';
 import type { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
 import { bindRuleHandlers } from '../rules';
-import type { BaseContext, RuleDefinition } from '../types';
+import { collectTokenCaip19s } from '../token/tokenSelectors';
+import type {
+  BaseContext,
+  RuleDefinition,
+  ShellTokenDisplay,
+  TokenCaip19Selector,
+} from '../types';
 
 export type ConfirmationShellRenderArgs<
   TContext extends BaseContext,
@@ -65,8 +62,11 @@ export type ConfirmationShellBindSessionArgs<
   interfaceId: string;
   initialContext: TContext;
   rules: RuleDefinition<TContext, TMetadata>[];
+  defaultTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
+  tokenMetadataCoordinator: TokenMetadataCoordinator;
   updateContext: (args: { updatedContext: TContext }) => Promise<void>;
   onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
+  syncCoordinator: (context: TContext) => void;
 };
 
 export type ConfirmationShellParams<
@@ -75,15 +75,16 @@ export type ConfirmationShellParams<
 > = {
   userEventDispatcher: UserEventDispatcher;
   accountController: AccountController;
-  tokenMetadataService: TokenMetadataService;
-  tokenPricesService: TokenPricesService;
   title: MessageKey;
   subtitle: MessageKey;
   permissionRequest: PermissionRequest;
-  showTokenBalance: boolean;
+  shellTokenCaip19s: TokenCaip19Selector<TContext>[];
+  balanceTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
+  tokenMetadataCoordinator: TokenMetadataCoordinator;
   renderBody: (args: {
     context: TContext;
     metadata: TMetadata;
+    tokenMetadata: TokenMetadataCoordinator;
   }) => Promise<SnapElement>;
 };
 
@@ -99,9 +100,7 @@ export class ConfirmationShell<
 
   readonly #accountController: AccountController;
 
-  readonly #tokenMetadataService: TokenMetadataService;
-
-  readonly #tokenPricesService: TokenPricesService;
+  readonly #tokenMetadataCoordinator: TokenMetadataCoordinator;
 
   readonly #permissionTitle: MessageKey;
 
@@ -109,7 +108,9 @@ export class ConfirmationShell<
 
   readonly #permissionRequest: PermissionRequest;
 
-  readonly #showTokenBalance: boolean;
+  readonly #shellTokenCaip19s: TokenCaip19Selector<TContext>[];
+
+  readonly #balanceTokenCaip19: TokenCaip19Selector<TContext> | undefined;
 
   readonly #renderBody: ConfirmationShellParams<
     TContext,
@@ -120,10 +121,6 @@ export class ConfirmationShell<
 
   #unbindSessionEvents: (() => void) | null = null;
 
-  #tokenBalance: string | null = null;
-
-  #tokenBalanceFiat: string | null = null;
-
   #accountUpgradeStatus: AccountUpgradeStatus = { isUpgraded: true };
 
   readonly #callOnceGuard = createCallOnceGuard(
@@ -133,22 +130,22 @@ export class ConfirmationShell<
   constructor({
     userEventDispatcher,
     accountController,
-    tokenMetadataService,
-    tokenPricesService,
     title,
     subtitle,
     permissionRequest,
-    showTokenBalance,
+    shellTokenCaip19s,
+    balanceTokenCaip19,
+    tokenMetadataCoordinator,
     renderBody,
   }: ConfirmationShellParams<TContext, TMetadata>) {
     this.#userEventDispatcher = userEventDispatcher;
     this.#accountController = accountController;
-    this.#tokenMetadataService = tokenMetadataService;
-    this.#tokenPricesService = tokenPricesService;
     this.#permissionTitle = title;
     this.#permissionSubtitle = subtitle;
     this.#permissionRequest = permissionRequest;
-    this.#showTokenBalance = showTokenBalance;
+    this.#shellTokenCaip19s = shellTokenCaip19s;
+    this.#balanceTokenCaip19 = balanceTokenCaip19;
+    this.#tokenMetadataCoordinator = tokenMetadataCoordinator;
     this.#renderBody = renderBody;
   }
 
@@ -160,6 +157,43 @@ export class ConfirmationShell<
     return SkeletonConfirmationShellContent({
       permissionTitle: this.#permissionTitle,
       permissionSubtitle: this.#permissionSubtitle,
+    });
+  }
+
+  /**
+   * Builds shell token display props from the coordinator and context.
+   * @param context - Current permission context.
+   * @param explorerUrl - Block explorer base URL.
+   * @returns Token display data for shell TokenField components.
+   */
+  #buildShellTokens(
+    context: TContext,
+    explorerUrl: string | undefined,
+  ): ShellTokenDisplay[] {
+    let selectors = this.#shellTokenCaip19s;
+    if (selectors.length === 0) {
+      selectors = this.#balanceTokenCaip19 ? [this.#balanceTokenCaip19] : [];
+    }
+
+    return collectTokenCaip19s(context, selectors).map((caip19) => {
+      const metadata = this.#tokenMetadataCoordinator.getMetadata(caip19);
+      const { assetReference, assetNamespace } = parseCaipAssetType(caip19);
+
+      let tokenAddress: string | undefined;
+      let tokenExplorerUrl: string | undefined;
+
+      if (assetNamespace === 'erc20' && explorerUrl) {
+        tokenAddress = assetReference;
+        tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
+      }
+
+      return {
+        caip19,
+        symbol: metadata?.symbol ?? '',
+        tokenAddress,
+        explorerUrl: tokenExplorerUrl,
+        iconData: getIconData(this.#tokenMetadataCoordinator, caip19),
+      };
     });
   }
 
@@ -184,21 +218,22 @@ export class ConfirmationShell<
 
     const { name: networkName, explorerUrl } = getChainMetadata({ chainId });
 
-    const tokenIconData = getIconData(context);
-
-    const {
-      justification,
-      tokenMetadata: { symbol: tokenSymbol },
-    } = context;
+    const { justification } = context;
 
     const delegateAddress = this.#permissionRequest.to;
     if (!delegateAddress) {
       throw new InvalidRequestError('Delegate address is undefined');
     }
 
+    const balanceCaip19 = this.#balanceTokenCaip19?.(context);
+    const balance = balanceCaip19
+      ? this.#tokenMetadataCoordinator.getBalance(balanceCaip19)
+      : undefined;
+
     const permissionContent = await this.#renderBody({
       context,
       metadata,
+      tokenMetadata: this.#tokenMetadataCoordinator,
     });
 
     return ConfirmationShellContent({
@@ -208,21 +243,19 @@ export class ConfirmationShell<
       delegateAddress,
       justification,
       networkName,
-      tokenSymbol,
-      tokenIconData,
+      shellTokens: this.#buildShellTokens(context, explorerUrl),
       isJustificationCollapsed: this.#isJustificationCollapsed,
       children: permissionContent,
       permissionTitle: this.#permissionTitle,
       permissionSubtitle: this.#permissionSubtitle,
       context,
-      tokenBalance: this.#tokenBalance,
-      tokenBalanceFiat: this.#tokenBalanceFiat,
+      tokenBalance: balance?.formatted ?? null,
+      tokenBalanceFiat: balance?.fiat ?? null,
       chainId,
-      explorerUrl,
       isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
       existingPermissionsStatus,
       isGrantDisabled,
-      showTokenBalance: this.#showTokenBalance,
+      showTokenBalance: balanceCaip19 !== undefined,
     });
   }
 
@@ -241,8 +274,11 @@ export class ConfirmationShell<
       interfaceId,
       initialContext,
       rules,
+      defaultTokenCaip19,
+      tokenMetadataCoordinator,
       updateContext,
       onExistingPermissionsViewChange,
+      syncCoordinator,
     } = args;
 
     let currentContext = initialContext;
@@ -250,87 +286,34 @@ export class ConfirmationShell<
       await updateContext({ updatedContext: currentContext });
     };
 
-    const fetchAccountBalance = createCancellableOperation<
-      TContext,
-      { balance: bigint; decimals: number; ctx: TContext }
-    >({
-      operation: async (ctx) => {
-        const { address } = parseCaipAccountId(ctx.accountAddressCaip10);
-        const {
-          assetReference,
-          chain: { reference: chainId },
-        } = parseCaipAssetType(ctx.tokenAddressCaip19);
-
-        const assetAddress = isStrictHexString(assetReference)
-          ? assetReference
-          : ZERO_ADDRESS;
-
-        const { balance, decimals } =
-          await this.#tokenMetadataService.getTokenBalanceAndMetadata({
-            chainId: parseInt(chainId, 10),
-            account: address as Hex,
-            assetAddress,
-          });
-
-        return { balance, decimals, ctx };
-      },
-      onSuccess: async ({ balance, decimals, ctx }, isCancelled) => {
-        this.#tokenBalance = formatUnits({ value: balance, decimals });
-        await rerender();
-
-        // Fetch fiat balance after token balance is set
-        const fiatBalance =
-          await this.#tokenPricesService.getCryptoToFiatConversion(
-            ctx.tokenAddressCaip19,
-            bigIntToHex(balance),
-            ctx.tokenMetadata.decimals,
-          );
-
-        // Check if this operation was cancelled during the fiat balance fetch
-        if (isCancelled()) {
-          return;
-        }
-
-        this.#tokenBalanceFiat = fiatBalance;
-        await rerender();
-      },
-    });
-
-    const fetchAccountUpgradeStatus = createCancellableOperation<
-      TContext,
-      AccountUpgradeStatus
-    >({
-      operation: async (ctx) => {
+    const fetchAccountUpgradeStatus = async (ctx: TContext): Promise<void> => {
+      try {
         const {
           address,
           chain: { reference: chainId },
         } = parseCaipAccountId(ctx.accountAddressCaip10);
 
-        return this.#accountController.getAccountUpgradeStatus({
-          account: address as Hex,
-          chainId: numberToHex(parseInt(chainId, 10)),
-        });
-      },
-      onSuccess: async (status) => {
-        this.#accountUpgradeStatus = status;
+        this.#accountUpgradeStatus =
+          await this.#accountController.getAccountUpgradeStatus({
+            account: address as Hex,
+            chainId: numberToHex(parseInt(chainId, 10)),
+          });
         await rerender();
-      },
-    });
-
-    const shouldFetchTokenBalance =
-      this.#showTokenBalance &&
-      currentContext.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
-    if (shouldFetchTokenBalance) {
-      fetchAccountBalance(currentContext).catch((error) => {
+      } catch (error) {
         const { message } = error as Error;
-        logger.error(`Fetching account balance failed: ${message}`);
-      });
-    }
+        logger.error(`Fetching account upgrade status failed: ${message}`);
+      }
+    };
 
-    // Fetch account upgrade status in the background (don't await)
-    fetchAccountUpgradeStatus(currentContext).catch(() => {
-      // Silently ignore errors, we don't want to block the permission request if the account upgrade status fetch fails
+    tokenMetadataCoordinator.onUpdate(() => {
+      rerender().catch((error) => {
+        const { message } = error as Error;
+        logger.error(`Token metadata coordinator update failed: ${message}`);
+      });
     });
+
+    syncCoordinator(currentContext);
+    fetchAccountUpgradeStatus(currentContext).catch(() => undefined);
 
     const { unbind: unbindShowMoreButtonClick } = this.#userEventDispatcher.on({
       elementName: JUSTIFICATION_SHOW_MORE_BUTTON_NAME,
@@ -358,26 +341,10 @@ export class ConfirmationShell<
           accountAddressCaip10: address,
         };
 
-        this.#tokenBalance = null;
-        this.#tokenBalanceFiat = null;
-        this.#accountUpgradeStatus = { isUpgraded: true }; // Reset to default while fetching
+        this.#accountUpgradeStatus = { isUpgraded: true };
 
-        // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
-        const shouldFetchTokenBalanceForAccount =
-          this.#showTokenBalance &&
-          currentContext.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
-        if (shouldFetchTokenBalanceForAccount) {
-          fetchAccountBalance(currentContext).catch((error) => {
-            const { message } = error as Error;
-            logger.error(`Fetching account balance failed: ${message}`);
-          });
-        }
-
-        // Fetch account upgrade status for the new account in the background
-        fetchAccountUpgradeStatus(currentContext).catch((error) => {
-          const { message } = error as Error;
-          logger.error(`Fetching account upgrade status failed: ${message}`);
-        });
+        syncCoordinator(currentContext);
+        fetchAccountUpgradeStatus(currentContext).catch(() => undefined);
 
         await rerender();
       },
@@ -412,6 +379,8 @@ export class ConfirmationShell<
         currentContext = context;
         await rerender();
       },
+      tokenMetadataCoordinator,
+      defaultTokenCaip19,
     });
 
     const unbind = (): void => {

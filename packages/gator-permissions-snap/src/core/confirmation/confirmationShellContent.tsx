@@ -1,4 +1,3 @@
-import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import {
   Box,
@@ -12,7 +11,6 @@ import {
   Container,
   Footer,
 } from '@metamask/snaps-sdk/jsx';
-import { parseCaipAssetType } from '@metamask/utils';
 
 import {
   AddressScanResultType,
@@ -38,7 +36,7 @@ import { t } from '../../utils/i18n';
 import { ConfirmationDialog } from '../confirmation';
 import { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
 import { isMetaMaskFacilitatorAddress } from '../facilitatorAddresses';
-import type { BaseContext, IconData } from '../types';
+import type { BaseContext, ShellTokenDisplay } from '../types';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './constants';
 
 export const ACCOUNT_SELECTOR_NAME = 'account-selector';
@@ -51,8 +49,7 @@ export type ConfirmationShellContentProps = {
   permissionSubtitle: MessageKey;
   justification: string;
   networkName: string;
-  tokenSymbol: string;
-  tokenIconData?: IconData | undefined;
+  shellTokens: ShellTokenDisplay[];
   isJustificationCollapsed: boolean;
   origin: string;
   /** Dapp URL scan result; when set with a warning/block, a warning icon with tooltip is shown beside the origin. */
@@ -64,7 +61,6 @@ export type ConfirmationShellContentProps = {
   tokenBalance: string | null;
   tokenBalanceFiat: string | null;
   chainId: number;
-  explorerUrl: string | undefined;
   isAccountUpgraded: boolean;
   existingPermissionsStatus: ExistingPermissionsState;
   /** When true, the primary grant button is not clickable. */
@@ -85,14 +81,12 @@ export type ConfirmationShellContentProps = {
  * @param options.delegateAddress - The address that will receive the delegated permission.
  * @param options.justification - The justification for the permission request.
  * @param options.networkName - The name of the network.
- * @param options.tokenSymbol - The symbol of the token.
- * @param options.tokenIconData - The icon data of the token.
+ * @param options.shellTokens - Tokens to display in the confirmation shell.
  * @param options.isJustificationCollapsed - Whether the justification is collapsed.
  * @param options.context - The context of the permission.
  * @param options.tokenBalance - The formatted balance of the token.
  * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
  * @param options.chainId - The chain ID of the network.
- * @param options.explorerUrl - The URL of the block explorer for the token.
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
  * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
  * @param options.isGrantDisabled - Whether the grant button should render disabled.
@@ -109,14 +103,12 @@ export const ConfirmationShellContent = ({
   delegateAddress,
   justification,
   networkName,
-  tokenSymbol,
-  tokenIconData,
+  shellTokens,
   isJustificationCollapsed,
   context,
   tokenBalance,
   tokenBalanceFiat,
   chainId,
-  explorerUrl,
   isAccountUpgraded,
   existingPermissionsStatus,
   isGrantDisabled,
@@ -132,21 +124,7 @@ export const ConfirmationShellContent = ({
     <Skeleton />
   );
 
-  const hasAsset = context.tokenAddressCaip19 !== NO_ASSET_ADDRESS;
-
-  let tokenExplorerUrl, tokenAddress;
-  if (hasAsset) {
-    const { assetReference, assetNamespace } = parseCaipAssetType(
-      context.tokenAddressCaip19,
-    );
-    if (assetNamespace === 'erc20') {
-      if (explorerUrl) {
-        tokenExplorerUrl = `${explorerUrl}/address/${assetReference}`;
-      }
-
-      tokenAddress = assetReference;
-    }
-  }
+  const hasShellTokens = shellTokens.length > 0;
 
   const urlWarningByRecommendedAction = {
     [RecommendedAction.BLOCK]: t('maliciousWebsiteLabel'),
@@ -248,7 +226,7 @@ export const ConfirmationShellContent = ({
                   {t('accountUpgradeWarning')}
                 </Text>
               )}
-              {showTokenBalance && hasAsset && (
+              {showTokenBalance && hasShellTokens && (
                 <Box direction="horizontal" alignment="end">
                   {fiatBalanceComponent}
                   {tokenBalanceComponent}
@@ -295,16 +273,17 @@ export const ConfirmationShellContent = ({
               value={networkName}
               tooltip={t('networkTooltip')}
             />
-            {hasAsset && (
+            {shellTokens.map((shellToken) => (
               <TokenField
+                key={shellToken.caip19}
                 label={t('tokenLabel')}
-                tokenSymbol={tokenSymbol}
-                tokenAddress={tokenAddress}
-                explorerUrl={tokenExplorerUrl}
+                tokenSymbol={shellToken.symbol}
+                tokenAddress={shellToken.tokenAddress}
+                explorerUrl={shellToken.explorerUrl}
                 tooltip={t('tokenTooltip')}
-                iconData={tokenIconData}
+                iconData={shellToken.iconData}
               />
-            )}
+            ))}
             {redeemerField}
             {payeeField}
           </Section>

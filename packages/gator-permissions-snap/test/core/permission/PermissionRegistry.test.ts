@@ -6,11 +6,12 @@ import type { PermissionModule } from '../../../src/core/permission/PermissionMo
 import { PermissionRegistry } from '../../../src/core/permission/PermissionRegistry';
 import { nativeTokenStreamPermissionModule } from '../../../src/permissions/nativeTokenStream';
 
-const createMinimalModule = (type: string): PermissionModule => ({
-  ...nativeTokenStreamPermissionModule,
-  type,
-  rules: [],
-});
+const createMinimalModule = (type: string): PermissionModule =>
+  ({
+    ...nativeTokenStreamPermissionModule,
+    type,
+    rules: [],
+  }) as unknown as PermissionModule;
 
 describe('PermissionRegistry', () => {
   describe('register', () => {
@@ -91,7 +92,7 @@ describe('PermissionRegistry', () => {
 
       expect(module.renderBody).toStrictEqual(expect.any(Function));
       expect(module.parseAndValidate).toStrictEqual(expect.any(Function));
-      expect(module.showTokenBalance).toBe(false);
+      expect(module.tokenCaip19s).toStrictEqual([]);
     });
   });
 });

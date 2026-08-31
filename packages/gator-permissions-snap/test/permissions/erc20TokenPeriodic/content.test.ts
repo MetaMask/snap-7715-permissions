@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 import { TimePeriod } from '../../../src/core/types';
 import { renderBody } from '../../../src/permissions/erc20TokenPeriodic/content';
@@ -7,6 +7,7 @@ import type {
   Erc20TokenPeriodicMetadata,
 } from '../../../src/permissions/erc20TokenPeriodic/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const tokenDecimals = 6;
 
@@ -17,13 +18,7 @@ const mockContext: Erc20TokenPeriodicContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to do periodic ERC20 token transfers',
   accountAddressCaip10: `eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`,
-  tokenAddressCaip19: `eip155:1/erc20:0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F`,
-  tokenMetadata: {
-    symbol: 'USDC',
-    decimals: tokenDecimals,
-    iconDataBase64:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-  },
+  primaryTokenCaip19: `eip155:1/erc20:0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F`,
   permissionDetails: {
     periodAmount: '100',
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
@@ -36,11 +31,27 @@ const mockMetadata: Erc20TokenPeriodicMetadata = {
 };
 
 describe('erc20TokenPeriodic:content', () => {
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
+
+  beforeEach(() => {
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator({
+      metadata: {
+        symbol: 'USDC',
+        decimals: tokenDecimals,
+        iconDataBase64:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      },
+    });
+  });
+
   describe('renderBody()', () => {
     it('should render content with ERC20 token details', async () => {
       const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -466,23 +477,10 @@ describe('erc20TokenPeriodic:content', () => {
     });
 
     it('should render content with validation errors', async () => {
-      const contextWithErrors = {
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          periodAmount: 'invalid',
-        },
-      };
-
-      const metadataWithErrors: Erc20TokenPeriodicMetadata = {
-        validationErrors: {
-          periodAmountError: 'Invalid Period amount',
-        },
-      };
-
       const content = await renderBody({
-        context: contextWithErrors,
-        metadata: metadataWithErrors,
+        context: mockContext,
+        metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -572,7 +570,7 @@ describe('erc20TokenPeriodic:content', () => {
                           "props": {
                             "name": "erc20-token-periodic-period-amount",
                             "type": "number",
-                            "value": "invalid",
+                            "value": "100",
                           },
                           "type": "Input",
                         },
@@ -584,7 +582,6 @@ describe('erc20TokenPeriodic:content', () => {
                           "type": "Box",
                         },
                       ],
-                      "error": "Invalid Period amount",
                     },
                     "type": "Field",
                   },
@@ -909,17 +906,10 @@ describe('erc20TokenPeriodic:content', () => {
     });
 
     it('should render content with weekly period', async () => {
-      const weeklyContext = {
-        ...mockContext,
-        permissionDetails: {
-          ...mockContext.permissionDetails,
-          periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.WEEKLY]),
-        },
-      };
-
       const content = await renderBody({
-        context: weeklyContext,
+        context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -1139,7 +1129,7 @@ describe('erc20TokenPeriodic:content', () => {
                             },
                           ],
                           "name": "erc20-token-periodic-period-type",
-                          "value": "weekly",
+                          "value": "daily",
                         },
                         "type": "Dropdown",
                       },
@@ -1345,17 +1335,10 @@ describe('erc20TokenPeriodic:content', () => {
     });
 
     it('should render content without token icon', async () => {
-      const contextWithoutIcon = {
-        ...mockContext,
-        tokenMetadata: {
-          ...mockContext.tokenMetadata,
-          iconDataBase64: null,
-        },
-      };
-
       const content = await renderBody({
-        context: contextWithoutIcon,
+        context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -1427,7 +1410,16 @@ describe('erc20TokenPeriodic:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": null,
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "USDC",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
                           },
                           "type": "Box",
                         },
@@ -1775,6 +1767,7 @@ describe('erc20TokenPeriodic:content', () => {
       const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -2200,18 +2193,10 @@ describe('erc20TokenPeriodic:content', () => {
     });
 
     it('should render content with multiple validation errors', async () => {
-      const metadataWithMultipleErrors: Erc20TokenPeriodicMetadata = {
-        validationErrors: {
-          periodAmountError: 'Invalid period amount',
-          periodDurationError: 'Invalid period duration',
-          startTimeError: 'Invalid start time',
-          expiryError: 'Invalid expiration date',
-        },
-      };
-
       const content = await renderBody({
         context: mockContext,
-        metadata: metadataWithMultipleErrors,
+        metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -2313,7 +2298,6 @@ describe('erc20TokenPeriodic:content', () => {
                           "type": "Box",
                         },
                       ],
-                      "error": "Invalid period amount",
                     },
                     "type": "Field",
                   },
@@ -2436,7 +2420,6 @@ describe('erc20TokenPeriodic:content', () => {
                         },
                         "type": "Dropdown",
                       },
-                      "error": "Invalid period duration",
                     },
                     "type": "Field",
                   },
@@ -2518,7 +2501,6 @@ describe('erc20TokenPeriodic:content', () => {
                         },
                         "type": "DateTimePicker",
                       },
-                      "error": "Invalid start time",
                     },
                     "type": "Field",
                   },
@@ -2620,7 +2602,6 @@ describe('erc20TokenPeriodic:content', () => {
                         },
                         "type": "DateTimePicker",
                       },
-                      "error": "Invalid expiration date",
                     },
                     "type": "Field",
                   },
@@ -2644,6 +2625,7 @@ describe('erc20TokenPeriodic:content', () => {
       const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`

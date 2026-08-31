@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 import { TimePeriod } from '../../../src/core/types';
 import { renderBody } from '../../../src/permissions/nativeTokenStream/content';
@@ -6,6 +6,7 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from '../../../src/permissions/nativeTokenStream/types';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const mockContext: NativeTokenStreamContext = {
   expiry: {
@@ -14,12 +15,7 @@ const mockContext: NativeTokenStreamContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to stream native tokens',
   accountAddressCaip10: `eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`,
-  tokenAddressCaip19: `eip155:1/erc20:0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F`,
-  tokenMetadata: {
-    symbol: 'ETH',
-    decimals: 18,
-    iconDataBase64: null,
-  },
+  primaryTokenCaip19: 'eip155:1/slip44:60',
   permissionDetails: {
     initialAmount: '1',
     maxAmount: '10',
@@ -36,11 +32,27 @@ const mockMetadata: NativeTokenStreamMetadata = {
 };
 
 describe('nativeTokenStream:content', () => {
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
+
+  beforeEach(() => {
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator({
+      metadata: {
+        symbol: 'ETH',
+        decimals: 18,
+        iconDataBase64:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      },
+    });
+  });
+
   describe('renderBody()', () => {
     it('should render content with all permission details', async () => {
       const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -140,7 +152,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -256,7 +277,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -537,7 +567,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -761,9 +800,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -865,9 +907,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -918,6 +963,7 @@ describe('nativeTokenStream:content', () => {
             initialAmountError: 'Invalid initial amount',
           },
         },
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(contentWithErrors).toMatchInlineSnapshot(`
@@ -1017,7 +1063,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -1134,7 +1189,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -1415,7 +1479,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -1640,9 +1713,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -1744,9 +1820,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -1794,6 +1873,7 @@ describe('nativeTokenStream:content', () => {
           isAdjustmentAllowed: false,
         },
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(contentWithoutAdjustment).toMatchInlineSnapshot(`
@@ -1878,9 +1958,12 @@ describe('nativeTokenStream:content', () => {
                                         "children": {
                                           "key": null,
                                           "props": {
-                                            "children": " ",
+                                            "alt": "ETH",
+                                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                           },
-                                          "type": "Text",
+                                          "type": "Image",
                                         },
                                       },
                                       "type": "Box",
@@ -1983,9 +2066,12 @@ describe('nativeTokenStream:content', () => {
                                         "children": {
                                           "key": null,
                                           "props": {
-                                            "children": " ",
+                                            "alt": "ETH",
+                                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                           },
-                                          "type": "Text",
+                                          "type": "Image",
                                         },
                                       },
                                       "type": "Box",
@@ -2311,9 +2397,12 @@ describe('nativeTokenStream:content', () => {
                                         "children": {
                                           "key": null,
                                           "props": {
-                                            "children": " ",
+                                            "alt": "ETH",
+                                            "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                           },
-                                          "type": "Text",
+                                          "type": "Image",
                                         },
                                       },
                                       "type": "Box",
@@ -2522,9 +2611,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -2626,9 +2718,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -2680,6 +2775,7 @@ describe('nativeTokenStream:content', () => {
           },
         },
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(contentWithMissingFields).toMatchInlineSnapshot(`
@@ -3116,7 +3212,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -3340,9 +3445,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -3444,9 +3552,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -3497,6 +3608,7 @@ describe('nativeTokenStream:content', () => {
           },
         },
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(contentWithDailyPeriod).toMatchInlineSnapshot(`
@@ -3596,7 +3708,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -3712,7 +3833,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -3993,7 +4123,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -4217,9 +4356,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -4321,9 +4463,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -4371,6 +4516,7 @@ describe('nativeTokenStream:content', () => {
           ...mockMetadata,
           totalExposure: null,
         },
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -4470,7 +4616,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -4586,7 +4741,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -4867,7 +5031,16 @@ describe('nativeTokenStream:content', () => {
                           {
                             "key": null,
                             "props": {
-                              "children": null,
+                              "children": {
+                                "key": null,
+                                "props": {
+                                  "alt": "ETH",
+                                  "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                                },
+                                "type": "Image",
+                              },
                             },
                             "type": "Box",
                           },
@@ -5091,9 +5264,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",
@@ -5195,9 +5371,12 @@ describe('nativeTokenStream:content', () => {
                                       "children": {
                                         "key": null,
                                         "props": {
-                                          "children": " ",
+                                          "alt": "ETH",
+                                          "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
                                         },
-                                        "type": "Text",
+                                        "type": "Image",
                                       },
                                     },
                                     "type": "Box",

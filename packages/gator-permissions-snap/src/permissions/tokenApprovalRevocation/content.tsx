@@ -7,6 +7,7 @@ import type {
   TokenApprovalRevocationContext,
   TokenApprovalRevocationMetadata,
 } from './types';
+import type { TokenMetadataCoordinator } from '../../core/coordinators/TokenMetadataCoordinator';
 import { renderRules } from '../../core/rules';
 import { Field } from '../../ui/components/Field';
 import { t } from '../../utils/i18n';
@@ -17,14 +18,17 @@ import { t } from '../../utils/i18n';
  * @param args - The options object containing the context and metadata.
  * @param args.context - The context containing the permission details.
  * @param args.metadata - The metadata containing the validation errors.
+ * @param args.tokenMetadata - Coordinator providing token metadata.
  * @returns A Promise that resolves to the UI element for the confirmation dialog.
  */
 export async function renderBody({
   context,
   metadata,
+  tokenMetadata,
 }: {
   context: TokenApprovalRevocationContext;
   metadata: TokenApprovalRevocationMetadata;
+  tokenMetadata: TokenMetadataCoordinator;
 }): Promise<SnapElement> {
   const enabledPrimitives = TOKEN_APPROVAL_REVOCATION_PRIMITIVES.filter(
     ({ key }) => context.approvalRevocationPrimitives[key],
@@ -58,6 +62,7 @@ export async function renderBody({
           rules: [expiryRule],
           context,
           metadata,
+          tokenMetadataCoordinator: tokenMetadata,
         })}
       </Section>
     </Box>

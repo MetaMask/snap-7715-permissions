@@ -21,13 +21,6 @@ describe('createExpiryRule', () => {
     isAdjustmentAllowed: false,
     justification: 'test justification',
     accountAddressCaip10: 'eip155:1:0x0000000000000000000000000000000000000000',
-    tokenAddressCaip19:
-      'eip155:1/erc20:0x0000000000000000000000000000000000000000',
-    tokenMetadata: {
-      decimals: 18,
-      symbol: 'TST',
-      iconDataBase64: null,
-    },
   };
 
   beforeEach(() => {
@@ -102,10 +95,6 @@ describe('createExpiryRule', () => {
     expect(updated.accountAddressCaip10).toStrictEqual(
       baseRuleContext.accountAddressCaip10,
     );
-    expect(updated.tokenAddressCaip19).toStrictEqual(
-      baseRuleContext.tokenAddressCaip19,
-    );
-    expect(updated.tokenMetadata).toStrictEqual(baseRuleContext.tokenMetadata);
   });
 
   it('throws InvalidInputError for invalid ISO 8601 value', () => {
@@ -131,13 +120,6 @@ describe('applyExpiryRule', () => {
     isAdjustmentAllowed: false,
     justification: 'test justification',
     accountAddressCaip10: 'eip155:1:0x0000000000000000000000000000000000000000',
-    tokenAddressCaip19:
-      'eip155:1/erc20:0x0000000000000000000000000000000000000000',
-    tokenMetadata: {
-      decimals: 18,
-      symbol: 'TST',
-      iconDataBase64: null,
-    },
   };
 
   it('adds an expiry rule when timestamp is provided and no existing rule', () => {

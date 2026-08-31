@@ -17,6 +17,7 @@ import type {
 } from './types';
 import { parseAndValidate } from './validation';
 import type { PermissionModule } from '../../core/permission/PermissionModule';
+import { primaryTokenCaip19Selector } from '../../core/token/tokenSelectors';
 
 export const nativeTokenStreamPermissionModule: PermissionModule<
   NativeTokenStreamPermissionRequest,
@@ -28,6 +29,9 @@ export const nativeTokenStreamPermissionModule: PermissionModule<
   type: 'native-token-stream',
   name: 'Native Token Stream',
   rules: allRules,
+  tokenCaip19s: [primaryTokenCaip19Selector],
+  balanceTokenCaip19: primaryTokenCaip19Selector,
+  shellTokenCaip19s: [primaryTokenCaip19Selector],
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
   parseAndValidate,

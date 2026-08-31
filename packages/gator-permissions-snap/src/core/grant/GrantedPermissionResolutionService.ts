@@ -90,7 +90,10 @@ export class GrantedPermissionResolutionService {
         TPermission,
         TPopulatedPermission
       >,
-      'applyContext' | 'populatePermission' | 'createPermissionCaveats'
+      | 'applyContext'
+      | 'populatePermission'
+      | 'createPermissionCaveats'
+      | 'tokenMetadataCoordinator'
     >;
   }): Promise<PermissionResponse> {
     const permissionType = extractDescriptorName(
@@ -101,6 +104,7 @@ export class GrantedPermissionResolutionService {
     const resolvedRequest = await lifecycleHandlers.applyContext({
       context: modifiedContext,
       originalRequest,
+      tokenMetadata: lifecycleHandlers.tokenMetadataCoordinator,
     });
 
     // populate optional values of the permission

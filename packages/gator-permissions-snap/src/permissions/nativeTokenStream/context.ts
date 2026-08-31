@@ -1,5 +1,5 @@
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
-import { InvalidInputError } from '@metamask/snaps-sdk';
+import { InvalidInputError, InternalError } from '@metamask/snaps-sdk';
 import {
   bigIntToHex,
   parseCaipAccountId,
@@ -15,6 +15,7 @@ import type {
   PopulatedNativeTokenStreamPermission,
   NativeTokenStreamPermission,
 } from './types';
+import type { TokenMetadataCoordinator } from '../../core/coordinators/TokenMetadataCoordinator';
 import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
 import { TimePeriod } from '../../core/types';
 import { t } from '../../utils/i18n';
@@ -50,19 +51,25 @@ const ASSET_REFERENCE = '60';
  * @param options0 - The options object containing the context and original request.
  * @param options0.context - The native token stream context containing the updated permission details.
  * @param options0.originalRequest - The original permission request to be amended.
+ * @param options0.tokenMetadata - Coordinator providing token metadata.
  * @returns A new permission request with the context changes applied.
  */
 export async function applyContext({
   context,
   originalRequest,
+  tokenMetadata,
 }: {
   context: NativeTokenStreamContext;
   originalRequest: NativeTokenStreamPermissionRequest;
+  tokenMetadata: TokenMetadataCoordinator;
 }): Promise<NativeTokenStreamPermissionRequest> {
-  const {
-    permissionDetails,
-    tokenMetadata: { decimals },
-  } = context;
+  const { permissionDetails } = context;
+  const decimals = tokenMetadata.getMetadata(
+    context.primaryTokenCaip19,
+  )?.decimals;
+  if (decimals === undefined) {
+    throw new InternalError('Token metadata not available for applyContext');
+  }
 
   const expiryMerged = applyExpiryRule(context, originalRequest);
   const redeemerMerged = applyRedeemerRule(originalRequest, expiryMerged);
@@ -128,14 +135,14 @@ export async function populatePermission({
  * and manage the permission state.
  * @param permissionRequest - The native token stream permission request to convert.
  * @param services - Services required to build permission context.
- * @param services.tokenMetadataService - Service for fetching token metadata.
+ * @param services.tokenMetadataCoordinator - Coordinator for token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext(
   permissionRequest: NativeTokenStreamPermissionRequest,
   services: PermissionBuildServices,
 ): Promise<NativeTokenStreamContext> {
-  const { tokenMetadataService } = services;
+  const { tokenMetadataCoordinator } = services;
   const chainId = Number(permissionRequest.chainId);
 
   const {
@@ -149,18 +156,23 @@ export async function buildContext(
     );
   }
 
-  const { decimals, symbol, iconUrl } =
-    await tokenMetadataService.getTokenBalanceAndMetadata({
-      chainId,
-      account: from,
-    });
+  const accountAddressCaip10 = toCaipAccountId(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    from,
+  );
 
-  const iconDataResponse =
-    await tokenMetadataService.fetchIconDataAsBase64(iconUrl);
+  const primaryTokenCaip19 = toCaipAssetType(
+    CHAIN_NAMESPACE,
+    chainId.toString(),
+    ASSET_NAMESPACE,
+    ASSET_REFERENCE,
+  );
 
-  const iconDataBase64 = iconDataResponse.ok
-    ? iconDataResponse.imageDataBase64
-    : null;
+  const { decimals } = await tokenMetadataCoordinator.ensureMetadata({
+    caip19: primaryTokenCaip19,
+    accountCaip10: accountAddressCaip10,
+  });
 
   const expiryRule = permissionRequest.rules?.find(
     (rule) => extractDescriptorName(rule.type) === 'expiry',
@@ -205,19 +217,6 @@ export async function buildContext(
 
   const startTime = data.startTime ?? Math.floor(Date.now() / 1000);
 
-  const tokenAddressCaip19 = toCaipAssetType(
-    CHAIN_NAMESPACE,
-    chainId.toString(),
-    ASSET_NAMESPACE,
-    ASSET_REFERENCE,
-  );
-
-  const accountAddressCaip10 = toCaipAccountId(
-    CHAIN_NAMESPACE,
-    chainId.toString(),
-    from,
-  );
-
   return {
     expiry,
     ...(redeemerAddresses === undefined ? {} : { redeemerAddresses }),
@@ -225,12 +224,7 @@ export async function buildContext(
     justification: data.justification,
     isAdjustmentAllowed,
     accountAddressCaip10,
-    tokenAddressCaip19,
-    tokenMetadata: {
-      symbol,
-      decimals,
-      iconDataBase64,
-    },
+    primaryTokenCaip19,
     permissionDetails: {
       initialAmount,
       maxAmount,
@@ -245,18 +239,27 @@ export async function buildContext(
  * Creates metadata for the native token stream context, including validation of amounts and timestamps.
  * @param options0 - The options object containing the context to create metadata for.
  * @param options0.context - The native token stream context to validate and create metadata from.
+ * @param options0.tokenMetadata - Coordinator providing token metadata.
  * @returns Metadata object containing derived values and validation errors.
  */
 export async function deriveMetadata({
   context,
+  tokenMetadata,
 }: {
   context: NativeTokenStreamContext;
+  tokenMetadata: TokenMetadataCoordinator;
 }): Promise<NativeTokenStreamMetadata> {
-  const {
-    permissionDetails,
-    expiry,
-    tokenMetadata: { decimals },
-  } = context;
+  const { permissionDetails, expiry } = context;
+  const decimals = tokenMetadata.getMetadata(
+    context.primaryTokenCaip19,
+  )?.decimals;
+  if (decimals === undefined) {
+    return {
+      amountPerSecond: t('unknownStreamRate'),
+      validationErrors: {},
+      totalExposure: null,
+    };
+  }
 
   const validationErrors: NativeTokenStreamMetadata['validationErrors'] = {};
 

@@ -3,22 +3,24 @@ import type { Caveat } from '@metamask/delegation-core';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import type { PermissionRequestLifecycleHandlers } from './PermissionRequestLifecycleHandlers';
-import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { MessageKey } from '../../utils/i18n';
 import type { DelegationContracts } from '../chainMetadata';
 import { ConfirmationShell } from '../confirmation/ConfirmationShell';
+import type { TokenMetadataCoordinator } from '../coordinators/TokenMetadataCoordinator';
+import { collectTokenCaip19s } from '../token/tokenSelectors';
 import type {
   BaseContext,
   BaseMetadata,
   DeepRequired,
   RuleDefinition,
+  TokenCaip19Selector,
 } from '../types';
 
 /**
  * Services injected when building permission context.
  */
 export type PermissionBuildServices = {
-  tokenMetadataService: TokenMetadataService;
+  tokenMetadataCoordinator: TokenMetadataCoordinator;
 };
 
 /**
@@ -37,22 +39,31 @@ export type PermissionModule<
   title: MessageKey;
   subtitle: MessageKey;
   rules: RuleDefinition<TContext, TMetadata>[];
-  /** When false, omits token balance from the confirmation shell. Defaults to true. */
-  showTokenBalance?: boolean;
+  /** All token CAIP-19s to fetch metadata for. */
+  tokenCaip19s: TokenCaip19Selector<TContext>[];
+  /** Token for account-section balance display. Undefined = no balance shown. */
+  balanceTokenCaip19?: TokenCaip19Selector<TContext>;
+  /** Tokens shown as TokenField in the confirmation shell. */
+  shellTokenCaip19s?: TokenCaip19Selector<TContext>[];
 
   parseAndValidate(request: PermissionRequest): TRequest;
   buildContext(
     request: TRequest,
     services: PermissionBuildServices,
   ): Promise<TContext>;
-  deriveMetadata(args: { context: TContext }): Promise<TMetadata>;
+  deriveMetadata(args: {
+    context: TContext;
+    tokenMetadata: TokenMetadataCoordinator;
+  }): Promise<TMetadata>;
   renderBody(args: {
     context: TContext;
     metadata: TMetadata;
+    tokenMetadata: TokenMetadataCoordinator;
   }): Promise<SnapElement>;
   applyContext(args: {
     context: TContext;
     originalRequest: TRequest;
+    tokenMetadata: TokenMetadataCoordinator;
   }): Promise<TRequest>;
   populatePermission(args: {
     permission: TPermission;
@@ -65,10 +76,10 @@ export type PermissionModule<
 
 /**
  * Builds pipeline lifecycle handlers from a module and its confirmation shell.
- * @param args - Module, shell instance, and services for context building.
+ * @param args - Module, shell instance, and coordinator for the request.
  * @param args.module - Registered permission module for the request type.
  * @param args.confirmationShell - Per-request confirmation shell instance.
- * @param args.tokenMetadataService - Service injected into module context building.
+ * @param args.tokenMetadataCoordinator - Coordinator for token metadata and balances.
  * @returns Lifecycle handlers consumed by {@link PermissionRequestPipeline}.
  */
 export function buildRequestLifecycleHandlers<
@@ -86,7 +97,7 @@ export function buildRequestLifecycleHandlers<
     TPopulatedPermission
   >;
   confirmationShell: ConfirmationShell<TContext, TMetadata>;
-  tokenMetadataService: TokenMetadataService;
+  tokenMetadataCoordinator: TokenMetadataCoordinator;
 }): PermissionRequestLifecycleHandlers<
   TRequest,
   TContext,
@@ -94,14 +105,36 @@ export function buildRequestLifecycleHandlers<
   TPermission,
   TPopulatedPermission
 > {
-  const { module, confirmationShell, tokenMetadataService } = args;
+  const { module, confirmationShell, tokenMetadataCoordinator } = args;
+
+  const syncCoordinator = (context: TContext): void => {
+    tokenMetadataCoordinator.sync({
+      accountCaip10: context.accountAddressCaip10,
+      tokenCaip19s: collectTokenCaip19s(context, module.tokenCaip19s),
+      balanceCaip19: module.balanceTokenCaip19?.(context),
+    });
+  };
 
   return {
-    parseAndValidatePermission: (request) => module.parseAndValidate(request),
-    buildContext: async (request) =>
-      module.buildContext(request, { tokenMetadataService }),
-    deriveMetadata: async (deriveArgs) => module.deriveMetadata(deriveArgs),
-    applyContext: async (applyArgs) => module.applyContext(applyArgs),
+    parseAndValidatePermission: (request): TRequest =>
+      module.parseAndValidate(request),
+    buildContext: async (request): Promise<TContext> => {
+      const context = await module.buildContext(request, {
+        tokenMetadataCoordinator,
+      });
+      syncCoordinator(context);
+      return context;
+    },
+    deriveMetadata: async (deriveArgs) =>
+      module.deriveMetadata({
+        context: deriveArgs.context,
+        tokenMetadata: tokenMetadataCoordinator,
+      }),
+    applyContext: async (applyArgs) =>
+      module.applyContext({
+        ...applyArgs,
+        tokenMetadata: tokenMetadataCoordinator,
+      }),
     populatePermission: async (populateArgs) =>
       module.populatePermission(populateArgs),
     createPermissionCaveats: (caveatArgs) =>
@@ -111,17 +144,22 @@ export function buildRequestLifecycleHandlers<
     createSkeletonConfirmationContent: async () =>
       Promise.resolve(confirmationShell.createSkeletonContent()),
     onConfirmationCreated: (sessionArgs): void => {
+      syncCoordinator(sessionArgs.initialContext);
       confirmationShell.bindSessionEvents({
         interfaceId: sessionArgs.interfaceId,
         initialContext: sessionArgs.initialContext,
         rules: module.rules,
+        defaultTokenCaip19: module.balanceTokenCaip19,
+        tokenMetadataCoordinator,
         updateContext: sessionArgs.updateContext,
         onExistingPermissionsViewChange:
           sessionArgs.onExistingPermissionsViewChange,
+        syncCoordinator,
       });
     },
     onConfirmationResolved: (): void => {
       confirmationShell.resolveSession();
     },
+    tokenMetadataCoordinator,
   };
 }

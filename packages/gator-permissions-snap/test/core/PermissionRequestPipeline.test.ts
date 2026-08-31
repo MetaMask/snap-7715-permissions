@@ -33,6 +33,10 @@ import type { ProfileSyncManager } from '../../src/profileSync/profileSync';
 import type { NonceCaveatService } from '../../src/services/nonceCaveatService';
 import type { SnapsMetricsService } from '../../src/services/snapsMetricsService';
 import type { TokenMetadataService } from '../../src/services/tokenMetadataService';
+import {
+  createMockTokenMetadataCoordinator,
+  createTestBaseContext,
+} from '../testContext';
 import { DialogInterface } from 'src/core/dialogInterface';
 import { BaseContext } from 'src/core/types';
 
@@ -48,18 +52,11 @@ const mockSignature = '0x1234';
 const mockInterfaceId = 'test-interface-id';
 const grantingAccountAddress = randomAddress();
 
-const mockContext: BaseContext = {
-  tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
+const mockContext: BaseContext = createTestBaseContext({
   expiry: { timestamp: 1717987200 },
-  isAdjustmentAllowed: true,
   accountAddressCaip10: 'eip155:1:0x1234',
   justification: 'Justification',
-  tokenMetadata: {
-    decimals: 18,
-    symbol: 'TKN',
-    iconDataBase64: null,
-  },
-};
+});
 
 const mockMetadata = {
   test: 'metadata',
@@ -195,6 +192,9 @@ type TestLifecycleHandlersMocks = {
   applyContext: jest.Mock;
   populatePermission: jest.Mock;
   createPermissionCaveats: jest.Mock;
+  tokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
   onConfirmationCreated?: jest.Mock;
   onConfirmationResolved?: jest.Mock;
 };
@@ -247,6 +247,7 @@ describe('PermissionRequestPipeline', () => {
       onConfirmationCreated: jest.fn(),
       onConfirmationResolved: jest.fn(),
       createPermissionCaveats: jest.fn(() => []),
+      tokenMetadataCoordinator: createMockTokenMetadataCoordinator(),
     };
 
     mockAccountController.signDelegation.mockImplementation(
@@ -703,6 +704,7 @@ describe('PermissionRequestPipeline', () => {
         expect(lifecycleHandlerMocks.applyContext).toHaveBeenCalledWith({
           context: mockContext,
           originalRequest: normalizedPermissionRequest,
+          tokenMetadata: lifecycleHandlerMocks.tokenMetadataCoordinator,
         });
       });
 

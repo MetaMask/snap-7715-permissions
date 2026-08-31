@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
-import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 
 import {
   applyContext,
@@ -12,7 +11,7 @@ import type {
   TokenApprovalRevocationPermission,
   TokenApprovalRevocationPermissionRequest,
 } from '../../../src/permissions/tokenApprovalRevocation/types';
-import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
@@ -50,6 +49,14 @@ const permissionRequest: TokenApprovalRevocationPermissionRequest = {
 };
 
 describe('tokenApprovalRevocation:context', () => {
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
+
+  beforeEach(() => {
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator();
+  });
+
   describe('populatePermission()', () => {
     it('should return the permission unchanged', async () => {
       const populatedPermission = await populatePermission({ permission });
@@ -58,19 +65,9 @@ describe('tokenApprovalRevocation:context', () => {
   });
 
   describe('buildContext()', () => {
-    let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
-    beforeEach(() => {
-      mockTokenMetadataService = {
-        getTokenBalanceAndMetadata: jest.fn(),
-        fetchIconDataAsBase64: jest.fn(async () =>
-          Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
-        ),
-      } as unknown as jest.Mocked<TokenMetadataService>;
-    });
-
     it('should create a context from a permission request', async () => {
       const context = await buildContext(permissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(context).toStrictEqual({
@@ -81,12 +78,6 @@ describe('tokenApprovalRevocation:context', () => {
         approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-        tokenAddressCaip19: NO_ASSET_ADDRESS,
-        tokenMetadata: {
-          symbol: '',
-          decimals: 0,
-          iconDataBase64: '',
-        },
       } satisfies TokenApprovalRevocationContext);
     });
 
@@ -97,7 +88,7 @@ describe('tokenApprovalRevocation:context', () => {
       };
 
       const context = await buildContext(request, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
       expect(context.expiry).toBeUndefined();
     });
@@ -110,7 +101,7 @@ describe('tokenApprovalRevocation:context', () => {
 
       await expect(
         buildContext(request, {
-          tokenMetadataService: mockTokenMetadataService,
+          tokenMetadataCoordinator: mockTokenMetadataCoordinator,
         }),
       ).rejects.toThrow(
         'PermissionRequest.address was not found. This should be resolved within the buildContextHandler function in PermissionHandler.',
@@ -128,12 +119,6 @@ describe('tokenApprovalRevocation:context', () => {
         approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-        tokenAddressCaip19: NO_ASSET_ADDRESS,
-        tokenMetadata: {
-          symbol: '',
-          decimals: 0,
-          iconDataBase64: '',
-        },
       };
 
       const metadata = await deriveMetadata({ context });
@@ -151,12 +136,6 @@ describe('tokenApprovalRevocation:context', () => {
         approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-        tokenAddressCaip19: NO_ASSET_ADDRESS,
-        tokenMetadata: {
-          symbol: '',
-          decimals: 0,
-          iconDataBase64: '',
-        },
       };
 
       const metadata = await deriveMetadata({ context });
@@ -177,12 +156,6 @@ describe('tokenApprovalRevocation:context', () => {
         approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-        tokenAddressCaip19: NO_ASSET_ADDRESS,
-        tokenMetadata: {
-          symbol: '',
-          decimals: 0,
-          iconDataBase64: '',
-        },
       };
 
       const result = await applyContext({
@@ -213,12 +186,6 @@ describe('tokenApprovalRevocation:context', () => {
         approvalRevocationPrimitives,
         isAdjustmentAllowed: true,
         accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-        tokenAddressCaip19: NO_ASSET_ADDRESS,
-        tokenMetadata: {
-          symbol: '',
-          decimals: 0,
-          iconDataBase64: '',
-        },
       };
 
       const originalRequestWithoutExpiry: TokenApprovalRevocationPermissionRequest =

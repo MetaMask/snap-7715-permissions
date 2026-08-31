@@ -12,6 +12,10 @@ import type {
   UserEventHandler,
 } from '../../src/userEventDispatcher';
 import type { MessageKey } from '../../src/utils/i18n';
+import {
+  createMockTokenMetadataCoordinator,
+  createTestBaseContext,
+} from '../testContext';
 
 type TestContext = BaseContext & {
   testValue?: string;
@@ -24,18 +28,12 @@ type TestMetadata = {
   validationErrors: Record<string, string>;
 };
 
+const mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator();
+
 const mockContext: TestContext = {
-  expiry: undefined,
-  isAdjustmentAllowed: true,
-  justification: 'Permission to do something important',
-  accountAddressCaip10: 'eip155:1:0x1234567890123456789012345678901234567890',
-  tokenAddressCaip19:
-    'eip155:1/erc20:0x1234567890123456789012345678901234567890',
-  tokenMetadata: {
-    decimals: 18,
-    symbol: 'ETH',
-    iconDataBase64: null,
-  },
+  ...createTestBaseContext({
+    justification: 'Permission to do something important',
+  }),
   testValue: 'test-value',
   optionalValue: 'optional-value',
   numberValue: '123',
@@ -127,6 +125,7 @@ describe('rules', () => {
         rule: textRule,
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -227,6 +226,7 @@ describe('rules', () => {
         rule: numberRule,
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -306,6 +306,7 @@ describe('rules', () => {
         rule: dropdownRule,
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -397,6 +398,7 @@ describe('rules', () => {
         rule: optionalRuleWithContentWhenDisabled,
         context: contextWithOptionalDisabled,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       const children = result?.props?.children;
@@ -416,6 +418,7 @@ describe('rules', () => {
         rule: optionalRule,
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -523,6 +526,7 @@ describe('rules', () => {
         rule: textRule,
         context: disabledContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -642,6 +646,7 @@ describe('rules', () => {
         rule: textRule,
         context: mockContext,
         metadata: errorMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -743,6 +748,7 @@ describe('rules', () => {
         rule: undefinedValueRule,
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toMatchInlineSnapshot(`
@@ -779,6 +785,7 @@ describe('rules', () => {
           rule: invalidDropdownRule,
           context: mockContext,
           metadata: mockMetadata,
+          tokenMetadataCoordinator: mockTokenMetadataCoordinator,
         }),
       ).toThrow('Dropdown rule must have options');
     });
@@ -794,6 +801,7 @@ describe('rules', () => {
           rule: unknownRule,
           context: mockContext,
           metadata: mockMetadata,
+          tokenMetadataCoordinator: mockTokenMetadataCoordinator,
         }),
       ).toThrow('Unknown rule type: unknown');
     });
@@ -806,6 +814,7 @@ describe('rules', () => {
         rules,
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toHaveLength(3);
@@ -820,6 +829,7 @@ describe('rules', () => {
         rules,
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toHaveLength(3);
@@ -833,6 +843,7 @@ describe('rules', () => {
         rules: [],
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(result).toStrictEqual([]);
@@ -879,6 +890,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(5); // 3 input handlers + 1 add button + 1 remove button
@@ -915,6 +927,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(mockUserEventDispatcher.on).toHaveBeenCalledWith({
@@ -934,6 +947,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       // Get the handler that was bound
@@ -968,6 +982,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       // Get the remove button handler
@@ -1002,6 +1017,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(typeof unbind).toBe('function');
@@ -1026,6 +1042,7 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(mockUserEventDispatcher.on).not.toHaveBeenCalled();

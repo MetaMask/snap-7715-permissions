@@ -236,8 +236,6 @@ const permissionRegistry = createPermissionRegistry();
 const confirmationShellFactory = new ConfirmationShellFactory({
   accountController,
   userEventDispatcher,
-  tokenMetadataService,
-  tokenPricesService,
 });
 
 const permissionRequestProcessor = new PermissionRequestProcessor({
@@ -245,6 +243,7 @@ const permissionRequestProcessor = new PermissionRequestProcessor({
   pipeline: permissionRequestPipeline,
   confirmationShellFactory,
   tokenMetadataService,
+  tokenPricesService,
 });
 
 const rpcHandler = createRpcHandler({

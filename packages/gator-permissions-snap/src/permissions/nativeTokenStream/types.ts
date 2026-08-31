@@ -13,6 +13,7 @@ import type {
   TypedPermissionRequest,
   BaseContext,
   BaseMetadata,
+  ContextWithPrimaryToken,
 } from '../../core/types';
 
 export type NativeTokenStreamMetadata = BaseMetadata & {
@@ -27,15 +28,16 @@ export type NativeTokenStreamMetadata = BaseMetadata & {
   };
 };
 
-export type NativeTokenStreamContext = BaseContext & {
-  permissionDetails: {
-    initialAmount: string | null;
-    maxAmount: string | null;
-    timePeriod: TimePeriod;
-    startTime: number;
-    amountPerPeriod: string;
+export type NativeTokenStreamContext = BaseContext &
+  ContextWithPrimaryToken & {
+    permissionDetails: {
+      initialAmount: string | null;
+      maxAmount: string | null;
+      timePeriod: TimePeriod;
+      startTime: number;
+      amountPerPeriod: string;
+    };
   };
-};
 
 export const zNativeTokenStreamPermission = zPermission.extend({
   type: z.literal('native-token-stream'),

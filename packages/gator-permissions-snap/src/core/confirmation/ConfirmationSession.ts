@@ -17,6 +17,7 @@ import type { AccountController } from '../accountController';
 import { ConfirmationDialog } from '../confirmation';
 import type { ConfirmationDialogFactory } from '../confirmationFactory';
 import { ExistingPermissionsCoordinator } from '../coordinators/ExistingPermissionsCoordinator';
+import type { TokenMetadataCoordinator } from '../coordinators/TokenMetadataCoordinator';
 import { TrustSignalsCoordinator } from '../coordinators/TrustSignalsCoordinator';
 import type { DialogInterface } from '../dialogInterface';
 import type { DialogInterfaceFactory } from '../dialogInterfaceFactory';
@@ -70,7 +71,10 @@ type ConfirmationRenderLifecycleHandlers<
   TContext extends BaseContext,
   TMetadata extends BaseMetadata,
 > = {
-  deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
+  deriveMetadata: (args: {
+    context: TContext;
+    tokenMetadata: TokenMetadataCoordinator;
+  }) => Promise<TMetadata>;
   createConfirmationContent: (args: {
     context: TContext;
     metadata: TMetadata;
@@ -81,6 +85,7 @@ type ConfirmationRenderLifecycleHandlers<
     existingPermissionsStatus: ExistingPermissionsState;
     isGrantDisabled: boolean;
   }) => Promise<SnapElement>;
+  tokenMetadataCoordinator: TokenMetadataCoordinator;
 };
 
 /**
@@ -232,6 +237,7 @@ export class ConfirmationSession {
 
     const metadata = await lifecycleHandlers.deriveMetadata({
       context: state.context,
+      tokenMetadata: lifecycleHandlers.tokenMetadataCoordinator,
     });
 
     const existingPermissionsStatus =
@@ -366,6 +372,7 @@ export class ConfirmationSession {
     const onBeforeGrant = async (): Promise<boolean> => {
       const metadata = await lifecycleHandlers.deriveMetadata({
         context: state.context,
+        tokenMetadata: lifecycleHandlers.tokenMetadataCoordinator,
       });
       return !hasValidationErrors(metadata);
     };
