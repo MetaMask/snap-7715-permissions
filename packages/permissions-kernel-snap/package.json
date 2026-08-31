@@ -47,7 +47,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@metamask/snaps-sdk": "11.2.0",
+    "@metamask/snaps-sdk": "12.0.1",
     "zod": "3.25.76"
   },
   "devDependencies": {
