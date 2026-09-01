@@ -14,7 +14,6 @@ import type {
   TrustSignalsClient,
 } from '../../clients/trustSignalsClient';
 import type { SnapsMetricsService } from '../../services/snapsMetricsService';
-import { t } from '../../utils/i18n';
 import type {
   AccountController,
   AccountUpgradeStatus,
@@ -534,12 +533,14 @@ export class ConfirmationSession {
           logger.error('Failed to check account upgrade status', error);
         }
 
-        if (accountStatus && !accountStatus.isSupported) {
-          throw new InvalidRequestError(t('accountNotSupportingEip7702'));
+        if (accountStatus?.isSupported === false) {
+          throw new InvalidRequestError(
+            'This account does not support EIP-7702 and cannot grant permissions.',
+          );
         }
 
         try {
-          if (accountStatus && !accountStatus.isUpgraded) {
+          if (accountStatus?.isUpgraded === false) {
             let upgradeSuccess = false;
             try {
               await this.#accountController.upgradeAccount({

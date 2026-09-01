@@ -224,6 +224,22 @@ export const ConfirmationShellContent = ({
       tooltip={t('payeeTooltip')}
     />
   ) : null;
+
+  let accountStatusField: SnapElement | null = null;
+  if (!isAccountSupported) {
+    accountStatusField = (
+      <Text size="sm" color="error">
+        {t('accountNotSupportingEip7702')}
+      </Text>
+    );
+  } else if (!isAccountUpgraded) {
+    accountStatusField = (
+      <Text size="sm" color="warning">
+        {t('accountUpgradeWarning')}
+      </Text>
+    );
+  }
+
   return (
     <Container>
       <Box>
@@ -246,17 +262,7 @@ export const ConfirmationShellContent = ({
                 switchGlobalAccount={false}
                 value={context.accountAddressCaip10}
               />
-              {isAccountSupported ? (
-                !isAccountUpgraded && (
-                  <Text size="sm" color="warning">
-                    {t('accountUpgradeWarning')}
-                  </Text>
-                )
-              ) : (
-                <Text size="sm" color="error">
-                  {t('accountNotSupportingEip7702')}
-                </Text>
-              )}
+              {accountStatusField}
               {showTokenBalance && hasAsset && (
                 <Box direction="horizontal" alignment="end">
                   {fiatBalanceComponent}
