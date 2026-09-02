@@ -558,7 +558,18 @@ export class ConfirmationSession {
             }
           }
         } catch {
-          // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
+          await this.#snapsMetricsService.trackPermissionRejected({
+            origin,
+            permissionType,
+            chainId: normalizedRequest.chainId,
+            permissionData: normalizedRequest.permission.data,
+            justification: state.context.justification,
+          });
+
+          return {
+            isApproved: false,
+            reason: 'Permission request denied during account upgrade',
+          };
         }
 
         return {

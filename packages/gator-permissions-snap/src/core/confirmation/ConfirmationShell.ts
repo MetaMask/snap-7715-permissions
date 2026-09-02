@@ -129,6 +129,8 @@ export class ConfirmationShell<
     isUpgraded: true,
   };
 
+  #isAccountUpgradeStatusLoading = false;
+
   readonly #callOnceGuard = createCallOnceGuard(
     'ConfirmationShell.bindSessionEvents()',
   );
@@ -226,7 +228,9 @@ export class ConfirmationShell<
       isAccountSupported: this.#accountUpgradeStatus.isSupported,
       existingPermissionsStatus,
       isGrantDisabled:
-        isGrantDisabled || !this.#accountUpgradeStatus.isSupported,
+        isGrantDisabled ||
+        this.#isAccountUpgradeStatusLoading ||
+        !this.#accountUpgradeStatus.isSupported,
       showTokenBalance: this.#showTokenBalance,
     });
   }
@@ -318,6 +322,7 @@ export class ConfirmationShell<
       },
       onSuccess: async (status) => {
         this.#accountUpgradeStatus = status;
+        this.#isAccountUpgradeStatusLoading = false;
         await rerender();
       },
     });
@@ -365,6 +370,7 @@ export class ConfirmationShell<
 
         this.#tokenBalance = null;
         this.#tokenBalanceFiat = null;
+        this.#isAccountUpgradeStatusLoading = true;
         this.#accountUpgradeStatus = { isSupported: true, isUpgraded: true }; // Reset to default while fetching
 
         // we explicitly don't await this as it's a background process that will re-render the UI once it is complete

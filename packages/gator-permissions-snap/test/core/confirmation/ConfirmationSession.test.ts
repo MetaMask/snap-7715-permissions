@@ -826,7 +826,7 @@ describe('ConfirmationSession', () => {
     expect(result.isApproved).toBe(true);
   });
 
-  it('tracks smart account upgrade failure when upgrade fails', async () => {
+  it('rejects the permission request when the account upgrade fails', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
       isSupported: true,
       isUpgraded: false,
@@ -849,7 +849,11 @@ describe('ConfirmationSession', () => {
       chainId: '0x1',
       success: false,
     });
-    expect(result.isApproved).toBe(true);
+    expect(result).toStrictEqual({
+      isApproved: false,
+      reason: 'Permission request denied during account upgrade',
+    });
+    expect(mockSnapsMetricsService.trackPermissionRejected).toHaveBeenCalled();
   });
 
   it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
