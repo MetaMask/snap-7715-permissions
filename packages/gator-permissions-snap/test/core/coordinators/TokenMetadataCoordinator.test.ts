@@ -153,4 +153,219 @@ describe('TokenMetadataCoordinator', () => {
 
     expect(coordinator.getMetadata(caip19)).toBeUndefined();
   });
+
+  it('ignores a stale balance fetch after the selected account changes', async () => {
+    const secondAccountCaip10 =
+      'eip155:1:0x2222222222222222222222222222222222222222';
+    const firstAccountAddress = '0x1234567890123456789012345678901234567890';
+
+    let resolveFirstBalance:
+      | ((value: {
+          balance: bigint;
+          decimals: number;
+          symbol: string;
+          iconUrl: undefined;
+        }) => void)
+      | undefined;
+    const firstBalanceResult = new Promise<{
+      balance: bigint;
+      decimals: number;
+      symbol: string;
+      iconUrl: undefined;
+    }>((resolve) => {
+      resolveFirstBalance = resolve;
+    });
+
+    let firstAccountCalls = 0;
+    mockMetadataService.getTokenBalanceAndMetadata.mockImplementation(
+      async ({ account }) => {
+        const isFirstAccount =
+          account.toLowerCase() === firstAccountAddress.toLowerCase();
+
+        if (isFirstAccount) {
+          firstAccountCalls += 1;
+          if (firstAccountCalls === 2) {
+            return firstBalanceResult;
+          }
+
+          return {
+            balance: 1000n,
+            decimals: 18,
+            symbol: 'ETH',
+            iconUrl: undefined,
+          };
+        }
+
+        return {
+          balance: 2000n,
+          decimals: 18,
+          symbol: 'ETH',
+          iconUrl: undefined,
+        };
+      },
+    );
+
+    const coordinator = createCoordinator();
+
+    let resolveMetadataReady: (() => void) | undefined;
+    const metadataReady = new Promise<void>((resolve) => {
+      resolveMetadataReady = resolve;
+    });
+    let resolveSecondBalanceReady: (() => void) | undefined;
+    const secondBalanceReady = new Promise<void>((resolve) => {
+      resolveSecondBalanceReady = resolve;
+    });
+
+    coordinator.onUpdate(() => {
+      if (
+        coordinator.getMetadata(caip19) &&
+        coordinator.isBalancePending(caip19)
+      ) {
+        resolveMetadataReady?.();
+      }
+      if (coordinator.getBalance(caip19)) {
+        resolveSecondBalanceReady?.();
+      }
+    });
+
+    coordinator.sync({
+      accountCaip10,
+      tokenCaip19s: [caip19],
+      balanceCaip19: caip19,
+    });
+
+    await metadataReady;
+
+    coordinator.sync({
+      accountCaip10: secondAccountCaip10,
+      tokenCaip19s: [caip19],
+      balanceCaip19: caip19,
+    });
+
+    await secondBalanceReady;
+
+    const secondFormatted = coordinator.getBalance(caip19)?.formatted;
+    expect(secondFormatted).toBeDefined();
+
+    resolveFirstBalance?.({
+      balance: 1000n,
+      decimals: 18,
+      symbol: 'ETH',
+      iconUrl: undefined,
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(coordinator.getBalance(caip19)?.formatted).toBe(secondFormatted);
+  });
+
+  it('ignores a stale balance fetch after the selected token changes', async () => {
+    const secondCaip19 =
+      'eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as CaipAssetType;
+    const nativeAssetAddress = '0x0000000000000000000000000000000000000000';
+
+    let resolveFirstBalance:
+      | ((value: {
+          balance: bigint;
+          decimals: number;
+          symbol: string;
+          iconUrl: undefined;
+        }) => void)
+      | undefined;
+    const firstBalanceResult = new Promise<{
+      balance: bigint;
+      decimals: number;
+      symbol: string;
+      iconUrl: undefined;
+    }>((resolve) => {
+      resolveFirstBalance = resolve;
+    });
+
+    let nativeCalls = 0;
+    mockMetadataService.getTokenBalanceAndMetadata.mockImplementation(
+      async ({ assetAddress }) => {
+        const isNative =
+          assetAddress === undefined ||
+          assetAddress.toLowerCase() === nativeAssetAddress;
+
+        if (isNative) {
+          nativeCalls += 1;
+          if (nativeCalls === 2) {
+            return firstBalanceResult;
+          }
+
+          return {
+            balance: 1000n,
+            decimals: 18,
+            symbol: 'ETH',
+            iconUrl: undefined,
+          };
+        }
+
+        return {
+          balance: 2000n,
+          decimals: 6,
+          symbol: 'USDC',
+          iconUrl: undefined,
+        };
+      },
+    );
+
+    const coordinator = createCoordinator();
+
+    let resolveMetadataReady: (() => void) | undefined;
+    const metadataReady = new Promise<void>((resolve) => {
+      resolveMetadataReady = resolve;
+    });
+    let resolveSecondBalanceReady: (() => void) | undefined;
+    const secondBalanceReady = new Promise<void>((resolve) => {
+      resolveSecondBalanceReady = resolve;
+    });
+
+    coordinator.onUpdate(() => {
+      if (
+        coordinator.getMetadata(caip19) &&
+        coordinator.isBalancePending(caip19)
+      ) {
+        resolveMetadataReady?.();
+      }
+      if (coordinator.getBalance(secondCaip19)) {
+        resolveSecondBalanceReady?.();
+      }
+    });
+
+    coordinator.sync({
+      accountCaip10,
+      tokenCaip19s: [caip19],
+      balanceCaip19: caip19,
+    });
+
+    await metadataReady;
+
+    coordinator.sync({
+      accountCaip10,
+      tokenCaip19s: [caip19, secondCaip19],
+      balanceCaip19: secondCaip19,
+    });
+
+    await secondBalanceReady;
+
+    const secondFormatted = coordinator.getBalance(secondCaip19)?.formatted;
+    expect(secondFormatted).toBeDefined();
+    expect(coordinator.getBalance(caip19)).toBeUndefined();
+
+    resolveFirstBalance?.({
+      balance: 1000n,
+      decimals: 18,
+      symbol: 'ETH',
+      iconUrl: undefined,
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(coordinator.getBalance(secondCaip19)?.formatted).toBe(
+      secondFormatted,
+    );
+    expect(coordinator.getBalance(caip19)).toBeUndefined();
+  });
 });

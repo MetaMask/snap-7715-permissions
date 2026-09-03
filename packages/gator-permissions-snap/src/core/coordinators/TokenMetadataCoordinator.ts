@@ -66,6 +66,8 @@ export class TokenMetadataCoordinator {
 
   #accountCaip10: CaipAccountId | undefined;
 
+  #balanceCaip19: CaipAssetType | undefined;
+
   constructor({
     tokenMetadataService,
     tokenPricesService,
@@ -130,6 +132,7 @@ export class TokenMetadataCoordinator {
     balanceCaip19?: CaipAssetType | undefined;
   }): void {
     this.#accountCaip10 = args.accountCaip10;
+    this.#balanceCaip19 = args.balanceCaip19;
 
     const uniqueCaip19s = [...new Set(args.tokenCaip19s)];
 
@@ -229,10 +232,11 @@ export class TokenMetadataCoordinator {
       return;
     }
 
+    const accountCaip10 = this.#accountCaip10;
     this.#balanceByCaip19.set(caip19, { status: 'pending' });
 
     try {
-      const { address } = parseCaipAccountId(this.#accountCaip10);
+      const { address } = parseCaipAccountId(accountCaip10);
       const { chainId, assetAddress } = caip19ToFetchParams(caip19);
 
       const { balance, decimals } =
@@ -253,6 +257,10 @@ export class TokenMetadataCoordinator {
         metadataDecimals,
       );
 
+      if (!this.#isSelectedBalance({ accountCaip10, caip19 })) {
+        return;
+      }
+
       this.#balanceByCaip19.set(caip19, {
         status: 'ready',
         balance: {
@@ -261,6 +269,10 @@ export class TokenMetadataCoordinator {
         },
       });
     } catch (error: unknown) {
+      if (!this.#isSelectedBalance({ accountCaip10, caip19 })) {
+        return;
+      }
+
       this.#balanceByCaip19.set(caip19, { status: 'failed' });
       logger.debug('TokenMetadataCoordinator: balance fetch failed', {
         caip19,
@@ -268,7 +280,28 @@ export class TokenMetadataCoordinator {
       });
     }
 
-    this.#onUpdate?.();
+    if (this.#isSelectedBalance({ accountCaip10, caip19 })) {
+      this.#onUpdate?.();
+    }
+  }
+
+  /**
+   * Whether this lookup still matches the selected account and balance token.
+   * @param args - Account and token captured when the fetch started.
+   * @param args.accountCaip10 - Account used for the in-flight fetch.
+   * @param args.caip19 - Token used for the in-flight fetch.
+   * @returns True when both still match the latest {@link sync} selection.
+   */
+  #isSelectedBalance({
+    accountCaip10,
+    caip19,
+  }: {
+    accountCaip10: CaipAccountId;
+    caip19: CaipAssetType;
+  }): boolean {
+    return (
+      this.#accountCaip10 === accountCaip10 && this.#balanceCaip19 === caip19
+    );
   }
 
   #getAccountAddress(): Hex {
