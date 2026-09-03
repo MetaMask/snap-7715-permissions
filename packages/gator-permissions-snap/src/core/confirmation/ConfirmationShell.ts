@@ -232,12 +232,14 @@ export class ConfirmationShell<
       tokenCaip19s: this.#tokenCaip19s,
       balanceTokenCaip19: this.#balanceTokenCaip19,
     });
-    // The balance section is shown as soon as a balance token is configured;
-    // null values render as skeletons until the lookup resolves.
-    const tokenBalance = balanceCaip19
-      ? (this.#tokenMetadataCoordinator.getBalance(balanceCaip19) ??
-        PENDING_TOKEN_BALANCE)
-      : undefined;
+    let tokenBalance: ConfirmationTokenBalance | undefined;
+    if (balanceCaip19) {
+      tokenBalance =
+        this.#tokenMetadataCoordinator.getBalance(balanceCaip19) ??
+        (this.#tokenMetadataCoordinator.isBalancePending(balanceCaip19)
+          ? PENDING_TOKEN_BALANCE
+          : undefined);
+    }
 
     const permissionContent = await this.#renderBody({
       context,

@@ -47,11 +47,13 @@ export function createTestTokenContext(
  * @param options - Optional metadata and balance overrides.
  * @param options.metadata - Metadata returned by the mock coordinator.
  * @param options.balance - Balance returned by the mock coordinator.
+ * @param options.isBalancePending - Whether the mock reports the balance as in-flight.
  * @returns A coordinator mock with noop sync/onUpdate by default.
  */
 export function createMockTokenMetadataCoordinator(options?: {
   metadata?: ResolvedTokenMetadata;
   balance?: ResolvedTokenBalance | undefined;
+  isBalancePending?: boolean | undefined;
 }): TokenMetadataCoordinator {
   const metadata: ResolvedTokenMetadata = options?.metadata ?? {
     symbol: 'ETH',
@@ -62,10 +64,12 @@ export function createMockTokenMetadataCoordinator(options?: {
     options && 'balance' in options
       ? options.balance
       : { formatted: '1', fiat: '$1' };
+  const isBalancePending = options?.isBalancePending ?? balance === undefined;
 
   const coordinator = {
     getMetadata: jest.fn((_caip19: CaipAssetType) => metadata),
     getBalance: jest.fn((_caip19: CaipAssetType) => balance),
+    isBalancePending: jest.fn((_caip19: CaipAssetType) => isBalancePending),
     onUpdate: jest.fn(),
     sync: jest.fn(),
     ensureMetadata: jest.fn(async () => metadata),

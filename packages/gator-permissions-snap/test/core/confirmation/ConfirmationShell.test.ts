@@ -2,7 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { InternalError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/snaps-sdk';
-import { Text } from '@metamask/snaps-sdk/jsx';
+import { Text as SnapText } from '@metamask/snaps-sdk/jsx';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { AddressScanResultType } from '../../../src/clients/trustSignalsClient';
@@ -60,7 +60,7 @@ const mockContext: TestContextType = createTestBaseContext({
 });
 const mockMetadata: TestMetadataType = {};
 
-const mockBodyContent = Text({
+const mockBodyContent = SnapText({
   children: 'Permission body',
 }) as unknown as SnapElement;
 
@@ -1164,6 +1164,47 @@ describe('ConfirmationShell', () => {
         });
 
       expect(JSON.stringify(confirmationContent)).toContain('Skeleton');
+    });
+
+    it('omits the balance row when the balance lookup has failed', async () => {
+      const failedCoordinator = createMockTokenMetadataCoordinator({
+        balance: undefined,
+        isBalancePending: false,
+      });
+      const confirmationShell = new ConfirmationShell({
+        userEventDispatcher: {
+          on: jest.fn(() => ({ unbind: jest.fn(), dispatcher: {} })),
+          off: jest.fn(),
+          createUserInputEventHandler: jest.fn(),
+          waitForPendingHandlers: jest.fn(),
+        } as unknown as jest.Mocked<UserEventDispatcher>,
+        accountController: {
+          getAccountUpgradeStatus: jest.fn(async () => ({ isUpgraded: false })),
+        } as unknown as jest.Mocked<AccountController>,
+        title: 'permissionRequestTitle' as MessageKey,
+        subtitle: 'permissionRequestSubtitle' as MessageKey,
+        permissionRequest: mockPermissionRequest,
+        tokenCaip19s: [mockBalanceTokenCaip19],
+        balanceTokenCaip19: mockBalanceTokenCaip19,
+        tokenMetadataCoordinator: failedCoordinator,
+        renderBody: jest.fn(async () => Promise.resolve(mockBodyContent)),
+      });
+
+      const confirmationContent =
+        await confirmationShell.createConfirmationContent({
+          context: mockContext,
+          metadata: mockMetadata,
+          origin: mockOrigin,
+          chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
+        });
+
+      const rendered = JSON.stringify(confirmationContent);
+      expect(rendered).not.toContain('Skeleton');
+      expect(rendered).not.toContain('available');
     });
 
     it('calls syncCoordinator again when the account is changed', async () => {

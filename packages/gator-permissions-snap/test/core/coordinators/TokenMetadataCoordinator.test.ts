@@ -19,6 +19,13 @@ describe('TokenMetadataCoordinator', () => {
     Pick<TokenPricesService, 'getCryptoToFiatConversion'>
   >;
 
+  const createCoordinator = (): TokenMetadataCoordinator =>
+    new TokenMetadataCoordinator({
+      tokenMetadataService:
+        mockMetadataService as unknown as TokenMetadataService,
+      tokenPricesService: mockPricesService as unknown as TokenPricesService,
+    });
+
   beforeEach(() => {
     mockMetadataService = {
       getTokenBalanceAndMetadata: jest
@@ -45,11 +52,7 @@ describe('TokenMetadataCoordinator', () => {
   });
 
   it('returns metadata after ensureMetadata', async () => {
-    const coordinator = new TokenMetadataCoordinator({
-      tokenMetadataService:
-        mockMetadataService as unknown as TokenMetadataService,
-      tokenPricesService: mockPricesService as unknown as TokenPricesService,
-    });
+    const coordinator = createCoordinator();
 
     const metadata = await coordinator.ensureMetadata({
       caip19,
@@ -60,12 +63,23 @@ describe('TokenMetadataCoordinator', () => {
     expect(coordinator.getMetadata(caip19)?.decimals).toBe(18);
   });
 
+  it('rejects ensureMetadata when metadata fetch fails', async () => {
+    mockMetadataService.getTokenBalanceAndMetadata.mockRejectedValue(
+      new Error('token not found'),
+    );
+    const coordinator = createCoordinator();
+
+    await expect(
+      coordinator.ensureMetadata({
+        caip19,
+        accountCaip10,
+      }),
+    ).rejects.toThrow('token not found');
+    expect(coordinator.getMetadata(caip19)).toBeUndefined();
+  });
+
   it('notifies listeners when balance sync completes', async () => {
-    const coordinator = new TokenMetadataCoordinator({
-      tokenMetadataService:
-        mockMetadataService as unknown as TokenMetadataService,
-      tokenPricesService: mockPricesService as unknown as TokenPricesService,
-    });
+    const coordinator = createCoordinator();
 
     const onUpdate = jest.fn();
     const syncCompleted = new Promise<void>((resolve) => {
@@ -87,5 +101,56 @@ describe('TokenMetadataCoordinator', () => {
 
     expect(onUpdate).toHaveBeenCalled();
     expect(coordinator.getBalance(caip19)?.formatted).toBeDefined();
+    expect(coordinator.isBalancePending(caip19)).toBe(false);
+  });
+
+  it('marks balance failed and notifies listeners when the balance fetch fails', async () => {
+    mockMetadataService.getTokenBalanceAndMetadata.mockRejectedValue(
+      new Error('balance unavailable'),
+    );
+    const coordinator = createCoordinator();
+
+    const updateCompleted = new Promise<void>((resolve) => {
+      coordinator.onUpdate(() => {
+        if (!coordinator.isBalancePending(caip19)) {
+          resolve();
+        }
+      });
+    });
+
+    coordinator.sync({
+      accountCaip10,
+      tokenCaip19s: [caip19],
+      balanceCaip19: caip19,
+    });
+
+    expect(coordinator.isBalancePending(caip19)).toBe(true);
+
+    await updateCompleted;
+
+    expect(coordinator.getBalance(caip19)).toBeUndefined();
+    expect(coordinator.isBalancePending(caip19)).toBe(false);
+  });
+
+  it('notifies listeners when a background metadata fetch fails', async () => {
+    mockMetadataService.getTokenBalanceAndMetadata.mockRejectedValue(
+      new Error('metadata unavailable'),
+    );
+    const coordinator = createCoordinator();
+
+    const updateCompleted = new Promise<void>((resolve) => {
+      coordinator.onUpdate(() => {
+        resolve();
+      });
+    });
+
+    coordinator.sync({
+      accountCaip10,
+      tokenCaip19s: [caip19],
+    });
+
+    await updateCompleted;
+
+    expect(coordinator.getMetadata(caip19)).toBeUndefined();
   });
 });

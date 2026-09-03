@@ -79,7 +79,7 @@ export class TokenMetadataCoordinator {
 
   /**
    * Registers a callback invoked whenever metadata or balance fetch completes.
-   * @param callback - Called after each successful fetch completion.
+   * @param callback - Called after each fetch completion, success or failure.
    * @throws If called more than once on the same instance.
    */
   onUpdate(callback: () => void): void {
@@ -152,15 +152,19 @@ export class TokenMetadataCoordinator {
             caip19,
             error: error instanceof Error ? error.message : error,
           });
+          this.#onUpdate?.();
         });
     }
 
     if (args.balanceCaip19) {
       this.#fetchBalance(args.balanceCaip19).catch((error: unknown) => {
-        logger.debug('TokenMetadataCoordinator: balance fetch failed', {
-          caip19: args.balanceCaip19,
-          error: error instanceof Error ? error.message : error,
-        });
+        logger.debug(
+          'TokenMetadataCoordinator: unexpected balance fetch error',
+          {
+            caip19: args.balanceCaip19,
+            error: error instanceof Error ? error.message : error,
+          },
+        );
       });
     }
   }
@@ -183,6 +187,18 @@ export class TokenMetadataCoordinator {
   getBalance(caip19: CaipAssetType): ResolvedTokenBalance | undefined {
     const entry = this.#balanceByCaip19.get(caip19);
     return entry?.status === 'ready' ? entry.balance : undefined;
+  }
+
+  /**
+   * Whether a balance lookup has not reached a terminal state.
+   * Absent and `pending` entries are treated as in-flight so the UI can
+   * render skeletons before `sync()` writes the first map entry.
+   * @param caip19 - The CAIP-19 asset identifier.
+   * @returns True when the balance is not yet `ready` or `failed`.
+   */
+  isBalancePending(caip19: CaipAssetType): boolean {
+    const entry = this.#balanceByCaip19.get(caip19);
+    return entry === undefined || entry.status === 'pending';
   }
 
   async #fetchMetadata(caip19: CaipAssetType): Promise<ResolvedTokenMetadata> {
@@ -215,34 +231,43 @@ export class TokenMetadataCoordinator {
 
     this.#balanceByCaip19.set(caip19, { status: 'pending' });
 
-    const { address } = parseCaipAccountId(this.#accountCaip10);
-    const { chainId, assetAddress } = caip19ToFetchParams(caip19);
+    try {
+      const { address } = parseCaipAccountId(this.#accountCaip10);
+      const { chainId, assetAddress } = caip19ToFetchParams(caip19);
 
-    const { balance, decimals } =
-      await this.#tokenMetadataService.getTokenBalanceAndMetadata({
-        chainId,
-        account: address as Hex,
-        assetAddress: assetAddress ?? ZERO_ADDRESS,
+      const { balance, decimals } =
+        await this.#tokenMetadataService.getTokenBalanceAndMetadata({
+          chainId,
+          account: address as Hex,
+          assetAddress: assetAddress ?? ZERO_ADDRESS,
+        });
+
+      const formatted = formatUnits({ value: balance, decimals });
+
+      const metadata = this.getMetadata(caip19);
+      const metadataDecimals = metadata?.decimals ?? decimals;
+
+      const fiat = await this.#tokenPricesService.getCryptoToFiatConversion(
+        caip19,
+        bigIntToHex(balance),
+        metadataDecimals,
+      );
+
+      this.#balanceByCaip19.set(caip19, {
+        status: 'ready',
+        balance: {
+          formatted,
+          fiat,
+        },
       });
+    } catch (error: unknown) {
+      this.#balanceByCaip19.set(caip19, { status: 'failed' });
+      logger.debug('TokenMetadataCoordinator: balance fetch failed', {
+        caip19,
+        error: error instanceof Error ? error.message : error,
+      });
+    }
 
-    const formatted = formatUnits({ value: balance, decimals });
-
-    const metadata = this.getMetadata(caip19);
-    const metadataDecimals = metadata?.decimals ?? decimals;
-
-    const fiat = await this.#tokenPricesService.getCryptoToFiatConversion(
-      caip19,
-      bigIntToHex(balance),
-      metadataDecimals,
-    );
-
-    this.#balanceByCaip19.set(caip19, {
-      status: 'ready',
-      balance: {
-        formatted,
-        fiat,
-      },
-    });
     this.#onUpdate?.();
   }
 
