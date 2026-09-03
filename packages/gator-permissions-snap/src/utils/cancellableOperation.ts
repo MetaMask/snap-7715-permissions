@@ -8,14 +8,18 @@
  * @param options.onSuccess - Callback invoked with the result if not cancelled.
  * Receives an `isCancelled` function to check cancellation status during
  * async operations within the callback.
+ * @param options.onError - Optional callback invoked when the latest operation
+ * fails. Receives the error and an `isCancelled` function.
  * @returns An async function that executes the operation with the given argument.
  */
 export function createCancellableOperation<TArg, TResult>({
   operation,
   onSuccess,
+  onError,
 }: {
   operation: (arg: TArg) => Promise<TResult>;
   onSuccess: (result: TResult, isCancelled: () => boolean) => Promise<void>;
+  onError?: (error: unknown, isCancelled: () => boolean) => Promise<void>;
 }): (arg: TArg) => Promise<void> {
   let callCounter = 0;
 
@@ -30,14 +34,21 @@ export function createCancellableOperation<TArg, TResult>({
     callCounter += 1;
     const currentCall = callCounter;
 
-    const result = await operation(arg);
+    try {
+      const result = await operation(arg);
 
-    // Check if this call is still the latest
-    if (currentCall !== callCounter) {
-      return;
+      // Check if this call is still the latest
+      if (currentCall !== callCounter) {
+        return;
+      }
+
+      const isCancelled = (): boolean => currentCall !== callCounter;
+      await onSuccess(result, isCancelled);
+    } catch (error) {
+      if (currentCall === callCounter && onError) {
+        await onError(error, () => currentCall !== callCounter);
+      }
+      throw error;
     }
-
-    const isCancelled = (): boolean => currentCall !== callCounter;
-    await onSuccess(result, isCancelled);
   };
 }

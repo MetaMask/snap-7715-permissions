@@ -325,6 +325,13 @@ export class ConfirmationShell<
         this.#isAccountUpgradeStatusLoading = false;
         await rerender();
       },
+      onError: async (_error, isCancelled) => {
+        if (isCancelled()) {
+          return;
+        }
+        this.#isAccountUpgradeStatusLoading = false;
+        await rerender();
+      },
     });
 
     const shouldFetchTokenBalance =

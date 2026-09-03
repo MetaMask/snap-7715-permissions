@@ -195,4 +195,21 @@ describe('createCancellableOperation', () => {
       // 'first-fiat-balance' should NOT be here because the isCancelled check prevented it
     ]);
   });
+
+  it('should call onError for the latest failed operation', async () => {
+    const error = new Error('failed');
+    const onError = jest.fn(
+      async (_error: unknown, _isCancelled: () => boolean) => Promise.resolve(),
+    );
+    const execute = createCancellableOperation({
+      operation: async () => {
+        throw error;
+      },
+      onSuccess: async () => Promise.resolve(),
+      onError,
+    });
+
+    await expect(execute(undefined)).rejects.toBe(error);
+    expect(onError).toHaveBeenCalledWith(error, expect.any(Function));
+  });
 });

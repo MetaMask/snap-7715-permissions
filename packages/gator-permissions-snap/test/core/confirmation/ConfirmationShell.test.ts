@@ -456,6 +456,72 @@ describe('ConfirmationShell', () => {
       expect(grantButton?.props.disabled).toBe(true);
     });
 
+    it('re-enables grant when the selected account upgrade status lookup fails', async () => {
+      const {
+        confirmationShell,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+        getBoundEvent,
+        accountController,
+      } = setupTest();
+      accountController.getAccountUpgradeStatus
+        .mockResolvedValueOnce({ isSupported: true, isUpgraded: true })
+        .mockRejectedValueOnce(new Error('lookup failed'));
+
+      confirmationShell.bindSessionEvents({
+        interfaceId: mockInterfaceId,
+        initialContext: mockContext,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+      });
+
+      const accountSelected = getBoundEvent({
+        elementName: 'account-selector',
+        eventType: 'InputChangeEvent',
+        interfaceId: mockInterfaceId,
+      });
+      await accountSelected?.({
+        event: { value: { addresses: [`eip155:1:${mockAddress2}`] } },
+      } as never);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const result = await confirmationShell.createConfirmationContent({
+        context: {
+          ...mockContext,
+          accountAddressCaip10: `eip155:1:${mockAddress2}`,
+        },
+        metadata: mockMetadata,
+        origin: mockOrigin,
+        chainId: 1,
+        scanDappUrlResult: null,
+        scanAddressResult: null,
+        existingPermissionsStatus: ExistingPermissionsState.None,
+        isGrantDisabled: false,
+      });
+      const flatten = (element: SnapElement): SnapElement[] => {
+        const children = Array.isArray(element.props.children)
+          ? element.props.children
+          : [element.props.children];
+        return [
+          element,
+          ...children.flatMap((child) =>
+            child && typeof child === 'object' && 'type' in child
+              ? flatten(child as SnapElement)
+              : [],
+          ),
+        ];
+      };
+      const grantButton = flatten(result).find(
+        (element) =>
+          element.type === 'Button' &&
+          element.props.name === ConfirmationDialog.grantButton,
+      );
+
+      expect(grantButton?.props.disabled).toBe(false);
+    });
+
     it('registers event handlers for account selection and justification toggle', async () => {
       const rule: RuleDefinition<TestContextType, TestMetadataType> = {
         name: 'amountPerSecond',
