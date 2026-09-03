@@ -521,7 +521,7 @@ export class ConfirmationSession {
 
         // A failed lookup means "unknown", not "unsupported": it must never
         // block the request. Only an explicit negative verdict does.
-        let accountStatus: AccountUpgradeStatus | null = null;
+        let accountStatus: AccountUpgradeStatus = { isResolved: false };
         try {
           accountStatus = await this.#accountController.getAccountUpgradeStatus(
             {
@@ -533,14 +533,14 @@ export class ConfirmationSession {
           logger.error('Failed to check account upgrade status', error);
         }
 
-        if (accountStatus?.isSupported === false) {
+        if (accountStatus.isResolved && !accountStatus.isSupported) {
           throw new InvalidRequestError(
             'This account does not support EIP-7702 and cannot grant permissions.',
           );
         }
 
         try {
-          if (accountStatus?.isUpgraded === false) {
+          if (accountStatus.isResolved && !accountStatus.isUpgraded) {
             let upgradeSuccess = false;
             try {
               await this.#accountController.upgradeAccount({

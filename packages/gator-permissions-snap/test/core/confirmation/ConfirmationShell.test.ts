@@ -136,6 +136,7 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
   } as unknown as jest.Mocked<AccountController>;
 
   accountController.getAccountUpgradeStatus.mockResolvedValue({
+    isResolved: true,
     isSupported: true,
     isUpgraded: false,
   });
@@ -327,6 +328,7 @@ describe('ConfirmationShell', () => {
       accountController,
     } = setupTest();
     accountController.getAccountUpgradeStatus.mockResolvedValue({
+      isResolved: true,
       isSupported: false,
       isUpgraded: false,
     });
@@ -466,7 +468,11 @@ describe('ConfirmationShell', () => {
         accountController,
       } = setupTest();
       accountController.getAccountUpgradeStatus
-        .mockResolvedValueOnce({ isSupported: true, isUpgraded: true })
+        .mockResolvedValueOnce({
+          isResolved: true,
+          isSupported: true,
+          isUpgraded: true,
+        })
         .mockRejectedValueOnce(new Error('lookup failed'));
 
       confirmationShell.bindSessionEvents({

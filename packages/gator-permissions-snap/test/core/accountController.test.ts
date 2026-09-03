@@ -115,7 +115,11 @@ describe('AccountController', () => {
         chainId: mockChainId,
       });
 
-      expect(result).toStrictEqual({ isSupported: true, isUpgraded: true });
+      expect(result).toStrictEqual({
+        isResolved: true,
+        isSupported: true,
+        isUpgraded: true,
+      });
       expect(mockEthereumProvider.request).toHaveBeenCalledWith({
         method: 'wallet_getAccountUpgradeStatus',
         params: { account: mockAddress, chainId: mockChainId },
@@ -134,7 +138,11 @@ describe('AccountController', () => {
         chainId: mockChainId,
       });
 
-      expect(result).toStrictEqual({ isSupported: false, isUpgraded: false });
+      expect(result).toStrictEqual({
+        isResolved: true,
+        isSupported: false,
+        isUpgraded: false,
+      });
     });
 
     it('should return isUpgraded false when the account is supported but not upgraded', async () => {
@@ -149,7 +157,11 @@ describe('AccountController', () => {
         chainId: mockChainId,
       });
 
-      expect(result).toStrictEqual({ isSupported: true, isUpgraded: false });
+      expect(result).toStrictEqual({
+        isResolved: true,
+        isSupported: true,
+        isUpgraded: false,
+      });
     });
 
     it('should treat a missing isSupported field as supported', async () => {
@@ -163,7 +175,11 @@ describe('AccountController', () => {
         chainId: mockChainId,
       });
 
-      expect(result).toStrictEqual({ isSupported: true, isUpgraded: false });
+      expect(result).toStrictEqual({
+        isResolved: true,
+        isSupported: true,
+        isUpgraded: false,
+      });
     });
   });
 

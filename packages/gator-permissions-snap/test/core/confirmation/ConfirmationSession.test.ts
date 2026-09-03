@@ -79,6 +79,7 @@ const mockPermissionRequest: PermissionRequest = {
 const mockAccountController = {
   getAccountAddresses: jest.fn(),
   getAccountUpgradeStatus: jest.fn(async () => ({
+    isResolved: true,
     isSupported: true,
     isUpgraded: false,
   })),
@@ -201,7 +202,7 @@ describe('ConfirmationSession', () => {
     };
 
     mockAccountController.getAccountUpgradeStatus.mockImplementation(
-      async () => ({ isSupported: true, isUpgraded: false }),
+      async () => ({ isResolved: true, isSupported: true, isUpgraded: false }),
     );
 
     mockConfirmationDialogFactory.createConfirmation.mockReturnValue(
@@ -372,6 +373,7 @@ describe('ConfirmationSession', () => {
 
   it('checks account upgrade status and triggers upgrade when needed', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isResolved: true,
       isSupported: true,
       isUpgraded: false,
     });
@@ -391,6 +393,7 @@ describe('ConfirmationSession', () => {
 
   it('does not trigger upgrade when account is already upgraded', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isResolved: true,
       isSupported: true,
       isUpgraded: true,
     });
@@ -405,6 +408,7 @@ describe('ConfirmationSession', () => {
 
   it('rejects the grant when the account does not support EIP-7702', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isResolved: true,
       isSupported: false,
       isUpgraded: false,
     });
@@ -420,6 +424,7 @@ describe('ConfirmationSession', () => {
 
   it('approves without upgrading when the account is supported and upgraded', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isResolved: true,
       isSupported: true,
       isUpgraded: true,
     });
@@ -802,6 +807,7 @@ describe('ConfirmationSession', () => {
 
   it('tracks smart account upgrade success when upgrade is successful', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isResolved: true,
       isSupported: true,
       isUpgraded: false,
     });
@@ -828,6 +834,7 @@ describe('ConfirmationSession', () => {
 
   it('rejects the permission request when the account upgrade fails', async () => {
     mockAccountController.getAccountUpgradeStatus.mockResolvedValueOnce({
+      isResolved: true,
       isSupported: true,
       isUpgraded: false,
     });

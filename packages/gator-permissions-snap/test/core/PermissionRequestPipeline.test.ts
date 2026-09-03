@@ -111,6 +111,7 @@ const mockAccountController = {
   signDelegation: jest.fn(),
   getAccountAddresses: jest.fn(),
   getAccountUpgradeStatus: jest.fn(async () => ({
+    isResolved: true,
     isSupported: true,
     isUpgraded: false,
   })),
@@ -260,7 +261,7 @@ describe('PermissionRequestPipeline', () => {
     );
 
     mockAccountController.getAccountUpgradeStatus.mockImplementation(
-      async () => ({ isSupported: true, isUpgraded: false }),
+      async () => ({ isResolved: true, isSupported: true, isUpgraded: false }),
     );
 
     mockAccountController.getAccountAddresses.mockResolvedValue([

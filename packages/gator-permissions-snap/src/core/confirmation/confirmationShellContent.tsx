@@ -65,8 +65,8 @@ export type ConfirmationShellContentProps = {
   tokenBalanceFiat: string | null;
   chainId: number;
   explorerUrl: string | undefined;
-  isAccountUpgraded: boolean;
-  isAccountSupported: boolean;
+  showAccountUnsupported: boolean;
+  showAccountUpgradeWarning: boolean;
   existingPermissionsStatus: ExistingPermissionsState;
   /** When true, the primary grant button is not clickable. */
   isGrantDisabled: boolean;
@@ -94,8 +94,8 @@ export type ConfirmationShellContentProps = {
  * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
- * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
- * @param options.isAccountSupported - Whether the account supports EIP-7702.
+ * @param options.showAccountUnsupported - Whether to show the unsupported account message.
+ * @param options.showAccountUpgradeWarning - Whether to show the account upgrade warning.
  * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
  * @param options.isGrantDisabled - Whether the grant button should render disabled.
  * @param options.showTokenBalance - Whether to show token balance in the account section.
@@ -119,8 +119,8 @@ export const ConfirmationShellContent = ({
   tokenBalanceFiat,
   chainId,
   explorerUrl,
-  isAccountUpgraded,
-  isAccountSupported,
+  showAccountUnsupported,
+  showAccountUpgradeWarning,
   existingPermissionsStatus,
   isGrantDisabled,
   showTokenBalance,
@@ -226,13 +226,13 @@ export const ConfirmationShellContent = ({
   ) : null;
 
   let accountStatusField: SnapElement | null = null;
-  if (!isAccountSupported) {
+  if (showAccountUnsupported) {
     accountStatusField = (
       <Text size="sm" color="error">
         {t('accountNotSupportingEip7702')}
       </Text>
     );
-  } else if (!isAccountUpgraded) {
+  } else if (showAccountUpgradeWarning) {
     accountStatusField = (
       <Text size="sm" color="warning">
         {t('accountUpgradeWarning')}
