@@ -1,13 +1,15 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import { InternalError } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/snaps-sdk';
 
 import {
   collectTokenCaip19s,
+  getTokenDecimals,
   primaryTokenCaip19Selector,
   resolveModuleTokenCaip19s,
 } from '../../../src/core/token/tokenSelectors';
 import {
+  createMockTokenMetadataCoordinator,
   createTestBaseContext,
   createTestTokenContext,
 } from '../../testContext';
@@ -95,6 +97,28 @@ describe('tokenSelectors', () => {
         tokenCaip19s: [],
         balanceCaip19: undefined,
       });
+    });
+  });
+
+  describe('getTokenDecimals', () => {
+    it('returns decimals from coordinator metadata', () => {
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: 'USDC',
+          decimals: 6,
+          iconDataBase64: null,
+        },
+      });
+
+      expect(getTokenDecimals(coordinator, erc20Caip19)).toBe(6);
+    });
+
+    it('returns undefined when the asset or metadata is missing', () => {
+      const coordinator = createMockTokenMetadataCoordinator();
+      jest.mocked(coordinator.getMetadata).mockReturnValue(undefined);
+
+      expect(getTokenDecimals(coordinator, undefined)).toBeUndefined();
+      expect(getTokenDecimals(coordinator, erc20Caip19)).toBeUndefined();
     });
   });
 });

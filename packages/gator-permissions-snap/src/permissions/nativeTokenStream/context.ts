@@ -17,6 +17,7 @@ import type {
 } from './types';
 import type { TokenMetadataCoordinator } from '../../core/coordinators/TokenMetadataCoordinator';
 import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
+import { getTokenDecimals } from '../../core/token/tokenSelectors';
 import { TimePeriod } from '../../core/types';
 import { t } from '../../utils/i18n';
 import { TIME_PERIOD_TO_SECONDS } from '../../utils/time';
@@ -64,9 +65,7 @@ export async function applyContext({
   tokenMetadata: TokenMetadataCoordinator;
 }): Promise<NativeTokenStreamPermissionRequest> {
   const { permissionDetails } = context;
-  const decimals = tokenMetadata.getMetadata(
-    context.primaryTokenCaip19,
-  )?.decimals;
+  const decimals = getTokenDecimals(tokenMetadata, context.primaryTokenCaip19);
   if (decimals === undefined) {
     throw new InternalError('Token metadata not available for applyContext');
   }
@@ -250,9 +249,7 @@ export async function deriveMetadata({
   tokenMetadata: TokenMetadataCoordinator;
 }): Promise<NativeTokenStreamMetadata> {
   const { permissionDetails, expiry } = context;
-  const decimals = tokenMetadata.getMetadata(
-    context.primaryTokenCaip19,
-  )?.decimals;
+  const decimals = getTokenDecimals(tokenMetadata, context.primaryTokenCaip19);
   if (decimals === undefined) {
     return {
       amountPerSecond: t('unknownStreamRate'),

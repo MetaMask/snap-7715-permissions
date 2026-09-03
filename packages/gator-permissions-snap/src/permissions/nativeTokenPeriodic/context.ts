@@ -17,6 +17,7 @@ import type {
 } from './types';
 import type { TokenMetadataCoordinator } from '../../core/coordinators/TokenMetadataCoordinator';
 import type { PermissionBuildServices } from '../../core/permission/PermissionModule';
+import { getTokenDecimals } from '../../core/token/tokenSelectors';
 import { parseUnits, formatUnitsFromHex } from '../../utils/value';
 import {
   validateAndParseAmount,
@@ -56,9 +57,7 @@ export async function applyContext({
   tokenMetadata: TokenMetadataCoordinator;
 }): Promise<NativeTokenPeriodicPermissionRequest> {
   const { permissionDetails } = context;
-  const decimals = tokenMetadata.getMetadata(
-    context.primaryTokenCaip19,
-  )?.decimals;
+  const decimals = getTokenDecimals(tokenMetadata, context.primaryTokenCaip19);
   if (decimals === undefined) {
     throw new InternalError('Token metadata not available for applyContext');
   }
@@ -213,9 +212,7 @@ export async function deriveMetadata({
   tokenMetadata: TokenMetadataCoordinator;
 }): Promise<NativeTokenPeriodicMetadata> {
   const { permissionDetails, expiry } = context;
-  const decimals = tokenMetadata.getMetadata(
-    context.primaryTokenCaip19,
-  )?.decimals;
+  const decimals = getTokenDecimals(tokenMetadata, context.primaryTokenCaip19);
   if (decimals === undefined) {
     return { validationErrors: {} };
   }
