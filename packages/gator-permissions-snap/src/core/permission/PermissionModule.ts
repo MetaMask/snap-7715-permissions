@@ -156,7 +156,6 @@ export function buildRequestLifecycleHandlers<
         interfaceId: sessionArgs.interfaceId,
         initialContext: sessionArgs.initialContext,
         rules: module.rules,
-        defaultTokenCaip19: module.balanceTokenCaip19,
         tokenMetadataCoordinator,
         updateContext: sessionArgs.updateContext,
         onExistingPermissionsViewChange:

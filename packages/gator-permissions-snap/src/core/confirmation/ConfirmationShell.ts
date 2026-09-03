@@ -69,7 +69,6 @@ export type ConfirmationShellBindSessionArgs<
   interfaceId: string;
   initialContext: TContext;
   rules: RuleDefinition<TContext, TMetadata>[];
-  defaultTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
   tokenMetadataCoordinator: TokenMetadataCoordinator;
   updateContext: (args: { updatedContext: TContext }) => Promise<void>;
   onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
@@ -283,7 +282,6 @@ export class ConfirmationShell<
       interfaceId,
       initialContext,
       rules,
-      defaultTokenCaip19,
       tokenMetadataCoordinator,
       updateContext,
       onExistingPermissionsViewChange,
@@ -388,8 +386,6 @@ export class ConfirmationShell<
         currentContext = context;
         await rerender();
       },
-      tokenMetadataCoordinator,
-      defaultTokenCaip19,
     });
 
     const unbind = (): void => {

@@ -175,8 +175,6 @@ export function renderRules<
  * @param options0.interfaceId - The interface ID for the event handlers.
  * @param options0.getContext - Function to get the current context state.
  * @param options0.onContextChanged - Function called when context changes.
- * @param options0.tokenMetadataCoordinator - Coordinator for token metadata used by rule handlers.
- * @param options0.defaultTokenCaip19 - Optional selector for the default token used by rules.
  * @returns A function that unbinds the handlers when called.
  */
 export function bindRuleHandlers<
@@ -188,16 +186,12 @@ export function bindRuleHandlers<
   interfaceId,
   getContext,
   onContextChanged,
-  tokenMetadataCoordinator: _tokenMetadataCoordinator,
-  defaultTokenCaip19: _defaultTokenCaip19,
 }: {
   rules: RuleDefinition<TContext, TMetadata>[];
   userEventDispatcher: UserEventDispatcher;
   interfaceId: string;
   getContext: () => TContext;
   onContextChanged: (args: { context: TContext }) => Promise<void>;
-  tokenMetadataCoordinator: TokenMetadataCoordinator;
-  defaultTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
 }): () => void {
   const unbinders = rules.reduce<(() => void)[]>((acc, rule) => {
     const { name, isOptional } = rule;

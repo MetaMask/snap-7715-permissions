@@ -890,7 +890,6 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
-        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(mockUserEventDispatcher.on).toHaveBeenCalledTimes(5); // 3 input handlers + 1 add button + 1 remove button
@@ -927,7 +926,6 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
-        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(mockUserEventDispatcher.on).toHaveBeenCalledWith({
@@ -947,7 +945,6 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
-        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       // Get the handler that was bound
@@ -982,7 +979,6 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
-        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       // Get the remove button handler
@@ -1017,7 +1013,6 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
-        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(typeof unbind).toBe('function');
@@ -1042,7 +1037,6 @@ describe('rules', () => {
         interfaceId: 'test-interface',
         getContext: mockGetContext,
         onContextChanged: mockOnContextChanged,
-        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(mockUserEventDispatcher.on).not.toHaveBeenCalled();
