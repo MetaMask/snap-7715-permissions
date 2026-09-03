@@ -1,5 +1,6 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { InvalidRequestError, UserInputEventType } from '@metamask/snaps-sdk';
+import type { CaipAssetType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import type { Hex } from '@metamask/utils';
 import {
@@ -14,6 +15,7 @@ import {
   SHOW_EXISTING_PERMISSIONS_BUTTON_NAME,
   SkeletonConfirmationShellContent,
 } from './confirmationShellContent';
+import type { ConfirmationTokenBalance } from './confirmationShellContent';
 import { JUSTIFICATION_SHOW_MORE_BUTTON_NAME } from './constants';
 import { logger } from '../../../../shared/src/utils/logger';
 import type {
@@ -33,13 +35,18 @@ import type { TokenMetadataCoordinator } from '../coordinators/TokenMetadataCoor
 import { EXISTING_PERMISSIONS_CONFIRM_BUTTON } from '../existingpermissions';
 import type { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
 import { bindRuleHandlers } from '../rules';
-import { collectTokenCaip19s } from '../token/tokenSelectors';
+import { resolveModuleTokenCaip19s } from '../token/tokenSelectors';
 import type {
   BaseContext,
   RuleDefinition,
   ShellTokenDisplay,
   TokenCaip19Selector,
 } from '../types';
+
+const PENDING_TOKEN_BALANCE: ConfirmationTokenBalance = {
+  formatted: null,
+  fiat: null,
+};
 
 export type ConfirmationShellRenderArgs<
   TContext extends BaseContext,
@@ -78,7 +85,7 @@ export type ConfirmationShellParams<
   title: MessageKey;
   subtitle: MessageKey;
   permissionRequest: PermissionRequest;
-  shellTokenCaip19s: TokenCaip19Selector<TContext>[];
+  tokenCaip19s: TokenCaip19Selector<TContext>[];
   balanceTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
   tokenMetadataCoordinator: TokenMetadataCoordinator;
   renderBody: (args: {
@@ -108,7 +115,7 @@ export class ConfirmationShell<
 
   readonly #permissionRequest: PermissionRequest;
 
-  readonly #shellTokenCaip19s: TokenCaip19Selector<TContext>[];
+  readonly #tokenCaip19s: TokenCaip19Selector<TContext>[];
 
   readonly #balanceTokenCaip19: TokenCaip19Selector<TContext> | undefined;
 
@@ -133,7 +140,7 @@ export class ConfirmationShell<
     title,
     subtitle,
     permissionRequest,
-    shellTokenCaip19s,
+    tokenCaip19s,
     balanceTokenCaip19,
     tokenMetadataCoordinator,
     renderBody,
@@ -143,7 +150,7 @@ export class ConfirmationShell<
     this.#permissionTitle = title;
     this.#permissionSubtitle = subtitle;
     this.#permissionRequest = permissionRequest;
-    this.#shellTokenCaip19s = shellTokenCaip19s;
+    this.#tokenCaip19s = tokenCaip19s;
     this.#balanceTokenCaip19 = balanceTokenCaip19;
     this.#tokenMetadataCoordinator = tokenMetadataCoordinator;
     this.#renderBody = renderBody;
@@ -161,21 +168,16 @@ export class ConfirmationShell<
   }
 
   /**
-   * Builds shell token display props from the coordinator and context.
-   * @param context - Current permission context.
+   * Builds shell token display props from resolved CAIP-19s.
+   * @param tokenCaip19s - Token CAIP-19s to display as TokenField rows.
    * @param explorerUrl - Block explorer base URL.
    * @returns Token display data for shell TokenField components.
    */
   #buildShellTokens(
-    context: TContext,
+    tokenCaip19s: CaipAssetType[],
     explorerUrl: string | undefined,
   ): ShellTokenDisplay[] {
-    let selectors = this.#shellTokenCaip19s;
-    if (selectors.length === 0) {
-      selectors = this.#balanceTokenCaip19 ? [this.#balanceTokenCaip19] : [];
-    }
-
-    return collectTokenCaip19s(context, selectors).map((caip19) => {
+    return tokenCaip19s.map((caip19) => {
       const metadata = this.#tokenMetadataCoordinator.getMetadata(caip19);
       const { assetReference, assetNamespace } = parseCaipAssetType(caip19);
 
@@ -225,9 +227,16 @@ export class ConfirmationShell<
       throw new InvalidRequestError('Delegate address is undefined');
     }
 
-    const balanceCaip19 = this.#balanceTokenCaip19?.(context);
-    const balance = balanceCaip19
-      ? this.#tokenMetadataCoordinator.getBalance(balanceCaip19)
+    const { tokenCaip19s, balanceCaip19 } = resolveModuleTokenCaip19s({
+      context,
+      tokenCaip19s: this.#tokenCaip19s,
+      balanceTokenCaip19: this.#balanceTokenCaip19,
+    });
+    // The balance section is shown as soon as a balance token is configured;
+    // null values render as skeletons until the lookup resolves.
+    const tokenBalance = balanceCaip19
+      ? (this.#tokenMetadataCoordinator.getBalance(balanceCaip19) ??
+        PENDING_TOKEN_BALANCE)
       : undefined;
 
     const permissionContent = await this.#renderBody({
@@ -243,19 +252,17 @@ export class ConfirmationShell<
       delegateAddress,
       justification,
       networkName,
-      shellTokens: this.#buildShellTokens(context, explorerUrl),
+      shellTokens: this.#buildShellTokens(tokenCaip19s, explorerUrl),
       isJustificationCollapsed: this.#isJustificationCollapsed,
       children: permissionContent,
       permissionTitle: this.#permissionTitle,
       permissionSubtitle: this.#permissionSubtitle,
       context,
-      tokenBalance: balance?.formatted ?? null,
-      tokenBalanceFiat: balance?.fiat ?? null,
+      tokenBalance,
       chainId,
       isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
       existingPermissionsStatus,
       isGrantDisabled,
-      showTokenBalance: balanceCaip19 !== undefined,
     });
   }
 

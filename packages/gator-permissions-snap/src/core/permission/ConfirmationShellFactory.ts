@@ -47,7 +47,7 @@ export class ConfirmationShellFactory {
       title: module.title,
       subtitle: module.subtitle,
       permissionRequest,
-      shellTokenCaip19s: module.shellTokenCaip19s ?? module.tokenCaip19s,
+      tokenCaip19s: module.tokenCaip19s,
       balanceTokenCaip19: module.balanceTokenCaip19,
       tokenMetadataCoordinator,
       renderBody: async (renderArgs) => module.renderBody(renderArgs),

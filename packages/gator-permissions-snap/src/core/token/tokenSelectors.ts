@@ -1,3 +1,4 @@
+import { InternalError } from '@metamask/snaps-sdk';
 import type { CaipAssetType } from '@metamask/snaps-sdk';
 
 import type { TokenMetadataCoordinator } from '../coordinators/TokenMetadataCoordinator';
@@ -37,6 +38,45 @@ export function collectTokenCaip19s<TContext extends BaseContext>(
 }
 
 /**
+ * Collects module token CAIP-19s and the optional balance token.
+ * @param args - Context and module token selectors.
+ * @param args.context - Permission context passed to each selector.
+ * @param args.tokenCaip19s - Selectors for every token whose metadata is fetched.
+ * @param args.balanceTokenCaip19 - Optional selector for the account-section balance token.
+ * @returns Deduplicated token CAIP-19s and the resolved balance CAIP-19.
+ * @throws If a balance token is selected that is not in `tokenCaip19s`.
+ */
+export function resolveModuleTokenCaip19s<TContext extends BaseContext>({
+  context,
+  tokenCaip19s,
+  balanceTokenCaip19,
+}: {
+  context: TContext;
+  tokenCaip19s: TokenCaip19Selector<TContext>[];
+  balanceTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
+}): {
+  tokenCaip19s: CaipAssetType[];
+  balanceCaip19: CaipAssetType | undefined;
+} {
+  const resolvedTokenCaip19s = collectTokenCaip19s(context, tokenCaip19s);
+  const balanceCaip19 = balanceTokenCaip19?.(context);
+
+  if (
+    balanceCaip19 !== undefined &&
+    !resolvedTokenCaip19s.includes(balanceCaip19)
+  ) {
+    throw new InternalError(
+      `balanceTokenCaip19 "${balanceCaip19}" is not in tokenCaip19s [${resolvedTokenCaip19s.join(', ')}]`,
+    );
+  }
+
+  return {
+    tokenCaip19s: resolvedTokenCaip19s,
+    balanceCaip19,
+  };
+}
+
+/**
  * Resolves the CAIP-19 asset for a rule's amount field.
  * @param rule - Rule definition with optional token selector.
  * @param context - Current permission context.
@@ -49,7 +89,7 @@ export function resolveRuleTokenCaip19<
 >(
   rule: RuleDefinition<TContext, TMetadata>,
   context: TContext,
-  defaultSelector?: TokenCaip19Selector<TContext>,
+  defaultSelector?: TokenCaip19Selector<TContext> | undefined,
 ): CaipAssetType | undefined {
   if (rule.tokenCaip19) {
     return rule.tokenCaip19(context);

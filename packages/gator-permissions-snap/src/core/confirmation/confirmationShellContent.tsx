@@ -43,6 +43,11 @@ export const ACCOUNT_SELECTOR_NAME = 'account-selector';
 export const SHOW_EXISTING_PERMISSIONS_BUTTON_NAME =
   'show-existing-permissions-button';
 
+export type ConfirmationTokenBalance = {
+  formatted: string | null;
+  fiat: string | null;
+};
+
 export type ConfirmationShellContentProps = {
   children: SnapElement;
   permissionTitle: MessageKey;
@@ -58,15 +63,16 @@ export type ConfirmationShellContentProps = {
   scanAddressResult: FetchAddressScanResult | null;
   delegateAddress: string;
   context: BaseContext;
-  tokenBalance: string | null;
-  tokenBalanceFiat: string | null;
+  /**
+   * Account-section token balance. Omit when no balance token is configured.
+   * `formatted`/`fiat` may be null while the lookup is in progress.
+   */
+  tokenBalance?: ConfirmationTokenBalance | undefined;
   chainId: number;
   isAccountUpgraded: boolean;
   existingPermissionsStatus: ExistingPermissionsState;
   /** When true, the primary grant button is not clickable. */
   isGrantDisabled: boolean;
-  /** When false, token balance fields are omitted from the account section. */
-  showTokenBalance: boolean;
 };
 
 /**
@@ -84,13 +90,11 @@ export type ConfirmationShellContentProps = {
  * @param options.shellTokens - Tokens to display in the confirmation shell.
  * @param options.isJustificationCollapsed - Whether the justification is collapsed.
  * @param options.context - The context of the permission.
- * @param options.tokenBalance - The formatted balance of the token.
- * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
+ * @param options.tokenBalance - Optional formatted token balance and fiat value for the account section.
  * @param options.chainId - The chain ID of the network.
  * @param options.isAccountUpgraded - Whether the account is upgraded to a smart account.
  * @param options.existingPermissionsStatus - Status of existing permissions for banner UI.
  * @param options.isGrantDisabled - Whether the grant button should render disabled.
- * @param options.showTokenBalance - Whether to show token balance in the account section.
  * @returns The confirmation content.
  */
 export const ConfirmationShellContent = ({
@@ -107,25 +111,11 @@ export const ConfirmationShellContent = ({
   isJustificationCollapsed,
   context,
   tokenBalance,
-  tokenBalanceFiat,
   chainId,
   isAccountUpgraded,
   existingPermissionsStatus,
   isGrantDisabled,
-  showTokenBalance,
 }: ConfirmationShellContentProps): SnapElement => {
-  const tokenBalanceComponent = TokenBalanceField({
-    tokenBalance,
-  });
-
-  const fiatBalanceComponent = tokenBalanceFiat ? (
-    <Text>{tokenBalanceFiat}</Text>
-  ) : (
-    <Skeleton />
-  );
-
-  const hasShellTokens = shellTokens.length > 0;
-
   const urlWarningByRecommendedAction = {
     [RecommendedAction.BLOCK]: t('maliciousWebsiteLabel'),
     [RecommendedAction.WARN]: t('potentiallyMaliciousWebsiteLabel'),
@@ -226,12 +216,18 @@ export const ConfirmationShellContent = ({
                   {t('accountUpgradeWarning')}
                 </Text>
               )}
-              {showTokenBalance && hasShellTokens && (
+              {tokenBalance ? (
                 <Box direction="horizontal" alignment="end">
-                  {fiatBalanceComponent}
-                  {tokenBalanceComponent}
+                  {tokenBalance.fiat ? (
+                    <Text>{tokenBalance.fiat}</Text>
+                  ) : (
+                    <Skeleton />
+                  )}
+                  {TokenBalanceField({
+                    tokenBalance: tokenBalance.formatted,
+                  })}
                 </Box>
-              )}
+              ) : null}
             </Box>
           </Section>
           {existingPermissionsStatus ===
@@ -275,7 +271,6 @@ export const ConfirmationShellContent = ({
             />
             {shellTokens.map((shellToken) => (
               <TokenField
-                key={shellToken.caip19}
                 label={t('tokenLabel')}
                 tokenSymbol={shellToken.symbol}
                 tokenAddress={shellToken.tokenAddress}

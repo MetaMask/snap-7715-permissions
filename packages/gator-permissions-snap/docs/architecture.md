@@ -321,9 +321,8 @@ Each `PermissionModule` exposes a flat contract:
 - `parseAndValidate`, `buildContext`, `deriveMetadata`, `renderBody`
 - `applyContext`, `populatePermission`, `createPermissionCaveats`
 - `rules`, `title`, `subtitle`
-- `tokenCaip19s`: selectors for all tokens whose metadata should be fetched
-- `balanceTokenCaip19` (optional): selector for the token shown in the account balance section
-- `shellTokenCaip19s` (optional): selectors for tokens rendered as `TokenField` in the shell (defaults to `tokenCaip19s`)
+- `tokenCaip19s`: selectors for all tokens whose metadata is fetched and shown as `TokenField` rows
+- `balanceTokenCaip19` (optional): selector for the token shown in the account balance section; must resolve to one of `tokenCaip19s`
 
 Token permissions extend context with `primaryTokenCaip19` via `ContextWithPrimaryToken`. Non-token permissions (e.g. token approval revocation) declare an empty `tokenCaip19s` array.
 
@@ -349,7 +348,7 @@ Lifecycle handlers pass the coordinator to `deriveMetadata`, `applyContext`, and
 `ConfirmationShell` provides permission-agnostic confirmation chrome:
 
 - Account selector, upgrade banner, and optional token balance (when `balanceTokenCaip19` is defined)
-- One or more `TokenField` rows for shell tokens (from `shellTokenCaip19s`)
+- One or more `TokenField` rows for tokens in `tokenCaip19s`
 - Trust signal display, justification, existing-permissions subview
 - Session event binding for rules, account changes, and shell interactions
 - Subscribes to coordinator `onUpdate` to re-render when token metadata or balances arrive

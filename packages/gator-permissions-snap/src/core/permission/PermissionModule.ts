@@ -7,7 +7,7 @@ import type { MessageKey } from '../../utils/i18n';
 import type { DelegationContracts } from '../chainMetadata';
 import { ConfirmationShell } from '../confirmation/ConfirmationShell';
 import type { TokenMetadataCoordinator } from '../coordinators/TokenMetadataCoordinator';
-import { collectTokenCaip19s } from '../token/tokenSelectors';
+import { resolveModuleTokenCaip19s } from '../token/tokenSelectors';
 import type {
   BaseContext,
   BaseMetadata,
@@ -39,12 +39,13 @@ export type PermissionModule<
   title: MessageKey;
   subtitle: MessageKey;
   rules: RuleDefinition<TContext, TMetadata>[];
-  /** All token CAIP-19s to fetch metadata for. */
+  /** All tokens whose metadata is fetched and shown as TokenField rows. */
   tokenCaip19s: TokenCaip19Selector<TContext>[];
-  /** Token for account-section balance display. Undefined = no balance shown. */
-  balanceTokenCaip19?: TokenCaip19Selector<TContext>;
-  /** Tokens shown as TokenField in the confirmation shell. */
-  shellTokenCaip19s?: TokenCaip19Selector<TContext>[];
+  /**
+   * Token for account-section balance display. Must resolve to one of
+   * `tokenCaip19s`. Undefined = no balance shown.
+   */
+  balanceTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
 
   parseAndValidate(request: PermissionRequest): TRequest;
   buildContext(
@@ -108,10 +109,16 @@ export function buildRequestLifecycleHandlers<
   const { module, confirmationShell, tokenMetadataCoordinator } = args;
 
   const syncCoordinator = (context: TContext): void => {
+    const { tokenCaip19s, balanceCaip19 } = resolveModuleTokenCaip19s({
+      context,
+      tokenCaip19s: module.tokenCaip19s,
+      balanceTokenCaip19: module.balanceTokenCaip19,
+    });
+
     tokenMetadataCoordinator.sync({
       accountCaip10: context.accountAddressCaip10,
-      tokenCaip19s: collectTokenCaip19s(context, module.tokenCaip19s),
-      balanceCaip19: module.balanceTokenCaip19?.(context),
+      tokenCaip19s,
+      balanceCaip19,
     });
   };
 

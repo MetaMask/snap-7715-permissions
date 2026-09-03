@@ -31,7 +31,6 @@ export const nativeTokenPeriodicPermissionModule: PermissionModule<
   rules: allRules,
   tokenCaip19s: [primaryTokenCaip19Selector],
   balanceTokenCaip19: primaryTokenCaip19Selector,
-  shellTokenCaip19s: [primaryTokenCaip19Selector],
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
   parseAndValidate,

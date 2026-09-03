@@ -163,7 +163,7 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
     title,
     subtitle,
     permissionRequest: mockPermissionRequest,
-    shellTokenCaip19s: [mockBalanceTokenCaip19],
+    tokenCaip19s: [mockBalanceTokenCaip19],
     balanceTokenCaip19: mockBalanceTokenCaip19,
     renderBody,
   });
@@ -1145,7 +1145,7 @@ describe('ConfirmationShell', () => {
         title: 'permissionRequestTitle' as MessageKey,
         subtitle: 'permissionRequestSubtitle' as MessageKey,
         permissionRequest: mockPermissionRequest,
-        shellTokenCaip19s: [mockBalanceTokenCaip19],
+        tokenCaip19s: [mockBalanceTokenCaip19],
         balanceTokenCaip19: mockBalanceTokenCaip19,
         tokenMetadataCoordinator: loadingCoordinator,
         renderBody: jest.fn(async () => Promise.resolve(mockBodyContent)),
@@ -1287,7 +1287,7 @@ describe('ConfirmationShell', () => {
         title: 'permissionRequestTitle' as MessageKey,
         subtitle: 'permissionRequestSubtitle' as MessageKey,
         permissionRequest: mockPermissionRequest,
-        shellTokenCaip19s: [],
+        tokenCaip19s: [],
         tokenMetadataCoordinator,
         renderBody: jest.fn(async () => Promise.resolve(mockBodyContent)),
       });
