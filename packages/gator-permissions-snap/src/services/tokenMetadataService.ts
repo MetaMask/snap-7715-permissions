@@ -1,3 +1,4 @@
+import { ZERO_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { Hex } from '@metamask/delegation-core';
 import { InternalError } from '@metamask/snaps-sdk';
@@ -17,6 +18,7 @@ export type GetTokenBalanceAndMetadataOptions = {
 export type TokenMetadata = {
   symbol: string;
   decimals: number;
+  iconUrl?: string;
 };
 
 /**
@@ -123,6 +125,57 @@ export class TokenMetadataService {
   }
 
   /**
+   * Fetches token metadata without requiring a balance lookup.
+   * Prefers the Account API metadata endpoint when the chain is supported,
+   * then falls back to balance+metadata clients.
+   * @param options - Chain, asset, and optional account for fallback fetches.
+   * @param options.chainId - The chain ID to fetch metadata from.
+   * @param options.assetAddress - Optional ERC-20 token address; omit for native token.
+   * @param options.account - Optional account used when falling back to balance clients.
+   * @returns Token symbol, decimals, and optional icon URL.
+   */
+  async #fetchTokenMetadataOnly(options: {
+    chainId: number;
+    assetAddress?: Hex;
+    account?: Hex;
+  }): Promise<TokenMetadata> {
+    const { chainId, assetAddress, account } = options;
+
+    if (this.#accountApiClient.isChainIdSupported({ chainId })) {
+      try {
+        const metadata = await this.#accountApiClient.getTokenMetadata({
+          chainId,
+          ...(assetAddress !== undefined && { assetAddress }),
+        });
+
+        return {
+          symbol: metadata.symbol,
+          decimals: metadata.decimals,
+          ...(metadata.iconUrl !== undefined && { iconUrl: metadata.iconUrl }),
+        };
+      } catch {
+        logger.info(
+          `TokenMetadataService - Account API metadata fetch failed for chain ${chainId}`,
+        );
+      }
+    }
+
+    const balanceAndMetadata = await this.#fetchTokenBalanceAndMetadata({
+      chainId,
+      account: account ?? ZERO_ADDRESS,
+      ...(assetAddress !== undefined && { assetAddress }),
+    });
+
+    return {
+      symbol: balanceAndMetadata.symbol,
+      decimals: balanceAndMetadata.decimals,
+      ...(balanceAndMetadata.iconUrl !== undefined && {
+        iconUrl: balanceAndMetadata.iconUrl,
+      }),
+    };
+  }
+
+  /**
    * Retrieves cached token metadata or fetches it if not cached.
    * Metadata (symbol, decimals) is static per token and safe to cache.
    * Concurrent requests for the same metadata share a single in-flight fetch.
@@ -130,7 +183,9 @@ export class TokenMetadataService {
    * @returns A promise resolving to the token metadata.
    */
   public async getTokenMetadata(
-    options: GetTokenBalanceAndMetadataOptions,
+    options: Omit<GetTokenBalanceAndMetadataOptions, 'account'> & {
+      account?: Hex;
+    },
   ): Promise<TokenMetadata> {
     logger.debug('TokenMetadataService:getTokenMetadata()');
 
@@ -147,21 +202,18 @@ export class TokenMetadataService {
     }
 
     // Start the fetch and cache the promise
-    promise = this.#fetchTokenBalanceAndMetadata(options)
-      .then((balanceAndMetadata) => {
-        return {
-          symbol: balanceAndMetadata.symbol,
-          decimals: balanceAndMetadata.decimals,
-        };
-      })
-      .catch((error) => {
-        logger.error(
-          'TokenMetadataService:getTokenMetadata() - failed to fetch metadata',
-          error,
-        );
-        this.#metadataPromiseCache.delete(cacheKey);
-        throw error;
-      });
+    promise = this.#fetchTokenMetadataOnly({
+      chainId,
+      ...(assetAddress !== undefined && { assetAddress }),
+      ...(options.account !== undefined && { account: options.account }),
+    }).catch((error) => {
+      logger.error(
+        'TokenMetadataService:getTokenMetadata() - failed to fetch metadata',
+        error,
+      );
+      this.#metadataPromiseCache.delete(cacheKey);
+      throw error;
+    });
 
     this.#metadataPromiseCache.set(cacheKey, promise);
     return promise;

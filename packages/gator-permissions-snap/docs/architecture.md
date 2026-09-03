@@ -334,10 +334,11 @@ Permission folders export `PermissionModule` objects directly; all modules are r
 
 Key responsibilities:
 
-- `ensureMetadata()`: awaited during `buildContext` when decimals or symbols are needed synchronously
-- `sync()`: registers tokens to track and fetches metadata/balance in the background for UI updates
-- `getMetadata()` / `getBalance()`: read cached results for rendering and validation
-- `onUpdate()`: callback invoked when async fetches complete, triggering shell re-renders
+- `ensureMetadata()`: awaited during `buildContext` when decimals or symbols are needed synchronously; joins an in-flight `start()` fetch for the same token
+- `start()`: one-shot background metadata fetch for the request tokens
+- `getMetadata()`: read cached metadata for rendering and validation
+- `getBalance({ accountCaip10, caip19 })`: on-demand cached balance read; the shell owns pending/ready UI state
+- `onUpdate()`: callback invoked when metadata fetches complete, triggering shell re-renders
 
 Lifecycle handlers pass the coordinator to `deriveMetadata`, `applyContext`, and `renderBody` so permission code can resolve token data without embedding it in context.
 
@@ -351,7 +352,7 @@ Lifecycle handlers pass the coordinator to `deriveMetadata`, `applyContext`, and
 - One or more `TokenField` rows for tokens in `tokenCaip19s`
 - Trust signal display, justification, existing-permissions subview
 - Session event binding for rules, account changes, and shell interactions
-- Subscribes to coordinator `onUpdate` to re-render when token metadata or balances arrive
+- Subscribes to coordinator `onUpdate` to re-render when token metadata arrives; loads balances via `getBalance` on bind and account change
 
 The shell's lifecycle methods (`createConfirmationContent`, `createSkeletonContent`, `bindSessionEvents`) are exposed to the pipeline via `PermissionRequestLifecycleHandlers`.
 

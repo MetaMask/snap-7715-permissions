@@ -146,14 +146,6 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
     balance: { formatted: '1', fiat: mockTokenBalanceFiat },
   });
 
-  const syncCoordinator = jest.fn((context: TestContextType) => {
-    tokenMetadataCoordinator.sync({
-      accountCaip10: context.accountAddressCaip10,
-      tokenCaip19s: [mockBalanceCaip19],
-      balanceCaip19: mockBalanceCaip19,
-    });
-  });
-
   const renderBody = jest.fn(async () => Promise.resolve(mockBodyContent));
 
   const confirmationShell = new ConfirmationShell({
@@ -186,8 +178,15 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
       rules,
       updateContext,
       onExistingPermissionsViewChange,
-      syncCoordinator,
     });
+  };
+
+  const waitForLatestBalance = async (): Promise<void> => {
+    const { results } = jest.mocked(tokenMetadataCoordinator.getBalance).mock;
+    const last = results.at(-1);
+    if (last?.type === 'return') {
+      await last.value.catch(() => undefined);
+    }
   };
 
   return {
@@ -199,7 +198,7 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
     getBoundEvent,
     getUnboundEvent,
     tokenMetadataCoordinator,
-    syncCoordinator,
+    waitForLatestBalance,
     bindSessionEvents,
     accountController,
     userEventDispatcher,
@@ -369,7 +368,6 @@ describe('ConfirmationShell', () => {
         rules,
         updateContext,
         onExistingPermissionsViewChange,
-        syncCoordinator,
         bindSessionEvents,
       } = setupTest();
 
@@ -382,7 +380,6 @@ describe('ConfirmationShell', () => {
           rules,
           updateContext,
           onExistingPermissionsViewChange,
-          syncCoordinator,
         }),
       ).toThrow(InternalError);
       expect(() =>
@@ -392,16 +389,18 @@ describe('ConfirmationShell', () => {
           rules,
           updateContext,
           onExistingPermissionsViewChange,
-          syncCoordinator,
         }),
       ).toThrow('ConfirmationShell.bindSessionEvents() called more than once');
     });
 
     it('loads the balance for the selected account', async () => {
-      const { syncCoordinator, bindSessionEvents } = setupTest();
+      const { tokenMetadataCoordinator, bindSessionEvents } = setupTest();
       bindSessionEvents();
 
-      expect(syncCoordinator).toHaveBeenCalled();
+      expect(tokenMetadataCoordinator.getBalance).toHaveBeenCalledWith({
+        accountCaip10: mockContext.accountAddressCaip10,
+        caip19: mockBalanceCaip19,
+      });
     });
 
     it('updates the context when the account is changed', async () => {
@@ -438,7 +437,8 @@ describe('ConfirmationShell', () => {
     });
 
     it('updates the balance when the account is changed', async () => {
-      const { getBoundEvent, syncCoordinator, bindSessionEvents } = setupTest();
+      const { getBoundEvent, tokenMetadataCoordinator, bindSessionEvents } =
+        setupTest();
       bindSessionEvents();
 
       const accountSelectorChangeHandler = getBoundEvent({
@@ -460,12 +460,17 @@ describe('ConfirmationShell', () => {
         interfaceId: mockInterfaceId,
       });
 
-      expect(syncCoordinator).toHaveBeenCalledTimes(2);
+      expect(tokenMetadataCoordinator.getBalance).toHaveBeenCalledWith({
+        accountCaip10: mockAddress2Caip10,
+        caip19: mockBalanceCaip19,
+      });
     });
 
     it('renders the balance in the confirmation content', async () => {
-      const { confirmationShell, bindSessionEvents } = setupTest();
+      const { confirmationShell, bindSessionEvents, waitForLatestBalance } =
+        setupTest();
       bindSessionEvents();
+      await waitForLatestBalance();
 
       const confirmationContent =
         await confirmationShell.createConfirmationContent({
@@ -1085,8 +1090,10 @@ describe('ConfirmationShell', () => {
         getBoundEvent,
         tokenMetadataCoordinator,
         bindSessionEvents,
+        waitForLatestBalance,
       } = setupTest();
       bindSessionEvents();
+      await waitForLatestBalance();
 
       const accountSelectorChangeHandler = getBoundEvent({
         elementName: 'account-selector',
@@ -1106,8 +1113,12 @@ describe('ConfirmationShell', () => {
         },
         interfaceId: mockInterfaceId,
       });
+      await waitForLatestBalance();
 
-      expect(tokenMetadataCoordinator.sync).toHaveBeenCalled();
+      expect(tokenMetadataCoordinator.getBalance).toHaveBeenCalledWith({
+        accountCaip10: mockAddress2Caip10,
+        caip19: mockBalanceCaip19,
+      });
 
       const confirmationContent =
         await confirmationShell.createConfirmationContent({
@@ -1165,7 +1176,6 @@ describe('ConfirmationShell', () => {
     it('omits the balance row when the balance lookup has failed', async () => {
       const failedCoordinator = createMockTokenMetadataCoordinator({
         balance: undefined,
-        isBalancePending: false,
       });
       const confirmationShell = new ConfirmationShell({
         userEventDispatcher: {
@@ -1186,6 +1196,8 @@ describe('ConfirmationShell', () => {
         renderBody: jest.fn(async () => Promise.resolve(mockBodyContent)),
       });
 
+      await confirmationShell.loadBalance(mockContext);
+
       const confirmationContent =
         await confirmationShell.createConfirmationContent({
           context: mockContext,
@@ -1203,10 +1215,10 @@ describe('ConfirmationShell', () => {
       expect(rendered).not.toContain('available');
     });
 
-    it('calls syncCoordinator again when the account is changed', async () => {
+    it('fetches a new balance when the account is changed', async () => {
       const {
         getBoundEvent,
-        syncCoordinator,
+        tokenMetadataCoordinator,
         updateContext,
         bindSessionEvents,
       } = setupTest();
@@ -1227,7 +1239,7 @@ describe('ConfirmationShell', () => {
         interfaceId: mockInterfaceId,
       });
 
-      expect(syncCoordinator).toHaveBeenCalledTimes(2);
+      expect(tokenMetadataCoordinator.getBalance).toHaveBeenCalledTimes(2);
       expect(updateContext).toHaveBeenCalled();
     });
 
@@ -1308,9 +1320,8 @@ describe('ConfirmationShell', () => {
       expect(accountSelectorHandler).toBeDefined();
     });
 
-    it('skips balance sync when no balance token is configured', () => {
+    it('skips balance fetch when no balance token is configured', async () => {
       const tokenMetadataCoordinator = createMockTokenMetadataCoordinator();
-      const syncCoordinator = jest.fn();
       const confirmationShell = new ConfirmationShell({
         userEventDispatcher: {
           on: jest.fn(() => ({ unbind: jest.fn(), dispatcher: {} })),
@@ -1335,11 +1346,11 @@ describe('ConfirmationShell', () => {
         rules: [],
         updateContext: jest.fn(async () => Promise.resolve()),
         onExistingPermissionsViewChange: jest.fn(async () => Promise.resolve()),
-        syncCoordinator,
       });
 
-      expect(syncCoordinator).toHaveBeenCalledTimes(1);
-      expect(syncCoordinator).toHaveBeenCalledWith(mockContext);
+      await Promise.resolve();
+
+      expect(tokenMetadataCoordinator.getBalance).not.toHaveBeenCalled();
     });
   });
 });

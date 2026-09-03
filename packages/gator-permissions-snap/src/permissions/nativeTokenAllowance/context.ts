@@ -146,7 +146,6 @@ export async function buildContext(
 
   const { decimals } = await tokenMetadataCoordinator.ensureMetadata({
     caip19: primaryTokenCaip19,
-    accountCaip10: accountAddressCaip10,
   });
 
   const expiryRule = permissionRequest.rules?.find(

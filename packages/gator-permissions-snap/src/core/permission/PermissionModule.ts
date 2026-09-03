@@ -108,17 +108,15 @@ export function buildRequestLifecycleHandlers<
 > {
   const { module, confirmationShell, tokenMetadataCoordinator } = args;
 
-  const syncCoordinator = (context: TContext): void => {
-    const { tokenCaip19s, balanceCaip19 } = resolveModuleTokenCaip19s({
+  const startCoordinator = (context: TContext): void => {
+    const { tokenCaip19s } = resolveModuleTokenCaip19s({
       context,
       tokenCaip19s: module.tokenCaip19s,
       balanceTokenCaip19: module.balanceTokenCaip19,
     });
 
-    tokenMetadataCoordinator.sync({
-      accountCaip10: context.accountAddressCaip10,
+    tokenMetadataCoordinator.start({
       tokenCaip19s,
-      balanceCaip19,
     });
   };
 
@@ -129,7 +127,8 @@ export function buildRequestLifecycleHandlers<
       const context = await module.buildContext(request, {
         tokenMetadataCoordinator,
       });
-      syncCoordinator(context);
+      startCoordinator(context);
+      confirmationShell.loadBalance(context).catch(() => undefined);
       return context;
     },
     deriveMetadata: async (deriveArgs) =>
@@ -151,7 +150,6 @@ export function buildRequestLifecycleHandlers<
     createSkeletonConfirmationContent: async () =>
       Promise.resolve(confirmationShell.createSkeletonContent()),
     onConfirmationCreated: (sessionArgs): void => {
-      syncCoordinator(sessionArgs.initialContext);
       confirmationShell.bindSessionEvents({
         interfaceId: sessionArgs.interfaceId,
         initialContext: sessionArgs.initialContext,
@@ -159,7 +157,6 @@ export function buildRequestLifecycleHandlers<
         updateContext: sessionArgs.updateContext,
         onExistingPermissionsViewChange:
           sessionArgs.onExistingPermissionsViewChange,
-        syncCoordinator,
       });
     },
     onConfirmationResolved: (): void => {

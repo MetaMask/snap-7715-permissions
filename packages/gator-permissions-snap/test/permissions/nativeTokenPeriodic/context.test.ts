@@ -152,7 +152,7 @@ describe('nativeTokenPeriodic:context', () => {
 
       expect(mockTokenMetadataCoordinator.ensureMetadata).toHaveBeenCalledWith(
         expect.objectContaining({
-          accountCaip10: expect.stringContaining('eip155:1:'),
+          caip19: expect.stringContaining('eip155:1/'),
         }),
       );
     });

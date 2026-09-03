@@ -13,16 +13,12 @@ import type { Hex } from '@metamask/utils';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import type { TokenPricesService } from '../../services/tokenPricesService';
 import { formatUnits } from '../../utils/value';
+import { createCallOnceGuard } from '../callOnceGuard';
 import type { ResolvedTokenBalance, ResolvedTokenMetadata } from '../types';
 
 type MetadataEntry =
   | { status: 'pending' }
   | { status: 'ready'; metadata: ResolvedTokenMetadata }
-  | { status: 'failed' };
-
-type BalanceEntry =
-  | { status: 'pending' }
-  | { status: 'ready'; balance: ResolvedTokenBalance }
   | { status: 'failed' };
 
 /**
@@ -49,9 +45,19 @@ export function caip19ToFetchParams(caip19: CaipAssetType): {
   };
 }
 
+const balanceCacheKey = ({
+  accountCaip10,
+  caip19,
+}: {
+  accountCaip10: CaipAccountId;
+  caip19: CaipAssetType;
+}): string => `${accountCaip10}|${caip19}`;
+
 /**
- * Runs token metadata and balance fetches for a permission request.
- * One instance per permission request; callers refresh UI via {@link onUpdate}.
+ * Runs token metadata fetches for a permission request and serves on-demand
+ * balance reads. One instance per permission request; {@link start} and
+ * {@link onUpdate} must each only be called once. Callers refresh confirmation
+ * UI when the update callback fires.
  */
 export class TokenMetadataCoordinator {
   readonly #tokenMetadataService: TokenMetadataService;
@@ -60,13 +66,18 @@ export class TokenMetadataCoordinator {
 
   readonly #metadataByCaip19 = new Map<CaipAssetType, MetadataEntry>();
 
-  readonly #balanceByCaip19 = new Map<CaipAssetType, BalanceEntry>();
+  readonly #metadataPromises = new Map<
+    CaipAssetType,
+    Promise<ResolvedTokenMetadata>
+  >();
+
+  readonly #balancePromises = new Map<string, Promise<ResolvedTokenBalance>>();
+
+  readonly #callOnceGuard = createCallOnceGuard(
+    'TokenMetadataCoordinator.start()',
+  );
 
   #onUpdate: (() => void) | undefined;
-
-  #accountCaip10: CaipAccountId | undefined;
-
-  #balanceCaip19: CaipAssetType | undefined;
 
   constructor({
     tokenMetadataService,
@@ -80,8 +91,11 @@ export class TokenMetadataCoordinator {
   }
 
   /**
-   * Registers a callback invoked whenever metadata or balance fetch completes.
-   * @param callback - Called after each fetch completion, success or failure.
+   * Registers a callback invoked whenever a metadata fetch completes after
+   * registration. Safe to call after {@link start}; callers that register after
+   * early completions should read settled results via {@link getMetadata}
+   * themselves.
+   * @param callback - Called after each metadata fetch completion, success or failure.
    * @throws If called more than once on the same instance.
    */
   onUpdate(callback: () => void): void {
@@ -95,44 +109,26 @@ export class TokenMetadataCoordinator {
 
   /**
    * Fetches and caches metadata (including icon) for a token before context formatting.
-   * @param args - Token identity and account for icon/balance lookups.
+   * Joins an in-flight {@link start} fetch for the same CAIP-19 when one exists.
+   * @param args - Token identity.
    * @param args.caip19 - The CAIP-19 asset identifier.
-   * @param args.accountCaip10 - The CAIP-10 account used for metadata lookups.
    * @returns Resolved token metadata.
    */
   async ensureMetadata(args: {
     caip19: CaipAssetType;
-    accountCaip10: CaipAccountId;
   }): Promise<ResolvedTokenMetadata> {
-    const existing = this.#metadataByCaip19.get(args.caip19);
-    if (existing?.status === 'ready') {
-      return existing.metadata;
-    }
-
-    this.#accountCaip10 = args.accountCaip10;
-
-    const metadata = await this.#fetchMetadata(args.caip19);
-    this.#metadataByCaip19.set(args.caip19, {
-      status: 'ready',
-      metadata,
-    });
-    return metadata;
+    return await this.#getOrFetchMetadata(args.caip19);
   }
 
   /**
-   * Registers tokens to track and (re)fetches metadata and optional balance.
-   * @param args - Context account, token CAIP-19s, and balance token selector result.
-   * @param args.accountCaip10 - The CAIP-10 account whose tokens are tracked.
+   * Starts non-blocking metadata fetches for the request tokens.
+   * Completions invoke the callback registered via {@link onUpdate}, if any.
+   * @param args - Tokens whose metadata should be fetched.
    * @param args.tokenCaip19s - The CAIP-19 assets whose metadata is fetched.
-   * @param args.balanceCaip19 - The optional CAIP-19 asset whose balance is fetched.
+   * @throws If called more than once on the same instance.
    */
-  sync(args: {
-    accountCaip10: CaipAccountId;
-    tokenCaip19s: CaipAssetType[];
-    balanceCaip19?: CaipAssetType | undefined;
-  }): void {
-    this.#accountCaip10 = args.accountCaip10;
-    this.#balanceCaip19 = args.balanceCaip19;
+  start(args: { tokenCaip19s: CaipAssetType[] }): void {
+    this.#callOnceGuard();
 
     const uniqueCaip19s = [...new Set(args.tokenCaip19s)];
 
@@ -142,33 +138,18 @@ export class TokenMetadataCoordinator {
         continue;
       }
 
-      this.#metadataByCaip19.set(caip19, { status: 'pending' });
-      this.#fetchMetadata(caip19)
-        .then((metadata) => {
-          this.#metadataByCaip19.set(caip19, { status: 'ready', metadata });
+      this.#getOrFetchMetadata(caip19)
+        .then(() => {
           this.#onUpdate?.();
           return undefined;
         })
         .catch((error: unknown) => {
-          this.#metadataByCaip19.set(caip19, { status: 'failed' });
           logger.debug('TokenMetadataCoordinator: metadata fetch failed', {
             caip19,
             error: error instanceof Error ? error.message : error,
           });
           this.#onUpdate?.();
         });
-    }
-
-    if (args.balanceCaip19) {
-      this.#fetchBalance(args.balanceCaip19).catch((error: unknown) => {
-        logger.debug(
-          'TokenMetadataCoordinator: unexpected balance fetch error',
-          {
-            caip19: args.balanceCaip19,
-            error: error instanceof Error ? error.message : error,
-          },
-        );
-      });
     }
   }
 
@@ -183,36 +164,70 @@ export class TokenMetadataCoordinator {
   }
 
   /**
-   * Returns cached balance for a CAIP-19 asset, if available.
-   * @param caip19 - The CAIP-19 asset identifier.
-   * @returns Resolved balance or undefined when pending or unavailable.
+   * Fetches and caches the token balance for an account and CAIP-19 asset.
+   * Concurrent calls with the same arguments share one in-flight request.
+   * @param args - Account and token to read.
+   * @param args.accountCaip10 - The CAIP-10 account whose balance is fetched.
+   * @param args.caip19 - The CAIP-19 asset whose balance is fetched.
+   * @returns Resolved token balance.
    */
-  getBalance(caip19: CaipAssetType): ResolvedTokenBalance | undefined {
-    const entry = this.#balanceByCaip19.get(caip19);
-    return entry?.status === 'ready' ? entry.balance : undefined;
+  async getBalance(args: {
+    accountCaip10: CaipAccountId;
+    caip19: CaipAssetType;
+  }): Promise<ResolvedTokenBalance> {
+    const key = balanceCacheKey(args);
+    const inFlight = this.#balancePromises.get(key);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    const promise = this.#fetchBalance(args).catch((error: unknown) => {
+      this.#balancePromises.delete(key);
+      logger.debug('TokenMetadataCoordinator: balance fetch failed', {
+        caip19: args.caip19,
+        error: error instanceof Error ? error.message : error,
+      });
+      throw error;
+    });
+    this.#balancePromises.set(key, promise);
+    return promise;
   }
 
-  /**
-   * Whether a balance lookup has not reached a terminal state.
-   * Absent and `pending` entries are treated as in-flight so the UI can
-   * render skeletons before `sync()` writes the first map entry.
-   * @param caip19 - The CAIP-19 asset identifier.
-   * @returns True when the balance is not yet `ready` or `failed`.
-   */
-  isBalancePending(caip19: CaipAssetType): boolean {
-    const entry = this.#balanceByCaip19.get(caip19);
-    return entry === undefined || entry.status === 'pending';
+  async #getOrFetchMetadata(
+    caip19: CaipAssetType,
+  ): Promise<ResolvedTokenMetadata> {
+    const existing = this.#metadataByCaip19.get(caip19);
+    if (existing?.status === 'ready') {
+      return Promise.resolve(existing.metadata);
+    }
+
+    const inFlight = this.#metadataPromises.get(caip19);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    this.#metadataByCaip19.set(caip19, { status: 'pending' });
+    const promise = this.#fetchMetadata(caip19)
+      .then((metadata) => {
+        this.#metadataByCaip19.set(caip19, { status: 'ready', metadata });
+        return metadata;
+      })
+      .catch((error: unknown) => {
+        this.#metadataByCaip19.set(caip19, { status: 'failed' });
+        this.#metadataPromises.delete(caip19);
+        throw error;
+      });
+    this.#metadataPromises.set(caip19, promise);
+    return promise;
   }
 
   async #fetchMetadata(caip19: CaipAssetType): Promise<ResolvedTokenMetadata> {
     const { chainId, assetAddress } = caip19ToFetchParams(caip19);
-    const account = this.#getAccountAddress();
 
     const { symbol, decimals, iconUrl } =
-      await this.#tokenMetadataService.getTokenBalanceAndMetadata({
+      await this.#tokenMetadataService.getTokenMetadata({
         chainId,
-        account,
-        assetAddress: assetAddress ?? ZERO_ADDRESS,
+        ...(assetAddress !== undefined && { assetAddress }),
       });
 
     const iconDataResponse =
@@ -227,91 +242,33 @@ export class TokenMetadataCoordinator {
     };
   }
 
-  async #fetchBalance(caip19: CaipAssetType): Promise<void> {
-    if (!this.#accountCaip10) {
-      return;
-    }
-
-    const accountCaip10 = this.#accountCaip10;
-    this.#balanceByCaip19.set(caip19, { status: 'pending' });
-
-    try {
-      const { address } = parseCaipAccountId(accountCaip10);
-      const { chainId, assetAddress } = caip19ToFetchParams(caip19);
-
-      const { balance, decimals } =
-        await this.#tokenMetadataService.getTokenBalanceAndMetadata({
-          chainId,
-          account: address as Hex,
-          assetAddress: assetAddress ?? ZERO_ADDRESS,
-        });
-
-      const formatted = formatUnits({ value: balance, decimals });
-
-      const metadata = this.getMetadata(caip19);
-      const metadataDecimals = metadata?.decimals ?? decimals;
-
-      const fiat = await this.#tokenPricesService.getCryptoToFiatConversion(
-        caip19,
-        bigIntToHex(balance),
-        metadataDecimals,
-      );
-
-      if (!this.#isSelectedBalance({ accountCaip10, caip19 })) {
-        return;
-      }
-
-      this.#balanceByCaip19.set(caip19, {
-        status: 'ready',
-        balance: {
-          formatted,
-          fiat,
-        },
-      });
-    } catch (error: unknown) {
-      if (!this.#isSelectedBalance({ accountCaip10, caip19 })) {
-        return;
-      }
-
-      this.#balanceByCaip19.set(caip19, { status: 'failed' });
-      logger.debug('TokenMetadataCoordinator: balance fetch failed', {
-        caip19,
-        error: error instanceof Error ? error.message : error,
-      });
-    }
-
-    if (this.#isSelectedBalance({ accountCaip10, caip19 })) {
-      this.#onUpdate?.();
-    }
-  }
-
-  /**
-   * Whether this lookup still matches the selected account and balance token.
-   * @param args - Account and token captured when the fetch started.
-   * @param args.accountCaip10 - Account used for the in-flight fetch.
-   * @param args.caip19 - Token used for the in-flight fetch.
-   * @returns True when both still match the latest {@link sync} selection.
-   */
-  #isSelectedBalance({
-    accountCaip10,
-    caip19,
-  }: {
+  async #fetchBalance(args: {
     accountCaip10: CaipAccountId;
     caip19: CaipAssetType;
-  }): boolean {
-    return (
-      this.#accountCaip10 === accountCaip10 && this.#balanceCaip19 === caip19
+  }): Promise<ResolvedTokenBalance> {
+    const { address } = parseCaipAccountId(args.accountCaip10);
+    const { chainId, assetAddress } = caip19ToFetchParams(args.caip19);
+
+    const { balance, decimals } =
+      await this.#tokenMetadataService.getTokenBalanceAndMetadata({
+        chainId,
+        account: address as Hex,
+        assetAddress: assetAddress ?? ZERO_ADDRESS,
+      });
+
+    const formatted = formatUnits({ value: balance, decimals });
+    const metadataDecimals =
+      this.getMetadata(args.caip19)?.decimals ?? decimals;
+
+    const fiat = await this.#tokenPricesService.getCryptoToFiatConversion(
+      args.caip19,
+      bigIntToHex(balance),
+      metadataDecimals,
     );
-  }
 
-  #getAccountAddress(): Hex {
-    if (!this.#accountCaip10) {
-      throw new InternalError(
-        'TokenMetadataCoordinator account not set before metadata fetch',
-      );
-    }
-
-    const { address } = parseCaipAccountId(this.#accountCaip10);
-    return address as Hex;
+    return {
+      formatted,
+      fiat,
+    };
   }
 }

@@ -71,7 +71,6 @@ export type ConfirmationShellBindSessionArgs<
   rules: RuleDefinition<TContext, TMetadata>[];
   updateContext: (args: { updatedContext: TContext }) => Promise<void>;
   onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
-  syncCoordinator: (context: TContext) => void;
 };
 
 export type ConfirmationShellParams<
@@ -127,6 +126,14 @@ export class ConfirmationShell<
   #unbindSessionEvents: (() => void) | null = null;
 
   #accountUpgradeStatus: AccountUpgradeStatus = { isUpgraded: true };
+
+  #tokenBalance: ConfirmationTokenBalance | undefined = PENDING_TOKEN_BALANCE;
+
+  #isBalanceFailed = false;
+
+  #balanceRequestId = 0;
+
+  #balanceKey: string | undefined;
 
   readonly #callOnceGuard = createCallOnceGuard(
     'ConfirmationShell.bindSessionEvents()',
@@ -232,11 +239,7 @@ export class ConfirmationShell<
     });
     let tokenBalance: ConfirmationTokenBalance | undefined;
     if (balanceCaip19) {
-      tokenBalance =
-        this.#tokenMetadataCoordinator.getBalance(balanceCaip19) ??
-        (this.#tokenMetadataCoordinator.isBalancePending(balanceCaip19)
-          ? PENDING_TOKEN_BALANCE
-          : undefined);
+      tokenBalance = this.#isBalanceFailed ? undefined : this.#tokenBalance;
     }
 
     const permissionContent = await this.#renderBody({
@@ -267,6 +270,58 @@ export class ConfirmationShell<
   }
 
   /**
+   * Fetches and stores the account-section token balance for the given context.
+   * Safe to call before {@link bindSessionEvents}; later callers should re-render
+   * after this promise settles to pick up the stored result.
+   * @param context - Permission context with the selected account.
+   */
+  async loadBalance(context: TContext): Promise<void> {
+    const { balanceCaip19 } = resolveModuleTokenCaip19s({
+      context,
+      tokenCaip19s: this.#tokenCaip19s,
+      balanceTokenCaip19: this.#balanceTokenCaip19,
+    });
+
+    if (!balanceCaip19) {
+      this.#isBalanceFailed = false;
+      this.#tokenBalance = undefined;
+      this.#balanceKey = undefined;
+      return;
+    }
+
+    this.#balanceRequestId += 1;
+    const requestId = this.#balanceRequestId;
+    const balanceKey = `${context.accountAddressCaip10}|${balanceCaip19}`;
+    if (this.#balanceKey !== balanceKey || this.#isBalanceFailed) {
+      this.#isBalanceFailed = false;
+      this.#tokenBalance = PENDING_TOKEN_BALANCE;
+      this.#balanceKey = balanceKey;
+    }
+
+    try {
+      const balance = await this.#tokenMetadataCoordinator.getBalance({
+        accountCaip10: context.accountAddressCaip10,
+        caip19: balanceCaip19,
+      });
+
+      if (requestId !== this.#balanceRequestId) {
+        return;
+      }
+
+      this.#tokenBalance = balance;
+    } catch (error) {
+      if (requestId !== this.#balanceRequestId) {
+        return;
+      }
+
+      this.#isBalanceFailed = true;
+      this.#tokenBalance = undefined;
+      const { message } = error as Error;
+      logger.error(`Fetching token balance failed: ${message}`);
+    }
+  }
+
+  /**
    * Registers session events for the confirmation dialog.
    * @param args - Session identifiers, rules, and context update callback.
    * @returns Unbind function for the registered handlers.
@@ -283,7 +338,6 @@ export class ConfirmationShell<
       rules,
       updateContext,
       onExistingPermissionsViewChange,
-      syncCoordinator,
     } = args;
 
     let currentContext = initialContext;
@@ -317,7 +371,12 @@ export class ConfirmationShell<
       });
     });
 
-    syncCoordinator(currentContext);
+    // Pick up metadata that settled before onUpdate registration, then load
+    // balance (joins an in-flight prefetch from buildContext when present).
+    rerender().catch(() => undefined);
+    this.loadBalance(currentContext)
+      .then(async () => rerender())
+      .catch(() => undefined);
     fetchAccountUpgradeStatus(currentContext).catch(() => undefined);
 
     const { unbind: unbindShowMoreButtonClick } = this.#userEventDispatcher.on({
@@ -348,7 +407,9 @@ export class ConfirmationShell<
 
         this.#accountUpgradeStatus = { isUpgraded: true };
 
-        syncCoordinator(currentContext);
+        this.loadBalance(currentContext)
+          .then(async () => rerender())
+          .catch(() => undefined);
         fetchAccountUpgradeStatus(currentContext).catch(() => undefined);
 
         await rerender();

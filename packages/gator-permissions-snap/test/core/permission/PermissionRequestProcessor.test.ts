@@ -77,6 +77,7 @@ describe('PermissionRequestProcessor', () => {
     } as unknown as jest.Mocked<TokenPricesService>;
 
     mockTokenMetadataService = {
+      getTokenMetadata: jest.fn(),
       getTokenBalanceAndMetadata: jest.fn(),
     } as unknown as jest.Mocked<TokenMetadataService>;
 

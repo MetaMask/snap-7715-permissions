@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { logger } from '@metamask/7715-permissions-shared/utils';
 import type { CaipAssetType } from '@metamask/snaps-sdk';
 
 import { TokenMetadataCoordinator } from '../../../src/core/coordinators/TokenMetadataCoordinator';
@@ -7,12 +8,18 @@ import type { TokenPricesService } from '../../../src/services/tokenPricesServic
 
 describe('TokenMetadataCoordinator', () => {
   const caip19 = 'eip155:1/slip44:60' as CaipAssetType;
+  const secondCaip19 =
+    'eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as CaipAssetType;
   const accountCaip10 = 'eip155:1:0x1234567890123456789012345678901234567890';
+  const secondAccountCaip10 =
+    'eip155:1:0x2222222222222222222222222222222222222222';
 
   let mockMetadataService: jest.Mocked<
     Pick<
       TokenMetadataService,
-      'getTokenBalanceAndMetadata' | 'fetchIconDataAsBase64'
+      | 'getTokenMetadata'
+      | 'getTokenBalanceAndMetadata'
+      | 'fetchIconDataAsBase64'
     >
   >;
   let mockPricesService: jest.Mocked<
@@ -27,7 +34,16 @@ describe('TokenMetadataCoordinator', () => {
     });
 
   beforeEach(() => {
+    jest.spyOn(logger, 'debug').mockImplementation(() => undefined);
+
     mockMetadataService = {
+      getTokenMetadata: jest
+        .fn<TokenMetadataService['getTokenMetadata']>()
+        .mockResolvedValue({
+          decimals: 18,
+          symbol: 'ETH',
+          iconUrl: undefined,
+        }),
       getTokenBalanceAndMetadata: jest
         .fn<TokenMetadataService['getTokenBalanceAndMetadata']>()
         .mockResolvedValue({
@@ -56,15 +72,43 @@ describe('TokenMetadataCoordinator', () => {
 
     const metadata = await coordinator.ensureMetadata({
       caip19,
-      accountCaip10,
     });
 
     expect(metadata.symbol).toBe('ETH');
     expect(coordinator.getMetadata(caip19)?.decimals).toBe(18);
   });
 
+  it('stores base64 icon data when icon URL resolves', async () => {
+    const iconUrl = 'https://example.com/eth.png';
+    const iconDataBase64 =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+
+    mockMetadataService.getTokenMetadata.mockResolvedValueOnce({
+      decimals: 18,
+      symbol: 'ETH',
+      iconUrl,
+    });
+    mockMetadataService.fetchIconDataAsBase64.mockResolvedValueOnce({
+      ok: true,
+      imageDataBase64: iconDataBase64,
+    });
+
+    const coordinator = createCoordinator();
+    const metadata = await coordinator.ensureMetadata({
+      caip19,
+    });
+
+    expect(mockMetadataService.fetchIconDataAsBase64).toHaveBeenCalledWith(
+      iconUrl,
+    );
+    expect(metadata.iconDataBase64).toBe(iconDataBase64);
+    expect(coordinator.getMetadata(caip19)?.iconDataBase64).toBe(
+      iconDataBase64,
+    );
+  });
+
   it('rejects ensureMetadata when metadata fetch fails', async () => {
-    mockMetadataService.getTokenBalanceAndMetadata.mockRejectedValue(
+    mockMetadataService.getTokenMetadata.mockRejectedValue(
       new Error('token not found'),
     );
     const coordinator = createCoordinator();
@@ -72,300 +116,283 @@ describe('TokenMetadataCoordinator', () => {
     await expect(
       coordinator.ensureMetadata({
         caip19,
-        accountCaip10,
       }),
     ).rejects.toThrow('token not found');
     expect(coordinator.getMetadata(caip19)).toBeUndefined();
   });
 
-  it('notifies listeners when balance sync completes', async () => {
+  it('notifies listeners when a background metadata fetch completes', async () => {
     const coordinator = createCoordinator();
-
     const onUpdate = jest.fn();
-    const syncCompleted = new Promise<void>((resolve) => {
-      coordinator.onUpdate(() => {
-        onUpdate();
-        if (coordinator.getBalance(caip19)) {
-          resolve();
-        }
-      });
-    });
+    coordinator.onUpdate(onUpdate);
 
-    coordinator.sync({
-      accountCaip10,
+    coordinator.start({
       tokenCaip19s: [caip19],
-      balanceCaip19: caip19,
     });
 
-    await syncCompleted;
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(onUpdate).toHaveBeenCalled();
-    expect(coordinator.getBalance(caip19)?.formatted).toBeDefined();
-    expect(coordinator.isBalancePending(caip19)).toBe(false);
-  });
-
-  it('marks balance failed and notifies listeners when the balance fetch fails', async () => {
-    mockMetadataService.getTokenBalanceAndMetadata.mockRejectedValue(
-      new Error('balance unavailable'),
-    );
-    const coordinator = createCoordinator();
-
-    const updateCompleted = new Promise<void>((resolve) => {
-      coordinator.onUpdate(() => {
-        if (!coordinator.isBalancePending(caip19)) {
-          resolve();
-        }
-      });
-    });
-
-    coordinator.sync({
-      accountCaip10,
-      tokenCaip19s: [caip19],
-      balanceCaip19: caip19,
-    });
-
-    expect(coordinator.isBalancePending(caip19)).toBe(true);
-
-    await updateCompleted;
-
-    expect(coordinator.getBalance(caip19)).toBeUndefined();
-    expect(coordinator.isBalancePending(caip19)).toBe(false);
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+    expect(coordinator.getMetadata(caip19)?.symbol).toBe('ETH');
   });
 
   it('notifies listeners when a background metadata fetch fails', async () => {
-    mockMetadataService.getTokenBalanceAndMetadata.mockRejectedValue(
+    mockMetadataService.getTokenMetadata.mockRejectedValue(
       new Error('metadata unavailable'),
     );
     const coordinator = createCoordinator();
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
 
-    const updateCompleted = new Promise<void>((resolve) => {
-      coordinator.onUpdate(() => {
-        resolve();
-      });
-    });
-
-    coordinator.sync({
-      accountCaip10,
+    coordinator.start({
       tokenCaip19s: [caip19],
     });
 
-    await updateCompleted;
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
+    expect(onUpdate).toHaveBeenCalledTimes(1);
     expect(coordinator.getMetadata(caip19)).toBeUndefined();
   });
 
-  it('ignores a stale balance fetch after the selected account changes', async () => {
-    const secondAccountCaip10 =
-      'eip155:1:0x2222222222222222222222222222222222222222';
-    const firstAccountAddress = '0x1234567890123456789012345678901234567890';
-
-    let resolveFirstBalance:
+  it('allows start before onUpdate and still calls onUpdate for later completions', async () => {
+    let resolveMetadata:
       | ((value: {
-          balance: bigint;
           decimals: number;
           symbol: string;
           iconUrl: undefined;
         }) => void)
       | undefined;
-    const firstBalanceResult = new Promise<{
-      balance: bigint;
-      decimals: number;
-      symbol: string;
-      iconUrl: undefined;
-    }>((resolve) => {
-      resolveFirstBalance = resolve;
-    });
-
-    let firstAccountCalls = 0;
-    mockMetadataService.getTokenBalanceAndMetadata.mockImplementation(
-      async ({ account }) => {
-        const isFirstAccount =
-          account.toLowerCase() === firstAccountAddress.toLowerCase();
-
-        if (isFirstAccount) {
-          firstAccountCalls += 1;
-          if (firstAccountCalls === 2) {
-            return firstBalanceResult;
-          }
-
-          return {
-            balance: 1000n,
-            decimals: 18,
-            symbol: 'ETH',
-            iconUrl: undefined,
-          };
-        }
-
-        return {
-          balance: 2000n,
-          decimals: 18,
-          symbol: 'ETH',
-          iconUrl: undefined,
-        };
-      },
+    mockMetadataService.getTokenMetadata.mockImplementation(
+      async () =>
+        new Promise((resolve) => {
+          resolveMetadata = resolve;
+        }),
     );
 
     const coordinator = createCoordinator();
-
-    let resolveMetadataReady: (() => void) | undefined;
-    const metadataReady = new Promise<void>((resolve) => {
-      resolveMetadataReady = resolve;
-    });
-    let resolveSecondBalanceReady: (() => void) | undefined;
-    const secondBalanceReady = new Promise<void>((resolve) => {
-      resolveSecondBalanceReady = resolve;
-    });
-
-    coordinator.onUpdate(() => {
-      if (
-        coordinator.getMetadata(caip19) &&
-        coordinator.isBalancePending(caip19)
-      ) {
-        resolveMetadataReady?.();
-      }
-      if (coordinator.getBalance(caip19)) {
-        resolveSecondBalanceReady?.();
-      }
-    });
-
-    coordinator.sync({
-      accountCaip10,
+    coordinator.start({
       tokenCaip19s: [caip19],
-      balanceCaip19: caip19,
     });
 
-    await metadataReady;
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
 
-    coordinator.sync({
-      accountCaip10: secondAccountCaip10,
-      tokenCaip19s: [caip19],
-      balanceCaip19: caip19,
-    });
+    expect(onUpdate).not.toHaveBeenCalled();
 
-    await secondBalanceReady;
-
-    const secondFormatted = coordinator.getBalance(caip19)?.formatted;
-    expect(secondFormatted).toBeDefined();
-
-    resolveFirstBalance?.({
-      balance: 1000n,
+    resolveMetadata?.({
       decimals: 18,
       symbol: 'ETH',
       iconUrl: undefined,
     });
-    await Promise.resolve();
-    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(coordinator.getBalance(caip19)?.formatted).toBe(secondFormatted);
+    expect(onUpdate).toHaveBeenCalledTimes(1);
   });
 
-  it('ignores a stale balance fetch after the selected token changes', async () => {
-    const secondCaip19 =
-      'eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as CaipAssetType;
-    const nativeAssetAddress = '0x0000000000000000000000000000000000000000';
+  it('does not notify onUpdate for metadata already resolved by ensureMetadata', async () => {
+    const coordinator = createCoordinator();
+    await coordinator.ensureMetadata({
+      caip19,
+    });
 
-    let resolveFirstBalance:
+    const onUpdate = jest.fn();
+    coordinator.onUpdate(onUpdate);
+    coordinator.start({
+      tokenCaip19s: [caip19],
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(mockMetadataService.getTokenMetadata).toHaveBeenCalledTimes(1);
+  });
+
+  it('joins an in-flight start fetch from ensureMetadata', async () => {
+    let resolveMetadata:
       | ((value: {
-          balance: bigint;
           decimals: number;
           symbol: string;
           iconUrl: undefined;
         }) => void)
       | undefined;
-    const firstBalanceResult = new Promise<{
-      balance: bigint;
-      decimals: number;
-      symbol: string;
-      iconUrl: undefined;
-    }>((resolve) => {
-      resolveFirstBalance = resolve;
-    });
-
-    let nativeCalls = 0;
-    mockMetadataService.getTokenBalanceAndMetadata.mockImplementation(
-      async ({ assetAddress }) => {
-        const isNative =
-          assetAddress === undefined ||
-          assetAddress.toLowerCase() === nativeAssetAddress;
-
-        if (isNative) {
-          nativeCalls += 1;
-          if (nativeCalls === 2) {
-            return firstBalanceResult;
-          }
-
-          return {
-            balance: 1000n,
-            decimals: 18,
-            symbol: 'ETH',
-            iconUrl: undefined,
-          };
-        }
-
-        return {
-          balance: 2000n,
-          decimals: 6,
-          symbol: 'USDC',
-          iconUrl: undefined,
-        };
-      },
+    mockMetadataService.getTokenMetadata.mockImplementation(
+      async () =>
+        new Promise((resolve) => {
+          resolveMetadata = resolve;
+        }),
     );
 
     const coordinator = createCoordinator();
-
-    let resolveMetadataReady: (() => void) | undefined;
-    const metadataReady = new Promise<void>((resolve) => {
-      resolveMetadataReady = resolve;
-    });
-    let resolveSecondBalanceReady: (() => void) | undefined;
-    const secondBalanceReady = new Promise<void>((resolve) => {
-      resolveSecondBalanceReady = resolve;
-    });
-
-    coordinator.onUpdate(() => {
-      if (
-        coordinator.getMetadata(caip19) &&
-        coordinator.isBalancePending(caip19)
-      ) {
-        resolveMetadataReady?.();
-      }
-      if (coordinator.getBalance(secondCaip19)) {
-        resolveSecondBalanceReady?.();
-      }
-    });
-
-    coordinator.sync({
-      accountCaip10,
+    coordinator.start({
       tokenCaip19s: [caip19],
-      balanceCaip19: caip19,
     });
 
-    await metadataReady;
-
-    coordinator.sync({
-      accountCaip10,
-      tokenCaip19s: [caip19, secondCaip19],
-      balanceCaip19: secondCaip19,
+    const ensurePromise = coordinator.ensureMetadata({
+      caip19,
     });
 
-    await secondBalanceReady;
+    expect(mockMetadataService.getTokenMetadata).toHaveBeenCalledTimes(1);
 
-    const secondFormatted = coordinator.getBalance(secondCaip19)?.formatted;
-    expect(secondFormatted).toBeDefined();
-    expect(coordinator.getBalance(caip19)).toBeUndefined();
-
-    resolveFirstBalance?.({
-      balance: 1000n,
+    resolveMetadata?.({
       decimals: 18,
       symbol: 'ETH',
       iconUrl: undefined,
     });
-    await Promise.resolve();
-    await Promise.resolve();
 
-    expect(coordinator.getBalance(secondCaip19)?.formatted).toBe(
-      secondFormatted,
+    await expect(ensurePromise).resolves.toMatchObject({ symbol: 'ETH' });
+  });
+
+  it('throws if start is called more than once', () => {
+    const coordinator = createCoordinator();
+    coordinator.start({
+      tokenCaip19s: [caip19],
+    });
+
+    expect(() =>
+      coordinator.start({
+        tokenCaip19s: [caip19],
+      }),
+    ).toThrow('TokenMetadataCoordinator.start() called more than once');
+  });
+
+  it('throws if onUpdate is called more than once', () => {
+    const coordinator = createCoordinator();
+    coordinator.onUpdate(jest.fn());
+
+    expect(() => coordinator.onUpdate(jest.fn())).toThrow(
+      'TokenMetadataCoordinator onUpdate callback already registered',
     );
-    expect(coordinator.getBalance(caip19)).toBeUndefined();
+  });
+
+  it('fetches and caches balance per account and token', async () => {
+    const coordinator = createCoordinator();
+
+    const first = await coordinator.getBalance({
+      accountCaip10,
+      caip19,
+    });
+    const second = await coordinator.getBalance({
+      accountCaip10,
+      caip19,
+    });
+
+    expect(first.formatted).toBeDefined();
+    expect(first.fiat).toBe('$1');
+    expect(second).toBe(first);
+    expect(
+      mockMetadataService.getTokenBalanceAndMetadata,
+    ).toHaveBeenCalledTimes(1);
+    expect(mockPricesService.getCryptoToFiatConversion).toHaveBeenCalledTimes(
+      1,
+    );
+  });
+
+  it('fetches a new balance when the account changes', async () => {
+    mockMetadataService.getTokenBalanceAndMetadata
+      .mockResolvedValueOnce({
+        balance: 1000n,
+        decimals: 18,
+        symbol: 'ETH',
+        iconUrl: undefined,
+      })
+      .mockResolvedValueOnce({
+        balance: 2000n,
+        decimals: 18,
+        symbol: 'ETH',
+        iconUrl: undefined,
+      });
+
+    const coordinator = createCoordinator();
+
+    const first = await coordinator.getBalance({
+      accountCaip10,
+      caip19,
+    });
+    const second = await coordinator.getBalance({
+      accountCaip10: secondAccountCaip10,
+      caip19,
+    });
+
+    expect(first.formatted).not.toBe(second.formatted);
+    expect(
+      mockMetadataService.getTokenBalanceAndMetadata,
+    ).toHaveBeenCalledTimes(2);
+  });
+
+  it('fetches a new balance when the token changes', async () => {
+    const coordinator = createCoordinator();
+
+    await coordinator.getBalance({
+      accountCaip10,
+      caip19,
+    });
+    await coordinator.getBalance({
+      accountCaip10,
+      caip19: secondCaip19,
+    });
+
+    expect(
+      mockMetadataService.getTokenBalanceAndMetadata,
+    ).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries getBalance after a failed fetch', async () => {
+    mockMetadataService.getTokenBalanceAndMetadata
+      .mockRejectedValueOnce(new Error('balance unavailable'))
+      .mockResolvedValueOnce({
+        balance: 1000n,
+        decimals: 18,
+        symbol: 'ETH',
+        iconUrl: undefined,
+      });
+
+    const coordinator = createCoordinator();
+
+    await expect(
+      coordinator.getBalance({
+        accountCaip10,
+        caip19,
+      }),
+    ).rejects.toThrow('balance unavailable');
+
+    const balance = await coordinator.getBalance({
+      accountCaip10,
+      caip19,
+    });
+
+    expect(balance.fiat).toBe('$1');
+    expect(
+      mockMetadataService.getTokenBalanceAndMetadata,
+    ).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses cached metadata decimals for fiat conversion when available', async () => {
+    mockMetadataService.getTokenMetadata.mockResolvedValueOnce({
+      decimals: 6,
+      symbol: 'USDC',
+      iconUrl: undefined,
+    });
+    mockMetadataService.getTokenBalanceAndMetadata.mockResolvedValueOnce({
+      balance: 1000n,
+      decimals: 18,
+      symbol: 'USDC',
+      iconUrl: undefined,
+    });
+
+    const coordinator = createCoordinator();
+    await coordinator.ensureMetadata({
+      caip19: secondCaip19,
+    });
+
+    await coordinator.getBalance({
+      accountCaip10,
+      caip19: secondCaip19,
+    });
+
+    expect(mockPricesService.getCryptoToFiatConversion).toHaveBeenCalledWith(
+      secondCaip19,
+      expect.any(String),
+      6,
+    );
   });
 });
