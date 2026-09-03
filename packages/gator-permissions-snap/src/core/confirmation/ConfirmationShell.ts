@@ -69,7 +69,6 @@ export type ConfirmationShellBindSessionArgs<
   interfaceId: string;
   initialContext: TContext;
   rules: RuleDefinition<TContext, TMetadata>[];
-  tokenMetadataCoordinator: TokenMetadataCoordinator;
   updateContext: (args: { updatedContext: TContext }) => Promise<void>;
   onExistingPermissionsViewChange: (show: boolean) => Promise<void>;
   syncCoordinator: (context: TContext) => void;
@@ -282,7 +281,6 @@ export class ConfirmationShell<
       interfaceId,
       initialContext,
       rules,
-      tokenMetadataCoordinator,
       updateContext,
       onExistingPermissionsViewChange,
       syncCoordinator,
@@ -312,7 +310,7 @@ export class ConfirmationShell<
       }
     };
 
-    tokenMetadataCoordinator.onUpdate(() => {
+    this.#tokenMetadataCoordinator.onUpdate(() => {
       rerender().catch((error) => {
         const { message } = error as Error;
         logger.error(`Token metadata coordinator update failed: ${message}`);

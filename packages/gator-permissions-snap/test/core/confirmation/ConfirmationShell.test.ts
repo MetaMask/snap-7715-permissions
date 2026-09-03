@@ -186,7 +186,6 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
       rules,
       updateContext,
       onExistingPermissionsViewChange,
-      tokenMetadataCoordinator,
       syncCoordinator,
     });
   };
@@ -370,7 +369,6 @@ describe('ConfirmationShell', () => {
         rules,
         updateContext,
         onExistingPermissionsViewChange,
-        tokenMetadataCoordinator,
         syncCoordinator,
         bindSessionEvents,
       } = setupTest();
@@ -384,7 +382,6 @@ describe('ConfirmationShell', () => {
           rules,
           updateContext,
           onExistingPermissionsViewChange,
-          tokenMetadataCoordinator,
           syncCoordinator,
         }),
       ).toThrow(InternalError);
@@ -395,7 +392,6 @@ describe('ConfirmationShell', () => {
           rules,
           updateContext,
           onExistingPermissionsViewChange,
-          tokenMetadataCoordinator,
           syncCoordinator,
         }),
       ).toThrow('ConfirmationShell.bindSessionEvents() called more than once');
@@ -1339,7 +1335,6 @@ describe('ConfirmationShell', () => {
         rules: [],
         updateContext: jest.fn(async () => Promise.resolve()),
         onExistingPermissionsViewChange: jest.fn(async () => Promise.resolve()),
-        tokenMetadataCoordinator,
         syncCoordinator,
       });
 

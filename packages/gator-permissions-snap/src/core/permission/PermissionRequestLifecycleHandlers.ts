@@ -24,10 +24,7 @@ export type PermissionRequestLifecycleHandlers<
 > = {
   parseAndValidatePermission: (request: PermissionRequest) => TRequest;
   buildContext: (request: TRequest) => Promise<TContext>;
-  deriveMetadata: (args: {
-    context: TContext;
-    tokenMetadata: TokenMetadataCoordinator;
-  }) => Promise<TMetadata>;
+  deriveMetadata: (args: { context: TContext }) => Promise<TMetadata>;
   createSkeletonConfirmationContent: () => Promise<SnapElement>;
   createConfirmationContent: (args: {
     context: TContext;

@@ -177,7 +177,7 @@ export type RuleDefinition<
   label: MessageKey;
   type: RuleType;
   getRuleData: (config: { context: TContext; metadata: TMetadata }) => RuleData;
-  /** CAIP-19 asset for amount display, validation, and conversion. Defaults to module primary token. */
+  /** CAIP-19 asset for amount-field icon display. Defaults to the module default token. */
   tokenCaip19?: TokenCaip19Selector<TContext>;
   // todo: it would be nice if we could make the value type more specific
   updateContext: (context: TContext, value: any) => TContext;
