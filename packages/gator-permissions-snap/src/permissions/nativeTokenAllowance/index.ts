@@ -17,6 +17,7 @@ import type {
 } from './types';
 import { parseAndValidate } from './validation';
 import type { PermissionModule } from '../../core/permission/PermissionModule';
+import { primaryTokenCaip19Selector } from '../../core/token/tokenSelectors';
 
 export const nativeTokenAllowancePermissionModule: PermissionModule<
   NativeTokenAllowancePermissionRequest,
@@ -28,6 +29,8 @@ export const nativeTokenAllowancePermissionModule: PermissionModule<
   type: 'native-token-allowance',
   name: 'Native Token Allowance',
   rules: allRules,
+  tokenCaip19s: [primaryTokenCaip19Selector],
+  balanceTokenCaip19: primaryTokenCaip19Selector,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
   parseAndValidate,

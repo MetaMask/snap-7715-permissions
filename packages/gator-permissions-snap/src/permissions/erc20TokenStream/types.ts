@@ -14,6 +14,7 @@ import type {
   TypedPermissionRequest,
   BaseContext,
   BaseMetadata,
+  ContextWithPrimaryToken,
 } from '../../core/types';
 
 export type Erc20TokenStreamMetadata = BaseMetadata & {
@@ -28,15 +29,16 @@ export type Erc20TokenStreamMetadata = BaseMetadata & {
   };
 };
 
-export type Erc20TokenStreamContext = BaseContext & {
-  permissionDetails: {
-    initialAmount: string | null;
-    maxAmount: string | null;
-    timePeriod: TimePeriod;
-    startTime: number;
-    amountPerPeriod: string;
+export type Erc20TokenStreamContext = BaseContext &
+  ContextWithPrimaryToken & {
+    permissionDetails: {
+      initialAmount: string | null;
+      maxAmount: string | null;
+      timePeriod: TimePeriod;
+      startTime: number;
+      amountPerPeriod: string;
+    };
   };
-};
 
 export const zErc20TokenStreamPermission = zPermission.extend({
   type: z.literal('erc20-token-stream'),

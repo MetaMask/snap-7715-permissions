@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 import { TimePeriod } from '../../../src/core/types';
 import { renderBody } from '../../../src/permissions/erc20TokenStream/content';
@@ -6,8 +6,7 @@ import type {
   Erc20TokenStreamContext,
   Erc20TokenStreamMetadata,
 } from '../../../src/permissions/erc20TokenStream/types';
-
-const tokenDecimals = 10;
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const mockContext: Erc20TokenStreamContext = {
   expiry: {
@@ -16,13 +15,7 @@ const mockContext: Erc20TokenStreamContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to stream ERC20 tokens',
   accountAddressCaip10: `eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`,
-  tokenAddressCaip19: `eip155:1/erc20:0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F`,
-  tokenMetadata: {
-    symbol: 'USDC',
-    decimals: tokenDecimals,
-    iconDataBase64:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-  },
+  primaryTokenCaip19: `eip155:1/erc20:0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F`,
   permissionDetails: {
     initialAmount: '1',
     maxAmount: '10',
@@ -39,11 +32,27 @@ const mockMetadata: Erc20TokenStreamMetadata = {
 };
 
 describe('erc20TokenStream:content', () => {
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
+
+  beforeEach(() => {
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator({
+      metadata: {
+        symbol: 'USDC',
+        decimals: 6,
+        iconDataBase64:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      },
+    });
+  });
+
   describe('renderBody()', () => {
     it('should render content with all permission details', async () => {
       const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -957,6 +966,7 @@ describe('erc20TokenStream:content', () => {
             expiryError: 'Invalid expiration date',
           },
         },
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -1866,6 +1876,7 @@ describe('erc20TokenStream:content', () => {
       const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -2773,6 +2784,7 @@ describe('erc20TokenStream:content', () => {
           isAdjustmentAllowed: false,
         },
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(contentWithoutAdjustment).toMatchInlineSnapshot(`
@@ -3674,6 +3686,7 @@ describe('erc20TokenStream:content', () => {
           },
         },
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(contentWithMissingFields).toMatchInlineSnapshot(`
@@ -4503,6 +4516,7 @@ describe('erc20TokenStream:content', () => {
           ...mockMetadata,
           totalExposure: null,
         },
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`

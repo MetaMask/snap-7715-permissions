@@ -1,7 +1,10 @@
 import { InvalidInputError, UserInputEventType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
-import type { BaseContext, RuleDefinition } from './types';
+import { getIconData } from '../permissions/iconUtil';
+import type { TokenMetadataCoordinator } from './coordinators/TokenMetadataCoordinator';
+import { resolveRuleTokenCaip19 } from './token/tokenSelectors';
+import type { BaseContext, RuleDefinition, TokenCaip19Selector } from './types';
 import { DateTimePickerField } from '../ui/components/DateTimePickerField';
 import { DropdownField } from '../ui/components/DropdownField';
 import { InputField } from '../ui/components/InputField';
@@ -18,6 +21,8 @@ import { t } from '../utils/i18n';
  * @param options0.rule - The rule definition to render.
  * @param options0.context - The current context state.
  * @param options0.metadata - Additional metadata for error validation.
+ * @param options0.tokenMetadataCoordinator - Token metadata coordinator for the request.
+ * @param options0.defaultTokenCaip19 - Default token selector from the permission module.
  * @returns The rendered rule element or null if the rule value is undefined.
  */
 export function renderRule<
@@ -27,17 +32,21 @@ export function renderRule<
   rule,
   context,
   metadata,
+  tokenMetadataCoordinator,
+  defaultTokenCaip19,
 }: {
   rule: RuleDefinition<TContext, TMetadata>;
   context: TContext;
   metadata: TMetadata;
+  tokenMetadataCoordinator: TokenMetadataCoordinator;
+  defaultTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
 }): SnapElement | null {
   const { label, type, name, isOptional, contentWhenDisabled } = rule;
   const {
     value,
     error,
     tooltip,
-    iconData,
+    iconData: ruleIconData,
     isVisible,
     options,
     isEditable,
@@ -47,6 +56,10 @@ export function renderRule<
   if (!isVisible) {
     return null;
   }
+
+  const tokenCaip19 = resolveRuleTokenCaip19(rule, context, defaultTokenCaip19);
+  const iconData =
+    ruleIconData ?? getIconData(tokenMetadataCoordinator, tokenCaip19);
 
   const addFieldButtonName = isOptional ? `${name}_addFieldButton` : undefined;
   const removeFieldButtonName = isOptional
@@ -121,6 +134,8 @@ export function renderRule<
  * @param options0.rules - The array of rule definitions to render.
  * @param options0.context - The current context state.
  * @param options0.metadata - Additional metadata for error validation.
+ * @param options0.tokenMetadataCoordinator - Token metadata coordinator for the request.
+ * @param options0.defaultTokenCaip19 - Default token selector from the permission module.
  * @returns An array of rendered rule elements (or null for undefined rule values).
  */
 export function renderRules<
@@ -130,13 +145,25 @@ export function renderRules<
   rules,
   context,
   metadata,
+  tokenMetadataCoordinator,
+  defaultTokenCaip19,
 }: {
   rules: RuleDefinition<TContext, TMetadata>[];
   context: TContext;
   metadata: TMetadata;
+  tokenMetadataCoordinator: TokenMetadataCoordinator;
+  defaultTokenCaip19?: TokenCaip19Selector<TContext> | undefined;
 }): SnapElement[] {
   return rules
-    .map((rule) => renderRule({ rule, context, metadata }))
+    .map((rule) =>
+      renderRule({
+        rule,
+        context,
+        metadata,
+        tokenMetadataCoordinator,
+        defaultTokenCaip19,
+      }),
+    )
     .filter((el): el is SnapElement => el !== null);
 }
 

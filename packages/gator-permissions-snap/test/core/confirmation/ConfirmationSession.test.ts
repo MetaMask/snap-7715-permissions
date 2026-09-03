@@ -25,6 +25,7 @@ import type { BaseContext } from '../../../src/core/types';
 import type { ProfileSyncManager } from '../../../src/profileSync/profileSync';
 import type { SnapsMetricsService } from '../../../src/services/snapsMetricsService';
 import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
+import { createTestBaseContext } from '../../testContext';
 
 const randomAddress = (): Hex => {
   const randomBytes = new Uint8Array(20);
@@ -38,18 +39,11 @@ const mockInterfaceId = 'test-interface-id';
 const grantingAccountAddress = randomAddress();
 const fixedCaip10Address = `eip155:1:${grantingAccountAddress}` as const;
 
-const mockContext: BaseContext = {
-  tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
+const mockContext: BaseContext = createTestBaseContext({
   expiry: { timestamp: 1717987200 },
-  isAdjustmentAllowed: true,
   accountAddressCaip10: fixedCaip10Address,
   justification: 'Justification',
-  tokenMetadata: {
-    decimals: 18,
-    symbol: 'TKN',
-    iconDataBase64: null,
-  },
-};
+});
 
 const mockMetadata = {
   test: 'metadata',
@@ -801,30 +795,20 @@ describe('ConfirmationSession', () => {
   });
 
   it('correctly sets up the onConfirmationCreated hook to update the context', async () => {
-    const initialContext: BaseContext = {
+    const initialContext: BaseContext & { foo?: string } = {
+      ...createTestBaseContext({
+        expiry: { timestamp: 1717987200 },
+        accountAddressCaip10: fixedCaip10Address,
+      }),
       foo: 'original',
-      expiry: { timestamp: 1717987200 },
-      isAdjustmentAllowed: true,
-      accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
-      tokenMetadata: {
-        decimals: 18,
-        symbol: 'TEST',
-        iconDataBase64: null,
-      },
-    } as unknown as BaseContext;
-    const modifiedContext: BaseContext = {
+    };
+    const modifiedContext: BaseContext & { foo?: string } = {
+      ...createTestBaseContext({
+        expiry: { timestamp: 1733088000 },
+        accountAddressCaip10: fixedCaip10Address,
+      }),
       foo: 'updated',
-      expiry: { timestamp: 1733088000 },
-      isAdjustmentAllowed: true,
-      accountAddressCaip10: fixedCaip10Address,
-      tokenAddressCaip19: 'eip155:1:0x1234/erc20:0x1234',
-      tokenMetadata: {
-        decimals: 18,
-        symbol: 'TEST',
-        iconDataBase64: null,
-      },
-    } as unknown as BaseContext;
+    };
 
     lifecycleHandlerMocks.buildContext.mockResolvedValue(initialContext);
 
@@ -889,18 +873,12 @@ describe('ConfirmationSession', () => {
     const contextWithMarker = (
       marker: string,
     ): BaseContext & { foo?: string } => ({
-      ...mockContext,
+      ...createTestBaseContext({
+        expiry: { timestamp: 1733088000 },
+        accountAddressCaip10: 'caip:10:address',
+        justification: '',
+      }),
       foo: marker,
-      justification: '',
-      expiry: { timestamp: 1733088000 },
-      isAdjustmentAllowed: true,
-      accountAddressCaip10: 'caip:10:address',
-      tokenAddressCaip19: 'caip:19/asset:address',
-      tokenMetadata: {
-        decimals: 18,
-        symbol: 'TEST',
-        iconDataBase64: null,
-      },
     });
 
     const delay = async (ms: number): Promise<void> =>

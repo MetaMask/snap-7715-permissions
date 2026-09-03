@@ -12,6 +12,7 @@ import type {
   TypedPermissionRequest,
   BaseContext,
   BaseMetadata,
+  ContextWithPrimaryToken,
 } from '../../core/types';
 
 export type Erc20TokenAllowanceMetadata = BaseMetadata & {
@@ -22,12 +23,13 @@ export type Erc20TokenAllowanceMetadata = BaseMetadata & {
   };
 };
 
-export type Erc20TokenAllowanceContext = BaseContext & {
-  permissionDetails: {
-    allowanceAmount: string;
-    startTime: number;
+export type Erc20TokenAllowanceContext = BaseContext &
+  ContextWithPrimaryToken & {
+    permissionDetails: {
+      allowanceAmount: string;
+      startTime: number;
+    };
   };
-};
 
 export const zErc20TokenAllowancePermission = zPermission.extend({
   type: z.literal('erc20-token-allowance'),

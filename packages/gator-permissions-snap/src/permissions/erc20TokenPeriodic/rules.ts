@@ -13,7 +13,6 @@ import {
   timestampToISO8601,
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
-import { getIconData } from '../iconUtil';
 import { createExpiryRule } from '../rules';
 
 export const PERIOD_AMOUNT_ELEMENT = 'erc20-token-periodic-period-amount';
@@ -33,7 +32,6 @@ export const periodAmountRule: RuleDefinition<
     isVisible: true,
     tooltip: t('amountTooltip'),
     error: metadata.validationErrors.periodAmountError,
-    iconData: getIconData(context),
     isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenPeriodicContext, value: string) => ({

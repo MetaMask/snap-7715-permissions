@@ -4,7 +4,6 @@ import {
   timestampToISO8601,
   iso8601ToTimestampIgnoreTimezone,
 } from '../../utils/time';
-import { getIconData } from '../iconUtil';
 import { createExpiryRule } from '../rules';
 import type {
   Erc20TokenAllowanceContext,
@@ -28,7 +27,6 @@ export const allowanceAmountRule: RuleDefinition<
     isVisible: true,
     tooltip: t('allowanceAmountTooltip'),
     error: metadata.validationErrors.allowanceAmountError,
-    iconData: getIconData(context),
     isEditable: context.isAdjustmentAllowed,
   }),
   updateContext: (context: Erc20TokenAllowanceContext, value: string) => ({

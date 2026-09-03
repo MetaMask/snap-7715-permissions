@@ -7,6 +7,7 @@ import type {
   ScanDappUrlResult,
 } from '../../clients/trustSignalsClient';
 import type { DelegationContracts } from '../chainMetadata';
+import type { TokenMetadataCoordinator } from '../coordinators/TokenMetadataCoordinator';
 import type { ExistingPermissionsState } from '../existingpermissions/existingPermissionsState';
 import type { BaseContext, BaseMetadata, DeepRequired } from '../types';
 
@@ -38,6 +39,7 @@ export type PermissionRequestLifecycleHandlers<
   applyContext: (args: {
     context: TContext;
     originalRequest: TRequest;
+    tokenMetadata: TokenMetadataCoordinator;
   }) => Promise<TRequest>;
   populatePermission: (args: {
     permission: TPermission;
@@ -46,6 +48,7 @@ export type PermissionRequestLifecycleHandlers<
     permission: TPopulatedPermission;
     contracts: DelegationContracts;
   }) => Caveat[];
+  tokenMetadataCoordinator: TokenMetadataCoordinator;
   onConfirmationCreated?: (confirmationCreatedArgs: {
     interfaceId: string;
     initialContext: TContext;

@@ -1,4 +1,4 @@
-import { describe, expect, beforeEach, it } from '@jest/globals';
+import { describe, expect, beforeEach, it, jest } from '@jest/globals';
 import { bigIntToHex, numberToHex } from '@metamask/utils';
 
 import { TimePeriod } from '../../../src/core/types';
@@ -13,7 +13,7 @@ import type {
   Erc20TokenStreamPermission,
   Erc20TokenStreamPermissionRequest,
 } from '../../../src/permissions/erc20TokenStream/types';
-import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 const USDC_ADDRESS = '0xA0b86a33E6417efb4e0Ba2b1e4E6FE87bbEf2B0F';
@@ -69,12 +69,7 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-  tokenAddressCaip19: `eip155:1/erc20:${USDC_ADDRESS}`,
-  tokenMetadata: {
-    symbol: 'USDC',
-    decimals: USDC_DECIMALS,
-    iconDataBase64: null,
-  },
+  primaryTokenCaip19: `eip155:1/erc20:${USDC_ADDRESS}`,
   permissionDetails: {
     initialAmount: '1',
     maxAmount: '10',
@@ -85,6 +80,20 @@ const alreadyPopulatedContext: Erc20TokenStreamContext = {
 } as const;
 
 describe('erc20TokenStream:context', () => {
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
+
+  beforeEach(() => {
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator({
+      metadata: {
+        symbol: 'USDC',
+        decimals: USDC_DECIMALS,
+        iconDataBase64: null,
+      },
+    });
+  });
+
   describe('populatePermission()', () => {
     it('should return the permission unchanged if it is already populated', async () => {
       const populatedPermission = await populatePermission({
@@ -139,59 +148,25 @@ describe('erc20TokenStream:context', () => {
   });
 
   describe('buildContext()', () => {
-    let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
-
-    beforeEach(() => {
-      mockTokenMetadataService = {
-        getTokenBalanceAndMetadata: jest.fn(() => ({
-          balance: BigInt(
-            alreadyPopulatedContext.permissionDetails.initialAmount ?? 0,
-          ),
-          symbol: alreadyPopulatedContext.tokenMetadata.symbol,
-          decimals: USDC_DECIMALS,
-          iconUrl: 'https://example.com/icon.png',
-        })),
-        fetchIconDataAsBase64: jest.fn(async () =>
-          Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
-        ),
-      } as unknown as jest.Mocked<TokenMetadataService>;
-    });
-
     it('should create a context from a permission request', async () => {
-      const text = 'The contents of the image';
-      /* eslint-disable no-restricted-globals */
-      const base64 = Buffer.from(text, 'utf8').toString('base64');
-
-      mockTokenMetadataService.fetchIconDataAsBase64.mockResolvedValueOnce({
-        ok: true,
-        imageDataBase64: `data:image/png;base64,${base64}`,
-      });
-
       const context = await buildContext(alreadyPopulatedPermissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(context).toStrictEqual({
         ...alreadyPopulatedContext,
-        tokenMetadata: {
-          ...alreadyPopulatedContext.tokenMetadata,
-          iconDataBase64: `data:image/png;base64,${base64}`,
-        },
       });
 
-      expect(
-        mockTokenMetadataService.getTokenBalanceAndMetadata,
-      ).toHaveBeenCalledWith({
-        chainId: Number(alreadyPopulatedPermissionRequest.chainId),
-        account: ACCOUNT_ADDRESS,
-        assetAddress: USDC_ADDRESS,
-      });
+      expect(mockTokenMetadataCoordinator.ensureMetadata).toHaveBeenCalledWith(
+        expect.objectContaining({
+          caip19: expect.stringContaining('eip155:1/'),
+        }),
+      );
     });
 
     it('should create a context with different token decimals', async () => {
       const DAI_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F';
       const DAI_DECIMALS = 18;
-      const DAI_BALANCE = bigIntToHex(100000000000000000000n); // 100 DAI (18 decimals)
 
       const daiPermission: Erc20TokenStreamPermission = {
         type: 'erc20-token-stream',
@@ -211,23 +186,21 @@ describe('erc20TokenStream:context', () => {
         permission: daiPermission,
       };
 
-      // Override mock return values for this test
-      mockTokenMetadataService.getTokenBalanceAndMetadata.mockResolvedValueOnce(
-        {
-          balance: BigInt(DAI_BALANCE),
-          symbol: 'DAI',
-          decimals: DAI_DECIMALS,
-        },
-      );
-
-      const context = await buildContext(daiPermissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
-      });
-
-      expect(context.tokenMetadata).toStrictEqual({
+      const daiMetadata = {
         symbol: 'DAI',
         decimals: DAI_DECIMALS,
         iconDataBase64: null,
+      };
+
+      jest
+        .mocked(mockTokenMetadataCoordinator.ensureMetadata)
+        .mockResolvedValueOnce(daiMetadata);
+      jest
+        .mocked(mockTokenMetadataCoordinator.getMetadata)
+        .mockReturnValueOnce(daiMetadata);
+
+      const context = await buildContext(daiPermissionRequest, {
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(context.permissionDetails.initialAmount).toBe('1');
@@ -241,7 +214,7 @@ describe('erc20TokenStream:context', () => {
       };
 
       const context = await buildContext(permissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
       expect(context.expiry).toBeUndefined();
     });
@@ -254,7 +227,7 @@ describe('erc20TokenStream:context', () => {
       } as unknown as Erc20TokenStreamPermissionRequest;
 
       const context = await buildContext(permissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
       expect(context.expiry).toBeUndefined();
     });
@@ -278,6 +251,7 @@ describe('erc20TokenStream:context', () => {
     it('should create metadata for a context', async () => {
       const metadata = await deriveMetadata({
         context,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(metadata).toStrictEqual({
@@ -301,6 +275,7 @@ describe('erc20TokenStream:context', () => {
 
           const metadata = await deriveMetadata({
             context: contextWithInvalidInitialAmount,
+            tokenMetadata: mockTokenMetadataCoordinator,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
@@ -320,6 +295,7 @@ describe('erc20TokenStream:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithNegativeInitialAmount,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -342,6 +318,7 @@ describe('erc20TokenStream:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithInitialAmountGreaterThanMaxAmount,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -362,6 +339,7 @@ describe('erc20TokenStream:context', () => {
 
           const metadata = await deriveMetadata({
             context: contextWithInvalidMaxAmount,
+            tokenMetadata: mockTokenMetadataCoordinator,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
@@ -381,6 +359,7 @@ describe('erc20TokenStream:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithNegativeMaxAmount,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -403,6 +382,7 @@ describe('erc20TokenStream:context', () => {
 
           const metadata = await deriveMetadata({
             context: contextWithInvalidAmountPerPeriod,
+            tokenMetadata: mockTokenMetadataCoordinator,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
@@ -422,6 +402,7 @@ describe('erc20TokenStream:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithNegativeAmountPerPeriod,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -441,6 +422,7 @@ describe('erc20TokenStream:context', () => {
 
           const metadata = await deriveMetadata({
             context: contextWithStartTimeInThePast,
+            tokenMetadata: mockTokenMetadataCoordinator,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
@@ -459,6 +441,7 @@ describe('erc20TokenStream:context', () => {
 
           const metadata = await deriveMetadata({
             context: contextWithInvalidStartTime,
+            tokenMetadata: mockTokenMetadataCoordinator,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
@@ -479,6 +462,7 @@ describe('erc20TokenStream:context', () => {
 
             const metadata = await deriveMetadata({
               context: contextWithInvalidStartTime,
+              tokenMetadata: mockTokenMetadataCoordinator,
             });
 
             expect(metadata.validationErrors).toStrictEqual({
@@ -504,6 +488,7 @@ describe('erc20TokenStream:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithExpiryInThePast,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -525,6 +510,7 @@ describe('erc20TokenStream:context', () => {
 
         const metadata = await deriveMetadata({
           context: contextWithInvalidExpiry,
+          tokenMetadata: mockTokenMetadataCoordinator,
         });
 
         expect(metadata.validationErrors).toStrictEqual({
@@ -548,6 +534,7 @@ describe('erc20TokenStream:context', () => {
 
           const metadata = await deriveMetadata({
             context: contextWithInvalidExpiry,
+            tokenMetadata: mockTokenMetadataCoordinator,
           });
 
           expect(metadata.validationErrors).toStrictEqual({
@@ -563,6 +550,7 @@ describe('erc20TokenStream:context', () => {
       const permissionRequest = await applyContext({
         context: alreadyPopulatedContext,
         originalRequest: alreadyPopulatedPermissionRequest,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(permissionRequest).toStrictEqual(
@@ -577,6 +565,7 @@ describe('erc20TokenStream:context', () => {
           ...alreadyPopulatedPermissionRequest,
           rules: [],
         },
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
       const expiryRule = permissionRequest.rules.find(
         (rule) => rule.type === 'expiry',

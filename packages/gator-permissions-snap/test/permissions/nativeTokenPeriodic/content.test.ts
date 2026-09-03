@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 import { TimePeriod } from '../../../src/core/types';
 import { renderBody } from '../../../src/permissions/nativeTokenPeriodic/content';
@@ -7,6 +7,7 @@ import type {
   NativeTokenPeriodicMetadata,
 } from '../../../src/permissions/nativeTokenPeriodic/types';
 import { TIME_PERIOD_TO_SECONDS } from '../../../src/utils/time';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const mockContext: NativeTokenPeriodicContext = {
   expiry: {
@@ -15,13 +16,7 @@ const mockContext: NativeTokenPeriodicContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to do periodic native token transfers',
   accountAddressCaip10: 'eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-  tokenAddressCaip19:
-    'eip155:1/erc20:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-  tokenMetadata: {
-    symbol: 'ETH',
-    decimals: 18,
-    iconDataBase64: null,
-  },
+  primaryTokenCaip19: 'eip155:1/slip44:60',
   permissionDetails: {
     periodAmount: '1',
     periodDuration: Number(TIME_PERIOD_TO_SECONDS[TimePeriod.DAILY]),
@@ -34,11 +29,27 @@ const mockMetadata: NativeTokenPeriodicMetadata = {
 };
 
 describe('nativeTokenPeriodic:content', () => {
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
+
+  beforeEach(() => {
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator({
+      metadata: {
+        symbol: 'ETH',
+        decimals: 18,
+        iconDataBase64:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      },
+    });
+  });
+
   describe('renderBody()', () => {
     it('should render content with all permission details', async () => {
       const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(content).toMatchInlineSnapshot(`
@@ -110,7 +121,16 @@ describe('nativeTokenPeriodic:content', () => {
                         {
                           "key": null,
                           "props": {
-                            "children": null,
+                            "children": {
+                              "key": null,
+                              "props": {
+                                "alt": "ETH",
+                                "src": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="24" height="24" />
+  </svg>",
+                              },
+                              "type": "Image",
+                            },
                           },
                           "type": "Box",
                         },

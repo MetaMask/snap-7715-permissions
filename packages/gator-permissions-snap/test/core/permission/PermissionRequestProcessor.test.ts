@@ -77,6 +77,7 @@ describe('PermissionRequestProcessor', () => {
     } as unknown as jest.Mocked<TokenPricesService>;
 
     mockTokenMetadataService = {
+      getTokenMetadata: jest.fn(),
       getTokenBalanceAndMetadata: jest.fn(),
     } as unknown as jest.Mocked<TokenMetadataService>;
 
@@ -95,8 +96,6 @@ describe('PermissionRequestProcessor', () => {
     const confirmationShellFactory = new ConfirmationShellFactory({
       accountController: mockAccountController,
       userEventDispatcher: mockUserEventDispatcher,
-      tokenMetadataService: mockTokenMetadataService,
-      tokenPricesService: mockTokenPricesService,
     });
 
     permissionRequestProcessor = new PermissionRequestProcessor({
@@ -104,6 +103,7 @@ describe('PermissionRequestProcessor', () => {
       pipeline: mockPipeline,
       confirmationShellFactory,
       tokenMetadataService: mockTokenMetadataService,
+      tokenPricesService: mockTokenPricesService,
     });
   });
 

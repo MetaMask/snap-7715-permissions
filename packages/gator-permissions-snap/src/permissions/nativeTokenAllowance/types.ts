@@ -11,6 +11,7 @@ import type {
   TypedPermissionRequest,
   BaseContext,
   BaseMetadata,
+  ContextWithPrimaryToken,
 } from '../../core/types';
 
 export type NativeTokenAllowanceMetadata = BaseMetadata & {
@@ -21,12 +22,13 @@ export type NativeTokenAllowanceMetadata = BaseMetadata & {
   };
 };
 
-export type NativeTokenAllowanceContext = BaseContext & {
-  permissionDetails: {
-    allowanceAmount: string;
-    startTime: number;
+export type NativeTokenAllowanceContext = BaseContext &
+  ContextWithPrimaryToken & {
+    permissionDetails: {
+      allowanceAmount: string;
+      startTime: number;
+    };
   };
-};
 
 export const zNativeTokenAllowancePermission = zPermission.extend({
   type: z.literal('native-token-allowance'),

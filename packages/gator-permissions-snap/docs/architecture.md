@@ -30,11 +30,12 @@ This document outlines the architecture of the Permissions Provider Snap system 
 
 - **EntryPoint (index.ts)**: The main entrypoint for the snap. Sets up all services, dependencies, and lifecycle handlers. Connects RPC handlers and UserEventDispatcher to the Snaps runtime.
 - **RpcHandler**: Functional RPC handler created by `createRpcHandler()` that responds to JSON-RPC requests from external systems. Supports grant, permission offers, granted permissions, revocation submission, and supported-permissions queries.
-- **PermissionRequestProcessor**: Looks up permission modules from the registry, creates a per-request `ConfirmationShell`, builds request lifecycle handlers, and runs each request through the request pipeline.
+- **PermissionRequestProcessor**: Looks up permission modules from the registry, creates a per-request `TokenMetadataCoordinator` and `ConfirmationShell`, builds request lifecycle handlers, and runs each request through the request pipeline.
 - **PermissionRegistry**: Maps permission type strings to unified `PermissionModule` definitions.
 - **PermissionRequestPipeline**: Sequences grant preparation, confirmation session, and grant resolution for each request.
 - **PermissionModule**: Per-type contract (parse, buildContext, renderBody, caveats, etc.) registered in the registry.
-- **ConfirmationShellFactory**: Creates a per-request `ConfirmationShell` wired to a module's `renderBody` and shell options.
+- **TokenMetadataCoordinator**: Per-request coordinator that fetches and caches token metadata and balances; notifies the shell when async lookups complete.
+- **ConfirmationShellFactory**: Creates a per-request `ConfirmationShell` wired to a module's `renderBody`, token selectors, and coordinator.
 - **ConfirmationShell**: Permission-agnostic confirmation chrome (account selector, trust signals, token balance, existing-permissions subview) and session event wiring.
 - **ConfirmationSession**: Owns dialog lifecycle for introduction, confirmation, and existing-permissions subviews per request.
 - **UserEventDispatcher**: Manages user input events from the snaps environment, providing event registration, cleanup, and sequential event processing.
@@ -68,7 +69,7 @@ Each permission type includes:
 
 Each permission folder exports a flat `PermissionModule` and typically contains:
 
-- **index.ts**: Exports the `PermissionModule` (type, rules, title, lifecycle functions, optional `showTokenBalance`)
+- **index.ts**: Exports the `PermissionModule` (type, rules, title, lifecycle functions, and token CAIP-19 selectors)
 - **types.ts**: Permission-specific TypeScript types for requests, contexts, metadata, and permissions
 - **validation.ts**: Request parsing and validation logic (`parseAndValidate`)
 - **context.ts**: Functions for building, applying, and populating permission context
@@ -300,15 +301,16 @@ The RpcHandler provides five main functions:
 
 ### PermissionRequestProcessor
 
-The `PermissionRequestProcessor` is the RPC-facing entry point for grant requests. It looks up the `PermissionModule` by type, creates a per-request `ConfirmationShell` via `ConfirmationShellFactory`, builds request lifecycle handlers via `buildRequestLifecycleHandlers()`, and delegates to `PermissionRequestPipeline`.
+The `PermissionRequestProcessor` is the RPC-facing entry point for grant requests. It looks up the `PermissionModule` by type, creates a per-request `TokenMetadataCoordinator`, creates a per-request `ConfirmationShell` via `ConfirmationShellFactory`, builds request lifecycle handlers via `buildRequestLifecycleHandlers()`, and delegates to `PermissionRequestPipeline`.
 
 Key architectural points:
 
 - One processor instance shared across all requests (no per-request handler object)
 - Registry lookup via `extractDescriptorName(request.permission.type)`
 - Each permission folder exports a `PermissionModule` registered at startup in `createPermissionRegistry.ts`
-- `ConfirmationShellFactory` wires shell chrome (balance, account selector, trust signals) to the module's `renderBody`
-- `buildRequestLifecycleHandlers()` adapts a module + shell into `PermissionRequestLifecycleHandlers` for the pipeline
+- A `TokenMetadataCoordinator` is created per request and shared by the shell and lifecycle handlers
+- `ConfirmationShellFactory` wires shell chrome (balance, account selector, trust signals) to the module's `renderBody` and token selectors
+- `buildRequestLifecycleHandlers()` adapts a module + shell + coordinator into `PermissionRequestLifecycleHandlers` for the pipeline
 
 ### PermissionRegistry and PermissionModule
 
@@ -318,19 +320,39 @@ Each `PermissionModule` exposes a flat contract:
 
 - `parseAndValidate`, `buildContext`, `deriveMetadata`, `renderBody`
 - `applyContext`, `populatePermission`, `createPermissionCaveats`
-- `rules`, `title`, `subtitle`, `showTokenBalance` (optional, defaults to `true`)
+- `rules`, `title`, `subtitle`
+- `tokenCaip19s`: selectors for all tokens whose metadata is fetched and shown as `TokenField` rows
+- `balanceTokenCaip19` (optional): selector for the token shown in the account balance section; must resolve to one of `tokenCaip19s`
+
+Token permissions extend context with `primaryTokenCaip19` via `ContextWithPrimaryToken`. Non-token permissions (e.g. token approval revocation) declare an empty `tokenCaip19s` array.
 
 Permission folders export `PermissionModule` objects directly; all modules are registered via `createPermissionRegistry()`.
 
+### TokenMetadataCoordinator
+
+`TokenMetadataCoordinator` is created once per permission request in `PermissionRequestProcessor`. It centralizes async token metadata and balance lookups so permission context stays focused on editable permission state.
+
+Key responsibilities:
+
+- `ensureMetadata()`: awaited during `buildContext` when decimals or symbols are needed synchronously; joins an in-flight `start()` fetch for the same token
+- `start()`: one-shot background metadata fetch for the request tokens
+- `getMetadata()`: read cached metadata for rendering and validation
+- `getBalance({ accountCaip10, caip19 })`: on-demand cached balance read; the shell owns pending/ready UI state
+- `onUpdate()`: callback invoked when metadata fetches complete, triggering shell re-renders
+
+Lifecycle handlers pass the coordinator to `deriveMetadata`, `applyContext`, and `renderBody` so permission code can resolve token data without embedding it in context.
+
 ### ConfirmationShell and ConfirmationShellFactory
 
-`ConfirmationShellFactory` creates a `ConfirmationShell` per request, wired to the module's `renderBody`, title, subtitle, and `showTokenBalance` option.
+`ConfirmationShellFactory` creates a `ConfirmationShell` per request, wired to the module's `renderBody`, title, subtitle, token selectors, and `TokenMetadataCoordinator`.
 
 `ConfirmationShell` provides permission-agnostic confirmation chrome:
 
-- Account selector, upgrade banner, and optional token balance (controlled by `showTokenBalance`)
+- Account selector, upgrade banner, and optional token balance (when `balanceTokenCaip19` is defined)
+- One or more `TokenField` rows for tokens in `tokenCaip19s`
 - Trust signal display, justification, existing-permissions subview
 - Session event binding for rules, account changes, and shell interactions
+- Subscribes to coordinator `onUpdate` to re-render when token metadata arrives; loads balances via `getBalance` on bind and account change
 
 The shell's lifecycle methods (`createConfirmationContent`, `createSkeletonContent`, `bindSessionEvents`) are exposed to the pipeline via `PermissionRequestLifecycleHandlers`.
 

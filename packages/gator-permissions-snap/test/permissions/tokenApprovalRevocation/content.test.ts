@@ -1,11 +1,13 @@
 import { describe, expect, it } from '@jest/globals';
-import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 
 import { renderBody } from '../../../src/permissions/tokenApprovalRevocation/content';
 import type {
   TokenApprovalRevocationContext,
   TokenApprovalRevocationMetadata,
 } from '../../../src/permissions/tokenApprovalRevocation/types';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
+
+const mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator();
 
 const mockContext: TokenApprovalRevocationContext = {
   expiry: {
@@ -22,12 +24,6 @@ const mockContext: TokenApprovalRevocationContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to revoke approvals',
   accountAddressCaip10: `eip155:1:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`,
-  tokenAddressCaip19: NO_ASSET_ADDRESS,
-  tokenMetadata: {
-    symbol: '',
-    decimals: 0,
-    iconDataBase64: '',
-  },
 };
 
 const mockMetadata: TokenApprovalRevocationMetadata = {
@@ -40,6 +36,7 @@ describe('tokenApprovalRevocation:content', () => {
       const content = await renderBody({
         context: mockContext,
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       const rendered = JSON.stringify(content);
@@ -62,6 +59,7 @@ describe('tokenApprovalRevocation:content', () => {
           },
         },
         metadata: mockMetadata,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       const rendered = JSON.stringify(content);

@@ -17,6 +17,7 @@ import type {
 } from './types';
 import { parseAndValidate } from './validation';
 import type { PermissionModule } from '../../core/permission/PermissionModule';
+import { primaryTokenCaip19Selector } from '../../core/token/tokenSelectors';
 
 export const nativeTokenPeriodicPermissionModule: PermissionModule<
   NativeTokenPeriodicPermissionRequest,
@@ -28,6 +29,8 @@ export const nativeTokenPeriodicPermissionModule: PermissionModule<
   type: 'native-token-periodic',
   name: 'Native Token Periodic Transfer',
   rules: allRules,
+  tokenCaip19s: [primaryTokenCaip19Selector],
+  balanceTokenCaip19: primaryTokenCaip19Selector,
   title: 'permissionRequestTitle',
   subtitle: 'permissionRequestSubtitle',
   parseAndValidate,

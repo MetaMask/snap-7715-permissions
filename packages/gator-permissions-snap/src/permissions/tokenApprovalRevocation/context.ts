@@ -1,4 +1,3 @@
-import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 import { InvalidInputError } from '@metamask/snaps-sdk';
 import { parseCaipAccountId, toCaipAccountId } from '@metamask/utils';
@@ -20,17 +19,6 @@ import {
 } from '../rules';
 
 const CHAIN_NAMESPACE = 'eip155';
-// presently BaseContext assumes that a token is associated with a permission.
-// This constant defines placeholder data that is not used for revocation
-// permissions.
-const EXTRANEOUS_CONTEXT_DATA = {
-  tokenAddressCaip19: NO_ASSET_ADDRESS,
-  tokenMetadata: {
-    symbol: '',
-    decimals: 0,
-    iconDataBase64: '',
-  },
-} as const;
 
 /**
  * Applies the context to the original request.
@@ -89,7 +77,6 @@ export async function populatePermission({
  * and manage the permission state.
  * @param permissionRequest - The token approval revocation permission request to convert.
  * @param _services - Services required to build permission context (unused for this permission type).
- * @param _services.tokenMetadataService - Service for fetching token metadata.
  * @returns A context object containing the formatted permission details and account information.
  */
 export async function buildContext(
@@ -152,8 +139,6 @@ export async function buildContext(
       permit2InvalidateNonces,
     },
     accountAddressCaip10,
-    // unfortunately there is a presumption that every permission has a related token.
-    ...EXTRANEOUS_CONTEXT_DATA,
   };
 }
 

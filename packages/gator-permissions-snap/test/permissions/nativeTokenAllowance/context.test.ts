@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
+import type { CaipAssetType } from '@metamask/snaps-sdk';
 import { bigIntToHex } from '@metamask/utils';
 
 import {
@@ -9,10 +10,11 @@ import type {
   NativeTokenAllowanceContext,
   NativeTokenAllowancePermissionRequest,
 } from '../../../src/permissions/nativeTokenAllowance/types';
-import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import { parseUnits } from '../../../src/utils/value';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+const primaryTokenCaip19 = 'eip155:1/slip44:60' as CaipAssetType;
 
 const startTime = 1729900800;
 const expiryTimestamp = startTime + 86400 * 30;
@@ -63,12 +65,7 @@ const baseContext: NativeTokenAllowanceContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-  tokenAddressCaip19: 'eip155:1/slip44:60',
-  tokenMetadata: {
-    symbol: 'ETH',
-    decimals: 18,
-    iconDataBase64: null,
-  },
+  primaryTokenCaip19,
   permissionDetails: {
     allowanceAmount: '1',
     startTime,
@@ -76,26 +73,24 @@ const baseContext: NativeTokenAllowanceContext = {
 };
 
 describe('nativeTokenAllowance:context', () => {
-  let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
 
   beforeEach(() => {
-    mockTokenMetadataService = {
-      getTokenBalanceAndMetadata: jest.fn(() => ({
-        balance: BigInt(0),
-        symbol: baseContext.tokenMetadata.symbol,
-        decimals: baseContext.tokenMetadata.decimals,
-        iconUrl: 'https://example.com/icon.png',
-      })),
-      fetchIconDataAsBase64: jest.fn(async () =>
-        Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
-      ),
-    } as unknown as jest.Mocked<TokenMetadataService>;
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator({
+      metadata: {
+        symbol: 'ETH',
+        decimals: 18,
+        iconDataBase64: null,
+      },
+    });
   });
 
   describe('buildContext()', () => {
     it('includes redeemer and payee addresses from rules', async () => {
       const context = await buildContext(permissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(context.redeemerAddresses).toStrictEqual([
@@ -112,6 +107,7 @@ describe('nativeTokenAllowance:context', () => {
       const result = await applyContext({
         context: baseContext,
         originalRequest: permissionRequest,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(result.rules).toStrictEqual(permissionRequest.rules);

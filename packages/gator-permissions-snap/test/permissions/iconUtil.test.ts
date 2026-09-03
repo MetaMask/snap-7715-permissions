@@ -1,34 +1,26 @@
 import { describe, expect, it } from '@jest/globals';
+import type { CaipAssetType } from '@metamask/snaps-sdk';
 
-import type { BaseContext } from '../../src/core/types';
 import { getIconData } from '../../src/permissions/iconUtil';
+import { createMockTokenMetadataCoordinator } from '../testContext';
+
+const mockCaip19 =
+  'eip155:1/erc20:0x1234567890123456789012345678901234567890' as CaipAssetType;
 
 describe('iconUtil', () => {
   describe('getIconData', () => {
-    const createMockContext = (
-      iconDataBase64: string | null,
-      symbol = 'USDC',
-    ): BaseContext => ({
-      expiry: { timestamp: 1714521600 },
-      isAdjustmentAllowed: true,
-      justification: 'Test permission',
-      accountAddressCaip10:
-        'eip155:1:0x1234567890123456789012345678901234567890',
-      tokenAddressCaip19:
-        'eip155:1/erc20:0x1234567890123456789012345678901234567890',
-      tokenMetadata: {
-        symbol,
-        decimals: 6,
-        iconDataBase64,
-      },
-    });
-
     it('returns IconData when iconDataBase64 is provided', () => {
       const mockIconUrl =
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-      const context = createMockContext(mockIconUrl, 'USDC');
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGAWjR9awAAAABJRU5ErkJggg==';
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: 'USDC',
+          decimals: 6,
+          iconDataBase64: mockIconUrl,
+        },
+      });
 
-      const result = getIconData(context);
+      const result = getIconData(coordinator, mockCaip19);
 
       expect(result).toStrictEqual({
         iconDataBase64: mockIconUrl,
@@ -38,9 +30,15 @@ describe('iconUtil', () => {
 
     it('uses token symbol as alt text', () => {
       const mockIconUrl = 'data:image/png;base64,test';
-      const context = createMockContext(mockIconUrl, 'ETH');
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: 'ETH',
+          decimals: 18,
+          iconDataBase64: mockIconUrl,
+        },
+      });
 
-      const result = getIconData(context);
+      const result = getIconData(coordinator, mockCaip19);
 
       expect(result).toStrictEqual({
         iconDataBase64: mockIconUrl,
@@ -50,9 +48,15 @@ describe('iconUtil', () => {
 
     it('handles different icon formats', () => {
       const mockIconUrl = 'https://example.com/icon.svg';
-      const context = createMockContext(mockIconUrl, 'DAI');
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: 'DAI',
+          decimals: 18,
+          iconDataBase64: mockIconUrl,
+        },
+      });
 
-      const result = getIconData(context);
+      const result = getIconData(coordinator, mockCaip19);
 
       expect(result).toStrictEqual({
         iconDataBase64: mockIconUrl,
@@ -60,26 +64,44 @@ describe('iconUtil', () => {
       });
     });
     it('returns undefined when iconDataBase64 is null', () => {
-      const context = createMockContext(null);
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: 'USDC',
+          decimals: 6,
+          iconDataBase64: null,
+        },
+      });
 
-      const result = getIconData(context);
+      const result = getIconData(coordinator, mockCaip19);
 
       expect(result).toBeUndefined();
     });
 
     it('returns undefined when iconDataBase64 is empty string', () => {
-      const context = createMockContext('');
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: 'USDC',
+          decimals: 6,
+          iconDataBase64: '',
+        },
+      });
 
-      const result = getIconData(context);
+      const result = getIconData(coordinator, mockCaip19);
 
       expect(result).toBeUndefined();
     });
 
     it('handles empty symbol', () => {
       const mockIconUrl = 'data:image/png;base64,test';
-      const context = createMockContext(mockIconUrl, '');
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: '',
+          decimals: 6,
+          iconDataBase64: mockIconUrl,
+        },
+      });
 
-      const result = getIconData(context);
+      const result = getIconData(coordinator, mockCaip19);
 
       expect(result).toStrictEqual({
         iconDataBase64: mockIconUrl,
@@ -89,9 +111,15 @@ describe('iconUtil', () => {
 
     it('handles symbol with special characters', () => {
       const mockIconUrl = 'data:image/png;base64,test';
-      const context = createMockContext(mockIconUrl, 'USDC-ETH LP');
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: 'USDC-ETH LP',
+          decimals: 6,
+          iconDataBase64: mockIconUrl,
+        },
+      });
 
-      const result = getIconData(context);
+      const result = getIconData(coordinator, mockCaip19);
 
       expect(result).toStrictEqual({
         iconDataBase64: mockIconUrl,
@@ -102,9 +130,15 @@ describe('iconUtil', () => {
     it('handles very long symbol', () => {
       const mockIconUrl = 'data:image/png;base64,test';
       const longSymbol = 'A'.repeat(100);
-      const context = createMockContext(mockIconUrl, longSymbol);
+      const coordinator = createMockTokenMetadataCoordinator({
+        metadata: {
+          symbol: longSymbol,
+          decimals: 6,
+          iconDataBase64: mockIconUrl,
+        },
+      });
 
-      const result = getIconData(context);
+      const result = getIconData(coordinator, mockCaip19);
 
       expect(result).toStrictEqual({
         iconDataBase64: mockIconUrl,

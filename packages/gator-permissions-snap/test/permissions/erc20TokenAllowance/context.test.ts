@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
+import type { CaipAssetType } from '@metamask/snaps-sdk';
 import { bigIntToHex } from '@metamask/utils';
 
 import {
@@ -10,12 +11,13 @@ import type {
   Erc20TokenAllowanceContext,
   Erc20TokenAllowancePermissionRequest,
 } from '../../../src/permissions/erc20TokenAllowance/types';
-import type { TokenMetadataService } from '../../../src/services/tokenMetadataService';
 import { parseUnits } from '../../../src/utils/value';
+import { createMockTokenMetadataCoordinator } from '../../testContext';
 
 const ACCOUNT_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 const tokenDecimals = 6;
 const tokenAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+const primaryTokenCaip19 = `eip155:1/erc20:${tokenAddress}` as CaipAssetType;
 
 const startTime = 1729900800;
 const expiryTimestamp = startTime + 86400 * 30;
@@ -65,12 +67,7 @@ const baseContext: Erc20TokenAllowanceContext = {
   isAdjustmentAllowed: true,
   justification: 'Permission to do something important',
   accountAddressCaip10: `eip155:1:${ACCOUNT_ADDRESS}`,
-  tokenAddressCaip19: `eip155:1/erc20:${tokenAddress}`,
-  tokenMetadata: {
-    symbol: 'USDC',
-    decimals: tokenDecimals,
-    iconDataBase64: null,
-  },
+  primaryTokenCaip19,
   permissionDetails: {
     allowanceAmount: '100',
     startTime,
@@ -78,26 +75,24 @@ const baseContext: Erc20TokenAllowanceContext = {
 };
 
 describe('erc20TokenAllowance:context', () => {
-  let mockTokenMetadataService: jest.Mocked<TokenMetadataService>;
+  let mockTokenMetadataCoordinator: ReturnType<
+    typeof createMockTokenMetadataCoordinator
+  >;
 
   beforeEach(() => {
-    mockTokenMetadataService = {
-      getTokenBalanceAndMetadata: jest.fn(() => ({
-        balance: BigInt(0),
-        symbol: baseContext.tokenMetadata.symbol,
+    mockTokenMetadataCoordinator = createMockTokenMetadataCoordinator({
+      metadata: {
+        symbol: 'USDC',
         decimals: tokenDecimals,
-        iconUrl: 'https://example.com/icon.png',
-      })),
-      fetchIconDataAsBase64: jest.fn(async () =>
-        Promise.resolve({ ok: false, reason: 'Icon URL not provided' }),
-      ),
-    } as unknown as jest.Mocked<TokenMetadataService>;
+        iconDataBase64: null,
+      },
+    });
   });
 
   describe('buildContext()', () => {
     it('includes redeemer and payee addresses from rules', async () => {
       const context = await buildContext(permissionRequest, {
-        tokenMetadataService: mockTokenMetadataService,
+        tokenMetadataCoordinator: mockTokenMetadataCoordinator,
       });
 
       expect(context.redeemerAddresses).toStrictEqual([
@@ -114,6 +109,7 @@ describe('erc20TokenAllowance:context', () => {
       const result = await applyContext({
         context: baseContext,
         originalRequest: permissionRequest,
+        tokenMetadata: mockTokenMetadataCoordinator,
       });
 
       expect(result.permission.type).toBe('erc20-token-allowance');
@@ -132,7 +128,10 @@ describe('erc20TokenAllowance:context', () => {
         expiry: undefined,
       };
 
-      const metadata = await deriveMetadata({ context: contextNoExpiry });
+      const metadata = await deriveMetadata({
+        context: contextNoExpiry,
+        tokenMetadata: mockTokenMetadataCoordinator,
+      });
 
       expect(metadata.validationErrors.expiryError).toBeUndefined();
     });

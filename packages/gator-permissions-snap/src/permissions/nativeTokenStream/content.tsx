@@ -1,3 +1,4 @@
+import type { CaipAssetType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Divider, Section, Text } from '@metamask/snaps-sdk/jsx';
 
@@ -13,57 +14,66 @@ import type {
   NativeTokenStreamContext,
   NativeTokenStreamMetadata,
 } from './types';
+import type { TokenMetadataCoordinator } from '../../core/coordinators/TokenMetadataCoordinator';
 import { renderRules } from '../../core/rules';
 import { Field, TokenIcon } from '../../ui/components';
 import { t } from '../../utils/i18n';
+import { getIconData, getTokenSymbol } from '../iconUtil';
 
 /**
  * Creates the confirmation content for a native token stream permission request.
  * @param options - The options for creating the confirmation content.
  * @param options.context - The context containing stream details and account information.
  * @param options.metadata - The metadata containing stream configuration.
+ * @param options.tokenMetadata - Token metadata coordinator for the request.
  * @returns A promise that resolves to a SnapElement containing the confirmation UI.
  */
 export async function renderBody({
   context,
   metadata,
+  tokenMetadata,
 }: {
   context: NativeTokenStreamContext;
   metadata: NativeTokenStreamMetadata;
+  tokenMetadata: TokenMetadataCoordinator;
 }): Promise<SnapElement> {
   const { amountPerSecond, totalExposure } = metadata;
+  const symbol = getTokenSymbol(tokenMetadata, context.primaryTokenCaip19);
+  const iconData = getIconData(tokenMetadata, context.primaryTokenCaip19);
 
   const totalExposureValue =
     totalExposure === null
       ? t('totalExposureUnlimited')
-      : `${totalExposure} ${context.tokenMetadata.symbol}`;
+      : `${totalExposure} ${symbol}`;
 
-  const streamRateValue = t('streamRateValue', [
-    amountPerSecond,
-    context.tokenMetadata.symbol,
-  ]);
+  const streamRateValue = t('streamRateValue', [amountPerSecond, symbol]);
+
+  const ruleOptions = {
+    context,
+    metadata,
+    tokenMetadataCoordinator: tokenMetadata,
+    defaultTokenCaip19: (ctx: NativeTokenStreamContext): CaipAssetType =>
+      ctx.primaryTokenCaip19,
+  };
 
   return (
     <Box>
       <Section>
         {renderRules({
           rules: [initialAmountRule, maxAmountRule],
-          context,
-          metadata,
+          ...ruleOptions,
         })}
         <Divider />
         {renderRules({
           rules: [startTimeRule, expiryRule],
-          context,
-          metadata,
+          ...ruleOptions,
         })}
       </Section>
 
       <Section>
         {renderRules({
           rules: [streamAmountPerPeriodRule, streamPeriodRule],
-          context,
-          metadata,
+          ...ruleOptions,
         })}
 
         <Field
@@ -76,8 +86,8 @@ export async function renderBody({
             <Box direction="horizontal">
               <Box>
                 <TokenIcon
-                  imageDataBase64={context.tokenMetadata.iconDataBase64}
-                  altText={context.tokenMetadata.symbol}
+                  imageDataBase64={iconData?.iconDataBase64 ?? null}
+                  altText={iconData?.iconAltText ?? symbol}
                 />
               </Box>
               <Text>{streamRateValue}</Text>
@@ -95,8 +105,8 @@ export async function renderBody({
             <Box direction="horizontal">
               <Box>
                 <TokenIcon
-                  imageDataBase64={context.tokenMetadata.iconDataBase64}
-                  altText={context.tokenMetadata.symbol}
+                  imageDataBase64={iconData?.iconDataBase64 ?? null}
+                  altText={iconData?.iconAltText ?? symbol}
                 />
               </Box>
               <Text>{totalExposureValue}</Text>

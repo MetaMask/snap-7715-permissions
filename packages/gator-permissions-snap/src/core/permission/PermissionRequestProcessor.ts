@@ -1,12 +1,14 @@
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { extractDescriptorName } from '@metamask/7715-permissions-shared/utils';
 
-import type { TokenMetadataService } from '../../services/tokenMetadataService';
-import type { PermissionRequestPipeline } from '../PermissionRequestPipeline';
-import type { PermissionRequestResult } from '../types';
 import type { ConfirmationShellFactory } from './ConfirmationShellFactory';
 import { buildRequestLifecycleHandlers } from './PermissionModule';
 import type { PermissionRegistry } from './PermissionRegistry';
+import type { TokenMetadataService } from '../../services/tokenMetadataService';
+import type { TokenPricesService } from '../../services/tokenPricesService';
+import { TokenMetadataCoordinator } from '../coordinators/TokenMetadataCoordinator';
+import type { PermissionRequestPipeline } from '../PermissionRequestPipeline';
+import type { PermissionRequestResult } from '../types';
 
 /**
  * Looks up a permission module and runs the grant pipeline for one request.
@@ -20,21 +22,26 @@ export class PermissionRequestProcessor {
 
   readonly #tokenMetadataService: TokenMetadataService;
 
+  readonly #tokenPricesService: TokenPricesService;
+
   constructor({
     registry,
     pipeline,
     confirmationShellFactory,
     tokenMetadataService,
+    tokenPricesService,
   }: {
     registry: PermissionRegistry;
     pipeline: PermissionRequestPipeline;
     confirmationShellFactory: ConfirmationShellFactory;
     tokenMetadataService: TokenMetadataService;
+    tokenPricesService: TokenPricesService;
   }) {
     this.#registry = registry;
     this.#pipeline = pipeline;
     this.#confirmationShellFactory = confirmationShellFactory;
     this.#tokenMetadataService = tokenMetadataService;
+    this.#tokenPricesService = tokenPricesService;
   }
 
   /**
@@ -49,14 +56,19 @@ export class PermissionRequestProcessor {
   ): Promise<PermissionRequestResult> {
     const type = extractDescriptorName(request.permission.type);
     const module = this.#registry.get(type);
+    const tokenMetadataCoordinator = new TokenMetadataCoordinator({
+      tokenMetadataService: this.#tokenMetadataService,
+      tokenPricesService: this.#tokenPricesService,
+    });
     const confirmationShell = this.#confirmationShellFactory.create({
       module,
       permissionRequest: request,
+      tokenMetadataCoordinator,
     });
     const lifecycleHandlers = buildRequestLifecycleHandlers({
       module,
       confirmationShell,
-      tokenMetadataService: this.#tokenMetadataService,
+      tokenMetadataCoordinator,
     });
 
     return await this.#pipeline.run({

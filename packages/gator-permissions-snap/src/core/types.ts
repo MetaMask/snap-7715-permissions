@@ -42,12 +42,6 @@ export type BaseContext = {
   isAdjustmentAllowed: boolean;
   justification: string;
   accountAddressCaip10: CaipAccountId;
-  tokenAddressCaip19: CaipAssetType;
-  tokenMetadata: {
-    decimals: number;
-    symbol: string;
-    iconDataBase64: string | null;
-  };
   /**
    * Allowed redeemer addresses from the dapp-provided redeemer rule (read-only in the UI).
    */
@@ -56,6 +50,36 @@ export type BaseContext = {
    * Allowed payee addresses from the dapp-provided payee rule (read-only in the UI).
    */
   payeeAddresses?: string[] | undefined;
+};
+
+/**
+ * Context extension for permissions with a primary token reference.
+ */
+export type ContextWithPrimaryToken = {
+  primaryTokenCaip19: CaipAssetType;
+};
+
+export type ResolvedTokenMetadata = {
+  symbol: string;
+  decimals: number;
+  iconDataBase64: string | null;
+};
+
+export type ResolvedTokenBalance = {
+  formatted: string;
+  fiat: string | null;
+};
+
+export type TokenCaip19Selector<TContext extends BaseContext> = (
+  context: TContext,
+) => CaipAssetType | undefined;
+
+export type ShellTokenDisplay = {
+  caip19: CaipAssetType;
+  symbol: string;
+  tokenAddress?: string | undefined;
+  explorerUrl?: string | undefined;
+  iconData?: IconData | undefined;
 };
 
 export type BaseMetadata = {
@@ -153,6 +177,8 @@ export type RuleDefinition<
   label: MessageKey;
   type: RuleType;
   getRuleData: (config: { context: TContext; metadata: TMetadata }) => RuleData;
+  /** CAIP-19 asset for amount-field icon display. Defaults to the module default token. */
+  tokenCaip19?: TokenCaip19Selector<TContext>;
   // todo: it would be nice if we could make the value type more specific
   updateContext: (context: TContext, value: any) => TContext;
   /** When provided, called to get content shown when the field is toggled off. */

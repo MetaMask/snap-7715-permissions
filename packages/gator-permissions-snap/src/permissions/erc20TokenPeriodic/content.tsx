@@ -1,3 +1,4 @@
+import type { CaipAssetType } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { Box, Divider, Section } from '@metamask/snaps-sdk/jsx';
 
@@ -11,6 +12,7 @@ import type {
   Erc20TokenPeriodicContext,
   Erc20TokenPeriodicMetadata,
 } from './types';
+import type { TokenMetadataCoordinator } from '../../core/coordinators/TokenMetadataCoordinator';
 import { renderRules } from '../../core/rules';
 
 /**
@@ -18,28 +20,37 @@ import { renderRules } from '../../core/rules';
  * @param args - The configuration for the confirmation content.
  * @param args.context - The context containing permission details.
  * @param args.metadata - Metadata including derived values and validation errors.
+ * @param args.tokenMetadata - Token metadata coordinator for the request.
  * @returns A Promise that resolves to the UI element for the confirmation dialog.
  */
 export async function renderBody({
   context,
   metadata,
+  tokenMetadata,
 }: {
   context: Erc20TokenPeriodicContext;
   metadata: Erc20TokenPeriodicMetadata;
+  tokenMetadata: TokenMetadataCoordinator;
 }): Promise<SnapElement> {
+  const ruleOptions = {
+    context,
+    metadata,
+    tokenMetadataCoordinator: tokenMetadata,
+    defaultTokenCaip19: (ctx: Erc20TokenPeriodicContext): CaipAssetType =>
+      ctx.primaryTokenCaip19,
+  };
+
   return (
     <Box>
       <Section>
         {renderRules({
           rules: [periodAmountRule, periodDurationRule],
-          context,
-          metadata,
+          ...ruleOptions,
         })}
         <Divider />
         {renderRules({
           rules: [startTimeRule, expiryRule],
-          context,
-          metadata,
+          ...ruleOptions,
         })}
       </Section>
     </Box>

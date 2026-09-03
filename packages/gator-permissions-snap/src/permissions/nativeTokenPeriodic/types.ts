@@ -11,6 +11,7 @@ import type {
   TypedPermissionRequest,
   BaseContext,
   BaseMetadata,
+  ContextWithPrimaryToken,
 } from '../../core/types';
 import { zPeriodDuration } from '../../utils/time';
 
@@ -23,13 +24,14 @@ export type NativeTokenPeriodicMetadata = BaseMetadata & {
   };
 };
 
-export type NativeTokenPeriodicContext = BaseContext & {
-  permissionDetails: {
-    periodAmount: string;
-    periodDuration: number;
-    startTime: number;
+export type NativeTokenPeriodicContext = BaseContext &
+  ContextWithPrimaryToken & {
+    permissionDetails: {
+      periodAmount: string;
+      periodDuration: number;
+      startTime: number;
+    };
   };
-};
 
 export const zNativeTokenPeriodicPermission = zPermission.extend({
   type: z.literal('native-token-periodic'),

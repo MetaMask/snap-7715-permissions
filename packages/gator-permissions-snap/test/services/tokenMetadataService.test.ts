@@ -24,6 +24,7 @@ describe('TokenMetadataService', () => {
   beforeEach(() => {
     mockAccountApiClient = {
       isChainIdSupported: jest.fn(),
+      getTokenMetadata: jest.fn(),
       getTokenBalanceAndMetadata: jest.fn(),
     } as unknown as jest.Mocked<AccountApiClient>;
 
@@ -422,9 +423,10 @@ describe('TokenMetadataService', () => {
     describe('caching behavior', () => {
       beforeEach(() => {
         mockAccountApiClient.isChainIdSupported.mockReturnValue(true);
-        mockAccountApiClient.getTokenBalanceAndMetadata.mockResolvedValue(
-          mockTokenBalanceAndMetadata,
-        );
+        mockAccountApiClient.getTokenMetadata.mockResolvedValue({
+          symbol: 'ETH',
+          decimals: 18,
+        });
       });
 
       it('should return metadata without balance', async () => {
@@ -440,25 +442,19 @@ describe('TokenMetadataService', () => {
       it('should cache metadata on first call', async () => {
         await tokenMetadataService.getTokenMetadata(baseOptions);
 
-        expect(
-          mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).toHaveBeenCalledTimes(1);
+        expect(mockAccountApiClient.getTokenMetadata).toHaveBeenCalledTimes(1);
       });
 
       it('should return cached metadata on subsequent calls without fetching', async () => {
         // First call
         await tokenMetadataService.getTokenMetadata(baseOptions);
-        expect(
-          mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).toHaveBeenCalledTimes(1);
+        expect(mockAccountApiClient.getTokenMetadata).toHaveBeenCalledTimes(1);
 
         // Second call with same params
         const result = await tokenMetadataService.getTokenMetadata(baseOptions);
 
         // Should not have called the client again
-        expect(
-          mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).toHaveBeenCalledTimes(1);
+        expect(mockAccountApiClient.getTokenMetadata).toHaveBeenCalledTimes(1);
         expect(result).toStrictEqual({
           symbol: 'ETH',
           decimals: 18,
@@ -470,8 +466,7 @@ describe('TokenMetadataService', () => {
         await tokenMetadataService.getTokenMetadata(baseOptions);
 
         // Second call for specific asset
-        mockAccountApiClient.getTokenBalanceAndMetadata.mockResolvedValueOnce({
-          ...mockTokenBalanceAndMetadata,
+        mockAccountApiClient.getTokenMetadata.mockResolvedValueOnce({
           symbol: 'USDC',
           decimals: 6,
         });
@@ -484,9 +479,7 @@ describe('TokenMetadataService', () => {
           await tokenMetadataService.getTokenMetadata(assetOptions);
 
         // Should have called the client twice (once for each asset)
-        expect(
-          mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).toHaveBeenCalledTimes(2);
+        expect(mockAccountApiClient.getTokenMetadata).toHaveBeenCalledTimes(2);
         expect(assetResult).toStrictEqual({
           symbol: 'USDC',
           decimals: 6,
@@ -498,17 +491,38 @@ describe('TokenMetadataService', () => {
         await tokenMetadataService.getTokenMetadata(baseOptions);
 
         // Second call for chain 137 (Polygon)
-        mockAccountApiClient.getTokenBalanceAndMetadata.mockResolvedValueOnce(
-          mockTokenBalanceAndMetadata,
-        );
+        mockAccountApiClient.getTokenMetadata.mockResolvedValueOnce({
+          symbol: 'ETH',
+          decimals: 18,
+        });
 
         const polygonOptions = { ...baseOptions, chainId: 137 };
         await tokenMetadataService.getTokenMetadata(polygonOptions);
 
         // Should have called the client twice (once for each chain)
+        expect(mockAccountApiClient.getTokenMetadata).toHaveBeenCalledTimes(2);
+      });
+
+      it('should return iconUrl from Account API metadata fetch', async () => {
+        mockAccountApiClient.getTokenMetadata.mockResolvedValueOnce({
+          symbol: 'USDC',
+          decimals: 6,
+          iconUrl: 'https://example.com/usdc.png',
+        });
+
+        const result = await tokenMetadataService.getTokenMetadata({
+          chainId: 1,
+          assetAddress: mockAssetAddress,
+        });
+
+        expect(result).toStrictEqual({
+          symbol: 'USDC',
+          decimals: 6,
+          iconUrl: 'https://example.com/usdc.png',
+        });
         expect(
           mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).toHaveBeenCalledTimes(2);
+        ).not.toHaveBeenCalled();
       });
     });
 
@@ -519,6 +533,7 @@ describe('TokenMetadataService', () => {
 
       it('should fallback to blockchain client when AccountApiClient fails', async () => {
         const networkError = new Error('Network timeout');
+        mockAccountApiClient.getTokenMetadata.mockRejectedValue(networkError);
         mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
           networkError,
         );
@@ -536,6 +551,7 @@ describe('TokenMetadataService', () => {
 
       it('should throw error when all clients fail', async () => {
         const error = new Error('All clients failed');
+        mockAccountApiClient.getTokenMetadata.mockRejectedValue(error);
         mockAccountApiClient.getTokenBalanceAndMetadata.mockRejectedValue(
           error,
         );
@@ -576,10 +592,17 @@ describe('TokenMetadataService', () => {
       beforeEach(() => {
         mockAccountApiClient.isChainIdSupported.mockReturnValue(true);
         // Simulate a slow fetch to ensure we can test concurrency
-        mockAccountApiClient.getTokenBalanceAndMetadata.mockImplementation(
+        mockAccountApiClient.getTokenMetadata.mockImplementation(
           async () =>
             new Promise((resolve) => {
-              setTimeout(() => resolve(mockTokenBalanceAndMetadata), 10);
+              setTimeout(
+                () =>
+                  resolve({
+                    symbol: 'ETH',
+                    decimals: 18,
+                  }),
+                10,
+              );
             }),
         );
       });
@@ -602,9 +625,7 @@ describe('TokenMetadataService', () => {
         });
 
         // But the client should only be called once
-        expect(
-          mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).toHaveBeenCalledTimes(1);
+        expect(mockAccountApiClient.getTokenMetadata).toHaveBeenCalledTimes(1);
       });
 
       it('should cache metadata after concurrent requests resolve', async () => {
@@ -615,7 +636,7 @@ describe('TokenMetadataService', () => {
         ]);
 
         // Reset the mock
-        mockAccountApiClient.getTokenBalanceAndMetadata.mockClear();
+        mockAccountApiClient.getTokenMetadata.mockClear();
 
         // Third call should use cache
         const result = await tokenMetadataService.getTokenMetadata(baseOptions);
@@ -625,9 +646,7 @@ describe('TokenMetadataService', () => {
           decimals: 18,
         });
         // Should not call the client again
-        expect(
-          mockAccountApiClient.getTokenBalanceAndMetadata,
-        ).not.toHaveBeenCalled();
+        expect(mockAccountApiClient.getTokenMetadata).not.toHaveBeenCalled();
       });
     });
   });
