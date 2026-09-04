@@ -9,21 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.5.0]
 
-### Uncategorized
-
-- feat: restrict permission grant to accounts not supporting EIP-7702 ([#414](https://github.com/MetaMask/snap-7715-permissions/pull/414))
-- chore(deps-dev): bump @metamask/auto-changelog from 6.1.1 to 6.2.0 ([#411](https://github.com/MetaMask/snap-7715-permissions/pull/411))
-- chore(deps): update eslint-config packages to version 15.0.1 and bump @metamask/7715-permission-types to version 1.0.0 ([#400](https://github.com/MetaMask/snap-7715-permissions/pull/400))
-- Decouple existing permissions navigation from context ([#389](https://github.com/MetaMask/snap-7715-permissions/pull/389))
-- Start dappscanning earlier ([#380](https://github.com/MetaMask/snap-7715-permissions/pull/380))
-- Implement shared `callOnceGuard` ([#379](https://github.com/MetaMask/snap-7715-permissions/pull/379))
-- Use Advanced Permission caveat constructor functions from @metamask/7715-permission-types ([#363](https://github.com/MetaMask/snap-7715-permissions/pull/363))
-
 ### Changed
 
-- Bump @metamask/snaps-sdk from `11.1.1` to `11.2.0` ([#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
-- Bump @metamask/snaps-jest from `10.1.4` to `10.2.0` ([#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
-- Bump @metamask/profile-sync-controller from `28.2.0` to `28.3.0` ([#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
+- Restrict permission grants to accounts that do not support EIP-7702 ([#414](https://github.com/MetaMask/snap-7715-permissions/pull/414))
+- Improve permission request flow by decoupling existing permissions navigation from context and starting dapp scanning earlier ([#389](https://github.com/MetaMask/snap-7715-permissions/pull/389), [#380](https://github.com/MetaMask/snap-7715-permissions/pull/380))
+- Consolidate permission handling internals with a shared `callOnceGuard` and Advanced Permission caveat constructors ([#379](https://github.com/MetaMask/snap-7715-permissions/pull/379), [#363](https://github.com/MetaMask/snap-7715-permissions/pull/363))
+- Update dependencies, including `@metamask/snaps-sdk` to `11.2.0`, `@metamask/snaps-jest` to `10.2.0`, `@metamask/profile-sync-controller` to `28.3.0`, `@metamask/auto-changelog` to `6.2.0`, ESLint config packages to `15.0.1`, and `@metamask/7715-permission-types` to `1.0.0` ([#411](https://github.com/MetaMask/snap-7715-permissions/pull/411), [#400](https://github.com/MetaMask/snap-7715-permissions/pull/400), [#390](https://github.com/MetaMask/snap-7715-permissions/pull/390))
 
 ## [2.4.0]
 
