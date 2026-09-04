@@ -12,9 +12,15 @@ import { getChainMetadata } from './chainMetadata';
 import type { SignDelegationOptions } from './types';
 import { ensureChain } from '../utils/blockchain';
 
-export type AccountUpgradeStatus = {
-  isUpgraded: boolean;
-};
+export type AccountUpgradeStatus =
+  | {
+      isResolved: true;
+      isSupported: boolean;
+      isUpgraded: boolean;
+    }
+  | {
+      isResolved: false;
+    };
 
 export type AccountUpgradeResult = {
   transactionHash: string;
@@ -187,7 +193,11 @@ export class AccountController {
       const result = (await this.#ethereumProvider.request({
         method: 'wallet_getAccountUpgradeStatus',
         params,
-      })) as { isUpgraded: boolean; upgradedAddress: Hex | null };
+      })) as {
+        isSupported?: boolean;
+        isUpgraded: boolean;
+        upgradedAddress: Hex | null;
+      };
 
       logger.debug('Account upgrade status result', result);
 
@@ -196,6 +206,10 @@ export class AccountController {
       } = getChainMetadata({ chainId: hexToNumber(params.chainId) });
 
       return {
+        isResolved: true,
+        // Only an explicit `false` means unsupported; wallets that omit the
+        // field are treated as supported so the request is not blocked.
+        isSupported: result.isSupported !== false,
         isUpgraded:
           result.isUpgraded &&
           result.upgradedAddress?.toLowerCase() ===

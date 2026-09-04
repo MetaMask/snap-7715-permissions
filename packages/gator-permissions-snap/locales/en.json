@@ -172,6 +172,9 @@
     "accountUpgradeWarning": {
       "message": "This account will be upgraded to a smart account to complete this permission."
     },
+    "accountNotSupportingEip7702": {
+      "message": "This account does not support EIP-7702 and cannot grant permissions."
+    },
     "removeFieldAlt": {
       "message": "Remove $1"
     },

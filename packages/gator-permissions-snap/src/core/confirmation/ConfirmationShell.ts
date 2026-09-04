@@ -124,7 +124,7 @@ export class ConfirmationShell<
 
   #tokenBalanceFiat: string | null = null;
 
-  #accountUpgradeStatus: AccountUpgradeStatus = { isUpgraded: true };
+  #accountUpgradeStatus: AccountUpgradeStatus = { isResolved: false };
 
   readonly #callOnceGuard = createCallOnceGuard(
     'ConfirmationShell.bindSessionEvents()',
@@ -219,9 +219,17 @@ export class ConfirmationShell<
       tokenBalanceFiat: this.#tokenBalanceFiat,
       chainId,
       explorerUrl,
-      isAccountUpgraded: this.#accountUpgradeStatus.isUpgraded,
+      showAccountUnsupported:
+        this.#accountUpgradeStatus.isResolved &&
+        !this.#accountUpgradeStatus.isSupported,
+      showAccountUpgradeWarning:
+        this.#accountUpgradeStatus.isResolved &&
+        !this.#accountUpgradeStatus.isUpgraded,
       existingPermissionsStatus,
-      isGrantDisabled,
+      isGrantDisabled:
+        isGrantDisabled ||
+        !this.#accountUpgradeStatus.isResolved ||
+        !this.#accountUpgradeStatus.isSupported,
       showTokenBalance: this.#showTokenBalance,
     });
   }
@@ -315,6 +323,19 @@ export class ConfirmationShell<
         this.#accountUpgradeStatus = status;
         await rerender();
       },
+      onError: async (_error, isCancelled) => {
+        if (isCancelled()) {
+          return;
+        }
+        // Older wallets may not support this method, so status lookup errors
+        // must remain fail-open.
+        this.#accountUpgradeStatus = {
+          isResolved: true,
+          isSupported: true,
+          isUpgraded: true,
+        };
+        await rerender();
+      },
     });
 
     const shouldFetchTokenBalance =
@@ -360,7 +381,7 @@ export class ConfirmationShell<
 
         this.#tokenBalance = null;
         this.#tokenBalanceFiat = null;
-        this.#accountUpgradeStatus = { isUpgraded: true }; // Reset to default while fetching
+        this.#accountUpgradeStatus = { isResolved: false };
 
         // we explicitly don't await this as it's a background process that will re-render the UI once it is complete
         const shouldFetchTokenBalanceForAccount =

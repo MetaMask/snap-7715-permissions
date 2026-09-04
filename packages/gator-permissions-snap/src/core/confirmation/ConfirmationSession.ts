@@ -3,6 +3,7 @@ import type {
   PermissionRequest,
 } from '@metamask/7715-permissions-shared/types';
 import { logger } from '@metamask/7715-permissions-shared/utils';
+import { InvalidRequestError } from '@metamask/snaps-sdk';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { numberToHex, parseCaipAccountId } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
@@ -13,7 +14,10 @@ import type {
   TrustSignalsClient,
 } from '../../clients/trustSignalsClient';
 import type { SnapsMetricsService } from '../../services/snapsMetricsService';
-import type { AccountController } from '../accountController';
+import type {
+  AccountController,
+  AccountUpgradeStatus,
+} from '../accountController';
 import { ConfirmationDialog } from '../confirmation';
 import type { ConfirmationDialogFactory } from '../confirmationFactory';
 import { ExistingPermissionsCoordinator } from '../coordinators/ExistingPermissionsCoordinator';
@@ -511,17 +515,32 @@ export class ConfirmationSession {
       const { isApproved } = await decisionPromise;
 
       if (isApproved) {
+        const { address } = parseCaipAccountId(
+          state.context.accountAddressCaip10,
+        );
+
+        // A failed lookup means "unknown", not "unsupported": it must never
+        // block the request. Only an explicit negative verdict does.
+        let accountStatus: AccountUpgradeStatus = { isResolved: false };
         try {
-          const { address } = parseCaipAccountId(
-            state.context.accountAddressCaip10,
-          );
-          const upgradeStatus =
-            await this.#accountController.getAccountUpgradeStatus({
+          accountStatus = await this.#accountController.getAccountUpgradeStatus(
+            {
               account: address,
               chainId: numberToHex(chainId),
-            });
+            },
+          );
+        } catch (error) {
+          logger.error('Failed to check account upgrade status', error);
+        }
 
-          if (!upgradeStatus.isUpgraded) {
+        if (accountStatus.isResolved && !accountStatus.isSupported) {
+          throw new InvalidRequestError(
+            'This account does not support EIP-7702 and cannot grant permissions.',
+          );
+        }
+
+        try {
+          if (accountStatus.isResolved && !accountStatus.isUpgraded) {
             let upgradeSuccess = false;
             try {
               await this.#accountController.upgradeAccount({
@@ -539,8 +558,18 @@ export class ConfirmationSession {
             }
           }
         } catch {
-          // Silently ignore errors here, we don't want to block the permission request if the account upgrade fails
-          // TODO: When we know extension has support for account upgrade, we can show an error to the user
+          await this.#snapsMetricsService.trackPermissionRejected({
+            origin,
+            permissionType,
+            chainId: normalizedRequest.chainId,
+            permissionData: normalizedRequest.permission.data,
+            justification: state.context.justification,
+          });
+
+          return {
+            isApproved: false,
+            reason: 'Permission request denied during account upgrade',
+          };
         }
 
         return {

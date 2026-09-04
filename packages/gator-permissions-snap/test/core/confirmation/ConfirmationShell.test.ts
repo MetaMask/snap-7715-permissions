@@ -8,6 +8,7 @@ import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 import { AddressScanResultType } from '../../../src/clients/trustSignalsClient';
 import type { TokenBalanceAndMetadata } from '../../../src/clients/types';
 import type { AccountController } from '../../../src/core/accountController';
+import { ConfirmationDialog } from '../../../src/core/confirmation';
 import { ConfirmationShell } from '../../../src/core/confirmation/ConfirmationShell';
 import { ExistingPermissionsState } from '../../../src/core/existingpermissions/existingPermissionsState';
 import { METAMASK_FACILITATOR_ADDRESSES } from '../../../src/core/facilitatorAddresses';
@@ -135,6 +136,8 @@ const setupTest = (options?: { rules?: RuleDefinition<any, any>[] }) => {
   } as unknown as jest.Mocked<AccountController>;
 
   accountController.getAccountUpgradeStatus.mockResolvedValue({
+    isResolved: true,
+    isSupported: true,
     isUpgraded: false,
   });
 
@@ -316,7 +319,215 @@ describe('ConfirmationShell', () => {
     });
   });
 
+  it('renders an error and disables grant for an account that does not support EIP-7702', async () => {
+    const {
+      confirmationShell,
+      rules,
+      updateContext,
+      onExistingPermissionsViewChange,
+      accountController,
+    } = setupTest();
+    accountController.getAccountUpgradeStatus.mockResolvedValue({
+      isResolved: true,
+      isSupported: false,
+      isUpgraded: false,
+    });
+
+    confirmationShell.bindSessionEvents({
+      interfaceId: mockInterfaceId,
+      initialContext: mockContext,
+      rules,
+      updateContext,
+      onExistingPermissionsViewChange,
+    });
+
+    const result = await confirmationShell.createConfirmationContent({
+      context: mockContext,
+      metadata: mockMetadata,
+      origin: mockOrigin,
+      chainId: 1,
+      scanDappUrlResult: null,
+      scanAddressResult: null,
+      existingPermissionsStatus: ExistingPermissionsState.None,
+      isGrantDisabled: false,
+    });
+
+    const flatten = (element: SnapElement): SnapElement[] => {
+      const { props } = element;
+      const children = Array.isArray(props.children)
+        ? props.children
+        : [props.children];
+      return [
+        element,
+        ...children.flatMap((child) =>
+          child && typeof child === 'object' && 'type' in child
+            ? flatten(child as SnapElement)
+            : [],
+        ),
+      ];
+    };
+
+    const flattened = flatten(result);
+
+    const errorText = flattened.find(
+      (element) =>
+        element.type === 'Text' &&
+        element.props.children ===
+          'This account does not support EIP-7702 and cannot grant permissions.',
+    );
+    expect(errorText).toBeDefined();
+    expect(errorText?.props).toMatchObject({ color: 'error', size: 'sm' });
+
+    const grantButton = flattened.find(
+      (element) =>
+        element.type === 'Button' &&
+        element.props.name === ConfirmationDialog.grantButton,
+    );
+    expect(grantButton).toBeDefined();
+    expect(grantButton?.props.disabled).toBe(true);
+
+    const accountSelector = flattened.find(
+      (element) => element.type === 'AccountSelector',
+    );
+    expect(accountSelector).toBeDefined();
+  });
+
   describe('bindSessionEvents', () => {
+    it('disables grant while the selected account upgrade status is loading', async () => {
+      const {
+        confirmationShell,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+        getBoundEvent,
+        accountController,
+      } = setupTest();
+      accountController.getAccountUpgradeStatus.mockImplementation(
+        async () => new Promise(() => undefined),
+      );
+
+      confirmationShell.bindSessionEvents({
+        interfaceId: mockInterfaceId,
+        initialContext: mockContext,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+      });
+
+      const accountSelected = getBoundEvent({
+        elementName: 'account-selector',
+        eventType: 'InputChangeEvent',
+        interfaceId: mockInterfaceId,
+      });
+      await accountSelected?.({
+        event: { value: { addresses: [`eip155:1:${mockAddress2}`] } },
+      } as never);
+
+      const result = await confirmationShell.createConfirmationContent({
+        context: {
+          ...mockContext,
+          accountAddressCaip10: `eip155:1:${mockAddress2}`,
+        },
+        metadata: mockMetadata,
+        origin: mockOrigin,
+        chainId: 1,
+        scanDappUrlResult: null,
+        scanAddressResult: null,
+        existingPermissionsStatus: ExistingPermissionsState.None,
+        isGrantDisabled: false,
+      });
+      const flatten = (element: SnapElement): SnapElement[] => {
+        const children = Array.isArray(element.props.children)
+          ? element.props.children
+          : [element.props.children];
+        return [
+          element,
+          ...children.flatMap((child) =>
+            child && typeof child === 'object' && 'type' in child
+              ? flatten(child as SnapElement)
+              : [],
+          ),
+        ];
+      };
+
+      const grantButton = flatten(result).find(
+        (element) =>
+          element.type === 'Button' &&
+          element.props.name === ConfirmationDialog.grantButton,
+      );
+      expect(grantButton?.props.disabled).toBe(true);
+    });
+
+    it('re-enables grant when the selected account upgrade status lookup fails', async () => {
+      const {
+        confirmationShell,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+        getBoundEvent,
+        accountController,
+      } = setupTest();
+      accountController.getAccountUpgradeStatus
+        .mockResolvedValueOnce({
+          isResolved: true,
+          isSupported: true,
+          isUpgraded: true,
+        })
+        .mockRejectedValueOnce(new Error('lookup failed'));
+
+      confirmationShell.bindSessionEvents({
+        interfaceId: mockInterfaceId,
+        initialContext: mockContext,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+      });
+
+      const accountSelected = getBoundEvent({
+        elementName: 'account-selector',
+        eventType: 'InputChangeEvent',
+        interfaceId: mockInterfaceId,
+      });
+      await accountSelected?.({
+        event: { value: { addresses: [`eip155:1:${mockAddress2}`] } },
+      } as never);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const result = await confirmationShell.createConfirmationContent({
+        context: {
+          ...mockContext,
+          accountAddressCaip10: `eip155:1:${mockAddress2}`,
+        },
+        metadata: mockMetadata,
+        origin: mockOrigin,
+        chainId: 1,
+        scanDappUrlResult: null,
+        scanAddressResult: null,
+        existingPermissionsStatus: ExistingPermissionsState.None,
+        isGrantDisabled: false,
+      });
+      const flatten = (element: SnapElement): SnapElement[] => {
+        const children = Array.isArray(element.props.children)
+          ? element.props.children
+          : [element.props.children];
+        return [
+          element,
+          ...children.flatMap((child) =>
+            child && typeof child === 'object' && 'type' in child
+              ? flatten(child as SnapElement)
+              : [],
+          ),
+        ];
+      };
+      const grantButton = flatten(result).find(
+        (element) =>
+          element.type === 'Button' &&
+          element.props.name === ConfirmationDialog.grantButton,
+      );
+
+      expect(grantButton?.props.disabled).toBe(false);
+    });
+
     it('registers event handlers for account selection and justification toggle', async () => {
       const rule: RuleDefinition<TestContextType, TestMetadataType> = {
         name: 'amountPerSecond',
