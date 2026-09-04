@@ -2860,6 +2860,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/7715-permission-types@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/7715-permission-types@npm:2.0.0"
+  dependencies:
+    "@metamask/delegation-core": "npm:^3.0.0"
+    "@metamask/utils": "npm:^11.4.0"
+  checksum: 10/f584c25cdd233f1bb7804bb83dafbc44733e5f149e1f43f8765a3990af3c46bc2708cbb195117c932aba29a3755614bcb3536a6384571abc296a7498ed7ceb75
+  languageName: node
+  linkType: hard
+
 "@metamask/7715-permissions-shared@workspace:*, @metamask/7715-permissions-shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "@metamask/7715-permissions-shared@workspace:packages/shared"
@@ -3139,10 +3149,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/delegation-abis@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@metamask/delegation-abis@npm:1.1.0"
-  checksum: 10/fd5cd9cbfbbf725405d2f53de682ab0042959d53486a9b6da32689a8f4f7f0ec1e61bfdc73bbb708055968dd7f71f18ff94cfdcd1c6a8a723bc0a112f6b35f83
+"@metamask/delegation-abis@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/delegation-abis@npm:2.0.0"
+  checksum: 10/7ee1655431b01c36cab3dec1d40b47a44b8d2a4e398b12ce0909008ea58c2da847de371ed5ce5c05bb3ac536ed4dbafc8fb4b46a9220820c39c497e6e18eef99
   languageName: node
   linkType: hard
 
@@ -3157,10 +3167,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/delegation-core@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@metamask/delegation-core@npm:3.0.0"
+  dependencies:
+    "@metamask/abi-utils": "npm:^3.0.0"
+    "@metamask/utils": "npm:^11.4.0"
+    "@noble/hashes": "npm:^1.8.0"
+  checksum: 10/dec0da73fce7b1702f30cd6d0c17f315b70f84bc81d09215f5c3ad0478d1e2ec22ea1e70a1c0ae155d5089060ce916f4e9a5974611043b4ac1464dc1ab7959c7
+  languageName: node
+  linkType: hard
+
 "@metamask/delegation-deployments@npm:^1.4.0":
   version: 1.4.0
   resolution: "@metamask/delegation-deployments@npm:1.4.0"
   checksum: 10/e5e7b83e27daec5b1b61482647d43d4b685954818ff02687e2dbe8169a4dfe199cc8d2ed444242b60425ac2e7d2cf2a5ca29f3e69936abe6a8391f578ec693bb
+  languageName: node
+  linkType: hard
+
+"@metamask/delegation-deployments@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/delegation-deployments@npm:2.0.0"
+  checksum: 10/7f2712ab5e48551880f2ce49d6bd6434b7587772b5053504b1186ae1a894313e9a30ef7ba94cceb7ee80a91c31764ca1a92aec9d8a30de925524a6314f163a7d
   languageName: node
   linkType: hard
 
@@ -3663,20 +3691,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/smart-accounts-kit@npm:^1.7.0":
-  version: 1.7.0
-  resolution: "@metamask/smart-accounts-kit@npm:1.7.0"
+"@metamask/smart-accounts-kit@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@metamask/smart-accounts-kit@npm:2.0.0"
   dependencies:
-    "@metamask/7715-permission-types": "npm:^1.0.0"
-    "@metamask/delegation-abis": "npm:^1.1.0"
-    "@metamask/delegation-core": "npm:^2.2.1"
-    "@metamask/delegation-deployments": "npm:^1.4.0"
+    "@metamask/7715-permission-types": "npm:^2.0.0"
+    "@metamask/delegation-abis": "npm:^2.0.0"
+    "@metamask/delegation-core": "npm:^3.0.0"
+    "@metamask/delegation-deployments": "npm:^2.0.0"
     "@metamask/utils": "npm:^11.4.0"
     openapi-fetch: "npm:^0.13.5"
     ox: "npm:0.8.1"
   peerDependencies:
     viem: ^2.31.4
-  checksum: 10/4258c02743d57f13b0962e4a07acd7ae6d73fd68b1694dc80becdc4f9d73557ed725754dbbfba4b75aeb394fccf97fd1f528a457e8713abea3161e2b93689e49
+  checksum: 10/5de4a888f70d2bef1154da4ed835ba5e5fda686f36d3782678e8eece3d9322885e641fc7bdde138b802a036cd1776c059a7e9c16676b2f79f9be85002eb074bf
   languageName: node
   linkType: hard
 
@@ -13858,7 +13886,7 @@ __metadata:
     "@metamask/eslint-config-nodejs": "npm:15.0.1"
     "@metamask/eslint-config-typescript": "npm:15.0.1"
     "@metamask/providers": "npm:22.1.1"
-    "@metamask/smart-accounts-kit": "npm:^1.7.0"
+    "@metamask/smart-accounts-kit": "npm:^2.0.0"
     "@metamask/utils": "npm:11.11.0"
     "@types/jest": "npm:27.5.2"
     "@types/react": "npm:19.2.3"
