@@ -92,7 +92,7 @@ export type SpotPricesRes = Record<
  * Represents token balance and metadata information
  */
 export type TokenBalanceAndMetadata = {
-  balance: bigint;
+  balance: bigint | undefined;
   decimals: number;
   symbol: string;
   iconUrl?: string;
