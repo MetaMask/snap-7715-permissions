@@ -260,7 +260,7 @@ export class ConfirmationShell<
 
     const fetchAccountBalance = createCancellableOperation<
       TContext,
-      { balance: bigint; decimals: number; ctx: TContext }
+      { balance: bigint | undefined; decimals: number; ctx: TContext }
     >({
       operation: async (ctx) => {
         const { address } = parseCaipAccountId(ctx.accountAddressCaip10);
@@ -283,6 +283,10 @@ export class ConfirmationShell<
         return { balance, decimals, ctx };
       },
       onSuccess: async ({ balance, decimals, ctx }, isCancelled) => {
+        if (balance === undefined) {
+          return;
+        }
+
         this.#tokenBalance = formatUnits({ value: balance, decimals });
         await rerender();
 

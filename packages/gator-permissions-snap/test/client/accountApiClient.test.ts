@@ -1,3 +1,5 @@
+import type { Hex } from '@metamask/delegation-core';
+
 import { AccountApiClient } from '../../src/clients/accountApiClient';
 
 const mockApiBaseUrl = 'https://mock-account-api.com';
@@ -271,6 +273,46 @@ describe('AccountApiClient', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
     });
+    it('omits the balance when the balance request fails, so that metadata still resolves', async () => {
+      // Balance API fails
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        headers: {
+          get: jest.fn().mockReturnValue('1024'),
+        },
+      });
+
+      // Metadata API succeeds
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          chainId: mockChainId,
+          decimals: 18,
+          address: '0x0000000000000000000000000000000000000000',
+          iconUrl:
+            'https://static.cx.metamask.io/api/v1/tokenIcons/1/0x0000000000000000000000000000000000000000.png',
+          name: 'Ethereum',
+          symbol: 'ETH',
+        }),
+        headers: {
+          get: jest.fn().mockReturnValue('1024'),
+        },
+      });
+
+      const result = await client.getTokenBalanceAndMetadata({
+        chainId: mockChainId,
+        account: mockAccount,
+      });
+
+      expect(result).toStrictEqual({
+        balance: undefined,
+        decimals: 18,
+        symbol: 'ETH',
+        iconUrl:
+          'https://static.cx.metamask.io/api/v1/tokenIcons/1/0x0000000000000000000000000000000000000000.png',
+      });
+    });
 
     it('fetches ERC20 token balance and metadata successfully', async () => {
       // Mock balance API response
@@ -508,11 +550,11 @@ describe('AccountApiClient', () => {
           chainId: 0,
           account: mockAccount,
         }),
-      ).rejects.toThrow('No chainId provided to fetch token balance');
+      ).rejects.toThrow('No chainId provided to fetch token metadata');
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    it('throws if account is not provided', async () => {
+    it('omits the balance if account is not provided', async () => {
       // Mock the metadata API call (getTokenMetadata doesn't validate account)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -528,12 +570,16 @@ describe('AccountApiClient', () => {
         },
       });
 
-      await expect(
-        client.getTokenBalanceAndMetadata({
-          chainId: mockChainId,
-          account: '' as any,
-        }),
-      ).rejects.toThrow('No account address provided to fetch token balance');
+      const result = await client.getTokenBalanceAndMetadata({
+        chainId: mockChainId,
+        account: '' as Hex,
+      });
+
+      expect(result).toStrictEqual({
+        balance: undefined,
+        decimals: 18,
+        symbol: 'ETH',
+      });
       expect(mockFetch).toHaveBeenCalledTimes(1); // Only metadata API call (balance API throws before making call)
     });
 
@@ -757,13 +803,16 @@ describe('AccountApiClient', () => {
       });
 
       it('does not retry on ResourceNotFoundError (404 status)', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 404,
-          headers: {
-            get: jest.fn().mockReturnValue(null),
-          },
-        } as any);
+        // Both the balance and metadata calls fail
+        for (let i = 0; i < 2; i++) {
+          mockFetch.mockResolvedValueOnce({
+            ok: false,
+            status: 404,
+            headers: {
+              get: jest.fn().mockReturnValue(null),
+            },
+          } as unknown as Response);
+        }
 
         await expect(
           client.getTokenBalanceAndMetadata({
@@ -776,27 +825,32 @@ describe('AccountApiClient', () => {
       });
 
       it('does not retry on other non-5xx errors', async () => {
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 400,
-          headers: {
-            get: jest.fn().mockReturnValue(null),
-          },
-        } as any);
+        // Both the balance and metadata calls fail
+        for (let i = 0; i < 2; i++) {
+          mockFetch.mockResolvedValueOnce({
+            ok: false,
+            status: 400,
+            headers: {
+              get: jest.fn().mockReturnValue(null),
+            },
+          } as unknown as Response);
+        }
 
         await expect(
           client.getTokenBalanceAndMetadata({
             chainId: mockChainId,
             account: mockAccount,
           }),
-        ).rejects.toThrow('Client error: 400');
+        ).rejects.toThrow(
+          'Failed to fetch token balance and metadata: Token address is invalid',
+        );
 
         expect(mockFetch).toHaveBeenCalledTimes(2); // 1 balance call + 1 metadata call
       });
 
       it('retries up to the specified number of attempts', async () => {
-        // All calls fail with 503 status - provide 7 mock responses (4 for balance API + 3 for metadata API)
-        for (let i = 0; i < 7; i++) {
+        // All calls fail with 503 status - provide 8 mock responses (4 for balance API + 4 for metadata API)
+        for (let i = 0; i < 8; i++) {
           mockFetch.mockResolvedValueOnce({
             ok: false,
             status: 503,
@@ -818,7 +872,7 @@ describe('AccountApiClient', () => {
           }),
         ).rejects.toThrow('Server error: 503');
 
-        expect(mockFetch).toHaveBeenCalledTimes(7); // 4 balance calls + 3 metadata calls (one API fails before making all retries)
+        expect(mockFetch).toHaveBeenCalledTimes(8); // 4 balance calls + 4 metadata calls
       });
 
       it('uses default retry options when none provided', async () => {
