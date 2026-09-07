@@ -267,12 +267,21 @@ export class AccountApiClient {
     assetAddress?: Hex | undefined;
     retryOptions?: RetryOptions;
   }): Promise<TokenBalanceAndMetadata> {
-    // Fetch balance and metadata in parallel for better performance
+    // Fetch balance and metadata in parallel for better performance.
+    // A failed balance lookup is omitted so that metadata (including the icon
+    // url) still resolves, rather than forcing a fallback to the blockchain
+    // client which cannot provide an icon.
     const balancePromise = this.getTokenBalance({
       chainId,
       assetAddress,
       account,
       retryOptions,
+    }).catch((error) => {
+      logger.info(
+        `AccountApiClient - failed to fetch token balance on chain ${chainId}`,
+        error,
+      );
+      return undefined;
     });
 
     const metadataPromise = this.getTokenMetadata({
