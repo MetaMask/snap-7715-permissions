@@ -124,6 +124,8 @@ export class ConfirmationShell<
 
   #tokenBalanceFiat: string | null = null;
 
+  #tokenBalanceUnavailable = false;
+
   #accountUpgradeStatus: AccountUpgradeStatus = { isResolved: false };
 
   readonly #callOnceGuard = createCallOnceGuard(
@@ -217,6 +219,7 @@ export class ConfirmationShell<
       context,
       tokenBalance: this.#tokenBalance,
       tokenBalanceFiat: this.#tokenBalanceFiat,
+      tokenBalanceUnavailable: this.#tokenBalanceUnavailable,
       chainId,
       explorerUrl,
       showAccountUnsupported:
@@ -260,7 +263,7 @@ export class ConfirmationShell<
 
     const fetchAccountBalance = createCancellableOperation<
       TContext,
-      { balance: bigint; decimals: number; ctx: TContext }
+      { balance: bigint | undefined; decimals: number; ctx: TContext }
     >({
       operation: async (ctx) => {
         const { address } = parseCaipAccountId(ctx.accountAddressCaip10);
@@ -283,6 +286,13 @@ export class ConfirmationShell<
         return { balance, decimals, ctx };
       },
       onSuccess: async ({ balance, decimals, ctx }, isCancelled) => {
+        if (balance === undefined) {
+          this.#tokenBalanceUnavailable = true;
+          await rerender();
+          return;
+        }
+
+        this.#tokenBalanceUnavailable = false;
         this.#tokenBalance = formatUnits({ value: balance, decimals });
         await rerender();
 
@@ -300,6 +310,14 @@ export class ConfirmationShell<
         }
 
         this.#tokenBalanceFiat = fiatBalance;
+        await rerender();
+      },
+      onError: async (_error, isCancelled) => {
+        if (isCancelled()) {
+          return;
+        }
+
+        this.#tokenBalanceUnavailable = true;
         await rerender();
       },
     });
@@ -381,6 +399,7 @@ export class ConfirmationShell<
 
         this.#tokenBalance = null;
         this.#tokenBalanceFiat = null;
+        this.#tokenBalanceUnavailable = false;
         this.#accountUpgradeStatus = { isResolved: false };
 
         // we explicitly don't await this as it's a background process that will re-render the UI once it is complete

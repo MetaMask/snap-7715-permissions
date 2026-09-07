@@ -2,7 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import type { PermissionRequest } from '@metamask/7715-permissions-shared/types';
 import { NO_ASSET_ADDRESS } from '@metamask/7715-permissions-shared/types';
 import { InternalError, UserInputEventType } from '@metamask/snaps-sdk';
-import { Text } from '@metamask/snaps-sdk/jsx';
+import { Text as SnapText } from '@metamask/snaps-sdk/jsx';
 import type { SnapElement } from '@metamask/snaps-sdk/jsx';
 
 import { AddressScanResultType } from '../../../src/clients/trustSignalsClient';
@@ -69,7 +69,7 @@ const mockTokenBalanceAndMetadata: TokenBalanceAndMetadata = {
 };
 const mockMetadata: TestMetadataType = {};
 
-const mockBodyContent = Text({
+const mockBodyContent = SnapText({
   children: 'Permission body',
 }) as unknown as SnapElement;
 
@@ -3896,6 +3896,51 @@ describe('ConfirmationShell', () => {
   "type": "Container",
 }
 `);
+    });
+
+    it('hides balance fields when the balance is unavailable', async () => {
+      const {
+        confirmationShell,
+        rules,
+        tokenMetadataService,
+        updateContext,
+        onExistingPermissionsViewChange,
+      } = setupTest();
+
+      const unavailableBalance = {
+        ...mockTokenBalanceAndMetadata,
+        balance: undefined,
+      };
+      const balancePromise = Promise.resolve(unavailableBalance);
+      tokenMetadataService.getTokenBalanceAndMetadata.mockReturnValue(
+        balancePromise,
+      );
+
+      confirmationShell.bindSessionEvents({
+        interfaceId: mockInterfaceId,
+        initialContext: mockContext,
+        rules,
+        updateContext,
+        onExistingPermissionsViewChange,
+      });
+
+      await balancePromise;
+
+      const confirmationContent =
+        await confirmationShell.createConfirmationContent({
+          context: mockContext,
+          metadata: mockMetadata,
+          origin: mockOrigin,
+          chainId: 1,
+          scanDappUrlResult: null,
+          scanAddressResult: null,
+          existingPermissionsStatus: ExistingPermissionsState.None,
+          isGrantDisabled: false,
+        });
+
+      expect(JSON.stringify(confirmationContent)).not.toContain(
+        '"type":"Skeleton"',
+      );
     });
 
     it('cancels the balance loading when the account is changed', async () => {

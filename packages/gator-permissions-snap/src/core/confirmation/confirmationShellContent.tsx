@@ -4,7 +4,7 @@ import {
   Box,
   Heading,
   Section,
-  Text,
+  Text as SnapText,
   Skeleton,
   AccountSelector,
   Banner,
@@ -63,6 +63,8 @@ export type ConfirmationShellContentProps = {
   context: BaseContext;
   tokenBalance: string | null;
   tokenBalanceFiat: string | null;
+  /** Whether balance retrieval completed without a usable balance. */
+  tokenBalanceUnavailable: boolean;
   chainId: number;
   explorerUrl: string | undefined;
   showAccountUnsupported: boolean;
@@ -92,6 +94,7 @@ export type ConfirmationShellContentProps = {
  * @param options.context - The context of the permission.
  * @param options.tokenBalance - The formatted balance of the token.
  * @param options.tokenBalanceFiat - The formatted fiat balance of the token.
+ * @param options.tokenBalanceUnavailable - Whether balance retrieval completed without a usable balance.
  * @param options.chainId - The chain ID of the network.
  * @param options.explorerUrl - The URL of the block explorer for the token.
  * @param options.showAccountUnsupported - Whether to show the unsupported account message.
@@ -117,6 +120,7 @@ export const ConfirmationShellContent = ({
   context,
   tokenBalance,
   tokenBalanceFiat,
+  tokenBalanceUnavailable,
   chainId,
   explorerUrl,
   showAccountUnsupported,
@@ -130,7 +134,7 @@ export const ConfirmationShellContent = ({
   });
 
   const fiatBalanceComponent = tokenBalanceFiat ? (
-    <Text>{tokenBalanceFiat}</Text>
+    <SnapText>{tokenBalanceFiat}</SnapText>
   ) : (
     <Skeleton />
   );
@@ -228,15 +232,15 @@ export const ConfirmationShellContent = ({
   let accountStatusField: SnapElement | null = null;
   if (showAccountUnsupported) {
     accountStatusField = (
-      <Text size="sm" color="error">
+      <SnapText size="sm" color="error">
         {t('accountNotSupportingEip7702')}
-      </Text>
+      </SnapText>
     );
   } else if (showAccountUpgradeWarning) {
     accountStatusField = (
-      <Text size="sm" color="warning">
+      <SnapText size="sm" color="warning">
         {t('accountUpgradeWarning')}
-      </Text>
+      </SnapText>
     );
   }
 
@@ -246,13 +250,13 @@ export const ConfirmationShellContent = ({
         <Box direction="vertical">
           <Box center={true}>
             <Heading size="lg">{t(permissionTitle)}</Heading>
-            <Text>{t(permissionSubtitle)}</Text>
+            <SnapText>{t(permissionSubtitle)}</SnapText>
           </Box>
           <Section>
             <Box direction="vertical">
               <Box direction="horizontal" alignment="space-between">
                 <Box direction="horizontal">
-                  <Text>{t('accountLabel')}</Text>
+                  <SnapText>{t('accountLabel')}</SnapText>
                   <TooltipIcon tooltip={t('accountTooltip')} />
                 </Box>
               </Box>
@@ -263,7 +267,7 @@ export const ConfirmationShellContent = ({
                 value={context.accountAddressCaip10}
               />
               {accountStatusField}
-              {showTokenBalance && hasAsset && (
+              {showTokenBalance && hasAsset && !tokenBalanceUnavailable && (
                 <Box direction="horizontal" alignment="end">
                   {fiatBalanceComponent}
                   {tokenBalanceComponent}
@@ -274,7 +278,7 @@ export const ConfirmationShellContent = ({
           {existingPermissionsStatus ===
             ExistingPermissionsState.SimilarPermissions && (
             <Banner title={t('existingPermissionsTitle')} severity="warning">
-              <Text>{t('existingPermissionsSimilarMessage')}</Text>
+              <SnapText>{t('existingPermissionsSimilarMessage')}</SnapText>
               <Button name={SHOW_EXISTING_PERMISSIONS_BUTTON_NAME}>
                 {t('existingPermissionsLink')}
               </Button>
@@ -283,7 +287,7 @@ export const ConfirmationShellContent = ({
           {existingPermissionsStatus ===
             ExistingPermissionsState.DissimilarPermissions && (
             <Banner title={t('existingPermissionsTitle')} severity="info">
-              <Text>{t('existingPermissionsExistingMessage')}</Text>
+              <SnapText>{t('existingPermissionsExistingMessage')}</SnapText>
               <Button name={SHOW_EXISTING_PERMISSIONS_BUTTON_NAME}>
                 {t('existingPermissionsLink')}
               </Button>
@@ -292,7 +296,7 @@ export const ConfirmationShellContent = ({
           <Section>
             <Box direction="vertical" alignment="space-between">
               <Box direction="horizontal">
-                <Text>{t('justificationLabel')}</Text>
+                <SnapText>{t('justificationLabel')}</SnapText>
                 <TooltipIcon tooltip={t('justificationTooltip')} />
               </Box>
               <ShowMoreText
@@ -362,13 +366,13 @@ export const SkeletonConfirmationShellContent = ({
         <Box direction="vertical">
           <Box center={true}>
             <Heading size="lg">{t(permissionTitle)}</Heading>
-            <Text>{t(permissionSubtitle)}</Text>
+            <SnapText>{t(permissionSubtitle)}</SnapText>
           </Box>
           <Section>
             <Box direction="vertical">
               <Box direction="horizontal" alignment="space-between">
                 <Box direction="horizontal">
-                  <Text>{t('accountLabel')}</Text>
+                  <SnapText>{t('accountLabel')}</SnapText>
                   <TooltipIcon tooltip={t('accountTooltip')} />
                 </Box>
               </Box>
