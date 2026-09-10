@@ -9,43 +9,61 @@ type ERC20TokenSwapFormProps = {
   onChange: (request: ERC20TokenSwapPermissionRequest) => void;
 };
 
-/**
- * Splits a comma-separated input into trimmed, non-empty entries.
- *
- * @param value - Raw comma-separated input.
- * @returns The individual entries.
- */
-const splitList = (value: string): string[] =>
-  value
-    .split(',')
+// Splits on commas outside parentheses, so function signatures stay intact.
+const splitList = (value: string): string[] => {
+  const entries: string[] = [];
+  let depth = 0;
+  let current = '';
+
+  for (const char of value) {
+    if (char === '(') {
+      depth += 1;
+    } else if (char === ')') {
+      depth = Math.max(0, depth - 1);
+    }
+
+    if (char === ',' && depth === 0) {
+      entries.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  entries.push(current);
+
+  return entries
     .map((entry) => entry.trim())
     .filter((entry) => entry.length > 0);
+};
 
 export const ERC20TokenSwapForm = ({ onChange }: ERC20TokenSwapFormProps) => {
-  const spendDecimals = 18;
-  const receiveDecimals = 6; // e.g. USDC
+  // Aave v3 on Ethereum mainnet: withdraw aEthUSDC to USDC.
+  const spendDecimals = 6;
+  const receiveDecimals = 6;
 
   const [spendTokenAddress, setSpendTokenAddress] = useState<Hex>(
-    '0x1111111111111111111111111111111111111111',
+    '0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c',
   );
   const [maxSpendAmount, setMaxSpendAmount] = useState(
-    BigInt(toHex(parseUnits('1', spendDecimals))),
+    BigInt(toHex(parseUnits('40000', spendDecimals))),
   );
   const [receiveTokenAddress, setReceiveTokenAddress] = useState<Hex>(
-    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // Sepolia / mainnet USDC
+    '0xA0b86991c6218b36c1d19D4a2e9eB0cE3606eB48',
   );
   const [minReceiveAmount, setMinReceiveAmount] = useState(
-    BigInt(toHex(parseUnits('1', receiveDecimals))),
+    BigInt(toHex(parseUnits('39600', receiveDecimals))),
   );
   const [targets, setTargets] = useState(
-    '0x2222222222222222222222222222222222222222',
+    '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
   );
-  const [selectors, setSelectors] = useState('transfer(address,uint256)');
+  const [selectors, setSelectors] = useState(
+    'withdraw(address,uint256,address)',
+  );
   const [expiry, setExpiry] = useState<number | null>(
     Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
   );
   const [justification, setJustification] = useState(
-    'This is a request to swap tokens on your behalf',
+    'Withdraw your Aave v3 USDC position to your wallet if an exploit is detected on Aave.',
   );
   const [isAdjustmentAllowed, setIsAdjustmentAllowed] = useState(true);
   const [redeemerAddresses, setRedeemerAddresses] = useState<Hex[]>([]);

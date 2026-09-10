@@ -202,16 +202,8 @@ const Index = () => {
     }
   };
 
-  /**
-   * Sends a permission request straight to the wallet RPC method.
-   * The Smart Accounts Kit client only encodes the permission types it knows
-   * about, so types that are not yet in `@metamask/7715-permission-types`
-   * (such as `erc20-token-swap`) bypass it.
-   *
-   * @param param - The permission request parameters.
-   * @returns The raw wallet response.
-   */
-  const requestExecutionPermissionsRaw = async (
+  // The extension and the Smart Accounts Kit only handle shipped permission types.
+  const requestExecutionPermissionsViaKernelSnap = async (
     param: RequestExecutionPermissionsParameters[0],
   ) => {
     if (!provider) {
@@ -228,15 +220,21 @@ const Index = () => {
     ];
 
     return provider.request({
-      method: 'wallet_requestExecutionPermissions',
-      params: [
-        {
-          chainId: toHex(param.chainId),
-          to: param.to,
-          permission: param.permission,
-          rules,
+      method: 'wallet_invokeSnap',
+      params: {
+        snapId: kernelSnapOrigin,
+        request: {
+          method: 'wallet_requestExecutionPermissions',
+          params: [
+            {
+              chainId: toHex(param.chainId),
+              to: param.to,
+              permission: param.permission,
+              rules,
+            },
+          ],
         },
-      ],
+      },
     });
   };
 
@@ -288,7 +286,9 @@ const Index = () => {
     try {
       const response =
         type === 'erc20-token-swap'
-          ? await requestExecutionPermissionsRaw(permissionRequestParam)
+          ? await requestExecutionPermissionsViaKernelSnap(
+              permissionRequestParam,
+            )
           : await metaMaskClient.requestExecutionPermissions([
               permissionRequestParam,
             ]);
