@@ -54,6 +54,7 @@
     "@metamask/profile-sync-controller": "28.3.0",
     "@metamask/snaps-sdk": "11.2.0",
     "@metamask/utils": "11.11.0",
+    "@noble/hashes": "^1.8.0",
     "zod": "3.25.76"
   },
   "devDependencies": {

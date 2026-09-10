@@ -7,9 +7,11 @@ import { hexToNumber } from '@metamask/utils';
 import type { Hex } from '@metamask/utils';
 
 import { DEFAULT_MAX_AMOUNT } from '../../permissions/erc20TokenStream/context';
+import { formatSelectorForDisplay } from '../../permissions/erc20TokenSwap/selectors';
 import { TOKEN_APPROVAL_REVOCATION_PRIMITIVES } from '../../permissions/tokenApprovalRevocation/types';
 import type { TokenMetadataService } from '../../services/tokenMetadataService';
 import { t } from '../../utils/i18n';
+import { shortenAddress } from '../../utils/string';
 import { getClosestTimePeriod } from '../../utils/time';
 import { formatUnitsFromHex } from '../../utils/value';
 import { nameAndExplorerUrlByChainId } from '../chainMetadata';
@@ -47,6 +49,59 @@ function formatTokenAmountWithMetadata(
   });
 
   return `${formattedAmount} ${symbol}`;
+}
+
+/**
+ * Extracts display details for an ERC-20 token swap permission.
+ * Note: Token amounts (spend.maxAmount, receive.minAmount) should be pre-formatted with metadata by formatPermissionWithTokenMetadata.
+ *
+ * @param permissionData - The permission data of an erc20-token-swap permission.
+ * @returns Object of swap details with label and value for each field.
+ */
+function extractErc20TokenSwapDetails(
+  permissionData: Record<string, unknown>,
+): PermissionDetail {
+  const details: PermissionDetail = {};
+
+  const spend = permissionData.spend as { maxAmount?: unknown } | undefined;
+  const receive = permissionData.receive as { minAmount?: unknown } | undefined;
+  const via = permissionData.via as
+    | { targets?: unknown; selectors?: unknown }
+    | undefined;
+
+  if (typeof spend?.maxAmount === 'string') {
+    details.maxSpendAmount = {
+      label: t('maxSpendAmountLabel'),
+      value: spend.maxAmount,
+    };
+  }
+
+  if (typeof receive?.minAmount === 'string') {
+    details.minReceiveAmount = {
+      label: t('minReceiveAmountLabel'),
+      value: receive.minAmount,
+    };
+  }
+
+  if (Array.isArray(via?.targets) && via.targets.length > 0) {
+    details.allowedContracts = {
+      label: t('allowedContractsLabel'),
+      value: via.targets
+        .map((target) => shortenAddress(String(target)))
+        .join(', '),
+    };
+  }
+
+  if (Array.isArray(via?.selectors) && via.selectors.length > 0) {
+    details.allowedFunctions = {
+      label: t('allowedFunctionsLabel'),
+      value: via.selectors
+        .map((selector) => formatSelectorForDisplay(String(selector)))
+        .join(', '),
+    };
+  }
+
+  return details;
 }
 
 /**
@@ -105,6 +160,10 @@ function extractPermissionDetails(
           value: revokeValue,
         };
       }
+    }
+    // For ERC-20 token swap permissions
+    else if (permissionType === 'erc20-token-swap') {
+      Object.assign(details, extractErc20TokenSwapDetails(permissionData));
     }
     // For periodic-type permissions
     else if (
@@ -250,6 +309,15 @@ export async function formatPermissionWithTokenMetadata(
     return permission;
   }
 
+  if (
+    extractDescriptorName(permission.permission.type) === 'erc20-token-swap'
+  ) {
+    return formatErc20TokenSwapPermissionWithTokenMetadata(
+      permission,
+      tokenMetadataService,
+    );
+  }
+
   // Check if this permission has token amount fields that need formatting
   const hasTokenAmountFields =
     'maxAmount' in permissionData ||
@@ -328,6 +396,84 @@ export async function formatPermissionWithTokenMetadata(
   } catch (error) {
     logger.debug(
       'formatPermissionWithTokenMetadata: token metadata fetch failed, using raw permission data',
+      {
+        chainId: permission.chainId,
+        error: error instanceof Error ? error.message : error,
+      },
+    );
+    return permission;
+  }
+}
+
+/**
+ * Formats an ERC-20 token swap permission with metadata for both tokens.
+ * Replaces spend.maxAmount and receive.minAmount (Hex) with human-readable strings.
+ *
+ * @param permission - The erc20-token-swap permission response to format.
+ * @param tokenMetadataService - Service for fetching token metadata.
+ * @returns The same permission shape with display-formatted token amounts in `data`.
+ */
+async function formatErc20TokenSwapPermissionWithTokenMetadata(
+  permission: PermissionResponse,
+  tokenMetadataService: TokenMetadataService,
+): Promise<PermissionResponse> {
+  const permissionData = permission.permission.data as Record<string, unknown>;
+  const spend = permissionData.spend as
+    | { tokenAddress?: Hex; maxAmount?: Hex }
+    | undefined;
+  const receive = permissionData.receive as
+    | { tokenAddress?: Hex; minAmount?: Hex }
+    | undefined;
+
+  if (!spend?.tokenAddress || !receive?.tokenAddress) {
+    return permission;
+  }
+
+  try {
+    const chainId = hexToNumber(permission.chainId);
+    const account = permission.from as `0x${string}`;
+
+    const [spendMetadata, receiveMetadata] = await Promise.all([
+      tokenMetadataService.getTokenMetadata({
+        chainId,
+        account,
+        assetAddress: spend.tokenAddress,
+      }),
+      tokenMetadataService.getTokenMetadata({
+        chainId,
+        account,
+        assetAddress: receive.tokenAddress,
+      }),
+    ]);
+
+    return {
+      ...permission,
+      permission: {
+        ...permission.permission,
+        data: {
+          ...permissionData,
+          spend: {
+            ...spend,
+            maxAmount: formatTokenAmountWithMetadata(
+              spend.maxAmount,
+              spendMetadata.decimals,
+              spendMetadata.symbol,
+            ),
+          },
+          receive: {
+            ...receive,
+            minAmount: formatTokenAmountWithMetadata(
+              receive.minAmount,
+              receiveMetadata.decimals,
+              receiveMetadata.symbol,
+            ),
+          },
+        },
+      },
+    };
+  } catch (error) {
+    logger.debug(
+      'formatErc20TokenSwapPermissionWithTokenMetadata: token metadata fetch failed, using raw permission data',
       {
         chainId: permission.chainId,
         error: error instanceof Error ? error.message : error,

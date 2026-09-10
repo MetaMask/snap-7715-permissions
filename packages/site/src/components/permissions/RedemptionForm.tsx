@@ -120,6 +120,9 @@ type PermissionResponse = {
       permit2Approve?: boolean;
       permit2Lockdown?: boolean;
       permit2InvalidateNonces?: boolean;
+      via?: {
+        targets?: Hex[];
+      };
     };
   };
   rules?: Rule[];
@@ -345,6 +348,10 @@ export const RedemptionForm = ({
     useState<TokenApprovalRevocationPrimitiveKey>('erc20Approve');
   const [tokenId, setTokenId] = useState('0');
   const [newNonce, setNewNonce] = useState('1');
+  const [swapTarget, setSwapTarget] = useState<Hex>(
+    permission.data?.via?.targets?.[0] ?? EMPTY_HEX,
+  );
+  const [swapCalldata, setSwapCalldata] = useState<Hex>(EMPTY_HEX);
 
   const enabledRevocationPrimitives = useMemo(() => {
     const primitives = TOKEN_APPROVAL_REVOCATION_PRIMITIVES.filter(
@@ -361,6 +368,7 @@ export const RedemptionForm = ({
     setSpenderAddress(delegateAddress ?? EMPTY_HEX);
     setTokenAddress(permission.data?.tokenAddress ?? EMPTY_HEX);
     setAmount(getDefaultAmount(permission));
+    setSwapTarget(permission.data?.via?.targets?.[0] ?? EMPTY_HEX);
   }, [delegateAddress, payeeAddresses, permission]);
 
   useEffect(() => {
@@ -384,10 +392,16 @@ export const RedemptionForm = ({
     permission.type === 'native-token-periodic';
   const isTokenApprovalRevocation =
     permission.type === 'token-approval-revocation';
+  const isErc20TokenSwap = permission.type === 'erc20-token-swap';
 
   let generatedCalldata: Hex = EMPTY_HEX;
   let targetAddress = tokenAddress;
-  if (isErc20Transfer) {
+  if (isErc20TokenSwap) {
+    // The swap outcome is enforced on-chain, so the redeemer supplies the raw
+    // call to one of the allow-listed contracts.
+    targetAddress = swapTarget;
+    generatedCalldata = swapCalldata;
+  } else if (isErc20Transfer) {
     generatedCalldata = encodeTransferCalldata(recipientAddress, value);
   } else if (isTokenApprovalRevocation) {
     if (revocationPrimitive === 'erc20Approve') {
@@ -484,6 +498,55 @@ export const RedemptionForm = ({
   }: React.ChangeEvent<HTMLInputElement>) => {
     setNewNonce(inputValue);
   };
+
+  const handleSwapTargetChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLSelectElement>) => {
+    setSwapTarget(inputValue as Hex);
+  };
+
+  const handleSwapCalldataChange = ({
+    target: { value: inputValue },
+  }: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setSwapCalldata(inputValue as Hex);
+  };
+
+  if (isErc20TokenSwap) {
+    const allowedTargets = permission.data?.via?.targets ?? [];
+
+    return (
+      <>
+        <div>
+          <label htmlFor="redeemSwapTarget">Target (allowed contract):</label>
+          <select
+            id="redeemSwapTarget"
+            name="redeemSwapTarget"
+            value={swapTarget}
+            onChange={handleSwapTargetChange}
+          >
+            {allowedTargets.map((target) => (
+              <option key={target} value={target}>
+                {target}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="redeemSwapCalldata">
+            Calldata (must use an allowed function and deliver the outcome):
+          </label>
+          <textarea
+            id="redeemSwapCalldata"
+            name="redeemSwapCalldata"
+            rows={3}
+            value={swapCalldata}
+            onChange={handleSwapCalldataChange}
+            placeholder="0x..."
+          />
+        </div>
+      </>
+    );
+  }
 
   if (isTokenApprovalRevocation) {
     return (

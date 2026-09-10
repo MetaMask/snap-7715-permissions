@@ -63,7 +63,7 @@ describe('PermissionRegistry', () => {
   });
 
   describe('createPermissionRegistry', () => {
-    it('registers all seven supported permission types', () => {
+    it('registers all eight supported permission types', () => {
       const registry = createPermissionRegistry();
 
       expect(registry.getSupportedTypes()).toStrictEqual([
@@ -74,6 +74,7 @@ describe('PermissionRegistry', () => {
         'erc20-token-periodic',
         'erc20-token-allowance',
         'token-approval-revocation',
+        'erc20-token-swap',
       ]);
     });
 
@@ -83,6 +84,18 @@ describe('PermissionRegistry', () => {
       for (const type of registry.getSupportedTypes()) {
         expect(registry.get(type).type).toBe(type);
       }
+    });
+
+    it('exposes flat module methods for erc20-token-swap', () => {
+      const registry = createPermissionRegistry();
+      const module = registry.get('erc20-token-swap');
+
+      expect(module.renderBody).toStrictEqual(expect.any(Function));
+      expect(module.parseAndValidate).toStrictEqual(expect.any(Function));
+      expect(module.createPermissionCaveats).toStrictEqual(
+        expect.any(Function),
+      );
+      expect(module.showTokenBalance).toBeUndefined();
     });
 
     it('exposes flat module methods for token-approval-revocation', () => {

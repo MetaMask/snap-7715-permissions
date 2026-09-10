@@ -4,6 +4,7 @@ import type { Chain } from 'viem';
 import { ERC20TokenAllowanceForm } from './ERC20TokenAllowanceForm';
 import { ERC20TokenPeriodicForm } from './ERC20TokenPeriodicForm';
 import { ERC20TokenStreamForm } from './ERC20TokenStreamForm';
+import { ERC20TokenSwapForm } from './ERC20TokenSwapForm';
 import { NativeTokenAllowanceForm } from './NativeTokenAllowanceForm';
 import { NativeTokenPeriodicForm } from './NativeTokenPeriodicForm';
 import { NativeTokenStreamForm } from './NativeTokenStreamForm';
@@ -48,6 +49,8 @@ const renderPermissionForm = (
       return <ERC20TokenAllowanceForm onChange={onFormChange} />;
     case 'token-approval-revocation':
       return <TokenApprovalRevocationForm onChange={onFormChange} />;
+    case 'erc20-token-swap':
+      return <ERC20TokenSwapForm onChange={onFormChange} />;
     default:
       return null;
   }
@@ -99,6 +102,7 @@ export const PermissionRequestPanel = ({
           <option value="token-approval-revocation">
             Token Approval Revocation
           </option>
+          <option value="erc20-token-swap">ERC20 Token Swap</option>
         </select>
       </div>
 

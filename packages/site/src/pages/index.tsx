@@ -5,7 +5,7 @@ import type {
 } from '@metamask/smart-accounts-kit/actions';
 import { useCallback, useMemo, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { createClient, http, custom, createPublicClient } from 'viem';
+import { createClient, http, custom, createPublicClient, toHex } from 'viem';
 import type { Chain, Hex } from 'viem';
 import type { UserOperationReceipt } from 'viem/account-abstraction';
 
@@ -202,6 +202,44 @@ const Index = () => {
     }
   };
 
+  /**
+   * Sends a permission request straight to the wallet RPC method.
+   * The Smart Accounts Kit client only encodes the permission types it knows
+   * about, so types that are not yet in `@metamask/7715-permission-types`
+   * (such as `erc20-token-swap`) bypass it.
+   *
+   * @param param - The permission request parameters.
+   * @returns The raw wallet response.
+   */
+  const requestExecutionPermissionsRaw = async (
+    param: RequestExecutionPermissionsParameters[0],
+  ) => {
+    if (!provider) {
+      throw new Error('Wallet provider not ready');
+    }
+
+    const rules = [
+      ...(param.expiry
+        ? [{ type: 'expiry', data: { timestamp: param.expiry } }]
+        : []),
+      ...(param.redeemer && param.redeemer.length > 0
+        ? [{ type: 'redeemer', data: { addresses: param.redeemer } }]
+        : []),
+    ];
+
+    return provider.request({
+      method: 'wallet_requestExecutionPermissions',
+      params: [
+        {
+          chainId: toHex(param.chainId),
+          to: param.to,
+          permission: param.permission,
+          rules,
+        },
+      ],
+    });
+  };
+
   const handleGrantPermissions = async () => {
     if (!delegateAccount) {
       throw new Error('Delegate account not found');
@@ -248,9 +286,12 @@ const Index = () => {
     setPermissionResponseError(null);
 
     try {
-      const response = await metaMaskClient.requestExecutionPermissions([
-        permissionRequestParam,
-      ]);
+      const response =
+        type === 'erc20-token-swap'
+          ? await requestExecutionPermissionsRaw(permissionRequestParam)
+          : await metaMaskClient.requestExecutionPermissions([
+              permissionRequestParam,
+            ]);
       setPermissionResponse(response);
     } catch (error) {
       setPermissionResponse(null);

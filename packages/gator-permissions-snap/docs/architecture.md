@@ -65,6 +65,7 @@ Each permission type includes:
 - **native-token-stream**, **native-token-periodic**, **native-token-allowance**
 - **erc20-token-stream**, **erc20-token-periodic**, **erc20-token-allowance**
 - **token-approval-revocation**
+- **erc20-token-swap**
 
 Each permission folder exports a flat `PermissionModule` and typically contains:
 
@@ -99,7 +100,8 @@ src/
     ├── erc20TokenStream/      # erc20-token-stream
     ├── erc20TokenPeriodic/    # erc20-token-periodic
     ├── erc20TokenAllowance/   # erc20-token-allowance
-    └── tokenApprovalRevocation/ # token-approval-revocation
+    ├── tokenApprovalRevocation/ # token-approval-revocation
+    └── erc20TokenSwap/        # erc20-token-swap
 ```
 
 ### Folder Descriptions

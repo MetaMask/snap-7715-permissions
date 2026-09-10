@@ -560,6 +560,10 @@ describe('RpcHandler', () => {
           proposedName: 'Token Approval Revocation',
           type: 'token-approval-revocation',
         },
+        {
+          proposedName: 'ERC20 Token Swap',
+          type: 'erc20-token-swap',
+        },
       ]);
     });
   });
@@ -903,6 +907,7 @@ describe('RpcHandler', () => {
       expect(result).toHaveProperty('erc20-token-periodic');
       expect(result).toHaveProperty('erc20-token-allowance');
       expect(result).toHaveProperty('token-approval-revocation');
+      expect(result).toHaveProperty('erc20-token-swap');
 
       // Each permission type should expose ruleTypes.
       const typedResult = result as {
@@ -936,6 +941,7 @@ describe('RpcHandler', () => {
       expect(typedResult['token-approval-revocation']?.ruleTypes).toContain(
         'expiry',
       );
+      expect(typedResult['erc20-token-swap']?.ruleTypes).toContain('expiry');
 
       for (const key of Object.keys(typedResult)) {
         expect(typedResult[key]?.ruleTypes).toContain('redeemer');
