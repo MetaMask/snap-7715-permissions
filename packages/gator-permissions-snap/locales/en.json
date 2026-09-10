@@ -220,6 +220,9 @@
     "permissionRequestSubtitleRevocation": {
       "message": "This site wants permissions to revoke your token approvals."
     },
+    "permissionRequestSubtitleErc20TokenSwap": {
+      "message": "This site wants permission to swap your tokens."
+    },
     "introAdvancedPermissionsTitle": {
       "message": "Advanced permissions keep you in control"
     },
@@ -264,6 +267,12 @@
     },
     "introTokenAllowanceDescription": {
       "message": "Token allowances let a site spend from your wallet up to a single total you set, rather than a recurring schedule like a subscription."
+    },
+    "introTokenSwapTitle": {
+      "message": "Token swap request"
+    },
+    "introTokenSwapDescription": {
+      "message": "Token swaps let a site convert up to a set amount of one token into at least a set amount of another token, delivered to your own account. The site can only call the contracts and functions listed."
     },
     "introPermissionInControlDescription": {
       "message": "You can revoke this permission at any time in advanced permissions."
@@ -348,6 +357,39 @@
     },
     "permit2InvalidateNoncesRevocationLabel": {
       "message": "Permit2 invalidate nonces"
+    },
+    "maxSpendAmountLabel": {
+      "message": "Swap up to"
+    },
+    "maxSpendAmountTooltip": {
+      "message": "The most of this token that can leave your account when the permission is used"
+    },
+    "minReceiveAmountLabel": {
+      "message": "Receive at least"
+    },
+    "minReceiveAmountTooltip": {
+      "message": "The least of this token that must arrive in your account for the swap to succeed"
+    },
+    "receiveTokenLabel": {
+      "message": "Receive token"
+    },
+    "deliveredToLabel": {
+      "message": "Delivered to"
+    },
+    "deliveredToTooltip": {
+      "message": "Swapped tokens are always delivered to the account granting this permission"
+    },
+    "allowedContractsLabel": {
+      "message": "Allowed contracts"
+    },
+    "allowedContractsTooltip": {
+      "message": "The only contracts this permission can call"
+    },
+    "allowedFunctionsLabel": {
+      "message": "Allowed functions"
+    },
+    "allowedFunctionsTooltip": {
+      "message": "The only functions this permission can call on the allowed contracts"
     }
   }
 }

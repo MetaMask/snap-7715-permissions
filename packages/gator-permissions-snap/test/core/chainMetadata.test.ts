@@ -36,6 +36,8 @@ describe('chainMetadata', () => {
         redeemerEnforcer: expect.any(String),
         allowedTargetsEnforcer: expect.any(String),
         approvalRevocationEnforcer: expect.any(String),
+        erc20BalanceChangeEnforcer: expect.any(String),
+        allowedMethodsEnforcer: expect.any(String),
       },
       name: expect.any(String),
       explorerUrl: expect.any(String),
@@ -106,6 +108,8 @@ describe('chainMetadata', () => {
           'redeemerEnforcer',
           'allowedTargetsEnforcer',
           'approvalRevocationEnforcer',
+          'erc20BalanceChangeEnforcer',
+          'allowedMethodsEnforcer',
         ];
 
         const metadata = getChainMetadata({ chainId: 11155111 }); // Sepolia

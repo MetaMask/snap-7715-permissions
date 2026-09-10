@@ -3,6 +3,7 @@ import { PermissionRegistry } from './PermissionRegistry';
 import { erc20TokenAllowancePermissionModule } from '../../permissions/erc20TokenAllowance';
 import { erc20TokenPeriodicPermissionModule } from '../../permissions/erc20TokenPeriodic';
 import { erc20TokenStreamPermissionModule } from '../../permissions/erc20TokenStream';
+import { erc20TokenSwapPermissionModule } from '../../permissions/erc20TokenSwap';
 import { nativeTokenAllowancePermissionModule } from '../../permissions/nativeTokenAllowance';
 import { nativeTokenPeriodicPermissionModule } from '../../permissions/nativeTokenPeriodic';
 import { nativeTokenStreamPermissionModule } from '../../permissions/nativeTokenStream';
@@ -16,6 +17,7 @@ const PERMISSION_MODULES = [
   erc20TokenPeriodicPermissionModule,
   erc20TokenAllowancePermissionModule,
   tokenApprovalRevocationPermissionModule,
+  erc20TokenSwapPermissionModule,
 ] as const;
 
 /**

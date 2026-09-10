@@ -104,6 +104,19 @@ const allowancePage1Content: PermissionIntroductionPageConfig = {
   ],
 };
 
+const swapPage1Content: PermissionIntroductionPageConfig = {
+  headerImageSvg: permissionRequestImage,
+  title: 'introTokenSwapTitle',
+  bulletPoints: [
+    {
+      description: 'introTokenSwapDescription',
+    },
+    {
+      description: 'introPermissionInControlDescription',
+    },
+  ],
+};
+
 /**
  * Map of permission types to their introduction configurations.
  * Note: Keys must match the permission type descriptor names (kebab-case).
@@ -118,6 +131,10 @@ export const permissionIntroductionConfigs: Record<
   },
   'erc20-token-allowance': {
     page1: allowancePage1Content,
+    page2: fixedPage2Content,
+  },
+  'erc20-token-swap': {
+    page1: swapPage1Content,
     page2: fixedPage2Content,
   },
   'token-approval-revocation': {

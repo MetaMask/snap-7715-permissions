@@ -25,6 +25,8 @@ export type DelegationContracts = {
   redeemerEnforcer: Hex;
   allowedTargetsEnforcer: Hex;
   approvalRevocationEnforcer: Hex;
+  erc20BalanceChangeEnforcer: Hex;
+  allowedMethodsEnforcer: Hex;
 };
 
 const DELEGATOR_CONTRACT_VERSION = '1.3.0';
@@ -130,6 +132,14 @@ const getContracts = (chainId: number): DelegationContracts => {
     approvalRevocationEnforcer: getDeployedContractAddress(
       deployedContracts,
       'ApprovalRevocationEnforcer',
+    ),
+    erc20BalanceChangeEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'ERC20BalanceChangeEnforcer',
+    ),
+    allowedMethodsEnforcer: getDeployedContractAddress(
+      deployedContracts,
+      'AllowedMethodsEnforcer',
     ),
   };
 };

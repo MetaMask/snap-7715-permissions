@@ -154,6 +154,53 @@ describe('groupPermissionsByFromAddress', () => {
 
     expect(grouped[fromA]?.[0]?.tokenApprovals).toBeUndefined();
   });
+
+  it('lists the swap outcome and allow-lists for erc20-token-swap permissions', () => {
+    const permission = basePermission({
+      permission: {
+        type: 'erc20-token-swap',
+        data: {
+          justification: 'exit',
+          spend: {
+            tokenAddress: '0x0000000000000000000000000000000000000001',
+            maxAmount: '40000 LP',
+          },
+          receive: {
+            tokenAddress: '0x0000000000000000000000000000000000000002',
+            minAmount: '36427.61 USDC',
+          },
+          via: {
+            targets: ['0x3333333333333333333333333333333333333333'],
+            selectors: [
+              'removeLiquiditySingleToken(address,address,uint256)',
+              '0xdeadbeef',
+            ],
+          },
+        },
+        isAdjustmentAllowed: true,
+      },
+    });
+
+    const grouped = groupPermissionsByFromAddress([permission]);
+    const details = grouped[fromA]?.[0];
+
+    expect(details?.maxSpendAmount).toStrictEqual({
+      label: 'Swap up to',
+      value: '40000 LP',
+    });
+    expect(details?.minReceiveAmount).toStrictEqual({
+      label: 'Receive at least',
+      value: '36427.61 USDC',
+    });
+    expect(details?.allowedContracts).toStrictEqual({
+      label: 'Allowed contracts',
+      value: '0x33333...33333',
+    });
+    expect(details?.allowedFunctions).toStrictEqual({
+      label: 'Allowed functions',
+      value: 'removeLiquiditySingleToken(), 0xdeadbeef',
+    });
+  });
 });
 
 describe('formatPermissionWithTokenMetadata', () => {
@@ -271,6 +318,93 @@ describe('formatPermissionWithTokenMetadata', () => {
     });
     const { maxAmount } = result.permission.data as { maxAmount: string };
     expect(maxAmount.toLowerCase().startsWith('0x')).toBe(false);
+  });
+
+  it('formats both swap amounts using each token metadata', async () => {
+    mockTokenMetadataService.getTokenMetadata.mockImplementation(
+      async ({ assetAddress }) =>
+        assetAddress === '0x0000000000000000000000000000000000000001'
+          ? { decimals: 18, symbol: 'LP' }
+          : { decimals: 6, symbol: 'USDC' },
+    );
+
+    const permission = basePermission({
+      permission: {
+        type: 'erc20-token-swap',
+        data: {
+          justification: 'exit',
+          spend: {
+            tokenAddress: '0x0000000000000000000000000000000000000001',
+            maxAmount: '0x878678326eac900000', // 2500 * 10^18
+          },
+          receive: {
+            tokenAddress: '0x0000000000000000000000000000000000000002',
+            minAmount: '0x8f0d180', // 150 * 10^6
+          },
+          via: {
+            targets: ['0x3333333333333333333333333333333333333333'],
+            selectors: ['0xdeadbeef'],
+          },
+        },
+        isAdjustmentAllowed: true,
+      },
+    });
+
+    const result = await formatPermissionWithTokenMetadata(
+      permission,
+      mockTokenMetadataService as unknown as TokenMetadataService,
+    );
+
+    expect(mockTokenMetadataService.getTokenMetadata).toHaveBeenCalledTimes(2);
+    expect(result.permission.data).toMatchObject({
+      spend: {
+        tokenAddress: '0x0000000000000000000000000000000000000001',
+        maxAmount: '2500 LP',
+      },
+      receive: {
+        tokenAddress: '0x0000000000000000000000000000000000000002',
+        minAmount: '150 USDC',
+      },
+      via: {
+        targets: ['0x3333333333333333333333333333333333333333'],
+      },
+    });
+  });
+
+  it('returns the swap permission unchanged when metadata fetch fails', async () => {
+    mockTokenMetadataService.getTokenMetadata.mockRejectedValue(
+      new Error('rpc down'),
+    );
+
+    const permission = basePermission({
+      permission: {
+        type: 'erc20-token-swap',
+        data: {
+          justification: 'exit',
+          spend: {
+            tokenAddress: '0x0000000000000000000000000000000000000001',
+            maxAmount: '0x1',
+          },
+          receive: {
+            tokenAddress: '0x0000000000000000000000000000000000000002',
+            minAmount: '0x1',
+          },
+          via: {
+            targets: ['0x3333333333333333333333333333333333333333'],
+            selectors: ['0xdeadbeef'],
+          },
+        },
+        isAdjustmentAllowed: true,
+      },
+    });
+
+    const result = await formatPermissionWithTokenMetadata(
+      permission,
+      mockTokenMetadataService as unknown as TokenMetadataService,
+    );
+
+    expect(result).toStrictEqual(permission);
+    expect(logger.debug).toHaveBeenCalled();
   });
 
   it('returns original permission when metadata fetch fails', async () => {

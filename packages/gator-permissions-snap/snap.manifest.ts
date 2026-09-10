@@ -15,7 +15,7 @@ const manifest: SnapManifest = {
     url: 'https://github.com/MetaMask/snap-7715-permissions.git',
   },
   source: {
-    shasum: 'tQRss8KLZ2+OlG2QQyH81XYBcTLsWUzYXf/Xy0cHZsk=',
+    shasum: 'TBZAb0kn4qO1r+u7rlxeEIuLJarqAB956dzRPea9Hhk=',
     location: {
       npm: {
         filePath: 'dist/bundle.js',

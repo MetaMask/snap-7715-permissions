@@ -60,6 +60,22 @@ export type TokenApprovalRevocationPermissionRequest = BasePermissionRequest & {
   permit2InvalidateNonces: boolean;
 };
 
+export type ERC20TokenSwapPermissionRequest = BasePermissionRequest & {
+  type: 'erc20-token-swap';
+  spend: {
+    tokenAddress: Hex;
+    maxAmount: Hex;
+  };
+  receive: {
+    tokenAddress: Hex;
+    minAmount: Hex;
+  };
+  via: {
+    targets: Hex[];
+    selectors: string[];
+  };
+};
+
 export type TokenApprovalRevocationPrimitive = Pick<
   TokenApprovalRevocationPermissionRequest,
   | 'erc20Approve'
@@ -95,4 +111,5 @@ export type PermissionRequest =
   | ERC20TokenPeriodicPermissionRequest
   | ERC20TokenAllowancePermissionRequest
   | TokenApprovalRevocationPermissionRequest
-  | ERC20TokenStreamPermissionRequest;
+  | ERC20TokenStreamPermissionRequest
+  | ERC20TokenSwapPermissionRequest;

@@ -5,6 +5,7 @@ export { ERC20TokenPeriodicForm } from './ERC20TokenPeriodicForm';
 export { NativeTokenAllowanceForm } from './NativeTokenAllowanceForm';
 export { ERC20TokenAllowanceForm } from './ERC20TokenAllowanceForm';
 export { TokenApprovalRevocationForm } from './TokenApprovalRevocationForm';
+export { ERC20TokenSwapForm } from './ERC20TokenSwapForm';
 export { RedemptionForm } from './RedemptionForm';
 export type { RedemptionCall } from './RedemptionForm';
 export { PermissionQueriesPanel } from './PermissionQueriesPanel';

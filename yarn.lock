@@ -3318,6 +3318,7 @@ __metadata:
     "@metamask/snaps-jest": "npm:10.2.0"
     "@metamask/snaps-sdk": "npm:11.2.0"
     "@metamask/utils": "npm:11.11.0"
+    "@noble/hashes": "npm:^1.8.0"
     "@types/react": "npm:18.2.4"
     "@types/react-dom": "npm:18.2.4"
     dotenv: "npm:17.2.0"

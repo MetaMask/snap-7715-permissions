@@ -14,6 +14,7 @@ export const SUPPORTED_RULE_TYPES = {
   'erc20-token-stream': ['expiry', 'redeemer', 'payee'],
   'erc20-token-periodic': ['expiry', 'redeemer', 'payee'],
   'token-approval-revocation': ['expiry', 'redeemer'],
+  'erc20-token-swap': ['expiry', 'redeemer'],
 } as const;
 
 /**
