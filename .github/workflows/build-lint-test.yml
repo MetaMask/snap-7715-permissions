@@ -26,7 +26,7 @@ jobs:
       child-workspace-package-names: ${{ steps.workspace-package-names.outputs.child-workspace-package-names }}
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@v1
+        uses: MetaMask/action-checkout-and-setup@392abd40aa6a0600a3c0ef4af75851662587e6ec # v1.4.0
         with:
           is-high-risk-environment: false
           cache-node-modules: ${{ matrix.node-version == '22.x' }}
@@ -46,7 +46,7 @@ jobs:
         node-version: [22.x]
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@v1
+        uses: MetaMask/action-checkout-and-setup@392abd40aa6a0600a3c0ef4af75851662587e6ec # v1.4.0
         with:
           is-high-risk-environment: false
       - run: yarn changelog:validate
@@ -68,22 +68,22 @@ jobs:
         node-version: [22.x]
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@v1
+        uses: MetaMask/action-checkout-and-setup@392abd40aa6a0600a3c0ef4af75851662587e6ec # v1.4.0
         with:
           is-high-risk-environment: false
       - run: yarn build
       - name: Cache permissions-kernel snap build
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ./packages/permissions-kernel-snap/dist
           key: permissions-kernel-${{ runner.os }}-${{ github.sha }}
       - name: Cache gator-permissions snap build
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ./packages/gator-permissions-snap/dist
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
       - name: Cache manifests
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ./packages/gator-permissions-snap/snap.manifest.json
@@ -107,7 +107,7 @@ jobs:
         node-version: [22.x]
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@v1
+        uses: MetaMask/action-checkout-and-setup@392abd40aa6a0600a3c0ef4af75851662587e6ec # v1.4.0
         with:
           is-high-risk-environment: false
       - run: yarn lint
@@ -130,21 +130,21 @@ jobs:
         node-version: [22.x]
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@v1
+        uses: MetaMask/action-checkout-and-setup@392abd40aa6a0600a3c0ef4af75851662587e6ec # v1.4.0
         with:
           is-high-risk-environment: false
       - name: Restore permissions-kernel snap build cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ./packages/permissions-kernel-snap/dist
           key: permissions-kernel-${{ runner.os }}-${{ github.sha }}
       - name: Restore gator-permissions snap build cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ./packages/gator-permissions-snap/dist
           key: gator-permissions-${{ runner.os }}-${{ github.sha }}
       - name: Restore manifests
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ./packages/gator-permissions-snap/snap.manifest.json
